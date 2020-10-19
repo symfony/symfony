@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\DependencyInjection\CacheCollectorPass as BaseCacheCollectorPass;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CacheCollectorPass::class, BaseCacheCollectorPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CacheCollectorPass::class, BaseCacheCollectorPass::class), \E_USER_DEPRECATED);
 
 /**
  * Inject a data collector to all the cache services to be able to get detailed statistics.

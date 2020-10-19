@@ -13,4 +13,9 @@ class BarTagClass
     {
         return 'bar_tab_class_with_defaultmethod';
     }
+
+    public static function getPriority(): int
+    {
+        return 0;
+    }
 }

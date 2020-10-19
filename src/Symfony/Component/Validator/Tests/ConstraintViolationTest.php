@@ -134,7 +134,7 @@ EOF;
     public function testMessageCannotBeArray()
     {
         $this->expectException(\TypeError::class);
-        $violation = new ConstraintViolation(
+        new ConstraintViolation(
             ['cannot be an array'],
             '',
             [],
@@ -147,7 +147,7 @@ EOF;
     public function testMessageObjectMustBeStringable()
     {
         $this->expectException(\TypeError::class);
-        $violation = new ConstraintViolation(
+        new ConstraintViolation(
             new CustomArrayObject(),
             '',
             [],

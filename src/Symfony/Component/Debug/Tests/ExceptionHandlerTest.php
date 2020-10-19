@@ -64,7 +64,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
         $handler->sendPhpResponse(new \RuntimeException($htmlWithXss));
         $response = ob_get_clean();
 
-        $this->assertStringContainsString(sprintf('<h1 class="break-long-words exception-message">%s</h1>', htmlspecialchars($htmlWithXss, ENT_COMPAT | ENT_SUBSTITUTE, 'UTF-8')), $response);
+        $this->assertStringContainsString(sprintf('<h1 class="break-long-words exception-message">%s</h1>', htmlspecialchars($htmlWithXss, \ENT_COMPAT | \ENT_SUBSTITUTE, 'UTF-8')), $response);
     }
 
     public function testStatusCode()
@@ -165,7 +165,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
             $this->fail('OutOfMemoryException should bypass the handler');
         });
 
-        $handler->handle(new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__));
+        $handler->handle(new OutOfMemoryException('foo', 0, \E_ERROR, __FILE__, __LINE__));
 
         $this->assertThatTheExceptionWasOutput(ob_get_clean(), OutOfMemoryException::class, 'OutOfMemoryException', 'foo');
     }

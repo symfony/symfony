@@ -102,25 +102,26 @@ class TemplateManager
     protected function templateExists($template/*, bool $triggerDeprecation = true */)
     {
         if (1 === \func_num_args()) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the "exists()" method of the Twig loader instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the "exists()" method of the Twig loader instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface) {
-            return $loader->exists($template);
-        }
 
-        try {
-            if ($loader instanceof SourceContextLoaderInterface || method_exists($loader, 'getSourceContext')) {
-                $loader->getSourceContext($template);
-            } else {
-                $loader->getSource($template);
+        if (1 === Environment::MAJOR_VERSION && !$loader instanceof ExistsLoaderInterface) {
+            try {
+                if ($loader instanceof SourceContextLoaderInterface) {
+                    $loader->getSourceContext($template);
+                } else {
+                    $loader->getSource($template);
+                }
+
+                return true;
+            } catch (LoaderError $e) {
             }
 
-            return true;
-        } catch (LoaderError $e) {
+            return false;
         }
 
-        return false;
+        return $loader->exists($template);
     }
 }

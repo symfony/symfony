@@ -200,7 +200,7 @@ class ProgressIndicator
         }, $this->format));
     }
 
-    private function determineBestFormat()
+    private function determineBestFormat(): string
     {
         switch ($this->output->getVerbosity()) {
             // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
@@ -227,12 +227,12 @@ class ProgressIndicator
         }
     }
 
-    private function getCurrentTimeInMilliseconds()
+    private function getCurrentTimeInMilliseconds(): float
     {
         return round(microtime(true) * 1000);
     }
 
-    private static function initPlaceholderFormatters()
+    private static function initPlaceholderFormatters(): array
     {
         return [
             'indicator' => function (self $indicator) {
@@ -250,7 +250,7 @@ class ProgressIndicator
         ];
     }
 
-    private static function initFormats()
+    private static function initFormats(): array
     {
         return [
             'normal' => ' %indicator% %message%',

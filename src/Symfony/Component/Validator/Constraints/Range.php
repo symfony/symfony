@@ -46,26 +46,46 @@ class Range extends Constraint
     public $max;
     public $maxPropertyPath;
 
+    // BC layer, to be removed in 5.0
+    /**
+     * @internal
+     */
+    public $deprecatedMinMessageSet = false;
+
+    /**
+     * @internal
+     */
+    public $deprecatedMaxMessageSet = false;
+
     public function __construct($options = null)
     {
         if (\is_array($options)) {
             if (isset($options['min']) && isset($options['minPropertyPath'])) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', \get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "min" or "minPropertyPath" options to be set, not both.', static::class));
             }
 
             if (isset($options['max']) && isset($options['maxPropertyPath'])) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', \get_class($this)));
+                throw new ConstraintDefinitionException(sprintf('The "%s" constraint requires only one of the "max" or "maxPropertyPath" options to be set, not both.', static::class));
             }
 
             if ((isset($options['minPropertyPath']) || isset($options['maxPropertyPath'])) && !class_exists(PropertyAccess::class)) {
-                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', \get_class($this)));
+                throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
+            }
+
+            if (isset($options['min']) && isset($options['max'])) {
+                $this->deprecatedMinMessageSet = isset($options['minMessage']);
+                $this->deprecatedMaxMessageSet = isset($options['maxMessage']);
+
+                if ($this->deprecatedMinMessageSet || $this->deprecatedMaxMessageSet) {
+                    @trigger_error('Since symfony/validator 4.4: "minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', \E_USER_DEPRECATED);
+                }
             }
         }
 
         parent::__construct($options);
 
         if (null === $this->min && null === $this->minPropertyPath && null === $this->max && null === $this->maxPropertyPath) {
-            throw new MissingOptionsException(sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint %s', __CLASS__), ['min', 'max']);
+            throw new MissingOptionsException(sprintf('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given for constraint "%s".', __CLASS__), ['min', 'minPropertyPath', 'max', 'maxPropertyPath']);
         }
     }
 }

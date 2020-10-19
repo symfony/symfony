@@ -21,7 +21,7 @@ class LogoutListenerTest extends TestCase
 {
     public function testHandleUnmatchedPath()
     {
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener();
+        list($listener, , $httpUtils, $options) = $this->getListener();
 
         list($event, $request) = $this->getGetResponseEvent();
 
@@ -128,7 +128,7 @@ class LogoutListenerTest extends TestCase
         $this->expectException('RuntimeException');
         $successHandler = $this->getSuccessHandler();
 
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($successHandler);
+        list($listener, , $httpUtils, $options) = $this->getListener($successHandler);
 
         list($event, $request) = $this->getGetResponseEvent();
 
@@ -150,7 +150,7 @@ class LogoutListenerTest extends TestCase
         $this->expectException('Symfony\Component\Security\Core\Exception\LogoutException');
         $tokenManager = $this->getTokenManager();
 
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener(null, $tokenManager);
+        list($listener, , $httpUtils, $options) = $this->getListener(null, $tokenManager);
 
         list($event, $request) = $this->getGetResponseEvent();
 

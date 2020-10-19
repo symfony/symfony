@@ -28,6 +28,8 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularAndPluralProps;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -129,6 +131,81 @@ class PropertyAccessorTest extends TestCase
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->getValue($objectOrArray, $path);
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testGetValueThrowsExceptionIfUninitializedProperty()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
+
+        $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
+
+        $this->propertyAccessor->getValue(new UninitializedPrivateProperty(), 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The method "class@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
+
+        $object = eval('return new class() {
+            private $uninitialized;
+
+            public function getUninitialized(): array
+            {
+                return $this->uninitialized;
+            }
+        };');
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The method "stdClass@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
+
+        $object = eval('return new class() extends \stdClass {
+            private $uninitialized;
+
+            public function getUninitialized(): array
+            {
+                return $this->uninitialized;
+            }
+        };');
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\AccessException');
+        $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
+
+        $object = eval('return new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty {};');
+
+        $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
     public function testGetValueThrowsExceptionIfNotArrayAccess()
@@ -546,7 +623,7 @@ class PropertyAccessorTest extends TestCase
     public function testThrowTypeErrorWithNullArgument()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Expected argument of type "DateTime", "NULL" given');
+        $this->expectExceptionMessage('Expected argument of type "DateTime", "null" given');
         $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', null);
@@ -744,7 +821,7 @@ class PropertyAccessorTest extends TestCase
     public function testAdderWithoutRemover()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The add method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidMethods" was found, but the corresponding remove method "removeFoo" was not found\./');
+        $this->expectExceptionMessageMatches('/.*The add method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidMethods" was found, but the corresponding remove method "removeFoo" was not found\./');
         $object = new TestAdderRemoverInvalidMethods();
         $this->propertyAccessor->setValue($object, 'foos', [1, 2]);
     }
@@ -752,7 +829,7 @@ class PropertyAccessorTest extends TestCase
     public function testRemoverWithoutAdder()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The remove method "removeBar" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidMethods" was found, but the corresponding add method "addBar" was not found\./');
+        $this->expectExceptionMessageMatches('/.*The remove method "removeBar" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidMethods" was found, but the corresponding add method "addBar" was not found\./');
         $object = new TestAdderRemoverInvalidMethods();
         $this->propertyAccessor->setValue($object, 'bars', [1, 2]);
     }
@@ -760,7 +837,7 @@ class PropertyAccessorTest extends TestCase
     public function testAdderAndRemoveNeedsTheExactParametersDefined()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1\. The method "removeFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./');
+        $this->expectExceptionMessageMatches('/.*The method "addFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1\. The method "removeFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./');
         $object = new TestAdderRemoverInvalidArgumentLength();
         $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
     }
@@ -768,7 +845,7 @@ class PropertyAccessorTest extends TestCase
     public function testSetterNeedsTheExactParametersDefined()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The method "setBar" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./');
+        $this->expectExceptionMessageMatches('/.*The method "setBar" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./');
         $object = new TestAdderRemoverInvalidArgumentLength();
         $this->propertyAccessor->setValue($object, 'bar', [1, 2]);
     }
@@ -776,7 +853,7 @@ class PropertyAccessorTest extends TestCase
     public function testSetterNeedsPublicAccess()
     {
         $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
-        $this->expectExceptionMessageRegExp('/.*The method "setFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestClassSetValue" was found but does not have public access./');
+        $this->expectExceptionMessageMatches('/.*The method "setFoo" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\Fixtures\\\TestClassSetValue" was found but does not have public access./');
         $object = new TestClassSetValue(0);
         $this->propertyAccessor->setValue($object, 'foo', 1);
     }

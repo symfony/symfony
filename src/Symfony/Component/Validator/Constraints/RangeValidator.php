@@ -37,7 +37,7 @@ class RangeValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Range) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Range');
+            throw new UnexpectedTypeException($constraint, Range::class);
         }
 
         if (null === $value) {
@@ -61,12 +61,26 @@ class RangeValidator extends ConstraintValidator
         // the DateTime constructor:
         // https://php.net/datetime.formats
         if ($value instanceof \DateTimeInterface) {
+            $dateTimeClass = null;
+
             if (\is_string($min)) {
-                $min = new \DateTime($min);
+                $dateTimeClass = $value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class;
+
+                try {
+                    $min = new $dateTimeClass($min);
+                } catch (\Exception $e) {
+                    throw new ConstraintDefinitionException(sprintf('The min value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $min, $dateTimeClass, \get_class($constraint)));
+                }
             }
 
             if (\is_string($max)) {
-                $max = new \DateTime($max);
+                $dateTimeClass = $dateTimeClass ?: ($value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class);
+
+                try {
+                    $max = new $dateTimeClass($max);
+                } catch (\Exception $e) {
+                    throw new ConstraintDefinitionException(sprintf('The max value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $max, $dateTimeClass, \get_class($constraint)));
+                }
             }
         }
 
@@ -74,11 +88,24 @@ class RangeValidator extends ConstraintValidator
         $hasUpperLimit = null !== $max;
 
         if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
-            $violationBuilder = $this->context->buildViolation($constraint->notInRangeMessage)
+            $message = $constraint->notInRangeMessage;
+            $code = Range::NOT_IN_RANGE_ERROR;
+
+            if ($value < $min && $constraint->deprecatedMinMessageSet) {
+                $message = $constraint->minMessage;
+                $code = Range::TOO_LOW_ERROR;
+            }
+
+            if ($value > $max && $constraint->deprecatedMaxMessageSet) {
+                $message = $constraint->maxMessage;
+                $code = Range::TOO_HIGH_ERROR;
+            }
+
+            $violationBuilder = $this->context->buildViolation($message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
                 ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE))
-                ->setCode(Range::NOT_IN_RANGE_ERROR);
+                ->setCode($code);
 
             if (null !== $constraint->maxPropertyPath) {
                 $violationBuilder->setParameter('{{ max_limit_path }}', $constraint->maxPropertyPath);
@@ -143,7 +170,7 @@ class RangeValidator extends ConstraintValidator
         try {
             return $this->getPropertyAccessor()->getValue($object, $propertyPath);
         } catch (NoSuchPropertyException $e) {
-            throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $propertyPath, \get_class($constraint), $e->getMessage()), 0, $e);
+            throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $propertyPath, \get_class($constraint)).$e->getMessage(), 0, $e);
         }
     }
 

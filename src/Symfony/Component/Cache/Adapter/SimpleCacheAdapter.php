@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-@trigger_error(sprintf('The "%s" class is @deprecated since Symfony 4.3, use "Psr16Adapter" instead.', SimpleCacheAdapter::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is @deprecated since Symfony 4.3, use "Psr16Adapter" instead.', SimpleCacheAdapter::class), \E_USER_DEPRECATED);
 
 /**
  * @deprecated since Symfony 4.3, use Psr16Adapter instead.

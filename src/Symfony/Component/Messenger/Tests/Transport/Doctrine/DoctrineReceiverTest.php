@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Driver\PDO\Exception;
+use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\Exception\DeadlockException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -68,6 +72,26 @@ class DoctrineReceiverTest extends TestCase
         $receiver->get();
     }
 
+    public function testOccursRetryableExceptionFromConnection()
+    {
+        $serializer = $this->createSerializer();
+        $connection = $this->createMock(Connection::class);
+        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
+        $connection->method('get')->willThrowException(new DeadlockException('Deadlock', $driverException));
+        $receiver = new DoctrineReceiver($connection, $serializer);
+        $this->assertSame([], $receiver->get());
+        $this->assertSame([], $receiver->get());
+        try {
+            $receiver->get();
+        } catch (TransportException $exception) {
+            // skip, and retry
+        }
+        $this->assertSame([], $receiver->get());
+        $this->assertSame([], $receiver->get());
+        $this->expectException(TransportException::class);
+        $receiver->get();
+    }
+
     public function testAll()
     {
         $serializer = $this->createSerializer();
@@ -96,7 +120,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
     }
 
-    private function createDoctrineEnvelope()
+    private function createDoctrineEnvelope(): array
     {
         return [
             'id' => 1,

@@ -53,6 +53,9 @@ class ParserTest extends TestCase
         $arguments->addElement(new Node\ConstantNode(2));
         $arguments->addElement(new Node\ConstantNode(true));
 
+        $arrayNode = new Node\ArrayNode();
+        $arrayNode->addElement(new Node\NameNode('bar'));
+
         return [
             [
                 new Node\NameNode('a'),
@@ -150,6 +153,36 @@ class ParserTest extends TestCase
                 new Node\NameNode('foo'),
                 'bar',
                 ['foo' => 'bar'],
+            ],
+
+            // Operators collisions
+            [
+                new Node\BinaryNode(
+                    'in',
+                    new Node\GetAttrNode(
+                        new Node\NameNode('foo'),
+                        new Node\ConstantNode('not', true),
+                        new Node\ArgumentsNode(),
+                        Node\GetAttrNode::PROPERTY_CALL
+                    ),
+                    $arrayNode
+                ),
+                'foo.not in [bar]',
+                ['foo', 'bar'],
+            ],
+            [
+                new Node\BinaryNode(
+                    'or',
+                    new Node\UnaryNode('not', new Node\NameNode('foo')),
+                    new Node\GetAttrNode(
+                        new Node\NameNode('foo'),
+                        new Node\ConstantNode('not', true),
+                        new Node\ArgumentsNode(),
+                        Node\GetAttrNode::PROPERTY_CALL
+                    )
+                ),
+                'not foo or foo.not',
+                ['foo'],
             ],
         ];
     }

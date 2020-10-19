@@ -16,9 +16,9 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 
 class NullTransportTest extends TestCase
 {
-    public function testName()
+    public function testToString()
     {
         $t = new NullTransport();
-        $this->assertEquals('smtp://null', $t->getName());
+        $this->assertEquals('null://', (string) $t);
     }
 }

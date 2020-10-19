@@ -23,6 +23,9 @@ use Twig\Node\Expression\FunctionExpression;
  */
 class SearchAndRenderBlockNode extends FunctionExpression
 {
+    /**
+     * @return void
+     */
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
@@ -30,7 +33,6 @@ class SearchAndRenderBlockNode extends FunctionExpression
 
         preg_match('/_([^_]+)$/', $this->getAttribute('name'), $matches);
 
-        $label = null;
         $arguments = iterator_to_array($this->getNode('arguments'));
         $blockNameSuffix = $matches[1];
 

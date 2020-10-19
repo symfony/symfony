@@ -35,7 +35,7 @@ class DumpNode extends Node
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function compile(Compiler $compiler)
     {

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * `AddEventAliasesPass` has been added, allowing applications and bundles to extend the event alias mapping used by `RegisterListenersPass`.
+ * Made the `event` attribute of the `kernel.event_listener` tag optional for FQCN events.
+
 4.3.0
 -----
 
@@ -10,7 +16,7 @@ CHANGELOG
 4.1.0
 -----
 
- * added support for invokable event listeners tagged with `kernel.event_listener` by default 
+ * added support for invokable event listeners tagged with `kernel.event_listener` by default
  * The `TraceableEventDispatcher::getOrphanedEvents()` method has been added.
  * The `TraceableEventDispatcherInterface` has been deprecated.
 

@@ -25,7 +25,7 @@ class TraceableCacheTest extends CacheTestCase
         'testPrune' => 'TraceableCache just proxies',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new TraceableCache(new FilesystemCache('', $defaultLifetime));
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\NegativeOrZero;
 
 /**
@@ -102,9 +103,17 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     }
 
     /**
-     * @dataProvider provideValidComparisonsToPropertyPath
+     * @dataProvider throwsOnInvalidStringDatesProvider
      */
-    public function testValidComparisonToPropertyPathOnArray($comparedValue)
+    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
+    {
+        $this->markTestSkipped('The compared value cannot be an invalid string date because it is hardcoded to 0.');
+    }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }

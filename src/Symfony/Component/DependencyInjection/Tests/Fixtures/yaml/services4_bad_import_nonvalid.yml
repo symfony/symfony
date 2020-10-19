@@ -1,0 +1,2 @@
+imports:
+    - { resource: nonvalid2.yml, ignore_errors: not_found }

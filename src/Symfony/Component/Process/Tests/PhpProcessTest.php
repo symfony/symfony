@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\PhpProcess;
 
@@ -44,7 +45,7 @@ PHP
         $process->wait();
         $this->assertStringContainsString($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
 
-        $this->assertSame(PHP_VERSION.\PHP_SAPI, $process->getOutput());
+        $this->assertSame(\PHP_VERSION.\PHP_SAPI, $process->getOutput());
     }
 
     public function testPassingPhpExplicitly()
@@ -59,5 +60,15 @@ PHP;
         $process = new PhpProcess($script, null, null, 60, $php);
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
+    }
+
+    public function testProcessCannotBeCreatedUsingFromShellCommandLine()
+    {
+        static::expectException(LogicException::class);
+        static::expectExceptionMessage('The "Symfony\Component\Process\PhpProcess::fromShellCommandline()" method cannot be called when using "Symfony\Component\Process\PhpProcess".');
+        PhpProcess::fromShellCommandline(<<<PHP
+<?php echo 'Hello World!';
+PHP
+        );
     }
 }

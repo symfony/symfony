@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -33,6 +34,11 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(TranslatorInterface::class);
+class_exists(LocaleAwareInterface::class);
+class_exists(TranslatorTrait::class);
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -63,9 +69,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $validatorFactory;
 
     /**
-     * @var CacheInterface|null
+     * @var CacheItemPoolInterface|null
      */
-    private $metadataCache;
+    private $mappingCache;
 
     /**
      * @var TranslatorInterface|null
@@ -228,15 +234,37 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the cache for caching class metadata.
+     *
+     * @return $this
+     *
+     * @deprecated since Symfony 4.4.
      */
     public function setMetadataCache(CacheInterface $cache)
     {
+        @trigger_error(sprintf('%s is deprecated since Symfony 4.4. Use setMappingCache() instead.', __METHOD__), \E_USER_DEPRECATED);
+
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot set a custom metadata cache after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
-        $this->metadataCache = $cache;
+        $this->mappingCache = $cache;
+
+        return $this;
+    }
+
+    /**
+     * Sets the cache for caching class metadata.
+     *
+     * @return $this
+     */
+    public function setMappingCache(CacheItemPoolInterface $cache)
+    {
+        if (null !== $this->metadataFactory) {
+            throw new ValidatorException('You cannot set a custom mapping cache after setting a custom metadata factory. Configure your metadata factory instead.');
+        }
+
+        $this->mappingCache = $cache;
 
         return $this;
     }
@@ -330,7 +358,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
                 $loader = $loaders[0];
             }
 
-            $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
+            $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->mappingCache);
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();

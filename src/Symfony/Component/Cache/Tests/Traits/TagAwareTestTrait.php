@@ -16,7 +16,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * Common assertions for TagAware adapters.
  *
- * @method \Symfony\Component\Cache\Adapter\TagAwareAdapterInterface createCachePool() Must be implemented by TestCase
+ * @method \Symfony\Component\Cache\Adapter\TagAwareAdapterInterface createCachePool(int $defaultLifetime = 0) Must be implemented by TestCase
  */
 trait TagAwareTestTrait
 {
@@ -154,5 +154,43 @@ trait TagAwareTestTrait
 
         $i = $pool->getItem('k');
         $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);
+    }
+
+    public function testRefreshAfterExpires()
+    {
+        $pool = $this->createCachePool();
+        $pool->clear();
+
+        $cacheItem = $pool->getItem('test');
+
+        $this->assertFalse($cacheItem->isHit());
+
+        // write cache with expires
+        $cacheItem->set('test');
+        $cacheItem->tag('1234');
+        $cacheItem->expiresAfter(1);
+
+        $pool->save($cacheItem);
+
+        $cacheItem = $pool->getItem('test');
+        $this->assertTrue($cacheItem->isHit());
+
+        // wait until expired
+        sleep(2);
+
+        // item should not longer be a hit
+        $cacheItem = $pool->getItem('test');
+        $this->assertFalse($cacheItem->isHit());
+
+        // update expired item
+        $cacheItem->set('test');
+        $cacheItem->tag('1234');
+        $cacheItem->expiresAfter(1);
+
+        $pool->save($cacheItem);
+
+        // item should be again a hit
+        $cacheItem = $pool->getItem('test');
+        $this->assertTrue($cacheItem->isHit());
     }
 }

@@ -94,7 +94,7 @@ class PhpEngineTest extends TestCase
 
     public function testExtendRender()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [], [new SlotsHelper()]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, []);
         try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
@@ -180,9 +180,9 @@ class PhpEngineTest extends TestCase
 
         $this->loader->setTemplate('global.php', '<?php echo $global; ?>');
 
-        $this->assertEquals($engine->render('global.php'), 'global variable');
+        $this->assertEquals('global variable', $engine->render('global.php'));
 
-        $this->assertEquals($engine->render('global.php', ['global' => 'overwritten']), 'overwritten');
+        $this->assertEquals('overwritten', $engine->render('global.php', ['global' => 'overwritten']));
     }
 
     public function testGetLoader()

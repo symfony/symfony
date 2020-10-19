@@ -44,7 +44,7 @@ trait TesterTrait
         $display = stream_get_contents($this->output->getStream());
 
         if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
+            $display = str_replace(\PHP_EOL, "\n", $display);
         }
 
         return $display;
@@ -68,7 +68,7 @@ trait TesterTrait
         $display = stream_get_contents($this->output->getErrorOutput()->getStream());
 
         if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
+            $display = str_replace(\PHP_EOL, "\n", $display);
         }
 
         return $display;
@@ -162,12 +162,15 @@ trait TesterTrait
         }
     }
 
+    /**
+     * @return resource
+     */
     private static function createStream(array $inputs)
     {
         $stream = fopen('php://memory', 'r+', false);
 
         foreach ($inputs as $input) {
-            fwrite($stream, $input.PHP_EOL);
+            fwrite($stream, $input.\PHP_EOL);
         }
 
         rewind($stream);

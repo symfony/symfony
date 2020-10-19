@@ -89,7 +89,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
     }
 
-    final public function addOption($name, $default = null)
+    final public function addOption(string $name, $default = null)
     {
         $this->options[$name] = $default;
     }
@@ -130,9 +130,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * @param ContainerBuilder $container
      * @param string           $id
      * @param array            $config
-     * @param string           $defaultEntryPointId
+     * @param string|null      $defaultEntryPointId
      *
-     * @return string the entry point id
+     * @return string|null the entry point id
      */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
     {

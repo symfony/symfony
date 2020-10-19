@@ -52,7 +52,7 @@ final class Definition
      */
     public function getInitialPlace(): ?string
     {
-        @trigger_error(sprintf('Calling %s::getInitialPlace() is deprecated since Symfony 4.3. Call getInitialPlaces() instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Calling %s::getInitialPlace() is deprecated since Symfony 4.3. Call getInitialPlaces() instead.', __CLASS__), \E_USER_DEPRECATED);
 
         if (!$this->initialPlaces) {
             return null;

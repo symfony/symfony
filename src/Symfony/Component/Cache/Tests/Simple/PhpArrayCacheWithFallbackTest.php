@@ -45,12 +45,14 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
 
     protected function tearDown(): void
     {
+        $this->createSimpleCache()->clear();
+
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new PhpArrayCache(self::$file, new FilesystemCache('php-array-fallback', $defaultLifetime));
     }

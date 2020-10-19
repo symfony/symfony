@@ -43,7 +43,13 @@ class Workflow implements WorkflowInterface
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
-        $this->dispatcher = null !== $dispatcher ? LegacyEventDispatcherProxy::decorate($dispatcher) : null;
+
+        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        } else {
+            $this->dispatcher = $dispatcher;
+        }
+
         $this->name = $name;
     }
 
@@ -150,30 +156,56 @@ class Workflow implements WorkflowInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param array $context Some context
      */
-    public function apply($subject, $transitionName, array $context = [])
+    public function apply($subject, $transitionName/*, array $context = []*/)
     {
+        $context = \func_get_args()[2] ?? [];
+
         $marking = $this->getMarking($subject);
 
-        $transitionBlockerList = null;
-        $applied = false;
-        $approvedTransitionQueue = [];
+        $transitionExist = false;
+        $approvedTransitions = [];
+        $bestTransitionBlockerList = null;
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $transitionName) {
                 continue;
             }
 
-            $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
-            if (!$transitionBlockerList->isEmpty()) {
+            $transitionExist = true;
+
+            $tmpTransitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
+
+            if ($tmpTransitionBlockerList->isEmpty()) {
+                $approvedTransitions[] = $transition;
                 continue;
             }
-            $approvedTransitionQueue[] = $transition;
+
+            if (!$bestTransitionBlockerList) {
+                $bestTransitionBlockerList = $tmpTransitionBlockerList;
+                continue;
+            }
+
+            // We prefer to return transitions blocker by something else than
+            // marking. Because it means the marking was OK. Transitions are
+            // deterministic: it's not possible to have many transitions enabled
+            // at the same time that match the same marking with the same name
+            if (!$tmpTransitionBlockerList->has(TransitionBlocker::BLOCKED_BY_MARKING)) {
+                $bestTransitionBlockerList = $tmpTransitionBlockerList;
+            }
         }
 
-        foreach ($approvedTransitionQueue as $transition) {
-            $applied = true;
+        if (!$transitionExist) {
+            throw new UndefinedTransitionException($subject, $transitionName, $this);
+        }
 
+        if (!$approvedTransitions) {
+            throw new NotEnabledTransitionException($subject, $transitionName, $this, $bestTransitionBlockerList);
+        }
+
+        foreach ($approvedTransitions as $transition) {
             $this->leave($subject, $transition, $marking);
 
             $context = $this->transition($subject, $transition, $marking, $context);
@@ -187,14 +219,6 @@ class Workflow implements WorkflowInterface
             $this->completed($subject, $transition, $marking);
 
             $this->announce($subject, $transition, $marking);
-        }
-
-        if (!$transitionBlockerList) {
-            throw new UndefinedTransitionException($subject, $transitionName, $this);
-        }
-
-        if (!$applied) {
-            throw new NotEnabledTransitionException($subject, $transitionName, $this, $transitionBlockerList);
         }
 
         return $marking;
@@ -250,7 +274,7 @@ class Workflow implements WorkflowInterface
         return $this->definition->getMetadataStore();
     }
 
-    private function buildTransitionBlockerListForTransition($subject, Marking $marking, Transition $transition)
+    private function buildTransitionBlockerListForTransition($subject, Marking $marking, Transition $transition): TransitionBlockerList
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {

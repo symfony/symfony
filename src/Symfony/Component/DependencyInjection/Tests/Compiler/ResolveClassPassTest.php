@@ -87,8 +87,8 @@ class ResolveClassPassTest extends TestCase
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
         $this->expectExceptionMessage('Service definition "App\Foo\Child" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.');
         $container = new ContainerBuilder();
-        $parent = $container->register('App\Foo', null);
-        $child = $container->setDefinition('App\Foo\Child', new ChildDefinition('App\Foo'));
+        $container->register('App\Foo', null);
+        $container->setDefinition('App\Foo\Child', new ChildDefinition('App\Foo'));
 
         (new ResolveClassPass())->process($container);
     }

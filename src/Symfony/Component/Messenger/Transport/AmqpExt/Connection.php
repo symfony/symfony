@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\LogicException;
 
 /**
  * An AMQP connection.
@@ -58,6 +59,10 @@ class Connection
 
     public function __construct(array $connectionOptions, array $exchangeOptions, array $queuesOptions, AmqpFactory $amqpFactory = null)
     {
+        if (!\extension_loaded('amqp')) {
+            throw new LogicException(sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
+        }
+
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
                 'exchange_name' => 'delays',
@@ -158,7 +163,7 @@ class Connection
             }
 
             if (!is_numeric($arguments[$key])) {
-                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", %s given.', $key, \gettype($arguments[$key])));
+                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", "%s" given.', $key, \gettype($arguments[$key])));
             }
 
             $arguments[$key] = (int) $arguments[$key];
@@ -224,12 +229,13 @@ class Connection
     private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $headers = [], AmqpStamp $amqpStamp = null)
     {
         $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
-        $attributes['headers'] = array_merge($headers, $attributes['headers'] ?? []);
+        $attributes['headers'] = array_merge($attributes['headers'] ?? [], $headers);
+        $attributes['delivery_mode'] = $attributes['delivery_mode'] ?? 2;
 
         $exchange->publish(
             $body,
             $routingKey,
-            $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM,
+            $amqpStamp ? $amqpStamp->getFlags() : \AMQP_NOPARAM,
             $attributes
         );
     }
@@ -250,8 +256,8 @@ class Connection
         if (null === $this->amqpDelayExchange) {
             $this->amqpDelayExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpDelayExchange->setName($this->connectionOptions['delay']['exchange_name']);
-            $this->amqpDelayExchange->setType(AMQP_EX_TYPE_DIRECT);
-            $this->amqpDelayExchange->setFlags(AMQP_DURABLE);
+            $this->amqpDelayExchange->setType(\AMQP_EX_TYPE_DIRECT);
+            $this->amqpDelayExchange->setFlags(\AMQP_DURABLE);
         }
 
         return $this->amqpDelayExchange;
@@ -266,7 +272,7 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay, ?string $routingKey)
+    private function createDelayQueue(int $delay, ?string $routingKey): \AMQPQueue
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName(str_replace(
@@ -274,7 +280,7 @@ class Connection
             [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         ));
-        $queue->setFlags(AMQP_DURABLE);
+        $queue->setFlags(\AMQP_DURABLE);
         $queue->setArguments([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
@@ -317,10 +323,10 @@ class Connection
             }
         } catch (\AMQPQueueException $e) {
             if (404 === $e->getCode() && $this->shouldSetup()) {
-                // If we get a 404 for the queue, it means we need to setup the exchange & queue.
+                // If we get a 404 for the queue, it means we need to set up the exchange & queue.
                 $this->setupExchangeAndQueues();
 
-                return $this->get();
+                return $this->get($queueName);
             }
 
             throw $e;
@@ -334,7 +340,7 @@ class Connection
         return $this->queue($queueName)->ack($message->getDeliveryTag());
     }
 
-    public function nack(\AMQPEnvelope $message, string $queueName, int $flags = AMQP_NOPARAM): bool
+    public function nack(\AMQPEnvelope $message, string $queueName, int $flags = \AMQP_NOPARAM): bool
     {
         return $this->queue($queueName)->nack($message->getDeliveryTag(), $flags);
     }
@@ -378,7 +384,7 @@ class Connection
                 $credentials['password'] = '********';
                 unset($credentials['delay']);
 
-                throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s)', json_encode($credentials)), 0, $e);
+                throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s).', json_encode($credentials, \JSON_UNESCAPED_SLASHES)), 0, $e);
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
 
@@ -397,7 +403,7 @@ class Connection
 
             $amqpQueue = $this->amqpFactory->createQueue($this->channel());
             $amqpQueue->setName($queueName);
-            $amqpQueue->setFlags($queueConfig['flags'] ?? AMQP_DURABLE);
+            $amqpQueue->setFlags($queueConfig['flags'] ?? \AMQP_DURABLE);
 
             if (isset($queueConfig['arguments'])) {
                 $amqpQueue->setArguments($queueConfig['arguments']);
@@ -414,8 +420,8 @@ class Connection
         if (null === $this->amqpExchange) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
             $this->amqpExchange->setName($this->exchangeOptions['name']);
-            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? AMQP_EX_TYPE_FANOUT);
-            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? AMQP_DURABLE);
+            $this->amqpExchange->setType($this->exchangeOptions['type'] ?? \AMQP_EX_TYPE_FANOUT);
+            $this->amqpExchange->setFlags($this->exchangeOptions['flags'] ?? \AMQP_DURABLE);
 
             if (isset($this->exchangeOptions['arguments'])) {
                 $this->amqpExchange->setArguments($this->exchangeOptions['arguments']);

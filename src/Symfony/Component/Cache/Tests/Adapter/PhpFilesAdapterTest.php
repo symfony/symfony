@@ -33,7 +33,7 @@ class PhpFilesAdapterTest extends AdapterTestCase
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
 
-    protected function isPruned(CacheItemPoolInterface $cache, $name)
+    protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
         $getFileMethod->setAccessible(true);

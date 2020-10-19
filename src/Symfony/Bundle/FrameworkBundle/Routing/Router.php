@@ -15,14 +15,21 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\CompatibilityServiceSubscriberInterface as ServiceSubscriberInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Resource\FileExistenceResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
+
+// Help opcache.preload discover always-needed symbols
+class_exists(RedirectableCompiledUrlMatcher::class);
+class_exists(Route::class);
 
 /**
  * This Router creates the Loader only when the cache is empty.
@@ -66,6 +73,16 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $this->collection = $this->container->get('routing.loader')->load($this->resource, $this->options['resource_type']);
             $this->resolveParameters($this->collection);
             $this->collection->addResource(new ContainerParametersResource($this->collectedParameters));
+
+            try {
+                $containerFile = ($this->paramFetcher)('kernel.cache_dir').'/'.($this->paramFetcher)('kernel.container_class').'.php';
+                if (file_exists($containerFile)) {
+                    $this->collection->addResource(new FileResource($containerFile));
+                } else {
+                    $this->collection->addResource(new FileExistenceResource($containerFile));
+                }
+            } catch (ParameterNotFoundException $exception) {
+            }
         }
 
         return $this->collection;
@@ -171,7 +188,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
                 return (string) $this->resolve($resolved);
             }
 
-            throw new RuntimeException(sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type %s.', $match[1], $value, \gettype($resolved)));
+            throw new RuntimeException(sprintf('The container parameter "%s", used in the route configuration value "%s", must be a string or numeric, but it is of type "%s".', $match[1], $value, \gettype($resolved)));
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);

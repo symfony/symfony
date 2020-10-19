@@ -38,7 +38,7 @@ class VarExporterTest extends TestCase
     public function testFailingSerialization($value)
     {
         $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
-        $this->expectExceptionMessageRegExp('/Type ".*" is not instantiable\./');
+        $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
             VarExporter::export($value);
@@ -87,10 +87,12 @@ class VarExporterTest extends TestCase
         $dump = "<?php\n\nreturn ".$marshalledValue.";\n";
         $dump = str_replace(var_export(__FILE__, true), "\\dirname(__DIR__).\\DIRECTORY_SEPARATOR.'VarExporterTest.php'", $dump);
 
-        if (\PHP_VERSION_ID < 70400 && \in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+        if (\PHP_VERSION_ID >= 70406 || !\in_array($testName, ['array-object', 'array-iterator', 'array-object-custom', 'spl-object-storage', 'final-array-iterator', 'final-error'], true)) {
+            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+        } elseif (\PHP_VERSION_ID < 70400) {
             $fixtureFile = __DIR__.'/Fixtures/'.$testName.'-legacy.php';
         } else {
-            $fixtureFile = __DIR__.'/Fixtures/'.$testName.'.php';
+            $this->markTestSkipped('PHP >= 7.4.6 required.');
         }
         $this->assertStringEqualsFile($fixtureFile, $dump);
 
@@ -112,6 +114,7 @@ class VarExporterTest extends TestCase
     public function provideExport()
     {
         yield ['multiline-string', ["\0\0\r\nA" => "B\rC\n\n"], true];
+        yield ['lf-ending-string', "'BOOM'\n.var_dump(123)//'", true];
 
         yield ['bool', true, true];
         yield ['simple-array', [123, ['abc']], true];

@@ -44,7 +44,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDefault($option));
+        $debug->getDefault($option);
     }
 
     public function testGetDefaultThrowsOnNotDefinedOption()
@@ -54,7 +54,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getDefault('foo'));
+        $debug->getDefault('foo');
     }
 
     public function testGetLazyClosures()
@@ -75,7 +75,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver->setDefined($option = 'foo');
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getLazyClosures($option));
+        $debug->getLazyClosures($option);
     }
 
     public function testGetLazyClosuresThrowsOnNotDefinedOption()
@@ -85,7 +85,7 @@ class OptionsResolverIntrospectorTest extends TestCase
         $resolver = new OptionsResolver();
 
         $debug = new OptionsResolverIntrospector($resolver);
-        $this->assertSame('bar', $debug->getLazyClosures('foo'));
+        $debug->getLazyClosures('foo');
     }
 
     public function testGetAllowedTypes()

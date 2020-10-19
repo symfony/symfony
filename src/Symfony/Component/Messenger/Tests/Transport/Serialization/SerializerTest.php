@@ -87,13 +87,14 @@ class SerializerTest extends TestCase
             ->with($validationStamp = new ValidationStamp(['foo', 'bar']));
 
         $symfonySerializer
-            ->expects($this->at(2))
-            ->method('serialize')->with(
-                $message,
-                'json',
-                [
+            ->expects($this->exactly(3))
+            ->method('serialize')
+            ->withConsecutive(
+                [$this->anything()],
+                [$this->anything()],
+                [$message, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
-                ]
+                ]]
             )
         ;
 
@@ -113,23 +114,18 @@ class SerializerTest extends TestCase
         );
 
         $symfonySerializer
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('deserialize')
-            ->with('[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [])
-            ->willReturn([new SerializerStamp(['groups' => ['foo']])])
-        ;
-
-        $symfonySerializer
-            ->expects($this->at(1))
-            ->method('deserialize')->with(
-                '{}',
-                DummyMessage::class,
-                'json',
-                [
+            ->withConsecutive(
+                ['[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', []],
+                ['{}', DummyMessage::class, 'json', [
                     ObjectNormalizer::GROUPS => ['foo'],
-                ]
+                ]]
             )
-            ->willReturn(new DummyMessage('test'))
+            ->willReturnOnConsecutiveCalls(
+                [new SerializerStamp(['groups' => ['foo']])],
+                new DummyMessage('test')
+            )
         ;
 
         $serializer->decode([
@@ -166,7 +162,7 @@ class SerializerTest extends TestCase
         $serializer->decode($data);
     }
 
-    public function getMissingKeyTests()
+    public function getMissingKeyTests(): iterable
     {
         yield 'no_body' => [
             ['headers' => ['type' => 'bar']],
@@ -207,7 +203,40 @@ class SerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $this->assertStringNotContainsString('DummySymfonySerializerNonSendableStamp', print_r($encoded['headers'], true));
     }
+
+    public function testDecodingFailedConstructorDeserialization()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{}',
+            'headers' => ['type' => DummySymfonySerializerInvalidConstructor::class],
+        ]);
+    }
+
+    public function testDecodingStampFailedDeserialization()
+    {
+        $serializer = new Serializer();
+
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer->decode([
+            'body' => '{"message":"hello"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.SerializerStamp::class => '[{}]',
+            ],
+        ]);
+    }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface
 {
+}
+class DummySymfonySerializerInvalidConstructor
+{
+    public function __construct(string $missingArgument)
+    {
+    }
 }

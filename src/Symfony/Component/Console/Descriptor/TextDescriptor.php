@@ -212,7 +212,7 @@ class TextDescriptor extends Descriptor
             // calculate max. width based on available commands per namespace
             $width = $this->getColumnWidth(array_merge(...array_values(array_map(function ($namespace) use ($commands) {
                 return array_intersect($namespace['commands'], array_keys($commands));
-            }, $namespaces))));
+            }, array_values($namespaces)))));
 
             if ($describedNamespace) {
                 $this->writeText(sprintf('<comment>Available commands for the "%s" namespace:</comment>', $describedNamespace), $options);
@@ -280,7 +280,7 @@ class TextDescriptor extends Descriptor
      */
     private function formatDefaultValue($default): string
     {
-        if (INF === $default) {
+        if (\INF === $default) {
             return 'INF';
         }
 
@@ -294,7 +294,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        return str_replace('\\\\', '\\', json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        return str_replace('\\\\', '\\', json_encode($default, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE));
     }
 
     /**

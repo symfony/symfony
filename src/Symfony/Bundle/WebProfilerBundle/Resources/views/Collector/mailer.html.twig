@@ -94,7 +94,7 @@
         {% for transport in events.transports %}
             <div class="metric">
                 <span class="value">{{ events.messages(transport)|length }}</span>
-                <span class="label">{{ events.messages(transport)|length == 1 ? 'message' : 'messages' }}</label>
+                <span class="label">{{ events.messages(transport)|length == 1 ? 'message' : 'messages' }}</span>
             </div>
         {% endfor %}
     </div>

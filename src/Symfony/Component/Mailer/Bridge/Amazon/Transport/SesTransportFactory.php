@@ -27,24 +27,26 @@ final class SesTransportFactory extends AbstractTransportFactory
         $user = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
         $region = $dsn->getOption('region');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        if ('api' === $scheme) {
-            return new SesApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+        if ('ses+api' === $scheme) {
+            return (new SesApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('http' === $scheme) {
-            return new SesHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+        if ('ses+https' === $scheme || 'ses' === $scheme) {
+            return (new SesHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('smtp' === $scheme || 'smtps' === $scheme) {
+        if ('ses+smtp' === $scheme || 'ses+smtps' === $scheme) {
             return new SesSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'ses', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'ses' === $dsn->getHost();
+        return ['ses', 'ses+api', 'ses+https', 'ses+smtp', 'ses+smtps'];
     }
 }

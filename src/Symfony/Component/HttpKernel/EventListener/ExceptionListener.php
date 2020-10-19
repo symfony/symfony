@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,10 +22,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "ErrorListener" instead.', ExceptionListener::class), \E_USER_DEPRECATED);
+
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.3
+ * @deprecated since Symfony 4.4, use ErrorListener instead
  */
 class ExceptionListener implements EventSubscriberInterface
 {

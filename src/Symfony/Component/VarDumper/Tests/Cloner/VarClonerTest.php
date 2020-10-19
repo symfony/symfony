@@ -22,7 +22,7 @@ class VarClonerTest extends TestCase
 {
     public function testMaxIntBoundary()
     {
-        $data = [PHP_INT_MAX => 123];
+        $data = [\PHP_INT_MAX => 123];
 
         $cloner = new VarCloner();
         $clone = $cloner->cloneVar($data);
@@ -53,10 +53,14 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
-        $this->assertSame(sprintf($expected, PHP_INT_MAX), print_r($clone, true));
+        $this->assertSame(sprintf($expected, \PHP_INT_MAX), print_r($clone, true));
     }
 
     public function testClone()
@@ -141,6 +145,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -162,7 +170,7 @@ EOTXT;
                     'Level 3 Item 3',
                 ],
                 [
-                    'Level 3 Item 4',
+                    999 => 'Level 3 Item 4',
                     'Level 3 Item 5',
                     'Level 3 Item 6',
                 ],
@@ -242,7 +250,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                     [1] => Array
                         (
                             [0] => 2
-                            [2] => 7
+                            [1] => 7
                         )
 
                     [2] => Array
@@ -299,7 +307,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
             [7] => Array
                 (
-                    [0] => Level 3 Item 4
+                    [999] => Level 3 Item 4
                 )
 
         )
@@ -309,6 +317,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -327,7 +339,7 @@ EOTXT;
         $clone = $cloner->cloneVar($data);
 
         $expected = <<<'EOTXT'
-object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
+object(Symfony\Component\VarDumper\Cloner\Data)#%d (7) {
   ["data":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   array(2) {
     [0]=>
@@ -372,6 +384,9 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
   int(-1)
   ["useRefHandles":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   int(-1)
+  ["context":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  array(0) {
+  }
 }
 
 EOTXT;
@@ -432,6 +447,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;
@@ -501,6 +520,10 @@ Symfony\Component\VarDumper\Cloner\Data Object
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
 )
 
 EOTXT;

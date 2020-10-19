@@ -31,6 +31,6 @@ class FailoverTransport extends RoundRobinTransport
 
     protected function getNameSymbol(): string
     {
-        return '||';
+        return 'failover';
     }
 }

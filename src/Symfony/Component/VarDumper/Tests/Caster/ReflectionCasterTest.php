@@ -49,8 +49,8 @@ ReflectionClass {
 %A]
   methods: array:%d [
 %A
-    "export" => ReflectionMethod {
-      +name: "export"
+    "__construct" => ReflectionMethod {
+      +name: "__construct"
       +class: "ReflectionClass"
 %A    parameters: {
         $%s: ReflectionParameter {
@@ -84,9 +84,6 @@ EOTXT
 
     public function testFromCallableClosureCaster()
     {
-        if (\defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped('Not for HHVM.');
-        }
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
             (new \ReflectionMethod(__CLASS__, 'stub'))->getClosure(),
@@ -120,7 +117,7 @@ EOTXT
 
     public function testReflectionParameter()
     {
-        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
+        $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -184,12 +181,11 @@ EOTXT
 Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
-    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() {
-      %sGeneratorDemo.php:14 {
-        › {
-        ›     yield from bar();
-        › }
-      }
+    %sGeneratorDemo.php:14 {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
+      › {
+      ›     yield from bar();
+      › }
     }
   }
   closed: false
@@ -208,6 +204,7 @@ array:2 [
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
     trace: {
       %s%eTests%eFixtures%eGeneratorDemo.php:9 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         › {
         ›     yield 1;
         › }
@@ -219,12 +216,11 @@ array:2 [
   }
   1 => Generator {
     executing: {
-      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() {
-        %sGeneratorDemo.php:10 {
-          ›     yield 1;
-          › }
-          › 
-        }
+      %sGeneratorDemo.php:10 {
+        Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
+        ›     yield 1;
+        › }
+        › 
       }
     }
     closed: false

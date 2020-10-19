@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Composer\Autoload\ClassLoader;
+use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
@@ -81,7 +82,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_unique($expanded);
     }
 
-    private function getClassesInComposerClassMaps()
+    private function getClassesInComposerClassMaps(): array
     {
         $classes = [];
 
@@ -90,7 +91,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
                 continue;
             }
 
-            if ($function[0] instanceof DebugClassLoader) {
+            if ($function[0] instanceof DebugClassLoader || $function[0] instanceof LegacyDebugClassLoader) {
                 $function = $function[0]->getClassLoader();
             }
 
@@ -102,7 +103,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return array_keys($classes);
     }
 
-    private function patternsToRegexps(array $patterns)
+    private function patternsToRegexps(array $patterns): array
     {
         $regexps = [];
 
@@ -124,12 +125,12 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
         return $regexps;
     }
 
-    private function matchAnyRegexps(string $class, array $regexps)
+    private function matchAnyRegexps(string $class, array $regexps): bool
     {
-        $blacklisted = false !== strpos($class, 'Test');
+        $isTest = false !== strpos($class, 'Test');
 
         foreach ($regexps as $regex) {
-            if ($blacklisted && false === strpos($regex, 'Test')) {
+            if ($isTest && false === strpos($regex, 'Test')) {
                 continue;
             }
 

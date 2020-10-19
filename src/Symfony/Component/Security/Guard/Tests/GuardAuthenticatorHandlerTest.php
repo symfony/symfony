@@ -87,7 +87,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     /**
      * @dataProvider getTokenClearingTests
      */
-    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey)
+    public function testHandleAuthenticationClearsToken($tokenProviderKey, $actualProviderKey)
     {
         $this->tokenStorage->expects($this->never())
             ->method('setToken')
@@ -108,10 +108,10 @@ class GuardAuthenticatorHandlerTest extends TestCase
     public function getTokenClearingTests()
     {
         $tests = [];
-        // correct token class and matching firewall => clear the token
-        $tests[] = ['Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key'];
-        $tests[] = ['Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key'];
-        $tests[] = ['Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key'];
+        // matching firewall => clear the token
+        $tests[] = ['the_firewall_key', 'the_firewall_key'];
+        $tests[] = ['the_firewall_key', 'different_key'];
+        $tests[] = ['the_firewall_key', 'the_firewall_key'];
 
         return $tests;
     }
@@ -151,6 +151,25 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['some_provider_key']);
         $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
         $handler->authenticateWithToken($this->token, $this->request, 'some_provider_key');
+    }
+
+    /**
+     * @requires function \Symfony\Component\HttpFoundation\Request::setSessionFactory
+     */
+    public function testSessionIsNotInstantiatedOnStatelessFirewall()
+    {
+        $sessionFactory = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+
+        $sessionFactory->expects($this->never())
+            ->method('__invoke');
+
+        $this->request->setSessionFactory($sessionFactory);
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher, ['stateless_provider_key']);
+        $handler->setSessionAuthenticationStrategy($this->sessionStrategy);
+        $handler->authenticateWithToken($this->token, $this->request, 'stateless_provider_key');
     }
 
     protected function setUp(): void

@@ -24,7 +24,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
 
     protected static $redis;
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
@@ -34,9 +34,10 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
         if (!\extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
-        if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
-            $e = error_get_last();
-            self::markTestSkipped($e['message']);
+        try {
+            (new \Redis())->connect(getenv('REDIS_HOST'));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
         }
     }
 

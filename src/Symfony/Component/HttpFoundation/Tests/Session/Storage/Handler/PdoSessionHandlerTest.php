@@ -54,7 +54,7 @@ class PdoSessionHandlerTest extends TestCase
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $storage = new PdoSessionHandler($pdo);
+        new PdoSessionHandler($pdo);
     }
 
     public function testInexistentTable()
@@ -147,7 +147,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testReadLockedConvertsStreamToString()
     {
-        if (filter_var(ini_get('session.use_strict_mode'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOLEAN)) {
             $this->markTestSkipped('Strict mode needs no locking for new sessions.');
         }
 
@@ -346,6 +346,9 @@ class PdoSessionHandlerTest extends TestCase
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
+    /**
+     * @return resource
+     */
     private function createStream($content)
     {
         $stream = tmpfile();
@@ -362,7 +365,7 @@ class MockPdo extends \PDO
     private $driverName;
     private $errorMode;
 
-    public function __construct($driverName = null, $errorMode = null)
+    public function __construct(string $driverName = null, int $errorMode = null)
     {
         $this->driverName = $driverName;
         $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;

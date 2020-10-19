@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container\ConstructorWithMandatoryArgumentsContainer
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

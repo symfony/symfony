@@ -19,6 +19,30 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DebugProcessorTest extends TestCase
 {
+    /**
+     * @dataProvider providerDatetimeFormatTests
+     */
+    public function testDatetimeFormat(array $record, $expectedTimestamp)
+    {
+        $processor = new DebugProcessor();
+        $processor($record);
+
+        $records = $processor->getLogs();
+        self::assertCount(1, $records);
+        self::assertSame($expectedTimestamp, $records[0]['timestamp']);
+    }
+
+    public function providerDatetimeFormatTests(): array
+    {
+        $record = $this->getRecord();
+
+        return [
+            [array_merge($record, ['datetime' => new \DateTime('2019-01-01T00:01:00+00:00')]), 1546300860],
+            [array_merge($record, ['datetime' => '2019-01-01T00:01:00+00:00']), 1546300860],
+            [array_merge($record, ['datetime' => 'foo']), false],
+        ];
+    }
+
     public function testDebugProcessor()
     {
         $processor = new DebugProcessor();
@@ -66,24 +90,16 @@ class DebugProcessorTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::getLogs()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
      */
-    public function testInheritedClassCallGetLogsWithoutArgument()
+    public function testInheritedClassWithoutArgument()
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
         $debugProcessorChild->getLogs();
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Bridge\Monolog\Processor\DebugProcessor::countErrors()" method will have a new "Request $request = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
-     */
-    public function testInheritedClassCallCountErrorsWithoutArgument()
-    {
-        $debugProcessorChild = new ClassThatInheritDebugProcessor();
         $debugProcessorChild->countErrors();
     }
 
-    private function getRecord($level = Logger::WARNING, $message = 'test')
+    private function getRecord($level = Logger::WARNING, $message = 'test'): array
     {
         return [
             'message' => $message,
@@ -94,18 +110,5 @@ class DebugProcessorTest extends TestCase
             'datetime' => new \DateTime(),
             'extra' => [],
         ];
-    }
-}
-
-class ClassThatInheritDebugProcessor extends DebugProcessor
-{
-    public function getLogs(): array
-    {
-        return parent::getLogs();
-    }
-
-    public function countErrors(): int
-    {
-        return parent::countErrors();
     }
 }

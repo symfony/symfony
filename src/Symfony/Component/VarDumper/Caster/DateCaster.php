@@ -17,6 +17,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * Casts DateTimeInterface related classes to array representation.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class DateCaster
 {
@@ -33,7 +35,11 @@ class DateCaster
             .($location ? ($d->format('I') ? "\nDST On" : "\nDST Off") : '')
         ;
 
-        $a = [];
+        unset(
+            $a[Caster::PREFIX_DYNAMIC.'date'],
+            $a[Caster::PREFIX_DYNAMIC.'timezone'],
+            $a[Caster::PREFIX_DYNAMIC.'timezone_type']
+        );
         $a[$prefix.'date'] = new ConstStub(self::formatDateTime($d, $location ? ' e (P)' : ' P'), $title);
 
         $stub->class .= $d->format(' @U');
@@ -52,7 +58,7 @@ class DateCaster
         return $filter & Caster::EXCLUDE_VERBOSE ? $i : $i + $a;
     }
 
-    private static function formatInterval(\DateInterval $i)
+    private static function formatInterval(\DateInterval $i): string
     {
         $format = '%R ';
 

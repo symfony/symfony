@@ -42,11 +42,9 @@ class WebServerExtension extends Extension
         if (!class_exists(ConsoleFormatter::class)) {
             $container->removeDefinition('web_server.command.server_log');
         }
-
-        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4, the new symfony local server has more feature, you should use it instead.', E_USER_DEPRECATED);
     }
 
-    private function getPublicDirectory(ContainerBuilder $container)
+    private function getPublicDirectory(ContainerBuilder $container): string
     {
         $kernelProjectDir = $container->getParameter('kernel.project_dir');
         $publicDir = 'public';

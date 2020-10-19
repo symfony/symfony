@@ -135,6 +135,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
+        return null;
     }
 
     /**
@@ -163,8 +164,8 @@ class LocaleDataGenerator extends AbstractDataGenerator
         // Discover the name of the region part of the locale
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
-            if (!RegionDataGenerator::isValidCountryCode($region)) {
-                throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
+            if (ctype_alpha($region) && !RegionDataGenerator::isValidCountryCode($region)) {
+                throw new MissingResourceException(sprintf('Skipping "%s" due an invalid country.', $locale));
             }
 
             $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));

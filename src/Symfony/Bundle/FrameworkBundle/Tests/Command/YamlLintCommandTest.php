@@ -72,29 +72,12 @@ bar';
     {
         $command = new YamlLintCommand();
         $expected = <<<EOF
-The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
-the first encountered syntax error.
-
-You can validates YAML contents passed from STDIN:
-
-  <info>cat filename | php %command.full_name%</info>
-
-You can also validate the syntax of a file:
-
-  <info>php %command.full_name% filename</info>
-
-Or of a whole directory:
-
-  <info>php %command.full_name% dirname</info>
-  <info>php %command.full_name% dirname --format=json</info>
-
 Or find all files in a bundle:
 
   <info>php %command.full_name% @AcmeDemoBundle</info>
-
 EOF;
 
-        $this->assertEquals($expected, $command->getHelp());
+        $this->assertStringContainsString($expected, $command->getHelp());
     }
 
     public function testLintFilesFromBundleDirectory()
@@ -185,9 +168,9 @@ EOF;
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                @unlink($file);
             }
         }
-        rmdir(sys_get_temp_dir().'/yml-lint-test');
+        @rmdir(sys_get_temp_dir().'/yml-lint-test');
     }
 }

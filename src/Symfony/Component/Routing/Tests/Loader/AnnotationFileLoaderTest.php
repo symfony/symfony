@@ -59,9 +59,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php');
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testLoadAnonymousClass()
     {
         $this->reader->expects($this->never())->method('getClassAnnotation');

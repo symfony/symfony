@@ -22,6 +22,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -82,14 +83,28 @@ class DateType extends AbstractType
             // so we need to handle the cascade setting here
             $emptyData = $builder->getEmptyData() ?: [];
 
-            if (isset($emptyData['year'])) {
-                $yearOptions['empty_data'] = $emptyData['year'];
-            }
-            if (isset($emptyData['month'])) {
-                $monthOptions['empty_data'] = $emptyData['month'];
-            }
-            if (isset($emptyData['day'])) {
-                $dayOptions['empty_data'] = $emptyData['day'];
+            if ($emptyData instanceof \Closure) {
+                $lazyEmptyData = static function ($option) use ($emptyData) {
+                    return static function (FormInterface $form) use ($emptyData, $option) {
+                        $emptyData = $emptyData($form->getParent());
+
+                        return isset($emptyData[$option]) ? $emptyData[$option] : '';
+                    };
+                };
+
+                $yearOptions['empty_data'] = $lazyEmptyData('year');
+                $monthOptions['empty_data'] = $lazyEmptyData('month');
+                $dayOptions['empty_data'] = $lazyEmptyData('day');
+            } else {
+                if (isset($emptyData['year'])) {
+                    $yearOptions['empty_data'] = $emptyData['year'];
+                }
+                if (isset($emptyData['month'])) {
+                    $monthOptions['empty_data'] = $emptyData['month'];
+                }
+                if (isset($emptyData['day'])) {
+                    $dayOptions['empty_data'] = $emptyData['day'];
+                }
             }
 
             if (isset($options['invalid_message'])) {
@@ -308,14 +323,24 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('days', 'array');
         $resolver->setAllowedTypes('input_format', 'string');
 
-        $resolver->setDeprecated('html5', function (Options $options, $html5) {
-            if ($html5 && 'single_text' === $options['widget'] && self::HTML5_FORMAT !== $options['format']) {
-                return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                //throw new LogicException(sprintf('Cannot use the "format" option of %s when the "html5" option is disabled.', self::class));
-            }
+        foreach (['html5', 'widget', 'format'] as $option) {
+            $resolver->setDeprecated($option, static function (Options $options, $value) use ($option): string {
+                try {
+                    $html5 = 'html5' === $option ? $value : $options['html5'];
+                    $widget = 'widget' === $option ? $value : $options['widget'];
+                    $format = 'format' === $option ? $value : $options['format'];
+                } catch (OptionDefinitionException $e) {
+                    return '';
+                }
 
-            return '';
-        });
+                if ($html5 && 'single_text' === $widget && self::HTML5_FORMAT !== $format) {
+                    return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                    //throw new LogicException(sprintf('Cannot use the "format" option of "%s" when the "html5" option is disabled.', self::class));
+                }
+
+                return '';
+            });
+        }
     }
 
     /**

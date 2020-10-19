@@ -70,7 +70,7 @@ final class LockRegistry
 
         foreach (self::$openedFiles as $file) {
             if ($file) {
-                flock($file, LOCK_UN);
+                flock($file, \LOCK_UN);
                 fclose($file);
             }
         }
@@ -90,8 +90,10 @@ final class LockRegistry
         while (true) {
             try {
                 // race to get the lock in non-blocking mode
-                if (flock($lock, LOCK_EX | LOCK_NB)) {
-                    $logger && $logger->info('Lock acquired, now computing item "{key}"', ['key' => $item->getKey()]);
+                $locked = flock($lock, \LOCK_EX | \LOCK_NB, $wouldBlock);
+
+                if ($locked || !$wouldBlock) {
+                    $logger && $logger->info(sprintf('Lock %s, now computing item "{key}"', $locked ? 'acquired' : 'not supported'), ['key' => $item->getKey()]);
                     self::$lockedFiles[$key] = true;
 
                     $value = $callback($item, $save);
@@ -109,9 +111,9 @@ final class LockRegistry
                 }
                 // if we failed the race, retry locking in blocking mode to wait for the winner
                 $logger && $logger->info('Item "{key}" is locked, waiting for it to be released', ['key' => $item->getKey()]);
-                flock($lock, LOCK_SH);
+                flock($lock, \LOCK_SH);
             } finally {
-                flock($lock, LOCK_UN);
+                flock($lock, \LOCK_UN);
                 unset(self::$lockedFiles[$key]);
             }
             static $signalingException, $signalingCallback;
@@ -131,6 +133,8 @@ final class LockRegistry
                 $logger && $logger->info('Item "{key}" not found while lock was released, now retrying', ['key' => $item->getKey()]);
             }
         }
+
+        return null;
     }
 
     private static function open(int $key)

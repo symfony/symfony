@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Container extends \Symfony\Component\DependencyInjection\Dump\AbstractContainer
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

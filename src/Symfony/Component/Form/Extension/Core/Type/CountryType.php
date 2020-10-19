@@ -42,16 +42,19 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
         $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 $choiceTranslationLocale = $options['choice_translation_locale'];
+                $alpha3 = $options['alpha3'];
 
-                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Countries::getNames($choiceTranslationLocale));
+                return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale, $alpha3) {
+                    return array_flip($alpha3 ? Countries::getAlpha3Names($choiceTranslationLocale) : Countries::getNames($choiceTranslationLocale));
                 });
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
+            'alpha3' => false,
         ]);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
+        $resolver->setAllowedTypes('alpha3', 'bool');
     }
 
     /**
@@ -59,7 +62,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\ChoiceType';
+        return ChoiceType::class;
     }
 
     /**
@@ -77,7 +80,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         if (null !== $this->choiceList) {
             return $this->choiceList;
@@ -93,7 +96,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadChoicesForValues(array $values, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $values = array_filter($values);
@@ -111,7 +114,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     public function loadValuesForChoices(array $choices, $value = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use the "choice_loader" option instead.', __METHOD__), \E_USER_DEPRECATED);
 
         // Optimize
         $choices = array_filter($choices);

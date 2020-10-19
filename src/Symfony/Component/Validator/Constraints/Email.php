@@ -79,15 +79,15 @@ class Email extends Constraint
     public function __construct($options = null)
     {
         if (\is_array($options) && \array_key_exists('strict', $options)) {
-            @trigger_error(sprintf('The "strict" property is deprecated since Symfony 4.1. Use "mode"=>"%s" instead.', self::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "strict" property is deprecated since Symfony 4.1. Use "mode"=>"%s" instead.', self::VALIDATION_MODE_STRICT), \E_USER_DEPRECATED);
         }
 
         if (\is_array($options) && \array_key_exists('checkMX', $options)) {
-            @trigger_error('The "checkMX" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
+            @trigger_error('The "checkMX" option is deprecated since Symfony 4.2.', \E_USER_DEPRECATED);
         }
 
         if (\is_array($options) && \array_key_exists('checkHost', $options)) {
-            @trigger_error('The "checkHost" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
+            @trigger_error('The "checkHost" option is deprecated since Symfony 4.2.', \E_USER_DEPRECATED);
         }
 
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
@@ -98,7 +98,7 @@ class Email extends Constraint
 
         if ((self::VALIDATION_MODE_STRICT === $this->mode || true === $this->strict) && !class_exists(StrictEmailValidator::class)) {
             // throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode.', __CLASS__));
-            @trigger_error(sprintf('Using the "%s" constraint in strict mode without the "egulias/email-validator" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s" constraint in strict mode without the "egulias/email-validator" component installed is deprecated since Symfony 4.2.', __CLASS__), \E_USER_DEPRECATED);
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

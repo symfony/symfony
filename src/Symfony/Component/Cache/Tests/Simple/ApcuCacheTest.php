@@ -25,9 +25,9 @@ class ApcuCacheTest extends CacheTestCase
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     ];
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
-        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) || ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))) {
+        if (!\function_exists('apcu_fetch') || !filter_var(ini_get('apc.enabled'), \FILTER_VALIDATE_BOOLEAN) || ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN))) {
             $this->markTestSkipped('APCu extension is required.');
         }
         if ('\\' === \DIRECTORY_SEPARATOR) {

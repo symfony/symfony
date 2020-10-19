@@ -33,11 +33,11 @@ interface HttpClientInterface
         'query' => [],          // string[] - associative array of query string values to merge with the request's URL
         'headers' => [],        // iterable|string[]|string[][] - headers names provided as keys or as part of values
         'body' => '',           // array|string|resource|\Traversable|\Closure - the callback SHOULD yield a string
-                                //   smaller than the amount requested as argument; the empty string signals EOF; when
+                                //   smaller than the amount requested as argument; the empty string signals EOF; if
                                 //   an array is passed, it is meant as a form payload of field names and values
-        'json' => null,         // array|\JsonSerializable - when set, implementations MUST set the "body" option to
-                                //   the JSON-encoded value and set the "content-type" headers to a JSON-compatible
-                                //   value if they are not defined - typically "application/json"
+        'json' => null,         // mixed - if set, implementations MUST set the "body" option to the JSON-encoded
+                                //   value and set the "content-type" header to a JSON-compatible value if it is not
+                                //   explicitly defined in the headers option - typically "application/json"
         'user_data' => null,    // mixed - any extra data to attach to the request (scalar, callable, object...) that
                                 //   MUST be available via $response->getInfo('user_data') - not used internally
         'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower than or equal to 0
@@ -45,7 +45,9 @@ interface HttpClientInterface
                                 //   NOT follow except for the initial host name
         'http_version' => null, // string - defaults to the best supported version, typically 1.1 or 2.0
         'base_uri' => null,     // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2
-        'buffer' => true,       // bool - whether the content of the response should be buffered or not
+        'buffer' => true,       // bool|resource|\Closure - whether the content of the response should be buffered or not,
+                                //   or a stream resource where the response body should be written,
+                                //   or a closure telling if/where the response should be buffered based on its headers
         'on_progress' => null,  // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort
                                 //   the request; it MUST be called on DNS resolution, on arrival of headers and on
                                 //   completion; it SHOULD be called on upload/download of data and at least 1/s

@@ -100,16 +100,11 @@ class PseudoClassExtension extends AbstractExtension
             ->addCondition('last() = 1');
     }
 
-    /**
-     * @throws ExpressionErrorException
-     */
     public function translateOnlyOfType(XPathExpr $xpath): XPathExpr
     {
-        if ('*' === $xpath->getElement()) {
-            throw new ExpressionErrorException('"*:only-of-type" is not implemented.');
-        }
+        $element = $xpath->getElement();
 
-        return $xpath->addCondition('last() = 1');
+        return $xpath->addCondition(sprintf('count(preceding-sibling::%s)=0 and count(following-sibling::%s)=0', $element, $element));
     }
 
     public function translateEmpty(XPathExpr $xpath): XPathExpr

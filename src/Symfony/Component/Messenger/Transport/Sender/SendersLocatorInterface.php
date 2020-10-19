@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\UnknownSenderException;
 
 /**
  * Maps a message to a list of senders.
@@ -28,13 +27,4 @@ interface SendersLocatorInterface
      * @return iterable|SenderInterface[] Indexed by sender alias if available
      */
     public function getSenders(Envelope $envelope): iterable;
-
-    /**
-     * Returns a specific sender by its alias.
-     *
-     * @param string $alias The alias given to the sender in getSenders()
-     *
-     * @throws UnknownSenderException If the sender is not found
-     */
-    public function getSenderByAlias(string $alias): SenderInterface;
 }

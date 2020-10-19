@@ -73,7 +73,7 @@ class Response
      */
     protected function buildHeader($name, $value)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3.', __METHOD__), \E_USER_DEPRECATED);
 
         return sprintf("%s: %s\n", $name, $value);
     }
@@ -97,7 +97,7 @@ class Response
      */
     public function getStatus()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3, use getStatusCode() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3, use getStatusCode() instead.', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->status;
     }

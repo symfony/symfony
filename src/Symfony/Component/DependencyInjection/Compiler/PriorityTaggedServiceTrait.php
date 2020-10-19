@@ -40,73 +40,128 @@ trait PriorityTaggedServiceTrait
      */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container): array
     {
-        $indexAttribute = $defaultIndexMethod = $needsIndexes = null;
+        $indexAttribute = $defaultIndexMethod = $needsIndexes = $defaultPriorityMethod = null;
 
         if ($tagName instanceof TaggedIteratorArgument) {
             $indexAttribute = $tagName->getIndexAttribute();
             $defaultIndexMethod = $tagName->getDefaultIndexMethod();
             $needsIndexes = $tagName->needsIndexes();
+            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod();
             $tagName = $tagName->getTag();
         }
 
+        $i = 0;
         $services = [];
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-
-            if (null === $indexAttribute && !$needsIndexes) {
-                $services[$priority][] = new Reference($serviceId);
-
-                continue;
-            }
-
+            $defaultPriority = null;
+            $defaultIndex = null;
             $class = $container->getDefinition($serviceId)->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
 
-            if (null !== $indexAttribute && isset($attributes[0][$indexAttribute])) {
-                $services[$priority][$attributes[0][$indexAttribute]] = new TypedReference($serviceId, $class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $attributes[0][$indexAttribute]);
+            foreach ($attributes as $attribute) {
+                $index = $priority = null;
 
-                continue;
-            }
+                if (isset($attribute['priority'])) {
+                    $priority = $attribute['priority'];
+                } elseif (null === $defaultPriority && $defaultPriorityMethod && $class) {
+                    $defaultPriority = PriorityTaggedServiceUtil::getDefaultPriority($container, $serviceId, $class, $defaultPriorityMethod, $tagName);
+                }
+                $priority = $priority ?? $defaultPriority ?? $defaultPriority = 0;
 
-            if (!$r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
-            }
-
-            $class = $r->name;
-
-            if (!$r->hasMethod($defaultIndexMethod)) {
-                if ($needsIndexes) {
-                    $services[$priority][$serviceId] = new TypedReference($serviceId, $class);
-
-                    continue;
+                if (null === $indexAttribute && !$needsIndexes) {
+                    $services[] = [$priority, ++$i, null, $serviceId, null];
+                    continue 2;
                 }
 
-                throw new InvalidArgumentException(sprintf('Method "%s::%s()" not found: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
+                if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
+                    $index = $attribute[$indexAttribute];
+                } elseif (null === $defaultIndex && $defaultIndexMethod && $class) {
+                    $defaultIndex = PriorityTaggedServiceUtil::getDefaultIndex($container, $serviceId, $class, $defaultIndexMethod, $tagName, $indexAttribute);
+                }
+                $index = $index ?? $defaultIndex ?? $defaultIndex = $serviceId;
+
+                $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }
-
-            if (!($rm = $r->getMethod($defaultIndexMethod))->isStatic()) {
-                throw new InvalidArgumentException(sprintf('Method "%s::%s()" should be static: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
-            }
-
-            if (!$rm->isPublic()) {
-                throw new InvalidArgumentException(sprintf('Method "%s::%s()" should be public: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
-            }
-
-            $key = $rm->invoke(null);
-
-            if (!\is_string($key)) {
-                throw new InvalidArgumentException(sprintf('Method "%s::%s()" should return a string, got %s: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, \gettype($key), $tagName, $serviceId, $indexAttribute));
-            }
-
-            $services[$priority][$key] = new TypedReference($serviceId, $class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $key);
         }
 
-        if ($services) {
-            krsort($services);
-            $services = array_merge(...$services);
+        uasort($services, static function ($a, $b) { return $b[0] <=> $a[0] ?: $a[1] <=> $b[1]; });
+
+        $refs = [];
+        foreach ($services as [, , $index, $serviceId, $class]) {
+            if (!$class) {
+                $reference = new Reference($serviceId);
+            } elseif ($index === $serviceId) {
+                $reference = new TypedReference($serviceId, $class);
+            } else {
+                $reference = new TypedReference($serviceId, $class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $index);
+            }
+
+            if (null === $index) {
+                $refs[] = $reference;
+            } else {
+                $refs[$index] = $reference;
+            }
         }
 
-        return $services;
+        return $refs;
+    }
+}
+
+/**
+ * @internal
+ */
+class PriorityTaggedServiceUtil
+{
+    /**
+     * Gets the index defined by the default index method.
+     */
+    public static function getDefaultIndex(ContainerBuilder $container, string $serviceId, string $class, string $defaultIndexMethod, string $tagName, string $indexAttribute): ?string
+    {
+        if (!($r = $container->getReflectionClass($class)) || !$r->hasMethod($defaultIndexMethod)) {
+            return null;
+        }
+
+        if (!($rm = $r->getMethod($defaultIndexMethod))->isStatic()) {
+            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be static or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
+        }
+
+        if (!$rm->isPublic()) {
+            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be public or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
+        }
+
+        $defaultIndex = $rm->invoke(null);
+
+        if (!\is_string($defaultIndex)) {
+            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should return a string (got "%s") or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, \gettype($defaultIndex), $tagName, $serviceId, $indexAttribute));
+        }
+
+        return $defaultIndex;
+    }
+
+    /**
+     * Gets the priority defined by the default priority method.
+     */
+    public static function getDefaultPriority(ContainerBuilder $container, string $serviceId, string $class, string $defaultPriorityMethod, string $tagName): ?int
+    {
+        if (!($r = $container->getReflectionClass($class)) || !$r->hasMethod($defaultPriorityMethod)) {
+            return null;
+        }
+
+        if (!($rm = $r->getMethod($defaultPriorityMethod))->isStatic()) {
+            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be static or tag "%s" on service "%s" is missing attribute "priority".', $class, $defaultPriorityMethod, $tagName, $serviceId));
+        }
+
+        if (!$rm->isPublic()) {
+            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be public or tag "%s" on service "%s" is missing attribute "priority".', $class, $defaultPriorityMethod, $tagName, $serviceId));
+        }
+
+        $defaultPriority = $rm->invoke(null);
+
+        if (!\is_int($defaultPriority)) {
+            throw new InvalidArgumentException(sprintf('Method "%s::%s()" should return an integer (got "%s") or tag "%s" on service "%s" is missing attribute "priority".', $class, $defaultPriorityMethod, \gettype($defaultPriority), $tagName, $serviceId));
+        }
+
+        return $defaultPriority;
     }
 }

@@ -39,7 +39,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         parent::__construct();
     }
 
-    protected function getReceiverName()
+    protected function getReceiverName(): string
     {
         return $this->receiverName;
     }
@@ -61,8 +61,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         /** @var SentToFailureTransportStamp|null $sentToFailureTransportStamp */
         $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
-        /** @var RedeliveryStamp|null $lastRedeliveryStamp */
-        $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+        $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope);
 
         $rows = [
             ['Class', \get_class($envelope->getMessage())],
@@ -72,13 +71,13 @@ abstract class AbstractFailedMessagesCommand extends Command
             $rows[] = ['Message Id', $id];
         }
 
-        $flattenException = null === $lastRedeliveryStamp ? null : $lastRedeliveryStamp->getFlattenException();
+        $flattenException = null === $lastRedeliveryStampWithException ? null : $lastRedeliveryStampWithException->getFlattenException();
         if (null === $sentToFailureTransportStamp) {
             $io->warning('Message does not appear to have been sent to this transport after failing');
         } else {
             $rows = array_merge($rows, [
-                ['Failed at', null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')],
-                ['Error', null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getExceptionMessage()],
+                ['Failed at', null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getRedeliveredAt()->format('Y-m-d H:i:s')],
+                ['Error', null === $lastRedeliveryStampWithException ? '' : $lastRedeliveryStampWithException->getExceptionMessage()],
                 ['Error Class', null === $flattenException ? '(unknown)' : $flattenException->getClass()],
                 ['Transport', $sentToFailureTransportStamp->getOriginalReceiverName()],
             ]);
@@ -90,7 +89,7 @@ abstract class AbstractFailedMessagesCommand extends Command
         $redeliveryStamps = $envelope->all(RedeliveryStamp::class);
         $io->writeln(' Message history:');
         foreach ($redeliveryStamps as $redeliveryStamp) {
-            $io->writeln(sprintf('  * Message failed and redelivered to the <info>%s</info> transport at <info>%s</info>', $redeliveryStamp->getSenderClassOrAlias(), $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')));
+            $io->writeln(sprintf('  * Message failed at <info>%s</info> and was redelivered', $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')));
         }
         $io->newLine();
 
@@ -119,5 +118,17 @@ abstract class AbstractFailedMessagesCommand extends Command
     protected function getReceiver(): ReceiverInterface
     {
         return $this->receiver;
+    }
+
+    protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
+    {
+        /** @var RedeliveryStamp $stamp */
+        foreach (array_reverse($envelope->all(RedeliveryStamp::class)) as $stamp) {
+            if (null !== $stamp->getExceptionMessage()) {
+                return $stamp;
+            }
+        }
+
+        return null;
     }
 }

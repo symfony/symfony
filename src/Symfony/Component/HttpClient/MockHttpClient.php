@@ -68,6 +68,10 @@ class MockHttpClient implements HttpClientInterface
             $this->responseFactory->next();
         }
 
+        if (!$response instanceof ResponseInterface) {
+            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', \is_object($response) ? \get_class($response) : \gettype($response)));
+        }
+
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 
@@ -79,7 +83,7 @@ class MockHttpClient implements HttpClientInterface
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
         } elseif (!is_iterable($responses)) {
-            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of MockResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+            throw new \TypeError(sprintf('"%s()" expects parameter 1 to be an iterable of MockResponse objects, "%s" given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 
         return new ResponseStream(MockResponse::stream($responses, $timeout));

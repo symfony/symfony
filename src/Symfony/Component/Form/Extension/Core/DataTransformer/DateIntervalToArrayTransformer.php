@@ -129,14 +129,14 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             }
         }
         if (\count($emptyFields) > 0) {
-            throw new TransformationFailedException(sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)));
+            throw new TransformationFailedException(sprintf('The fields "%s" should not be empty.', implode('", "', $emptyFields)));
         }
         if (isset($value['invert']) && !\is_bool($value['invert'])) {
-            throw new TransformationFailedException('The value of "invert" must be boolean');
+            throw new TransformationFailedException('The value of "invert" must be boolean.');
         }
         foreach (self::$availableFields as $field => $char) {
             if ('invert' !== $field && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
-                throw new TransformationFailedException(sprintf('This amount of "%s" is invalid', $field));
+                throw new TransformationFailedException(sprintf('This amount of "%s" is invalid.', $field));
             }
         }
         try {

@@ -49,7 +49,7 @@ final class Locales extends ResourceBundle
     }
 
     /**
-     * @throws MissingResourceException if the locale does not exists
+     * @throws MissingResourceException if the locale does not exist
      */
     public static function getName(string $locale, string $displayLocale = null): string
     {

@@ -21,7 +21,7 @@ class ConfigurationTest extends TestCase
     {
         $input = [
             'strict_variables' => false, // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0
             'form_themes' => ['form_div_layout.html.twig'],
         ];
 
@@ -45,14 +45,14 @@ class ConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Relying on the default value ("twig.controller.exception::showAction") of the "twig.exception_controller" configuration option is deprecated since Symfony 4.4, set it to "null" explicitly instead, which will be the new default in 5.0.
+     * @expectedDeprecation The "twig.exception_controller" configuration key has been deprecated in Symfony 4.4, set it to "null" and use "framework.error_controller" configuration key instead.
      */
     public function testGetExceptionControllerDefault()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), [[]]);
+        $config = $processor->processConfiguration(new Configuration(), [['exception_controller' => 'exception_controller']]);
 
-        $this->assertSame('twig.controller.exception::showAction', $config['exception_controller']);
+        $this->assertSame('exception_controller', $config['exception_controller']);
     }
 
     public function testGlobalsAreNotNormalized()

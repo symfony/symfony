@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.83",
     "Names": {
         "aa": "afarî",
         "ab": "abxazî",
@@ -11,7 +10,6 @@
         "am": "amharî",
         "an": "aragonî",
         "ar": "erebî",
-        "ar_001": "erebiya standard",
         "as": "asamî",
         "ast": "astûrî",
         "av": "avarî",
@@ -31,7 +29,6 @@
         "br": "bretonî",
         "bs": "bosnî",
         "bug": "bugî",
-        "byn": "byn",
         "ca": "katalanî",
         "ce": "çeçenî",
         "ceb": "sebwanoyî",
@@ -69,7 +66,6 @@
         "fy": "frîsî",
         "ga": "îrî",
         "gd": "gaelîka skotî",
-        "gez": "gez",
         "gil": "kîrîbatî",
         "gl": "galîsî",
         "gn": "guwaranî",
@@ -150,7 +146,6 @@
         "ne": "nepalî",
         "niu": "nîwî",
         "nl": "holendî",
-        "nl_BE": "flamî",
         "nn": "norwecî (nynorsk)",
         "nso": "sotoyiya bakur",
         "nv": "navajoyî",
@@ -232,5 +227,9 @@
         "yue": "kantonî",
         "zu": "zuluyî",
         "zza": "zazakî"
+    },
+    "LocalizedNames": {
+        "ar_001": "erebiya standard",
+        "nl_BE": "flamî"
     }
 }

@@ -25,7 +25,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class CurrencyDataGenerator extends AbstractDataGenerator
 {
-    private static $blacklist = [
+    private static $denylist = [
         'XBA' => true, // European Composite Unit
         'XBB' => true, // European Monetary Unit
         'XBC' => true, // European Unit of Account (XBC)
@@ -82,7 +82,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
         if (isset($localeBundle['Currencies']) && null !== $localeBundle['Currencies']) {
             $data = [
-                'Version' => $localeBundle['Version'],
                 'Names' => $this->generateSymbolNamePairs($localeBundle),
             ];
 
@@ -102,7 +101,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $rootBundle = $reader->read($tempDir, 'root');
 
         return [
-            'Version' => $rootBundle['Version'],
             'Names' => $this->generateSymbolNamePairs($rootBundle),
         ];
     }
@@ -112,7 +110,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
         $supplementalDataBundle = $reader->read($tempDir, 'supplementalData');
         $numericCodesBundle = $reader->read($tempDir, 'currencyNumericCodes');
 
@@ -121,7 +118,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         sort($this->currencyCodes);
 
         $data = [
-            'Version' => $rootBundle['Version'],
             'Currencies' => $this->currencyCodes,
             'Meta' => $this->generateCurrencyMeta($supplementalDataBundle),
             'Alpha3ToNumeric' => $this->generateAlpha3ToNumericMapping($numericCodesBundle, $this->currencyCodes),
@@ -137,7 +133,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $symbolNamePairs = iterator_to_array($rootBundle['Currencies']);
 
         // Remove unwanted currencies
-        $symbolNamePairs = array_diff_key($symbolNamePairs, self::$blacklist);
+        $symbolNamePairs = array_diff_key($symbolNamePairs, self::$denylist);
 
         return $symbolNamePairs;
     }

@@ -70,7 +70,7 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response('', 302, ['Location' => 'https://example.com/']))->assertResponseRedirects('https://example.com/', 302);
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('is redirected and has header "Location" with value "https://example.com/" and status code is 301.');
+        $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
     }
 
@@ -274,13 +274,14 @@ class WebTestCaseTest extends TestCase
 
     private function getTester(KernelBrowser $client): WebTestCase
     {
-        return new class($client) extends WebTestCase {
-            use WebTestAssertionsTrait;
-
-            public function __construct(KernelBrowser $client)
-            {
-                self::getClient($client);
+        $tester = new class() extends WebTestCase {
+            use WebTestAssertionsTrait {
+                getClient as public;
             }
         };
+
+        $tester::getClient($client);
+
+        return $tester;
     }
 }

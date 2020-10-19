@@ -12,10 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
@@ -58,7 +58,14 @@ class EntityTypeTest extends BaseTypeTest
      */
     private $emRegistry;
 
-    protected static $supportedFeatureSetVersion = 304;
+    protected static $supportedFeatureSetVersion = 404;
+
+    public static function setUpBeforeClass(): void
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+    }
 
     protected function setUp(): void
     {
@@ -130,6 +137,39 @@ class EntityTypeTest extends BaseTypeTest
         ]);
     }
 
+    /**
+     * @dataProvider choiceTranslationDomainProvider
+     */
+    public function testChoiceTranslationDomainIsDisabledByDefault($expanded)
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+
+        $this->persist([$entity1]);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'choices' => [
+                $entity1,
+            ],
+            'class' => SingleIntIdEntity::class,
+            'em' => 'default',
+            'expanded' => $expanded,
+        ]);
+
+        if ($expanded) {
+            $this->assertFalse($field->get('1')->getConfig()->getOption('translation_domain'));
+        } else {
+            $this->assertFalse($field->getConfig()->getOption('choice_translation_domain'));
+        }
+    }
+
+    public function choiceTranslationDomainProvider()
+    {
+        return [
+            [false],
+            [true],
+        ];
+    }
+
     public function testSetDataToUninitializedEntityWithNonRequired()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -187,7 +227,7 @@ class EntityTypeTest extends BaseTypeTest
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
@@ -953,6 +993,56 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
+    public function testSingleIdentifierWithLimit()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist([$entity1, $entity2, $entity3]);
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2, 3)')
+                ->setMaxResults(1),
+            'choice_label' => 'name',
+        ]);
+
+        $field->submit('1');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertSame($entity1, $field->getData());
+    }
+
+    public function testDisallowChoicesThatAreNotIncludedByQueryBuilderSingleIdentifierWithLimit()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist([$entity1, $entity2, $entity3]);
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.id IN (1, 2, 3)')
+                ->setMaxResults(1),
+            'choice_label' => 'name',
+        ]);
+
+        $field->submit('3');
+
+        $this->assertFalse($field->isSynchronized());
+        $this->assertNull($field->getData());
+    }
+
     public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier()
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
@@ -1226,7 +1316,7 @@ class EntityTypeTest extends BaseTypeTest
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))

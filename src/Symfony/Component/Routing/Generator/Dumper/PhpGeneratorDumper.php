@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "CompiledUrlGeneratorDumper" instead.', PhpGeneratorDumper::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "CompiledUrlGeneratorDumper" instead.', PhpGeneratorDumper::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 
@@ -116,7 +116,6 @@ EOF;
         if (null !== $locale && null !== $name) {
             do {
                 if ((self::$declaredRoutes[$name.'.'.$locale][1]['_canonical_route'] ?? null) === $name) {
-                    unset($parameters['_locale']);
                     $name .= '.'.$locale;
                     break;
                 }
@@ -128,6 +127,14 @@ EOF;
         }
 
         list($variables, $defaults, $requirements, $tokens, $hostTokens, $requiredSchemes) = self::$declaredRoutes[$name];
+
+        if (isset($defaults['_canonical_route']) && isset($defaults['_locale'])) {
+            if (!\in_array('_locale', $variables, true)) {
+                unset($parameters['_locale']);
+            } elseif (!isset($parameters['_locale'])) {
+                $parameters['_locale'] = $defaults['_locale'];
+            }
+        }
 
         return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
     }

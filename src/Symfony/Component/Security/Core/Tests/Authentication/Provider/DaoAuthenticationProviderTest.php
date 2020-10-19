@@ -152,7 +152,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
         $method->invoke(
             $provider,
-            $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(),
+            new User('username', 'password'),
             $token
         );
     }
@@ -176,7 +176,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new User('username', 'password'), $token);
     }
 
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
@@ -248,7 +248,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserInterface')->getMock(), $token);
+        $method->invoke($provider, new User('username', 'password'), $token);
     }
 
     public function testPasswordUpgrades()
@@ -303,7 +303,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null, $passwordEncoder = null)
     {
-        $userProvider = $this->getMockBuilder([UserProviderInterface::class, PasswordUpgraderInterface::class])->getMock();
+        $userProvider = $this->getMockBuilder(PasswordUpgraderProvider::class)->getMock();
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
@@ -328,4 +328,8 @@ class DaoAuthenticationProviderTest extends TestCase
 
         return new DaoAuthenticationProvider($userProvider, $userChecker, 'key', $encoderFactory);
     }
+}
+
+interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
+{
 }

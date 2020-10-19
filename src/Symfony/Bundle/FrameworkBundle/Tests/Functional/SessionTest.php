@@ -59,7 +59,30 @@ class SessionTest extends AbstractWebTestCase
         }
 
         // set flash
-        $crawler = $client->request('GET', '/session_setflash/Hello%20world.');
+        $client->request('GET', '/session_setflash/Hello%20world.');
+
+        // check flash displays on redirect
+        $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());
+
+        // check flash is gone
+        $crawler = $client->request('GET', '/session_showflash');
+        $this->assertStringContainsString('No flash was set.', $crawler->text());
+    }
+
+    /**
+     * Tests flash messages work when flashbag service is injected to the constructor.
+     *
+     * @dataProvider getConfigs
+     */
+    public function testFlashOnInjectedFlashbag($config, $insulate)
+    {
+        $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        // set flash
+        $client->request('GET', '/injected_flashbag/session_setflash/Hello%20world.');
 
         // check flash displays on redirect
         $this->assertStringContainsString('Hello world.', $client->followRedirect()->text());

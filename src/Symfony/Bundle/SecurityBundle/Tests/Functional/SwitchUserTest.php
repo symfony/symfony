@@ -29,15 +29,15 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserCannotSwitchToOther()
+    public function testSwitchedUserCanSwitchToOther()
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_1');
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_2');
 
-        $this->assertEquals(500, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_2', $client->getProfile()->getCollector('security')->getUser());
     }
 
     public function testSwitchedUserExit()
@@ -68,7 +68,7 @@ class SwitchUserTest extends AbstractWebTestCase
         return [
             'unauthorized_user_cannot_switch' => ['user_cannot_switch_1', 'user_cannot_switch_1', 'user_cannot_switch_1', 403],
             'authorized_user_can_switch' => ['user_can_switch', 'user_cannot_switch_1', 'user_cannot_switch_1', 200],
-            'authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', 'user_does_not_exist', 'user_can_switch', 500],
+            'authorized_user_cannot_switch_to_non_existent' => ['user_can_switch', 'user_does_not_exist', 'user_can_switch', 403],
             'authorized_user_can_switch_to_himself' => ['user_can_switch', 'user_can_switch', 'user_can_switch', 200],
         ];
     }

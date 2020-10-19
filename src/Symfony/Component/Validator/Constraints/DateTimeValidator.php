@@ -27,7 +27,7 @@ class DateTimeValidator extends DateValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof DateTime) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTime');
+            throw new UnexpectedTypeException($constraint, DateTime::class);
         }
 
         if (null === $value || '' === $value) {
@@ -35,7 +35,7 @@ class DateTimeValidator extends DateValidator
         }
 
         if ($value instanceof \DateTimeInterface) {
-            @trigger_error(sprintf('Validating a \\DateTimeInterface with "%s" is deprecated since version 4.2. Use "%s" instead or remove the constraint if the underlying model is already type hinted to \\DateTimeInterface.', DateTime::class, Type::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Validating a \\DateTimeInterface with "%s" is deprecated since version 4.2. Use "%s" instead or remove the constraint if the underlying model is already type hinted to \\DateTimeInterface.', DateTime::class, Type::class), \E_USER_DEPRECATED);
 
             return;
         }
@@ -57,6 +57,12 @@ class DateTimeValidator extends DateValidator
                 ->addViolation();
 
             return;
+        }
+
+        if ('+' === substr($constraint->format, -1)) {
+            $errors['warnings'] = array_filter($errors['warnings'], function ($warning) {
+                return 'Trailing data' !== $warning;
+            });
         }
 
         foreach ($errors['warnings'] as $warning) {

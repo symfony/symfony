@@ -228,7 +228,7 @@ class MainConfiguration implements ConfigurationInterface
                                 foreach ($v as $originalName => $cookieConfig) {
                                     if (false !== strpos($originalName, '-')) {
                                         $normalizedName = str_replace('-', '_', $originalName);
-                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), E_USER_DEPRECATED);
+                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), \E_USER_DEPRECATED);
 
                                         // normalize cookie names manually for BC reasons. Remove it in Symfony 5.0.
                                         $v[$normalizedName] = $cookieConfig;
@@ -244,6 +244,8 @@ class MainConfiguration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('path')->defaultNull()->end()
                                 ->scalarNode('domain')->defaultNull()->end()
+                                ->scalarNode('secure')->defaultFalse()->end()
+                                ->scalarNode('samesite')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()
@@ -253,12 +255,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->arrayNode('handlers')
                         ->prototype('scalar')->end()
                     ->end()
-                ->end()
-            ->end()
-            ->arrayNode('anonymous')
-                ->canBeUnset()
-                ->children()
-                    ->scalarNode('secret')->defaultNull()->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')
@@ -399,7 +395,17 @@ class MainConfiguration implements ConfigurationInterface
                         ->performNoDeepMerging()
                         ->beforeNormalization()->ifString()->then(function ($v) { return ['algorithm' => $v]; })->end()
                         ->children()
-                            ->scalarNode('algorithm')->cannotBeEmpty()->end()
+                            ->scalarNode('algorithm')
+                                ->cannotBeEmpty()
+                                ->validate()
+                                    ->ifTrue(function ($v) { return !\is_string($v); })
+                                    ->thenInvalid('You must provide a string value.')
+                                ->end()
+                            ->end()
+                            ->arrayNode('migrate_from')
+                                ->prototype('scalar')->end()
+                                ->beforeNormalization()->castToArray()->end()
+                            ->end()
                             ->scalarNode('hash_algorithm')->info('Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms.')->defaultValue('sha512')->end()
                             ->scalarNode('key_length')->defaultValue(40)->end()
                             ->booleanNode('ignore_case')->defaultFalse()->end()

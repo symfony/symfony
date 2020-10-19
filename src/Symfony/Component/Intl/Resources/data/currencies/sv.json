@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.90",
     "Names": {
         "ADP": [
             "ADP",
@@ -263,7 +262,7 @@
         ],
         "CNH": [
             "CNH",
-            "CNH"
+            "kinesisk yuan (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -971,7 +970,7 @@
         ],
         "TPE": [
             "TPE",
-            "timoriansk escudo"
+            "östtimoresisk escudo"
         ],
         "TRL": [
             "TRL",
@@ -1032,6 +1031,10 @@
         "UYU": [
             "UYU",
             "uruguayansk peso"
+        ],
+        "UYW": [
+            "UYW",
+            "uruguayansk indexenhet för nominell lön"
         ],
         "UZS": [
             "UZS",

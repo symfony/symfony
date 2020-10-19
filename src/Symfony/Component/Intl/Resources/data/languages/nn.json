@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.49.82",
     "Names": {
         "aa": "afar",
         "ab": "abkhasisk",
@@ -21,7 +20,6 @@
         "ang": "gammalengelsk",
         "anp": "angika",
         "ar": "arabisk",
-        "ar_001": "moderne standardarabisk",
         "arc": "arameisk",
         "arn": "mapudungun",
         "arp": "arapaho",
@@ -114,7 +112,6 @@
         "el": "gresk",
         "elx": "elamite",
         "en": "engelsk",
-        "en_GB": "britisk engelsk",
         "enm": "mellomengelsk",
         "eo": "esperanto",
         "es": "spansk",
@@ -304,14 +301,12 @@
         "nb": "bokmål",
         "nd": "nord-ndebele",
         "nds": "lågtysk",
-        "nds_NL": "lågsaksisk",
         "ne": "nepalsk",
         "new": "newari",
         "ng": "ndonga",
         "nia": "nias",
         "niu": "niuisk",
         "nl": "nederlandsk",
-        "nl_BE": "flamsk",
         "nmg": "kwasio",
         "nn": "nynorsk",
         "nnh": "ngiemboon",
@@ -360,7 +355,6 @@
         "rm": "retoromansk",
         "rn": "rundi",
         "ro": "rumensk",
-        "ro_MD": "moldavisk",
         "rof": "rombo",
         "rom": "romani",
         "ru": "russisk",
@@ -486,10 +480,17 @@
         "zen": "zenaga",
         "zgh": "standard marokkansk tamazight",
         "zh": "kinesisk",
-        "zh_Hans": "forenkla kinesisk",
-        "zh_Hant": "tradisjonell kinesisk",
         "zu": "zulu",
         "zun": "zuni",
         "zza": "zaza"
+    },
+    "LocalizedNames": {
+        "ar_001": "moderne standardarabisk",
+        "en_GB": "britisk engelsk",
+        "nds_NL": "lågsaksisk",
+        "nl_BE": "flamsk",
+        "ro_MD": "moldavisk",
+        "zh_Hans": "forenkla kinesisk",
+        "zh_Hant": "tradisjonell kinesisk"
     }
 }

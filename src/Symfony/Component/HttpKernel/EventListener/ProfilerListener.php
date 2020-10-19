@@ -62,7 +62,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $this->exception = $event->getException();
+        $this->exception = $event->getThrowable();
     }
 
     /**

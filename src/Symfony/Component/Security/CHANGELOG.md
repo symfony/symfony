@@ -11,6 +11,10 @@ CHANGELOG
  * Added `Guard\PasswordAuthenticatedInterface`, an optional interface
    for "guard" authenticators that deal with user passwords
  * Marked all dispatched event classes as `@final`
+ * Deprecated returning a non-boolean value when implementing `Guard\AuthenticatorInterface::checkCredentials()`.
+ * Deprecated passing more than one attribute to `AccessDecisionManager::decide()` and `AuthorizationChecker::isGranted()`
+ * Added new `argon2id` encoder, undeprecated the `bcrypt` and `argon2i` ones (using `auto` is still recommended by default.)
+ * Added `AbstractListener` which replaces the deprecated `ListenerInterface`
 
 4.3.0
 -----

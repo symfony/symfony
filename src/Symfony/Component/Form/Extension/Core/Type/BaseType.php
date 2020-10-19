@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -101,6 +102,7 @@ abstract class BaseType extends AbstractType
             'attr' => $options['attr'],
             'block_prefixes' => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
+            'row_attr' => $options['row_attr'],
             'translation_domain' => $translationDomain,
             'label_translation_parameters' => $labelTranslationParameters,
             'attr_translation_parameters' => $attrTranslationParameters,
@@ -110,7 +112,7 @@ abstract class BaseType extends AbstractType
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getBlockPrefix(),
+            AbstractRendererEngine::CACHE_KEY_VAR => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getBlockPrefix(),
         ]);
     }
 
@@ -125,6 +127,7 @@ abstract class BaseType extends AbstractType
             'disabled' => false,
             'label' => null,
             'label_format' => null,
+            'row_attr' => [],
             'label_translation_parameters' => [],
             'attr_translation_parameters' => [],
             'attr' => [],
@@ -134,5 +137,6 @@ abstract class BaseType extends AbstractType
 
         $resolver->setAllowedTypes('block_prefix', ['null', 'string']);
         $resolver->setAllowedTypes('attr', 'array');
+        $resolver->setAllowedTypes('row_attr', 'array');
     }
 }

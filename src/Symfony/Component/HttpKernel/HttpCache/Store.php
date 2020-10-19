@@ -48,7 +48,7 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            flock($lock, LOCK_UN);
+            flock($lock, \LOCK_UN);
             fclose($lock);
         }
 
@@ -70,7 +70,7 @@ class Store implements StoreInterface
                 return $path;
             }
             $h = fopen($path, 'cb');
-            if (!flock($h, LOCK_EX | LOCK_NB)) {
+            if (!flock($h, \LOCK_EX | \LOCK_NB)) {
                 fclose($h);
 
                 return $path;
@@ -92,7 +92,7 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
 
         if (isset($this->locks[$key])) {
-            flock($this->locks[$key], LOCK_UN);
+            flock($this->locks[$key], \LOCK_UN);
             fclose($this->locks[$key]);
             unset($this->locks[$key]);
 
@@ -115,8 +115,8 @@ class Store implements StoreInterface
         }
 
         $h = fopen($path, 'rb');
-        flock($h, LOCK_EX | LOCK_NB, $wouldBlock);
-        flock($h, LOCK_UN); // release the lock we just acquired
+        flock($h, \LOCK_EX | \LOCK_NB, $wouldBlock);
+        flock($h, \LOCK_UN); // release the lock we just acquired
         fclose($h);
 
         return (bool) $wouldBlock;
@@ -150,8 +150,8 @@ class Store implements StoreInterface
         }
 
         $headers = $match[1];
-        if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
-            return $this->restoreResponse($headers, $body);
+        if (file_exists($path = $this->getPath($headers['x-content-digest'][0]))) {
+            return $this->restoreResponse($headers, $path);
         }
 
         // TODO the metaStore referenced an entity that doesn't exist in
@@ -175,15 +175,24 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
         $storedEnv = $this->persistRequest($request);
 
-        // write the response body to the entity store if this is the original response
-        if (!$response->headers->has('X-Content-Digest')) {
-            $digest = $this->generateContentDigest($response);
-
-            if (!$this->save($digest, $response->getContent())) {
-                throw new \RuntimeException('Unable to store the entity.');
+        if ($response->headers->has('X-Body-File')) {
+            // Assume the response came from disk, but at least perform some safeguard checks
+            if (!$response->headers->has('X-Content-Digest')) {
+                throw new \RuntimeException('A restored response must have the X-Content-Digest header.');
             }
 
+            $digest = $response->headers->get('X-Content-Digest');
+            if ($this->getPath($digest) !== $response->headers->get('X-Body-File')) {
+                throw new \RuntimeException('X-Body-File and X-Content-Digest do not match.');
+            }
+            // Everything seems ok, omit writing content to disk
+        } else {
+            $digest = $this->generateContentDigest($response);
             $response->headers->set('X-Content-Digest', $digest);
+
+            if (!$this->save($digest, $response->getContent(), false)) {
+                throw new \RuntimeException('Unable to store the entity.');
+            }
 
             if (!$response->headers->has('Transfer-Encoding')) {
                 $response->headers->set('Content-Length', \strlen($response->getContent()));
@@ -319,7 +328,7 @@ class Store implements StoreInterface
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
-            flock($this->locks[$key], LOCK_UN);
+            flock($this->locks[$key], \LOCK_UN);
             fclose($this->locks[$key]);
             unset($this->locks[$key]);
         }
@@ -346,9 +355,13 @@ class Store implements StoreInterface
     /**
      * Save data for the given key.
      */
-    private function save(string $key, string $data): bool
+    private function save(string $key, string $data, bool $overwrite = true): bool
     {
         $path = $this->getPath($key);
+
+        if (!$overwrite && file_exists($path)) {
+            return true;
+        }
 
         if (isset($this->locks[$key])) {
             $fp = $this->locks[$key];
@@ -448,15 +461,15 @@ class Store implements StoreInterface
     /**
      * Restores a Response from the HTTP headers and body.
      */
-    private function restoreResponse(array $headers, string $body = null): Response
+    private function restoreResponse(array $headers, string $path = null): Response
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);
 
-        if (null !== $body) {
-            $headers['X-Body-File'] = [$body];
+        if (null !== $path) {
+            $headers['X-Body-File'] = [$path];
         }
 
-        return new Response($body, $status, $headers);
+        return new Response($path, $status, $headers);
     }
 }

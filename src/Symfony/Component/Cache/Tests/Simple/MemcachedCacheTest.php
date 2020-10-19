@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
 
 /**
  * @group legacy
+ * @group integration
  */
 class MemcachedCacheTest extends CacheTestCase
 {
@@ -42,7 +43,7 @@ class MemcachedCacheTest extends CacheTestCase
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]) : self::$client;
 
@@ -78,14 +79,20 @@ class MemcachedCacheTest extends CacheTestCase
     /**
      * @dataProvider provideBadOptions
      */
-    public function testBadOptions($name, $value)
+    public function testBadOptions(string $name, $value)
     {
-        $this->expectException('ErrorException');
-        $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        if (\PHP_VERSION_ID < 80000) {
+            $this->expectException('ErrorException');
+            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
+        } else {
+            $this->expectException('Error');
+            $this->expectExceptionMessage('Undefined constant Memcached::');
+        }
+
         MemcachedCache::createConnection([], [$name => $value]);
     }
 
-    public function provideBadOptions()
+    public function provideBadOptions(): array
     {
         return [
             ['foo', 'bar'],
@@ -120,7 +127,7 @@ class MemcachedCacheTest extends CacheTestCase
     /**
      * @dataProvider provideServersSetting
      */
-    public function testServersSetting($dsn, $host, $port)
+    public function testServersSetting(string $dsn, string $host, int $port)
     {
         $client1 = MemcachedCache::createConnection($dsn);
         $client2 = MemcachedCache::createConnection([$dsn]);
@@ -136,7 +143,7 @@ class MemcachedCacheTest extends CacheTestCase
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
-    public function provideServersSetting()
+    public function provideServersSetting(): iterable
     {
         yield [
             'memcached://127.0.0.1/50',
@@ -148,7 +155,7 @@ class MemcachedCacheTest extends CacheTestCase
             'localhost',
             11222,
         ];
-        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
@@ -165,7 +172,7 @@ class MemcachedCacheTest extends CacheTestCase
             '/var/local/run/memcached.socket',
             0,
         ];
-        if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var(ini_get('memcached.use_sasl'), \FILTER_VALIDATE_BOOLEAN)) {
             yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',

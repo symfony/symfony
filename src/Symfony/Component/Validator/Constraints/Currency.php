@@ -36,7 +36,7 @@ class Currency extends Constraint
     {
         if (!class_exists(Currencies::class)) {
             // throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');
-            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), \E_USER_DEPRECATED);
         }
 
         parent::__construct($options);

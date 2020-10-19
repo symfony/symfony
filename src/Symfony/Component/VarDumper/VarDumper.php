@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 // Load the global dump() function
@@ -38,6 +40,8 @@ class VarDumper
                 $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg']) ? new CliDumper() : new HtmlDumper();
             }
 
+            $dumper = new ContextualizedDumper($dumper, [new SourceContextProvider()]);
+
             self::$handler = function ($var) use ($cloner, $dumper) {
                 $dumper->dump($cloner->cloneVar($var));
             };
@@ -49,6 +53,12 @@ class VarDumper
     public static function setHandler(callable $callable = null)
     {
         $prevHandler = self::$handler;
+
+        // Prevent replacing the handler with expected format as soon as the env var was set:
+        if (isset($_SERVER['VAR_DUMPER_FORMAT'])) {
+            return $prevHandler;
+        }
+
         self::$handler = $callable;
 
         return $prevHandler;

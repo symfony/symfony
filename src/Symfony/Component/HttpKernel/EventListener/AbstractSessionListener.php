@@ -85,6 +85,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         if ($session instanceof Session ? $session->getUsageIndex() !== end($this->sessionUsageStack) : $session->isStarted()) {
             if ($autoCacheControl) {
                 $response
+                    ->setExpires(new \DateTime())
                     ->setPrivate()
                     ->setMaxAge(0)
                     ->headers->addCacheControlDirective('must-revalidate');

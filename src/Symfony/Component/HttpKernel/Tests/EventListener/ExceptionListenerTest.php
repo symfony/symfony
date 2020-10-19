@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
  * ExceptionListenerTest.
@@ -29,6 +27,7 @@ use Symfony\Component\HttpKernel\Tests\Logger;
  * @author Robert Schönthal <seroscho@googlemail.com>
  *
  * @group time-sensitive
+ * @group legacy
  */
 class ExceptionListenerTest extends TestCase
 {
@@ -157,26 +156,4 @@ class ExceptionListenerTest extends TestCase
     }
 }
 
-class TestLogger extends Logger implements DebugLoggerInterface
-{
-    public function countErrors(): int
-    {
-        return \count($this->logs['critical']);
-    }
-}
-
-class TestKernel implements HttpKernelInterface
-{
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
-    {
-        return new Response('foo');
-    }
-}
-
-class TestKernelThatThrowsException implements HttpKernelInterface
-{
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
-    {
-        throw new \RuntimeException('bar');
-    }
-}
+class_exists(ErrorListenerTest::class);

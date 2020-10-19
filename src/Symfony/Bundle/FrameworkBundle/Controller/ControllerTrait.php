@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
@@ -155,7 +156,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function addFlash(string $type, string $message)
+    protected function addFlash(string $type, $message)
     {
         if (!$this->container->has('session')) {
             throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');
@@ -207,7 +208,7 @@ trait ControllerTrait
     protected function renderView(string $view, array $parameters = []): string
     {
         if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
             return $this->container->get('templating')->render($view, $parameters);
         }
@@ -227,7 +228,7 @@ trait ControllerTrait
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
             $content = $this->container->get('templating')->render($view, $parameters);
         } elseif ($this->container->has('twig')) {
@@ -253,7 +254,7 @@ trait ControllerTrait
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
         if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
             $templating = $this->container->get('templating');
 
@@ -288,7 +289,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function createNotFoundException(string $message = 'Not Found', \Exception $previous = null): NotFoundHttpException
+    protected function createNotFoundException(string $message = 'Not Found', \Throwable $previous = null): NotFoundHttpException
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -304,7 +305,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function createAccessDeniedException(string $message = 'Access Denied.', \Exception $previous = null): AccessDeniedException
+    protected function createAccessDeniedException(string $message = 'Access Denied.', \Throwable $previous = null): AccessDeniedException
     {
         if (!class_exists(AccessDeniedException::class)) {
             throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
@@ -336,11 +337,13 @@ trait ControllerTrait
     /**
      * Shortcut to return the Doctrine Registry service.
      *
+     * @return ManagerRegistry
+     *
      * @throws \LogicException If DoctrineBundle is not available
      *
      * @final
      */
-    protected function getDoctrine(): ManagerRegistry
+    protected function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
@@ -352,7 +355,7 @@ trait ControllerTrait
     /**
      * Get a user from the Security Token Storage.
      *
-     * @return object|null
+     * @return UserInterface|object|null
      *
      * @throws \LogicException If SecurityBundle is not available
      *

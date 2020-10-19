@@ -15,11 +15,55 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
+    /**
+     * @dataProvider validResponseFactoryProvider
+     */
+    public function testValidResponseFactory($responseFactory)
+    {
+        (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function validResponseFactoryProvider()
+    {
+        return [
+            [static function (): MockResponse { return new MockResponse(); }],
+            [new MockResponse()],
+            [[new MockResponse()]],
+            [new \ArrayIterator([new MockResponse()])],
+            [null],
+            [(static function (): \Generator { yield new MockResponse(); })()],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidResponseFactoryProvider
+     */
+    public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
+    {
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
+    }
+
+    public function invalidResponseFactoryProvider()
+    {
+        return [
+            [static function (): \Generator { yield new MockResponse(); }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "Generator" given.'],
+            [static function (): array { return [new MockResponse()]; }, 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "array" given.'],
+            [(static function (): \Generator { yield 'ccc'; })(), 'The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "string" given.'],
+        ];
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         $responses = [];
@@ -34,6 +78,7 @@ class MockHttpClientTest extends HttpClientTestCase
     "SERVER_NAME": "127.0.0.1",
     "REQUEST_URI": "/",
     "REQUEST_METHOD": "GET",
+    "HTTP_ACCEPT": "*/*",
     "HTTP_FOO": "baR",
     "HTTP_HOST": "localhost:8057"
 }';
@@ -45,7 +90,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 return new MockHttpClient(function (string $method, string $url, array $options) use ($client) {
                     try {
                         // force the request to be completed so that we don't test side effects of the transport
-                        $response = $client->request($method, $url, $options);
+                        $response = $client->request($method, $url, ['buffer' => false] + $options);
                         $content = $response->getContent(false);
 
                         return new MockResponse($content, $response->getInfo());
@@ -66,8 +111,16 @@ class MockHttpClientTest extends HttpClientTestCase
                 $this->markTestSkipped("MockHttpClient doesn't unzip");
                 break;
 
+            case 'testTimeoutWithActiveConcurrentStream':
+                $this->markTestSkipped('Real transport required');
+                break;
+
             case 'testDestruct':
                 $this->markTestSkipped("MockHttpClient doesn't timeout on destruct");
+                break;
+
+            case 'testHandleIsRemovedOnException':
+                $this->markTestSkipped("MockHttpClient doesn't cache handles");
                 break;
 
             case 'testGetRequest':
@@ -100,6 +153,9 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testBadRequestBody':
             case 'testOnProgressCancel':
             case 'testOnProgressError':
+            case 'testReentrantBufferCallback':
+            case 'testThrowingBufferCallback':
+            case 'testInfoOnCanceledResponse':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
@@ -112,6 +168,12 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = $mock;
                 break;
 
+            case 'testAcceptHeader':
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
+                $responses[] = new MockResponse(str_replace('*/*', 'foo/bar', $body), ['response_headers' => $headers]);
+                $responses[] = new MockResponse(str_replace('"HTTP_ACCEPT": "*/*",', '', $body), ['response_headers' => $headers]);
+                break;
+
             case 'testResolve':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
@@ -120,8 +182,48 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testTimeoutOnStream':
             case 'testUncheckedTimeoutThrows':
+            case 'testTimeoutIsNotAFatalError':
                 $body = ['<1>', '', '<2>'];
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
+                break;
+
+            case 'testInformationalResponseStream':
+                $client = $this->createMock(HttpClientInterface::class);
+                $response = new MockResponse('Here the body', ['response_headers' => [
+                    'HTTP/1.1 103 ',
+                    'Link: </style.css>; rel=preload; as=style',
+                    'HTTP/1.1 200 ',
+                    'Date: foo',
+                    'Content-Length: 13',
+                ]]);
+                $client->method('request')->willReturn($response);
+                $client->method('stream')->willReturn(new ResponseStream((function () use ($response) {
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('getInformationalStatus')
+                        ->willReturn([103, ['link' => ['</style.css>; rel=preload; as=style', '</script.js>; rel=preload; as=script']]]);
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('isFirst')->willReturn(true);
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('getContent')->willReturn('Here the body');
+
+                    yield $response => $chunk;
+
+                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk->method('isLast')->willReturn(true);
+
+                    yield $response => $chunk;
+                })()));
+
+                return $client;
+
+            case 'testNonBlockingStream':
+                $responses[] = new MockResponse((function () { yield '<1>'; yield ''; yield '<2>'; })(), ['response_headers' => $headers]);
                 break;
 
             case 'testMaxDuration':

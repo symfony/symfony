@@ -24,10 +24,9 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 class CookieTest extends TestCase
 {
-    public function invalidNames()
+    public function namesWithSpecialCharacters()
     {
         return [
-            [''],
             [',MyName'],
             [';MyName'],
             [' MyName'],
@@ -40,12 +39,26 @@ class CookieTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidNames
+     * @dataProvider namesWithSpecialCharacters
      */
-    public function testInstantiationThrowsExceptionIfCookieNameContainsInvalidCharacters($name)
+    public function testInstantiationThrowsExceptionIfRawCookieNameContainsSpecialCharacters($name)
     {
         $this->expectException('InvalidArgumentException');
-        Cookie::create($name);
+        Cookie::create($name, null, 0, null, null, null, false, true);
+    }
+
+    /**
+     * @dataProvider namesWithSpecialCharacters
+     */
+    public function testInstantiationSucceedNonRawCookieNameContainsSpecialCharacters($name)
+    {
+        $this->assertInstanceOf(Cookie::class, Cookie::create($name));
+    }
+
+    public function testInstantiationThrowsExceptionIfCookieNameIsEmpty()
+    {
+        $this->expectException('InvalidArgumentException');
+        Cookie::create('');
     }
 
     public function testInvalidExpiration()

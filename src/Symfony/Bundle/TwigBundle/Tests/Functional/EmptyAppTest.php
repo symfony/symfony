@@ -15,7 +15,8 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ErrorRenderer\ErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
 class EmptyAppTest extends TestCase
@@ -27,6 +28,26 @@ class EmptyAppTest extends TestCase
 
         $this->assertTrue($kernel->getContainer()->hasParameter('twig.default_path'));
         $this->assertNotEmpty($kernel->getContainer()->getParameter('twig.default_path'));
+    }
+
+    protected function setUp(): void
+    {
+        $this->deleteTempDir();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteTempDir();
+    }
+
+    private function deleteTempDir()
+    {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel')) {
+            return;
+        }
+
+        $fs = new Filesystem();
+        $fs->remove($dir);
     }
 }
 
@@ -44,7 +65,8 @@ class EmptyAppKernel extends Kernel
                 'strict_variables' => false,
                 'exception_controller' => null,
             ]);
-            $container->register('error_renderer', ErrorRenderer::class);
+            $container->register('error_renderer.html', HtmlErrorRenderer::class);
+            $container->setAlias('error_renderer', 'error_renderer.html');
             $container->setParameter('debug.file_link_format', null);
         });
     }

@@ -17,6 +17,7 @@ $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($di
 
 $packages = array();
 $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+$preferredInstall = json_decode(file_get_contents(__DIR__.'/composer-config.json'), true)['config']['preferred-install'];
 
 foreach ($dirs as $k => $dir) {
     if (!system("git diff --name-only $mergeBase -- $dir", $exitStatus)) {
@@ -42,24 +43,25 @@ foreach ($dirs as $k => $dir) {
         $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
     }
-    passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    if (!isset($package->extra->{'branch-alias'}->{'dev-master'})) {
-        echo "Missing \"dev-master\" branch-alias in composer.json extra.\n";
+    if (isset($preferredInstall[$package->name]) && 'source' === $preferredInstall[$package->name]) {
+        passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
+    } else {
+        passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
+    }
+
+    if (!isset($package->extra->{'branch-version'})) {
+        echo "Missing \"branch-version\" in composer.json's \"extra\".\n";
         exit(1);
     }
-    $package->version = str_replace('-dev', '.x-dev', $package->extra->{'branch-alias'}->{'dev-master'});
+    $package->version = $package->extra->{'branch-version'}.'.x-dev';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 
     $packages[$package->name][$package->version] = $package;
 
-    $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"dev-master":%s}}}', $package->name, file_get_contents($dir.'/composer.json'));
+    $versions = @file_get_contents('https://repo.packagist.org/p/'.$package->name.'.json') ?: sprintf('{"packages":{"%s":{"%s":%s}}}', $package->name, $package->version, file_get_contents($dir.'/composer.json'));
     $versions = json_decode($versions)->packages->{$package->name};
-
-    if (isset($versions->{'dev-master'}) && $package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
-        unset($versions->{'dev-master'});
-    }
 
     foreach ($versions as $v => $package) {
         $packages[$package->name] += array($v => $package);

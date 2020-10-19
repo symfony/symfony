@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mime;
 
+use Symfony\Component\Mime\Exception\LogicException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -52,6 +54,13 @@ class RawMessage implements \Serializable
     }
 
     /**
+     * @throws LogicException if the message is not valid
+     */
+    public function ensureValidity()
+    {
+    }
+
+    /**
      * @internal
      */
     final public function serialize(): string
@@ -69,7 +78,7 @@ class RawMessage implements \Serializable
 
     public function __serialize(): array
     {
-        return [$this->message];
+        return [$this->toString()];
     }
 
     public function __unserialize(array $data): void

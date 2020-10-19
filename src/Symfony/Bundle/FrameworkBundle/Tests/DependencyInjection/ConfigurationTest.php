@@ -187,6 +187,69 @@ class ConfigurationTest extends TestCase
         yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
     }
 
+    /**
+     * @dataProvider provideValidLockConfigurationTests
+     */
+    public function testValidLockConfiguration($lockConfig, $processedConfig)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'lock' => $lockConfig,
+            ],
+        ]);
+
+        $this->assertArrayHasKey('lock', $config);
+
+        $this->assertEquals($processedConfig, $config['lock']);
+    }
+
+    public function provideValidLockConfigurationTests()
+    {
+        yield [null, ['enabled' => true, 'resources' => ['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']]]];
+
+        yield ['flock', ['enabled' => true, 'resources' => ['default' => ['flock']]]];
+        yield [['flock', 'semaphore'], ['enabled' => true, 'resources' => ['default' => ['flock', 'semaphore']]]];
+        yield [['foo' => 'flock', 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+        yield [['default' => 'flock'], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
+
+        yield [['enabled' => false, 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
+        yield [['enabled' => false, ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['default' => ['flock', 'semaphore']]]];
+        yield [['enabled' => false, 'foo' => 'flock', 'bar' => 'semaphore'], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['enabled' => false, 'foo' => ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore']]]];
+        yield [['enabled' => false, 'default' => 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
+
+        yield [['resources' => 'flock'], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
+        yield [['resources' => ['flock', 'semaphore']], ['enabled' => true, 'resources' => ['default' => ['flock', 'semaphore']]]];
+        yield [['resources' => ['foo' => 'flock', 'bar' => 'semaphore']], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['resources' => ['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore']], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+        yield [['resources' => ['default' => 'flock']], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
+
+        yield [['enabled' => false, 'resources' => 'flock'], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
+        yield [['enabled' => false, 'resources' => ['flock', 'semaphore']], ['enabled' => false, 'resources' => ['default' => ['flock', 'semaphore']]]];
+        yield [['enabled' => false, 'resources' => ['foo' => 'flock', 'bar' => 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => 'semaphore']], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+        yield [['enabled' => false, 'resources' => ['default' => 'flock']], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
+
+        // xml
+
+        yield [['resource' => ['flock']], ['enabled' => true, 'resources' => ['default' => ['flock']]]];
+        yield [['resource' => ['flock', ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['default' => ['flock'], 'foo' => ['semaphore']]]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'flock']]], ['enabled' => true, 'resources' => ['foo' => ['flock']]]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore']]]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => true, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+
+        yield [['enabled' => false, 'resource' => ['flock']], ['enabled' => false, 'resources' => ['default' => ['flock']]]];
+        yield [['enabled' => false, 'resource' => ['flock', ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['default' => ['flock'], 'foo' => ['semaphore']]]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock']]], ['enabled' => false, 'resources' => ['foo' => ['flock']]]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore']]]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
+        yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
@@ -202,6 +265,85 @@ class ConfigurationTest extends TestCase
                     'buses' => [
                         'first_bus' => [],
                         'second_bus' => [],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBusMiddlewareDontMerge()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'messenger' => [
+                    'default_bus' => 'existing_bus',
+                    'buses' => [
+                        'existing_bus' => [
+                            'middleware' => 'existing_bus.middleware',
+                        ],
+                        'common_bus' => [
+                            'default_middleware' => false,
+                            'middleware' => 'common_bus.old_middleware',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'messenger' => [
+                    'buses' => [
+                        'common_bus' => [
+                            'middleware' => 'common_bus.new_middleware',
+                        ],
+                        'new_bus' => [
+                            'middleware' => 'new_bus.middleware',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                'existing_bus' => [
+                    'default_middleware' => true,
+                    'middleware' => [
+                        ['id' => 'existing_bus.middleware', 'arguments' => []],
+                    ],
+                ],
+                'common_bus' => [
+                    'default_middleware' => false,
+                    'middleware' => [
+                        ['id' => 'common_bus.new_middleware', 'arguments' => []],
+                    ],
+                ],
+                'new_bus' => [
+                    'default_middleware' => true,
+                    'middleware' => [
+                        ['id' => 'new_bus.middleware', 'arguments' => []],
+                    ],
+                ],
+            ],
+            $config['messenger']['buses']
+        );
+    }
+
+    public function testItErrorsWhenDefaultBusDoesNotExist()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
+
+        $processor->processConfiguration($configuration, [
+            [
+                'messenger' => [
+                    'default_bus' => 'foo',
+                    'buses' => [
+                        'bar' => null,
+                        'baz' => null,
                     ],
                 ],
             ],
@@ -369,8 +511,16 @@ class ConfigurationTest extends TestCase
                 'scoped_clients' => [],
             ],
             'mailer' => [
-                'dsn' => 'smtp://null',
+                'dsn' => null,
+                'transports' => [],
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+            ],
+            'error_controller' => 'error_controller',
+            'secrets' => [
+                'enabled' => true,
+                'vault_directory' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                'local_dotenv_file' => '%kernel.project_dir%/.env.%kernel.environment%.local',
+                'decryption_env_var' => 'base64:default::SYMFONY_DECRYPTION_SECRET',
             ],
         ];
     }

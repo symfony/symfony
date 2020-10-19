@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Mailer;
 
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Mailer\Event\MessageEvent;
-use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Mailer implements MailerInterface
+final class Mailer implements MailerInterface
 {
     private $transport;
     private $bus;
@@ -32,10 +32,10 @@ class Mailer implements MailerInterface
     {
         $this->transport = $transport;
         $this->bus = $bus;
-        $this->dispatcher = $dispatcher;
+        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): void
+    public function send(RawMessage $message, Envelope $envelope = null): void
     {
         if (null === $this->bus) {
             $this->transport->send($message, $envelope);
@@ -45,16 +45,8 @@ class Mailer implements MailerInterface
 
         if (null !== $this->dispatcher) {
             $message = clone $message;
-            if (null !== $envelope) {
-                $envelope = clone $envelope;
-            } else {
-                try {
-                    $envelope = new DelayedSmtpEnvelope($message);
-                } catch (\Exception $e) {
-                    throw new TransportException('Cannot send message without a valid envelope.', 0, $e);
-                }
-            }
-            $event = new MessageEvent($message, $envelope, $this->transport->getName(), true);
+            $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
+            $event = new MessageEvent($message, $envelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
         }
 

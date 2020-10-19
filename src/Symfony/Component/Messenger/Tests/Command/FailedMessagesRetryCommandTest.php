@@ -13,12 +13,11 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
-use Symfony\Component\Messenger\Worker;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
@@ -29,7 +28,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         // message will eventually be ack'ed in Worker
         $receiver->expects($this->exactly(2))->method('ack');
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = new EventDispatcher();
         $bus = $this->createMock(MessageBusInterface::class);
         // the bus should be called in the worker
         $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
@@ -42,7 +41,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(['id' => [10, 12]]);
+        $tester->execute(['id' => [10, 12], '--force' => true]);
 
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }

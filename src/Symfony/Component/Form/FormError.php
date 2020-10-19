@@ -50,7 +50,7 @@ class FormError
     public function __construct(?string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, $cause = null)
     {
         if (null === $message) {
-            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), \E_USER_DEPRECATED);
             $message = '';
         }
 
@@ -130,7 +130,7 @@ class FormError
     /**
      * Returns the form that caused this error.
      *
-     * @return FormInterface The form that caused this error
+     * @return FormInterface|null The form that caused this error
      */
     public function getOrigin()
     {

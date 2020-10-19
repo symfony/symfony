@@ -64,8 +64,8 @@ interface ExecutionContextInterface
     /**
      * Adds a violation at the current node of the validation graph.
      *
-     * @param string $message The error message as a string or a stringable object
-     * @param array  $params  The parameters substituted in the error message
+     * @param string|\Stringable $message The error message as a string or a stringable object
+     * @param array              $params  The parameters substituted in the error message
      */
     public function addViolation($message, array $params = []);
 
@@ -81,8 +81,8 @@ interface ExecutionContextInterface
      *         ->setTranslationDomain('number_validation')
      *         ->addViolation();
      *
-     * @param string $message    The error message as a string or a stringable object
-     * @param array  $parameters The parameters substituted in the error message
+     * @param string|\Stringable $message    The error message as a string or a stringable object
+     * @param array              $parameters The parameters substituted in the error message
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      */
@@ -280,7 +280,7 @@ interface ExecutionContextInterface
     /**
      * Returns the validation group that is currently being validated.
      *
-     * @return string The current validation group
+     * @return string|null The current validation group
      */
     public function getGroup();
 

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -29,7 +29,7 @@ interface TransportInterface
     /**
      * @throws TransportExceptionInterface
      */
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage;
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage;
 
-    public function getName(): string;
+    public function __toString(): string;
 }

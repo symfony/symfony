@@ -171,7 +171,7 @@ class InputDefinition
      */
     public function getArgumentCount()
     {
-        return $this->hasAnArrayArgument ? PHP_INT_MAX : \count($this->arguments);
+        return $this->hasAnArrayArgument ? \PHP_INT_MAX : \count($this->arguments);
     }
 
     /**

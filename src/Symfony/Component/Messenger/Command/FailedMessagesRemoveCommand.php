@@ -61,6 +61,8 @@ EOF
 
         $shouldForce = $input->getOption('force');
         $this->removeSingleMessage($input->getArgument('id'), $receiver, $io, $shouldForce);
+
+        return 0;
     }
 
     private function removeSingleMessage(string $id, ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce)

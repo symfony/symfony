@@ -23,6 +23,8 @@ class NativeFilesystemLoader extends FilesystemLoader
 {
     /**
      * {@inheritdoc}
+     *
+     * @return string|null
      */
     protected function findTemplate($template, $throw = true)
     {

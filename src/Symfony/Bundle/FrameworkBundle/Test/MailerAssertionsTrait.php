@@ -40,7 +40,7 @@ trait MailerAssertionsTrait
         self::assertThat($event, new LogicalNot(new MailerConstraint\EmailIsQueued()), $message);
     }
 
-    public static function assertEmailAttachementCount(RawMessage $email, int $count, string $message = ''): void
+    public static function assertEmailAttachmentCount(RawMessage $email, int $count, string $message = ''): void
     {
         self::assertThat($email, new MimeConstraint\EmailAttachmentCount($count), $message);
     }
@@ -118,14 +118,10 @@ trait MailerAssertionsTrait
 
     private static function getMessageMailerEvents(): MessageEvents
     {
-        if (!self::getClient()->getRequest()) {
-            static::fail('Unable to make email assertions. Did you forget to make an HTTP request?');
-        }
-
-        if (!$logger = self::$container->get('mailer.logger_message_listener')) {
+        if (!self::$container->has('mailer.logger_message_listener')) {
             static::fail('A client must have Mailer enabled to make email assertions. Did you forget to require symfony/mailer?');
         }
 
-        return $logger->getEvents();
+        return self::$container->get('mailer.logger_message_listener')->getEvents();
     }
 }

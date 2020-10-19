@@ -66,7 +66,7 @@ class ExpressionLanguageTest extends TestCase
     public function testConstantFunction()
     {
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+        $this->assertEquals(\PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
@@ -158,7 +158,7 @@ class ExpressionLanguageTest extends TestCase
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
         $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
-        $savedParsedExpressions = [];
+        $savedParsedExpression = null;
 
         $cacheMock
             ->expects($this->exactly(2))
@@ -195,6 +195,17 @@ class ExpressionLanguageTest extends TestCase
         $expressionLanguage->compile($expression, ['B' => 'b', 'a']);
     }
 
+    public function testOperatorCollisions()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = 'foo.not in [bar]';
+        $compiled = $expressionLanguage->compile($expression, ['foo', 'bar']);
+        $this->assertSame('in_array($foo->not, [0 => $bar])', $compiled);
+
+        $result = $expressionLanguage->evaluate($expression, ['foo' => (object) ['not' => 'test'], 'bar' => 'test']);
+        $this->assertTrue($result);
+    }
+
     /**
      * @dataProvider getRegisterCallbacks
      */
@@ -220,7 +231,7 @@ class ExpressionLanguageTest extends TestCase
     public function testCallBadCallable()
     {
         $this->expectException('RuntimeException');
-        $this->expectExceptionMessageRegExp('/Unable to call method "\w+" of object "\w+"./');
+        $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
     }

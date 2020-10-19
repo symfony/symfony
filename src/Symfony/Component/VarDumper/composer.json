@@ -16,15 +16,16 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": ">=7.1.3",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php72": "~1.5"
+        "symfony/polyfill-php72": "~1.5",
+        "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
         "ext-iconv": "*",
         "symfony/console": "^3.4|^4.0|^5.0",
         "symfony/process": "^4.4|^5.0",
-        "twig/twig": "~1.34|~2.4"
+        "twig/twig": "^1.34|^2.4|^3.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
@@ -47,8 +48,6 @@
     ],
     "minimum-stability": "dev",
     "extra": {
-        "branch-alias": {
-            "dev-master": "4.4-dev"
-        }
+        "branch-version": "4.4"
     }
 }

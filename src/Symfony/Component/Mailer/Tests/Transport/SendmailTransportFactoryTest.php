@@ -27,20 +27,15 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'sendmail'),
+            new Dsn('sendmail+smtp', 'default'),
             true,
-        ];
-
-        yield [
-            new Dsn('smtp', 'example.com'),
-            false,
         ];
     }
 
     public function createProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'sendmail'),
+            new Dsn('sendmail+smtp', 'default'),
             new SendmailTransport(null, $this->getDispatcher(), $this->getLogger()),
         ];
     }
@@ -48,8 +43,8 @@ class SendmailTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
-            new Dsn('http', 'sendmail'),
-            'The "http" scheme is not supported for mailer "sendmail". Supported schemes are: "smtp".',
+            new Dsn('sendmail+http', 'default'),
+            'The "sendmail+http" scheme is not supported; supported schemes for mailer "sendmail" are: "sendmail", "sendmail+smtp".',
         ];
     }
 }

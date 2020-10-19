@@ -61,7 +61,7 @@ class BicValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Bic) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Bic');
+            throw new UnexpectedTypeException($constraint, Bic::class);
         }
 
         if (null === $value || '' === $value) {
@@ -138,7 +138,7 @@ class BicValidator extends ConstraintValidator
             try {
                 $iban = $this->getPropertyAccessor()->getValue($object, $path);
             } catch (NoSuchPropertyException $e) {
-                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $path, \get_class($constraint), $e->getMessage()), 0, $e);
+                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $path, \get_class($constraint)).$e->getMessage(), 0, $e);
             }
         }
         if (!$iban) {

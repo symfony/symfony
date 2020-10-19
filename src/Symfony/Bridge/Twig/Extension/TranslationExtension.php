@@ -24,6 +24,10 @@ use Twig\NodeVisitor\NodeVisitorInterface;
 use Twig\TokenParser\AbstractTokenParser;
 use Twig\TwigFilter;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(TranslatorInterface::class);
+class_exists(TranslatorTrait::class);
+
 /**
  * Provides integration of the Translation component with Twig.
  *
@@ -42,7 +46,7 @@ class TranslationExtension extends AbstractExtension
     public function __construct($translator = null, NodeVisitorInterface $translationNodeVisitor = null)
     {
         if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
         }
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;

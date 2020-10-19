@@ -24,7 +24,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * @dataProvider providePrepareRequestUrl
      */
-    public function testPrepareRequestUrl($expected, $url, $query = [])
+    public function testPrepareRequestUrl(string $expected, string $url, array $query = [])
     {
         $defaults = [
             'base_uri' => 'http://example.com?c=c',
@@ -36,7 +36,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, implode('', $url));
     }
 
-    public function providePrepareRequestUrl()
+    public function providePrepareRequestUrl(): iterable
     {
         yield ['http://example.com/', 'http://example.com/'];
         yield ['http://example.com/?a=1&b=b', '.'];
@@ -48,7 +48,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * @dataProvider provideResolveUrl
      */
-    public function testResolveUrl($base, $url, $expected)
+    public function testResolveUrl(string $base, string $url, string $expected)
     {
         $this->assertSame($expected, implode('', self::resolveUrl(self::parseUrl($url), self::parseUrl($base))));
     }
@@ -56,7 +56,7 @@ class HttpClientTraitTest extends TestCase
     /**
      * From https://github.com/guzzle/psr7/blob/master/tests/UriResoverTest.php.
      */
-    public function provideResolveUrl()
+    public function provideResolveUrl(): array
     {
         return [
             [self::RFC3986_BASE, 'http:h',        'http:h'],
@@ -123,14 +123,14 @@ class HttpClientTraitTest extends TestCase
     /**
      * @dataProvider provideParseUrl
      */
-    public function testParseUrl($expected, $url, $query = [])
+    public function testParseUrl(array $expected, string $url, array $query = [])
     {
         $expected = array_combine(['scheme', 'authority', 'path', 'query', 'fragment'], $expected);
 
         $this->assertSame($expected, self::parseUrl($url, $query));
     }
 
-    public function provideParseUrl()
+    public function provideParseUrl(): iterable
     {
         yield [['http:', '//example.com', null, null, null], 'http://Example.coM:80'];
         yield [['https:', '//xn--dj-kia8a.example.com:8000', '/', null, null], 'https://DÉjà.Example.com:8000/'];
@@ -172,14 +172,14 @@ class HttpClientTraitTest extends TestCase
     public function testAuthBearerOption()
     {
         [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foobar'], HttpClientInterface::OPTIONS_DEFAULTS);
-        $this->assertSame(['Authorization: Bearer foobar'], $options['headers']);
+        $this->assertSame(['Accept: */*', 'Authorization: Bearer foobar'], $options['headers']);
         $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 
     public function testInvalidAuthBearerOption()
     {
         $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, object given.');
+        $this->expectExceptionMessage('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, "object" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
@@ -249,7 +249,7 @@ class HttpClientTraitTest extends TestCase
     public function testNormalizePeerFingerprintTypeException()
     {
         $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, object given.');
+        $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "object" given.');
         $fingerprint = new \stdClass();
 
         $this->normalizePeerFingerprint($fingerprint);

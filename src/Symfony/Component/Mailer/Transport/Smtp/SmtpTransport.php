@@ -12,11 +12,11 @@
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
@@ -35,6 +35,8 @@ class SmtpTransport extends AbstractTransport
     private $restartThreshold = 100;
     private $restartThresholdSleep = 0;
     private $restartCounter;
+    private $pingThreshold = 100;
+    private $lastMessageTime = 0;
     private $stream;
     private $domain = '[127.0.0.1]';
 
@@ -67,6 +69,28 @@ class SmtpTransport extends AbstractTransport
     }
 
     /**
+     * Sets the minimum number of seconds required between two messages, before the server is pinged.
+     * If the transport wants to send a message and the time since the last message exceeds the specified threshold,
+     * the transport will ping the server first (NOOP command) to check if the connection is still alive.
+     * Otherwise the message will be sent without pinging the server first.
+     *
+     * Do not set the threshold too low, as the SMTP server may drop the connection if there are too many
+     * non-mail commands (like pinging the server with NOOP).
+     *
+     * By default, the threshold is set to 100 seconds.
+     *
+     * @param int $seconds The minimum number of seconds between two messages required to ping the server
+     *
+     * @return $this
+     */
+    public function setPingThreshold(int $seconds): self
+    {
+        $this->pingThreshold = $seconds;
+
+        return $this;
+    }
+
+    /**
      * Sets the name of the local domain that will be used in HELO.
      *
      * This should be a fully-qualified domain name and should be truly the domain
@@ -79,9 +103,9 @@ class SmtpTransport extends AbstractTransport
     public function setLocalDomain(string $domain): self
     {
         if ('' !== $domain && '[' !== $domain[0]) {
-            if (filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            if (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
                 $domain = '['.$domain.']';
-            } elseif (filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            } elseif (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
                 $domain = '[IPv6:'.$domain.']';
             }
         }
@@ -102,20 +126,17 @@ class SmtpTransport extends AbstractTransport
         return $this->domain;
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->ping();
-        if (!$this->started) {
-            $this->start();
-        }
-
         try {
             $message = parent::send($message, $envelope);
         } catch (TransportExceptionInterface $e) {
-            try {
-                $this->executeCommand("RSET\r\n", [250]);
-            } catch (TransportExceptionInterface $_) {
-                // ignore this exception as it probably means that the server error was final
+            if ($this->started) {
+                try {
+                    $this->executeCommand("RSET\r\n", [250]);
+                } catch (TransportExceptionInterface $_) {
+                    // ignore this exception as it probably means that the server error was final
+                }
             }
 
             throw $e;
@@ -126,7 +147,7 @@ class SmtpTransport extends AbstractTransport
         return $message;
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         if ($this->stream instanceof SocketStream) {
             $name = sprintf('smtp%s://%s', ($tls = $this->stream->isTLS()) ? 's' : '', $this->stream->getHost());
@@ -163,11 +184,19 @@ class SmtpTransport extends AbstractTransport
 
     protected function doSend(SentMessage $message): void
     {
+        if (microtime(true) - $this->lastMessageTime > $this->pingThreshold) {
+            $this->ping();
+        }
+
+        if (!$this->started) {
+            $this->start();
+        }
+
         try {
             $envelope = $message->getEnvelope();
-            $this->doMailFromCommand($envelope->getSender()->toString());
+            $this->doMailFromCommand($envelope->getSender()->getAddress());
             foreach ($envelope->getRecipients() as $recipient) {
-                $this->doRcptToCommand($recipient->toString());
+                $this->doRcptToCommand($recipient->getAddress());
             }
 
             $this->executeCommand("DATA\r\n", [354]);
@@ -177,9 +206,10 @@ class SmtpTransport extends AbstractTransport
             $this->stream->flush();
             $this->executeCommand("\r\n.\r\n", [250]);
             $message->appendDebug($this->stream->getDebug());
+            $this->lastMessageTime = microtime(true);
         } catch (TransportExceptionInterface $e) {
             $e->appendDebug($this->stream->getDebug());
-
+            $this->lastMessageTime = 0;
             throw $e;
         }
     }
@@ -211,6 +241,7 @@ class SmtpTransport extends AbstractTransport
         $this->assertResponseCode($this->getFullResponse(), [220]);
         $this->doHeloCommand();
         $this->started = true;
+        $this->lastMessageTime = 0;
 
         $this->getLogger()->debug(sprintf('Email transport "%s" started', __CLASS__));
     }

@@ -65,17 +65,17 @@ class Base64EncoderTest extends TestCase
         $encoder = new Base64Encoder();
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C', random_int(0, 255));
-            $this->assertRegExp('~^[a-zA-Z0-9/\+]{2}==$~', $encoder->encodeString($input), 'A single byte should have 2 bytes of padding');
+            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{2}==$~', $encoder->encodeString($input), 'A single byte should have 2 bytes of padding');
         }
 
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C*', random_int(0, 255), random_int(0, 255));
-            $this->assertRegExp('~^[a-zA-Z0-9/\+]{3}=$~', $encoder->encodeString($input), 'Two bytes should have 1 byte of padding');
+            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{3}=$~', $encoder->encodeString($input), 'Two bytes should have 1 byte of padding');
         }
 
         for ($i = 0; $i < 30; ++$i) {
             $input = pack('C*', random_int(0, 255), random_int(0, 255), random_int(0, 255));
-            $this->assertRegExp('~^[a-zA-Z0-9/\+]{4}$~', $encoder->encodeString($input), 'Three bytes should have no padding');
+            $this->assertMatchesRegularExpression('~^[a-zA-Z0-9/\+]{4}$~', $encoder->encodeString($input), 'Three bytes should have no padding');
         }
     }
 

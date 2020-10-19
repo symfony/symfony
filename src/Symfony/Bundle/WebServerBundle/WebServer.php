@@ -174,7 +174,7 @@ class WebServer
         return $process;
     }
 
-    private function getDefaultPidFile()
+    private function getDefaultPidFile(): string
     {
         return ($this->pidFileDirectory ?? getcwd()).'/.web-server-pid';
     }

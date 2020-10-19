@@ -220,7 +220,7 @@ abstract class AbstractHeader implements HeaderInterface
      */
     protected function generateTokenLines(string $token): array
     {
-        return preg_split('~(\r\n)~', $token, -1, PREG_SPLIT_DELIM_CAPTURE);
+        return preg_split('~(\r\n)~', $token, -1, \PREG_SPLIT_DELIM_CAPTURE);
     }
 
     /**

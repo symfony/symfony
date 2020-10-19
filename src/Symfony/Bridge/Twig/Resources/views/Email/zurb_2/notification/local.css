@@ -1,0 +1,19 @@
+body {
+    background: #f3f3f3;
+}
+
+.wrapper.secondary {
+    background: #f3f3f3;
+}
+
+.container.body_alert {
+    border-top: 8px solid #ec5840;
+}
+
+.container.body_warning {
+    border-top: 8px solid #ffae00;
+}
+
+.container.body_default {
+    border-top: 8px solid #aaaaaa;
+}

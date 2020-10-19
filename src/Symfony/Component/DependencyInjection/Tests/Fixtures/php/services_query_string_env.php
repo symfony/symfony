@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Test_QueryStringParameters extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
 
     public function __construct()
     {

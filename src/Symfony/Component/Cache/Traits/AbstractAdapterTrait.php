@@ -51,11 +51,13 @@ trait AbstractAdapterTrait
             foreach ($this->doFetch([$id]) as $value) {
                 $isHit = true;
             }
+
+            return $f($key, $value, $isHit);
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to fetch key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
         }
 
-        return $f($key, $value, $isHit);
+        return $f($key, null, false);
     }
 
     /**
@@ -112,6 +114,16 @@ trait AbstractAdapterTrait
         return true;
     }
 
+    public function __sleep()
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
     public function __destruct()
     {
         if ($this->deferred) {
@@ -119,14 +131,14 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function generateItems(iterable $items, array &$keys)
+    private function generateItems(iterable $items, array &$keys): iterable
     {
         $f = $this->createCacheItem;
 
         try {
             foreach ($items as $id => $value) {
                 if (!isset($keys[$id])) {
-                    $id = key($keys);
+                    throw new InvalidArgumentException(sprintf('Could not match value id "%s" to keys "%s".', $id, implode('", "', $keys)));
                 }
                 $key = $keys[$id];
                 unset($keys[$id]);

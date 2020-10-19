@@ -34,7 +34,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function __construct($defaultContext = [])
     {
         if (!\is_array($defaultContext)) {
-            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), \E_USER_DEPRECATED);
 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
         }
@@ -69,7 +69,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return __CLASS__ === \get_class($this);
+        return __CLASS__ === static::class;
     }
 
     /**
@@ -81,7 +81,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!\is_string($data)) {
-            throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
+            throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', \gettype($data)));
         }
 
         if (!$this->isISO8601($data)) {
@@ -132,7 +132,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
         return \DateInterval::class === $type;
     }
 
-    private function isISO8601(string $string)
+    private function isISO8601(string $string): bool
     {
         return preg_match('/^[\-+]?P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
     }

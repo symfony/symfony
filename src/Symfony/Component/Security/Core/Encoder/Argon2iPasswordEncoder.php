@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" instead.', Argon2iPasswordEncoder::class, SodiumPasswordEncoder::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" instead.', Argon2iPasswordEncoder::class, SodiumPasswordEncoder::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
@@ -102,12 +102,12 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
         throw new \LogicException('Argon2i algorithm is not supported. Please install the libsodium extension or upgrade to PHP 7.2+.');
     }
 
-    private function encodePasswordNative(string $raw)
+    private function encodePasswordNative(string $raw): string
     {
         return password_hash($raw, \PASSWORD_ARGON2I, $this->config);
     }
 
-    private function encodePasswordSodiumFunction(string $raw)
+    private function encodePasswordSodiumFunction(string $raw): string
     {
         $hash = sodium_crypto_pwhash_str(
             $raw,
@@ -119,7 +119,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
         return $hash;
     }
 
-    private function encodePasswordSodiumExtension(string $raw)
+    private function encodePasswordSodiumExtension(string $raw): string
     {
         $hash = \Sodium\crypto_pwhash_str(
             $raw,

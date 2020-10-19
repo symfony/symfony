@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.49.33",
     "Names": {
         "aa": "afara",
         "ab": "abĥaza",
@@ -98,8 +97,6 @@
         "pl": "pola",
         "ps": "paŝtoa",
         "pt": "portugala",
-        "pt_BR": "brazilportugala",
-        "pt_PT": "eŭropportugala",
         "qu": "keĉua",
         "rm": "romanĉa",
         "rn": "burunda",
@@ -136,7 +133,6 @@
         "tr": "turka",
         "ts": "conga",
         "tt": "tatara",
-        "tw": "tw",
         "ug": "ujgura",
         "uk": "ukraina",
         "ur": "urduo",
@@ -149,8 +145,12 @@
         "yo": "joruba",
         "za": "ĝuanga",
         "zh": "ĉina",
-        "zh_Hans": "ĉina simpligita",
-        "zh_Hant": "ĉina tradicia",
         "zu": "zulua"
+    },
+    "LocalizedNames": {
+        "pt_BR": "brazilportugala",
+        "pt_PT": "eŭropportugala",
+        "zh_Hans": "ĉina simpligita",
+        "zh_Hant": "ĉina tradicia"
     }
 }

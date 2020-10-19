@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Workflow\MarkingStore;
 
-@trigger_error(sprintf('"%s" is deprecated since Symfony 4.3, use "%s" instead.', SingleStateMarkingStore::class, MethodMarkingStore::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('"%s" is deprecated since Symfony 4.3, use "%s" instead.', SingleStateMarkingStore::class, MethodMarkingStore::class), \E_USER_DEPRECATED);
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -45,7 +45,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
     {
         $placeName = $this->propertyAccessor->getValue($subject, $this->property);
 
-        if (!$placeName) {
+        if (null === $placeName) {
             return new Marking();
         }
 

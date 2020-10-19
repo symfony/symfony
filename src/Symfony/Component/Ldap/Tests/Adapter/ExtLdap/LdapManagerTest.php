@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Ldap\Tests;
+namespace Symfony\Component\Ldap\Tests\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
@@ -19,6 +19,7 @@ use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
+use Symfony\Component\Ldap\Tests\LdapTestCase;
 
 /**
  * @requires extension ldap
@@ -185,7 +186,7 @@ class LdapManagerTest extends LdapTestCase
 
         $result = $this->executeSearchQuery(1);
         $renamedEntry = $result[0];
-        $this->assertEquals($renamedEntry->getAttribute('cn')[0], 'Kevin');
+        $this->assertEquals('Kevin', $renamedEntry->getAttribute('cn')[0]);
 
         $oldRdn = $entry->getAttribute('cn')[0];
         $entryManager->rename($renamedEntry, 'cn='.$oldRdn);
@@ -271,7 +272,7 @@ class LdapManagerTest extends LdapTestCase
 
         $this->expectException(UpdateOperationException::class);
 
-        $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', [])]);
+        $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', [])]);
     }
 
     public function testLdapApplyOperationsWithWrongConstantError()
@@ -294,8 +295,8 @@ class LdapManagerTest extends LdapTestCase
         $entry = $result[0];
 
         $entryManager->applyOperations($entry->getDn(), [
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
         ]);
 
         $result = $this->executeSearchQuery(1);
@@ -304,8 +305,8 @@ class LdapManagerTest extends LdapTestCase
         $this->assertCount(6, $newEntry->getAttribute('mail'));
 
         $entryManager->applyOperations($entry->getDn(), [
-            new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
-            new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
         ]);
 
         $result = $this->executeSearchQuery(1);
@@ -317,13 +318,13 @@ class LdapManagerTest extends LdapTestCase
     public function testUpdateOperationsWithIterator()
     {
         $iteratorAdd = new \ArrayIterator([
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
         ]);
 
         $iteratorRemove = new \ArrayIterator([
-            new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
-            new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE, 'mail', ['fabpot3@example.org', 'fabpot4@example.org']),
         ]);
 
         $entryManager = $this->adapter->getEntryManager();
@@ -349,8 +350,8 @@ class LdapManagerTest extends LdapTestCase
     public function testUpdateOperationsThrowsExceptionWhenAddedDuplicatedValue()
     {
         $duplicateIterator = new \ArrayIterator([
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org']),
-            new UpdateOperation(LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org']),
+            new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org']),
         ]);
 
         $entryManager = $this->adapter->getEntryManager();

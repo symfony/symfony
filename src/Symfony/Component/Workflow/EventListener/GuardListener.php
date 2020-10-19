@@ -38,7 +38,7 @@ class GuardListener
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
         if (null !== $roleHierarchy && !method_exists($roleHierarchy, 'getReachableRoleNames')) {
-            @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($roleHierarchy)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not implementing the "%s::getReachableRoleNames()" method in "%s" is deprecated since Symfony 4.3.', RoleHierarchyInterface::class, \get_class($roleHierarchy)), \E_USER_DEPRECATED);
         }
 
         $this->configuration = $configuration;
@@ -83,14 +83,14 @@ class GuardListener
         $token = $this->tokenStorage->getToken();
 
         if (null === $token) {
-            throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
+            throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow "%s".', $event->getWorkflowName()));
         }
 
         if (method_exists($token, 'getRoleNames')) {
             $roleNames = $token->getRoleNames();
             $roles = array_map(function (string $role) { return new Role($role, false); }, $roleNames);
         } else {
-            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not implementing the "%s::getRoleNames()" method in "%s" is deprecated since Symfony 4.3.', TokenInterface::class, \get_class($token)), \E_USER_DEPRECATED);
 
             $roles = $token->getRoles(false);
             $roleNames = array_map(function (Role $role) { return $role->getRole(); }, $roles);

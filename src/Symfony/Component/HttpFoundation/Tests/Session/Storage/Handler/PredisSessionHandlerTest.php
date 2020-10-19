@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Predis\Client;
 
+/**
+ * @group integration
+ */
 class PredisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
 {
     protected function createRedisClient(string $host): Client

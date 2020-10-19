@@ -28,7 +28,7 @@ class AddExpressionLanguageProvidersPass implements CompilerPassInterface
     public function __construct(bool $handleSecurityLanguageProviders = true)
     {
         if ($handleSecurityLanguageProviders) {
-            @trigger_error(sprintf('Registering services tagged "security.expression_language_provider" with "%s" is deprecated since Symfony 4.2, use the "%s" instead.', __CLASS__, SecurityExpressionLanguageProvidersPass::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Registering services tagged "security.expression_language_provider" with "%s" is deprecated since Symfony 4.2, use the "%s" instead.', __CLASS__, SecurityExpressionLanguageProvidersPass::class), \E_USER_DEPRECATED);
         }
 
         $this->handleSecurityLanguageProviders = $handleSecurityLanguageProviders;

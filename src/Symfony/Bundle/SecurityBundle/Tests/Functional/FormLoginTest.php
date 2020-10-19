@@ -27,7 +27,7 @@ class FormLoginTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/profile');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
     }
@@ -47,7 +47,7 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/profile');
 
         $crawler = $client->followRedirect();
-        $text = $crawler->text();
+        $text = $crawler->text(null, true);
 
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
@@ -80,7 +80,7 @@ class FormLoginTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/foo');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
@@ -101,7 +101,7 @@ class FormLoginTest extends AbstractWebTestCase
         $client->submit($form);
         $this->assertRedirect($client->getResponse(), '/protected_resource');
 
-        $text = $client->followRedirect()->text();
+        $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Hello johannes!', $text);
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
     }

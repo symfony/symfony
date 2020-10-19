@@ -56,7 +56,7 @@ class DebugCommand extends Command
         $this->twigDefaultPath = $twigDefaultPath;
 
         if (\is_string($fileLinkFormatter) || $rootDir instanceof FileLinkFormatter) {
-            @trigger_error(sprintf('Passing a string as "$fileLinkFormatter" 5th argument or an instance of FileLinkFormatter as "$rootDir" 6th argument of the "%s()" method is deprecated since Symfony 4.4, swap the variables position.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a string as "$fileLinkFormatter" 5th argument or an instance of FileLinkFormatter as "$rootDir" 6th argument of the "%s()" method is deprecated since Symfony 4.4, swap the variables position.', __METHOD__), \E_USER_DEPRECATED);
 
             $this->rootDir = $fileLinkFormatter;
             $this->fileLinkFormatter = $rootDir;
@@ -106,17 +106,21 @@ EOF
         $filter = $input->getOption('filter');
 
         if (null !== $name && [] === $this->getFilesystemLoaders()) {
-            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s"', FilesystemLoader::class));
+            throw new InvalidArgumentException(sprintf('Argument "name" not supported, it requires the Twig loader "%s".', FilesystemLoader::class));
         }
 
         switch ($input->getOption('format')) {
             case 'text':
-                return $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter);
+                $name ? $this->displayPathsText($io, $name) : $this->displayGeneralText($io, $filter);
+                break;
             case 'json':
-                return $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter);
+                $name ? $this->displayPathsJson($io, $name) : $this->displayGeneralJson($io, $filter);
+                break;
             default:
                 throw new InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
         }
+
+        return 0;
     }
 
     private function displayPathsText(SymfonyStyle $io, string $name)
@@ -272,7 +276,7 @@ EOF
             $data['warnings'] = $this->buildWarningMessages($wrongBundles);
         }
 
-        $data = json_encode($data, JSON_PRETTY_PRINT);
+        $data = json_encode($data, \JSON_PRETTY_PRINT);
         $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
     }
 
@@ -327,7 +331,7 @@ EOF
             } elseif (\is_string($cb) && preg_match('{^(.+)::(.+)$}', $cb, $m) && method_exists($m[1], $m[2])) {
                 $refl = new \ReflectionMethod($m[1], $m[2]);
             } else {
-                throw new \UnexpectedValueException('Unsupported callback type');
+                throw new \UnexpectedValueException('Unsupported callback type.');
             }
 
             $args = $refl->getParameters();
@@ -360,7 +364,7 @@ EOF
         return null;
     }
 
-    private function getPrettyMetadata(string $type, $entity, bool $decorated)
+    private function getPrettyMetadata(string $type, $entity, bool $decorated): ?string
     {
         if ('tests' === $type) {
             return '';
@@ -402,7 +406,7 @@ EOF
         $bundleNames = [];
 
         if ($this->rootDir && $this->projectDir) {
-            $folders = glob($this->rootDir.'/Resources/*/views', GLOB_ONLYDIR);
+            $folders = glob($this->rootDir.'/Resources/*/views', \GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->rootDir.\DIRECTORY_SEPARATOR.'Resources/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
                 if (0 === strpos($absolutePath, $this->projectDir)) {
@@ -410,7 +414,7 @@ EOF
                     $path = ltrim($relativePath.$name, \DIRECTORY_SEPARATOR);
                     $carry[$name] = $path;
 
-                    @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $absolutePath, $this->twigDefaultPath.'/bundles/'.$name), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $absolutePath, $this->twigDefaultPath.'/bundles/'.$name), \E_USER_DEPRECATED);
                 }
 
                 return $carry;
@@ -418,7 +422,7 @@ EOF
         }
 
         if ($this->twigDefaultPath && $this->projectDir) {
-            $folders = glob($this->twigDefaultPath.'/bundles/*', GLOB_ONLYDIR);
+            $folders = glob($this->twigDefaultPath.'/bundles/*', \GLOB_ONLYDIR);
             $relativePath = ltrim(substr($this->twigDefaultPath.'/bundles/', \strlen($this->projectDir)), \DIRECTORY_SEPARATOR);
             $bundleNames = array_reduce($folders, function ($carry, $absolutePath) use ($relativePath) {
                 if (0 === strpos($absolutePath, $this->projectDir)) {
@@ -558,7 +562,7 @@ EOF
 
         $threshold = 1e3;
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }
@@ -574,7 +578,7 @@ EOF
 
     private function isAbsolutePath(string $file): bool
     {
-        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || null !== parse_url($file, PHP_URL_SCHEME);
+        return strspn($file, '/\\', 0, 1) || (\strlen($file) > 3 && ctype_alpha($file[0]) && ':' === $file[1] && strspn($file, '/\\', 2, 1)) || null !== parse_url($file, \PHP_URL_SCHEME);
     }
 
     /**

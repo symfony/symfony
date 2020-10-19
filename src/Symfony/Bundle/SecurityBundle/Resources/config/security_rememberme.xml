@@ -9,7 +9,7 @@
 
         <service id="security.authentication.listener.rememberme" class="Symfony\Component\Security\Http\Firewall\RememberMeListener" abstract="true">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.untracked_token_storage" />
             <argument type="service" id="security.authentication.rememberme" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="logger" on-invalid="null" />

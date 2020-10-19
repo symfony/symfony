@@ -62,7 +62,7 @@ final class ConnectionOptions
     const X_KEEPALIVE_PROBES = 0x6301;
     const X_KEEPALIVE_INTERVAL = 0x6302;
 
-    public static function getOptionName($name)
+    public static function getOptionName(string $name): string
     {
         return sprintf('%s::%s', self::class, strtoupper($name));
     }
@@ -71,11 +71,9 @@ final class ConnectionOptions
      * Fetches an option's corresponding constant value from an option name.
      * The option name can either be in snake or camel case.
      *
-     * @param string $name
-     *
      * @throws LdapException
      */
-    public static function getOption($name): int
+    public static function getOption(string $name): int
     {
         // Convert
         $constantName = self::getOptionName($name);
@@ -87,7 +85,7 @@ final class ConnectionOptions
         return \constant($constantName);
     }
 
-    public static function isOption($name)
+    public static function isOption(string $name): bool
     {
         return \defined(self::getOptionName($name));
     }

@@ -163,4 +163,23 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
         $this->assertMatchesXpath($html, '/div[@class="form-group"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
     }
+
+    public function testCheckboxRowWithHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [@class="form-group"]
+    [
+        ./div[@class="col-sm-2" or @class="col-sm-10"]
+        /following-sibling::div[@class="col-sm-2" or @class="col-sm-10"]
+        [
+            ./span[text() = "[trans]really helpful text[/trans]"]
+        ]
+    ]
+'
+        );
+    }
 }

@@ -28,23 +28,28 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('api', 'postmark'),
+            new Dsn('postmark+api', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'postmark'),
+            new Dsn('postmark', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtps', 'postmark'),
+            new Dsn('postmark+smtp', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'example.com'),
-            false,
+            new Dsn('postmark+smtps', 'default'),
+            true,
+        ];
+
+        yield [
+            new Dsn('postmark+smtp', 'example.com'),
+            true,
         ];
     }
 
@@ -54,17 +59,27 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
         $logger = $this->getLogger();
 
         yield [
-            new Dsn('api', 'postmark', self::USER),
+            new Dsn('postmark+api', 'default', self::USER),
             new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtp', 'postmark', self::USER),
+            new Dsn('postmark+api', 'example.com', self::USER, '', 8080),
+            (new PostmarkApiTransport(self::USER, $this->getClient(), $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
+            new Dsn('postmark', 'default', self::USER),
             new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtps', 'postmark', self::USER),
+            new Dsn('postmark+smtp', 'default', self::USER),
+            new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('postmark+smtps', 'default', self::USER),
             new PostmarkSmtpTransport(self::USER, $dispatcher, $logger),
         ];
     }
@@ -72,13 +87,13 @@ class PostmarkTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
-            new Dsn('foo', 'postmark', self::USER),
-            'The "foo" scheme is not supported for mailer "postmark". Supported schemes are: "api", "smtp", "smtps".',
+            new Dsn('postmark+foo', 'default', self::USER),
+            'The "postmark+foo" scheme is not supported; supported schemes for mailer "postmark" are: "postmark", "postmark+api", "postmark+smtp", "postmark+smtps".',
         ];
     }
 
     public function incompleteDsnProvider(): iterable
     {
-        yield [new Dsn('api', 'postmark')];
+        yield [new Dsn('postmark+api', 'default')];
     }
 }

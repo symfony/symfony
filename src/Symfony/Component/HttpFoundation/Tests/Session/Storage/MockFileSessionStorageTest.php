@@ -41,12 +41,12 @@ class MockFileSessionStorageTest extends TestCase
 
     protected function tearDown(): void
     {
+        array_map('unlink', glob($this->sessionDir.'/*'));
+        if (is_dir($this->sessionDir)) {
+            @rmdir($this->sessionDir);
+        }
         $this->sessionDir = null;
         $this->storage = null;
-        array_map('unlink', glob($this->sessionDir.'/*.session'));
-        if (is_dir($this->sessionDir)) {
-            rmdir($this->sessionDir);
-        }
     }
 
     public function testStart()
@@ -114,7 +114,7 @@ class MockFileSessionStorageTest extends TestCase
         $storage1->save();
     }
 
-    private function getStorage()
+    private function getStorage(): MockFileSessionStorage
     {
         $storage = new MockFileSessionStorage($this->sessionDir);
         $storage->registerBag(new FlashBag());

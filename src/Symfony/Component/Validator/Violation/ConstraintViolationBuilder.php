@@ -45,17 +45,17 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $cause;
 
     /**
-     * @param string              $message    The error message as a string or a stringable object
+     * @param string|object       $message    The error message as a string or a stringable object
      * @param TranslatorInterface $translator
      */
     public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)
     {
         if (null === $message) {
-            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), \E_USER_DEPRECATED);
             $message = '';
         }
         if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 8 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
+            throw new \TypeError(sprintf('Argument 8 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
         }
         $this->violations = $violations;
         $this->message = $message;
@@ -134,7 +134,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     public function setCode($code)
     {
         if (null !== $code && !\is_string($code)) {
-            @trigger_error(sprintf('Not using a string as the error code in %s() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not using a string as the error code in %s() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $this->code = $code;

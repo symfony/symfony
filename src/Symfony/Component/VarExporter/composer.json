@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": "^7.1.3"
+        "php": ">=7.1.3"
     },
     "require-dev": {
-        "symfony/var-dumper": "^4.1.1|^5.0"
+        "symfony/var-dumper": "^4.4.9|^5.0.9"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\VarExporter\\": "" },
@@ -29,8 +29,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-alias": {
-            "dev-master": "4.4-dev"
-        }
+        "branch-version": "4.4"
     }
 }

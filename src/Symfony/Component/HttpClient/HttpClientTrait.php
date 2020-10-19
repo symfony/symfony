@@ -42,6 +42,32 @@ trait HttpClientTrait
 
         $options = self::mergeDefaultOptions($options, $defaultOptions, $allowExtraOptions);
 
+        $buffer = $options['buffer'] ?? true;
+
+        if ($buffer instanceof \Closure) {
+            $options['buffer'] = static function (array $headers) use ($buffer) {
+                if (!\is_bool($buffer = $buffer($headers))) {
+                    if (!\is_array($bufferInfo = @stream_get_meta_data($buffer))) {
+                        throw new \LogicException(sprintf('The closure passed as option "buffer" must return bool or stream resource, got "%s".', \is_resource($buffer) ? get_resource_type($buffer).' resource' : \gettype($buffer)));
+                    }
+
+                    if (false === strpbrk($bufferInfo['mode'], 'acew+')) {
+                        throw new \LogicException(sprintf('The stream returned by the closure passed as option "buffer" must be writeable, got mode "%s".', $bufferInfo['mode']));
+                    }
+                }
+
+                return $buffer;
+            };
+        } elseif (!\is_bool($buffer)) {
+            if (!\is_array($bufferInfo = @stream_get_meta_data($buffer))) {
+                throw new InvalidArgumentException(sprintf('Option "buffer" must be bool, stream resource or Closure, "%s" given.', \is_resource($buffer) ? get_resource_type($buffer).' resource' : \gettype($buffer)));
+            }
+
+            if (false === strpbrk($bufferInfo['mode'], 'acew+')) {
+                throw new InvalidArgumentException(sprintf('The stream in option "buffer" must be writeable, mode "%s" given.', $bufferInfo['mode']));
+            }
+        }
+
         if (isset($options['json'])) {
             if (isset($options['body']) && '' !== $options['body']) {
                 throw new InvalidArgumentException('Define either the "json" or the "body" option, setting both is not supported.');
@@ -54,6 +80,10 @@ trait HttpClientTrait
             }
         }
 
+        if (!isset($options['normalized_headers']['accept'])) {
+            $options['normalized_headers']['accept'] = [$options['headers'][] = 'Accept: */*'];
+        }
+
         if (isset($options['body'])) {
             $options['body'] = self::normalizeBody($options['body']);
         }
@@ -64,24 +94,24 @@ trait HttpClientTrait
 
         // Validate on_progress
         if (!\is_callable($onProgress = $options['on_progress'] ?? 'var_dump')) {
-            throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, %s given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
+            throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, "%s" given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
         }
 
         if (\is_array($options['auth_basic'] ?? null)) {
             $count = \count($options['auth_basic']);
             if ($count <= 0 || $count > 2) {
-                throw new InvalidArgumentException(sprintf('Option "auth_basic" must contain 1 or 2 elements, %s given.', $count));
+                throw new InvalidArgumentException(sprintf('Option "auth_basic" must contain 1 or 2 elements, "%s" given.', $count));
             }
 
             $options['auth_basic'] = implode(':', $options['auth_basic']);
         }
 
         if (!\is_string($options['auth_basic'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string or an array, %s given.', \gettype($options['auth_basic'])));
+            throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string or an array, "%s" given.', \gettype($options['auth_basic'])));
         }
 
-        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._~+/0-9a-zA-Z]++=*+$}', $options['auth_bearer']))) {
-            throw new InvalidArgumentException(sprintf('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, %s given.', \is_string($options['auth_bearer']) ? 'invalid string' : \gettype($options['auth_bearer'])));
+        if (isset($options['auth_bearer']) && (!\is_string($options['auth_bearer']) || !preg_match('{^[-._=:~+/0-9a-zA-Z]++$}', $options['auth_bearer']))) {
+            throw new InvalidArgumentException(sprintf('Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, '.(\is_string($options['auth_bearer']) ? 'invalid string given.' : '"%s" given.'), \gettype($options['auth_bearer'])));
         }
 
         if (isset($options['auth_basic'], $options['auth_bearer'])) {
@@ -167,6 +197,16 @@ trait HttpClientTrait
                 continue;
             }
 
+            if ('auth_ntlm' === $name) {
+                if (!\extension_loaded('curl')) {
+                    $msg = 'try installing the "curl" extension to use "%s" instead.';
+                } else {
+                    $msg = 'try using "%s" instead.';
+                }
+
+                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by "%s", '.$msg, __CLASS__, CurlHttpClient::class));
+            }
+
             $alternatives = [];
 
             foreach ($defaultOptions as $key => $v) {
@@ -175,11 +215,7 @@ trait HttpClientTrait
                 }
             }
 
-            if ('auth_ntlm' === $name) {
-                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" is not supported by %s, try using CurlHttpClient instead.', __CLASS__));
-            }
-
-            throw new InvalidArgumentException(sprintf('Unsupported option "%s" passed to %s, did you mean "%s"?', $name, __CLASS__, implode('", "', $alternatives ?: array_keys($defaultOptions))));
+            throw new InvalidArgumentException(sprintf('Unsupported option "%s" passed to "%s", did you mean "%s"?', $name, __CLASS__, implode('", "', $alternatives ?: array_keys($defaultOptions))));
         }
 
         return $options;
@@ -195,10 +231,21 @@ trait HttpClientTrait
         $normalizedHeaders = [];
 
         foreach ($headers as $name => $values) {
+            if (\is_object($values) && method_exists($values, '__toString')) {
+                $values = (string) $values;
+            }
+
             if (\is_int($name)) {
+                if (!\is_string($values)) {
+                    throw new InvalidArgumentException(sprintf('Invalid value for header "%s": expected string, "%s" given.', $name, \gettype($values)));
+                }
                 [$name, $values] = explode(':', $values, 2);
                 $values = [ltrim($values)];
             } elseif (!is_iterable($values)) {
+                if (\is_object($values)) {
+                    throw new InvalidArgumentException(sprintf('Invalid value for header "%s": expected string, "%s" given.', $name, \get_class($values)));
+                }
+
                 $values = (array) $values;
             }
 
@@ -227,7 +274,7 @@ trait HttpClientTrait
     private static function normalizeBody($body)
     {
         if (\is_array($body)) {
-            return http_build_query($body, '', '&', PHP_QUERY_RFC1738);
+            return http_build_query($body, '', '&', \PHP_QUERY_RFC1738);
         }
 
         if ($body instanceof \Traversable) {
@@ -258,7 +305,7 @@ trait HttpClientTrait
         }
 
         if (!\is_string($body) && !\is_array(@stream_get_meta_data($body))) {
-            throw new InvalidArgumentException(sprintf('Option "body" must be string, stream resource, iterable or callable, %s given.', \is_resource($body) ? get_resource_type($body) : \gettype($body)));
+            throw new InvalidArgumentException(sprintf('Option "body" must be string, stream resource, iterable or callable, "%s" given.', \is_resource($body) ? get_resource_type($body) : \gettype($body)));
         }
 
         return $body;
@@ -284,33 +331,29 @@ trait HttpClientTrait
                 $fingerprint[$algo] = 'pin-sha256' === $algo ? (array) $hash : str_replace(':', '', $hash);
             }
         } else {
-            throw new InvalidArgumentException(sprintf('Option "peer_fingerprint" must be string or array, %s given.', \gettype($fingerprint)));
+            throw new InvalidArgumentException(sprintf('Option "peer_fingerprint" must be string or array, "%s" given.', \gettype($fingerprint)));
         }
 
         return $fingerprint;
     }
 
     /**
-     * @param array|\JsonSerializable $value
+     * @param mixed $value
      *
      * @throws InvalidArgumentException When the value cannot be json-encoded
      */
     private static function jsonEncode($value, int $flags = null, int $maxDepth = 512): string
     {
-        $flags = $flags ?? (JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION);
-
-        if (!\is_array($value) && !$value instanceof \JsonSerializable) {
-            throw new InvalidArgumentException(sprintf('Option "json" must be array or JsonSerializable, %s given.', \is_object($value) ? \get_class($value) : \gettype($value)));
-        }
+        $flags = $flags ?? (\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION);
 
         try {
             $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0), $maxDepth);
         } catch (\JsonException $e) {
-            throw new InvalidArgumentException(sprintf('Invalid value for "json" option: %s.', $e->getMessage()));
+            throw new InvalidArgumentException('Invalid value for "json" option: '.$e->getMessage());
         }
 
-        if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-            throw new InvalidArgumentException(sprintf('Invalid value for "json" option: %s.', json_last_error_msg()));
+        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & \JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+            throw new InvalidArgumentException('Invalid value for "json" option: '.json_last_error_msg());
         }
 
         return $value;
@@ -404,10 +447,7 @@ trait HttpClientTrait
                 throw new InvalidArgumentException(sprintf('Unsupported IDN "%s", try enabling the "intl" PHP extension or running "composer require symfony/polyfill-intl-idn".', $host));
             }
 
-            if (false === $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) : strtolower($host)) {
-                throw new InvalidArgumentException(sprintf('Unsupported host in "%s".', $url));
-            }
-
+            $host = \defined('INTL_IDNA_VARIANT_UTS46') ? idn_to_ascii($host, \IDNA_DEFAULT, \INTL_IDNA_VARIANT_UTS46) ?: strtolower($host) : strtolower($host);
             $host .= $port ? ':'.$port : '';
         }
 
@@ -492,7 +532,7 @@ trait HttpClientTrait
             }
         }
 
-        $queryString = http_build_query($queryArray, '', '&', PHP_QUERY_RFC3986);
+        $queryString = http_build_query($queryArray, '', '&', \PHP_QUERY_RFC3986);
         $queryArray = [];
 
         if ($queryString) {
@@ -502,5 +542,18 @@ trait HttpClientTrait
         }
 
         return implode('&', $replace ? array_replace($query, $queryArray) : ($query + $queryArray));
+    }
+
+    private static function shouldBuffer(array $headers): bool
+    {
+        if (null === $contentType = $headers['content-type'][0] ?? null) {
+            return false;
+        }
+
+        if (false !== $i = strpos($contentType, ';')) {
+            $contentType = substr($contentType, 0, $i);
+        }
+
+        return $contentType && preg_match('#^(?:text/|application/(?:.+\+)?(?:json|xml)$)#i', $contentType);
     }
 }

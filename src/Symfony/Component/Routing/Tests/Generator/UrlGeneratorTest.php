@@ -171,6 +171,7 @@ class UrlGeneratorTest extends TestCase
         foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
             $localizedRoute = clone $route;
             $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setRequirement('_locale', $locale);
             $localizedRoute->setDefault('_canonical_route', $name);
             $localizedRoute->setPath($path);
             $routes->add($name.'.'.$locale, $localizedRoute);
@@ -195,6 +196,7 @@ class UrlGeneratorTest extends TestCase
         foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
             $localizedRoute = clone $route;
             $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setRequirement('_locale', $locale);
             $localizedRoute->setDefault('_canonical_route', $name);
             $localizedRoute->setPath($path);
             $routes->add($name.'.'.$locale, $localizedRoute);
@@ -219,6 +221,7 @@ class UrlGeneratorTest extends TestCase
         foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
             $localizedRoute = clone $route;
             $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setRequirement('_locale', $locale);
             $localizedRoute->setDefault('_canonical_route', $name);
             $localizedRoute->setPath($path);
             $routes->add($name.'.'.$locale, $localizedRoute);
@@ -234,6 +237,29 @@ class UrlGeneratorTest extends TestCase
             'http://localhost/app.php/bar',
             $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
+    }
+
+    public function testDumpWithLocalizedRoutesPreserveTheGoodLocaleInTheUrl()
+    {
+        $routeCollection = new RouteCollection();
+
+        $routeCollection->add('foo.en', (new Route('/{_locale}/fork'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en'));
+        $routeCollection->add('foo.fr', (new Route('/{_locale}/fourchette'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'fr'));
+        $routeCollection->add('fun.en', (new Route('/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'fun')->setRequirement('_locale', 'en'));
+        $routeCollection->add('fun.fr', (new Route('/amusant'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'fun')->setRequirement('_locale', 'fr'));
+
+        $urlGenerator = $this->getGenerator($routeCollection);
+        $urlGenerator->getContext()->setParameter('_locale', 'fr');
+
+        $this->assertSame('/app.php/fr/fourchette', $urlGenerator->generate('foo'));
+        $this->assertSame('/app.php/en/fork', $urlGenerator->generate('foo.en'));
+        $this->assertSame('/app.php/en/fork', $urlGenerator->generate('foo', ['_locale' => 'en']));
+        $this->assertSame('/app.php/fr/fourchette', $urlGenerator->generate('foo.fr', ['_locale' => 'en']));
+
+        $this->assertSame('/app.php/amusant', $urlGenerator->generate('fun'));
+        $this->assertSame('/app.php/fun', $urlGenerator->generate('fun.en'));
+        $this->assertSame('/app.php/fun', $urlGenerator->generate('fun', ['_locale' => 'en']));
+        $this->assertSame('/app.php/amusant', $urlGenerator->generate('fun.fr', ['_locale' => 'en']));
     }
 
     public function testGenerateWithoutRoutes()
@@ -255,6 +281,7 @@ class UrlGeneratorTest extends TestCase
         foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
             $localizedRoute = clone $route;
             $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setRequirement('_locale', $locale);
             $localizedRoute->setDefault('_canonical_route', $name);
             $localizedRoute->setPath($path);
             $routes->add($name.'.'.$locale, $localizedRoute);

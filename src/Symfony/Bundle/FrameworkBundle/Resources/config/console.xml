@@ -70,6 +70,10 @@
             <tag name="console.command" command="debug:container" />
         </service>
 
+        <service id="console.command.container_lint" class="Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand">
+            <tag name="console.command" command="lint:container" />
+        </service>
+
         <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
             <argument>null</argument>
             <argument type="service" id="debug.file_link_formatter" on-invalid="null"/>
@@ -84,13 +88,9 @@
         <service id="console.command.messenger_consume_messages" class="Symfony\Component\Messenger\Command\ConsumeMessagesCommand">
             <argument /> <!-- Routable message bus -->
             <argument type="service" id="messenger.receiver_locator" />
+            <argument type="service" id="event_dispatcher" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="collection" /> <!-- Receiver names -->
-            <argument type="service" id="messenger.retry_strategy_locator" />
-            <argument type="service" id="event_dispatcher" />
-            <call method="setCachePoolForRestartSignal">
-                <argument type="service" id="cache.messenger.restart_workers_signal" />
-            </call>
 
             <tag name="console.command" command="messenger:consume" />
             <tag name="console.command" command="messenger:consume-messages" />
@@ -116,10 +116,9 @@
 
         <service id="console.command.messenger_failed_messages_retry" class="Symfony\Component\Messenger\Command\FailedMessagesRetryCommand">
             <argument /> <!-- Receiver name -->
-            <argument /> <!-- Receiver locator -->
+            <argument /> <!-- Receiver -->
             <argument type="service" id="messenger.routable_message_bus" />
             <argument type="service" id="event_dispatcher" />
-            <argument /> <!-- Retry strategy -->
             <argument type="service" id="logger" />
 
             <tag name="console.command" command="messenger:failed:retry" />
@@ -127,14 +126,14 @@
 
         <service id="console.command.messenger_failed_messages_show" class="Symfony\Component\Messenger\Command\FailedMessagesShowCommand">
             <argument /> <!-- Receiver name -->
-            <argument /> <!-- Receiver locator -->
+            <argument /> <!-- Receiver -->
 
             <tag name="console.command" command="messenger:failed:show" />
         </service>
 
         <service id="console.command.messenger_failed_messages_remove" class="Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand">
             <argument /> <!-- Receiver name -->
-            <argument /> <!-- Receiver locator -->
+            <argument /> <!-- Receiver -->
 
             <tag name="console.command" command="messenger:failed:remove" />
         </service>
@@ -195,10 +194,40 @@
             <tag name="console.command" command="debug:form" />
         </service>
 
-        <service id="console.command.error_renderer_debug" class="Symfony\Component\ErrorRenderer\Command\DebugCommand">
-            <argument type="collection" /> <!-- All error renderers are injected here by ErrorRendererPass -->
-            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
-            <tag name="console.command" command="debug:error-renderer" />
+        <service id="console.command.secrets_set" class="Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:set" />
+        </service>
+
+        <service id="console.command.secrets_remove" class="Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:remove" />
+        </service>
+
+        <service id="console.command.secrets_generate_key" class="Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeysCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:generate-keys" />
+        </service>
+
+        <service id="console.command.secrets_list" class="Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:list" />
+        </service>
+
+        <service id="console.command.secrets_decrypt_to_local" class="Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:decrypt-to-local" />
+        </service>
+
+        <service id="console.command.secrets_encrypt_from_local" class="Symfony\Bundle\FrameworkBundle\Command\SecretsEncryptFromLocalCommand">
+            <argument type="service" id="secrets.vault" />
+            <argument type="service" id="secrets.local_vault" on-invalid="ignore" />
+            <tag name="console.command" command="secrets:encrypt-from-local" />
         </service>
     </services>
 </container>

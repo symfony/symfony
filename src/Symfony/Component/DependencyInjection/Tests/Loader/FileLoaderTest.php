@@ -75,7 +75,7 @@ class FileLoaderTest extends TestCase
                 ['foo', 'bar'],
             ],
             'mixedcase' => ['MixedCaseKey' => 'value'],
-            'constant' => PHP_EOL,
+            'constant' => \PHP_EOL,
             'bar' => '%foo%',
             'escape' => '@escapeme',
             'foo_bar' => new Reference('foo_bar'),
@@ -89,8 +89,11 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->autoRegisterAliasesForSinglyImplementedInterfaces = false;
 
         $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*');
+        $loader->registerClasses(new Definition(), 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\\', 'Prototype/%sub_dir%/*'); // loading twice should not be an issue
+        $loader->registerAliasesForSinglyImplementedInterfaces();
 
         $this->assertEquals(
             ['service_container', Bar::class],
@@ -106,11 +109,6 @@ class FileLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testRegisterClassesWithExclude()
     {
         $container = new ContainerBuilder();
@@ -138,13 +136,15 @@ class FileLoaderTest extends TestCase
             ],
             array_keys($container->getAliases())
         );
+
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            'Prototype/NotExistingDir'
+        );
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testRegisterClassesWithExcludeAsArray()
     {
         $container = new ContainerBuilder();
@@ -158,17 +158,13 @@ class FileLoaderTest extends TestCase
                 'Prototype/OtherDir/AnotherSub/DeeperBaz.php',
             ]
         );
+
         $this->assertTrue($container->has(Foo::class));
         $this->assertTrue($container->has(Baz::class));
         $this->assertFalse($container->has(Bar::class));
         $this->assertFalse($container->has(DeeperBaz::class));
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testNestedRegisterClasses()
     {
         $container = new ContainerBuilder();
@@ -197,11 +193,6 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($alias->isPrivate());
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testMissingParentClass()
     {
         $container = new ContainerBuilder();
@@ -216,16 +207,16 @@ class FileLoaderTest extends TestCase
 
         $this->assertTrue($container->has(MissingParent::class));
 
-        $this->assertSame(
-            ['While discovering services from namespace "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\", an error was thrown when processing the class "Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent": "Class Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingClass not found".'],
-            $container->getDefinition(MissingParent::class)->getErrors()
+        $this->assertMatchesRegularExpression(
+            '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
+            $container->getDefinition(MissingParent::class)->getErrors()[0]
         );
     }
 
     public function testRegisterClassesWithBadPrefix()
     {
         $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
-        $this->expectExceptionMessageRegExp('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
+        $this->expectExceptionMessageMatches('/Expected to find class "Symfony\\\Component\\\DependencyInjection\\\Tests\\\Fixtures\\\Prototype\\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/');
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
@@ -251,6 +242,8 @@ class FileLoaderTest extends TestCase
 
 class TestFileLoader extends FileLoader
 {
+    public $autoRegisterAliasesForSinglyImplementedInterfaces = true;
+
     public function load($resource, $type = null)
     {
         return $resource;

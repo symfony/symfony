@@ -35,7 +35,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @internal since Symfony 4.3
  */
-abstract class AbstractPreAuthenticatedListener implements ListenerInterface
+abstract class AbstractPreAuthenticatedListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -52,23 +52,39 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+
+        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        } else {
+            $this->dispatcher = $dispatcher;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        try {
+            $request->attributes->set('_pre_authenticated_data', $this->getPreAuthenticatedData($request));
+        } catch (BadCredentialsException $e) {
+            $this->clearToken($e);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Handles pre-authentication.
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
 
-        try {
-            list($user, $credentials) = $this->getPreAuthenticatedData($request);
-        } catch (BadCredentialsException $e) {
-            $this->clearToken($e);
-
-            return;
-        }
+        [$user, $credentials] = $request->attributes->get('_pre_authenticated_data');
+        $request->attributes->remove('_pre_authenticated_data');
 
         if (null !== $this->logger) {
             $this->logger->debug('Checking current security token.', ['token' => (string) $this->tokenStorage->getToken()]);

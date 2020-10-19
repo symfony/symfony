@@ -40,7 +40,7 @@ class Psr16CacheTest extends SimpleCacheTest
         }
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new Psr16Cache(new FilesystemAdapter('', $defaultLifetime));
     }
@@ -146,7 +146,7 @@ class Psr16CacheTest extends SimpleCacheTest
         $cache->clear();
     }
 
-    protected function isPruned($cache, $name)
+    protected function isPruned(CacheInterface $cache, string $name): bool
     {
         if (Psr16Cache::class !== \get_class($cache)) {
             $this->fail('Test classes for pruneable caches must implement `isPruned($cache, $name)` method.');

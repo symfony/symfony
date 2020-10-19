@@ -1,0 +1,65 @@
+{% apply inky_to_html|inline_css %}
+<html>
+<head>
+<style>
+    {% block style %}
+        {{ source("@email/zurb_2/main.css") }}
+        {{ source("@email/zurb_2/notification/local.css") }}
+    {% endblock %}
+</style>
+</head>
+<body>
+<spacer size="32"></spacer>
+<wrapper class="body">
+    <container class="body_{{ ("urgent" == importance ? "alert" : ("high" == importance ? "warning" : "default")) }}">
+        <spacer size="16"></spacer>
+        <row>
+            <columns large="12" small="12">
+                {% block lead %}
+                    <small><strong>{{ importance|upper }}</strong></small>
+                    <p class="lead">
+                        {{ email.subject }}
+                    </p>
+                {% endblock %}
+
+                {% block content %}
+                    {% if markdown %}
+                        {{ include('@email/zurb_2/notification/content_markdown.html.twig') }}
+                    {% else %}
+                        {{ (raw ? content|raw : content)|nl2br }}
+                    {% endif %}
+                {% endblock %}
+
+                {% block action %}
+                    {% if action_url %}
+                        <spacer size="16"></spacer>
+                        <button href="{{ action_url }}">{{ action_text }}</button>
+                    {% endif %}
+                {% endblock %}
+
+                {% block exception %}
+                    {% if exception %}
+                        <spacer size="16"></spacer>
+                        <p><em>Exception stack trace attached.</em></p>
+                    {% endif %}
+                {% endblock %}
+            </columns>
+        </row>
+
+        <wrapper class="secondary">
+            <spacer size="16"></spacer>
+            {% block footer %}
+                <row>
+                    <columns small="12" large="6">
+                        {% block footer_content %}
+                            <p><small>Notification e-mail sent by Symfony</small></p>
+                        {% endblock %}
+                    </columns>
+                </row>
+            {% endblock %}
+        </wrapper>
+    </container>
+</wrapper>
+</body>
+</html>
+{% endapply %}

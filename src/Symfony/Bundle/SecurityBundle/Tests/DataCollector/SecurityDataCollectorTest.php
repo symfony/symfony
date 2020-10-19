@@ -258,7 +258,6 @@ class SecurityDataCollectorTest extends TestCase
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMockForAbstractClass();
         $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
-        $decoratedVoter2 = new TraceableVoter($voter2, $eventDispatcher);
 
         yield [
             AccessDecisionManager::STRATEGY_AFFIRMATIVE,

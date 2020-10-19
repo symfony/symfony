@@ -128,7 +128,7 @@ class YamlFileLoader extends FileLoader
         return array_keys($this->classes);
     }
 
-    private function getClassesFromYaml()
+    private function getClassesFromYaml(): array
     {
         if (!stream_is_local($this->file)) {
             throw new MappingException(sprintf('This is not a local file "%s".', $this->file));

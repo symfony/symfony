@@ -48,7 +48,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
      * @param string                            $providerKey         The provider (i.e. firewall) key
      */
-    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
+    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
@@ -86,7 +86,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
                 return $token;
             }
 
-            // this AccountStatusException causes the user to be logged out
+            // this causes the user to be logged out
             throw new AuthenticationExpiredException();
         }
 
@@ -99,22 +99,26 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $this->authenticateViaGuard($guardAuthenticator, $token);
     }
 
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
+    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token): GuardTokenInterface
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from %s::getUser()', \get_class($guardAuthenticator)));
+            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', \get_class($guardAuthenticator)));
         }
 
         if (!$user instanceof UserInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::getUser() method must return a UserInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
+            throw new \UnexpectedValueException(sprintf('The "%s::getUser()" method must return a UserInterface. You returned "%s".', \get_class($guardAuthenticator), \is_object($user) ? \get_class($user) : \gettype($user)));
         }
 
         $this->userChecker->checkPreAuth($user);
-        if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
-            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', \get_class($guardAuthenticator)));
+        if (true !== $checkCredentialsResult = $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
+            if (false !== $checkCredentialsResult) {
+                @trigger_error(sprintf('"%s::checkCredentials()" must return a boolean value. You returned "%s". This behavior is deprecated in Symfony 4.4 and will trigger a TypeError in Symfony 5.', \get_class($guardAuthenticator), \is_object($checkCredentialsResult) ? \get_class($checkCredentialsResult) : \gettype($checkCredentialsResult)), \E_USER_DEPRECATED);
+            }
+
+            throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', \get_class($guardAuthenticator)));
         }
         if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
             $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
@@ -124,13 +128,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         // turn the UserInterface into a TokenInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
-            throw new \UnexpectedValueException(sprintf('The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.', \get_class($guardAuthenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
+            throw new \UnexpectedValueException(sprintf('The "%s::createAuthenticatedToken()" method must return a TokenInterface. You returned "%s".', \get_class($guardAuthenticator), \is_object($authenticatedToken) ? \get_class($authenticatedToken) : \gettype($authenticatedToken)));
         }
 
         return $authenticatedToken;
     }
 
-    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token)
+    private function findOriginatingAuthenticator(PreAuthenticationGuardToken $token): ?AuthenticatorInterface
     {
         // find the *one* GuardAuthenticator that this token originated from
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {

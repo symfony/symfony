@@ -64,7 +64,7 @@ class EsmtpTransportFactoryTest extends TransportFactoryTestCase
         $transport = new EsmtpTransport('example.com', 465, true, $eventDispatcher, $logger);
 
         yield [
-            new Dsn('smtp', 'example.com', '', '', 465),
+            new Dsn('smtps', 'example.com', '', '', 465),
             $transport,
         ];
     }

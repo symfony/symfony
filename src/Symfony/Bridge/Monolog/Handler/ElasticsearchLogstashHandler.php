@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Monolog\Handler;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogstashFormatter;
 use Monolog\Handler\AbstractHandler;
+use Monolog\Handler\FormattableHandlerTrait;
+use Monolog\Handler\ProcessableHandlerTrait;
 use Monolog\Logger;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -39,18 +41,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {
-    use ProcessableHandlerTrait;
     use FormattableHandlerTrait;
+    use ProcessableHandlerTrait;
 
     private $endpoint;
     private $index;
     private $client;
     private $responses;
 
-    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, int $level = Logger::DEBUG, bool $bubble = true)
+    /**
+     * @param string|int $level The minimum logging level at which this handler will be triggered
+     */
+    public function __construct(string $endpoint = 'http://127.0.0.1:9200', string $index = 'monolog', HttpClientInterface $client = null, $level = Logger::DEBUG, bool $bubble = true)
     {
         if (!interface_exists(HttpClientInterface::class)) {
-            throw new \LogicException(sprintf('The %s handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
+            throw new \LogicException(sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
         parent::__construct($level, $bubble);

@@ -256,6 +256,37 @@ class DefaultChoiceListFactoryTest extends TestCase
         );
     }
 
+    public function testCreateViewFlatPreferredChoiceGroupsSameOrder()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj4, $this->obj2, $this->obj1, $this->obj3],
+            null, // label
+            null, // index
+            [$this, 'getGroup']
+        );
+
+        $preferredLabels = array_map(static function (ChoiceGroupView $groupView): array {
+            return array_map(static function (ChoiceView $view): string {
+                return $view->label;
+            }, $groupView->choices);
+        }, $view->preferredChoices);
+
+        $this->assertEquals(
+            [
+                'Group 2' => [
+                    2 => 'C',
+                    3 => 'D',
+                ],
+                'Group 1' => [
+                    0 => 'A',
+                    1 => 'B',
+                ],
+            ],
+            $preferredLabels
+        );
+    }
+
     public function testCreateViewFlatPreferredChoicesEmptyArray()
     {
         $view = $this->factory->createView(

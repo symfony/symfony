@@ -60,7 +60,7 @@ final class Key
     /**
      * @param float $ttl the expiration delay of locks in seconds
      */
-    public function reduceLifetime($ttl)
+    public function reduceLifetime(float $ttl)
     {
         $newTime = microtime(true) + $ttl;
 

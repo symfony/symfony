@@ -11,15 +11,16 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use the ErrorRenderer component instead.', ExceptionController::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ExceptionController::class, \Symfony\Component\HttpKernel\Controller\ErrorController::class), \E_USER_DEPRECATED);
 
 /**
  * ExceptionController renders error or exception pages for a given
@@ -28,7 +29,7 @@ use Twig\Loader\ExistsLoaderInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Matthias Pigulla <mp@webfactory.de>
  *
- * @deprecated since Symfony 4.4, use the ErrorRenderer component instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\HttpKernel\Controller\ErrorController instead.
  */
 class ExceptionController
 {
@@ -124,23 +125,28 @@ class ExceptionController
         return sprintf('@Twig/Exception/%s.html.twig', $showException ? 'exception_full' : $name);
     }
 
-    // to be removed when the minimum required version of Twig is >= 3.0
+    // to be removed when the minimum required version of Twig is >= 2.0
     protected function templateExists($template)
     {
         $template = (string) $template;
 
         $loader = $this->twig->getLoader();
-        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
-            return $loader->exists($template);
+
+        if (1 === Environment::MAJOR_VERSION && !$loader instanceof ExistsLoaderInterface) {
+            try {
+                if ($loader instanceof SourceContextLoaderInterface) {
+                    $loader->getSourceContext($template);
+                } else {
+                    $loader->getSource($template);
+                }
+
+                return true;
+            } catch (LoaderError $e) {
+            }
+
+            return false;
         }
 
-        try {
-            $loader->getSourceContext($template)->getCode();
-
-            return true;
-        } catch (LoaderError $e) {
-        }
-
-        return false;
+        return $loader->exists($template);
     }
 }

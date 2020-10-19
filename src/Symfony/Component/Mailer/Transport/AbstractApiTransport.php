@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
@@ -24,20 +24,20 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 abstract class AbstractApiTransport extends AbstractHttpTransport
 {
-    abstract protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface;
+    abstract protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface;
 
     protected function doSendHttp(SentMessage $message): ResponseInterface
     {
         try {
             $email = MessageConverter::toEmail($message->getOriginalMessage());
         } catch (\Exception $e) {
-            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: %s', __CLASS__, $e->getMessage()), 0, $e);
+            throw new RuntimeException(sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }
 
-        return $this->doSendApi($email, $message->getEnvelope());
+        return $this->doSendApi($message, $email, $message->getEnvelope());
     }
 
-    protected function getRecipients(Email $email, SmtpEnvelope $envelope): array
+    protected function getRecipients(Email $email, Envelope $envelope): array
     {
         return array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
             return false === \in_array($address, array_merge($email->getCc(), $email->getBcc()), true);

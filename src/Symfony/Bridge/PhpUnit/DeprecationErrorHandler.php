@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestResult;
 use PHPUnit\Util\ErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
@@ -95,7 +96,7 @@ class DeprecationErrorHandler
     {
         $deprecations = [];
         $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
-            if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
+            if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
@@ -103,7 +104,16 @@ class DeprecationErrorHandler
                 return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
             }
 
-            $deprecations[] = [error_reporting(), $msg, $file];
+            $filesStack = [];
+            foreach (debug_backtrace() as $frame) {
+                if (!isset($frame['file']) || \in_array($frame['function'], ['require', 'require_once', 'include', 'include_once'], true)) {
+                    continue;
+                }
+
+                $filesStack[] = $frame['file'];
+            }
+
+            $deprecations[] = [error_reporting() & $type, $msg, $file, $filesStack];
 
             return null;
         });
@@ -118,7 +128,7 @@ class DeprecationErrorHandler
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || !$this->getConfiguration()->isEnabled()) {
+        if ((\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || false === strpos($msg, '" targeting switch is equivalent to "break'))) || !$this->getConfiguration()->isEnabled()) {
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
@@ -133,7 +143,7 @@ class DeprecationErrorHandler
             $method = $deprecation->originatingMethod();
             $msg = $deprecation->getMessage();
 
-            if (0 !== error_reporting()) {
+            if (error_reporting() & $type) {
                 $group = 'unsilenced';
             } elseif ($deprecation->isLegacy()) {
                 $group = 'legacy';
@@ -178,6 +188,9 @@ class DeprecationErrorHandler
             return;
         }
 
+        if (class_exists(DebugClassLoader::class, false)) {
+            DebugClassLoader::checkClasses();
+        }
         $currErrorHandler = set_error_handler('var_dump');
         restore_error_handler();
 
@@ -319,13 +332,13 @@ class DeprecationErrorHandler
     private static function getPhpUnitErrorHandler()
     {
         if (!isset(self::$isAtLeastPhpUnit83)) {
-            self::$isAtLeastPhpUnit83 = class_exists(ErrorHandler::class) && method_exists(ErrorHandler::class, '__invoke');
+            self::$isAtLeastPhpUnit83 = class_exists('PHPUnit\Util\ErrorHandler') && method_exists('PHPUnit\Util\ErrorHandler', '__invoke');
         }
         if (!self::$isAtLeastPhpUnit83) {
             return 'PHPUnit\Util\ErrorHandler::handleError';
         }
 
-        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+        foreach (debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
             if (isset($frame['object']) && $frame['object'] instanceof TestResult) {
                 return new ErrorHandler(
                     $frame['object']->getConvertDeprecationsToExceptions(),
@@ -353,27 +366,32 @@ class DeprecationErrorHandler
             return false;
         }
 
+        // Follow https://no-color.org/
+        if (isset($_SERVER['NO_COLOR']) || false !== getenv('NO_COLOR')) {
+            return false;
+        }
+
         if ('Hyper' === getenv('TERM_PROGRAM')) {
             return true;
         }
 
         if (\DIRECTORY_SEPARATOR === '\\') {
             return (\function_exists('sapi_windows_vt100_support')
-                && sapi_windows_vt100_support(STDOUT))
+                && sapi_windows_vt100_support(\STDOUT))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
         }
 
         if (\function_exists('stream_isatty')) {
-            return stream_isatty(STDOUT);
+            return stream_isatty(\STDOUT);
         }
 
         if (\function_exists('posix_isatty')) {
-            return posix_isatty(STDOUT);
+            return posix_isatty(\STDOUT);
         }
 
-        $stat = fstat(STDOUT);
+        $stat = fstat(\STDOUT);
 
         // Check if formatted mode is S_IFCHR
         return $stat ? 0020000 === ($stat['mode'] & 0170000) : false;

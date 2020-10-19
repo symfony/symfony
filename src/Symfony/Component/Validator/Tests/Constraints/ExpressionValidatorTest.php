@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -302,11 +303,13 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument must be an instance of "Symfony\Component\ExpressionLanguage\ExpressionLanguage" or null since 4.4. "string" given
+     * @expectedDeprecation The "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument must be an instance of "Symfony\Component\ExpressionLanguage\ExpressionLanguage" or null since 4.4. "Symfony\Component\PropertyAccess\PropertyAccessor" given
      */
-    public function testConstructorInvalidType()
+    public function testDeprecatedArgumentType()
     {
-        new ExpressionValidator('foo');
+        $validator = new ExpressionValidator(PropertyAccess::createPropertyAccessor());
+        $validator->initialize($this->createContext());
+        $validator->validate(null, new Expression(['expression' => 'false']));
     }
 
     public function testPassingCustomValues()

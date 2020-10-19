@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -52,10 +53,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
             foreach ($comparison as $i => $value) {
                 if ($value instanceof \DateTime) {
-                    $comparison[$i] = new \DateTimeImmutable(
-                        $value->format('Y-m-d H:i:s.u e'),
-                        $value->getTimezone()
-                    );
+                    $comparison[$i] = new \DateTimeImmutable($value->format('Y-m-d H:i:s.u e'));
                     $add = true;
                 } elseif ('DateTime' === $value) {
                     $comparison[$i] = 'DateTimeImmutable';
@@ -224,6 +222,57 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
             ->assertRaised();
     }
 
+    /**
+     * @dataProvider throwsOnInvalidStringDatesProvider
+     */
+    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->validator->validate($value, $constraint);
+    }
+
+    public function throwsOnInvalidStringDatesProvider(): array
+    {
+        $constraint = $this->createConstraint([
+            'value' => 'foo',
+        ]);
+
+        $constraintClass = \get_class($constraint);
+
+        return [
+            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTimeImmutable" instance in the "%s" constraint.', $constraintClass), new \DateTimeImmutable()],
+            [$constraint, sprintf('The compared value "foo" could not be converted to a "DateTime" instance in the "%s" constraint.', $constraintClass), new \DateTime()],
+        ];
+    }
+
+    /**
+     * @dataProvider provideComparisonsToNullValueAtPropertyPath
+     */
+    public function testCompareWithNullValueAtPropertyAt($dirtyValue, $dirtyValueAsString, $isValid)
+    {
+        $constraint = $this->createConstraint(['propertyPath' => 'value']);
+        $constraint->message = 'Constraint Message';
+
+        $object = new ComparisonTest_Class(null);
+        $this->setObject($object);
+
+        $this->validator->validate($dirtyValue, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('Constraint Message')
+                ->setParameter('{{ value }}', $dirtyValueAsString)
+                ->setParameter('{{ compared_value }}', 'null')
+                ->setParameter('{{ compared_value_type }}', 'NULL')
+                ->setParameter('{{ compared_value_path }}', 'value')
+                ->setCode($this->getErrorCode())
+                ->assertRaised();
+        }
+    }
+
     public function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
@@ -238,6 +287,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     }
 
     abstract public function provideInvalidComparisons(): array;
+
+    abstract public function provideComparisonsToNullValueAtPropertyPath();
 
     /**
      * @param array|null $options Options for the constraint

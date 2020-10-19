@@ -12,68 +12,10 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form as DomCrawlerForm;
-
-class SpecialResponse extends Response
-{
-}
-
-class TestClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-    protected $nextScript = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    public function setNextScript($script)
-    {
-        $this->nextScript = $script;
-    }
-
-    protected function doRequest($request): Response
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    protected function filterResponse($response): Response
-    {
-        if ($response instanceof SpecialResponse) {
-            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        }
-
-        return $response;
-    }
-
-    protected function getScript($request)
-    {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
-        $path = $r->getFileName();
-
-        return <<<EOF
-<?php
-
-require_once('$path');
-
-echo serialize($this->nextScript);
-EOF;
-    }
-}
 
 class AbstractBrowserTest extends TestCase
 {
@@ -158,17 +100,6 @@ class AbstractBrowserTest extends TestCase
     {
         $client = $this->getBrowser();
         $this->assertNull($client->getResponse());
-    }
-
-    public function testGetInternalResponse()
-    {
-        $client = $this->getBrowser();
-        $client->setNextResponse(new SpecialResponse('foo'));
-        $client->request('GET', 'http://example.com/');
-
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
     }
 
     /**
@@ -297,6 +228,15 @@ class AbstractBrowserTest extends TestCase
         $client->request('GET', 'bar');
         $server = $client->getRequest()->getServer();
         $this->assertEquals('http://www.example.com/foo/foobar', $server['HTTP_REFERER'], '->request() sets the referer');
+    }
+
+    public function testRequestRefererCanBeOverridden()
+    {
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $client->request('GET', 'bar', [], [], ['HTTP_REFERER' => 'xyz']);
+        $server = $client->getRequest()->getServer();
+        $this->assertEquals('xyz', $server['HTTP_REFERER'], '->request() allows referer to be overridden');
     }
 
     public function testRequestHistory()
@@ -923,32 +863,5 @@ class AbstractBrowserTest extends TestCase
         $clientChild = new ClassThatInheritClient();
         $clientChild->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $clientChild->submit($clientChild->request('GET', 'http://www.example.com/foo/foobar')->filter('input')->form());
-    }
-}
-
-class ClassThatInheritClient extends AbstractBrowser
-{
-    protected $nextResponse = null;
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    protected function doRequest($request): Response
-    {
-        if (null === $this->nextResponse) {
-            return new Response();
-        }
-
-        $response = $this->nextResponse;
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    public function submit(DomCrawlerForm $form, array $values = []): Crawler
-    {
-        return parent::submit($form, $values);
     }
 }

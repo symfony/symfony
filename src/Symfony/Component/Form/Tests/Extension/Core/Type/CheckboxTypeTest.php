@@ -197,7 +197,7 @@ class CheckboxTypeTest extends BaseTypeTest
     public function testDontAllowNonArrayFalseValues()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessageRegExp('/"false_values" with value "invalid" is expected to be of type "array"/');
+        $this->expectExceptionMessageMatches('/"false_values" with value "invalid" is expected to be of type "array"/');
         $this->factory->create(static::TESTED_TYPE, null, [
             'false_values' => 'invalid',
         ]);
@@ -219,5 +219,14 @@ class CheckboxTypeTest extends BaseTypeTest
         $this->assertSame('1', $form->getViewData());
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
+    }
+
+    public function testSubmitNullIsEmpty()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $form->submit(null);
+
+        $this->assertTrue($form->isEmpty());
     }
 }

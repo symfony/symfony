@@ -9,7 +9,7 @@
 
         <service id="security.authentication.listener.anonymous" class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.untracked_token_storage" />
             <argument /> <!-- Key -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="security.authentication.manager" />
@@ -37,7 +37,7 @@
 
         <service id="security.context_listener" class="Symfony\Component\Security\Http\Firewall\ContextListener">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.untracked_token_storage" />
             <argument type="collection" />
             <argument /> <!-- Provider Key -->
             <argument type="service" id="logger" on-invalid="null" />
@@ -128,7 +128,7 @@
 
         <service id="security.authentication.listener.simple_preauth" class="Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener" abstract="true">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.untracked_token_storage" />
             <argument type="service" id="security.authentication.manager" />
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Authenticator -->
@@ -195,10 +195,10 @@
             <argument /> <!-- UserChecker -->
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- LDAP -->
-            <argument /> <!-- search dn -->
-            <argument /> <!-- search password -->
             <argument /> <!-- Base DN -->
             <argument>%security.authentication.hide_user_not_found%</argument>
+            <argument /> <!-- search dn -->
+            <argument /> <!-- search password -->
         </service>
 
         <service id="security.authentication.provider.simple" class="Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider" abstract="true">

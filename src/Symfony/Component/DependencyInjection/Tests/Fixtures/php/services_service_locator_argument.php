@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 {
     private $parameters = [];
-    private $targetDirs = [];
     private $getService;
 
     public function __construct()
@@ -49,7 +48,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     public function getRemovedIds(): array
     {
         return [
-            '.service_locator.38dy3OH' => true,
+            '.service_locator.iSxuxv5' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
@@ -121,6 +120,11 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected function getFoo4Service()
     {
-        return $this->privates['foo4'] = new \stdClass();
+        $this->throw('BOOM');
+    }
+
+    protected function throw($message)
+    {
+        throw new RuntimeException($message);
     }
 }

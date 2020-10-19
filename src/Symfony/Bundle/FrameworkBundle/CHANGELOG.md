@@ -4,17 +4,25 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added `lint:container` command to check that services wiring matches type declarations
  * Added `MailerAssertionsTrait`
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
  * Added support for configuring chained cache pools
- * Deprecated booting the kernel before running `WebTestCase::createClient()`
+ * Deprecated calling `WebTestCase::createClient()` while a kernel has been booted, ensure the kernel is shut down before calling the method
  * Deprecated `routing.loader.service`, use `routing.loader.container` instead.
  * Not tagging service route loaders with `routing.route_loader` has been deprecated.
  * Overriding the methods `KernelTestCase::tearDown()` and `WebTestCase::tearDown()` without the `void` return-type is deprecated.
- 
+ * Added new `error_controller` configuration to handle system exceptions
+ * Added sort option for `translation:update` command.
+ * [BC Break] The `framework.messenger.routing.senders` config key is not deeply merged anymore.
+ * Added `secrets:*` commands to deal with secrets seamlessly.
+ * Made `framework.session.handler_id` accept a DSN
+ * Marked the `RouterDataCollector` class as `@final`.
+ * [BC Break] The `framework.messenger.buses.<name>.middleware` config key is not deeply merged anymore.
+
 4.3.0
 -----
 

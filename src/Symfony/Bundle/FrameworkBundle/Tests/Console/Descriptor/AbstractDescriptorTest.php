@@ -229,9 +229,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), JSON_PRETTY_PRINT));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $output->fetch())));
         }
     }
 
@@ -278,6 +278,27 @@ abstract class AbstractDescriptorTest extends TestCase
 
         $data = [];
         foreach ($objects as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
+                $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+                $data[] = [$object, $description, $options, $file];
+            }
+        }
+
+        return $data;
+    }
+
+    /** @dataProvider getDescribeContainerBuilderWithPriorityTagsTestData */
+    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options): void
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public function getDescribeContainerBuilderWithPriorityTagsTestData(): array
+    {
+        $variations = ['priority_tag' => ['tag' => 'tag1']];
+        $data = [];
+        foreach (ObjectsProvider::getContainerBuildersWithPriorityTags() as $name => $object) {
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);

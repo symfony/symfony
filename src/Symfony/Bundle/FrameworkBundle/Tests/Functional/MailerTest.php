@@ -43,7 +43,7 @@ class MailerTest extends AbstractWebTestCase
                 $this->onDoSend = $onDoSend;
             }
 
-            public function getName(): string
+            public function __toString(): string
             {
                 return 'dummy://local';
             }
@@ -55,7 +55,7 @@ class MailerTest extends AbstractWebTestCase
             }
         };
 
-        $mailer = new Mailer($testTransport, null);
+        $mailer = new Mailer($testTransport);
 
         $message = (new Email())
             ->subject('Test subject')
@@ -92,7 +92,7 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailTextBodyNotContains($email, 'Foo');
         $this->assertEmailHtmlBodyContains($email, 'Foo');
         $this->assertEmailHtmlBodyNotContains($email, 'Bar');
-        $this->assertEmailAttachementCount($email, 1);
+        $this->assertEmailAttachmentCount($email, 1);
 
         $email = $this->getMailerMessage($second);
         $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');

@@ -38,17 +38,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Normalizes keys between the different configuration formats.
+     * {@inheritdoc}
      *
      * Namely, you mostly have foo_bar in YAML while you have foo-bar in XML.
      * After running this method, all keys are normalized to foo_bar.
      *
      * If you have a mixed key like foo-bar_moo, it will not be altered.
      * The key will also not be altered if the target key already exists.
-     *
-     * @param mixed $value
-     *
-     * @return array The value with normalized keys
      */
     protected function preNormalize($value)
     {
@@ -219,7 +215,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function finalizeValue($value)
     {
         if (false === $value) {
-            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s', $this->getPath(), json_encode($value)));
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: "%s".', $this->getPath(), json_encode($value)));
         }
 
         foreach ($this->children as $name => $child) {
@@ -239,7 +235,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             if ($child->isDeprecated()) {
-                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), \E_USER_DEPRECATED);
             }
 
             try {
@@ -309,7 +305,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $guesses = [];
 
             foreach (array_keys($value) as $subject) {
-                $minScore = INF;
+                $minScore = \INF;
                 foreach ($proposals as $proposal) {
                     $distance = levenshtein($subject, $proposal);
                     if ($distance <= $minScore && $distance < 3) {

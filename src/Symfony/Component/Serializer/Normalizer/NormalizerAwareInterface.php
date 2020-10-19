@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * Class accepting a normalizer.
- *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
 interface NormalizerAwareInterface

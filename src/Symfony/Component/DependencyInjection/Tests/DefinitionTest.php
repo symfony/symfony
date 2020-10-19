@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
@@ -86,6 +87,13 @@ class DefinitionTest extends TestCase
 
     public function testSetGetDecoratedService()
     {
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed', 5, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->assertEquals(['foo', 'foo.renamed', 5, ContainerInterface::NULL_ON_INVALID_REFERENCE], $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
         $def = new Definition('stdClass');
         $this->assertNull($def->getDecoratedService());
         $def->setDecoratedService('foo', 'foo.renamed', 5);
@@ -272,10 +280,10 @@ class DefinitionTest extends TestCase
         $def->addTag('foo', ['foo' => 'bar']);
         $this->assertEquals([[], ['foo' => 'bar']], $def->getTag('foo'), '->addTag() can adds the same tag several times');
         $def->addTag('bar', ['bar' => 'bar']);
-        $this->assertEquals($def->getTags(), [
+        $this->assertEquals([
             'foo' => [[], ['foo' => 'bar']],
             'bar' => [['bar' => 'bar']],
-        ], '->getTags() returns all tags');
+        ], $def->getTags(), '->getTags() returns all tags');
     }
 
     public function testSetArgument()

@@ -12,8 +12,9 @@
 namespace Symfony\Component\Mailer\Bridge\Postmark\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
-use Symfony\Component\Mailer\SmtpEnvelope;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -25,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class PostmarkApiTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'http://api.postmarkapp.com/email';
+    private const HOST = 'api.postmarkapp.com';
 
     private $key;
 
@@ -36,14 +37,14 @@ class PostmarkApiTransport extends AbstractApiTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
-        return sprintf('api://postmark');
+        return sprintf('postmark+api://%s', $this->getEndpoint());
     }
 
-    protected function doSendApi(Email $email, SmtpEnvelope $envelope): ResponseInterface
+    protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', self::ENDPOINT, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
             'headers' => [
                 'Accept' => 'application/json',
                 'X-Postmark-Server-Token' => $this->key,
@@ -51,29 +52,31 @@ class PostmarkApiTransport extends AbstractApiTransport
             'json' => $this->getPayload($email, $envelope),
         ]);
 
+        $result = $response->toArray(false);
         if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
-
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error['Message'], $error['ErrorCode']), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result['Message'].sprintf(' (code %d).', $result['ErrorCode']), $response);
         }
+
+        $sentMessage->setMessageId($result['MessageID']);
 
         return $response;
     }
 
-    private function getPayload(Email $email, SmtpEnvelope $envelope): array
+    private function getPayload(Email $email, Envelope $envelope): array
     {
         $payload = [
             'From' => $envelope->getSender()->toString(),
             'To' => implode(',', $this->stringifyAddresses($this->getRecipients($email, $envelope))),
             'Cc' => implode(',', $this->stringifyAddresses($email->getCc())),
             'Bcc' => implode(',', $this->stringifyAddresses($email->getBcc())),
+            'ReplyTo' => implode(',', $this->stringifyAddresses($email->getReplyTo())),
             'Subject' => $email->getSubject(),
             'TextBody' => $email->getTextBody(),
             'HtmlBody' => $email->getHtmlBody(),
             'Attachments' => $this->getAttachments($email),
         ];
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender'];
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
                 continue;
@@ -81,7 +84,7 @@ class PostmarkApiTransport extends AbstractApiTransport
 
             $payload['Headers'][] = [
                 'Name' => $name,
-                'Value' => $header->toString(),
+                'Value' => $header->getBodyAsString(),
             ];
         }
 
@@ -110,5 +113,10 @@ class PostmarkApiTransport extends AbstractApiTransport
         }
 
         return $attachments;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
     }
 }

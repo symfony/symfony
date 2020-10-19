@@ -62,4 +62,11 @@ class SubmitTypeTest extends ButtonTypeTest
 
         $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
+
+    public function testFormNoValidate()
+    {
+        $this->assertTrue($this->factory->create(static::TESTED_TYPE, null, [
+            'validate' => false,
+        ])->createView()->vars['attr']['formnovalidate']);
+    }
 }

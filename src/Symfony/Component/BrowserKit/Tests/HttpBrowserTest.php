@@ -14,88 +14,8 @@ namespace Symfony\Component\BrowserKit\Tests;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
-use Symfony\Component\BrowserKit\Response;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-
-class SpecialHttpResponse extends Response
-{
-}
-
-class TestHttpClient extends HttpBrowser
-{
-    protected $nextResponse = null;
-    protected $nextScript = null;
-
-    public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
-    {
-        $client = new MockHttpClient(function (string $method, string $url, array $options) {
-            if (null === $this->nextResponse) {
-                return new MockResponse();
-            }
-
-            return new MockResponse($this->nextResponse->getContent(), [
-                'http_code' => $this->nextResponse->getStatusCode(),
-                'response_headers' => $this->nextResponse->getHeaders(),
-            ]);
-        });
-        parent::__construct($client);
-
-        $this->setServerParameters($server);
-        $this->history = $history ?? new History();
-        $this->cookieJar = $cookieJar ?? new CookieJar();
-    }
-
-    public function setNextResponse(Response $response)
-    {
-        $this->nextResponse = $response;
-    }
-
-    public function setNextScript($script)
-    {
-        $this->nextScript = $script;
-    }
-
-    protected function filterResponse($response): Response
-    {
-        if ($response instanceof SpecialHttpResponse) {
-            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        }
-
-        return $response;
-    }
-
-    protected function doRequest($request): Response
-    {
-        $response = parent::doRequest($request);
-
-        if (null === $this->nextResponse) {
-            return $response;
-        }
-
-        $class = \get_class($this->nextResponse);
-        $response = new $class($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        $this->nextResponse = null;
-
-        return $response;
-    }
-
-    protected function getScript($request)
-    {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
-        $path = $r->getFileName();
-
-        return <<<EOF
-<?php
-
-require_once('$path');
-
-echo serialize($this->nextScript);
-EOF;
-    }
-}
 
 class HttpBrowserTest extends AbstractBrowserTest
 {
@@ -104,31 +24,20 @@ class HttpBrowserTest extends AbstractBrowserTest
         return new TestHttpClient($server, $history, $cookieJar);
     }
 
-    public function testGetInternalResponse()
-    {
-        $client = $this->getBrowser();
-        $client->setNextResponse(new SpecialHttpResponse('foo'));
-        $client->request('GET', 'http://example.com/');
-
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialHttpResponse', $client->getInternalResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialHttpResponse', $client->getResponse());
-    }
-
     /**
      * @dataProvider validContentTypes
      */
-    public function testRequestHeaders(array $request, array $exepectedCall)
+    public function testRequestHeaders(array $requestArguments, array $expectedArguments)
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client
             ->expects($this->once())
             ->method('request')
-            ->with(...$exepectedCall)
+            ->with(...$expectedArguments)
             ->willReturn($this->createMock(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
-        $browser->request(...$request);
+        $browser->request(...$requestArguments);
     }
 
     public function validContentTypes()
@@ -150,9 +59,13 @@ class HttpBrowserTest extends AbstractBrowserTest
             ['POST', 'http://example.com/', [], [], [], 'content'],
             ['POST', 'http://example.com/', ['headers' => $defaultHeaders + ['Content-Type: text/plain; charset=utf-8', 'Content-Transfer-Encoding: 8bit'], 'body' => 'content', 'max_redirects' => 0]],
         ];
+        yield 'POST JSON' => [
+            ['POST', 'http://example.com/', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
+            ['POST', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
     }
 
-    public function testMultiPartRequest()
+    public function testMultiPartRequestWithSingleFile()
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client
@@ -171,5 +84,131 @@ class HttpBrowserTest extends AbstractBrowserTest
         $path = tempnam(sys_get_temp_dir(), 'http');
         file_put_contents($path, 'my_file');
         $browser->request('POST', 'http://example.com/', [], ['file' => ['tmp_name' => $path, 'name' => 'foo']]);
+    }
+
+    public function testMultiPartRequestWithNormalFlatArray()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], [
+            'file1' => $this->getUploadedFile('file1'),
+            'file2' => $this->getUploadedFile('file2'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithNormalNestedArray()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], [
+            'level1' => [
+                'level2' => [
+                    'file1' => $this->getUploadedFile('file1'),
+                    'file2' => $this->getUploadedFile('file2'),
+                ],
+            ],
+        ]);
+    }
+
+    public function testMultiPartRequestWithBracketedArray()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], [
+            'form[file1]' => $this->getUploadedFile('file1'),
+            'form[file2]' => $this->getUploadedFile('file2'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithInvalidItem()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', [], [
+            'file1' => $this->getUploadedFile('file1'),
+            'file2' => 'INVALID',
+        ]);
+    }
+
+    public function testMultiPartRequestWithAdditionalParameters()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'baz']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', ['bar' => 'baz'], [
+            'file1' => $this->getUploadedFile('file1'),
+        ]);
+    }
+
+    public function testMultiPartRequestWithAdditionalParametersOfTheSameName()
+    {
+        $client = $this->createMock(HttpClientInterface::class);
+        $this->expectClientToNotSendRequestWithFiles($client, ['baz']);
+
+        $browser = new HttpBrowser($client);
+        $browser->request('POST', 'http://example.com/', ['file1' => 'baz'], [
+            'file1' => $this->getUploadedFile('file1'),
+        ]);
+    }
+
+    private function uploadFile(string $data): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'http');
+        file_put_contents($path, $data);
+
+        return $path;
+    }
+
+    private function getUploadedFile(string $name): array
+    {
+        return [
+            'tmp_name' => $this->uploadFile($name.'_content'),
+            'name' => $name.'_name',
+        ];
+    }
+
+    protected function expectClientToSendRequestWithFiles(HttpClientInterface $client, $fileContents)
+    {
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
+                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                $this->assertInstanceOf('\Generator', $options['body']);
+                $body = implode('', iterator_to_array($options['body'], false));
+                foreach ($fileContents as $content) {
+                    $this->assertStringContainsString($content, $body);
+                }
+
+                return true;
+            }))
+            ->willReturn($this->createMock(ResponseInterface::class));
+    }
+
+    protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents)
+    {
+        $client
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
+                $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
+                $this->assertInstanceOf('\Generator', $options['body']);
+                $body = implode('', iterator_to_array($options['body'], false));
+                foreach ($fileContents as $content) {
+                    $this->assertStringNotContainsString($content, $body);
+                }
+
+                return true;
+            }))
+            ->willReturn($this->createMock(ResponseInterface::class));
     }
 }

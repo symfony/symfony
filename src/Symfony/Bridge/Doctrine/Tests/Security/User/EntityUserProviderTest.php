@@ -12,14 +12,25 @@
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 class EntityUserProviderTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        if (\PHP_VERSION_ID >= 80000) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+    }
+
     public function testRefreshUserGetsUserByPrimaryKey()
     {
         $em = DoctrineTestHelper::createTestEntityManager();
@@ -59,9 +70,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(UserLoaderRepository::class);
         $repository
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -147,7 +156,7 @@ class EntityUserProviderTest extends TestCase
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
     {
-        $repository = $this->getMockBuilder('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')->getMock();
+        $repository = $this->createMock(UserLoaderRepository::class);
         $repository->expects($this->once())
             ->method('loadUserByUsername')
             ->with('name')
@@ -166,7 +175,7 @@ class EntityUserProviderTest extends TestCase
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
         $this->expectException('InvalidArgumentException');
-        $repository = $this->getMockBuilder('\Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
+        $repository = $this->createMock(ObjectRepository::class);
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
@@ -180,7 +189,7 @@ class EntityUserProviderTest extends TestCase
     {
         $user = new User(1, 1, 'user1');
 
-        $repository = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $repository = $this->createMock(PasswordUpgraderRepository::class);
         $repository->expects($this->once())
             ->method('upgradePassword')
             ->with($user, 'foobar');
@@ -195,7 +204,7 @@ class EntityUserProviderTest extends TestCase
 
     private function getManager($em, $name = null)
     {
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $manager = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $manager->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
@@ -206,7 +215,7 @@ class EntityUserProviderTest extends TestCase
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder(ObjectManager::class)
             ->setMethods(['getClassMetadata', 'getRepository'])
             ->getMockForAbstractClass();
         $em->expects($this->any())
@@ -223,4 +232,12 @@ class EntityUserProviderTest extends TestCase
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\User'),
         ]);
     }
+}
+
+abstract class UserLoaderRepository implements ObjectRepository, UserLoaderInterface
+{
+}
+
+abstract class PasswordUpgraderRepository implements ObjectRepository, PasswordUpgraderInterface
+{
 }

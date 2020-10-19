@@ -38,7 +38,7 @@ class InflectorTest extends TestCase
             ['bases', ['bas', 'base', 'basis']],
             ['batches', ['batch', 'batche']],
             ['beaux', 'beau'],
-            ['bees', ['be', 'bee']],
+            ['bees', 'bee'],
             ['boxes', 'box'],
             ['boys', 'boy'],
             ['bureaus', 'bureau'],
@@ -68,7 +68,9 @@ class InflectorTest extends TestCase
             ['echoes', ['echo', 'echoe']],
             ['elves', ['elf', 'elve', 'elff']],
             ['emphases', ['emphas', 'emphase', 'emphasis']],
+            ['employees', 'employee'],
             ['faxes', 'fax'],
+            ['fees', 'fee'],
             ['feet', 'foot'],
             ['feedback', 'feedback'],
             ['foci', 'focus'],
@@ -132,6 +134,7 @@ class InflectorTest extends TestCase
             ['services', 'service'],
             ['sheriffs', 'sheriff'],
             ['shoes', ['sho', 'shoe']],
+            ['species', 'species'],
             ['spies', 'spy'],
             ['staves', ['staf', 'stave', 'staff']],
             ['stories', 'story'],
@@ -143,14 +146,14 @@ class InflectorTest extends TestCase
             ['theses', ['thes', 'these', 'thesis']],
             ['thieves', ['thief', 'thieve', 'thieff']],
             ['treasons', 'treason'],
-            ['trees', ['tre', 'tree']],
+            ['trees', 'tree'],
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],
             ['GrandChildren', 'GrandChild'],
-            ['SubTrees', ['SubTre', 'SubTree']],
+            ['SubTrees', 'SubTree'],
 
             // Known issues
             //['insignia', 'insigne'],
@@ -266,6 +269,7 @@ class InflectorTest extends TestCase
             ['service', 'services'],
             ['sheriff', 'sheriffs'],
             ['shoe', 'shoes'],
+            ['species', 'species'],
             ['spy', 'spies'],
             ['staff', 'staves'],
             ['story', 'stories'],
@@ -290,30 +294,30 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider singularizeProvider
      */
-    public function testSingularize($plural, $singular)
+    public function testSingularize($plural, $expectedSingular)
     {
-        $single = Inflector::singularize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $singular = Inflector::singularize($plural);
+        if (\is_string($expectedSingular) && \is_array($singular)) {
+            $this->fail("--- Expected\n`string`: ".$expectedSingular."\n+++ Actual\n`array`: ".implode(', ', $singular));
+        } elseif (\is_array($expectedSingular) && \is_string($singular)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedSingular)."\n+++ Actual\n`string`: ".$singular);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedSingular, $singular);
     }
 
     /**
      * @dataProvider pluralizeProvider
      */
-    public function testPluralize($plural, $singular)
+    public function testPluralize($singular, $expectedPlural)
     {
-        $single = Inflector::pluralize($plural);
-        if (\is_string($singular) && \is_array($single)) {
-            $this->fail("--- Expected\n`string`: ".$singular."\n+++ Actual\n`array`: ".implode(', ', $single));
-        } elseif (\is_array($singular) && \is_string($single)) {
-            $this->fail("--- Expected\n`array`: ".implode(', ', $singular)."\n+++ Actual\n`string`: ".$single);
+        $plural = Inflector::pluralize($singular);
+        if (\is_string($expectedPlural) && \is_array($plural)) {
+            $this->fail("--- Expected\n`string`: ".$expectedPlural."\n+++ Actual\n`array`: ".implode(', ', $plural));
+        } elseif (\is_array($expectedPlural) && \is_string($plural)) {
+            $this->fail("--- Expected\n`array`: ".implode(', ', $expectedPlural)."\n+++ Actual\n`string`: ".$plural);
         }
 
-        $this->assertEquals($singular, $single);
+        $this->assertEquals($expectedPlural, $plural);
     }
 }

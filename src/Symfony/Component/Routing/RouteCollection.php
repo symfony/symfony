@@ -140,7 +140,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function addPrefix($prefix, array $defaults = [], array $requirements = [])
     {
         if (null === $prefix) {
-            @trigger_error(sprintf('Passing null as $prefix to %s is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing null as $prefix to %s is deprecated in Symfony 4.4 and will trigger a TypeError in 5.0.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         $prefix = trim(trim($prefix), '/');

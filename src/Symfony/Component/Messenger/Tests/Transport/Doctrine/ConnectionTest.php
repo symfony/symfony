@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
-use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
+use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -28,8 +30,7 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
-        $stmt = $this->getStatementMock([
+        $stmt = $this->getResultMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -44,11 +45,14 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -59,21 +63,24 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
-        $stmt = $this->getStatementMock(false);
+        $stmt = $this->getResultMock(false);
 
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
-        $driverConnection->method('prepare')
-            ->willReturn($stmt);
         $driverConnection->expects($this->never())
             ->method('update');
+        $driverConnection
+            ->method('executeQuery')
+            ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
         $this->assertNull($doctrineEnvelope);
     }
@@ -82,7 +89,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->ack('dummy_id');
@@ -92,7 +104,12 @@ class ConnectionTest extends TestCase
     {
         $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
         $driverConnection = $this->getDBALConnectionMock();
-        $driverConnection->method('delete')->willThrowException(new DBALException());
+
+        if (class_exists(Exception::class)) {
+            $driverConnection->method('delete')->willThrowException(new Exception());
+        } else {
+            $driverConnection->method('delete')->willThrowException(new DBALException());
+        }
 
         $connection = new Connection([], $driverConnection);
         $connection->reject('dummy_id');
@@ -135,25 +152,21 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getStatementMock($expectedResult)
+    private function getResultMock($expectedResult)
     {
-        $stmt = $this->createMock(Statement::class);
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
+
         $stmt->expects($this->once())
-            ->method('fetch')
+            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAssociative' : 'fetch')
             ->willReturn($expectedResult);
 
         return $stmt;
     }
 
-    private function getSchemaSynchronizerMock()
-    {
-        return $this->createMock(SchemaSynchronizer::class);
-    }
-
     /**
      * @dataProvider buildConfigurationProvider
      */
-    public function testBuildConfiguration($dsn, $options, $expectedConnection, $expectedTableName, $expectedRedeliverTimeout, $expectedQueue, $expectedAutoSetup)
+    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
     {
         $config = Connection::buildConfiguration($dsn, $options);
         $this->assertEquals($expectedConnection, $config['connection']);
@@ -163,7 +176,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals($expectedAutoSetup, $config['auto_setup']);
     }
 
-    public function buildConfigurationProvider()
+    public function buildConfigurationProvider(): iterable
     {
         yield 'no options' => [
             'dsn' => 'doctrine://default',
@@ -200,7 +213,7 @@ class ConnectionTest extends TestCase
             'expectedAutoSetup' => false,
         ];
 
-        yield 'options from options array wins over options from dsn' => [
+        yield 'options from dsn array wins over options from options' => [
             'dsn' => 'doctrine://default?table_name=name_from_dsn&redeliver_timeout=1200&queue_name=normal&auto_setup=true',
             'options' => [
                 'table_name' => 'name_from_options',
@@ -209,10 +222,10 @@ class ConnectionTest extends TestCase
                 'auto_setup' => false,
             ],
             'expectedConnection' => 'default',
-            'expectedTableName' => 'name_from_options',
-            'expectedRedeliverTimeout' => 1800,
-            'expectedQueue' => 'important',
-            'expectedAutoSetup' => false,
+            'expectedTableName' => 'name_from_dsn',
+            'expectedRedeliverTimeout' => 1200,
+            'expectedQueue' => 'normal',
+            'expectedAutoSetup' => true,
         ];
 
         yield 'options from dsn with falsey boolean' => [
@@ -252,9 +265,8 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $id = 1;
-        $stmt = $this->getStatementMock([
+        $stmt = $this->getResultMock([
             'id' => $id,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -273,10 +285,10 @@ class ConnectionTest extends TestCase
             ->method('getParameters')
             ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->find($id);
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -287,7 +299,6 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
-        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $message1 = [
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -299,9 +310,9 @@ class ConnectionTest extends TestCase
             'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
-        $stmt = $this->createMock(Statement::class);
+        $stmt = $this->createMock(class_exists(Result::class) ? Result::class : (interface_exists(AbstractionResult::class) ? AbstractionResult::class : Statement::class));
         $stmt->expects($this->once())
-            ->method('fetchAll')
+            ->method(interface_exists(AbstractionResult::class) || class_exists(Result::class) ? 'fetchAllAssociative' : 'fetchAll')
             ->willReturn([$message1, $message2]);
 
         $driverConnection
@@ -316,11 +327,14 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getParameters')
             ->willReturn([]);
+        $queryBuilder
+            ->method('getParameterTypes')
+            ->willReturn([]);
         $driverConnection
-            ->method('prepare')
+            ->method('executeQuery')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $connection = new Connection([], $driverConnection);
         $doctrineEnvelopes = $connection->findAll();
 
         $this->assertEquals(1, $doctrineEnvelopes[0]['id']);

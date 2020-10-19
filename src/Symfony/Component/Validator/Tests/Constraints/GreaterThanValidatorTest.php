@@ -81,4 +81,11 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             ['22', '"22"', '22', '"22"', 'string'],
         ];
     }
+
+    public function provideComparisonsToNullValueAtPropertyPath()
+    {
+        return [
+            [5, '5', true],
+        ];
+    }
 }

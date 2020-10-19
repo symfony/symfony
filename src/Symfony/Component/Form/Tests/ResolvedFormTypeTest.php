@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;
@@ -183,7 +184,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
-        $this->expectExceptionMessage('An error has occurred resolving the options of the form "stdClass": The required option "foo" is missing.');
+        $this->expectExceptionMessage('An error has occurred resolving the options of the form "Symfony\Component\Form\Extension\Core\Type\HiddenType": The required option "foo" is missing.');
         $optionsResolver = (new OptionsResolver())
             ->setRequired('foo')
         ;
@@ -198,7 +199,7 @@ class ResolvedFormTypeTest extends TestCase
         ;
         $this->resolvedType->expects($this->once())
             ->method('getInnerType')
-            ->willReturn(new \stdClass())
+            ->willReturn(new HiddenType())
         ;
         $factory = $this->getMockFormFactory();
 
@@ -375,12 +376,12 @@ class ResolvedFormTypeTest extends TestCase
     public function provideTypeClassBlockPrefixTuples()
     {
         return [
-            [__NAMESPACE__.'\Fixtures\FooType', 'foo'],
-            [__NAMESPACE__.'\Fixtures\Foo', 'foo'],
-            [__NAMESPACE__.'\Fixtures\Type', 'type'],
-            [__NAMESPACE__.'\Fixtures\FooBarHTMLType', 'foo_bar_html'],
+            [Fixtures\FooType::class, 'foo'],
+            [Fixtures\Foo::class, 'foo'],
+            [Fixtures\Type::class, 'type'],
+            [Fixtures\FooBarHTMLType::class, 'foo_bar_html'],
             [__NAMESPACE__.'\Fixtures\Foo1Bar2Type', 'foo1_bar2'],
-            [__NAMESPACE__.'\Fixtures\FBooType', 'f_boo'],
+            [Fixtures\FBooType::class, 'f_boo'],
         ];
     }
 

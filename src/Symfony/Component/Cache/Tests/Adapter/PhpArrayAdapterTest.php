@@ -66,12 +66,14 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     protected function tearDown(): void
     {
+        $this->createCachePool()->clear();
+
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
         }
     }
 
-    public function createCachePool($defaultLifetime = 0, $testMethod = null): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0, string $testMethod = null): CacheItemPoolInterface
     {
         if ('testGetMetadata' === $testMethod || 'testClearPrefix' === $testMethod) {
             return new PhpArrayAdapter(self::$file, new FilesystemAdapter());

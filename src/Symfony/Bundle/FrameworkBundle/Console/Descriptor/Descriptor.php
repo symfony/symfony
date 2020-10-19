@@ -94,24 +94,12 @@ abstract class Descriptor implements DescriptorInterface
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
 
-    /**
-     * Describes an InputArgument instance.
-     */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = []);
 
-    /**
-     * Describes an InputOption instance.
-     */
     abstract protected function describeRoute(Route $route, array $options = []);
 
-    /**
-     * Describes container parameters.
-     */
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = []);
 
-    /**
-     * Describes container tags.
-     */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = []);
 
     /**
@@ -132,24 +120,12 @@ abstract class Descriptor implements DescriptorInterface
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = []);
 
-    /**
-     * Describes a service definition.
-     */
     abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
 
-    /**
-     * Describes a service alias.
-     */
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
-    /**
-     * Describes a container parameter.
-     */
     abstract protected function describeContainerParameter($parameter, array $options = []);
 
-    /**
-     * Describes container environment variables.
-     */
     abstract protected function describeContainerEnvVars(array $envs, array $options = []);
 
     /**
@@ -267,9 +243,44 @@ abstract class Descriptor implements DescriptorInterface
         return $serviceIds;
     }
 
-    /**
-     * Gets class description from a docblock.
-     */
+    protected function sortTaggedServicesByPriority(array $services): array
+    {
+        $maxPriority = [];
+        foreach ($services as $service => $tags) {
+            $maxPriority[$service] = 0;
+            foreach ($tags as $tag) {
+                $currentPriority = $tag['priority'] ?? 0;
+                if ($maxPriority[$service] < $currentPriority) {
+                    $maxPriority[$service] = $currentPriority;
+                }
+            }
+        }
+        uasort($maxPriority, function ($a, $b) {
+            return $b <=> $a;
+        });
+
+        return array_keys($maxPriority);
+    }
+
+    protected function sortTagsByPriority(array $tags): array
+    {
+        $sortedTags = [];
+        foreach ($tags as $tagName => $tag) {
+            $sortedTags[$tagName] = $this->sortByPriority($tag);
+        }
+
+        return $sortedTags;
+    }
+
+    protected function sortByPriority(array $tag): array
+    {
+        usort($tag, function ($a, $b) {
+            return ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0);
+        });
+
+        return $tag;
+    }
+
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
         $resolvedClass = $class;

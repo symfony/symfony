@@ -21,10 +21,36 @@ class XmlUtilsTest extends TestCase
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
         try {
+            XmlUtils::loadFile($fixtures);
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('is not a file', $e->getMessage());
+        }
+
+        try {
+            XmlUtils::loadFile($fixtures.'non_existing.xml');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('is not a file', $e->getMessage());
+        }
+
+        try {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                $this->markTestSkipped('chmod is not supported on Windows');
+            }
+            chmod($fixtures.'not_readable.xml', 000);
+            XmlUtils::loadFile($fixtures.'not_readable.xml');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            chmod($fixtures.'not_readable.xml', 0644);
+            $this->assertStringContainsString('is not readable', $e->getMessage());
+        }
+
+        try {
             XmlUtils::loadFile($fixtures.'invalid.xml');
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertStringContainsString('ERROR 77', $e->getMessage());
+            $this->assertStringContainsString('ERROR ', $e->getMessage());
         }
 
         try {
@@ -48,14 +74,14 @@ class XmlUtilsTest extends TestCase
             $this->assertStringContainsString('XSD file or callable', $e->getMessage());
         }
 
-        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock = $this->getMockBuilder(Validator::class)->getMock();
         $mock->expects($this->exactly(2))->method('validate')->will($this->onConsecutiveCalls(false, true));
 
         try {
             XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']);
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertRegExp('/The XML file ".+" is not valid\./', $e->getMessage());
+            $this->assertMatchesRegularExpression('/The XML file ".+" is not valid\./', $e->getMessage());
         }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
@@ -68,7 +94,7 @@ class XmlUtilsTest extends TestCase
         $this->expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
-        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock = $this->getMockBuilder(Validator::class)->getMock();
         $mock->expects($this->once())->method('validate')->willReturn(false);
 
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), [$mock, 'validate']);
@@ -165,7 +191,7 @@ class XmlUtilsTest extends TestCase
         $file = __DIR__.'/../Fixtures/foo.xml';
 
         $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        $this->expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);
     }
@@ -173,7 +199,9 @@ class XmlUtilsTest extends TestCase
     // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
-        $originalDisableEntities = libxml_disable_entity_loader(false);
+        if (\LIBXML_VERSION < 20900) {
+            $originalDisableEntities = libxml_disable_entity_loader(false);
+        }
         $errorReporting = error_reporting(-1);
 
         set_error_handler(function ($errno, $errstr) {
@@ -186,19 +214,20 @@ class XmlUtilsTest extends TestCase
                 XmlUtils::loadFile($file);
                 $this->fail('An exception should have been raised');
             } catch (\InvalidArgumentException $e) {
-                $this->assertEquals(sprintf('File %s does not contain valid XML, it is empty.', $file), $e->getMessage());
+                $this->assertEquals(sprintf('File "%s" does not contain valid XML, it is empty.', $file), $e->getMessage());
             }
         } finally {
             restore_error_handler();
             error_reporting($errorReporting);
         }
 
-        $disableEntities = libxml_disable_entity_loader(true);
-        libxml_disable_entity_loader($disableEntities);
+        if (\LIBXML_VERSION < 20900) {
+            $disableEntities = libxml_disable_entity_loader(true);
+            libxml_disable_entity_loader($disableEntities);
 
-        libxml_disable_entity_loader($originalDisableEntities);
-
-        $this->assertFalse($disableEntities);
+            libxml_disable_entity_loader($originalDisableEntities);
+            $this->assertFalse($disableEntities);
+        }
 
         // should not throw an exception
         XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');

@@ -12,6 +12,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
             0,
             [],
             [],
+            null,
         ],
     ]
 );

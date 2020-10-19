@@ -29,6 +29,10 @@ class InlineServiceConfigurator extends AbstractConfigurator
     use Traits\ParentTrait;
     use Traits\TagTrait;
 
+    private $id = '[inline]';
+    private $allowParent = true;
+    private $path = null;
+
     public function __construct(Definition $definition)
     {
         $this->definition = $definition;

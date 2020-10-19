@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
@@ -56,7 +56,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
         // chain provider
         $this->assertEquals([new IteratorArgument([
-            new Reference('security.user.provider.concrete.service'),
+            new Reference('user.manager'),
             new Reference('security.user.provider.concrete.basic'),
         ])], $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
@@ -70,9 +70,9 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+            $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configDef = $container->getDefinition((string) $arguments[3]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -87,6 +87,14 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.user_checker',
                 '.security.request_matcher.xmi9dcw',
                 false,
+                false,
+                '',
+                '',
+                '',
+                '',
+                '',
+                [],
+                null,
             ],
             [
                 'secure',
@@ -287,6 +295,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -299,6 +308,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -320,6 +330,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -348,6 +359,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -360,6 +372,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -377,14 +390,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    /**
-     * @group legacy
-     *
-     * @expectedDeprecation Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "auto" instead.
-     */
     public function testEncodersWithArgon2i()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
+        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
 
@@ -406,6 +414,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -418,6 +427,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -429,15 +439,76 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => [8, 102400, 15],
             ],
             'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => [256, 1, 2],
+                'class' => $sodium ? SodiumPasswordEncoder::class : NativePasswordEncoder::class,
+                'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    /**
-     * @group legacy
-     */
+    public function testMigratingEncoder()
+    {
+        if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $container = $this->getContainer('migrating_encoder');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'algorithm' => 'argon2i',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => 256,
+                'time_cost' => 1,
+                'threads' => null,
+                'migrate_from' => ['bcrypt'],
+            ],
+        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
+    }
+
     public function testEncodersWithBCrypt()
     {
         $container = $this->getContainer('bcrypt_encoder');
@@ -458,6 +529,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
@@ -470,6 +542,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
+                'migrate_from' => [],
             ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => [
@@ -481,8 +554,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'arguments' => [8, 102400, 15],
             ],
             'JMS\FooBundle\Entity\User7' => [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [15],
+                'class' => NativePasswordEncoder::class,
+                'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -592,9 +665,9 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
+            $listeners[] = array_map('strval', $arguments[0]->getValues());
 
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
+            $configDef = $container->getDefinition((string) $arguments[3]);
             $configs[] = array_values($configDef->getArguments());
         }
 
@@ -643,6 +716,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->setParameter('request_listener.http_port', 80);
+        $container->setParameter('request_listener.https_port', 443);
 
         $security = new SecurityExtension();
         $container->registerExtension($security);
@@ -651,7 +726,6 @@ abstract class CompleteConfigurationTest extends TestCase
         $bundle->build($container); // Attach all default factories
         $this->getLoader($container)->load($file);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();

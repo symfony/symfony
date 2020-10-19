@@ -29,28 +29,33 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('api', 'mailgun'),
+            new Dsn('mailgun+api', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('http', 'mailgun'),
+            new Dsn('mailgun', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'mailgun'),
+            new Dsn('mailgun+https', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtps', 'mailgun'),
+            new Dsn('mailgun+smtp', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'example.com'),
-            false,
+            new Dsn('mailgun+smtps', 'default'),
+            true,
+        ];
+
+        yield [
+            new Dsn('mailgun+smtp', 'example.com'),
+            true,
         ];
     }
 
@@ -61,27 +66,42 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
         $logger = $this->getLogger();
 
         yield [
-            new Dsn('api', 'mailgun', self::USER, self::PASSWORD),
+            new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD),
             new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('api', 'mailgun', self::USER, self::PASSWORD, null, ['region' => 'eu']),
+            new Dsn('mailgun+api', 'default', self::USER, self::PASSWORD, null, ['region' => 'eu']),
             new MailgunApiTransport(self::USER, self::PASSWORD, 'eu', $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('http', 'mailgun', self::USER, self::PASSWORD),
+            new Dsn('mailgun+api', 'example.com', self::USER, self::PASSWORD, 8080),
+            (new MailgunApiTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
+            new Dsn('mailgun', 'default', self::USER, self::PASSWORD),
             new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtp', 'mailgun', self::USER, self::PASSWORD),
+            new Dsn('mailgun+https', 'default', self::USER, self::PASSWORD),
+            new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger),
+        ];
+
+        yield [
+            new Dsn('mailgun+https', 'example.com', self::USER, self::PASSWORD, 8080),
+            (new MailgunHttpTransport(self::USER, self::PASSWORD, null, $client, $dispatcher, $logger))->setHost('example.com')->setPort(8080),
+        ];
+
+        yield [
+            new Dsn('mailgun+smtp', 'default', self::USER, self::PASSWORD),
             new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
 
         yield [
-            new Dsn('smtps', 'mailgun', self::USER, self::PASSWORD),
+            new Dsn('mailgun+smtps', 'default', self::USER, self::PASSWORD),
             new MailgunSmtpTransport(self::USER, self::PASSWORD, null, $dispatcher, $logger),
         ];
     }
@@ -89,15 +109,15 @@ class MailgunTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
-            new Dsn('foo', 'mailgun', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "mailgun". Supported schemes are: "api", "http", "smtp", "smtps".',
+            new Dsn('mailgun+foo', 'default', self::USER, self::PASSWORD),
+            'The "mailgun+foo" scheme is not supported; supported schemes for mailer "mailgun" are: "mailgun", "mailgun+api", "mailgun+https", "mailgun+smtp", "mailgun+smtps".',
         ];
     }
 
     public function incompleteDsnProvider(): iterable
     {
-        yield [new Dsn('api', 'mailgun', self::USER)];
+        yield [new Dsn('mailgun+api', 'default', self::USER)];
 
-        yield [new Dsn('api', 'mailgun', null, self::PASSWORD)];
+        yield [new Dsn('mailgun+api', 'default', null, self::PASSWORD)];
     }
 }

@@ -209,11 +209,6 @@ Security
  * Not implementing the methods `__serialize` and `__unserialize` in classes implementing
    the `TokenInterface` is deprecated
 
-SecurityBundle
---------------
-
- * Configuring encoders using `argon2i` or `bcrypt` as algorithm has been deprecated, use `auto` instead.
-
 TwigBridge
 ----------
 
@@ -240,6 +235,28 @@ Workflow
       workflows:
           article:
               initial_marking: [draft]
+   ```
+
+ * `WorkflowInterface::apply()` will have a third argument in Symfony 5.0.
+
+   Before:
+   ```php
+   class MyWorkflow implements WorkflowInterface
+   {
+       public function apply($subject, $transitionName)
+       {
+       }
+   }
+   ```
+
+   After:
+   ```php
+   class MyWorkflow implements WorkflowInterface
+   {
+       public function apply($subject, $transitionName, array $context = [])
+       {
+       }
+   }
    ```
 
  * `MarkingStoreInterface::setMarking()` will have a third argument in Symfony 5.0.

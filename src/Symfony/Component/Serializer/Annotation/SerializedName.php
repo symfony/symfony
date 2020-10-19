@@ -31,11 +31,11 @@ final class SerializedName
     public function __construct(array $data)
     {
         if (!isset($data['value'])) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', \get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', static::class));
         }
 
         if (!\is_string($data['value']) || empty($data['value'])) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', \get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', static::class));
         }
 
         $this->serializedName = $data['value'];

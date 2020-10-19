@@ -12,11 +12,11 @@
 namespace Symfony\Component\Mailer\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Mailer\SmtpEnvelope;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * Allows the transformation of a Message and the SMTP Envelope before the email is sent.
+ * Allows the transformation of a Message and the Envelope before the email is sent.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,14 +24,14 @@ final class MessageEvent extends Event
 {
     private $message;
     private $envelope;
-    private $transportName;
+    private $transport;
     private $queued;
 
-    public function __construct(RawMessage $message, SmtpEnvelope $envelope, string $transportName, bool $queued = false)
+    public function __construct(RawMessage $message, Envelope $envelope, string $transport, bool $queued = false)
     {
         $this->message = $message;
         $this->envelope = $envelope;
-        $this->transportName = $transportName;
+        $this->transport = $transport;
         $this->queued = $queued;
     }
 
@@ -45,19 +45,19 @@ final class MessageEvent extends Event
         $this->message = $message;
     }
 
-    public function getEnvelope(): SmtpEnvelope
+    public function getEnvelope(): Envelope
     {
         return $this->envelope;
     }
 
-    public function setEnvelope(SmtpEnvelope $envelope): void
+    public function setEnvelope(Envelope $envelope): void
     {
         $this->envelope = $envelope;
     }
 
-    public function getTransportName(): string
+    public function getTransport(): string
     {
-        return $this->transportName;
+        return $this->transport;
     }
 
     public function isQueued(): bool

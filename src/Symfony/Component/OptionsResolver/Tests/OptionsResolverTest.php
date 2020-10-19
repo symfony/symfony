@@ -518,7 +518,9 @@ class OptionsResolverTest extends TestCase
     {
         $count = 0;
         error_clear_last();
-        set_error_handler(function () use (&$count) {
+        set_error_handler(function (int $type) use (&$count) {
+            $this->assertSame(\E_USER_DEPRECATED, $type);
+
             ++$count;
 
             return false;
@@ -549,7 +551,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             1,
@@ -567,7 +569,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated, use "bar" option instead.',
             ],
             2,
@@ -587,7 +589,7 @@ class OptionsResolverTest extends TestCase
             },
             [],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             1,
@@ -609,7 +611,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => new \stdClass()],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Passing an instance of "stdClass" to option "foo" is deprecated, pass its FQCN instead.',
             ],
             1,
@@ -645,7 +647,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => null], // It triggers a deprecation
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Passing a value different than true or false is deprecated.',
             ],
             1,
@@ -681,7 +683,7 @@ class OptionsResolverTest extends TestCase
             },
             ['widget' => 'single_text', 'date_format' => 2],
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'Using the "date_format" option when the "widget" option is set to "single_text" is deprecated.',
             ],
             1,
@@ -707,7 +709,7 @@ class OptionsResolverTest extends TestCase
             },
             ['foo' => 'baz'], // It triggers a deprecation
             [
-                'type' => E_USER_DEPRECATED,
+                'type' => \E_USER_DEPRECATED,
                 'message' => 'The option "foo" is deprecated.',
             ],
             4,
@@ -776,7 +778,7 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfInvalidTypedArray()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime[]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "DateTime".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
@@ -796,7 +798,7 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass[]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[]", but one of the elements is of type "stdClass|array|DateTime".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
@@ -811,7 +813,7 @@ class OptionsResolverTest extends TestCase
     public function testResolveFailsWithCorrectLevelsButWrongScalar()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "double[][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "double".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
 
@@ -847,6 +849,11 @@ class OptionsResolverTest extends TestCase
             [42, 'string', 'The option "option" with value 42 is expected to be of type "string", but is of type "integer".'],
             [null, 'string', 'The option "option" with value null is expected to be of type "string", but is of type "NULL".'],
             ['bar', '\stdClass', 'The option "option" with value "bar" is expected to be of type "\stdClass", but is of type "string".'],
+            [['foo', 12], 'string[]', 'The option "option" with value array is expected to be of type "string[]", but one of the elements is of type "integer".'],
+            [123, ['string[]', 'string'], 'The option "option" with value 123 is expected to be of type "string[]" or "string", but is of type "integer".'],
+            [[null], ['string[]', 'string'], 'The option "option" with value array is expected to be of type "string[]" or "string", but one of the elements is of type "NULL".'],
+            [['string', null], ['string[]', 'string'], 'The option "option" with value array is expected to be of type "string[]" or "string", but one of the elements is of type "NULL".'],
+            [[\stdClass::class], ['string'], 'The option "option" with value array is expected to be of type "string", but is of type "array".'],
         ];
     }
 
@@ -1501,6 +1508,17 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
     }
 
+    public function testForcePrependNormalizerForResolverWithoutPreviousNormalizers()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
+            return '1st-normalized-'.$value;
+        }, true);
+
+        $this->assertEquals(['foo' => '1st-normalized-bar'], $this->resolver->resolve());
+    }
+
     public function testAddNormalizerFailsIfUnknownOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
@@ -1898,7 +1916,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArraysException()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "float[][][][]", but one of the elements is of type "integer[][][][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "float[][][][]", but one of the elements is of type "integer".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'float[][][][]');
 
@@ -1916,7 +1934,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArrayException1()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean|string|array".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
         $this->resolver->resolve([
@@ -1929,7 +1947,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArrayException2()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean[][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "int[][]", but one of the elements is of type "boolean|string|array".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
         $this->resolver->resolve([
@@ -1942,7 +1960,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArrayException3()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "string[][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "string|integer".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[][][]');
         $this->resolver->resolve([
@@ -1955,7 +1973,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArrayException4()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "integer[][][]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[][][]", but one of the elements is of type "integer".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[][][]');
         $this->resolver->resolve([
@@ -1969,7 +1987,7 @@ class OptionsResolverTest extends TestCase
     public function testNestedArrayException5()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[]", but one of the elements is of type "array[]".');
+        $this->expectExceptionMessage('The option "foo" with value array is expected to be of type "string[]", but one of the elements is of type "array".');
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'string[]');
         $this->resolver->resolve([
@@ -1993,7 +2011,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfUndefinedNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
-        $this->expectExceptionMessage('The option "foo" does not exist. Defined options are: "host", "port".');
+        $this->expectExceptionMessage('The option "database[foo]" does not exist. Defined options are: "host", "port".');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {
@@ -2008,7 +2026,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfMissingRequiredNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
-        $this->expectExceptionMessage('The required option "host" is missing.');
+        $this->expectExceptionMessage('The required option "database[host]" is missing.');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {
@@ -2023,7 +2041,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfInvalidTypeNestedOption()
     {
         $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
-        $this->expectExceptionMessage('The option "logging" with value null is expected to be of type "bool", but is of type "NULL".');
+        $this->expectExceptionMessage('The option "database[logging]" with value null is expected to be of type "bool", but is of type "NULL".');
         $this->resolver->setDefaults([
             'name' => 'default',
             'database' => function (OptionsResolver $resolver) {

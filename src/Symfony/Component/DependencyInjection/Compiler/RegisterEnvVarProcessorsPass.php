@@ -60,7 +60,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         }
     }
 
-    private static function validateProvidedTypes($types, $class)
+    private static function validateProvidedTypes(string $types, string $class): array
     {
         $types = explode('|', $types);
 

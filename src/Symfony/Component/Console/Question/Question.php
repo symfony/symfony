@@ -220,8 +220,11 @@ class Question
      */
     public function setMaxAttempts($attempts)
     {
-        if (null !== $attempts && $attempts < 1) {
-            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
+        if (null !== $attempts) {
+            $attempts = (int) $attempts;
+            if ($attempts < 1) {
+                throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
+            }
         }
 
         $this->attempts = $attempts;
@@ -260,7 +263,7 @@ class Question
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return callable
+     * @return callable|null
      */
     public function getNormalizer()
     {

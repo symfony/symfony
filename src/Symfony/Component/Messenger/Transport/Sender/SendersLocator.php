@@ -15,7 +15,6 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
-use Symfony\Component\Messenger\Exception\UnknownSenderException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 
 /**
@@ -38,7 +37,7 @@ class SendersLocator implements SendersLocatorInterface
         $this->sendersMap = $sendersMap;
 
         if (\is_array($sendersLocator) || null === $sendersLocator) {
-            @trigger_error(sprintf('"%s::__construct()" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.', __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('"%s::__construct()" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.', __CLASS__, ContainerInterface::class), \E_USER_DEPRECATED);
             // "%s" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.'
             $this->sendersLocator = new ServiceLocator([]);
             $this->useLegacyLookup = true;
@@ -78,14 +77,5 @@ class SendersLocator implements SendersLocatorInterface
                 }
             }
         }
-    }
-
-    public function getSenderByAlias(string $alias): SenderInterface
-    {
-        if ($this->sendersLocator->has($alias)) {
-            return $this->sendersLocator->get($alias);
-        }
-
-        throw new UnknownSenderException(sprintf('Unknown sender alias "%s".', $alias));
     }
 }

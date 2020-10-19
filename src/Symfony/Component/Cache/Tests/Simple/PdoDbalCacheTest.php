@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Version;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\PdoCache;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
@@ -32,6 +33,10 @@ class PdoDbalCacheTest extends CacheTestCase
             self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
+        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
         $pool = new PdoCache(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
@@ -43,7 +48,7 @@ class PdoDbalCacheTest extends CacheTestCase
         @unlink(self::$dbFile);
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new PdoCache(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }

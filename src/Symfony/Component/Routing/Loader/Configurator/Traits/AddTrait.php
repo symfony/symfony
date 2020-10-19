@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Loader\Configurator\CollectionConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouteCompiler;
 
 trait AddTrait
 {
@@ -67,6 +68,7 @@ trait AddTrait
             $routes->add($name.'.'.$locale, $route = $this->createRoute($path));
             $this->collection->add($this->name.$name.'.'.$locale, $route);
             $route->setDefault('_locale', $locale);
+            $route->setRequirement('_locale', preg_quote($locale, RouteCompiler::REGEX_DELIMITER));
             $route->setDefault('_canonical_route', $this->name.$name);
         }
 

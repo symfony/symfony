@@ -174,27 +174,37 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $value = $zval[self::VALUE];
             }
         } catch (\TypeError $e) {
-            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $propertyPath);
+            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $propertyPath, $e);
 
             // It wasn't thrown in this class so rethrow it
             throw $e;
         }
     }
 
-    private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath): void
+    private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath, \Throwable $previous = null): void
     {
-        // the type mismatch is not caused by invalid arguments (but e.g. by an incompatible return type hint of the writer method)
-        if (0 !== strpos($message, 'Argument ')) {
+        if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
         }
 
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && \array_key_exists(0, $trace[$i]['args'])) {
+        if (\PHP_VERSION_ID < 80000) {
+            if (0 !== strpos($message, 'Argument ')) {
+                return;
+            }
+
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += \strlen($delim);
-            $type = $trace[$i]['args'][0];
-            $type = \is_object($type) ? \get_class($type) : \gettype($type);
+            $j = strpos($message, ',', $pos);
+            $type = substr($message, 2 + $j, strpos($message, ' given', $j) - $j - 2);
+            $message = substr($message, $pos, $j - $pos);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type, $propertyPath));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $message, 'NULL' === $type ? 'null' : $type, $propertyPath), 0, $previous);
+        }
+
+        if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
+            list(, $expectedType, $actualType) = $matches;
+
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath), 0, $previous);
         }
     }
 
@@ -377,30 +387,57 @@ class PropertyAccessor implements PropertyAccessorInterface
         $object = $zval[self::VALUE];
         $access = $this->getReadAccessInfo(\get_class($object), $property);
 
-        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
-        } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
-            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
+        try {
+            if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+                try {
+                    $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+                } catch (\TypeError $e) {
+                    list($trace) = $e->getTrace();
 
-            if ($access[self::ACCESS_REF] && isset($zval[self::REF])) {
-                $result[self::REF] = &$object->{$access[self::ACCESS_NAME]};
-            }
-        } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
-            // Needed to support \stdClass instances. We need to explicitly
-            // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
-            // a *protected* property was found on the class, property_exists()
-            // returns true, consequently the following line will result in a
-            // fatal error.
+                    // handle uninitialized properties in PHP >= 7
+                    if (__FILE__ === $trace['file']
+                        && $access[self::ACCESS_NAME] === $trace['function']
+                        && $object instanceof $trace['class']
+                        && preg_match((sprintf('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/')), $e->getMessage(), $matches)
+                    ) {
+                        throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: 'class').'@anonymous', $access[self::ACCESS_NAME], $matches[1]), 0, $e);
+                    }
 
-            $result[self::VALUE] = $object->$property;
-            if (isset($zval[self::REF])) {
-                $result[self::REF] = &$object->$property;
+                    throw $e;
+                }
+            } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+                $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
+
+                if ($access[self::ACCESS_REF] && isset($zval[self::REF])) {
+                    $result[self::REF] = &$object->{$access[self::ACCESS_NAME]};
+                }
+            } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
+                // Needed to support \stdClass instances. We need to explicitly
+                // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
+                // a *protected* property was found on the class, property_exists()
+                // returns true, consequently the following line will result in a
+                // fatal error.
+
+                $result[self::VALUE] = $object->$property;
+                if (isset($zval[self::REF])) {
+                    $result[self::REF] = &$object->$property;
+                }
+            } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
+                // we call the getter and hope the __call do the job
+                $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+            } elseif (!$ignoreInvalidProperty) {
+                throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
             }
-        } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
-            // we call the getter and hope the __call do the job
-            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
-        } elseif (!$ignoreInvalidProperty) {
-            throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+        } catch (\Error $e) {
+            // handle uninitialized properties in PHP >= 7.4
+            if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
+                $r = new \ReflectionProperty($matches[1], $matches[2]);
+                $type = ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
+
+                throw new AccessException(sprintf('The property "%s::$%s" is not readable because it is typed "%s". You should initialize it or declare a default value instead.', $r->getDeclaringClass()->getName(), $r->getName(), $type), 0, $e);
+            }
+
+            throw $e;
         }
 
         // Objects are always passed around by reference
@@ -540,7 +577,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
         } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s"%s', $property, \get_class($object), isset($access[self::ACCESS_NAME]) ? ': '.$access[self::ACCESS_NAME] : '.'));
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s"%s.', $property, \get_class($object), isset($access[self::ACCESS_NAME]) ? ': '.$access[self::ACCESS_NAME] : '.'));
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
@@ -852,11 +889,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     public static function createCache($namespace, $defaultLifetime, $version, LoggerInterface $logger = null)
     {
         if (null === $defaultLifetime) {
-            @trigger_error(sprintf('Passing null as "$defaultLifetime" 2nd argument of the "%s()" method is deprecated since Symfony 4.4, pass 0 instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing null as "$defaultLifetime" 2nd argument of the "%s()" method is deprecated since Symfony 4.4, pass 0 instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
-            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use %s().', __METHOD__));
+            throw new \LogicException(sprintf('The Symfony Cache component must be installed to use "%s()".', __METHOD__));
         }
 
         if (!ApcuAdapter::isSupported()) {
@@ -864,7 +901,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
-        if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
+        if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             $apcu->setLogger(new NullLogger());
         } elseif (null !== $logger) {
             $apcu->setLogger($logger);

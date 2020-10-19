@@ -44,7 +44,7 @@ class HttpFoundationExtension extends AbstractExtension
             throw new \TypeError(sprintf('The first argument must be an instance of "%s" or an instance of "%s".', UrlHelper::class, RequestStack::class));
         }
 
-        @trigger_error(sprintf('Passing a "%s" instance as the first argument to the "%s" constructor is deprecated since Symfony 4.3, pass a "%s" instance instead.', RequestStack::class, __CLASS__, UrlHelper::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Passing a "%s" instance as the first argument to the "%s" constructor is deprecated since Symfony 4.3, pass a "%s" instance instead.', RequestStack::class, __CLASS__, UrlHelper::class), \E_USER_DEPRECATED);
 
         $requestContext = null;
         if (2 === \func_num_args()) {

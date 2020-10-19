@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
@@ -162,7 +162,7 @@ abstract class ControllerTraitTest extends TestCase
         $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(\JSON_FORCE_OBJECT);
         $this->assertEquals('{}', $response->getContent());
     }
 
@@ -273,8 +273,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         $controller = $this->createController();
 
-        /* @var BinaryFileResponse $response */
-        $response = $controller->file('some-file.txt', 'test.php');
+        $controller->file('some-file.txt', 'test.php');
     }
 
     public function testIsGranted()
@@ -519,7 +518,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
+        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
 
         $container = new Container();
         $container->set('doctrine', $doctrine);
@@ -543,31 +542,5 @@ abstract class ControllerTraitTest extends TestCase
         $links = $request->attributes->get('_links')->getLinks();
         $this->assertContains($link1, $links);
         $this->assertContains($link2, $links);
-    }
-}
-
-trait TestControllerTrait
-{
-    use ControllerTrait {
-        generateUrl as public;
-        redirect as public;
-        forward as public;
-        getUser as public;
-        json as public;
-        file as public;
-        isGranted as public;
-        denyAccessUnlessGranted as public;
-        redirectToRoute as public;
-        addFlash as public;
-        isCsrfTokenValid as public;
-        renderView as public;
-        render as public;
-        stream as public;
-        createNotFoundException as public;
-        createAccessDeniedException as public;
-        createForm as public;
-        createFormBuilder as public;
-        getDoctrine as public;
-        addLink as public;
     }
 }

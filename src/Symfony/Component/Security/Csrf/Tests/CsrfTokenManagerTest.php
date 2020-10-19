@@ -165,7 +165,7 @@ class CsrfTokenManagerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
 
-        $manager = new CsrfTokenManager($generator, $storage, null, $requestStack);
+        $manager = new CsrfTokenManager($generator, $storage);
 
         $token = $manager->getToken('foo');
         $this->assertSame('foo', $token->getId());
@@ -202,7 +202,7 @@ class CsrfTokenManagerTest extends TestCase
         return $data;
     }
 
-    private function getGeneratorAndStorage()
+    private function getGeneratorAndStorage(): array
     {
         return [
             $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock(),

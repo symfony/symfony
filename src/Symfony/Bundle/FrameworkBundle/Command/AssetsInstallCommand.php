@@ -49,7 +49,7 @@ class AssetsInstallCommand extends Command
         parent::__construct();
 
         if (null === $projectDir) {
-            @trigger_error(sprintf('Not passing the project directory to the constructor of %s is deprecated since Symfony 4.3 and will not be supported in 5.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not passing the project directory to the constructor of %s is deprecated since Symfony 4.3 and will not be supported in 5.0.', __CLASS__), \E_USER_DEPRECATED);
         }
 
         $this->filesystem = $filesystem;
@@ -109,7 +109,7 @@ EOT
             $targetArg = $kernel->getProjectDir().'/'.$targetArg;
 
             if (!is_dir($targetArg)) {
-                throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+                throw new InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $targetArg));
             }
         }
 
@@ -262,7 +262,7 @@ EOT
         return self::METHOD_COPY;
     }
 
-    private function getPublicDirectory(ContainerInterface $container)
+    private function getPublicDirectory(ContainerInterface $container): string
     {
         $defaultPublicDir = 'public';
 

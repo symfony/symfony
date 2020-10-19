@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 
 class TwigExtensionTest extends TestCase
 {
@@ -32,7 +33,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'strict_variables' => false, // to be removed in 5.0 relying on default
-            'exception_controller' => null, // to be removed in 5.0 relying on default
+            'exception_controller' => null, // to be removed in 5.0
         ]);
         $this->compileContainer($container);
 
@@ -302,6 +303,7 @@ class TwigExtensionTest extends TestCase
         $container->register('templating.locator', 'FooClass');
         $container->register('templating.name_parser', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
+        $container->register('error_renderer.html', HtmlErrorRenderer::class);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
@@ -360,7 +362,7 @@ class TwigExtensionTest extends TestCase
                 $loader = new YamlFileLoader($container, $locator);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unsupported format: %s', $format));
+                throw new \InvalidArgumentException(sprintf('Unsupported format: "%s"', $format));
         }
 
         $loader->load($file.'.'.$format);

@@ -46,11 +46,11 @@ class ProgressIndicatorTest extends TestCase
             $this->generateOutput(' \\ Advancing...').
             $this->generateOutput(' | Advancing...').
             $this->generateOutput(' | Done...').
-            PHP_EOL.
+            \PHP_EOL.
             $this->generateOutput(' - Starting Again...').
             $this->generateOutput(' \\ Starting Again...').
             $this->generateOutput(' \\ Done Again...').
-            PHP_EOL,
+            \PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -70,9 +70,9 @@ class ProgressIndicatorTest extends TestCase
         rewind($output->getStream());
 
         $this->assertEquals(
-            ' Starting...'.PHP_EOL.
-            ' Midway...'.PHP_EOL.
-            ' Done...'.PHP_EOL.PHP_EOL,
+            ' Starting...'.\PHP_EOL.
+            ' Midway...'.\PHP_EOL.
+            ' Done...'.\PHP_EOL.\PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }
@@ -104,7 +104,7 @@ class ProgressIndicatorTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Must have at least 2 indicator value characters.');
-        $bar = new ProgressIndicator($this->getOutputStream(), null, 100, ['1']);
+        new ProgressIndicator($this->getOutputStream(), null, 100, ['1']);
     }
 
     public function testCannotStartAlreadyStartedIndicator()

@@ -38,6 +38,11 @@ interface ItemInterface extends CacheItemInterface
     const METADATA_TAGS = 'tags';
 
     /**
+     * Reserved characters that cannot be used in a key or tag.
+     */
+    const RESERVED_CHARACTERS = '{}()/\@:';
+
+    /**
      * Adds a tag to a cache item.
      *
      * Tags are strings that follow the same validation rules as keys.

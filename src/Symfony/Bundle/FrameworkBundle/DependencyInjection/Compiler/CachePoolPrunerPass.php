@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass as BaseCachePoolPrunerPass;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CachePoolPrunerPass::class, BaseCachePoolPrunerPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.2, use "%s" instead.', CachePoolPrunerPass::class, BaseCachePoolPrunerPass::class), \E_USER_DEPRECATED);
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>

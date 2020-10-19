@@ -22,7 +22,7 @@ class SymfonyTestsListenerForV5 extends \PHPUnit_Framework_BaseTestListener
 {
     private $trait;
 
-    public function __construct(array $mockedNamespaces = array())
+    public function __construct(array $mockedNamespaces = [])
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }
@@ -45,11 +45,6 @@ class SymfonyTestsListenerForV5 extends \PHPUnit_Framework_BaseTestListener
     public function startTest(\PHPUnit_Framework_Test $test)
     {
         $this->trait->startTest($test);
-    }
-
-    public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
-    {
-        $this->trait->addWarning($test, $e, $time);
     }
 
     public function endTest(\PHPUnit_Framework_Test $test, $time)

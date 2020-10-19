@@ -43,7 +43,7 @@ class JsonResponseTest extends TestCase
         $this->assertSame('0', $response->getContent());
 
         $response = new JsonResponse(0.1);
-        $this->assertEquals('0.1', $response->getContent());
+        $this->assertEquals(0.1, $response->getContent());
         $this->assertIsString($response->getContent());
 
         $response = new JsonResponse(true);
@@ -132,7 +132,7 @@ class JsonResponseTest extends TestCase
 
         $response = JsonResponse::create(0.1);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
-        $this->assertEquals('0.1', $response->getContent());
+        $this->assertEquals(0.1, $response->getContent());
         $this->assertIsString($response->getContent());
 
         $response = JsonResponse::create(true);
@@ -186,7 +186,7 @@ class JsonResponseTest extends TestCase
     {
         $response = new JsonResponse();
 
-        $this->assertEquals(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT, $response->getEncodingOptions());
+        $this->assertEquals(\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT, $response->getEncodingOptions());
     }
 
     public function testSetEncodingOptions()
@@ -196,7 +196,7 @@ class JsonResponseTest extends TestCase
 
         $this->assertEquals('[[1,2,3]]', $response->getContent());
 
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(\JSON_FORCE_OBJECT);
 
         $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }

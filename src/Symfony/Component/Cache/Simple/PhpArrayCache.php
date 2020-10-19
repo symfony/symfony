@@ -19,7 +19,7 @@ use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\PhpArrayTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PhpArrayCache::class, PhpArrayAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', PhpArrayCache::class, PhpArrayAdapter::class, CacheInterface::class), \E_USER_DEPRECATED);
 
 /**
  * @deprecated since Symfony 4.3, use PhpArrayAdapter and type-hint for CacheInterface instead.
@@ -41,18 +41,14 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
     /**
      * This adapter takes advantage of how PHP stores arrays in its latest versions.
      *
-     * @param string $file The PHP file were values are cached
+     * @param string         $file         The PHP file were values are cached
+     * @param CacheInterface $fallbackPool A pool to fallback on when an item is not hit
      *
      * @return Psr16CacheInterface
      */
     public static function create($file, Psr16CacheInterface $fallbackPool)
     {
-        // Shared memory is available in PHP 7.0+ with OPCache enabled
-        if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
-            return new static($file, $fallbackPool);
-        }
-
-        return $fallbackPool;
+        return new static($file, $fallbackPool);
     }
 
     /**
@@ -95,7 +91,7 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
         if ($keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
         } elseif (!\is_array($keys)) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given.', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
         foreach ($keys as $key) {
             if (!\is_string($key)) {
@@ -151,7 +147,7 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
     public function deleteMultiple($keys)
     {
         if (!\is_array($keys) && !$keys instanceof \Traversable) {
-            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
+            throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given.', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
 
         $deleted = true;
@@ -204,7 +200,7 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
     public function setMultiple($values, $ttl = null)
     {
         if (!\is_array($values) && !$values instanceof \Traversable) {
-            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
+            throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given.', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
 
         $saved = true;
@@ -229,7 +225,7 @@ class PhpArrayCache implements Psr16CacheInterface, PruneableInterface, Resettab
         return $saved;
     }
 
-    private function generateItems(array $keys, $default)
+    private function generateItems(array $keys, $default): iterable
     {
         $fallbackKeys = [];
 

@@ -39,11 +39,11 @@ class DiscriminatorMap
     public function __construct(array $data)
     {
         if (empty($data['typeProperty'])) {
-            throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', \get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));
         }
 
         if (empty($data['mapping'])) {
-            throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', \get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', static::class));
         }
 
         $this->typeProperty = $data['typeProperty'];

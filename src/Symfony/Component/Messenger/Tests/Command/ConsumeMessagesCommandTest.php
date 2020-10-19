@@ -16,6 +16,8 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -27,7 +29,7 @@ class ConsumeMessagesCommandTest extends TestCase
 {
     public function testConfigurationWithDefaultReceiver()
     {
-        $command = new ConsumeMessagesCommand($this->createMock(RoutableMessageBus::class), $this->createMock(ServiceLocator::class), null, ['amqp']);
+        $command = new ConsumeMessagesCommand($this->createMock(RoutableMessageBus::class), $this->createMock(ServiceLocator::class), $this->createMock(EventDispatcherInterface::class), null, ['amqp']);
         $inputArgument = $command->getDefinition()->getArgument('receivers');
         $this->assertFalse($inputArgument->isRequired());
         $this->assertSame(['amqp'], $inputArgument->getDefault());
@@ -51,7 +53,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
         $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
 
-        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator);
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
         $application->add($command);
@@ -83,7 +85,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
         $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
 
-        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator);
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
         $application->add($command);
@@ -120,7 +122,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
         $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
 
-        $command = new ConsumeMessagesCommand($busLocator, $receiverLocator);
+        $command = new ConsumeMessagesCommand($busLocator, $receiverLocator, new EventDispatcher());
 
         $application = new Application();
         $application->add($command);
@@ -156,7 +158,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $busLocator->expects($this->once())->method('has')->with('dummy-bus')->willReturn(true);
         $busLocator->expects($this->once())->method('get')->with('dummy-bus')->willReturn($bus);
 
-        $command = new ConsumeMessagesCommand($busLocator, $receiverLocator);
+        $command = new ConsumeMessagesCommand($busLocator, $receiverLocator, new EventDispatcher());
 
         $application = new Application();
         $application->add($command);

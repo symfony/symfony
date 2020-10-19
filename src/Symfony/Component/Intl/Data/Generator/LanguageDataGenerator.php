@@ -83,7 +83,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'za' => 'zha',
         'zh' => 'zho',
     ];
-    private static $blacklist = [
+    private static $denylist = [
         'root' => true, // Absolute root language
         'mul' => true, // Multiple languages
         'mis' => true, // Uncoded language
@@ -132,12 +132,20 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
+            $names = [];
+            $localizedNames = [];
+            foreach (self::generateLanguageNames($localeBundle) as $language => $name) {
+                if (false === strpos($language, '_')) {
+                    $this->languageCodes[] = $language;
+                    $names[$language] = $name;
+                } else {
+                    $localizedNames[$language] = $name;
+                }
+            }
             $data = [
-                'Version' => $localeBundle['Version'],
-                'Names' => self::generateLanguageNames($localeBundle),
+                'Names' => $names,
+                'LocalizedNames' => $localizedNames,
             ];
-
-            $this->languageCodes = array_merge($this->languageCodes, array_keys($data['Names']));
 
             return $data;
         }
@@ -150,6 +158,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForRoot(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
+        return null;
     }
 
     /**
@@ -157,7 +166,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, string $tempDir): ?array
     {
-        $rootBundle = $reader->read($tempDir, 'root');
         $metadataBundle = $reader->read($tempDir, 'metadata');
 
         $this->languageCodes = array_unique($this->languageCodes);
@@ -165,7 +173,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
         sort($this->languageCodes);
 
         return [
-            'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
             'Alpha3Languages' => $this->generateAlpha3Codes($this->languageCodes, $metadataBundle),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
@@ -175,7 +182,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
     private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array
     {
-        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$blacklist);
+        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$denylist);
     }
 
     private function generateAlpha3Codes(array $languageCodes, ArrayAccessibleResourceBundle $metadataBundle): array
@@ -195,7 +202,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return array_keys($alpha3Codes);
     }
 
-    private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)
+    private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle): array
     {
         $aliases = iterator_to_array($metadataBundle['alias']['language']);
         $alpha2ToAlpha3 = [];

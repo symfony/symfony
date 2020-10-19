@@ -13,7 +13,9 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Config\Tests\Fixtures\BadFileName;
 use Symfony\Component\Config\Tests\Fixtures\BadParent;
+use Symfony\Component\Config\Tests\Fixtures\ParseError;
 use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends TestCase
@@ -67,7 +69,7 @@ EOF
 
             $loadedClass = 123;
 
-            $res = new ClassExistenceResource('MissingFooClass', false);
+            new ClassExistenceResource('MissingFooClass', false);
 
             $this->assertSame(123, $loadedClass);
         } finally {
@@ -75,28 +77,36 @@ EOF
         }
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testBadParentWithTimestamp()
     {
         $res = new ClassExistenceResource(BadParent::class, false);
         $this->assertTrue($res->isFresh(time()));
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
     public function testBadParentWithNoTimestamp()
     {
         $this->expectException('ReflectionException');
-        $this->expectExceptionMessage('Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found');
+        $this->expectExceptionMessage('Class "Symfony\Component\Config\Tests\Fixtures\MissingParent" not found while loading "Symfony\Component\Config\Tests\Fixtures\BadParent".');
 
         $res = new ClassExistenceResource(BadParent::class, false);
+        $res->isFresh(0);
+    }
+
+    public function testBadFileName()
+    {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Mismatch between file name and class name.');
+
+        $res = new ClassExistenceResource(BadFileName::class, false);
+        $res->isFresh(0);
+    }
+
+    public function testBadFileNameBis()
+    {
+        $this->expectException('ReflectionException');
+        $this->expectExceptionMessage('Mismatch between file name and class name.');
+
+        $res = new ClassExistenceResource(BadFileName::class, false);
         $res->isFresh(0);
     }
 
@@ -105,5 +115,13 @@ EOF
         $res = new ClassExistenceResource(ConditionalClass::class, false);
 
         $this->assertFalse($res->isFresh(0));
+    }
+
+    public function testParseError()
+    {
+        $this->expectException('ParseError');
+
+        $res = new ClassExistenceResource(ParseError::class, false);
+        $res->isFresh(0);
     }
 }

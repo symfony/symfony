@@ -17,7 +17,7 @@ use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundFatalErrorHandler::class, \Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundFatalErrorHandler::class, \Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler::class), \E_USER_DEPRECATED);
 
 /**
  * ErrorHandler for classes that do not exist.
@@ -33,50 +33,34 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     public function handleError(array $error, FatalErrorException $exception)
     {
-        $messageLen = \strlen($error['message']);
-        $notFoundSuffix = '\' not found';
-        $notFoundSuffixLen = \strlen($notFoundSuffix);
-        if ($notFoundSuffixLen > $messageLen) {
+        if (!preg_match('/^(Class|Interface|Trait) [\'"]([^\'"]+)[\'"] not found$/', $error['message'], $matches)) {
             return null;
         }
+        $typeName = strtolower($matches[1]);
+        $fullyQualifiedClassName = $matches[2];
 
-        if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
-            return null;
+        if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
+            $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
+            $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
+            $message = sprintf('Attempted to load %s "%s" from namespace "%s".', $typeName, $className, $namespacePrefix);
+            $tail = ' for another namespace?';
+        } else {
+            $className = $fullyQualifiedClassName;
+            $message = sprintf('Attempted to load %s "%s" from the global namespace.', $typeName, $className);
+            $tail = '?';
         }
 
-        foreach (['class', 'interface', 'trait'] as $typeName) {
-            $prefix = ucfirst($typeName).' \'';
-            $prefixLen = \strlen($prefix);
-            if (0 !== strpos($error['message'], $prefix)) {
-                continue;
-            }
-
-            $fullyQualifiedClassName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);
-            if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
-                $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
-                $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
-                $message = sprintf('Attempted to load %s "%s" from namespace "%s".', $typeName, $className, $namespacePrefix);
-                $tail = ' for another namespace?';
+        if ($candidates = $this->getClassCandidates($className)) {
+            $tail = array_pop($candidates).'"?';
+            if ($candidates) {
+                $tail = ' for e.g. "'.implode('", "', $candidates).'" or "'.$tail;
             } else {
-                $className = $fullyQualifiedClassName;
-                $message = sprintf('Attempted to load %s "%s" from the global namespace.', $typeName, $className);
-                $tail = '?';
+                $tail = ' for "'.$tail;
             }
-
-            if ($candidates = $this->getClassCandidates($className)) {
-                $tail = array_pop($candidates).'"?';
-                if ($candidates) {
-                    $tail = ' for e.g. "'.implode('", "', $candidates).'" or "'.$tail;
-                } else {
-                    $tail = ' for "'.$tail;
-                }
-            }
-            $message .= "\nDid you forget a \"use\" statement".$tail;
-
-            return new ClassNotFoundException($message, $exception);
         }
+        $message .= "\nDid you forget a \"use\" statement".$tail;
 
-        return null;
+        return new ClassNotFoundException($message, $exception);
     }
 
     /**

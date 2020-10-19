@@ -50,7 +50,7 @@ class EmailValidator extends ConstraintValidator
     public function __construct($defaultMode = Email::VALIDATION_MODE_LOOSE)
     {
         if (\is_bool($defaultMode)) {
-            @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Calling `new %s(%s)` is deprecated since Symfony 4.1, use `new %s("%s")` instead.', self::class, $defaultMode ? 'true' : 'false', self::class, $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE), \E_USER_DEPRECATED);
 
             $defaultMode = $defaultMode ? Email::VALIDATION_MODE_STRICT : Email::VALIDATION_MODE_LOOSE;
         }
@@ -68,7 +68,7 @@ class EmailValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Email) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Email');
+            throw new UnexpectedTypeException($constraint, Email::class);
         }
 
         if (null === $value || '' === $value) {
@@ -80,13 +80,16 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        if ('' === $value) {
+            return;
+        }
 
         if (null !== $constraint->normalizer) {
             $value = ($constraint->normalizer)($value);
         }
 
         if (null !== $constraint->strict) {
-            @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), \E_USER_DEPRECATED);
 
             if ($constraint->strict) {
                 $constraint->mode = Email::VALIDATION_MODE_STRICT;
@@ -100,12 +103,12 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (!\in_array($constraint->mode, Email::$validationModes, true)) {
-            throw new \InvalidArgumentException(sprintf('The %s::$mode parameter value is not valid.', \get_class($constraint)));
+            throw new \InvalidArgumentException(sprintf('The "%s::$mode" parameter value is not valid.', \get_class($constraint)));
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {
             if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
+                throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0.');
             }
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();

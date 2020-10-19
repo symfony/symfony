@@ -35,9 +35,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $expectedDescription = $this->getExpectedDescription($fixtureName);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), JSON_PRETTY_PRINT));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $describedObject)));
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $describedObject)));
         }
     }
 
@@ -48,9 +48,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $expectedDescription = $this->getExpectedDescription($fixtureName);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), JSON_PRETTY_PRINT));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $describedObject)));
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $describedObject)));
         }
     }
 
@@ -61,9 +61,9 @@ abstract class AbstractDescriptorTest extends TestCase
         $expectedDescription = $this->getExpectedDescription($fixtureName);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), JSON_PRETTY_PRINT));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($describedObject), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertStringMatchesFormat(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $describedObject)));
+            $this->assertStringMatchesFormat(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $describedObject)));
         }
     }
 

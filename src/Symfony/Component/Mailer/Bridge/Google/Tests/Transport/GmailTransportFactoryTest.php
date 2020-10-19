@@ -18,30 +18,40 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'gmail'),
+            new Dsn('gmail', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtps', 'gmail'),
+            new Dsn('gmail+smtp', 'default'),
             true,
         ];
 
         yield [
-            new Dsn('smtp', 'example.com'),
-            false,
+            new Dsn('gmail+smtps', 'default'),
+            true,
+        ];
+
+        yield [
+            new Dsn('gmail+smtp', 'example.com'),
+            true,
         ];
     }
 
     public function createProvider(): iterable
     {
         yield [
-            new Dsn('smtp', 'gmail', self::USER, self::PASSWORD),
+            new Dsn('gmail', 'default', self::USER, self::PASSWORD),
             new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
         ];
 
         yield [
-            new Dsn('smtps', 'gmail', self::USER, self::PASSWORD),
+            new Dsn('gmail+smtp', 'default', self::USER, self::PASSWORD),
+            new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
+        ];
+
+        yield [
+            new Dsn('gmail+smtps', 'default', self::USER, self::PASSWORD),
             new GmailSmtpTransport(self::USER, self::PASSWORD, $this->getDispatcher(), $this->getLogger()),
         ];
     }
@@ -49,15 +59,15 @@ class GmailTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield [
-            new Dsn('foo', 'gmail', self::USER, self::PASSWORD),
-            'The "foo" scheme is not supported for mailer "gmail". Supported schemes are: "smtp", "smtps".',
+            new Dsn('gmail+foo', 'default', self::USER, self::PASSWORD),
+            'The "gmail+foo" scheme is not supported; supported schemes for mailer "gmail" are: "gmail", "gmail+smtp", "gmail+smtps".',
         ];
     }
 
     public function incompleteDsnProvider(): iterable
     {
-        yield [new Dsn('smtp', 'gmail', self::USER)];
+        yield [new Dsn('gmail+smtp', 'default', self::USER)];
 
-        yield [new Dsn('smtp', 'gmail', null, self::PASSWORD)];
+        yield [new Dsn('gmail+smtp', 'default', null, self::PASSWORD)];
     }
 }

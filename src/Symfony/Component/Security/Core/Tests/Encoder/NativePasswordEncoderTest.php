@@ -53,12 +53,38 @@ class NativePasswordEncoderTest extends TestCase
         $result = $encoder->encodePassword('password', null);
         $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
+        $this->assertFalse($encoder->isPasswordValid($result, '', null));
+    }
+
+    public function testNonArgonValidation()
+    {
+        $encoder = new NativePasswordEncoder();
+        $this->assertTrue($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password', null));
+        $this->assertFalse($encoder->isPasswordValid('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'anotherPassword', null));
+        $this->assertTrue($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'password', null));
+        $this->assertFalse($encoder->isPasswordValid('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword', null));
+    }
+
+    public function testConfiguredAlgorithm()
+    {
+        $encoder = new NativePasswordEncoder(null, null, null, \PASSWORD_BCRYPT);
+        $result = $encoder->encodePassword('password', null);
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
+        $this->assertStringStartsWith('$2', $result);
+    }
+
+    public function testConfiguredAlgorithmWithLegacyConstValue()
+    {
+        $encoder = new NativePasswordEncoder(null, null, null, '1');
+        $result = $encoder->encodePassword('password', null);
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
+        $this->assertStringStartsWith('$2', $result);
     }
 
     public function testCheckPasswordLength()
     {
         $encoder = new NativePasswordEncoder(null, null, 4);
-        $result = password_hash(str_repeat('a', 72), PASSWORD_BCRYPT, ['cost' => 4]);
+        $result = password_hash(str_repeat('a', 72), \PASSWORD_BCRYPT, ['cost' => 4]);
 
         $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));

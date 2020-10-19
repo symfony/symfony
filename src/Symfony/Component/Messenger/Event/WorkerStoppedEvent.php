@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Event;
 
+use Symfony\Component\Messenger\Worker;
+
 /**
  * Dispatched when a worker has been stopped.
  *
@@ -18,4 +20,15 @@ namespace Symfony\Component\Messenger\Event;
  */
 final class WorkerStoppedEvent
 {
+    private $worker;
+
+    public function __construct(Worker $worker)
+    {
+        $this->worker = $worker;
+    }
+
+    public function getWorker(): Worker
+    {
+        return $this->worker;
+    }
 }

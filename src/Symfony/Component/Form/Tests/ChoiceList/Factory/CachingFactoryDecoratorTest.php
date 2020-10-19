@@ -13,7 +13,9 @@ namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,7 +40,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromChoicesEmpty()
     {
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -54,7 +56,7 @@ class CachingFactoryDecoratorTest extends TestCase
         // The top-most traversable is converted to an array
         $choices1 = new \ArrayIterator(['A' => 'a']);
         $choices2 = ['A' => 'a'];
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -69,17 +71,16 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $choices1 = ['key' => ['A' => 'a']];
         $choices2 = ['A' => 'a'];
-        $list1 = new \stdClass();
-        $list2 = new \stdClass();
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
-            ->with($choices1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$choices1],
+                [$choices2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices2));
@@ -92,7 +93,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $choices1 = [$choice1];
         $choices2 = [$choice2];
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -110,17 +111,16 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $choices1 = [$choice1];
         $choices2 = [$choice2];
-        $list1 = new \stdClass();
-        $list2 = new \stdClass();
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
-            ->with($choices1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$choices1],
+                [$choices2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices2));
@@ -129,7 +129,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromChoicesSameValueClosure()
     {
         $choices = [1];
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
         $closure = function () {};
 
         $this->decoratedFactory->expects($this->once())
@@ -144,19 +144,18 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromChoicesDifferentValueClosure()
     {
         $choices = [1];
-        $list1 = new \stdClass();
-        $list2 = new \stdClass();
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
         $closure1 = function () {};
         $closure2 = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromChoices')
-            ->with($choices, $closure1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromChoices')
-            ->with($choices, $closure2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$choices, $closure1],
+                [$choices, $closure2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, $closure1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure2));
@@ -165,7 +164,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromLoaderSameLoader()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
@@ -180,17 +179,16 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $loader1 = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
         $loader2 = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
-        $list1 = new \stdClass();
-        $list2 = new \stdClass();
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
-            ->with($loader1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$loader1],
+                [$loader2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromLoader($loader1));
         $this->assertSame($list2, $this->factory->createListFromLoader($loader2));
@@ -199,7 +197,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromLoaderSameValueClosure()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
-        $list = new \stdClass();
+        $list = new ArrayChoiceList([]);
         $closure = function () {};
 
         $this->decoratedFactory->expects($this->once())
@@ -214,19 +212,18 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromLoaderDifferentValueClosure()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
-        $list1 = new \stdClass();
-        $list2 = new \stdClass();
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
         $closure1 = function () {};
         $closure2 = function () {};
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createListFromLoader')
-            ->with($loader, $closure1)
-            ->willReturn($list1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createListFromLoader')
-            ->with($loader, $closure2)
-            ->willReturn($list2);
+            ->withConsecutive(
+                [$loader, $closure1],
+                [$loader, $closure2]
+            )
+            ->willReturnOnConsecutiveCalls($list1, $list2);
 
         $this->assertSame($list1, $this->factory->createListFromLoader($loader, $closure1));
         $this->assertSame($list2, $this->factory->createListFromLoader($loader, $closure2));
@@ -236,7 +233,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $preferred = ['a'];
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -252,17 +249,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $preferred1 = ['a'];
         $preferred2 = ['b'];
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, $preferred1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, $preferred2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, $preferred1],
+                [$list, $preferred2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, $preferred1));
         $this->assertSame($view2, $this->factory->createView($list, $preferred2));
@@ -272,7 +268,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $preferred = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -288,17 +284,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $preferred1 = function () {};
         $preferred2 = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, $preferred1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, $preferred2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, $preferred1],
+                [$list, $preferred2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, $preferred1));
         $this->assertSame($view2, $this->factory->createView($list, $preferred2));
@@ -308,7 +303,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $labels = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -324,17 +319,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $labels1 = function () {};
         $labels2 = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, null, $labels1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, $labels2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, null, $labels1],
+                [$list, null, $labels2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, null, $labels1));
         $this->assertSame($view2, $this->factory->createView($list, null, $labels2));
@@ -344,7 +338,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $index = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -360,17 +354,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $index1 = function () {};
         $index2 = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, null, null, $index1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, $index2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, null, null, $index1],
+                [$list, null, null, $index2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, null, null, $index1));
         $this->assertSame($view2, $this->factory->createView($list, null, null, $index2));
@@ -380,7 +373,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $groupBy = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -396,17 +389,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $groupBy1 = function () {};
         $groupBy2 = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, null, null, null, $groupBy1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, $groupBy2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, null, null, null, $groupBy1],
+                [$list, null, null, null, $groupBy2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, null, null, null, $groupBy1));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, $groupBy2));
@@ -416,7 +408,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $attr = ['class' => 'foobar'];
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -432,17 +424,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $attr1 = ['class' => 'foobar1'];
         $attr2 = ['class' => 'foobar2'];
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, null, $attr2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, null, null, null, null, $attr1],
+                [$list, null, null, null, null, $attr2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2));
@@ -452,7 +443,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $attr = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view = new \stdClass();
+        $view = new ChoiceListView();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -468,17 +459,16 @@ class CachingFactoryDecoratorTest extends TestCase
         $attr1 = function () {};
         $attr2 = function () {};
         $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
-        $view1 = new \stdClass();
-        $view2 = new \stdClass();
+        $view1 = new ChoiceListView();
+        $view2 = new ChoiceListView();
 
-        $this->decoratedFactory->expects($this->at(0))
+        $this->decoratedFactory->expects($this->exactly(2))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr1)
-            ->willReturn($view1);
-        $this->decoratedFactory->expects($this->at(1))
-            ->method('createView')
-            ->with($list, null, null, null, null, $attr2)
-            ->willReturn($view2);
+            ->withConsecutive(
+                [$list, null, null, null, null, $attr1],
+                [$list, null, null, null, null, $attr2]
+            )
+            ->willReturnOnConsecutiveCalls($view1, $view2);
 
         $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1));
         $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2));

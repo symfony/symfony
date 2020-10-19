@@ -33,6 +33,10 @@ trait BlockingStoreTestTrait
      *
      * This test is time sensible: the $clockDelay could be adjust.
      *
+     * It also fails when run with the global ./phpunit test suite.
+     *
+     * @group transient
+     *
      * @requires extension pcntl
      * @requires extension posix
      * @requires function pcntl_sigwaitinfo
@@ -46,11 +50,11 @@ trait BlockingStoreTestTrait
         $parentPID = posix_getpid();
 
         // Block SIGHUP signal
-        pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
+        pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
 
         if ($childPID = pcntl_fork()) {
             // Wait the start of the child
-            pcntl_sigwaitinfo([SIGHUP], $info);
+            pcntl_sigwaitinfo([\SIGHUP], $info);
 
             $store = $this->getStore();
             try {
@@ -62,7 +66,7 @@ trait BlockingStoreTestTrait
             }
 
             // send the ready signal to the child
-            posix_kill($childPID, SIGHUP);
+            posix_kill($childPID, \SIGHUP);
 
             // This call should be blocked by the child #1
             try {
@@ -78,23 +82,23 @@ trait BlockingStoreTestTrait
             }
         } else {
             // Block SIGHUP signal
-            pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
+            pcntl_sigprocmask(\SIG_BLOCK, [\SIGHUP]);
 
             try {
                 $store = $this->getStore();
                 $store->save($key);
                 // send the ready signal to the parent
-                posix_kill($parentPID, SIGHUP);
+                posix_kill($parentPID, \SIGHUP);
 
                 // Wait for the parent to be ready
-                pcntl_sigwaitinfo([SIGHUP], $info);
+                pcntl_sigwaitinfo([\SIGHUP], $info);
 
                 // Wait ClockDelay to let parent assert to finish
                 usleep($clockDelay);
                 $store->delete($key);
                 exit(0);
             } catch (\Throwable $e) {
-                posix_kill($parentPID, SIGHUP);
+                posix_kill($parentPID, \SIGHUP);
                 exit(1);
             }
         }

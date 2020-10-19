@@ -233,7 +233,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
             ->method('vote')
             ->willReturnCallback(function (TokenInterface $token, $subject, array $attributes) use ($sut, $voter3) {
                 if (\in_array('attr2', $attributes) && $subject) {
-                    $vote = $sut->decide($token, $attributes);
+                    $vote = $sut->decide($token, $attributes) ? VoterInterface::ACCESS_GRANTED : VoterInterface::ACCESS_DENIED;
                 } else {
                     $vote = VoterInterface::ACCESS_ABSTAIN;
                 }

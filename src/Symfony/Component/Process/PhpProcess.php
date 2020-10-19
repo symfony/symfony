@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -50,13 +51,21 @@ class PhpProcess extends Process
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    {
+        throw new LogicException(sprintf('The "%s()" method cannot be called when using "%s".', __METHOD__, self::class));
+    }
+
+    /**
      * Sets the path to the PHP binary to use.
      *
      * @deprecated since Symfony 4.2, use the $php argument of the constructor instead.
      */
     public function setPhpBinary($php)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the $php argument of the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the $php argument of the constructor instead.', __METHOD__), \E_USER_DEPRECATED);
 
         $this->setCommandLine($php);
     }

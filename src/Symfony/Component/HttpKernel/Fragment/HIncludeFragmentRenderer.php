@@ -19,6 +19,7 @@ use Symfony\Component\Templating\EngineInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Loader\ExistsLoaderInterface;
+use Twig\Loader\SourceContextLoaderInterface;
 
 /**
  * Implements the Hinclude rendering strategy.
@@ -56,11 +57,11 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     public function setTemplating($templating)
     {
         if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof Environment) {
-            throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of Twig\Environment or Symfony\Component\Templating\EngineInterface');
+            throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of Twig\Environment or Symfony\Component\Templating\EngineInterface.');
         }
 
         if ($templating instanceof EngineInterface) {
-            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.3; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.3; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), \E_USER_DEPRECATED);
         }
 
         $this->templating = $templating;
@@ -112,7 +113,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (\count($attributes) > 0) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            $flags = \ENT_QUOTES | \ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',
@@ -136,22 +137,23 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         $loader = $this->templating->getLoader();
-        if ($loader instanceof ExistsLoaderInterface || method_exists($loader, 'exists')) {
-            return $loader->exists($template);
-        }
 
-        try {
-            if (method_exists($loader, 'getSourceContext')) {
-                $loader->getSourceContext($template);
-            } else {
-                $loader->getSource($template);
+        if (1 === Environment::MAJOR_VERSION && !$loader instanceof ExistsLoaderInterface) {
+            try {
+                if ($loader instanceof SourceContextLoaderInterface) {
+                    $loader->getSourceContext($template);
+                } else {
+                    $loader->getSource($template);
+                }
+
+                return true;
+            } catch (LoaderError $e) {
             }
 
-            return true;
-        } catch (LoaderError $e) {
+            return false;
         }
 
-        return false;
+        return $loader->exists($template);
     }
 
     /**

@@ -82,6 +82,7 @@ class DumpExtensionTest extends TestCase
             $this->assertStringStartsWith('<script>', $dump);
             $dump = preg_replace('/^.*?<pre/', '<pre', $dump);
             $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
+            $dump = preg_replace('/<samp [^>]++>/', '<samp>', $dump);
         }
         $this->assertEquals($expectedOutput, $dump);
     }

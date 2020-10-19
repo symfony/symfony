@@ -70,18 +70,18 @@ The <info>%command.name%</info> command displays information about form types.
 
   <info>php %command.full_name%</info>
 
-The command lists all built-in types, services types, type extensions and 
+The command lists all built-in types, services types, type extensions and
 guessers currently available.
 
   <info>php %command.full_name% Symfony\Component\Form\Extension\Core\Type\ChoiceType</info>
   <info>php %command.full_name% ChoiceType</info>
 
-The command lists all defined options that contains the given form type, 
+The command lists all defined options that contains the given form type,
 as well as their parents and type extensions.
 
   <info>php %command.full_name% ChoiceType choice_value</info>
 
-Use the <info>--show-deprecated</info> option to display form types with 
+Use the <info>--show-deprecated</info> option to display form types with
 deprecated options or the deprecated options of the given form type:
 
   <info>php %command.full_name% --show-deprecated</info>
@@ -152,9 +152,11 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);
+
+        return 0;
     }
 
-    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName)
+    private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, string $shortClassName): string
     {
         $classes = [];
         sort($this->namespaces);
@@ -189,13 +191,13 @@ EOF
             return $classes[0];
         }
         if (!$input->isInteractive()) {
-            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s", $shortClassName, implode("\n    ", $classes)));
+            throw new InvalidArgumentException(sprintf("The type \"%s\" is ambiguous.\n\nDid you mean one of these?\n    %s.", $shortClassName, implode("\n    ", $classes)));
         }
 
         return $io->choice(sprintf("The type \"%s\" is ambiguous.\n\nSelect one of the following form types to display its information:", $shortClassName), $classes, $classes[0]);
     }
 
-    private function getCoreTypes()
+    private function getCoreTypes(): array
     {
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
@@ -223,7 +225,7 @@ EOF
         return $typesWithDeprecatedOptions;
     }
 
-    private function findAlternatives(string $name, array $collection)
+    private function findAlternatives(string $name, array $collection): array
     {
         $alternatives = [];
         foreach ($collection as $item) {
@@ -235,7 +237,7 @@ EOF
 
         $threshold = 1e3;
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($alternatives, \SORT_NATURAL | \SORT_FLAG_CASE);
 
         return array_keys($alternatives);
     }

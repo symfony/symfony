@@ -125,6 +125,9 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertCount(2, $routes);
         $this->assertEquals('/path', $routes->get('action.en')->getPath());
         $this->assertEquals('/pad', $routes->get('action.nl')->getPath());
+
+        $this->assertEquals('nl', $routes->get('action.nl')->getRequirement('_locale'));
+        $this->assertEquals('en', $routes->get('action.en')->getRequirement('_locale'));
     }
 
     public function testLocalizedPathRoutesWithExplicitPathPropety()

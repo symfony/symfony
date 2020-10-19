@@ -30,7 +30,7 @@ class Registry
      */
     public function add(Workflow $workflow, $supportStrategy)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), \E_USER_DEPRECATED);
         $this->workflows[] = [$workflow, $supportStrategy];
     }
 
@@ -47,14 +47,11 @@ class Registry
      */
     public function get($subject, $workflowName = null)
     {
-        $matched = null;
+        $matched = [];
 
         foreach ($this->workflows as list($workflow, $supportStrategy)) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
-                if ($matched) {
-                    throw new InvalidArgumentException('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
-                }
-                $matched = $workflow;
+                $matched[] = $workflow;
             }
         }
 
@@ -62,7 +59,15 @@ class Registry
             throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', \get_class($subject)));
         }
 
-        return $matched;
+        if (2 <= \count($matched)) {
+            $names = array_map(static function (WorkflowInterface $workflow): string {
+                return $workflow->getName();
+            }, $matched);
+
+            throw new InvalidArgumentException(sprintf('Too many workflows (%s) match this subject (%s); set a different name on each and use the second (name) argument of this method.', implode(', ', $names), \get_class($subject)));
+        }
+
+        return $matched[0];
     }
 
     /**

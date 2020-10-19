@@ -20,4 +20,9 @@ class NativeHttpClientTest extends HttpClientTestCase
     {
         return new NativeHttpClient();
     }
+
+    public function testInformationalResponseStream()
+    {
+        $this->markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
+    }
 }

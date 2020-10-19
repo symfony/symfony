@@ -26,10 +26,11 @@ use Symfony\Component\Workflow\Marking;
  */
 class GraphvizDumper implements DumperInterface
 {
+    // All values should be strings
     protected static $defaultOptions = [
         'graph' => ['ratio' => 'compress', 'rankdir' => 'LR'],
-        'node' => ['fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => 'false', 'width' => 1],
-        'edge' => ['fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => 0.5],
+        'node' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => 'false', 'width' => '1'],
+        'edge' => ['fontsize' => '9', 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => '0.5'],
     ];
 
     /**
@@ -61,7 +62,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function findPlaces(Definition $definition, Marking $marking = null)
+    protected function findPlaces(Definition $definition, Marking $marking = null): array
     {
         $workflowMetadata = $definition->getMetadataStore();
 
@@ -96,7 +97,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function findTransitions(Definition $definition)
+    protected function findTransitions(Definition $definition): array
     {
         $workflowMetadata = $definition->getMetadataStore();
 
@@ -124,7 +125,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function addPlaces(array $places)
+    protected function addPlaces(array $places): string
     {
         $code = '';
 
@@ -145,7 +146,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function addTransitions(array $transitions)
+    protected function addTransitions(array $transitions): string
     {
         $code = '';
 
@@ -159,7 +160,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function findEdges(Definition $definition)
+    protected function findEdges(Definition $definition): array
     {
         $workflowMetadata = $definition->getMetadataStore();
 
@@ -192,7 +193,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function addEdges(array $edges)
+    protected function addEdges(array $edges): string
     {
         $code = '';
 
@@ -216,7 +217,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function startDot(array $options)
+    protected function startDot(array $options): string
     {
         return sprintf("digraph workflow {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($options['graph']),
@@ -228,7 +229,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function endDot()
+    protected function endDot(): string
     {
         return "}\n";
     }
@@ -236,7 +237,7 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function dotize($id)
+    protected function dotize(string $id): string
     {
         return hash('sha1', $id);
     }

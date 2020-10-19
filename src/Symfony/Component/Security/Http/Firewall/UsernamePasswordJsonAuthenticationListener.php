@@ -44,7 +44,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final since Symfony 4.3
  */
-class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
+class UsernamePasswordJsonAuthenticationListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -69,27 +69,38 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+
+        if (null !== $eventDispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        } else {
+            $this->eventDispatcher = $eventDispatcher;
+        }
+
         $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+    }
+
+    public function supports(Request $request): ?bool
+    {
+        if (false === strpos($request->getRequestFormat(), 'json')
+            && false === strpos($request->getContentType(), 'json')
+        ) {
+            return false;
+        }
+
+        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
-        if (false === strpos($request->getRequestFormat(), 'json')
-            && false === strpos($request->getContentType(), 'json')
-        ) {
-            return;
-        }
-
-        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
-            return;
-        }
-
         $data = json_decode($request->getContent());
 
         try {
@@ -168,7 +179,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         return $response;
     }
 
-    private function onFailure(Request $request, AuthenticationException $failed)
+    private function onFailure(Request $request, AuthenticationException $failed): Response
     {
         if (null !== $this->logger) {
             $this->logger->info('Authentication request failed.', ['exception' => $failed]);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
@@ -63,7 +64,7 @@ class ParserTest extends TestCase
 
         foreach ($yamls as $yaml) {
             try {
-                $content = $this->parser->parse($yaml);
+                $this->parser->parse($yaml);
 
                 $this->fail('YAML files must not contain tabs');
             } catch (\Exception $e) {
@@ -601,7 +602,7 @@ EOF;
     public function testMultipleDocumentsNotSupportedException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('/^Multiple documents are not supported.+/');
+        $this->expectExceptionMessageMatches('/^Multiple documents are not supported.+/');
         Yaml::parse(<<<'EOL'
 # Ranking of 1998 home runs
 ---
@@ -1347,7 +1348,7 @@ EOT
     public function testParseInvalidBinaryData($data, $expectedMessage)
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp($expectedMessage);
+        $this->expectExceptionMessageMatches($expectedMessage);
 
         $this->parser->parse($data);
     }
@@ -1529,6 +1530,33 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testEscapedQuoteInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    \\"bar\\"
+    baz"
+YAML;
+        $expected = [
+            'foobar' => 'foo "bar" baz',
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testBackslashInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: "foo
+    bar\\\\"
+YAML;
+        $expected = [
+            'foobar' => 'foo bar\\',
+        ];
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT
@@ -1614,6 +1642,206 @@ EOF;
         return $tests;
     }
 
+    /**
+     * @dataProvider inlineNotationSpanningMultipleLinesProvider
+     */
+    public function testInlineNotationSpanningMultipleLines($expected, string $yaml)
+    {
+        $this->assertEquals($expected, $this->parser->parse($yaml));
+    }
+
+    public function inlineNotationSpanningMultipleLinesProvider(): array
+    {
+        return [
+            'mapping' => [
+                ['foo' => 'bar', 'bar' => 'baz'],
+                <<<YAML
+{
+    'foo': 'bar',
+    'bar': 'baz'
+}
+YAML
+                ,
+            ],
+            'sequence' => [
+                ['foo', 'bar'],
+                <<<YAML
+[
+    'foo',
+    'bar'
+]
+YAML
+                ,
+            ],
+            'sequence nested in mapping' => [
+                ['foo' => ['bar', 'foobar'], 'bar' => ['baz']],
+                <<<YAML
+{
+    'foo': ['bar', 'foobar'],
+    'bar': ['baz']
+}
+YAML
+                ,
+            ],
+            'sequence spanning multiple lines nested in mapping' => [
+                [
+                    'foobar' => [
+                        'foo',
+                        'bar',
+                        'baz',
+                    ],
+                ],
+                <<<YAML
+foobar: [foo,
+    bar,
+    baz
+]
+YAML
+                ,
+            ],
+            'nested sequence nested in mapping starting on the same line' => [
+                [
+                    'foo' => [
+                        'foobar',
+                        [
+                            'bar',
+                            'baz',
+                        ],
+                    ],
+                ],
+                <<<YAML
+foo: [foobar, [
+    bar,
+    baz
+]]
+YAML
+                ,
+            ],
+            'nested sequence nested in mapping starting on the following line' => [
+                [
+                    'foo' => [
+                        'foobar',
+                        [
+                            'bar',
+                            'baz',
+                        ],
+                    ],
+                ],
+                <<<YAML
+foo: [foobar,
+    [
+        bar,
+        baz
+]]
+YAML
+                ,
+            ],
+            'mapping nested in sequence' => [
+                ['foo', ['bar' => 'baz']],
+                <<<YAML
+[
+    'foo',
+    {
+        'bar': 'baz'
+    }
+]
+YAML
+                ,
+            ],
+            'mapping spanning multiple lines nested in sequence' => [
+                [
+                    [
+                        'foo' => 'bar',
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- {
+    foo: bar,
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'nested mapping nested in sequence starting on the same line' => [
+                [
+                    [
+                        'foo' => [
+                            'bar' => 'foobar',
+                        ],
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- { foo: {
+        bar: foobar
+    },
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'nested mapping nested in sequence starting on the following line' => [
+                [
+                    [
+                        'foo' => [
+                            'bar' => 'foobar',
+                        ],
+                        'bar' => 'baz',
+                    ],
+                ],
+                <<<YAML
+- { foo:
+    {
+        bar: foobar
+    },
+    bar: baz
+}
+YAML
+                ,
+            ],
+            'single quoted multi-line string' => [
+                "foo\nbar",
+                <<<YAML
+'foo
+
+bar'
+YAML
+                ,
+            ],
+            'double quoted multi-line string' => [
+                "foo\nbar",
+                <<<YAML
+'foo
+
+bar'
+YAML
+                ,
+            ],
+            'single-quoted multi-line mapping value' => [
+                ['foo' => "bar\nbaz"],
+                <<<YAML
+foo: 'bar
+
+baz'
+YAML
+            ],
+        ];
+    }
+
+    public function testRootLevelInlineMappingFollowedByMoreContentIsInvalid()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "foobar").');
+
+        $yaml = <<<YAML
+{ foo: bar }
+foobar
+YAML;
+
+        $this->parser->parse($yaml);
+    }
+
     public function testTaggedInlineMapping()
     {
         $this->assertEquals(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
@@ -1670,6 +1898,30 @@ YAML
                 [new TaggedValue('foo', 'bar')],
                 '[ !foo bar ]',
             ],
+            'with-comments' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz
+    #bar
+  ]]
+YAML
+            ],
+            'with-comments-trailing-comma' => [
+                [
+                    [new TaggedValue('foo', ['foo', 'baz'])],
+                ],
+                <<<YAML
+- [!foo [
+    foo,
+    baz,
+    #bar
+  ]]
+YAML
+            ],
         ];
     }
 
@@ -1699,7 +1951,7 @@ YAML
         $this->parser->parse('!!iterator foo');
     }
 
-    public function testExceptionWhenUsingUnsuportedBuiltInTags()
+    public function testExceptionWhenUsingUnsupportedBuiltInTags()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
         $this->expectExceptionMessage('The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").');
@@ -1749,7 +2001,7 @@ YAML;
     public function testParsingIniThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessage('Unable to parse at line 1 (near "[parameters]").');
+        $this->expectExceptionMessage('Unable to parse at line 2 (near "  foo = bar").');
         $ini = <<<INI
 [parameters]
   foo = bar
@@ -1841,6 +2093,42 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
     }
 
+    public function testDeprecatedPhpConstantSyntax()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing value for tag "php/const:App\Kernel::SEMART_VERSION" at line 1 (near "!php/const:App\Kernel::SEMART_VERSION").');
+
+        $this->parser->parse('!php/const:App\Kernel::SEMART_VERSION', Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT);
+    }
+
+    public function testPhpConstantTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - foo: 'value_0'
+    !php/const 'Symfony\Component\Yaml\Tests\B::BAR': 'value_1'
+map2:
+  - !php/const 'Symfony\Component\Yaml\Tests\B::FOO': 'value_0'
+    bar: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['foo' => 'value_0', 'bar' => 'value_1']],
+            'map2' => [['foo' => 'value_0', 'bar' => 'value_1']],
+        ], $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testTagMappingAsScalarKey()
+    {
+        $yaml = <<<YAML
+map1:
+  - !!str 0: 'value_0'
+    !!str 1: 'value_1'
+YAML;
+        $this->assertSame([
+            'map1' => [['0' => 'value_0', '1' => 'value_1']],
+        ], $this->parser->parse($yaml));
+    }
+
     public function testMergeKeysWhenMappingsAreParsedAsObjects()
     {
         $yaml = <<<YAML
@@ -1893,14 +2181,14 @@ YAML;
     public function testParsingNonExistentFilesThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
+        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/nonexistent.yml" does not exist\.$#');
         $this->parser->parseFile(__DIR__.'/Fixtures/nonexistent.yml');
     }
 
     public function testParsingNotReadableFilesThrowsException()
     {
         $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
-        $this->expectExceptionMessageRegExp('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
+        $this->expectExceptionMessageMatches('#^File ".+/Fixtures/not_readable.yml" cannot be read\.$#');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
@@ -2103,7 +2391,7 @@ YAML;
 parameters:
     abc
 
-# Comment 
+# Comment
 YAML;
 
         $this->assertSame(['parameters' => 'abc'], $this->parser->parse($yaml));
@@ -2149,6 +2437,33 @@ YAML;
             ],
             $this->parser->parse($yaml)
         );
+    }
+
+    /**
+     * This is a regression test for a bug where a YAML block with a nested multiline string using | was parsed without
+     * a trailing \n when a shorter YAML document was parsed before.
+     *
+     * When a shorter document was parsed before, the nested string did not have a \n at the end of the string, because
+     * the Parser thought it was the end of the file, even though it is not.
+     */
+    public function testParsingMultipleDocuments()
+    {
+        $shortDocument = 'foo: bar';
+        $longDocument = <<<YAML
+a:
+    b: |
+        row
+        row2
+c: d
+YAML;
+
+        // The first parsing set and fixed the totalNumberOfLines in the Parser before, so parsing the short document here
+        // to reproduce the issue. If the issue would not have been fixed, the next assertion will fail
+        $this->parser->parse($shortDocument);
+
+        // After the total number of lines has been reset the result will be the same as if a new parser was used
+        // (before, there was no \n after row2)
+        $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
 }
 

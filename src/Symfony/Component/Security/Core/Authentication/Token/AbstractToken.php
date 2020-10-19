@@ -41,7 +41,7 @@ abstract class AbstractToken implements TokenInterface
             if (\is_string($role)) {
                 $role = new Role($role, false);
             } elseif (!$role instanceof Role) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or Role instances, but got %s.', \gettype($role)));
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, but got "%s".', \gettype($role)));
             }
 
             $this->roles[] = $role;
@@ -60,7 +60,7 @@ abstract class AbstractToken implements TokenInterface
     public function getRoles()
     {
         if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.3. Use the getRoleNames() method instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.3. Use the getRoleNames() method instead.', __METHOD__), \E_USER_DEPRECATED);
         }
 
         return $this->roles;
@@ -166,6 +166,7 @@ abstract class AbstractToken implements TokenInterface
      * @return string
      *
      * @final since Symfony 4.3, use __serialize() instead
+     *
      * @internal since Symfony 4.3, use __serialize() instead
      */
     public function serialize()
@@ -173,7 +174,7 @@ abstract class AbstractToken implements TokenInterface
         $serialized = $this->__serialize();
 
         if (null === $isCalledFromOverridingMethod = \func_num_args() ? func_get_arg(0) : null) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $trace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
             $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
         }
 
@@ -287,7 +288,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function __toString()
     {
-        $class = \get_class($this);
+        $class = static::class;
         $class = substr($class, strrpos($class, '\\') + 1);
 
         $roles = [];
@@ -298,7 +299,7 @@ abstract class AbstractToken implements TokenInterface
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
     }
 
-    private function hasUserChanged(UserInterface $user)
+    private function hasUserChanged(UserInterface $user): bool
     {
         if (!($this->user instanceof UserInterface)) {
             throw new \BadMethodCallException('Method "hasUserChanged" should be called when current user class is instance of "UserInterface".');
@@ -316,12 +317,22 @@ abstract class AbstractToken implements TokenInterface
             return true;
         }
 
+        $userRoles = array_map('strval', (array) $user->getRoles());
+
+        if ($this instanceof SwitchUserToken) {
+            $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
+        }
+
+        if (\count($userRoles) !== \count($this->getRoleNames()) || \count($userRoles) !== \count(array_intersect($userRoles, $this->getRoleNames()))) {
+            return true;
+        }
+
         if ($this->user->getUsername() !== $user->getUsername()) {
             return true;
         }
 
         if ($this->user instanceof AdvancedUserInterface && $user instanceof AdvancedUserInterface) {
-            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), \E_USER_DEPRECATED);
             if ($this->user->isAccountNonExpired() !== $user->isAccountNonExpired()) {
                 return true;
             }
@@ -338,7 +349,7 @@ abstract class AbstractToken implements TokenInterface
                 return true;
             }
         } elseif ($this->user instanceof AdvancedUserInterface xor $user instanceof AdvancedUserInterface) {
-            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Checking for the AdvancedUserInterface in "%s()" is deprecated since Symfony 4.1 and support for it will be removed in 5.0. Implement the %s to check if the user has been changed,', __METHOD__, EquatableInterface::class), \E_USER_DEPRECATED);
 
             return true;
         }

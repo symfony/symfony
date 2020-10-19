@@ -17,10 +17,11 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
 
 /**
  * @group legacy
+ * @group integration
  */
 class MemcachedCacheTextModeTest extends MemcachedCacheTest
 {
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         $client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
 

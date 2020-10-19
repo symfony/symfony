@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.47.96",
     "Names": {
         "ace": "acehnés",
         "arp": "arapaho",
@@ -8,7 +7,6 @@
         "bho": "bhoshpuri",
         "bla": "siksika",
         "bua": "buriat",
-        "de_AT": "alemán austriaco",
         "dum": "neerlandés medieval",
         "enm": "inglés medieval",
         "eu": "euskera",
@@ -30,20 +28,23 @@
         "nr": "ndebele meridional",
         "nso": "sotho septentrional",
         "pa": "punyabí",
-        "pcm": "pcm",
-        "rn": "kiroundi",
         "shu": "árabe chadiano",
         "ss": "siswati",
-        "st": "sesotho meridional",
         "sw": "suajili",
-        "sw_CD": "suajili del Congo",
         "syr": "siriaco",
         "tet": "tetún",
         "tn": "setswana",
         "tyv": "tuviniano",
-        "wo": "wolof",
-        "wuu": "wuu",
+        "wuu": "chino wu",
         "xal": "kalmyk",
         "zgh": "tamazight marroquí estándar"
+    },
+    "LocalizedNames": {
+        "ar_001": "árabe estándar moderno",
+        "de_AT": "alemán austriaco",
+        "nl_BE": "flamenco",
+        "sw_CD": "suajili del Congo",
+        "zh_Hans": "chino simplificado",
+        "zh_Hant": "chino tradicional"
     }
 }

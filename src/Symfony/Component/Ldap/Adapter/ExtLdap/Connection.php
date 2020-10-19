@@ -25,9 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Connection extends AbstractConnection
 {
-    private const LDAP_INVALID_CREDENTIALS = '0x31';
-    private const LDAP_TIMEOUT = '0x55';
-    private const LDAP_ALREADY_EXISTS = '0x44';
+    private const LDAP_INVALID_CREDENTIALS = 0x31;
+    private const LDAP_TIMEOUT = 0x55;
+    private const LDAP_ALREADY_EXISTS = 0x44;
 
     /** @var bool */
     private $bound = false;
@@ -50,6 +50,8 @@ class Connection extends AbstractConnection
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $password WARNING: When the LDAP server allows unauthenticated binds, a blank $password will always be valid
      */
     public function bind($dn = null, $password = null)
     {
@@ -116,6 +118,10 @@ class Connection extends AbstractConnection
                 $options->setDefault('debug_level', 7);
             }
 
+            if (!isset($parent['network_timeout'])) {
+                $options->setDefault('network_timeout', ini_get('default_socket_timeout'));
+            }
+
             $options->setDefaults([
                 'protocol_version' => $parent['version'],
                 'referrals' => $parent['referrals'],
@@ -136,11 +142,11 @@ class Connection extends AbstractConnection
         }
 
         if (false === $this->connection) {
-            throw new LdapException(sprintf('Could not connect to Ldap server: %s.', ldap_error($this->connection)));
+            throw new LdapException('Could not connect to Ldap server: '.ldap_error($this->connection));
         }
 
         if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {
-            throw new LdapException(sprintf('Could not initiate TLS connection: %s.', ldap_error($this->connection)));
+            throw new LdapException('Could not initiate TLS connection: '.ldap_error($this->connection));
         }
     }
 

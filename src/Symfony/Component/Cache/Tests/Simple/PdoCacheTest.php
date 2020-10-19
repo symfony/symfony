@@ -42,7 +42,7 @@ class PdoCacheTest extends CacheTestCase
         @unlink(self::$dbFile);
     }
 
-    public function createSimpleCache($defaultLifetime = 0): CacheInterface
+    public function createSimpleCache(int $defaultLifetime = 0): CacheInterface
     {
         return new PdoCache('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }

@@ -81,6 +81,9 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
+    /**
+     * @return mixed
+     */
     private function doProcessValue($value, bool $isRoot = false)
     {
         if ($value instanceof TypedReference) {
@@ -371,7 +374,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label)
+    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label): callable
     {
         if (null === $this->typesClone->container) {
             $this->typesClone->container = new ContainerBuilder($this->container->getParameterBag());
@@ -386,7 +389,7 @@ class AutowirePass extends AbstractRecursivePass
         })->bindTo($this->typesClone);
     }
 
-    private function createTypeNotFoundMessage(TypedReference $reference, string $label, string $currentId)
+    private function createTypeNotFoundMessage(TypedReference $reference, string $label, string $currentId): string
     {
         if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
             // either $type does not exist or a parent class does not exist
@@ -420,7 +423,7 @@ class AutowirePass extends AbstractRecursivePass
         return $message;
     }
 
-    private function createTypeAlternatives(ContainerBuilder $container, TypedReference $reference)
+    private function createTypeAlternatives(ContainerBuilder $container, TypedReference $reference): string
     {
         // try suggesting available aliases first
         if ($message = $this->getAliasesSuggestionForType($container, $type = $reference->getType())) {
@@ -444,7 +447,7 @@ class AutowirePass extends AbstractRecursivePass
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
     }
 
-    private function getAliasesSuggestionForType(ContainerBuilder $container, string $type)
+    private function getAliasesSuggestionForType(ContainerBuilder $container, string $type): ?string
     {
         $aliases = [];
         foreach (class_parents($type) + class_implements($type) as $parent) {

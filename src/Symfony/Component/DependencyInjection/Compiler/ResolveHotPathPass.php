@@ -26,7 +26,7 @@ class ResolveHotPathPass extends AbstractRecursivePass
     private $tagName;
     private $resolvedIds = [];
 
-    public function __construct($tagName = 'container.hot_path')
+    public function __construct(string $tagName = 'container.hot_path')
     {
         $this->tagName = $tagName;
     }

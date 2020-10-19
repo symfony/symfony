@@ -103,7 +103,7 @@ class IdentificationHeaderTest extends TestCase
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
-        $header = new IdentificationHeader('References', 'a b c@d');
+        new IdentificationHeader('References', 'a b c@d');
     }
 
     public function testIdRightCanBeDotAtom()
@@ -139,7 +139,7 @@ class IdentificationHeaderTest extends TestCase
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
-        $header = new IdentificationHeader('References', 'a@b c d');
+        new IdentificationHeader('References', 'a@b c d');
     }
 
     public function testMissingAtSignThrowsException()
@@ -149,7 +149,7 @@ class IdentificationHeaderTest extends TestCase
         /* -- RFC 2822, 3.6.4.
          msg-id          =       [CFWS] "<" id-left "@" id-right ">" [CFWS]
          */
-        $header = new IdentificationHeader('References', 'abc');
+        new IdentificationHeader('References', 'abc');
     }
 
     public function testSetBody()

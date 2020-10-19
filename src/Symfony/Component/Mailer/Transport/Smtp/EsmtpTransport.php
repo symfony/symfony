@@ -106,6 +106,7 @@ class EsmtpTransport extends SmtpTransport
 
         /** @var SocketStream $stream */
         $stream = $this->getStream();
+
         if ($stream->isTLS() && \defined('OPENSSL_VERSION_NUMBER') && \array_key_exists('STARTTLS', $capabilities)) {
             $this->executeCommand("STARTTLS\r\n", [220]);
 
@@ -115,6 +116,7 @@ class EsmtpTransport extends SmtpTransport
 
             try {
                 $response = $this->executeCommand(sprintf("EHLO %s\r\n", $this->getLocalDomain()), [250]);
+                $capabilities = $this->getCapabilities($response);
             } catch (TransportExceptionInterface $e) {
                 parent::doHeloCommand();
 
@@ -162,7 +164,11 @@ class EsmtpTransport extends SmtpTransport
 
                 return;
             } catch (TransportExceptionInterface $e) {
-                $this->executeCommand("RSET\r\n", [250]);
+                try {
+                    $this->executeCommand("RSET\r\n", [250]);
+                } catch (TransportExceptionInterface $_) {
+                    // ignore this exception as it probably means that the server error was final
+                }
 
                 // keep the error message, but tries the other authenticators
                 $errors[$authenticator->getAuthKeyword()] = $e;

@@ -21,10 +21,17 @@
         </service>
         <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
-        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" public="true">
+        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage" public="true">
+            <tag name="kernel.reset" method="disableUsageTracking" />
             <tag name="kernel.reset" method="setToken" />
+            <argument type="service" id="security.untracked_token_storage" />
+            <argument type="service_locator">
+                <argument key="session" type="service" id="session" />
+            </argument>
         </service>
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" />
+
+        <service id="security.untracked_token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
 
         <service id="security.helper" class="Symfony\Component\Security\Core\Security">
             <argument type="service_locator">
@@ -80,7 +87,7 @@
         <service id="security.user_checker" class="Symfony\Component\Security\Core\User\UserChecker" />
 
         <service id="security.expression_language" class="Symfony\Component\Security\Core\Authorization\ExpressionLanguage">
-            <argument type="service" id="cache.security_expression_language"></argument>
+            <argument type="service" id="cache.security_expression_language" on-invalid="null" />
         </service>
 
         <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" public="true">
@@ -144,25 +151,33 @@
             <argument />  <!-- FirewallConfig -->
         </service>
 
+        <service id="security.firewall.lazy_context" class="Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext" abstract="true">
+            <argument type="collection" />
+            <argument type="service" id="security.exception_listener" />
+            <argument />  <!-- LogoutListener -->
+            <argument />  <!-- FirewallConfig -->
+            <argument type="service" id="security.untracked_token_storage" />
+        </service>
+
         <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true">
             <argument />                   <!-- name -->
             <argument />                   <!-- user_checker -->
             <argument />                   <!-- request_matcher -->
-            <argument />                   <!-- security enabled -->
-            <argument />                   <!-- stateless -->
+            <argument>false</argument>     <!-- security enabled -->
+            <argument>false</argument>     <!-- stateless -->
             <argument />                   <!-- provider -->
             <argument />                   <!-- context -->
             <argument />                   <!-- entry_point -->
             <argument />                   <!-- access_denied_handler -->
             <argument />                   <!-- access_denied_url -->
             <argument type="collection" /> <!-- listeners -->
-            <argument />                   <!-- switch_user -->
+            <argument>null</argument>      <!-- switch_user -->
         </service>
 
         <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator">
             <argument type="service" id="request_stack" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />
-            <argument type="service" id="security.token_storage" on-invalid="null" />
+            <argument type="service" id="security.token_storage" />
         </service>
 
         <!-- Provisioning -->

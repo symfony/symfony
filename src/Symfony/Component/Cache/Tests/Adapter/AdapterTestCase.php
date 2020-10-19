@@ -58,7 +58,7 @@ abstract class AdapterTestCase extends CachePoolTest
             $isHit = false;
             $this->assertTrue($item->isHit());
             $this->assertSame($value, $item->get());
-        }, INF));
+        }, \INF));
         $this->assertFalse($isHit);
 
         $this->assertSame($value, $cache->get('bar', new class($value) implements CallbackInterface {
@@ -87,8 +87,8 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache = $this->createCachePool(0, __FUNCTION__);
 
         $v = $cache->get('k1', function () use (&$counter, $cache) {
-            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; });
-            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; });
+            $cache->get('k2', function () use (&$counter) { return ++$counter; });
+            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; }); // ensure the callback is called once
 
             return $v;
         });
@@ -109,7 +109,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->deleteItem('foo');
         $cache->get('foo', function ($item) {
             $item->expiresAfter(10);
-            sleep(1);
+            usleep(999000);
 
             return 'bar';
         });
@@ -251,16 +251,6 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->prune();
         $this->assertFalse($this->isPruned($cache, 'foo'));
         $this->assertTrue($this->isPruned($cache, 'qux'));
-    }
-
-    /**
-     * @group issue-32995
-     *
-     * @runInSeparateProcess https://github.com/symfony/symfony/issues/32995
-     */
-    public function testSavingObject()
-    {
-        parent::testSavingObject();
     }
 
     public function testClearPrefix()

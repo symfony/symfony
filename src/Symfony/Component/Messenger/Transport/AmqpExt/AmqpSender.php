@@ -45,18 +45,20 @@ class AmqpSender implements SenderInterface
         $delayStamp = $envelope->last(DelayStamp::class);
         $delay = $delayStamp ? $delayStamp->getDelay() : 0;
 
+        /** @var AmqpStamp|null $amqpStamp */
         $amqpStamp = $envelope->last(AmqpStamp::class);
         if (isset($encodedMessage['headers']['Content-Type'])) {
             $contentType = $encodedMessage['headers']['Content-Type'];
             unset($encodedMessage['headers']['Content-Type']);
 
-            $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
-
-            if (!isset($attributes['content_type'])) {
-                $attributes['content_type'] = $contentType;
-
-                $amqpStamp = new AmqpStamp($amqpStamp ? $amqpStamp->getRoutingKey() : null, $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM, $attributes);
+            if (!$amqpStamp || !isset($amqpStamp->getAttributes()['content_type'])) {
+                $amqpStamp = AmqpStamp::createWithAttributes(['content_type' => $contentType], $amqpStamp);
             }
+        }
+
+        $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
+        if ($amqpReceivedStamp instanceof AmqpReceivedStamp) {
+            $amqpStamp = AmqpStamp::createFromAmqpEnvelope($amqpReceivedStamp->getAmqpEnvelope(), $amqpStamp);
         }
 
         try {

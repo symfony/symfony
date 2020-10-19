@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.48.42",
     "Names": {
         "ADP": [
             "ADP",
@@ -193,6 +192,10 @@
             "BRR",
             "brazilski cruzeiro"
         ],
+        "BRZ": [
+            "BRZ",
+            "BRZ"
+        ],
         "BSD": [
             "BSD",
             "bahamski dolar"
@@ -215,7 +218,7 @@
         ],
         "BYN": [
             "BYN",
-            "bjeloruska rublja"
+            "bjeloruski rubalj"
         ],
         "BYR": [
             "BYR",
@@ -539,7 +542,7 @@
         ],
         "KHR": [
             "KHR",
-            "kambođanski rijal"
+            "kambodžanski rijal"
         ],
         "KMF": [
             "KMF",
@@ -633,6 +636,10 @@
             "MAF",
             "marokanski franak"
         ],
+        "MCF": [
+            "MCF",
+            "MCF"
+        ],
         "MDC": [
             "MDC",
             "moldavski kupon"
@@ -643,7 +650,7 @@
         ],
         "MGA": [
             "MGA",
-            "madagaskarski ariary"
+            "malgaški arijari"
         ],
         "MGF": [
             "MGF",
@@ -835,7 +842,7 @@
         ],
         "RUB": [
             "RUB",
-            "ruska rublja"
+            "ruski rubalj"
         ],
         "RUR": [
             "RUR",
@@ -847,7 +854,7 @@
         ],
         "SAR": [
             "SAR",
-            "saudijski rial"
+            "saudijski rijal"
         ],
         "SBD": [
             "SBD",
@@ -1095,7 +1102,7 @@
         ],
         "YER": [
             "YER",
-            "jemenski rial"
+            "jemenski rijal"
         ],
         "YUD": [
             "YUD",

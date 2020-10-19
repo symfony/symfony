@@ -51,7 +51,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertEquals(['name' => 'foo'], $c->getRouteParams());
         $this->assertSame([], $c->getSessionAttributes());
         $this->assertSame('en', $c->getLocale());
-        $this->assertContains(__FILE__, $attributes->get('resource'));
+        $this->assertContainsEquals(__FILE__, $attributes->get('resource'));
         $this->assertSame('stdClass', $attributes->get('object')->getType());
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getResponseHeaders());
@@ -99,7 +99,7 @@ class RequestDataCollectorTest extends TestCase
                 '"Regular" callable',
                 [$this, 'testControllerInspection'],
                 [
-                    'class' => __NAMESPACE__.'\RequestDataCollectorTest',
+                    'class' => self::class,
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
                     'line' => $r1->getStartLine(),

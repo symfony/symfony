@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Transport;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\ProcessStream;
@@ -64,7 +64,7 @@ class SendmailTransport extends AbstractTransport
         }
     }
 
-    public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
         if ($this->transport) {
             return $this->transport->send($message, $envelope);
@@ -73,10 +73,10 @@ class SendmailTransport extends AbstractTransport
         return parent::send($message, $envelope);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
         if ($this->transport) {
-            return $this->transport->getName();
+            return (string) $this->transport;
         }
 
         return 'smtp://sendmail';

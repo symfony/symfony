@@ -103,9 +103,10 @@ EOF
         $serviceIdsNb = 0;
         foreach ($serviceIds as $serviceId) {
             $text = [];
+            $resolvedServiceId = $serviceId;
             if (0 !== strpos($serviceId, $previousId)) {
                 $text[] = '';
-                if ('' !== $description = Descriptor::getClassDescription($serviceId, $serviceId)) {
+                if ('' !== $description = Descriptor::getClassDescription($serviceId, $resolvedServiceId)) {
                     if (isset($hasAlias[$serviceId])) {
                         continue;
                     }

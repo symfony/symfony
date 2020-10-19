@@ -16,9 +16,9 @@ use Symfony\Component\Mailer\Transport\SendmailTransport;
 
 class SendmailTransportTest extends TestCase
 {
-    public function testName()
+    public function testToString()
     {
         $t = new SendmailTransport();
-        $this->assertEquals('smtp://sendmail', $t->getName());
+        $this->assertEquals('smtp://sendmail', (string) $t);
     }
 }

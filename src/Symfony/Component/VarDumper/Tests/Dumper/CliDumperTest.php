@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Twig\Environment;
@@ -45,7 +46,7 @@ class CliDumperTest extends TestCase
         $dumper->dump($data);
         $out = ob_get_clean();
         $out = preg_replace('/[ \t]+$/m', '', $out);
-        $intMax = PHP_INT_MAX;
+        $intMax = \PHP_INT_MAX;
         $res = (int) $var['res'];
 
         $this->assertStringMatchesFormat(
@@ -143,6 +144,7 @@ RuntimeException {
   #line: %d
   trace: {
     %ACliDumperTest.php:%d {
+      Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest->testDumpWithCommaFlagsAndExceptionCodeExcerpt()
       › 
       › $ex = new \RuntimeException('foo');
       › 
@@ -198,6 +200,7 @@ EOTXT;
 
     /**
      * @requires extension xml
+     * @requires PHP < 8.0
      */
     public function testXmlResource()
     {
@@ -382,6 +385,7 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
+        __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
         › foo bar
         ›   twig source
         › 
@@ -512,6 +516,57 @@ EOTXT
             ,
             $var
         );
+    }
+
+    public function provideDumpArrayWithColor()
+    {
+        yield [
+            ['foo' => 'bar'],
+            0,
+            <<<EOTXT
+\e[0;38;5;208m\e[38;5;38marray:1\e[0;38;5;208m [\e[m
+  \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
+\e[0;38;5;208m]\e[m
+
+EOTXT
+        ];
+
+        yield [[], AbstractDumper::DUMP_LIGHT_ARRAY, "\e[0;38;5;208m[]\e[m\n"];
+
+        yield [
+            ['foo' => 'bar'],
+            AbstractDumper::DUMP_LIGHT_ARRAY,
+            <<<EOTXT
+\e[0;38;5;208m[\e[m
+  \e[0;38;5;208m"\e[38;5;113mfoo\e[0;38;5;208m" => "\e[1;38;5;113mbar\e[0;38;5;208m"\e[m
+\e[0;38;5;208m]\e[m
+
+EOTXT
+        ];
+
+        yield [[], 0, "\e[0;38;5;208m[]\e[m\n"];
+    }
+
+    /**
+     * @dataProvider provideDumpArrayWithColor
+     */
+    public function testDumpArrayWithColor($value, $flags, $expectedOut)
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows console does not support coloration');
+        }
+
+        $out = '';
+        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
+            if ($depth >= 0) {
+                $out .= str_repeat('  ', $depth).$line."\n";
+            }
+        }, null, $flags);
+        $dumper->setColors(true);
+        $cloner = new VarCloner();
+        $dumper->dump($cloner->cloneVar($value));
+
+        $this->assertSame($expectedOut, $out);
     }
 
     private function getSpecialVars()

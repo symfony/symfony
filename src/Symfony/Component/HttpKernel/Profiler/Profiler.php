@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Profiler;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,12 +64,12 @@ class Profiler implements ResetInterface
     /**
      * Loads the Profile for the given Response.
      *
-     * @return Profile|false A Profile instance
+     * @return Profile|null A Profile instance
      */
     public function loadProfileFromResponse(Response $response)
     {
         if (!$token = $response->headers->get('X-Debug-Token')) {
-            return false;
+            return null;
         }
 
         return $this->loadProfile($token);
@@ -79,7 +80,7 @@ class Profiler implements ResetInterface
      *
      * @param string $token A token
      *
-     * @return Profile A Profile instance
+     * @return Profile|null A Profile instance
      */
     public function loadProfile($token)
     {
@@ -138,10 +139,14 @@ class Profiler implements ResetInterface
     /**
      * Collects data for the given Response.
      *
+     * @param \Throwable|null $exception
+     *
      * @return Profile|null A Profile instance or null if the profiler is disabled
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
+        $exception = 2 < \func_num_args() ? func_get_arg(2) : null;
+
         if (false === $this->enabled) {
             return null;
         }
@@ -163,9 +168,14 @@ class Profiler implements ResetInterface
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 
+        $wrappedException = null;
         foreach ($this->collectors as $collector) {
-            $collector->collect($request, $response, $exception);
+            if (($e = $exception) instanceof \Error) {
+                $r = new \ReflectionMethod($collector, 'collect');
+                $e = 2 >= $r->getNumberOfParameters() || !($p = $r->getParameters()[2])->hasType() || \Exception::class !== $p->getType()->getName() ? $e : ($wrappedException ?? $wrappedException = new FatalThrowableError($e));
+            }
 
+            $collector->collect($request, $response, $e);
             // we need to clone for sub-requests
             $profile->addCollector(clone $collector);
         }

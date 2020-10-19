@@ -32,6 +32,13 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
         $this->logger = $logger;
     }
 
+    public function supports(Dsn $dsn): bool
+    {
+        return \in_array($dsn->getScheme(), $this->getSupportedSchemes());
+    }
+
+    abstract protected function getSupportedSchemes(): array;
+
     protected function getUser(Dsn $dsn): string
     {
         $user = $dsn->getUser();

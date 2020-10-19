@@ -45,7 +45,7 @@ trait DoctrineTrait
                     case 'unserialize':
                     case 'apcu_fetch':
                     case 'apc_fetch':
-                        throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                        throw new \ErrorException($e->getMessage(), $e->getCode(), \E_ERROR, $e->getFile(), $e->getLine());
                 }
             }
 
@@ -91,7 +91,7 @@ trait DoctrineTrait
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         return $this->provider->saveMultiple($values, $lifetime);
     }

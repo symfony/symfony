@@ -23,10 +23,6 @@
             <parameter key="Symfony\Component\HttpKernel\Event\ViewEvent">kernel.view</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\ExceptionEvent">kernel.exception</parameter>
             <parameter key="Symfony\Component\HttpKernel\Event\TerminateEvent">kernel.terminate</parameter>
-            <parameter key="Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent">security.authentication.success</parameter>
-            <parameter key="Symfony\Component\Security\Core\Event\AuthenticationFailureEvent">security.authentication.failure</parameter>
-            <parameter key="Symfony\Component\Security\Http\Event\InteractiveLoginEvent">security.interactive_login</parameter>
-            <parameter key="Symfony\Component\Security\Http\Event\SwitchUserEvent">security.switch_user</parameter>
             <parameter key="Symfony\Component\Workflow\Event\GuardEvent">workflow.guard</parameter>
             <parameter key="Symfony\Component\Workflow\Event\LeaveEvent">workflow.leave</parameter>
             <parameter key="Symfony\Component\Workflow\Event\TransitionEvent">workflow.transition</parameter>
@@ -124,6 +120,12 @@
             <argument type="collection" /> <!-- locale aware services -->
             <argument type="service" id="request_stack" />
             <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="container.env_var_processor" class="Symfony\Component\DependencyInjection\EnvVarProcessor">
+            <tag name="container.env_var_processor" />
+            <argument type="service" id="service_container" />
+            <argument type="tagged_iterator" tag="container.env_var_loader" />
         </service>
     </services>
 </container>

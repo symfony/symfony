@@ -84,7 +84,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         }
 
         if ($count > 1) {
-            throw new UsernameNotFoundException('More than one user found');
+            throw new UsernameNotFoundException('More than one user found.');
         }
 
         $entry = $entries[0];
@@ -108,7 +108,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
-        return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles());
+        return new LdapUser($user->getEntry(), $user->getUsername(), $user->getPassword(), $user->getRoles(), $user->getExtraFields());
     }
 
     /**
@@ -144,7 +144,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * Loads a user from an LDAP entry.
      *
-     * @return LdapUser
+     * @return UserInterface
      */
     protected function loadUser($username, Entry $entry)
     {

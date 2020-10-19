@@ -112,7 +112,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
     public function offsetGet($key)
     {
         if (!isset($this->elements[$key])) {
-            throw new \OutOfBoundsException('The offset "'.$key.'" does not exist.');
+            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $key));
         }
 
         return $this->elements[$key];

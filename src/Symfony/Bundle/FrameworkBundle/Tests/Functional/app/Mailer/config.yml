@@ -4,7 +4,7 @@ imports:
 
 framework:
     mailer:
-        dsn: 'smtp://null'
+        dsn: 'null://null'
         envelope:
             sender: sender@example.org
             recipients:

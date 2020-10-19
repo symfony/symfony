@@ -26,7 +26,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @deprecated since Symfony 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
+ * @deprecated since Symfony 4.4, to be removed in 5.0; use ServerLogCommand from symfony/monolog-bridge instead
  */
 class ServerLogCommand extends Command
 {
@@ -80,7 +80,7 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
+        @trigger_error('Using the WebserverBundle is deprecated since Symfony 4.4. Use the DebugBundle combined with MonologBridge instead.', \E_USER_DEPRECATED);
 
         $filter = $input->getOption('filter');
         if ($filter) {
@@ -106,7 +106,7 @@ EOF
         }
 
         if (!$socket = stream_socket_server($host, $errno, $errstr)) {
-            throw new RuntimeException(sprintf('Server start failed on "%s": %s %s.', $host, $errstr, $errno));
+            throw new RuntimeException(sprintf('Server start failed on "%s": ', $host).$errstr.' '.$errno);
         }
 
         foreach ($this->getLogs($socket) as $clientId => $message) {
@@ -121,11 +121,13 @@ EOF
                 continue;
             }
 
-            $this->displayLog($input, $output, $clientId, $record);
+            $this->displayLog($output, $clientId, $record);
         }
+
+        return 0;
     }
 
-    private function getLogs($socket)
+    private function getLogs($socket): iterable
     {
         $sockets = [(int) $socket => $socket];
         $write = [];
@@ -148,7 +150,7 @@ EOF
         }
     }
 
-    private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record)
+    private function displayLog(OutputInterface $output, int $clientId, array $record)
     {
         if (isset($record['log_id'])) {
             $clientId = unpack('H*', $record['log_id'])[1];

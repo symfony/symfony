@@ -20,6 +20,8 @@
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
+            <argument>null</argument>
+            <argument type="tagged_iterator" tag="routing.expression_language_provider" />
         </service>
 
         <service id="web_profiler.controller.exception" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController" public="true">
@@ -27,12 +29,12 @@
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
             <argument type="service" id="debug.file_link_formatter" />
-            <argument type="service" id="error_renderer.renderer.html" />
+            <argument type="service" id="error_handler.error_renderer.html" />
             <deprecated>The "%service_id%" service is deprecated since Symfony 4.4, use the "web_profiler.controller.exception_panel" service instead.</deprecated>
         </service>
 
         <service id="web_profiler.controller.exception_panel" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionPanelController" public="true">
-            <argument type="service" id="error_renderer.renderer.html" />
+            <argument type="service" id="error_handler.error_renderer.html" />
             <argument type="service" id="profiler" on-invalid="null" />
         </service>
 

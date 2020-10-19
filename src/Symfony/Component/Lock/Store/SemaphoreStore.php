@@ -37,7 +37,7 @@ class SemaphoreStore implements StoreInterface, BlockingStoreInterface
     public function __construct()
     {
         if (!static::isSupported()) {
-            throw new InvalidArgumentException('Semaphore extension (sysvsem) is required');
+            throw new InvalidArgumentException('Semaphore extension (sysvsem) is required.');
         }
     }
 

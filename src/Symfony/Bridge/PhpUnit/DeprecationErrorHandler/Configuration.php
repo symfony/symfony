@@ -48,10 +48,10 @@ class Configuration
 
         foreach ($thresholds as $group => $threshold) {
             if (!\in_array($group, $groups, true)) {
-                throw new \InvalidArgumentException(sprintf('Unrecognized threshold "%s", expected one of "%s"', $group, implode('", "', $groups)));
+                throw new \InvalidArgumentException(sprintf('Unrecognized threshold "%s", expected one of "%s".', $group, implode('", "', $groups)));
             }
             if (!is_numeric($threshold)) {
-                throw new \InvalidArgumentException(sprintf('Threshold for group "%s" has invalid value "%s"', $group, $threshold));
+                throw new \InvalidArgumentException(sprintf('Threshold for group "%s" has invalid value "%s".', $group, $threshold));
             }
             $this->thresholds[$group] = (int) $threshold;
         }
@@ -146,7 +146,7 @@ class Configuration
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
             if (!\in_array($key, ['max', 'disabled', 'verbose'], true)) {
-                throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s"', $key));
+                throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s".', $key));
             }
         }
 

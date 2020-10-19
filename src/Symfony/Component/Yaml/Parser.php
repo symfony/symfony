@@ -85,7 +85,6 @@ class Parser
         $this->refs = [];
 
         $mbEncoding = null;
-        $data = null;
 
         if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
             $mbEncoding = mb_internal_encoding();
@@ -103,17 +102,10 @@ class Parser
             $this->refs = [];
             $this->skippedLineNumbers = [];
             $this->locallySkippedLineNumbers = [];
+            $this->totalNumberOfLines = null;
         }
 
         return $data;
-    }
-
-    /**
-     * @internal
-     */
-    public function getLastLineNumberBeforeDeprecation(): int
-    {
-        return $this->getRealCurrentLineNb();
     }
 
     private function doParse(string $value, int $flags)
@@ -162,7 +154,7 @@ class Parser
             $isRef = $mergeNode = false;
             if ('-' === $this->currentLine[0] && self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#u', rtrim($this->currentLine), $values)) {
                 if ($context && 'mapping' == $context) {
-                    throw new ParseException('You cannot define a sequence item when in a mapping', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                    throw new ParseException('You cannot define a sequence item when in a mapping.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
                 }
                 $context = 'sequence';
 
@@ -185,8 +177,12 @@ class Parser
                         $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags)
                     );
                 } else {
-                    if (isset($values['leadspaces'])
-                        && self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->trimTag($values['value']), $matches)
+                    if (
+                        isset($values['leadspaces'])
+                        && (
+                            '!' === $values['value'][0]
+                            || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->trimTag($values['value']), $matches)
+                        )
                     ) {
                         // this is a compact notation element, add to next block and parse
                         $block = $values['value'];
@@ -208,7 +204,7 @@ class Parser
                 && (false === strpos($values['key'], ' #') || \in_array($values['key'][0], ['"', "'"]))
             ) {
                 if ($context && 'sequence' == $context) {
-                    throw new ParseException('You cannot define a mapping item when in a sequence', $this->currentLineNb + 1, $this->currentLine, $this->filename);
+                    throw new ParseException('You cannot define a mapping item when in a sequence.', $this->currentLineNb + 1, $this->currentLine, $this->filename);
                 }
                 $context = 'mapping';
 
@@ -353,6 +349,61 @@ class Parser
                     $this->refs[$isRef] = $data[$key];
                     array_pop($this->refsBeingParsed);
                 }
+            } elseif ('"' === $this->currentLine[0] || "'" === $this->currentLine[0]) {
+                if (null !== $context) {
+                    throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                }
+
+                try {
+                    return Inline::parse($this->parseQuotedString($this->currentLine), $flags, $this->refs);
+                } catch (ParseException $e) {
+                    $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                    $e->setSnippet($this->currentLine);
+
+                    throw $e;
+                }
+            } elseif ('{' === $this->currentLine[0]) {
+                if (null !== $context) {
+                    throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                }
+
+                try {
+                    $parsedMapping = Inline::parse($this->lexInlineMapping($this->currentLine), $flags, $this->refs);
+
+                    while ($this->moveToNextLine()) {
+                        if (!$this->isCurrentLineEmpty()) {
+                            throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                        }
+                    }
+
+                    return $parsedMapping;
+                } catch (ParseException $e) {
+                    $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                    $e->setSnippet($this->currentLine);
+
+                    throw $e;
+                }
+            } elseif ('[' === $this->currentLine[0]) {
+                if (null !== $context) {
+                    throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                }
+
+                try {
+                    $parsedSequence = Inline::parse($this->lexInlineSequence($this->currentLine), $flags, $this->refs);
+
+                    while ($this->moveToNextLine()) {
+                        if (!$this->isCurrentLineEmpty()) {
+                            throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+                        }
+                    }
+
+                    return $parsedSequence;
+                } catch (ParseException $e) {
+                    $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                    $e->setSnippet($this->currentLine);
+
+                    throw $e;
+                }
             } else {
                 // multiple documents are not supported
                 if ('---' === $this->currentLine) {
@@ -393,7 +444,7 @@ class Parser
                         }
 
                         if (false !== strpos($line, ': ')) {
-                            @trigger_error('Support for mapping keys in multi-line blocks is deprecated since Symfony 4.3 and will throw a ParseException in 5.0.', E_USER_DEPRECATED);
+                            @trigger_error('Support for mapping keys in multi-line blocks is deprecated since Symfony 4.3 and will throw a ParseException in 5.0.', \E_USER_DEPRECATED);
                         }
 
                         if ('' === trim($line)) {
@@ -572,8 +623,14 @@ class Parser
         }
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+        $isItComment = $this->isCurrentLineComment();
 
         while ($this->moveToNextLine()) {
+            if ($isItComment && !$isItUnindentedCollection) {
+                $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
+                $isItComment = $this->isCurrentLineComment();
+            }
+
             $indent = $this->getCurrentLineIndentation();
 
             if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
@@ -664,7 +721,7 @@ class Parser
         if (\in_array($value[0], ['!', '|', '>'], true) && self::preg_match('/^(?:'.self::TAG_PATTERN.' +)?'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
-            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs((int) $modifiers));
+            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), abs((int) $modifiers));
 
             if ('' !== $matches['tag'] && '!' !== $matches['tag']) {
                 if ('!!binary' === $matches['tag']) {
@@ -678,6 +735,12 @@ class Parser
         }
 
         try {
+            if ('' !== $value && '{' === $value[0]) {
+                return Inline::parse($this->lexInlineMapping($value), $flags, $this->refs);
+            } elseif ('' !== $value && '[' === $value[0]) {
+                return Inline::parse($this->lexInlineSequence($value), $flags, $this->refs);
+            }
+
             $quotation = '' !== $value && ('"' === $value[0] || "'" === $value[0]) ? $value[0] : null;
 
             // do not take following lines into account when the current line is a quoted single line value
@@ -698,7 +761,8 @@ class Parser
                 $lines[] = trim($this->currentLine);
 
                 // quoted string values end with a line that is terminated with the quotation character
-                if ('' !== $this->currentLine && substr($this->currentLine, -1) === $quotation) {
+                $escapedLine = str_replace(['\\\\', '\\"'], '', $this->currentLine);
+                if ('' !== $escapedLine && substr($escapedLine, -1) === $quotation) {
                     break;
                 }
             }
@@ -1009,19 +1073,19 @@ class Parser
     {
         if (false === $ret = preg_match($pattern, $subject, $matches, $flags, $offset)) {
             switch (preg_last_error()) {
-                case PREG_INTERNAL_ERROR:
+                case \PREG_INTERNAL_ERROR:
                     $error = 'Internal PCRE error.';
                     break;
-                case PREG_BACKTRACK_LIMIT_ERROR:
+                case \PREG_BACKTRACK_LIMIT_ERROR:
                     $error = 'pcre.backtrack_limit reached.';
                     break;
-                case PREG_RECURSION_LIMIT_ERROR:
+                case \PREG_RECURSION_LIMIT_ERROR:
                     $error = 'pcre.recursion_limit reached.';
                     break;
-                case PREG_BAD_UTF8_ERROR:
+                case \PREG_BAD_UTF8_ERROR:
                     $error = 'Malformed UTF-8 data.';
                     break;
-                case PREG_BAD_UTF8_OFFSET_ERROR:
+                case \PREG_BAD_UTF8_OFFSET_ERROR:
                     $error = 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.';
                     break;
                 default:
@@ -1071,5 +1135,129 @@ class Parser
         }
 
         throw new ParseException(sprintf('Tags support is not enabled. You must use the flag "Yaml::PARSE_CUSTOM_TAGS" to use "%s".', $matches['tag']), $this->getRealCurrentLineNb() + 1, $value, $this->filename);
+    }
+
+    private function parseQuotedString(string $yaml): ?string
+    {
+        if ('' === $yaml || ('"' !== $yaml[0] && "'" !== $yaml[0])) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a quoted string.', $yaml));
+        }
+
+        $lines = [$yaml];
+
+        while ($this->moveToNextLine()) {
+            $lines[] = $this->currentLine;
+
+            if (!$this->isCurrentLineEmpty() && $yaml[0] === $this->currentLine[-1]) {
+                break;
+            }
+        }
+
+        $value = '';
+
+        for ($i = 0, $linesCount = \count($lines), $previousLineWasNewline = false, $previousLineWasTerminatedWithBackslash = false; $i < $linesCount; ++$i) {
+            if ('' === trim($lines[$i])) {
+                $value .= "\n";
+            } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
+                $value .= ' ';
+            }
+
+            if ('' !== trim($lines[$i]) && '\\' === substr($lines[$i], -1)) {
+                $value .= ltrim(substr($lines[$i], 0, -1));
+            } elseif ('' !== trim($lines[$i])) {
+                $value .= trim($lines[$i]);
+            }
+
+            if ('' === trim($lines[$i])) {
+                $previousLineWasNewline = true;
+                $previousLineWasTerminatedWithBackslash = false;
+            } elseif ('\\' === substr($lines[$i], -1)) {
+                $previousLineWasNewline = false;
+                $previousLineWasTerminatedWithBackslash = true;
+            } else {
+                $previousLineWasNewline = false;
+                $previousLineWasTerminatedWithBackslash = false;
+            }
+        }
+
+        return $value;
+
+        for ($i = 1; isset($yaml[$i]) && $quotation !== $yaml[$i]; ++$i) {
+        }
+
+        // quoted single line string
+        if (isset($yaml[$i]) && $quotation === $yaml[$i]) {
+            return $yaml;
+        }
+
+        $lines = [$yaml];
+
+        while ($this->moveToNextLine()) {
+            for ($i = 1; isset($this->currentLine[$i]) && $quotation !== $this->currentLine[$i]; ++$i) {
+            }
+
+            $lines[] = trim($this->currentLine);
+
+            if (isset($this->currentLine[$i]) && $quotation === $this->currentLine[$i]) {
+                break;
+            }
+        }
+    }
+
+    private function lexInlineMapping(string $yaml): string
+    {
+        if ('' === $yaml || '{' !== $yaml[0]) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a sequence.', $yaml));
+        }
+
+        for ($i = 1; isset($yaml[$i]) && '}' !== $yaml[$i]; ++$i) {
+        }
+
+        if (isset($yaml[$i]) && '}' === $yaml[$i]) {
+            return $yaml;
+        }
+
+        $lines = [$yaml];
+
+        while ($this->moveToNextLine()) {
+            $lines[] = $this->currentLine;
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function lexInlineSequence(string $yaml): string
+    {
+        if ('' === $yaml || '[' !== $yaml[0]) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a sequence.', $yaml));
+        }
+
+        for ($i = 1; isset($yaml[$i]) && ']' !== $yaml[$i]; ++$i) {
+        }
+
+        if (isset($yaml[$i]) && ']' === $yaml[$i]) {
+            return $yaml;
+        }
+
+        $value = $yaml;
+
+        while ($this->moveToNextLine()) {
+            for ($i = 1; isset($this->currentLine[$i]) && ']' !== $this->currentLine[$i]; ++$i) {
+            }
+
+            $trimmedValue = trim($this->currentLine);
+
+            if ('' !== $trimmedValue && '#' === $trimmedValue[0]) {
+                continue;
+            }
+
+            $value .= $trimmedValue;
+
+            if (isset($this->currentLine[$i]) && ']' === $this->currentLine[$i]) {
+                break;
+            }
+        }
+
+        return $value;
     }
 }

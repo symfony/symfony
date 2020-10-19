@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class SesHttpTransport extends AbstractHttpTransport
 {
-    private const ENDPOINT = 'https://email.%region%.amazonaws.com';
+    private const HOST = 'email.%region%.amazonaws.com';
 
     private $accessKey;
     private $secretKey;
@@ -42,9 +42,9 @@ class SesHttpTransport extends AbstractHttpTransport
         parent::__construct($client, $dispatcher, $logger);
     }
 
-    public function getName(): string
+    public function __toString(): string
     {
-        return sprintf('http://%s@ses?region=%s', $this->accessKey, $this->region);
+        return sprintf('ses+https://%s@%s', $this->accessKey, $this->getEndpoint());
     }
 
     protected function doSendHttp(SentMessage $message): ResponseInterface
@@ -52,8 +52,7 @@ class SesHttpTransport extends AbstractHttpTransport
         $date = gmdate('D, d M Y H:i:s e');
         $auth = sprintf('AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s', $this->accessKey, $this->getSignature($date));
 
-        $endpoint = str_replace('%region%', $this->region, self::ENDPOINT);
-        $response = $this->client->request('POST', $endpoint, [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), [
             'headers' => [
                 'X-Amzn-Authorization' => $auth,
                 'Date' => $date,
@@ -64,13 +63,19 @@ class SesHttpTransport extends AbstractHttpTransport
             ],
         ]);
 
+        $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {
-            $error = new \SimpleXMLElement($response->getContent(false));
-
-            throw new HttpTransportException(sprintf('Unable to send an email: %s (code %s).', $error->Error->Message, $error->Error->Code), $response);
+            throw new HttpTransportException('Unable to send an email: '.$result->Error->Message.sprintf(' (code %d).', $result->Error->Code), $response);
         }
 
+        $message->setMessageId($result->SendRawEmailResult->MessageId);
+
         return $response;
+    }
+
+    private function getEndpoint(): ?string
+    {
+        return ($this->host ?: str_replace('%region%', $this->region, self::HOST)).($this->port ? ':'.$this->port : '');
     }
 
     private function getSignature(string $string): string

@@ -92,7 +92,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         return [$providerId, $listenerId, $entryPointId];
     }
 
-    private function determineEntryPoint(?string $defaultEntryPointId, array $config)
+    private function determineEntryPoint(?string $defaultEntryPointId, array $config): string
     {
         if ($defaultEntryPointId) {
             // explode if they've configured the entry_point, but there is already one
@@ -115,6 +115,6 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         }
 
         // we have multiple entry points - we must ask them to configure one
-        throw new \LogicException(sprintf('Because you have multiple guard authenticators, you need to set the "guard.entry_point" key to one of your authenticators (%s)', implode(', ', $authenticatorIds)));
+        throw new \LogicException(sprintf('Because you have multiple guard authenticators, you need to set the "guard.entry_point" key to one of your authenticators (%s).', implode(', ', $authenticatorIds)));
     }
 }

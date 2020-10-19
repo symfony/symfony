@@ -42,7 +42,7 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of %s)', implode(', ', array_keys($this->mapping))))
+            ->addArgument('bus', InputArgument::OPTIONAL, sprintf('The bus id (one of "%s")', implode('", "', array_keys($this->mapping))))
             ->setDescription('Lists messages you can dispatch using the message buses')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all messages that can be
@@ -70,7 +70,7 @@ EOF
         $mapping = $this->mapping;
         if ($bus = $input->getArgument('bus')) {
             if (!isset($mapping[$bus])) {
-                throw new RuntimeException(sprintf('Bus "%s" does not exist. Known buses are %s.', $bus, implode(', ', array_keys($this->mapping))));
+                throw new RuntimeException(sprintf('Bus "%s" does not exist. Known buses are "%s".', $bus, implode('", "', array_keys($this->mapping))));
             }
             $mapping = [$bus => $mapping[$bus]];
         }
@@ -96,6 +96,8 @@ EOF
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }
         }
+
+        return 0;
     }
 
     private function formatConditions(array $options): string
@@ -106,9 +108,9 @@ EOF
 
         $optionsMapping = [];
         foreach ($options as $key => $value) {
-            $optionsMapping[] = ' '.$key.'='.$value;
+            $optionsMapping[] = $key.'='.$value;
         }
 
-        return ' (when'.implode(', ', $optionsMapping).')';
+        return ' (when '.implode(', ', $optionsMapping).')';
     }
 }

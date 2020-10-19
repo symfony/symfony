@@ -47,6 +47,7 @@ Exception {
   #line: 28
   trace: {
     %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
@@ -66,11 +67,12 @@ EODUMP;
         $expectedDump = <<<'EODUMP'
 {
   %s%eTests%eCaster%eExceptionCasterTest.php:28 {
+    Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
     › {
     ›     return new \Exception(''.$msg);
     › }
   }
-  %s%eTests%eCaster%eExceptionCasterTest.php:64 { …}
+  %s%eTests%eCaster%eExceptionCasterTest.php:65 { …}
 %A
 EODUMP;
 
@@ -90,11 +92,12 @@ Exception {
   #line: 28
   trace: {
     %sExceptionCasterTest.php:28 {
+      Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest->getTestException($msg, &$ref = null)
       › {
       ›     return new \Exception(''.$msg);
       › }
     }
-    %s%eTests%eCaster%eExceptionCasterTest.php:82 { …}
+    %s%eTests%eCaster%eExceptionCasterTest.php:84 { …}
 %A
 EODUMP;
 
@@ -142,11 +145,11 @@ EODUMP;
   #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str>1</span>"
   #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
   #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%sExceptionCasterTest.php
-%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eCaster%eExceptionCasterTest.php</span>"
+%d characters"><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>"
   #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>28</span>
   <span class=sf-dump-meta>trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
-Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class=sf-dump-ellipsis>%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>28</span>
+Stack level %d."><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%s%eVarDumper</span><span class="sf-dump-ellipsis sf-dump-ellipsis-path">%e</span>Tests%eCaster%eExceptionCasterTest.php</span>:<span class=sf-dump-num>28</span>
      &hellip;%d
   </samp>}
 </samp>}

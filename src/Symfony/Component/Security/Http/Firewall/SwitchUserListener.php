@@ -39,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final since Symfony 4.3
  */
-class SwitchUserListener implements ListenerInterface
+class SwitchUserListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
@@ -70,8 +70,36 @@ class SwitchUserListener implements ListenerInterface
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+
+        if (null !== $dispatcher && class_exists(LegacyEventDispatcherProxy::class)) {
+            $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        } else {
+            $this->dispatcher = $dispatcher;
+        }
+
         $this->stateless = $stateless;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request): ?bool
+    {
+        // usernames can be falsy
+        $username = $request->get($this->usernameParameter);
+
+        if (null === $username || '' === $username) {
+            $username = $request->headers->get($this->usernameParameter);
+        }
+
+        // if it's still "empty", nothing to do.
+        if (null === $username || '' === $username) {
+            return false;
+        }
+
+        $request->attributes->set('_switch_user_username', $username);
+
+        return true;
     }
 
     /**
@@ -79,14 +107,12 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws \LogicException if switching to a user failed
      */
-    public function __invoke(RequestEvent $event)
+    public function authenticate(RequestEvent $event)
     {
         $request = $event->getRequest();
-        $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
 
-        if (!$username) {
-            return;
-        }
+        $username = $request->attributes->get('_switch_user_username');
+        $request->attributes->remove('_switch_user_username');
 
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
@@ -98,7 +124,8 @@ class SwitchUserListener implements ListenerInterface
             try {
                 $this->tokenStorage->setToken($this->attemptSwitchUser($request, $username));
             } catch (AuthenticationException $e) {
-                throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
+                // Generate 403 in any conditions to prevent user enumeration vulnerabilities
+                throw new AccessDeniedException('Switch User failed: '.$e->getMessage(), $e);
             }
         }
 
@@ -127,10 +154,27 @@ class SwitchUserListener implements ListenerInterface
                 return $token;
             }
 
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            // User already switched, exit before seamlessly switching to another user
+            $token = $this->attemptExitUser($request);
         }
 
-        $user = $this->provider->loadUserByUsername($username);
+        $currentUsername = $token->getUsername();
+        $nonExistentUsername = '_'.md5(random_bytes(8).$username);
+
+        // To protect against user enumeration via timing measurements
+        // we always load both successfully and unsuccessfully
+        try {
+            $user = $this->provider->loadUserByUsername($username);
+
+            try {
+                $this->provider->loadUserByUsername($nonExistentUsername);
+            } catch (\Exception $e) {
+            }
+        } catch (AuthenticationException $e) {
+            $this->provider->loadUserByUsername($currentUsername);
+
+            throw $e;
+        }
 
         if (false === $this->accessDecisionManager->decide($token, [$this->role], $user)) {
             $exception = new AccessDeniedException();
@@ -146,7 +190,7 @@ class SwitchUserListener implements ListenerInterface
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken(), false);
+        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $token, false);
 
         $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
 

@@ -159,7 +159,7 @@ class GuardAuthenticationFactoryTest extends TestCase
             'authenticators' => ['authenticator123', 'authenticatorABC'],
             'entry_point' => 'authenticatorABC',
         ];
-        list($container, $entryPointId) = $this->executeCreate($config, null);
+        list(, $entryPointId) = $this->executeCreate($config, null);
         $this->assertEquals('authenticatorABC', $entryPointId);
     }
 
@@ -172,7 +172,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $userProviderId = 'my_user_provider';
 
         $factory = new GuardAuthenticationFactory();
-        list($providerId, $listenerId, $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
+        list(, , $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 
         return [$container, $entryPointId];
     }

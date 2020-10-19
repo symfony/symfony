@@ -4,11 +4,26 @@ CHANGELOG
 4.4.0
 -----
 
- * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
-   pass a `RoutableMessageBus`  instance instead.
  * Added support for auto trimming of Redis streams.
  * `InMemoryTransport` handle acknowledged and rejected messages.
  * Made all dispatched worker event classes final.
+ * Added support for `from_transport` attribute on `messenger.message_handler` tag.
+ * Added support for passing `dbindex` as a query parameter to the redis transport DSN.
+ * Added `WorkerStartedEvent` and `WorkerRunningEvent`
+ * [BC BREAK] Removed `SendersLocatorInterface::getSenderByAlias` added in 4.3.
+ * [BC BREAK] Removed `$retryStrategies` argument from `Worker::__construct`.
+ * [BC BREAK] Changed arguments of `ConsumeMessagesCommand::__construct`.
+ * [BC BREAK] Removed `$senderClassOrAlias` argument from `RedeliveryStamp::__construct`.
+ * [BC BREAK] Removed `UnknownSenderException`.
+ * [BC BREAK] Removed `WorkerInterface`.
+ * [BC BREAK] Removed `$onHandledCallback` of `Worker::run(array $options = [], callable $onHandledCallback = null)`.
+ * [BC BREAK] Removed `StopWhenMemoryUsageIsExceededWorker` in favor of `StopWorkerOnMemoryLimitListener`.
+ * [BC BREAK] Removed `StopWhenMessageCountIsExceededWorker` in favor of `StopWorkerOnMessageLimitListener`.
+ * [BC BREAK] Removed `StopWhenTimeLimitIsReachedWorker` in favor of `StopWorkerOnTimeLimitListener`.
+ * [BC BREAK] Removed `StopWhenRestartSignalIsReceived` in favor of `StopWorkerOnRestartSignalListener`.
+ * The component is not marked as `@experimental` anymore.
+ * Marked the `MessengerDataCollector` class as `@final`.
+ * Added support for `DelayStamp` to the `redis` transport.
 
 4.3.0
 -----

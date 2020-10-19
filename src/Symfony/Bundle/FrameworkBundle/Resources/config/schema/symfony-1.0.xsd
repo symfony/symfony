@@ -41,6 +41,7 @@
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="test" type="xsd:boolean" />
+        <xsd:attribute name="error-controller" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">
@@ -347,7 +348,7 @@
 
     <xsd:complexType name="metadata">
         <xsd:sequence>
-            <xsd:any minOccurs="0" processContents="lax"/>
+            <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -374,6 +375,7 @@
     <xsd:simpleType name="cookie_samesite">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="" />
+            <xsd:enumeration value="none" />
             <xsd:enumeration value="lax" />
             <xsd:enumeration value="strict" />
         </xsd:restriction>
@@ -424,6 +426,8 @@
             <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="failure-transport" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_serializer">
@@ -454,10 +458,19 @@
     <xsd:complexType name="messenger_transport">
         <xsd:sequence>
             <xsd:element name="options" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="retry-strategy" type="messenger_retry_strategy" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="serializer" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_retry_strategy">
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="max-retries" type="xsd:integer" />
+        <xsd:attribute name="delay" type="xsd:integer" />
+        <xsd:attribute name="multiplier" type="xsd:float" />
+        <xsd:attribute name="max-delay" type="xsd:float" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_bus">
@@ -558,14 +571,19 @@
 
     <xsd:complexType name="mailer">
         <xsd:sequence>
+            <xsd:element name="transport" type="mailer_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="envelope" type="mailer_envelope" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="dsn" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="mailer_transport" mixed="true">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
     <xsd:complexType name="mailer_envelope">
         <xsd:sequence>
-            <xsd:element name="sender" type="xsd:string" />
+            <xsd:element name="sender" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="recipients" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>

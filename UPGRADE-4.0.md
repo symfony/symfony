@@ -26,8 +26,8 @@ file and directory structure of your application:
 
 Then, upgrade the contents of your console script and your front controller:
 
-* `bin/console`: https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console
-* `public/index.php`: https://github.com/symfony/recipes/blob/master/symfony/framework-bundle/3.3/public/index.php
+* `bin/console`: https://github.com/symfony/recipes/blob/master/symfony/console/4.4/bin/console
+* `public/index.php`: https://github.com/symfony/recipes/blob/master/symfony/framework-bundle/4.4/public/index.php
 
 Lastly, read the following article to add Symfony Flex to your application and
 upgrade the configuration files: https://symfony.com/doc/current/setup/flex.html
@@ -924,7 +924,7 @@ Validator
 VarDumper
 ---------
 
- * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$context = null`
+ * The `VarDumperTestTrait::assertDumpEquals()` method expects a 3rd `$filter = 0`
    argument and moves `$message = ''` argument at 4th position.
 
    Before:
@@ -939,7 +939,7 @@ VarDumper
    VarDumperTestTrait::assertDumpEquals($dump, $data, $filter = 0, $message = '');
    ```
 
- * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$context = null`
+ * The `VarDumperTestTrait::assertDumpMatchesFormat()` method expects a 3rd `$filter = 0`
    argument and moves `$message = ''` argument at 4th position.
 
    Before:

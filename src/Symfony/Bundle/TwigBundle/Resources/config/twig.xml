@@ -134,6 +134,7 @@
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%kernel.debug%</argument>
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
         </service>
 
         <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">
@@ -145,7 +146,7 @@
         <service id="twig.controller.preview_error" class="Symfony\Bundle\TwigBundle\Controller\PreviewErrorController" public="true">
             <argument type="service" id="http_kernel" />
             <argument>%twig.exception_listener.controller%</argument>
-            <argument type="service" id="error_renderer" on-invalid="null" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4.</deprecated>
         </service>
 
         <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator">
@@ -161,11 +162,16 @@
             <argument /> <!-- runtime locator -->
         </service>
 
-        <service id="twig.error_renderer.html" class="Symfony\Bundle\TwigBundle\ErrorRenderer\TwigHtmlErrorRenderer">
-            <tag name="error_renderer.renderer" priority="1" />
+        <service id="twig.error_renderer.html" class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" decorates="error_renderer.html">
             <argument type="service" id="twig" />
-            <argument type="service" id="error_renderer.renderer.html" />
-            <argument>%kernel.debug%</argument>
+            <argument type="service" id="twig.error_renderer.html.inner" />
+            <argument type="service">
+                <service>
+                    <factory class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer" method="isDebug" />
+                    <argument type="service" id="request_stack" />
+                    <argument>%kernel.debug%</argument>
+                </service>
+            </argument>
         </service>
     </services>
 </container>

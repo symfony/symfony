@@ -40,7 +40,7 @@ final class FormDataPart extends AbstractMultipartPart
             $this->fields[$name] = $value;
         }
         // HTTP does not support \r\n in header values
-        $this->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $this->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
     }
 
     public function getMediaSubtype(): string
@@ -56,11 +56,20 @@ final class FormDataPart extends AbstractMultipartPart
     private function prepareFields(array $fields): array
     {
         $values = [];
-        array_walk_recursive($fields, function ($item, $key) use (&$values) {
-            if (!\is_array($item)) {
-                $values[] = $this->preparePart($key, $item);
+
+        $prepare = function ($item, $key, $root = null) use (&$values, &$prepare) {
+            $fieldName = $root ? sprintf('%s[%s]', $root, $key) : $key;
+
+            if (\is_array($item)) {
+                array_walk($item, $prepare, $fieldName);
+
+                return;
             }
-        });
+
+            $values[] = $this->preparePart($fieldName, $item);
+        };
+
+        array_walk($fields, $prepare);
 
         return $values;
     }
@@ -86,7 +95,7 @@ final class FormDataPart extends AbstractMultipartPart
         $part->setDisposition('form-data');
         $part->setName($name);
         // HTTP does not support \r\n in header values
-        $part->getHeaders()->setMaxLineLength(PHP_INT_MAX);
+        $part->getHeaders()->setMaxLineLength(\PHP_INT_MAX);
         $r->setValue($part, '8bit');
 
         return $part;

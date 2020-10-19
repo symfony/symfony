@@ -79,7 +79,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
             return null;
         }
         if (!$this->isISO8601($value)) {
-            throw new TransformationFailedException('Non ISO 8601 date strings are not supported yet');
+            throw new TransformationFailedException('Non ISO 8601 date strings are not supported yet.');
         }
         $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $this->format).'$/';
         if (!preg_match($valuePattern, $value)) {
@@ -94,7 +94,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
         return $dateInterval;
     }
 
-    private function isISO8601(string $string)
+    private function isISO8601(string $string): bool
     {
         return preg_match('/^P(?=\w*(?:\d|%\w))(?:\d+Y|%[yY]Y)?(?:\d+M|%[mM]M)?(?:(?:\d+D|%[dD]D)|(?:\d+W|%[wW]W))?(?:T(?:\d+H|[hH]H)?(?:\d+M|[iI]M)?(?:\d+S|[sS]S)?)?$/', $string);
     }

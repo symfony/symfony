@@ -20,7 +20,7 @@ class HttpTransportException extends TransportException
 {
     private $response;
 
-    public function __construct(string $message = null, ResponseInterface $response, int $code = 0, \Exception $previous = null)
+    public function __construct(string $message = null, ResponseInterface $response, int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

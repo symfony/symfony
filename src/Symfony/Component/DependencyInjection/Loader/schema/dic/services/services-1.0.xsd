@@ -78,7 +78,7 @@
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="resource" type="xsd:string" use="required" />
-    <xsd:attribute name="ignore-errors" type="boolean" />
+    <xsd:attribute name="ignore-errors" type="ignore_errors" />
     <xsd:attribute name="type" type="xsd:string" />
   </xsd:complexType>
 
@@ -129,6 +129,7 @@
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="decorates" type="xsd:string" />
+    <xsd:attribute name="decoration-on-invalid" type="invalid_decorated_service_sequence" />
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
     <xsd:attribute name="autowire" type="boolean" />
@@ -221,6 +222,7 @@
     <xsd:attribute name="key" type="xsd:string" use="required" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">
@@ -236,6 +238,7 @@
     <xsd:attribute name="tag" type="xsd:string" />
     <xsd:attribute name="index-by" type="xsd:string" />
     <xsd:attribute name="default-index-method" type="xsd:string" />
+    <xsd:attribute name="default-priority-method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -262,12 +265,19 @@
       <xsd:enumeration value="expression" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
+      <xsd:enumeration value="binary" />
       <xsd:enumeration value="iterator" />
       <xsd:enumeration value="service_locator" />
-      <!-- "tagged" is deprecated since Symfony 4.4 and will be removed in 5.0, use "tagged_iterator" instead. -->
+      <!-- "tagged" is an alias of "tagged_iterator", using "tagged_iterator" is preferred. -->
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_iterator" />
       <xsd:enumeration value="tagged_locator" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="ignore_errors">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="(true|false|not_found)" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -277,6 +287,14 @@
       <xsd:enumeration value="ignore" />
       <xsd:enumeration value="exception" />
       <xsd:enumeration value="ignore_uninitialized" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="invalid_decorated_service_sequence">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="null" />
+      <xsd:enumeration value="ignore" />
+      <xsd:enumeration value="exception" />
     </xsd:restriction>
   </xsd:simpleType>
 

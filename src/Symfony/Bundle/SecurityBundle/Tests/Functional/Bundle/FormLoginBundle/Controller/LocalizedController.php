@@ -59,6 +59,6 @@ class LocalizedController implements ContainerAwareInterface
 
     public function homepageAction()
     {
-        return new Response('<html><body>Homepage</body></html>');
+        return (new Response('<html><body>Homepage</body></html>'))->setPublic();
     }
 }

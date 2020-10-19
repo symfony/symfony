@@ -18,6 +18,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {
+    protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
+
     protected $headers = [];
     protected $cacheControl = [];
 
@@ -62,9 +65,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     public function all(/*string $key = null*/)
     {
         if (1 <= \func_num_args() && null !== $key = func_get_arg(0)) {
-            $key = str_replace('_', '-', strtolower($key));
-
-            return $this->headers[$key] ?? [];
+            return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];
         }
 
         return $this->headers;
@@ -111,14 +112,22 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $headers = $this->all((string) $key);
         if (2 < \func_num_args()) {
-            @trigger_error(sprintf('Passing a third argument to "%s()" is deprecated since Symfony 4.4, use method "all()" instead', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a third argument to "%s()" is deprecated since Symfony 4.4, use method "all()" instead', __METHOD__), \E_USER_DEPRECATED);
 
             if (!func_get_arg(2)) {
                 return $headers;
             }
         }
 
-        return $headers[0] ?? $default;
+        if (!$headers) {
+            return $default;
+        }
+
+        if (null === $headers[0]) {
+            return null;
+        }
+
+        return (string) $headers[0];
     }
 
     /**
@@ -130,7 +139,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function set($key, $values, $replace = true)
     {
-        $key = str_replace('_', '-', strtolower($key));
+        $key = strtr($key, self::UPPER, self::LOWER);
 
         if (\is_array($values)) {
             $values = array_values($values);
@@ -162,7 +171,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function has($key)
     {
-        return \array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
+        return \array_key_exists(strtr($key, self::UPPER, self::LOWER), $this->all());
     }
 
     /**
@@ -185,7 +194,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function remove($key)
     {
-        $key = str_replace('_', '-', strtolower($key));
+        $key = strtr($key, self::UPPER, self::LOWER);
 
         unset($this->headers[$key]);
 
@@ -209,8 +218,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return $default;
         }
 
-        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
-            throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
+        if (false === $date = \DateTime::createFromFormat(\DATE_RFC2822, $value)) {
+            throw new \RuntimeException(sprintf('The "%s" HTTP header is not parseable (%s).', $key, $value));
         }
 
         return $date;

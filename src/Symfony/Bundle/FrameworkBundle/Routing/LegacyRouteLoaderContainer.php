@@ -36,7 +36,7 @@ class LegacyRouteLoaderContainer implements ContainerInterface
             return $this->serviceLocator->get($id);
         }
 
-        @trigger_error(sprintf('Registering the service route loader "%s" without tagging it with the "routing.route_loader" tag is deprecated since Symfony 4.4 and will be required in Symfony 5.0.', $id), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Registering the service route loader "%s" without tagging it with the "routing.route_loader" tag is deprecated since Symfony 4.4 and will be required in Symfony 5.0.', $id), \E_USER_DEPRECATED);
 
         return $this->container->get($id);
     }

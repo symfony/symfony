@@ -22,7 +22,7 @@ final class SessionBagProxy implements SessionBagInterface
     private $data;
     private $usageIndex;
 
-    public function __construct(SessionBagInterface $bag, array &$data, &$usageIndex)
+    public function __construct(SessionBagInterface $bag, array &$data, ?int &$usageIndex)
     {
         $this->bag = $bag;
         $this->data = &$data;

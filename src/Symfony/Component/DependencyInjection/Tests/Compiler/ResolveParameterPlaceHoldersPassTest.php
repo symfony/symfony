@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class ResolveParameterPlaceHoldersPassTest extends TestCase
 {
@@ -71,7 +72,32 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
     }
 
-    private function createContainerBuilder()
+    public function testParameterNotFoundExceptionsIsThrown()
+    {
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('The service "baz_service_id" has a dependency on a non-existent parameter "non_existent_param".');
+
+        $containerBuilder = new ContainerBuilder();
+        $definition = $containerBuilder->register('baz_service_id');
+        $definition->setArgument(0, '%non_existent_param%');
+
+        $pass = new ResolveParameterPlaceHoldersPass();
+        $pass->process($containerBuilder);
+    }
+
+    public function testParameterNotFoundExceptionsIsNotThrown()
+    {
+        $containerBuilder = new ContainerBuilder();
+        $definition = $containerBuilder->register('baz_service_id');
+        $definition->setArgument(0, '%non_existent_param%');
+
+        $pass = new ResolveParameterPlaceHoldersPass(true, false);
+        $pass->process($containerBuilder);
+
+        $this->assertCount(1, $definition->getErrors());
+    }
+
+    private function createContainerBuilder(): ContainerBuilder
     {
         $containerBuilder = new ContainerBuilder();
 

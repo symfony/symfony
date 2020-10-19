@@ -146,6 +146,16 @@ class XmlDumperTest extends TestCase
   </services>
 </container>
 ", include $fixturesPath.'/containers/container16.php'],
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"decorator\" decorates=\"decorated\" decoration-on-invalid=\"null\" decoration-inner-name=\"decorated.inner\" decoration-priority=\"1\"/>
+    <service id=\"Psr\Container\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
+    <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container34.php'],
         ];
     }
 
@@ -204,7 +214,7 @@ class XmlDumperTest extends TestCase
 
     public function testTaggedArguments()
     {
-        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar');
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');
         $container = new ContainerBuilder();
         $container->register('foo', 'Foo')->addTag('foo_tag');
         $container->register('foo_tagged_iterator', 'Bar')

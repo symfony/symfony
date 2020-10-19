@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 /**
@@ -47,6 +48,19 @@ class InMemoryTransportTest extends TestCase
         $this->transport->ack($envelope1);
         $this->assertSame([$envelope2], $this->transport->get());
         $this->transport->reject($envelope2);
+        $this->assertSame([], $this->transport->get());
+    }
+
+    public function testAcknowledgeSameMessageWithDifferentStamps()
+    {
+        $envelope1 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
+        $this->transport->send($envelope1);
+        $envelope2 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
+        $this->transport->send($envelope2);
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get());
+        $this->transport->ack($envelope1->with(new AnEnvelopeStamp()));
+        $this->assertSame([$envelope2], $this->transport->get());
+        $this->transport->reject($envelope2->with(new AnEnvelopeStamp()));
         $this->assertSame([], $this->transport->get());
     }
 

@@ -13,7 +13,9 @@ namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -45,10 +47,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($choices, $callback) {
-                return array_map($callback, $choices);
+                return new ArrayChoiceList(array_map($callback, $choices));
             });
 
-        $this->assertSame(['value'], $this->factory->createListFromChoices($choices, 'property'));
+        $this->assertSame(['value' => 'value'], $this->factory->createListFromChoices($choices, 'property')->getChoices());
     }
 
     public function testCreateFromChoicesPropertyPathInstance()
@@ -59,10 +61,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($choices, $callback) {
-                return array_map($callback, $choices);
+                return new ArrayChoiceList(array_map($callback, $choices));
             });
 
-        $this->assertSame(['value'], $this->factory->createListFromChoices($choices, new PropertyPath('property')));
+        $this->assertSame(['value' => 'value'], $this->factory->createListFromChoices($choices, new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateFromLoaderPropertyPath()
@@ -73,10 +75,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($loader, $callback) {
-                return $callback((object) ['property' => 'value']);
+                return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
             });
 
-        $this->assertSame('value', $this->factory->createListFromLoader($loader, 'property'));
+        $this->assertSame(['value' => 'value'], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -88,10 +90,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($choices, $callback) {
-                return array_map($callback, $choices);
+                return new ArrayChoiceList(array_map($callback, $choices));
             });
 
-        $this->assertSame([null], $this->factory->createListFromChoices($choices, 'property'));
+        $this->assertSame([null], $this->factory->createListFromChoices($choices, 'property')->getChoices());
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -103,10 +105,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($loader, $callback) {
-                return $callback(null);
+                return new ArrayChoiceList((array) $callback(null));
             });
 
-        $this->assertNull($this->factory->createListFromLoader($loader, 'property'));
+        $this->assertSame([], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
     public function testCreateFromLoaderPropertyPathInstance()
@@ -117,10 +119,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($loader, $callback) {
-                return $callback((object) ['property' => 'value']);
+                return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
             });
 
-        $this->assertSame('value', $this->factory->createListFromLoader($loader, new PropertyPath('property')));
+        $this->assertSame(['value' => 'value'], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPath()
@@ -131,13 +133,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred) {
-                return $preferred((object) ['property' => true]);
+                return new ChoiceListView((array) $preferred((object) ['property' => true]));
             });
 
-        $this->assertTrue($this->factory->createView(
-            $list,
-            'property'
-        ));
+        $this->assertSame([true], $this->factory->createView($list, 'property')->choices);
     }
 
     public function testCreateViewPreferredChoicesAsPropertyPathInstance()
@@ -148,13 +147,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred) {
-                return $preferred((object) ['property' => true]);
+                return new ChoiceListView((array) $preferred((object) ['property' => true]));
             });
 
-        $this->assertTrue($this->factory->createView(
-            $list,
-            new PropertyPath('property')
-        ));
+        $this->assertSame([true], $this->factory->createView($list, 'property')->choices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -166,13 +162,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred) {
-                return $preferred((object) ['category' => null]);
+                return new ChoiceListView((array) $preferred((object) ['category' => null]));
             });
 
-        $this->assertFalse($this->factory->createView(
-            $list,
-            'category.preferred'
-        ));
+        $this->assertSame([false], $this->factory->createView($list, 'category.preferred')->choices);
     }
 
     public function testCreateViewLabelsAsPropertyPath()
@@ -183,14 +176,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label) {
-                return $label((object) ['property' => 'label']);
+                return new ChoiceListView((array) $label((object) ['property' => 'label']));
             });
 
-        $this->assertSame('label', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            'property'
-        ));
+        $this->assertSame(['label'], $this->factory->createView($list, null, 'property')->choices);
     }
 
     public function testCreateViewLabelsAsPropertyPathInstance()
@@ -201,14 +190,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label) {
-                return $label((object) ['property' => 'label']);
+                return new ChoiceListView((array) $label((object) ['property' => 'label']));
             });
 
-        $this->assertSame('label', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            new PropertyPath('property')
-        ));
+        $this->assertSame(['label'], $this->factory->createView($list, null, new PropertyPath('property'))->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPath()
@@ -219,15 +204,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index) {
-                return $index((object) ['property' => 'index']);
+                return new ChoiceListView((array) $index((object) ['property' => 'index']));
             });
 
-        $this->assertSame('index', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            'property'
-        ));
+        $this->assertSame(['index'], $this->factory->createView($list, null, null, 'property')->choices);
     }
 
     public function testCreateViewIndicesAsPropertyPathInstance()
@@ -238,15 +218,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index) {
-                return $index((object) ['property' => 'index']);
+                return new ChoiceListView((array) $index((object) ['property' => 'index']));
             });
 
-        $this->assertSame('index', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            new PropertyPath('property')
-        ));
+        $this->assertSame(['index'], $this->factory->createView($list, null, null, new PropertyPath('property'))->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPath()
@@ -257,16 +232,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) ['property' => 'group']);
+                return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
             });
 
-        $this->assertSame('group', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            null, // index
-            'property'
-        ));
+        $this->assertSame(['group'], $this->factory->createView($list, null, null, null, 'property')->choices);
     }
 
     public function testCreateViewGroupsAsPropertyPathInstance()
@@ -277,16 +246,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) ['property' => 'group']);
+                return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
             });
 
-        $this->assertSame('group', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            null, // index
-            new PropertyPath('property')
-        ));
+        $this->assertSame(['group'], $this->factory->createView($list, null, null, null, new PropertyPath('property'))->choices);
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -298,16 +261,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) ['group' => null]);
+                return new ChoiceListView((array) $groupBy((object) ['group' => null]));
             });
 
-        $this->assertNull($this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            null, // index
-            'group.name'
-        ));
+        $this->assertSame([], $this->factory->createView($list, null, null, null, 'group.name')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPath()
@@ -318,17 +275,10 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return $attr((object) ['property' => 'attr']);
+                return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
             });
 
-        $this->assertSame('attr', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            null, // index
-            null, // groups
-            'property'
-        ));
+        $this->assertSame(['attr'], $this->factory->createView($list, null, null, null, null, 'property')->choices);
     }
 
     public function testCreateViewAttrAsPropertyPathInstance()
@@ -339,16 +289,9 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return $attr((object) ['property' => 'attr']);
+                return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
             });
 
-        $this->assertSame('attr', $this->factory->createView(
-            $list,
-            null, // preferred choices
-            null, // label
-            null, // index
-            null, // groups
-            new PropertyPath('property')
-        ));
+        $this->assertSame(['attr'], $this->factory->createView($list, null, null, null, null, new PropertyPath('property'))->choices);
     }
 }

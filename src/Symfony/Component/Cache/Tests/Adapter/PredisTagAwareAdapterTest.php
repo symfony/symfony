@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
+/**
+ * @group integration
+ */
 class PredisTagAwareAdapterTest extends PredisAdapterTest
 {
     use TagAwareTestTrait;
@@ -25,7 +28,7 @@ class PredisTagAwareAdapterTest extends PredisAdapterTest
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         $this->assertInstanceOf(\Predis\Client::class, self::$redis);
         $adapter = new RedisTagAwareAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime);

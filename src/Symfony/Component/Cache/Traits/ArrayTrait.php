@@ -113,7 +113,7 @@ trait ArrayTrait
         $this->clear();
     }
 
-    private function generateItems(array $keys, float $now, callable $f)
+    private function generateItems(array $keys, float $now, callable $f): iterable
     {
         foreach ($keys as $i => $key) {
             if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] > $now || !$this->deleteItem($key))) {
@@ -146,7 +146,7 @@ trait ArrayTrait
                 $serialized = serialize($value);
             } catch (\Exception $e) {
                 $type = \is_object($value) ? \get_class($value) : \gettype($value);
-                $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
+                $message = sprintf('Failed to save key "{key}" of type %s: ', $type).$e->getMessage();
                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
 
                 return null;

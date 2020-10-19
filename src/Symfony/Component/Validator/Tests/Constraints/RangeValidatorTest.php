@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RangeValidatorTest extends ConstraintValidatorTestCase
@@ -390,6 +391,31 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @dataProvider throwsOnInvalidStringDatesProvider
+     */
+    public function testThrowsOnInvalidStringDates($expectedMessage, $value, $min, $max)
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->validator->validate($value, new Range([
+            'min' => $min,
+            'max' => $max,
+        ]));
+    }
+
+    public function throwsOnInvalidStringDatesProvider(): array
+    {
+        return [
+            ['The min value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'foo', null],
+            ['The min value "foo" could not be converted to a "DateTime" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTime(), 'foo', null],
+            ['The max value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), null, 'foo'],
+            ['The max value "foo" could not be converted to a "DateTime" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTime(), null, 'foo'],
+            ['The min value "bar" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'bar', 'ccc'],
+        ];
+    }
+
     public function testNoViolationOnNullObjectWithPropertyPaths()
     {
         $this->setObject(null);
@@ -726,6 +752,66 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ max_limit_path }}', 'max')
             ->setParameter('{{ min_limit_path }}', 'min')
             ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function provideMessageIfMinAndMaxSet(): array
+    {
+        $notInRangeMessage = (new Range(['min' => '']))->notInRangeMessage;
+
+        return [
+            [
+                [],
+                12,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['notInRangeMessage' => 'not_in_range_message'],
+                12,
+                'not_in_range_message',
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['minMessage' => 'min_message'],
+                0,
+                'min_message',
+                Range::TOO_LOW_ERROR,
+            ],
+            [
+                ['maxMessage' => 'max_message'],
+                0,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['minMessage' => 'min_message'],
+                15,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['maxMessage' => 'max_message'],
+                15,
+                'max_message',
+                Range::TOO_HIGH_ERROR,
+            ],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideMessageIfMinAndMaxSet
+     */
+    public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)
+    {
+        $constraint = new Range(array_merge(['min' => 1, 'max' => 10], $constraintExtraOptions));
+        $this->validator->validate($value, $constraint);
+
+        $this
+            ->buildViolation($expectedMessage)
+            ->setParameters(['{{ min }}' => '1', '{{ max }}' => '10', '{{ value }}' => (string) $value])
+            ->setCode($expectedCode)
             ->assertRaised();
     }
 }

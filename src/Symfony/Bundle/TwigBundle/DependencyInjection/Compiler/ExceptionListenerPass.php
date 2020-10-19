@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Registers the Twig exception listener if Twig is registered as a templating engine.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
 class ExceptionListenerPass implements CompilerPassInterface
 {
@@ -27,14 +29,23 @@ class ExceptionListenerPass implements CompilerPassInterface
             return;
         }
 
-        // register the exception controller only if Twig is enabled and required dependencies do exist
-        if (!class_exists('Symfony\Component\ErrorRenderer\Exception\FlattenException') || !interface_exists('Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
+        // to be removed in 5.0
+        // register the exception listener only if it's currently used, else use the provided by FrameworkBundle
+        if (null === $container->getParameter('twig.exception_listener.controller') && $container->hasDefinition('exception_listener')) {
             $container->removeDefinition('twig.exception_listener');
-        } elseif ($container->hasParameter('templating.engines')) {
+
+            return;
+        }
+
+        if ($container->hasParameter('templating.engines')) {
             $engines = $container->getParameter('templating.engines');
-            if (!\in_array('twig', $engines)) {
-                $container->removeDefinition('twig.exception_listener');
+            if (\in_array('twig', $engines, true)) {
+                $container->removeDefinition('exception_listener');
+
+                return;
             }
         }
+
+        $container->removeDefinition('twig.exception_listener');
     }
 }

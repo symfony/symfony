@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Doctrine\DBAL\Version;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
@@ -30,6 +31,10 @@ class PdoAdapterTest extends AdapterTestCase
             self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
+        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
+
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
         $pool = new PdoAdapter('sqlite:'.self::$dbFile);
@@ -41,7 +46,7 @@ class PdoAdapterTest extends AdapterTestCase
         @unlink(self::$dbFile);
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
@@ -70,5 +75,34 @@ class PdoAdapterTest extends AdapterTestCase
         $newItem = $cache->getItem($item->getKey());
         $this->assertFalse($newItem->isHit());
         $this->assertSame(0, $getCacheItemCount(), 'PDOAdapter must clean up expired items');
+    }
+
+    /**
+     * @dataProvider provideDsn
+     */
+    public function testDsn(string $dsn, string $file = null)
+    {
+        try {
+            $pool = new PdoAdapter($dsn);
+            $pool->createTable();
+
+            $item = $pool->getItem('key');
+            $item->set('value');
+            $this->assertTrue($pool->save($item));
+        } finally {
+            if (null !== $file) {
+                @unlink($file);
+            }
+        }
+    }
+
+    public function provideDsn()
+    {
+        $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        yield ['sqlite://localhost/'.$dbFile.'1', $dbFile.'1'];
+        yield ['sqlite:'.$dbFile.'2', $dbFile.'2'];
+        yield ['sqlite3:///'.$dbFile.'3', $dbFile.'3'];
+        yield ['sqlite://localhost/:memory:'];
+        yield ['sqlite::memory:'];
     }
 }

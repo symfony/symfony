@@ -57,15 +57,8 @@ class Length extends Constraint
 
         parent::__construct($options);
 
-        if (null === $this->allowEmptyString) {
-            $this->allowEmptyString = true;
-            if (null !== $this->min) {
-                @trigger_error(sprintf('Using the "%s" constraint with the "min" option without setting the "allowEmptyString" one is deprecated and defaults to true. In 5.0, it will become optional and default to false.', self::class), E_USER_DEPRECATED);
-            }
-        }
-
         if (null === $this->min && null === $this->max) {
-            throw new MissingOptionsException(sprintf('Either option "min" or "max" must be given for constraint %s', __CLASS__), ['min', 'max']);
+            throw new MissingOptionsException(sprintf('Either option "min" or "max" must be given for constraint "%s".', __CLASS__), ['min', 'max']);
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

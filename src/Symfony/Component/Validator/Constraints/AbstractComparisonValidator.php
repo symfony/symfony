@@ -40,7 +40,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof AbstractComparison) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\AbstractComparison');
+            throw new UnexpectedTypeException($constraint, AbstractComparison::class);
         }
 
         if (null === $value) {
@@ -55,7 +55,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             try {
                 $comparedValue = $this->getPropertyAccessor()->getValue($object, $path);
             } catch (NoSuchPropertyException $e) {
-                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: %s', $path, \get_class($constraint), $e->getMessage()), 0, $e);
+                throw new ConstraintDefinitionException(sprintf('Invalid property path "%s" provided to "%s" constraint: ', $path, \get_class($constraint)).$e->getMessage(), 0, $e);
             }
         } else {
             $comparedValue = $constraint->value;
@@ -65,14 +65,14 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         // This allows to compare with any date/time value supported by
         // the DateTime constructor:
         // https://php.net/datetime.formats
-        if (\is_string($comparedValue)) {
-            if ($value instanceof \DateTimeImmutable) {
-                // If $value is immutable, convert the compared value to a
-                // DateTimeImmutable too
-                $comparedValue = new \DateTimeImmutable($comparedValue);
-            } elseif ($value instanceof \DateTimeInterface) {
-                // Otherwise use DateTime
-                $comparedValue = new \DateTime($comparedValue);
+        if (\is_string($comparedValue) && $value instanceof \DateTimeInterface) {
+            // If $value is immutable, convert the compared value to a DateTimeImmutable too, otherwise use DateTime
+            $dateTimeClass = $value instanceof \DateTimeImmutable ? \DateTimeImmutable::class : \DateTime::class;
+
+            try {
+                $comparedValue = new $dateTimeClass($comparedValue);
+            } catch (\Exception $e) {
+                throw new ConstraintDefinitionException(sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, $dateTimeClass, \get_class($constraint)));
             }
         }
 
@@ -91,7 +91,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         }
     }
 
-    private function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (null === $this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();

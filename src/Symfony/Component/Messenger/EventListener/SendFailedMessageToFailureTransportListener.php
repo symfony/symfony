@@ -11,16 +11,14 @@
 namespace Symfony\Component\Messenger\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Sends a rejected message to a "failure transport".
@@ -29,14 +27,12 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {
-    private $messageBus;
-    private $failureSenderAlias;
+    private $failureSender;
     private $logger;
 
-    public function __construct(MessageBusInterface $messageBus, string $failureSenderAlias, LoggerInterface $logger = null)
+    public function __construct(SenderInterface $failureSender, LoggerInterface $logger = null)
     {
-        $this->messageBus = $messageBus;
-        $this->failureSenderAlias = $failureSenderAlias;
+        $this->failureSender = $failureSender;
         $this->logger = $logger;
     }
 
@@ -53,27 +49,26 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        // remove the received stamp so it's redelivered
         $throwable = $event->getThrowable();
         if ($throwable instanceof HandlerFailedException) {
             $throwable = $throwable->getNestedExceptions()[0];
         }
 
         $flattenedException = class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
-        $envelope = $envelope->withoutAll(ReceivedStamp::class)
-            ->withoutAll(TransportMessageIdStamp::class)
-            ->with(new SentToFailureTransportStamp($event->getReceiverName()))
-            ->with(new DelayStamp(0))
-            ->with(new RedeliveryStamp(0, $this->failureSenderAlias, $throwable->getMessage(), $flattenedException));
+        $envelope = $envelope->with(
+            new SentToFailureTransportStamp($event->getReceiverName()),
+            new DelayStamp(0),
+            new RedeliveryStamp(0, $throwable->getMessage(), $flattenedException)
+        );
 
         if (null !== $this->logger) {
             $this->logger->info('Rejected message {class} will be sent to the failure transport {transport}.', [
                 'class' => \get_class($envelope->getMessage()),
-                'transport' => $this->failureSenderAlias,
+                'transport' => \get_class($this->failureSender),
             ]);
         }
 
-        $this->messageBus->dispatch($envelope);
+        $this->failureSender->send($envelope);
     }
 
     public static function getSubscribedEvents()

@@ -27,10 +27,14 @@ class LengthValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Length) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Length');
+            throw new UnexpectedTypeException($constraint, Length::class);
         }
 
-        if (null === $value || ('' === $value && $constraint->allowEmptyString)) {
+        if (null !== $constraint->min && null === $constraint->allowEmptyString) {
+            @trigger_error(sprintf('Using the "%s" constraint with the "min" option without setting the "allowEmptyString" one is deprecated and defaults to true. In 5.0, it will become optional and default to false.', Length::class), \E_USER_DEPRECATED);
+        }
+
+        if (null === $value || ('' === $value && ($constraint->allowEmptyString ?? true))) {
             return;
         }
 
@@ -44,8 +48,14 @@ class LengthValidator extends ConstraintValidator
             $stringValue = ($constraint->normalizer)($stringValue);
         }
 
-        if (!$invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset)) {
-            $length = mb_strlen($stringValue, $constraint->charset);
+        try {
+            $invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset);
+        } catch (\ValueError $e) {
+            if (!str_starts_with($e->getMessage(), 'mb_check_encoding(): Argument #2 ($encoding) must be a valid encoding')) {
+                throw $e;
+            }
+
+            $invalidCharset = true;
         }
 
         if ($invalidCharset) {
@@ -58,6 +68,8 @@ class LengthValidator extends ConstraintValidator
 
             return;
         }
+
+        $length = mb_strlen($stringValue, $constraint->charset);
 
         if (null !== $constraint->max && $length > $constraint->max) {
             $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)

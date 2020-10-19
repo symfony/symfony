@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Exception;
 
+use Symfony\Component\Mailer\Bridge;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 /**
@@ -18,8 +19,51 @@ use Symfony\Component\Mailer\Transport\Dsn;
  */
 class UnsupportedSchemeException extends LogicException
 {
-    public function __construct(Dsn $dsn, array $supported)
+    private const SCHEME_TO_PACKAGE_MAP = [
+        'gmail' => [
+            'class' => Bridge\Google\Transport\GmailTransportFactory::class,
+            'package' => 'symfony/google-mailer',
+        ],
+        'mailgun' => [
+            'class' => Bridge\Mailgun\Transport\MailgunTransportFactory::class,
+            'package' => 'symfony/mailgun-mailer',
+        ],
+        'postmark' => [
+            'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
+            'package' => 'symfony/postmark-mailer',
+        ],
+        'sendgrid' => [
+            'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,
+            'package' => 'symfony/sendgrid-mailer',
+        ],
+        'ses' => [
+            'class' => Bridge\Amazon\Transport\SesTransportFactory::class,
+            'package' => 'symfony/amazon-mailer',
+        ],
+        'mandrill' => [
+            'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
+            'package' => 'symfony/mailchimp-mailer',
+        ],
+    ];
+
+    public function __construct(Dsn $dsn, string $name = null, array $supported = [])
     {
-        parent::__construct(sprintf('The "%s" scheme is not supported for mailer "%s". Supported schemes are: "%s".', $dsn->getScheme(), $dsn->getHost(), implode('", "', $supported)));
+        $provider = $dsn->getScheme();
+        if (false !== $pos = strpos($provider, '+')) {
+            $provider = substr($provider, 0, $pos);
+        }
+        $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
+        if ($package && !class_exists($package['class'])) {
+            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed; try running "composer require %s".', $provider, $package['package']));
+
+            return;
+        }
+
+        $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
+        if ($name && $supported) {
+            $message .= sprintf('; supported schemes for mailer "%s" are: "%s"', $name, implode('", "', $supported));
+        }
+
+        parent::__construct($message.'.');
     }
 }

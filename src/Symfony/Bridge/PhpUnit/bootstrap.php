@@ -56,7 +56,6 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
         'PHPUnit_Framework_Constraint_TraversableContains',
         'PHPUnit_Framework_Constraint_TraversableContainsOnly',
 
-        'PHPUnit_Framework_Error',
         'PHPUnit_Framework_Error_Deprecated',
         'PHPUnit_Framework_Error_Notice',
         'PHPUnit_Framework_Error_Warning',
@@ -100,6 +99,7 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
     class_alias('PHPUnit_Framework_Constraint_Not', 'PHPUnit\Framework\Constraint\LogicalNot');
     class_alias('PHPUnit_Framework_Constraint_Or', 'PHPUnit\Framework\Constraint\LogicalOr');
     class_alias('PHPUnit_Framework_Constraint_Xor', 'PHPUnit\Framework\Constraint\LogicalXor');
+    class_alias('PHPUnit_Framework_Error', 'PHPUnit\Framework\Error\Error');
 }
 
 // Detect if we need to serialize deprecations to a file.
@@ -115,7 +115,7 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Comman
 }
 
 // Enforce a consistent locale
-setlocale(LC_ALL, 'C');
+setlocale(\LC_ALL, 'C');
 
 if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
     if (method_exists('Doctrine\Common\Annotations\AnnotationRegistry', 'registerUniqueLoader')) {

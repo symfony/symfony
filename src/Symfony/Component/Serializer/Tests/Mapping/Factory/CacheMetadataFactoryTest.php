@@ -63,4 +63,20 @@ class CacheMetadataFactoryTest extends TestCase
 
         $factory->getMetadataFor('Not\Exist');
     }
+
+    public function testAnonymousClass()
+    {
+        $anonymousObject = new class() {
+        };
+
+        $metadata = new ClassMetadata(\get_class($anonymousObject));
+        $decorated = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
+        $decorated
+            ->expects($this->once())
+            ->method('getMetadataFor')
+            ->willReturn($metadata);
+
+        $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
+        $this->assertEquals($metadata, $factory->getMetadataFor($anonymousObject));
+    }
 }

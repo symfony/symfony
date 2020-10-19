@@ -16,20 +16,23 @@ if (true) {
     {
         public function log($level, $message, array $context = [])
         {
-            echo $message, "\n";
+            echo 'LOG: ', $message, "\n";
         }
     }
 }
 
-set_exception_handler(function ($e) { echo 123; throw $e; });
+$_SERVER['NO_COLOR'] = '1';
+set_exception_handler(function ($e) { echo "EHLO\n"; throw $e; });
 ErrorHandler::register()->setDefaultLogger(new TestLogger());
-ini_set('display_errors', 1);
 
 throw new \Exception('foo');
 ?>
 --EXPECTF--
-Uncaught Exception: foo
-123
-Fatal error: Uncaught %s:25
-Stack trace:
-%a
+LOG: Uncaught Exception: foo
+EHLO
+Exception {%S
+  #message: "foo"
+  #code: 0
+  #file: "%s"
+  #line: 25
+}

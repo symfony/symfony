@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Tests\Fixtures\StringableTag;
 
 class CacheItemTest extends TestCase
 {
@@ -31,7 +32,7 @@ class CacheItemTest extends TestCase
         CacheItem::validateKey($key);
     }
 
-    public function provideInvalidKey()
+    public function provideInvalidKey(): array
     {
         return [
             [''],
@@ -61,9 +62,11 @@ class CacheItemTest extends TestCase
 
         $this->assertSame($item, $item->tag('foo'));
         $this->assertSame($item, $item->tag(['bar', 'baz']));
+        $this->assertSame($item, $item->tag(new StringableTag('qux')));
+        $this->assertSame($item, $item->tag([new StringableTag('quux'), new StringableTag('quuux')]));
 
         (\Closure::bind(function () use ($item) {
-            $this->assertSame(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'], $item->newMetadata[CacheItem::METADATA_TAGS]);
+            $this->assertSame(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz', 'qux' => 'qux', 'quux' => 'quux', 'quuux' => 'quuux'], $item->newMetadata[CacheItem::METADATA_TAGS]);
         }, $this, CacheItem::class))();
     }
 

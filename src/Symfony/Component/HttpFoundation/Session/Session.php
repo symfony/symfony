@@ -18,6 +18,11 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(AttributeBag::class);
+class_exists(FlashBag::class);
+class_exists(SessionBagProxy::class);
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Drak <drak@zikula.org>
@@ -136,10 +141,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
         return \count($this->getAttributeBag()->all());
     }
 
-    /**
-     * @internal
-     */
-    public function getUsageIndex(): int
+    public function &getUsageIndex(): int
     {
         return $this->usageIndex;
     }

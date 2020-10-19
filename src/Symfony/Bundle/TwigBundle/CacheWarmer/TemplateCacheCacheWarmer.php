@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
-@trigger_error('The '.TemplateCacheCacheWarmer::class.' class is deprecated since version 4.4 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+@trigger_error('The '.TemplateCacheCacheWarmer::class.' class is deprecated since version 4.4 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;

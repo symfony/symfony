@@ -408,12 +408,10 @@ class RequestTest extends TestCase
 
         $request->setRequestFormat('atom');
         $request->headers->set('Accept', 'application/ld+json');
-        $request->headers->set('Content-Type', 'application/merge-patch+json');
         $this->assertSame('atom', $request->getPreferredFormat());
 
         $request = new Request();
         $request->headers->set('Accept', 'application/xml');
-        $request->headers->set('Content-Type', 'application/json');
         $this->assertSame('xml', $request->getPreferredFormat());
 
         $request = new Request();
@@ -1803,7 +1801,7 @@ class RequestTest extends TestCase
         $property->setValue(false);
     }
 
-    private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)
+    private function getRequestInstanceForClientIpTests(string $remoteAddr, ?string $httpForwardedFor, ?array $trustedProxies): Request
     {
         $request = new Request();
 
@@ -1821,7 +1819,7 @@ class RequestTest extends TestCase
         return $request;
     }
 
-    private function getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies)
+    private function getRequestInstanceForClientIpsForwardedTests(string $remoteAddr, ?string $httpForwarded, ?array $trustedProxies): Request
     {
         $request = new Request();
 
@@ -2323,6 +2321,26 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Port', '');
 
         $this->assertSame(80, $request->getPort());
+    }
+
+    /**
+     * @dataProvider trustedProxiesRemoteAddr
+     */
+    public function testTrustedProxiesRemoteAddr($serverRemoteAddr, $trustedProxies, $result)
+    {
+        $_SERVER['REMOTE_ADDR'] = $serverRemoteAddr;
+        Request::setTrustedProxies($trustedProxies, Request::HEADER_X_FORWARDED_ALL);
+        $this->assertSame($result, Request::getTrustedProxies());
+    }
+
+    public function trustedProxiesRemoteAddr()
+    {
+        return [
+            ['1.1.1.1', ['REMOTE_ADDR'], ['1.1.1.1']],
+            ['1.1.1.1', ['REMOTE_ADDR', '2.2.2.2'], ['1.1.1.1', '2.2.2.2']],
+            [null, ['REMOTE_ADDR'], []],
+            [null, ['REMOTE_ADDR', '2.2.2.2'], ['2.2.2.2']],
+        ];
     }
 }
 

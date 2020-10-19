@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
@@ -85,6 +86,15 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->disableAnnotationMapping());
     }
 
+    public function testSetMappingCache()
+    {
+        $this->assertSame($this->builder, $this->builder->setMappingCache($this->createMock(CacheItemPoolInterface::class)));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Symfony\Component\Validator\ValidatorBuilder::setMetadataCache is deprecated since Symfony 4.4. Use setMappingCache() instead.
+     */
     public function testSetMetadataCache()
     {
         $this->assertSame($this->builder, $this->builder->setMetadataCache(

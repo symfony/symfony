@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Version;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
@@ -31,9 +32,11 @@ class PdoDbalAdapterTest extends AdapterTestCase
             self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
-        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
+        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
+            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
+        }
 
-        $pool = new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
+        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
     }
 
     public static function tearDownAfterClass(): void
@@ -41,7 +44,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
         @unlink(self::$dbFile);
     }
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }

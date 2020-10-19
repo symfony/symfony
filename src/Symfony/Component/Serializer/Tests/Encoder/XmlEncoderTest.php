@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -603,11 +604,11 @@ XML;
 XML;
 
         if ($legacy) {
-            $this->encoder = new XmlEncoder('people', null, [XML_PI_NODE]);
+            $this->encoder = new XmlEncoder('people', null, [\XML_PI_NODE]);
         } else {
             $this->encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'people',
-                XmlEncoder::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+                XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
             ]);
         }
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
@@ -798,6 +799,20 @@ XML;
         $this->assertEquals($expectedXml, $actualXml);
     }
 
+    public function testEncodeXmlWithDomNodeValue()
+    {
+        $expectedXml = <<<'XML'
+<?xml version="1.0"?>
+<response><foo>bar</foo><bar>foo &amp; bar</bar></response>
+
+XML;
+        $document = new \DOMDocument();
+
+        $actualXml = $this->encoder->encode(['foo' => $document->createTextNode('bar'), 'bar' => $document->createTextNode('foo & bar')], 'xml');
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
     public function testEncodeXmlWithDateTimeObjectValue()
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
@@ -814,6 +829,14 @@ XML;
         $actualXml = $xmlEncoder->encode(['foo' => ['@dateTime' => new \DateTime($this->exampleDateTimeString)]], 'xml');
 
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
+    }
+
+    public function testNotEncodableValueExceptionMessageForAResource()
+    {
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
+
+        (new XmlEncoder())->encode(tmpfile(), 'xml');
     }
 
     public function testEncodeComment()
@@ -842,11 +865,11 @@ XML;
     private function doTestEncodeWithoutPi(bool $legacy = false)
     {
         if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_PI_NODE]);
+            $encoder = new XmlEncoder('response', null, [], [\XML_PI_NODE]);
         } else {
             $encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_PI_NODE],
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_PI_NODE],
             ]);
         }
 
@@ -868,11 +891,11 @@ XML;
     private function doTestEncodeWithoutComment(bool $legacy = false)
     {
         if ($legacy) {
-            $encoder = new XmlEncoder('response', null, [], [XML_COMMENT_NODE]);
+            $encoder = new XmlEncoder('response', null, [], [\XML_COMMENT_NODE]);
         } else {
             $encoder = new XmlEncoder([
                 XmlEncoder::ROOT_NODE_NAME => 'response',
-                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [XML_COMMENT_NODE],
+                XmlEncoder::ENCODER_IGNORED_NODE_TYPES => [\XML_COMMENT_NODE],
             ]);
         }
 

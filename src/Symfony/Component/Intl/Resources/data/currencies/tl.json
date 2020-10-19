@@ -1,5 +1,4 @@
 {
-    "Version": "2.1.49.82",
     "Names": {
         "AED": [
             "AED",
@@ -120,6 +119,10 @@
         "CLP": [
             "CLP",
             "Piso ng Chile"
+        ],
+        "CNH": [
+            "CNH",
+            "Chinese Yuan (offshore)"
         ],
         "CNY": [
             "CN¥",

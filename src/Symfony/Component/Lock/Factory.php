@@ -28,7 +28,7 @@ class Factory implements LoggerAwareInterface
 
     private $store;
 
-    public function __construct(StoreInterface $store)
+    public function __construct(PersistingStoreInterface $store)
     {
         $this->store = $store;
 

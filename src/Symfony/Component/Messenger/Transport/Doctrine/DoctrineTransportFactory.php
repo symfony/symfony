@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Doctrine\Common\Persistence\ConnectionRegistry;
+use Doctrine\Persistence\ConnectionRegistry;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -24,8 +25,12 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 {
     private $registry;
 
-    public function __construct(ConnectionRegistry $registry)
+    public function __construct($registry)
     {
+        if (!$registry instanceof RegistryInterface && !$registry instanceof ConnectionRegistry) {
+            throw new \TypeError(sprintf('Expected an instance of "%s" or "%s", but got "%s".', RegistryInterface::class, ConnectionRegistry::class, \is_object($registry) ? \get_class($registry) : \gettype($registry)));
+        }
+
         $this->registry = $registry;
     }
 

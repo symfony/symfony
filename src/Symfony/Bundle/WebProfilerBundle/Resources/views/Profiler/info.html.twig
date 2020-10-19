@@ -4,7 +4,7 @@
     'no_token' : {
         status:  'error',
         title:   (token|default('') == 'latest') ? 'There are no profiles' : 'Token not found',
-        message: (token|default('') == 'latest') ? 'No profiles found in the database.' : 'Token "' ~ token|default('') ~ '" was not found in the database.'
+        message: (token|default('') == 'latest') ? 'No profiles found.' : 'Token "' ~ token|default('') ~ '" not found.'
     }
 } %}
 

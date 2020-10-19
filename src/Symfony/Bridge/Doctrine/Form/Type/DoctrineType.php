@@ -12,9 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -85,13 +84,16 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
      *
+     * @param object $queryBuilder A query builder, type declaration is not present here as there
+     *                             is no common base class for the different implementations
+     *
      * @return array|null Array with important QueryBuilder parts or null if
      *                    they can't be determined
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): ?array
+    public function getQueryBuilderPartsForCachingHash($queryBuilder): ?array
     {
         return null;
     }
@@ -186,7 +188,6 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         };
 
         $emNormalizer = function (Options $options, $em) {
-            /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 if ($em instanceof ObjectManager) {
                     return $em;
@@ -258,7 +259,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
-        $resolver->setAllowedTypes('em', ['null', 'string', 'Doctrine\Common\Persistence\ObjectManager']);
+        $resolver->setAllowedTypes('em', ['null', 'string', ObjectManager::class]);
     }
 
     /**
@@ -281,3 +282,5 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         $this->choiceLoaders = [];
     }
 }
+
+interface_exists(ObjectManager::class);

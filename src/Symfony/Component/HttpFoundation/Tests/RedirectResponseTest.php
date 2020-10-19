@@ -20,23 +20,20 @@ class RedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
 
-        $this->assertEquals(1, preg_match(
-            '#<meta http-equiv="refresh" content="\d+;url=foo\.bar" />#',
-            preg_replace(['/\s+/', '/\'/'], [' ', '"'], $response->getContent())
-        ));
+        $this->assertMatchesRegularExpression('#<meta http-equiv="refresh" content="\d+;url=\'foo\.bar\'" />#', preg_replace('/\s+/', ' ', $response->getContent()));
     }
 
     public function testRedirectResponseConstructorEmptyUrl()
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Cannot redirect to an empty URL.');
-        $response = new RedirectResponse('');
+        new RedirectResponse('');
     }
 
     public function testRedirectResponseConstructorWrongStatusCode()
     {
         $this->expectException('InvalidArgumentException');
-        $response = new RedirectResponse('foo.bar', 404);
+        new RedirectResponse('foo.bar', 404);
     }
 
     public function testGenerateLocationHeader()

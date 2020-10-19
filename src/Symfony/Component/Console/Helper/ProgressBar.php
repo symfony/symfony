@@ -46,7 +46,7 @@ final class ProgressBar
     private $messages = [];
     private $overwrite = true;
     private $terminal;
-    private $firstRun = true;
+    private $previousMessage;
 
     private static $formatters;
     private static $formats;
@@ -256,14 +256,14 @@ final class ProgressBar
         $this->redrawFreq = null !== $freq ? max(1, $freq) : null;
     }
 
-    public function preventRedrawFasterThan(float $intervalInSeconds): void
+    public function minSecondsBetweenRedraws(float $seconds): void
     {
-        $this->minSecondsBetweenRedraws = $intervalInSeconds;
+        $this->minSecondsBetweenRedraws = $seconds;
     }
 
-    public function forceRedrawSlowerThan(float $intervalInSeconds): void
+    public function maxSecondsBetweenRedraws(float $seconds): void
     {
-        $this->maxSecondsBetweenRedraws = $intervalInSeconds;
+        $this->maxSecondsBetweenRedraws = $seconds;
     }
 
     /**
@@ -432,8 +432,14 @@ final class ProgressBar
      */
     private function overwrite(string $message): void
     {
+        if ($this->previousMessage === $message) {
+            return;
+        }
+
+        $originalMessage = $message;
+
         if ($this->overwrite) {
-            if (!$this->firstRun) {
+            if (null !== $this->previousMessage) {
                 if ($this->output instanceof ConsoleSectionOutput) {
                     $lines = floor(Helper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
                     $this->output->clear($lines);
@@ -448,10 +454,10 @@ final class ProgressBar
                 }
             }
         } elseif ($this->step > 0) {
-            $message = PHP_EOL.$message;
+            $message = \PHP_EOL.$message;
         }
 
-        $this->firstRun = false;
+        $this->previousMessage = $originalMessage;
         $this->lastWriteTime = microtime(true);
 
         $this->output->write($message);
@@ -519,7 +525,7 @@ final class ProgressBar
                 return Helper::formatMemory(memory_get_usage(true));
             },
             'current' => function (self $bar) {
-                return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
+                return str_pad($bar->getProgress(), $bar->getStepWidth(), ' ', \STR_PAD_LEFT);
             },
             'max' => function (self $bar) {
                 return $bar->getMaxSteps();

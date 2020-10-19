@@ -143,7 +143,7 @@ class RouterListener implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if (!$this->debug || !($e = $event->getException()) instanceof NotFoundHttpException) {
+        if (!$this->debug || !($e = $event->getThrowable()) instanceof NotFoundHttpException) {
             return;
         }
 
@@ -161,14 +161,14 @@ class RouterListener implements EventSubscriberInterface
         ];
     }
 
-    private function createWelcomeResponse()
+    private function createWelcomeResponse(): Response
     {
         $version = Kernel::VERSION;
-        $baseDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;
+        $projectDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;
         $docVersion = substr(Kernel::VERSION, 0, 3);
 
         ob_start();
-        include __DIR__.'/../Resources/welcome.html.php';
+        include \dirname(__DIR__).'/Resources/welcome.html.php';
 
         return new Response(ob_get_clean(), Response::HTTP_NOT_FOUND);
     }

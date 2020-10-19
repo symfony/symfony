@@ -210,7 +210,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testPerListenerProviderWithRememberMe()
+    public function testPerListenerProviderWithRememberMeAndAnonymous()
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -223,6 +223,7 @@ class SecurityExtensionTest extends TestCase
                 'default' => [
                     'form_login' => ['provider' => 'second'],
                     'remember_me' => ['secret' => 'baz'],
+                    'anonymous' => true,
                 ],
             ],
         ]);
@@ -387,6 +388,30 @@ class SecurityExtensionTest extends TestCase
                 true,
             ],
         ];
+    }
+
+    public function testSwitchUserWithSeveralDefinedProvidersButNoFirewallRootProviderConfigured()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
+
+            'firewalls' => [
+                'foobar' => [
+                    'switch_user' => [
+                        'provider' => 'second',
+                    ],
+                    'anonymous' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
     }
 
     protected function getRawContainer()

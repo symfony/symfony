@@ -27,24 +27,26 @@ final class MailgunTransportFactory extends AbstractTransportFactory
         $user = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
         $region = $dsn->getOption('region');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        if ('api' === $scheme) {
-            return new MailgunApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+        if ('mailgun+api' === $scheme) {
+            return (new MailgunApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('http' === $scheme) {
-            return new MailgunHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger);
+        if ('mailgun+https' === $scheme || 'mailgun' === $scheme) {
+            return (new MailgunHttpTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('smtp' === $scheme || 'smtps' === $scheme) {
+        if ('mailgun+smtp' === $scheme || 'mailgun+smtps' === $scheme) {
             return new MailgunSmtpTransport($user, $password, $region, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'http', 'smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'mailgun', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'mailgun' === $dsn->getHost();
+        return ['mailgun', 'mailgun+api', 'mailgun+https', 'mailgun+smtp', 'mailgun+smtps'];
     }
 }

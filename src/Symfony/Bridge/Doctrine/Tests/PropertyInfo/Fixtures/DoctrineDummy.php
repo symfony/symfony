@@ -74,7 +74,7 @@ class DoctrineDummy
     /**
      * @Column(type="json_array")
      */
-    private $json;
+    private $jsonArray;
 
     /**
      * @Column(type="simple_array")
@@ -112,4 +112,14 @@ class DoctrineDummy
     private $bigint;
 
     public $notMapped;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="dt", indexBy="dt")
+     */
+    protected $indexedByDt;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="customType", indexBy="customType")
+     */
+    private $indexedByCustomType;
 }

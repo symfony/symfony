@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
  */
 class FilesystemAdapterTest extends AdapterTestCase
 {
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new FilesystemAdapter('', $defaultLifetime);
     }
@@ -29,7 +29,7 @@ class FilesystemAdapterTest extends AdapterTestCase
         self::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
 
-    public static function rmdir($dir)
+    public static function rmdir(string $dir)
     {
         if (!file_exists($dir)) {
             return;
@@ -51,7 +51,7 @@ class FilesystemAdapterTest extends AdapterTestCase
         rmdir($dir);
     }
 
-    protected function isPruned(CacheItemPoolInterface $cache, $name)
+    protected function isPruned(CacheItemPoolInterface $cache, string $name): bool
     {
         $getFileMethod = (new \ReflectionObject($cache))->getMethod('getFile');
         $getFileMethod->setAccessible(true);

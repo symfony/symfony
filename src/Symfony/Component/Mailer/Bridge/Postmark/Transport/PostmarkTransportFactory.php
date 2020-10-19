@@ -26,19 +26,22 @@ final class PostmarkTransportFactory extends AbstractTransportFactory
         $scheme = $dsn->getScheme();
         $user = $this->getUser($dsn);
 
-        if ('api' === $scheme) {
-            return new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger);
+        if ('postmark+api' === $scheme) {
+            $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+            $port = $dsn->getPort();
+
+            return (new PostmarkApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('smtp' === $scheme || 'smtps' === $scheme) {
+        if ('postmark+smtp' === $scheme || 'postmark+smtps' === $scheme || 'postmark' === $scheme) {
             return new PostmarkSmtpTransport($user, $this->dispatcher, $this->logger);
         }
 
-        throw new UnsupportedSchemeException($dsn, ['api', 'smtp', 'smtps']);
+        throw new UnsupportedSchemeException($dsn, 'postmark', $this->getSupportedSchemes());
     }
 
-    public function supports(Dsn $dsn): bool
+    protected function getSupportedSchemes(): array
     {
-        return 'postmark' === $dsn->getHost();
+        return ['postmark', 'postmark+api', 'postmark+smtp', 'postmark+smtps'];
     }
 }

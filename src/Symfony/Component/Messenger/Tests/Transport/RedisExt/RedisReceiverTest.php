@@ -54,7 +54,7 @@ class RedisReceiverTest extends TestCase
         $receiver->get();
     }
 
-    private function createRedisEnvelope()
+    private function createRedisEnvelope(): array
     {
         return [
             'id' => 1,

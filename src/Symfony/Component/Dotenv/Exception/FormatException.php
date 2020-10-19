@@ -20,14 +20,14 @@ final class FormatException extends \LogicException implements ExceptionInterfac
 {
     private $context;
 
-    public function __construct(string $message, FormatExceptionContext $context, int $code = 0, \Exception $previous = null)
+    public function __construct(string $message, FormatExceptionContext $context, int $code = 0, \Throwable $previous = null)
     {
         $this->context = $context;
 
         parent::__construct(sprintf("%s in \"%s\" at line %d.\n%s", $message, $context->getPath(), $context->getLineno(), $context->getDetails()), $code, $previous);
     }
 
-    public function getContext()
+    public function getContext(): FormatExceptionContext
     {
         return $this->context;
     }

@@ -2097,7 +2097,7 @@ class FrameworkExtension extends Extension
 
         $container
             ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, -10) // lower priority than TraceableHttpClient
+            ->setDecoratedService($name, null, 10) // higher priority than TraceableHttpClient
             ->setArguments([new Reference($name.'.retryable.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
     }

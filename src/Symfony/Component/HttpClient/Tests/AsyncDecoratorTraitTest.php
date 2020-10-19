@@ -263,4 +263,23 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $content);
     }
+
+    public function testInfoPassToDecorator()
+    {
+        $lastInfo = null;
+        $options = ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$lastInfo) {
+            $lastInfo = $info;
+        }];
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use ($options) {
+            $context->setInfo('foo', 'test');
+            $context->getResponse()->cancel();
+            $context->replaceRequest('GET', 'http://localhost:8057/', $options);
+            $context->passthru();
+        });
+
+        $client->request('GET', 'http://localhost:8057')->getContent();
+        $this->assertArrayHasKey('foo', $lastInfo);
+        $this->assertSame('test', $lastInfo['foo']);
+        $this->assertArrayHasKey('previous_info', $lastInfo);
+    }
 }

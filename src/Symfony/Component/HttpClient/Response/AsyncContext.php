@@ -151,6 +151,12 @@ final class AsyncContext
     public function replaceRequest(string $method, string $url, array $options = []): ResponseInterface
     {
         $this->info['previous_info'][] = $this->response->getInfo();
+        if (null !== $onProgress = $options['on_progress'] ?? null) {
+            $thisInfo = &$this->info;
+            $options['on_progress'] = static function (int $dlNow, int $dlSize, array $info) use (&$thisInfo, $onProgress) {
+                $onProgress($dlNow, $dlSize, $thisInfo + $info);
+            };
+        }
 
         return $this->response = $this->client->request($method, $url, ['buffer' => false] + $options);
     }

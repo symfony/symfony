@@ -66,7 +66,6 @@ class RetryableHttpClient implements HttpClientInterface
                 }
             } catch (TransportExceptionInterface $exception) {
                 // catch TransportExceptionInterface to send it to the strategy
-                $context->setInfo('retry_count', $retryCount);
             }
             if (null !== $exception) {
                 // always retry request that fail to resolve DNS
@@ -91,8 +90,6 @@ class RetryableHttpClient implements HttpClientInterface
                     }
                 }
             } elseif ($chunk->isFirst()) {
-                $context->setInfo('retry_count', $retryCount);
-
                 if (false === $shouldRetry = $this->strategy->shouldRetry($context, null, null)) {
                     $context->passthru();
                     yield $chunk;
@@ -138,6 +135,7 @@ class RetryableHttpClient implements HttpClientInterface
                 'delay' => $delay,
             ]);
 
+            $context->setInfo('retry_count', $retryCount);
             $context->replaceRequest($method, $url, $options);
             $context->pause($delay / 1000);
 

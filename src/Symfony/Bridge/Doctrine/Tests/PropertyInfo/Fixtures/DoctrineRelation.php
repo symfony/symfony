@@ -41,6 +41,11 @@ class DoctrineRelation
     protected $foo;
 
     /**
+     * @ManyToOne(targetEntity="DoctrineDummy")
+     */
+    protected $baz;
+
+    /**
      * @Column(type="datetime")
      */
     private $dt;

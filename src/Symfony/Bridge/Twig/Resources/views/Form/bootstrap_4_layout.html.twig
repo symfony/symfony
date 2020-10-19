@@ -135,7 +135,13 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
+        {% set className = ' form-control' %}
+        {% if type|default('') == 'file' %}
+            {% set className = ' custom-file-input' %}
+        {% elseif type|default('') == 'range' %}
+            {% set className = ' form-control-range' %}
+        {% endif %}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ className)|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}

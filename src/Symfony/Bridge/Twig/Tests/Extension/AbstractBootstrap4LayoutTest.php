@@ -1230,4 +1230,35 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 '
         );
     }
+    
+        public function testRange()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5]]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value="42"]
+    [@min="5"]
+    [@class="my&class form-control-range"]
+'
+        );
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5, 'max' => 57]]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value="42"]
+    [@min="5"]
+    [@max="57"]
+    [@class="my&class form-control-range"]
+'
+        );
+    }
 }

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-18T09:37:49Z
+
+Should we document it in https://github.com/symfony/symfony/blob/8f12f968f53e978d98333e5198a83b3d6f374e05/src/Symfony/Component/Messenger/Bridge/Amqp/Transport/Connection.php#L122?
+
+---------------------------------------------------------------------------
+
+by W0rma at 2020-10-18T11:04:52Z
+
+> Should we document it in https://github.com/symfony/symfony/blob/8f12f968f53e978d98333e5198a83b3d6f374e05/src/Symfony/Component>
+
+@chalasr Makes sense - thank you for the hint. Done.

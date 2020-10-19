@@ -27,19 +27,27 @@ class Connection
 {
     private const DEFAULT_OPTIONS = [
         // PubSub client
-        'apiEndpoint'    => null,
-        'projectId'      => null,
-        'keyFile'        => null,
-        'keyFilePath'    => null,
+        'apiEndpoint' => null,
+        'projectId' => null,
+        'keyFile' => null,
+        'keyFilePath' => null,
         'requestTimeout' => null,
-        'retries'        => 3,
-        'scopes'         => null,
-        'quotaProject'   => null,
+        'retries' => 3,
+        'scopes' => null,
+        'quotaProject' => null,
+
+        // PubSub topic
+        'topic' => [
+            'name' => null
+        ],
+
+        // PubSub subscription
+        'subscription' => [
+            'name' => null
+        ],
 
         // Internal
-        'auto_setup'     => true,
-        'topic'          => null,
-        'subscription'   => null,
+        'auto_setup' => true,
     ];
 
     private $configuration;
@@ -48,7 +56,7 @@ class Connection
     public function __construct(array $configuration, PubSubClient $client = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
-        $this->client        = $client ?? new PubSubClient([]);
+        $this->client = $client ?? new PubSubClient([]);
     }
 
     /**
@@ -64,8 +72,8 @@ class Connection
      * * retries: Number of retries for a failed request. (Default: `3`)
      * * scopes: Scopes to be used for the request
      * * quotaProject: Specifies a user project to bill for access charges associated with the request
-     * * topic: The name of the topic (when messages should be published)
-     * * subscription: The name of the subscription (when messages should be received)
+     * * topic: The options for the topic to publish messages to
+     * * subscription: The options of the subscription to receive messages from
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      */
     public static function fromDsn(string $dsn, array $options = []): self
@@ -93,16 +101,16 @@ class Connection
 
         $options       = $query + $options + self::DEFAULT_OPTIONS;
         $configuration = [
-            'topic'        => $options['topic'],
+            'topic' => $options['topic'],
             'subscription' => $options['subscription'],
-            'auto_setup'   => (bool) $options['auto_setup'],
+            'auto_setup' => (bool) $options['auto_setup'],
         ];
 
         $clientConfiguration = [
-            'projectId'      => ltrim($parsedUrl['path'] ?? '', '/') ?? self::DEFAULT_OPTIONS['projectId'],
+            'projectId' => ltrim($parsedUrl['path'] ?? '', '/') ?? self::DEFAULT_OPTIONS['projectId'],
             'requestTimeout' => $options['requestTimeout'] ?? self::DEFAULT_OPTIONS['requestTimeout'],
-            'retries'        => $options['retries'] ?? self::DEFAULT_OPTIONS['retries'],
-            'quotaProject'   => $options['quotaProject'] ?? self::DEFAULT_OPTIONS['quotaProject'],
+            'retries' => $options['retries'] ?? self::DEFAULT_OPTIONS['retries'],
+            'quotaProject' => $options['quotaProject'] ?? self::DEFAULT_OPTIONS['quotaProject'],
         ];
 
         // Set the service account key
@@ -126,11 +134,12 @@ class Connection
 
     public function setupTopic(): ?Topic
     {
-        if (null === $this->configuration['topic']) {
+        $config = $this->configuration['topic'];
+        if (null === $name = $config['name'] ?? null) {
             return null;
         }
 
-        $topic = $this->client->topic($this->configuration['topic']);
+        $topic = $this->client->topic($name);
         if ($topic->exists()) {
             return $topic;
         }
@@ -140,9 +149,11 @@ class Connection
         }
 
         try {
-            $topic->create();
+            unset($config['name']);
+
+            $topic->create($config);
         } catch (GoogleException $e) {
-            throw new TransportException(sprintf('Failed to create the Google Pub/Sub topic "%s".', $this->configuration['topic']), 0, $e);
+            throw new TransportException(sprintf('Failed to create the Google Pub/Sub topic "%s".', $name), 0, $e);
         }
 
         return $topic;
@@ -150,11 +161,12 @@ class Connection
 
     public function setupSubscription(): ?Subscription
     {
-        if (null === $this->configuration['subscription']) {
+        $config = $this->configuration['subscription'];
+        if (null === $name = $config['name'] ?? null) {
             return null;
         }
 
-        $subscription = $this->client->subscription($this->configuration['subscription']);
+        $subscription = $this->client->subscription($name);
         if ($subscription->exists()) {
             return $subscription;
         }
@@ -164,9 +176,11 @@ class Connection
         }
 
         try {
-            $subscription->create();
+            unset($config['name']);
+
+            $subscription->create($config);
         } catch (GoogleException $e) {
-            throw new TransportException(sprintf('Failed to create the Google Pub/Sub subscription "%s".', $this->configuration['subscription']), 0, $e);
+            throw new TransportException(sprintf('Failed to create the Google Pub/Sub subscription "%s".', $name), 0, $e);
         }
 
         return $subscription;

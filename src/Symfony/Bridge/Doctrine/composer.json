@@ -40,7 +40,7 @@
         "symfony/security-core": "^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/uid": "^5.1",
-        "symfony/validator": "^5.0.2",
+        "symfony/validator": "^5.2",
         "symfony/translation": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
         "doctrine/annotations": "~1.7",
@@ -61,7 +61,7 @@
         "symfony/property-info": "<5",
         "symfony/security-bundle": "<5",
         "symfony/security-core": "<5",
-        "symfony/validator": "<5.0.2"
+        "symfony/validator": "<5.2"
     },
     "suggest": {
         "symfony/form": "",

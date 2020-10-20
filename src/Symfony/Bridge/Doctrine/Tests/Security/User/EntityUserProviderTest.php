@@ -24,13 +24,6 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 class EntityUserProviderTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        if (\PHP_VERSION_ID >= 80000) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-    }
-
     public function testRefreshUserGetsUserByPrimaryKey()
     {
         $em = DoctrineTestHelper::createTestEntityManager();

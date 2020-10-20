@@ -115,7 +115,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 return;
             } catch (\TypeError $e) {
-                self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $propertyPath);
+                self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0, $propertyPath, $e);
                 // It wasn't thrown in this class so rethrow it
                 throw $e;
             }

@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpFoundation\RateLimiter;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\RateLimiter\Limit;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\NoLimiter;
+use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * An implementation of RequestRateLimiterInterface that
@@ -26,23 +26,23 @@ use Symfony\Component\RateLimiter\NoLimiter;
  */
 abstract class AbstractRequestRateLimiter implements RequestRateLimiterInterface
 {
-    public function consume(Request $request): Limit
+    public function consume(Request $request): RateLimit
     {
         $limiters = $this->getLimiters($request);
         if (0 === \count($limiters)) {
             $limiters = [new NoLimiter()];
         }
 
-        $minimalLimit = null;
+        $minimalRateLimit = null;
         foreach ($limiters as $limiter) {
-            $limit = $limiter->consume(1);
+            $rateLimit = $limiter->consume(1);
 
-            if (null === $minimalLimit || $limit->getRemainingTokens() < $minimalLimit->getRemainingTokens()) {
-                $minimalLimit = $limit;
+            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $rateLimit;
             }
         }
 
-        return $minimalLimit;
+        return $minimalRateLimit;
     }
 
     public function reset(Request $request): void

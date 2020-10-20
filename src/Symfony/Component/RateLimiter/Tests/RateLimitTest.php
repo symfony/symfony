@@ -13,25 +13,25 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
-use Symfony\Component\RateLimiter\Limit;
+use Symfony\Component\RateLimiter\RateLimit;
 
-class LimitTest extends TestCase
+class RateLimitTest extends TestCase
 {
     public function testEnsureAcceptedDoesNotThrowExceptionIfAccepted()
     {
-        $limit = new Limit(10, new \DateTimeImmutable(), true);
+        $rateLimit = new RateLimit(10, new \DateTimeImmutable(), true, 10);
 
-        $this->assertSame($limit, $limit->ensureAccepted());
+        $this->assertSame($rateLimit, $rateLimit->ensureAccepted());
     }
 
     public function testEnsureAcceptedThrowsRateLimitExceptionIfNotAccepted()
     {
-        $limit = new Limit(10, $retryAfter = new \DateTimeImmutable(), false);
+        $rateLimit = new RateLimit(10, $retryAfter = new \DateTimeImmutable(), false, 10);
 
         try {
-            $limit->ensureAccepted();
+            $rateLimit->ensureAccepted();
         } catch (RateLimitExceededException $exception) {
-            $this->assertSame($limit, $exception->getLimit());
+            $this->assertSame($rateLimit, $exception->getRateLimit());
             $this->assertSame(10, $exception->getRemainingTokens());
             $this->assertSame($retryAfter, $exception->getRetryAfter());
 

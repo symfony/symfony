@@ -38,18 +38,18 @@ final class CompoundLimiter implements LimiterInterface
         throw new ReserveNotSupportedException(__CLASS__);
     }
 
-    public function consume(int $tokens = 1): Limit
+    public function consume(int $tokens = 1): RateLimit
     {
-        $minimalLimit = null;
+        $minimalRateLimit = null;
         foreach ($this->limiters as $limiter) {
-            $limit = $limiter->consume($tokens);
+            $rateLimit = $limiter->consume($tokens);
 
-            if (null === $minimalLimit || $limit->getRemainingTokens() < $minimalLimit->getRemainingTokens()) {
-                $minimalLimit = $limit;
+            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
+                $minimalRateLimit = $rateLimit;
             }
         }
 
-        return $minimalLimit;
+        return $minimalRateLimit;
     }
 
     public function reset(): void

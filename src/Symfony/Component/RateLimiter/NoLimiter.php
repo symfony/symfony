@@ -25,12 +25,12 @@ final class NoLimiter implements LimiterInterface
 {
     public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
     {
-        return new Reservation(time(), new Limit(\INF, new \DateTimeImmutable(), true));
+        return new Reservation(time(), new RateLimit(\INF, new \DateTimeImmutable(), true, \INF));
     }
 
-    public function consume(int $tokens = 1): Limit
+    public function consume(int $tokens = 1): RateLimit
     {
-        return new Limit(\INF, new \DateTimeImmutable(), true);
+        return new RateLimit(\INF, new \DateTimeImmutable(), true, \INF);
     }
 
     public function reset(): void

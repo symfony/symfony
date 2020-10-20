@@ -43,7 +43,7 @@ interface LimiterInterface
      *
      * @param int $tokens the number of tokens required
      */
-    public function consume(int $tokens = 1): Limit;
+    public function consume(int $tokens = 1): RateLimit;
 
     /**
      * Resets the limit.

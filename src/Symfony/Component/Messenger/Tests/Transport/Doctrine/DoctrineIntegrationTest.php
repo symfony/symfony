@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -30,13 +29,6 @@ class DoctrineIntegrationTest extends TestCase
     private $connection;
     /** @var string */
     private $sqliteFile;
-
-    public static function setUpBeforeClass(): void
-    {
-        if (\PHP_VERSION_ID >= 80000 && class_exists(Version::class)) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-    }
 
     protected function setUp(): void
     {

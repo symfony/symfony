@@ -114,8 +114,8 @@ jobs:
                 run: |
                     ([ -d ~/.composer ] || mkdir ~/.composer) && cp .github/composer-config.json ~/.composer/config.json
                     SYMFONY_VERSION=$(cat composer.json | grep '^ *\"branch-version\". *\"[1-9]' | grep -o '[0-9.]*')
-                    echo "::set-env name=SYMFONY_VERSION::$SYMFONY_VERSION"
-                    echo "::set-env name=COMPOSER_ROOT_VERSION::$SYMFONY_VERSION.x-dev"
+                    echo "SYMFONY_VERSION=$SYMFONY_VERSION" >> $GITHUB_ENV
+                    echo "COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory
                 id: composer-cache

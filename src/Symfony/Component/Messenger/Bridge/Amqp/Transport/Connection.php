@@ -37,6 +37,7 @@ class Connection
         'port',
         'vhost',
         'user',
+        'login',
         'password',
         'queues',
         'exchange',
@@ -124,7 +125,7 @@ class Connection
      *   * host: Hostname of the AMQP service
      *   * port: Port of the AMQP service
      *   * vhost: Virtual Host to use with the AMQP service
-     *   * user: Username to use to connect the AMQP service
+     *   * user|login: Username to use to connect the AMQP service
      *   * password: Password to use to connect to the AMQP service
      *   * read_timeout: Timeout in for income activity. Note: 0 or greater seconds. May be fractional.
      *   * write_timeout: Timeout in for outcome activity. Note: 0 or greater seconds. May be fractional.

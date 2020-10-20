@@ -114,6 +114,26 @@
                 <source>Please provide a valid phone number.</source>
                 <target>Please provide a valid phone number.</target>
             </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>The checkbox has an invalid value.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Please enter a valid email address.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Please select a valid option.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Please select a valid range.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Please enter a valid week.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

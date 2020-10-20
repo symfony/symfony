@@ -107,6 +107,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
+use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -2225,6 +2226,7 @@ class FrameworkExtension extends Extension
             EsendexTransportFactory::class => 'notifier.transport_factory.esendex',
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
+            LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
         ];
 
         foreach ($classToServices as $class => $service) {

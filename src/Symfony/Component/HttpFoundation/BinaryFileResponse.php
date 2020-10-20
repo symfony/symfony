@@ -231,33 +231,36 @@ class BinaryFileResponse extends Response
                 $this->headers->set($type, $path);
                 $this->maxlen = 0;
             }
-        } elseif ($request->headers->has('Range')) {
+        } elseif ($request->headers->has('Range') && $request->isMethod('GET')) {
             // Process the range headers.
             if (!$request->headers->has('If-Range') || $this->hasValidIfRangeHeader($request->headers->get('If-Range'))) {
                 $range = $request->headers->get('Range');
 
-                list($start, $end) = explode('-', substr($range, 6), 2) + [0];
+                if (0 === strpos($range, 'bytes=')) {
+                    list($start, $end) = explode('-', substr($range, 6), 2) + [0];
 
-                $end = ('' === $end) ? $fileSize - 1 : (int) $end;
+                    $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 
-                if ('' === $start) {
-                    $start = $fileSize - $end;
-                    $end = $fileSize - 1;
-                } else {
-                    $start = (int) $start;
-                }
+                    if ('' === $start) {
+                        $start = $fileSize - $end;
+                        $end = $fileSize - 1;
+                    } else {
+                        $start = (int) $start;
+                    }
 
-                if ($start <= $end) {
-                    if ($start < 0 || $end > $fileSize - 1) {
-                        $this->setStatusCode(416);
-                        $this->headers->set('Content-Range', sprintf('bytes */%s', $fileSize));
-                    } elseif (0 !== $start || $end !== $fileSize - 1) {
-                        $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
-                        $this->offset = $start;
+                    if ($start <= $end) {
+                        $end = min($end, $fileSize - 1);
+                        if ($start < 0 || $start > $end) {
+                            $this->setStatusCode(416);
+                            $this->headers->set('Content-Range', sprintf('bytes */%s', $fileSize));
+                        } elseif ($end - $start < $fileSize - 1) {
+                            $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
+                            $this->offset = $start;
 
-                        $this->setStatusCode(206);
-                        $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
-                        $this->headers->set('Content-Length', $end - $start + 1);
+                            $this->setStatusCode(206);
+                            $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
+                            $this->headers->set('Content-Length', $end - $start + 1);
+                        }
                     }
                 }
             }

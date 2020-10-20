@@ -1500,7 +1500,7 @@ abstract class FrameworkExtensionTest extends TestCase
         }
         $container = $this->createContainerFromFile('http_client_retry');
 
-        $this->assertSame([429, 500], $container->getDefinition('http_client.retry_strategy')->getArgument(0));
+        $this->assertSame([429, 500 => ['GET', 'HEAD']], $container->getDefinition('http_client.retry_strategy')->getArgument(0));
         $this->assertSame(100, $container->getDefinition('http_client.retry_strategy')->getArgument(1));
         $this->assertSame(2, $container->getDefinition('http_client.retry_strategy')->getArgument(2));
         $this->assertSame(0, $container->getDefinition('http_client.retry_strategy')->getArgument(3));

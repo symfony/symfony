@@ -12,25 +12,47 @@
 namespace Symfony\Component\HttpClient\Tests\Retry;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class GenericRetryStrategyTest extends TestCase
 {
-    public function testShouldRetryStatusCode()
+    /**
+     * @dataProvider provideRetryable
+     */
+    public function testShouldRetry(string $method, int $code, ?TransportExceptionInterface $exception)
     {
-        $strategy = new GenericRetryStrategy([500]);
+        $strategy = new GenericRetryStrategy();
 
-        self::assertTrue($strategy->shouldRetry($this->getContext(0, 'GET', 'http://example.com/', 500), null, null));
+        self::assertTrue($strategy->shouldRetry($this->getContext(0, $method, 'http://example.com/', $code), null, $exception));
     }
 
-    public function testIsNotRetryableOk()
+    /**
+     * @dataProvider provideNotRetryable
+     */
+    public function testShouldNotRetry(string $method, int $code, ?TransportExceptionInterface $exception)
     {
-        $strategy = new GenericRetryStrategy([500]);
+        $strategy = new GenericRetryStrategy();
 
-        self::assertFalse($strategy->shouldRetry($this->getContext(0, 'GET', 'http://example.com/', 200), null, null));
+        self::assertFalse($strategy->shouldRetry($this->getContext(0, $method, 'http://example.com/', $code), null, $exception));
+    }
+
+    public function provideRetryable(): iterable
+    {
+        yield ['GET', 200, new TransportException()];
+        yield ['GET', 500, null];
+        yield ['POST', 429, null];
+    }
+
+    public function provideNotRetryable(): iterable
+    {
+        yield ['POST', 200, null];
+        yield ['POST', 200, new TransportException()];
+        yield ['POST', 500, null];
     }
 
     /**

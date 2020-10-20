@@ -64,6 +64,7 @@ use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -2074,8 +2075,17 @@ class FrameworkExtension extends Extension
             $retryStrategy = new Reference($options['retry_strategy']);
         } else {
             $retryStrategy = new ChildDefinition('http_client.abstract_retry_strategy');
+            $codes = [];
+            foreach ($options['http_codes'] as $code => $codeOptions) {
+                if ($codeOptions['methods']) {
+                    $codes[$code] = $codeOptions['methods'];
+                } else {
+                    $codes[] = $code;
+                }
+            }
+
             $retryStrategy
-                ->replaceArgument(0, $options['http_codes'])
+                ->replaceArgument(0, $codes ?: GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES)
                 ->replaceArgument(1, $options['delay'])
                 ->replaceArgument(2, $options['multiplier'])
                 ->replaceArgument(3, $options['max_delay'])

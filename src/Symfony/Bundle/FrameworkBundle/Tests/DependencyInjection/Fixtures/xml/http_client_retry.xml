@@ -14,8 +14,11 @@
                         max-retries="2"
                         multiplier="2"
                         jitter="0.3">
-                    <framework:http-code>429</framework:http-code>
-                    <framework:http-code>500</framework:http-code>
+                    <framework:http-code code="429"/>
+                    <framework:http-code code="500">
+                        <framework:method>GET</framework:method>
+                        <framework:method>HEAD</framework:method>
+                    </framework:http-code>
                 </framework:retry-failed>
             </framework:default-options>
             <framework:scoped-client name="foo" base-uri="http://example.com">

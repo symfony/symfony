@@ -578,7 +578,7 @@
 
     <xsd:complexType name="http_client_retry_failed">
         <xsd:sequence>
-            <xsd:element name="http-code" type="xsd:integer" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="http-code" type="http_client_retry_code" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="retry-strategy" type="xsd:string" />
@@ -588,6 +588,13 @@
         <xsd:attribute name="max-delay" type="xsd:float" />
         <xsd:attribute name="jitter" type="xsd:float" />
         <xsd:attribute name="response_header" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="http_client_retry_code">
+        <xsd:sequence>
+            <xsd:element name="method" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="code" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="http_query" mixed="true">

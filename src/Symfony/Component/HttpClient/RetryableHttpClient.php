@@ -68,44 +68,63 @@ class RetryableHttpClient implements HttpClientInterface
                 // catch TransportExceptionInterface to send it to the strategy
                 $context->setInfo('retry_count', $retryCount);
             }
-
-            if (null === $exception) {
-                if ($chunk->isFirst()) {
-                    $context->setInfo('retry_count', $retryCount);
-
-                    if (false === $shouldRetry = $this->strategy->shouldRetry($context, null, null)) {
-                        $context->passthru();
-                        yield $chunk;
-
-                        return;
-                    }
-
-                    // Body is needed to decide
+            if (null !== $exception) {
+                // always retry request that fail to resolve DNS
+                if ('' !== $context->getInfo('primary_ip')) {
+                    $shouldRetry = $this->strategy->shouldRetry($context, null, $exception);
                     if (null === $shouldRetry) {
-                        $firstChunk = $chunk;
-                        $content = '';
-
-                        return;
-                    }
-                } else {
-                    $content .= $chunk->getContent();
-
-                    if (!$chunk->isLast()) {
-                        return;
-                    }
-
-                    if (null === $shouldRetry = $this->strategy->shouldRetry($context, $content, null)) {
-                        throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with a body.', \get_class($this->strategy)));
+                        throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with an exception.', \get_class($this->decider)));
                     }
 
                     if (false === $shouldRetry) {
                         $context->passthru();
-                        yield $firstChunk;
-                        yield $context->createChunk($content);
+                        if (null !== $firstChunk) {
+                            yield $firstChunk;
+                            yield $context->createChunk($content);
+                            yield $chunk;
+                        } else {
+                            yield $chunk;
+                        }
                         $content = '';
 
                         return;
                     }
+                }
+            } elseif ($chunk->isFirst()) {
+                $context->setInfo('retry_count', $retryCount);
+
+                if (false === $shouldRetry = $this->strategy->shouldRetry($context, null, null)) {
+                    $context->passthru();
+                    yield $chunk;
+
+                    return;
+                }
+
+                // Body is needed to decide
+                if (null === $shouldRetry) {
+                    $firstChunk = $chunk;
+                    $content = '';
+
+                    return;
+                }
+            } else {
+                $content .= $chunk->getContent();
+
+                if (!$chunk->isLast()) {
+                    return;
+                }
+
+                if (null === $shouldRetry = $this->strategy->shouldRetry($context, $content, null)) {
+                    throw new \LogicException(sprintf('The "%s::shouldRetry()" method must not return null when called with a body.', \get_class($this->strategy)));
+                }
+
+                if (false === $shouldRetry) {
+                    $context->passthru();
+                    yield $firstChunk;
+                    yield $context->createChunk($content);
+                    $content = '';
+
+                    return;
                 }
             }
 

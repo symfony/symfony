@@ -169,6 +169,14 @@ class CurlHttpClientTest extends HttpClientTestCase
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
+            if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
+                $this->markTestSkipped('vulcain binary is missing');
+            }
+
+            if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
+                $this->markTestSkipped('vulcain binary is not executable');
+            }
+
             throw new ProcessFailedException($process);
         }
 

@@ -1,0 +1,209 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-16T17:02:47Z
+
+I've looked in the RateLimiter implementations of other languages (Golang, Java, Python, Rust and C#) and I couldn't find an equivalent object. (Golang has a `Reservation`, but it's not for the same purpose). So ... maybe we don't need neither `Limit` nor `Quota` and we could embed this login into the limiter object itself?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-16T17:07:08Z
+
+@javiereguiluz I asked the same question to @wouterj and he gave a nice answer already, check https://github.com/symfony/symfony/pull/38257#issuecomment-700684270
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-16T17:15:50Z
+
+This information is the last missing information from the [rate limiting RFC](https://tools.ietf.org/html/draft-polli-ratelimit-headers-00#section-1.3):
+
+> This proposal defines syntax and semantics for the following header fields:
+>
+>   o  "RateLimit-Limit": containing the requests quota in the time window;
+>   o  "RateLimit-Remaining": containing the remaining requests quota in the current window;
+>   o  "RateLimit-Reset": containing the time remaining in the current window, specified in seconds or as a timestamp;
+
+The limit value is the only value from these 3 that is based on configuration and not current limiter state. However, as the other information is exposed by the `Limit`/`Quota` object, I think it makes most sense to expose the limit value also through this object.
+
+As mentioned in the issue, reference API rate limiters implement this RFC completely as well. See e.g. [Laravel](https://github.com/laravel/framework/blob/68725a1a4d0be5afa04489fc1a1b1e678861a180/src/Illuminate/Routing/Middleware/ThrottleRequests.php#L241-L263) and [GitHub](https://developer.github.com/v3/#rate-limiting).
+
+So I agree that we, as Symfony, should also have a DX-friendly way of exposing all information required to implement that RFC in your application.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-16T17:26:22Z
+
+@wouterj I agree that the Limiter object must provide a way to get these three HTTP headers in a trivial way ... but I don't understand why can't we provide that in the Limiter object itself.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-16T17:30:55Z
+
+I tried to answer that one in the commented referenced by @nicolas-grekas https://github.com/symfony/symfony/pull/38257#issuecomment-700684270
+
+Besides that comment, there is a fourth reason now: For compound limiters, the headers/returned state is of the limiter that is closest to reach its limit. If this information is fetched using getters, each getter on the compound limiter has to know which limiter is the closest to reach its limit.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-16T17:36:54Z
+
+Understood. We need this object.
+
+Reading the RFC (https://tools.ietf.org/id/draft-polli-ratelimit-headers-00.html) I wonder if this object should be called `Policy` instead of `Quota`. Maybe not ... and maybe it's because I'm not native in English, but `Quota` doesn't feel entirely right to me.
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-10-16T18:01:34Z
+
+When developing a [personal POC rate limiting library](https://github.com/zenstruck/governator), I spent an inordinate amount of time agonizing over the terminology. "Quota" was the best term I could think of the describe the current "state" of the rate limiter. That being said, I'm not 100% sold on Quota either... but had to move on... :)
+
+I don't think Policy makes sense, because the "Policy" is a property of this "state" (although we don't include this currently).
+
+*Edit: re-reading the RFC, I do see the argument for calling this Policy. Some parts of the RFC are confusing and a lot of terms are used interchangeably. To me, a "Policy" is a static thing like "fixed window, 5/requests/minute" and shouldn't include dynamic info like remaining requests and reset at time.*
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-16T18:22:17Z
+
+After your comment, I re-read the RFC and now I think that:
+
+* We use "strategy" to refer to "fixed window", "token bucket", "sliding window", etc. But this might be renamed as "policy"
+* Instead of `Limit` or `Quota`, the status object may be called `QuotaPolicy`:
+
+```
+To help clients throttling their requests, servers may expose the counters used to evaluate quota policies via HTTP header fields.
+
+[...]
+
+A server MAY use one or more RateLimit response header fields defined in this document to communicate its quota policies.
+
+The returned values refers to the metrics used to evaluate if the current request respects the quota policy and MAY not apply to subsequent requests.
+
+Example: a successful response with the following header fields
+
+RateLimit-Limit: 10
+RateLimit-Remaining: 1
+RateLimit-Reset: 7
+```
+
+And the other "quota policy" examples also expose the entire state:
+
+```
+RateLimit-Limit: 10, 10;window=1, 50;window=60, 1000;window=3600, 5000;window=86400
+RateLimit-Limit: 10, 10;window=1;burst=1000, 1000;window=3600
+```
+
+---------------------------------------------------------------------------
+
+by Mediagone at 2020-10-16T18:49:47Z
+
+At Google, they are using "quota" for API calls : https://developers.google.com/analytics/devguides/config/mgmt/v3/limits-quotas
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-17T10:43:15Z
+
+@Mediagone yes, but when they refer to "how much you can use". We agree that's called "quota".
+
+But the "status object" we're discussing in this PR is about "how much usage is left". In the RFC it looks like they call this "QuotaPolicy".
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2020-10-17T11:55:12Z
+
+Just on a semantic basis, if it's a RateLimiter then it is applying a Limit to the Rate, so I don't see any problem with that naming
+
+If Limit::getLimit seems redundant then maybe call it Limit::asInt or similar to reflect what it's really doing (converting a value object to a scalar)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-17T12:14:58Z
+
+The `Limit` object at this moment holds some data:
+
+* `getLimit()`: The actual limit for the current window (e.g. `25`, if the limit is 25 per minute or the like)
+* `getRemainingTokens()`: the quota left in the current window (called "remaining quota" by the RFC)
+* `getRetryAfter()`: the moment the window resets/the client should try to call again
+
+In the RFC, they use:
+
+* "policy" to define the strategy (e.g. "fixed window", "token bucket", "sliding window", etc): `policy="leaky bucket"`
+* "request quota" to define the limit for the window/bucket: `request-quota=4`
+* "quota policy" to define the combination of "policy" and "request quota": `100;window=60` ("An example policy of 100 quota-units per minute")
+
+So imho, "quota policy" is a static configured thing and not a "current state". This object in Symfony holds the data for all 3 headers defined in the RFC and the RFC doesn't define a word for this.
+
+I think we should call it something like `Quota`, `QuotaState`, `LimiterQuotas` (as it holds all sorts of quotas, the quota policy, the request quota, the remaining quota, etc), `LimiterState`, etc
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-10-17T12:19:04Z
+
+What about ?
+
+- `QuotaStatus`
+- `Status`
+- `QuotaUsage`
+- `Usage`
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-10-17T12:25:08Z
+
+For English speakers: which are the words that usually go with "quota"? Used? Consumed? Remaining? Left? If that's the case, we could use e.g. RemainingQuota
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2020-10-17T12:27:42Z
+
+@javiereguiluz Remaining sounds best to me
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-10-17T12:39:47Z
+
+My issue with Remaining, is that is just one "property" of this object.
+
+Maybe we should drop this new "Quota" term and stick with the current component terminology and use `LimiterState` as @wouterj suggests above?
+
+---------------------------------------------------------------------------
+
+by craigh at 2020-10-18T12:02:10Z
+
+> For English speakers: which are the words that usually go with "quota"? Used? Consumed? Remaining? Left? If that's the case, we could use e.g. RemainingQuota
+
+A quota is typically a quota _of something_ (a quota of candy), but to my knowledge has no directly associated verbs. You might say you have 4 pieces of candy _remaining_ in your quota.
+
+A quota is assigned to someone to indicate an allotted amount that one is _indicated to receive_, or more importantly, _required to contribute_. It can also be used as a _minimum_ amount one is to receive. It also has some very minor political overtones. In this light, I find Quota an odd choice and make these suggestions:
+
+ 1. Allotment (noun), Allot , Allotted
+ 2. Allocation (noun), Allocate, Allocated
+ 3. Hit (noun), (hit is also a verb) so maybe MaximumHits (Hit seems like a logical extension of RateLimiter because you are limiting Hits)
+
+So far, I like Allocation the best because it has some parallels with CPU memory allocation or resource allocation in CS (at least I think it does, my degree is not in CS!) I would guess this is where the _Reservation_ you mentioned above comes from as well.
+
+_After re-reading this post again (20+ minutes later) and reading my answer, I think I prefer "Limit" and "Remaining" best._
+
+---------------------------------------------------------------------------
+
+by bytesystems at 2020-10-19T11:36:00Z
+
+Neither status nor state fit. Status is a final result of an action -> 404, state on the other hand describes a stage in a process.
+I'd just go with
+**CurrentLimit**
+because it returns the actual available limit at any time. It does not have to be aware of Quota, Policy or QuotaPolicy.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-19T12:58:37Z
+
+Thanks for the insights and perspectives from the native english speakers!
+
+Let's go with `RateLimit`. That fits the current component terminology and @kbond pointed out in a Slack conversation that this also closely resembles the HTTP headers (`RateLimit-Limit` -> `$rateLimit->getLimit()`).
+
+Let's not forget that it's very easy to rename a class later on (even the BC layer is very solid when renaming classes). So let's not block this PR any longer. If someone dislikes the new term, please consider opening a new PR afterwards :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2020-10-19T13:29:21Z
+
+Ok, I think this PR is ready.

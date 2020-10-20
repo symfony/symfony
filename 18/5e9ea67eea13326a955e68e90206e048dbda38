@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-06T07:33:24Z
+
+I wonder if the implementation/configuration shouldn't be more complicated:
+- 423, 425, 429, 503 => always
+- 500, 502, 504, 507, 510 => idempotent only
+
+Maybe:
+ChainDecider
+- StatusCodeDecider([423, 425, 429, 503])
+- IdempotentStatusCodeDecider([500, 502, 504, 507, 510], [GET, HEAD, PUT, DELETE, TRACE, OPTIONS, CONNECT]
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-06T22:19:37Z
+
+failling test are related to Could not parse version constraint >=5.x: Invalid version string "5.x" And related to async-aws that should be fixed by https://github.com/async-aws/aws/pull/802
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-12T19:55:49Z
+
+Let's settle on #38532 before merging (and rebasing) this one.

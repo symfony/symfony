@@ -23,13 +23,6 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 
 class EntityUserProviderTest extends TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        if (\PHP_VERSION_ID >= 80000) {
-            self::markTestSkipped('Doctrine DBAL 2.x is incompatible with PHP 8.');
-        }
-    }
-
     public function testRefreshUserGetsUserByPrimaryKey()
     {
         $em = DoctrineTestHelper::createTestEntityManager();

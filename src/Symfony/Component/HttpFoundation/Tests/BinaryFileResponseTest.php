@@ -149,6 +149,7 @@ class BinaryFileResponseTest extends ResponseTestCase
             ['bytes=30-', 30, 5, 'bytes 30-34/35'],
             ['bytes=30-30', 30, 1, 'bytes 30-30/35'],
             ['bytes=30-34', 30, 5, 'bytes 30-34/35'],
+            ['bytes=30-40', 30, 5, 'bytes 30-34/35'],
         ];
     }
 
@@ -203,7 +204,29 @@ class BinaryFileResponseTest extends ResponseTestCase
             // Syntactical invalid range-request should also return the full resource
             ['bytes=20-10'],
             ['bytes=50-40'],
+            // range units other than bytes must be ignored
+            ['unknown=10-20'],
         ];
+    }
+
+    public function testRangeOnPostMethod()
+    {
+        $request = Request::create('/', 'POST');
+        $request->headers->set('Range', 'bytes=10-20');
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
+
+        $file = fopen(__DIR__.'/File/Fixtures/test.gif', 'r');
+        $data = fread($file, 35);
+        fclose($file);
+
+        $this->expectOutputString($data);
+        $response = clone $response;
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('35', $response->headers->get('Content-Length'));
+        $this->assertNull($response->headers->get('Content-Range'));
     }
 
     public function testUnpreparedResponseSendsFullFile()
@@ -242,7 +265,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     {
         return [
             ['bytes=-40'],
-            ['bytes=30-40'],
+            ['bytes=40-50'],
         ];
     }
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-20T17:36:25Z
+
+I added a test. I needed to use an adapter that extends AbstractAdapter.

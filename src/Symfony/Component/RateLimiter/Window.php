@@ -85,12 +85,4 @@ final class Window implements LimiterStateInterface
 
         return $cyclesRequired * $this->intervalInSeconds;
     }
-
-    /**
-     * @internal
-     */
-    public function __sleep(): array
-    {
-        return ['id', 'hitCount', 'intervalInSeconds', 'timer', 'maxSize'];
-    }
 }

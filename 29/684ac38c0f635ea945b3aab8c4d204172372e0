@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-21T14:32:47Z
+
+Do we need to bump `symfony/polyfill-intl-grapheme` for this to work?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-21T14:48:50Z
+
+> Do we need to bump symfony/polyfill-intl-grapheme for this to work?
+
+nope, that's independant

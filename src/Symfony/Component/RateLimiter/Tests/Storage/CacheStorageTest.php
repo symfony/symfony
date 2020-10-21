@@ -55,6 +55,18 @@ class CacheStorageTest extends TestCase
         $this->assertEquals($window, $this->storage->fetch('test'));
     }
 
+    public function testFetchExistingJunk()
+    {
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+
+        $cacheItem->expects($this->any())->method('get')->willReturn('junk');
+        $cacheItem->expects($this->any())->method('isHit')->willReturn(true);
+
+        $this->pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+
+        $this->assertNull($this->storage->fetch('test'));
+    }
+
     public function testFetchNonExistingState()
     {
         $cacheItem = $this->createMock(CacheItemInterface::class);

@@ -13,10 +13,10 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\RateLimiter\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
-use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
 class LimiterTest extends TestCase
 {
@@ -24,7 +24,7 @@ class LimiterTest extends TestCase
     {
         $factory = $this->createFactory([
             'id' => 'test',
-            'strategy' => 'token_bucket',
+            'policy' => 'token_bucket',
             'limit' => 10,
             'rate' => ['interval' => '1 second'],
         ]);
@@ -37,7 +37,7 @@ class LimiterTest extends TestCase
     {
         $factory = $this->createFactory([
             'id' => 'test',
-            'strategy' => 'fixed_window',
+            'policy' => 'fixed_window',
             'limit' => 10,
             'interval' => '1 minute',
         ]);
@@ -53,7 +53,7 @@ class LimiterTest extends TestCase
 
         $this->createFactory([
             'id' => 'test',
-            'strategy' => 'fixed_window',
+            'policy' => 'fixed_window',
             'limit' => 10,
             'interval' => '1 minut',
         ]);

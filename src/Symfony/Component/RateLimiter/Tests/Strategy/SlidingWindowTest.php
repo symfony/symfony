@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter\Tests;
+namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
-use Symfony\Component\RateLimiter\SlidingWindow;
+use Symfony\Component\RateLimiter\Policy\SlidingWindow;
 
 class SlidingWindowTest extends TestCase
 {

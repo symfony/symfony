@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\RateLimiter;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\LimiterInterface;
-use Symfony\Component\RateLimiter\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\NoLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 
 /**

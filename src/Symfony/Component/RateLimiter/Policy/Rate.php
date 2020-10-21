@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter;
+namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 

@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter\Tests;
+namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
-use Symfony\Component\RateLimiter\Rate;
+use Symfony\Component\RateLimiter\Policy\Rate;
+use Symfony\Component\RateLimiter\Policy\TokenBucket;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
-use Symfony\Component\RateLimiter\TokenBucket;
-use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
 /**
  * @group time-sensitive

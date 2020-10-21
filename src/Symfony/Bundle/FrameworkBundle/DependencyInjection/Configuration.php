@@ -31,7 +31,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
-use Symfony\Component\RateLimiter\TokenBucketLimiter;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -1843,7 +1843,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('The service ID of a custom storage implementation, this precedes any configured "cache_pool"')
                                         ->defaultNull()
                                     ->end()
-                                    ->enumNode('strategy')
+                                    ->enumNode('policy')
                                         ->info('The rate limiting algorithm to use for this rate')
                                         ->isRequired()
                                         ->values(['fixed_window', 'token_bucket', 'sliding_window', 'no_limit'])
@@ -1853,10 +1853,10 @@ class Configuration implements ConfigurationInterface
                                         ->isRequired()
                                     ->end()
                                     ->scalarNode('interval')
-                                        ->info('Configures the fixed interval if "strategy" is set to "fixed_window" or "sliding_window". The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).')
+                                        ->info('Configures the fixed interval if "policy" is set to "fixed_window" or "sliding_window". The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).')
                                     ->end()
                                     ->arrayNode('rate')
-                                        ->info('Configures the fill rate if "strategy" is set to "token_bucket"')
+                                        ->info('Configures the fill rate if "policy" is set to "token_bucket"')
                                         ->children()
                                             ->scalarNode('interval')
                                                 ->info('Configures the rate interval. The value must be a number followed by "second", "minute", "hour", "day", "week" or "month" (or their plural equivalent).')

@@ -14,8 +14,8 @@ namespace Symfony\Component\RateLimiter\Tests\Storage;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\RateLimiter\Policy\Window;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
-use Symfony\Component\RateLimiter\Window;
 
 class CacheStorageTest extends TestCase
 {

@@ -15,6 +15,11 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\Rate;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
@@ -44,7 +49,7 @@ final class RateLimiterFactory
         $id = $this->config['id'].$key;
         $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();
 
-        switch ($this->config['strategy']) {
+        switch ($this->config['policy']) {
             case 'token_bucket':
                 return new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock);
 
@@ -58,7 +63,7 @@ final class RateLimiterFactory
                 return new NoLimiter();
 
             default:
-                throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['strategy']));
+                throw new \LogicException(sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy']));
         }
     }
 
@@ -78,7 +83,7 @@ final class RateLimiterFactory
 
         $options
             ->define('id')->required()
-            ->define('strategy')
+            ->define('policy')
                 ->required()
                 ->allowedValues('token_bucket', 'fixed_window', 'sliding_window', 'no_limit')
 

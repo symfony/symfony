@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-16T14:11:29Z
+
+Thank you.
+
+Im thinking of the label. Currently, if the label attribute is null, we are trying to create/invent a label looking at the ID. It feels weird that the behavior for `placeholder` and `title` is not the same.
+
+But I also agree that we should translate null values, because that will cause an error =)
+
+I am 👍  but I want to hear your thoughts on this ^^
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-10-16T14:26:02Z
+
+Most of the time we can derive useful labels from the field names if it isn't configured. For placeholders and titles that not really possible. I mainly think that using `null` for both of them does not make much sense but I can also see the use case described in #37573 and I agree with the reasoning made there that we should not fail hard over it.

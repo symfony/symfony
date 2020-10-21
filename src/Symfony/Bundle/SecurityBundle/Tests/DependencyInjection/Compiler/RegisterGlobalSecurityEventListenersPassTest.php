@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 {
@@ -79,6 +80,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             [LogoutEvent::class, [TestSubscriber::class, 'onLogout'], -200],
             [CheckPassportEvent::class, [TestSubscriber::class, 'onCheckPassport'], 120],
             [LoginSuccessEvent::class, [TestSubscriber::class, 'onLoginSuccess'], 0],
+            [SecurityEvents::INTERACTIVE_LOGIN, [TestSubscriber::class, 'onInteractiveLogin'], 0],
         ]);
     }
 
@@ -161,6 +163,7 @@ class TestSubscriber implements EventSubscriberInterface
             LogoutEvent::class => ['onLogout', -200],
             CheckPassportEvent::class => ['onCheckPassport', 120],
             LoginSuccessEvent::class => 'onLoginSuccess',
+            SecurityEvents::INTERACTIVE_LOGIN => 'onInteractiveLogin',
         ];
     }
 }

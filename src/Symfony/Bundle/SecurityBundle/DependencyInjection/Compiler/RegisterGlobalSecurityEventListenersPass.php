@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Makes sure all event listeners on the global dispatcher are also listening
@@ -31,7 +32,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
  */
 class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
 {
-    private static $eventBubblingEvents = [CheckPassportEvent::class, LoginFailureEvent::class, LoginSuccessEvent::class, LogoutEvent::class];
+    private static $eventBubblingEvents = [CheckPassportEvent::class, LoginFailureEvent::class, LoginSuccessEvent::class, LogoutEvent::class, SecurityEvents::INTERACTIVE_LOGIN];
 
     /**
      * {@inheritdoc}

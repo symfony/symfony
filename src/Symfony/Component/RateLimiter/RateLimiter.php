@@ -54,8 +54,11 @@ final class RateLimiter
             case 'sliding_window':
                 return new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock);
 
+            case 'no_limit':
+                return new NoLimiter();
+
             default:
-                throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket", "sliding_window" or "fixed_window".', $this->config['strategy']));
+                throw new \LogicException(sprintf('Limiter strategy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['strategy']));
         }
     }
 

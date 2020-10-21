@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Koc at 2020-10-13T11:07:06Z
+
+Why not `kernel.runtime_environment` to be consistent in parameters naming?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-13T11:16:25Z
+
+> Why not kernel.runtime_environment to be consistent in parameters naming?
+
+Because it's shorter and equally descriptive to me.

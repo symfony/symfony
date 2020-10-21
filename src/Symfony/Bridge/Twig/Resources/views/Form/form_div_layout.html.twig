@@ -399,7 +399,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) or attrvalue is null ? attrvalue : attrvalue|trans({}, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}

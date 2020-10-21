@@ -302,6 +302,14 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         sleep('\\' === \DIRECTORY_SEPARATOR ? 10 : 1);
 
         if (!$process->isRunning()) {
+            if ('\\' !== \DIRECTORY_SEPARATOR && 127 === $process->getExitCode()) {
+                self::markTestSkipped('vulcain binary is missing');
+            }
+
+            if ('\\' !== \DIRECTORY_SEPARATOR && 126 === $process->getExitCode()) {
+                self::markTestSkipped('vulcain binary is not executable');
+            }
+
             self::markTestSkipped((new ProcessFailedException($process))->getMessage());
         }
 

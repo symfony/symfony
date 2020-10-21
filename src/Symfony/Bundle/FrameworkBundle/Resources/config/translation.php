@@ -53,7 +53,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('translation loaders locator'),
                 service('translator.formatter'),
                 param('kernel.default_locale'),
-                abstract_arg('translation loaders ids'),
+                [], // translation loaders ids
                 [
                     'cache_dir' => param('kernel.cache_dir').'/translations',
                     'debug' => param('kernel.debug'),

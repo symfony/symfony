@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-19T16:36:58Z
+
+Can you write a test for this issue?
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2020-10-19T16:43:15Z
+
+With this PR I have `response_content` instead of `response_json`. Is it possible to get `response_json`?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-19T18:28:13Z
+
+> Can you write a test for this issue?
+
+Done.
+
+> With this PR I have response_content instead of response_json. Is it possible to get response_json?
+
+We don't know how the response has been fetched (via `getContent` or `toArray`), thus we can't use `response_json`.
+I've 2 solutions:
+- revert #38413 and make TracableClient decorating RetryClient
+- use `response_json` when response's `content-type` contains `json` /cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-19T18:31:54Z
+
+> revert #38413 and make TracableClient decorating RetryClient
+
+that's an option.
+We could then improve `RetryableClient` to make it report the retries in details (I'm thinking about merging the `response_header` and `debug` info of all retries in one)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-19T18:33:39Z
+
+For the record, I skipped collecting the content consciously back then: to prevent collecting streamed responses (aka potentially long of even infinite content, think SSE).
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-19T20:39:35Z
+
+Ready for review.
+Changed the implementation to revert Client decoraton and collect retries metadata
+
+This is how it likes:
+![Screenshot from 2020-10-19 22-38-26](https://user-images.githubusercontent.com/578547/96509100-da604c00-125b-11eb-8584-bc425e1fcd92.png)

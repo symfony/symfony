@@ -27,6 +27,10 @@ final class TokenBucketLimiter implements LimiterInterface
     private $maxBurst;
     private $rate;
     private $storage;
+
+    /**
+     * @var LockInterface
+     */
     private $lock;
 
     use ResetLimiterTrait;

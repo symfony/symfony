@@ -26,8 +26,16 @@ final class FixedWindowLimiter implements LimiterInterface
 {
     private $id;
     private $limit;
-    private $interval;
     private $storage;
+
+    /**
+     * @var int seconds
+     */
+    private $interval;
+
+    /**
+     * @var LockInterface
+     */
     private $lock;
 
     use ResetLimiterTrait;

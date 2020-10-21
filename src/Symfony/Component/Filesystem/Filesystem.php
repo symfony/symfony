@@ -175,7 +175,7 @@ class Filesystem
                 if (!self::box('rmdir', $file) && file_exists($file)) {
                     throw new IOException(sprintf('Failed to remove directory "%s": ', $file).self::$lastError);
                 }
-            } elseif (!self::box('unlink', $file) && file_exists($file)) {
+            } elseif (!self::box('unlink', $file) && (false !== strpos(self::$lastError, 'Permission denied') || file_exists($file))) {
                 throw new IOException(sprintf('Failed to remove file "%s": ', $file).self::$lastError);
             }
         }

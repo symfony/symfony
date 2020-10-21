@@ -304,7 +304,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $typeCastAttributes = $this->resolveXmlTypeCastAttributes($context);
 
         foreach ($node->attributes as $attr) {
-            if (!is_numeric($attr->nodeValue) || !$typeCastAttributes || (isset($attr->nodeValue[1]) && '0' === $attr->nodeValue[0])) {
+            if (!is_numeric($attr->nodeValue) || !$typeCastAttributes || (isset($attr->nodeValue[1]) && '0' === $attr->nodeValue[0] && '.' !== $attr->nodeValue[1])) {
                 $data['@'.$attr->nodeName] = $attr->nodeValue;
 
                 continue;

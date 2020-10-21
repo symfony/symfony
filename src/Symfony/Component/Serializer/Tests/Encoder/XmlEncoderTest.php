@@ -268,10 +268,10 @@ XML;
     {
         $source = <<<XML
 <?xml version="1.0"?>
-<document index="-12.11">Name</document>
+<document index="12.11">Name</document>
 XML;
 
-        $this->assertSame(['@index' => -12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
+        $this->assertSame(['@index' => 12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeNegativeFloatAttribute()
@@ -282,6 +282,16 @@ XML;
 XML;
 
         $this->assertSame(['@index' => -12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodeFloatAttributeWithZeroWholeNumber()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<document index="0.123">Name</document>
+XML;
+
+        $this->assertSame(['@index' => 0.123, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
     public function testNoTypeCastAttribute()

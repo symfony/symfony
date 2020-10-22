@@ -80,7 +80,7 @@ final class RateLimiter
             ->define('id')->required()
             ->define('strategy')
                 ->required()
-                ->allowedValues('token_bucket', 'fixed_window')
+                ->allowedValues('token_bucket', 'fixed_window', 'sliding_window', 'no_limit')
 
             ->define('limit')->allowedTypes('int')
             ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)

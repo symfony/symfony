@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.2.0
------
-
- * polyfill new phpunit 9.1 assertions
-
 5.1.0
 -----
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-22T08:04:58Z
+
+I removed the annotations that are the same as the constructor. On a few occasions i kept the annotations because the doc block had a valuable comment too.

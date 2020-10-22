@@ -396,8 +396,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
                 ['dé', 'jÀ', 'déjàdéjà', 0, true],
                 ['éjàdéjà', 'é', 'déjàdéjà', 0, false],
                 ['d', 'é', 'déjàdéjà', 0, true],
-                ['', 'Ç', 'déjàdéjà', 0, false],
-                ['', 'Ç', 'déjàdéjà', 0, true],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
             ]
         );
     }
@@ -407,8 +407,8 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLast(),
             [
-                ['', 'Ç', 'déjàdéjà', 0, false],
-                ['', 'Ç', 'déjàdéjà', 0, true],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, true],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['déjàd', 'é', 'déjàdéjà', 0, true],
             ]
@@ -420,7 +420,7 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
         return array_merge(
             parent::provideBeforeAfterLastIgnoreCase(),
             [
-                ['', 'Ç', 'déjàdéjà', 0, false],
+                ['déjàdéjà', 'Ç', 'déjàdéjà', 0, false],
                 ['éjà', 'é', 'déjàdéjà', 0, false],
                 ['éjà', 'É', 'déjàdéjà', 0, false],
             ]

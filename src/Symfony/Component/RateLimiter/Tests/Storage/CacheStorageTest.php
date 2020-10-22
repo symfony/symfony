@@ -76,4 +76,11 @@ class CacheStorageTest extends TestCase
 
         $this->assertNull($this->storage->fetch('test'));
     }
+
+    public function testDelete()
+    {
+        $this->pool->expects($this->once())->method('deleteItem')->with(sha1('test'))->willReturn(true);
+
+        $this->assertNull($this->storage->delete('test'));
+    }
 }

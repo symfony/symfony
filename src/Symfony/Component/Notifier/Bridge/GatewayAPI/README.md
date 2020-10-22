@@ -8,7 +8,7 @@ DSN example
 
 ```
 // .env file
-GATEWAYAPI_DSN=gatewaypi://TOKEN@default?from=FROM
+GATEWAYAPI_DSN=gatewayapi://TOKEN@default?from=FROM
 ```
 
 where:

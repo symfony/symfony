@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\RateLimiter\RateLimiter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
@@ -35,13 +35,13 @@ class LoginThrottlingListenerTest extends TestCase
     {
         $this->requestStack = new RequestStack();
 
-        $localLimiter = new RateLimiter([
+        $localLimiter = new RateLimiterFactory([
             'id' => 'login',
             'strategy' => 'fixed_window',
             'limit' => 3,
             'interval' => '1 minute',
         ], new InMemoryStorage());
-        $globalLimiter = new RateLimiter([
+        $globalLimiter = new RateLimiterFactory([
             'id' => 'login',
             'strategy' => 'fixed_window',
             'limit' => 6,

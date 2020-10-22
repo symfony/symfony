@@ -18,11 +18,11 @@ $ composer require symfony/rate-limiter
 
 ```php
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Component\RateLimiter\RateLimiter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
-$limiter = new RateLimiter([
+$limiter = new RateLimiterFactory([
     'id' => 'login',
-    'strategy' => 'token_bucket', // or 'fixed_window'
+    'strategy' => 'token_bucket',
     'limit' => 10,
     'rate' => ['interval' => '15 minutes'],
 ], new InMemoryStorage());

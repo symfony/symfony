@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\RateLimiter\RateLimiter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -19,7 +19,7 @@ return static function (ContainerConfigurator $container) {
             ->parent('cache.app')
             ->tag('cache.pool')
 
-        ->set('limiter', RateLimiter::class)
+        ->set('limiter', RateLimiterFactory::class)
             ->abstract()
             ->args([
                 abstract_arg('config'),

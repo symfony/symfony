@@ -15,19 +15,19 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\RateLimiter\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\NoLimiter;
-use Symfony\Component\RateLimiter\RateLimiter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
-class RateLimiterTest extends TestCase
+class RateLimiterFactoryTest extends TestCase
 {
     /**
      * @dataProvider validConfigProvider
      */
     public function testValidConfig(string $expectedClass, array $config)
     {
-        $factory = new RateLimiter($config, new InMemoryStorage());
+        $factory = new RateLimiterFactory($config, new InMemoryStorage());
         $rateLimiter = $factory->create('key');
         $this->assertInstanceOf($expectedClass, $rateLimiter);
     }
@@ -66,7 +66,7 @@ class RateLimiterTest extends TestCase
     public function testInvalidConfig(string $exceptionClass, array $config)
     {
         $this->expectException($exceptionClass);
-        $factory = new RateLimiter($config, new InMemoryStorage());
+        $factory = new RateLimiterFactory($config, new InMemoryStorage());
         $factory->create('key');
     }
 

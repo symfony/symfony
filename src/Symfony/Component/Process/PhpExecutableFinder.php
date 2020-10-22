@@ -79,9 +79,10 @@ class PhpExecutableFinder
      * Finds the PHP executable by a specific name.
      *
      * @param string $name
+     * @param array  $extraDirs Additional dirs to check into
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
-    public function findByName(string $name): ?string
+    public function findByName(string $name, array $extraDirs = []): ?string
     {
         if (@is_executable($php = \PHP_BINDIR.('\\' === \DIRECTORY_SEPARATOR ? '\\'.$name.'.exe' : '/'.$name))) {
             return $php;
@@ -92,6 +93,8 @@ class PhpExecutableFinder
             $dirs[] = 'C:\xampp\php\\';
         }
 
+        $dirs = array_merge($dirs, $extraDirs);
+
         return $this->executableFinder->find($name, null, $dirs);
     }
 
@@ -99,12 +102,13 @@ class PhpExecutableFinder
      * Finds a PHP executable with one of the given names.
      *
      * @param string[] $names
+     * @param array    $extraDirs Additional dirs to check into
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
-    public function tryNames(array $names): ?string
+    public function tryNames(array $names, array $extraDirs = []): ?string
     {
         foreach ($names as $name) {
-            if ($php = $this->findByName($name)) {
+            if ($php = $this->findByName($name, $extraDirs)) {
                 return $php;
             }
         }
@@ -115,10 +119,11 @@ class PhpExecutableFinder
     /**
      * Finds the PHP executable by a specific version.
      *
-     * @param string $version A version string in the form `x.y`
+     * @param string $version   A version string in the form `x.y`
+     * @param array  $extraDirs Additional dirs to check into
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
-    public function findByVersion(string $version)
+    public function findByVersion(string $version, array $extraDirs = [])
     {
         if (!preg_match('#^\d+\.\d+$#', $version)) {
             throw new InvalidArgumentException('The version string must be in the form "x.y".');
@@ -129,19 +134,20 @@ class PhpExecutableFinder
             'php'.str_replace('.', '', $version),
         ];
 
-        return $this->tryNames($names);
+        return $this->tryNames($names, $extraDirs);
     }
 
     /**
      * Finds a PHP executable in one of the given versions.
      *
-     * @param string[] $versions A list of version strings in the form `x.y`
+     * @param string[] $versions  A list of version strings in the form `x.y`
+     * @param array    $extraDirs Additional dirs to check into
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
-    public function tryVersions(array $versions)
+    public function tryVersions(array $versions, array $extraDirs = [])
     {
         foreach ($versions as $version) {
-            if ($php = $this->findByVersion($version)) {
+            if ($php = $this->findByVersion($version, $extraDirs)) {
                 return $php;
             }
         }

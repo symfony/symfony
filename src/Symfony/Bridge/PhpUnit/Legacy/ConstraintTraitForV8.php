@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 /**
  * @internal
  */
-trait ConstraintTraitForV7
+trait ConstraintTraitForV8
 {
     use ConstraintLogicTrait;
 

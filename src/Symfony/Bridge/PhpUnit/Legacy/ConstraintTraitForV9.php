@@ -14,14 +14,11 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 /**
  * @internal
  */
-trait ConstraintTraitForV7
+trait ConstraintTraitForV9
 {
     use ConstraintLogicTrait;
 
-    /**
-     * @return bool|null
-     */
-    public function evaluate($other, $description = '', $returnResult = false)
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         return $this->doEvaluate($other, $description, $returnResult);
     }

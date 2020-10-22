@@ -33,15 +33,15 @@ final class GatewayAPITransportFactory extends AbstractTransportFactory
         $from = $dsn->getOption('from');
         $port = $dsn->getPort();
 
-        if ('gatewaypi' === $scheme) {
+        if ('gatewayapi' === $scheme) {
             return (new GatewayAPITransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
-        throw new UnsupportedSchemeException($dsn, 'gatewaypi', $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, 'gatewayapi', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['gatewaypi'];
+        return ['gatewayapi'];
     }
 }

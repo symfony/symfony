@@ -41,7 +41,7 @@ final class GatewayAPITransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('gatewaypi://%s?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('gatewayapi://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool

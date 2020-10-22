@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
  * @experimental in 5.2
  */
-class GatewayAPITransportFactory extends AbstractTransportFactory
+final class GatewayAPITransportFactory extends AbstractTransportFactory
 {
     /**
      * @return GatewayAPITransport

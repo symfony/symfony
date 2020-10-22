@@ -52,6 +52,6 @@ class CacheStorage implements StorageInterface
 
     public function delete(string $limiterStateId): void
     {
-        $this->pool->deleteItem($limiterStateId);
+        $this->pool->deleteItem(sha1($limiterStateId));
     }
 }

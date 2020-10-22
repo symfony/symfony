@@ -23,6 +23,10 @@ final class Window implements LimiterStateInterface
     private $hitCount = 0;
     private $intervalInSeconds;
     private $maxSize;
+
+    /**
+     * @var float
+     */
     private $timer;
 
     public function __construct(string $id, int $intervalInSeconds, int $windowSize, ?float $timer = null)

@@ -20,9 +20,21 @@ namespace Symfony\Component\RateLimiter;
 final class TokenBucket implements LimiterStateInterface
 {
     private $id;
-    private $tokens;
-    private $burstSize;
     private $rate;
+
+    /**
+     * @var int
+     */
+    private $tokens;
+
+    /**
+     * @var int
+     */
+    private $burstSize;
+
+    /**
+     * @var float
+     */
     private $timer;
 
     /**

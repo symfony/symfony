@@ -32,28 +32,17 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class SlidingWindowLimiter implements LimiterInterface
 {
-    /**
-     * @var string
-     */
     private $id;
-
-    /**
-     * @var int
-     */
     private $limit;
+    private $storage;
 
     /**
-     * @var \DateInterval
+     * @var int seconds
      */
     private $interval;
 
     /**
-     * @var StorageInterface
-     */
-    private $storage;
-
-    /**
-     * @var LockInterface|null
+     * @var LockInterface
      */
     private $lock;
 

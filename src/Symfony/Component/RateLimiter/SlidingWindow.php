@@ -16,13 +16,11 @@ use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *
+ * @internal
  * @experimental in 5.2
  */
 final class SlidingWindow implements LimiterStateInterface
 {
-    /**
-     * @var string
-     */
     private $id;
 
     /**

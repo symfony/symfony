@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use SebastianBergmann\Exporter\Exporter;
+
 /**
  * @internal
  */
@@ -29,6 +31,15 @@ trait ConstraintTraitForV7
     protected function additionalFailureDescription($other): string
     {
         return $this->doAdditionalFailureDescription($other);
+    }
+
+    protected function exporter(): Exporter
+    {
+        if (null !== $this->exporter) {
+            $this->exporter = new Exporter();
+        }
+
+        return $this->exporter;
     }
 
     protected function failureDescription($other): string

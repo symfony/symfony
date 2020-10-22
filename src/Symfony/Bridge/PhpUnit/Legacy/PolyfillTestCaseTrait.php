@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
+use PHPUnit\Framework\Error\Error;
+use PHPUnit\Framework\Error\Notice;
+use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -66,9 +69,7 @@ trait PolyfillTestCaseTrait
      */
     public function expectException($exception)
     {
-        $property = new \ReflectionProperty(TestCase::class, 'expectedException');
-        $property->setAccessible(true);
-        $property->setValue($this, $exception);
+        $this->doExpectException($exception);
     }
 
     /**
@@ -115,5 +116,96 @@ trait PolyfillTestCaseTrait
         $property = new \ReflectionProperty(TestCase::class, 'expectedExceptionMessageRegExp');
         $property->setAccessible(true);
         $property->setValue($this, $messageRegExp);
+    }
+
+    /**
+     * @return void
+     */
+    public function expectNotice()
+    {
+        $this->doExpectException(Notice::class);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public function expectNoticeMessage($message)
+    {
+        $this->expectExceptionMessage($message);
+    }
+
+    /**
+     * @param string $regularExpression
+     *
+     * @return void
+     */
+    public function expectNoticeMessageMatches($regularExpression)
+    {
+        $this->expectExceptionMessageMatches($regularExpression);
+    }
+
+    /**
+     * @return void
+     */
+    public function expectWarning()
+    {
+        $this->doExpectException(Warning::class);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public function expectWarningMessage($message)
+    {
+        $this->expectExceptionMessage($message);
+    }
+
+    /**
+     * @param string $regularExpression
+     *
+     * @return void
+     */
+    public function expectWarningMessageMatches($regularExpression)
+    {
+        $this->expectExceptionMessageMatches($regularExpression);
+    }
+
+    /**
+     * @return void
+     */
+    public function expectError()
+    {
+        $this->doExpectException(Error::class);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
+    public function expectErrorMessage($message)
+    {
+        $this->expectExceptionMessage($message);
+    }
+
+    /**
+     * @param string $regularExpression
+     *
+     * @return void
+     */
+    public function expectErrorMessageMatches($regularExpression)
+    {
+        $this->expectExceptionMessageMatches($regularExpression);
+    }
+
+    private function doExpectException($exception)
+    {
+        $property = new \ReflectionProperty(TestCase::class, 'expectedException');
+        $property->setAccessible(true);
+        $property->setValue($this, $exception);
     }
 }

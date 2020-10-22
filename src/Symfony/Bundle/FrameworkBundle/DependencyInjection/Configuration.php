@@ -1846,7 +1846,7 @@ class Configuration implements ConfigurationInterface
                                     ->enumNode('strategy')
                                         ->info('The rate limiting algorithm to use for this rate')
                                         ->isRequired()
-                                        ->values(['fixed_window', 'token_bucket', 'sliding_window'])
+                                        ->values(['fixed_window', 'token_bucket', 'sliding_window', 'no_limit'])
                                     ->end()
                                     ->integerNode('limit')
                                         ->info('The maximum allowed hits in a fixed interval or burst')

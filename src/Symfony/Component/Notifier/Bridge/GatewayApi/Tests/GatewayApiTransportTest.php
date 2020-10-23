@@ -42,6 +42,13 @@ final class GatewayApiTransportTest extends TestCase
         $this->assertTrue($transport->supports($message));
     }
 
+    public function testNotSupportsChatMessage(): void
+    {
+        $transport = $this->getTransport();
+        $message = new ChatMessage("3333333333");
+        $this->assertFalse($transport->supports($message));
+    }
+
     private function getTransport(MockHttpClient $client = null): GatewayApiTransport
     {
         if($client == null) {

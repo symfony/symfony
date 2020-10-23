@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-22T12:16:49Z
+
+`ExpectDeprecationTrait` predates `expectDeprecation()` and is providing a more useful behavior than the newly added method in phpunit. I don't think we need to polyfill it, because it's just useless as it is...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-22T12:29:10Z
+
+We consider such changes as bugfixes (see https://github.com/symfony/symfony/pull/37970 for bg)
+Please rebase+retarget your PRs for 4.4

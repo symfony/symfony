@@ -66,16 +66,6 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
                 $node->getNode('node')->getAttribute('value'),
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
             ];
-        } elseif (
-            $node instanceof FilterExpression &&
-            'transchoice' === $node->getNode('filter')->getAttribute('value') &&
-            $node->getNode('node') instanceof ConstantExpression
-        ) {
-            // extract constant nodes with a trans filter
-            $this->messages[] = [
-                $node->getNode('node')->getAttribute('value'),
-                $this->getReadDomainFromArguments($node->getNode('arguments'), 2),
-            ];
         } elseif ($node instanceof TransNode) {
             // extract trans nodes
             $this->messages[] = [

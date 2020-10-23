@@ -12,10 +12,12 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -114,5 +116,93 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame($response, $r);
         $this->assertGreaterThan(1, \count($chunks));
         $this->assertSame('Symfony is awesome!', implode('', $chunks));
+    }
+
+    public function testStopwatch()
+    {
+        $sw = new Stopwatch(true);
+        $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
+        $response = $sut->request('GET', 'http://localhost:8057');
+
+        $response->getStatusCode();
+        $response->getHeaders();
+        $response->getContent();
+
+        $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
+        $this->assertCount(1, $events = $sections['__root__']->getEvents());
+        $this->assertArrayHasKey('GET http://localhost:8057', $events);
+        $this->assertCount(3, $events['GET http://localhost:8057']->getPeriods());
+        $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
+    }
+
+    public function testStopwatchError()
+    {
+        $sw = new Stopwatch(true);
+        $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
+        $response = $sut->request('GET', 'http://localhost:8057/404');
+
+        try {
+            $response->getContent();
+            $this->fail('Response should have thrown an exception');
+        } catch (ClientException $e) {
+            // no-op
+        }
+
+        $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
+        $this->assertCount(1, $events = $sections['__root__']->getEvents());
+        $this->assertArrayHasKey('GET http://localhost:8057/404', $events);
+        $this->assertCount(1, $events['GET http://localhost:8057/404']->getPeriods());
+    }
+
+    public function testStopwatchStream()
+    {
+        $sw = new Stopwatch(true);
+        $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
+        $response = $sut->request('GET', 'http://localhost:8057');
+
+        $chunkCount = 0;
+        foreach ($sut->stream([$response]) as $chunk) {
+            ++$chunkCount;
+        }
+
+        $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
+        $this->assertCount(1, $events = $sections['__root__']->getEvents());
+        $this->assertArrayHasKey('GET http://localhost:8057', $events);
+        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057']->getPeriods()));
+    }
+
+    public function testStopwatchStreamError()
+    {
+        $sw = new Stopwatch(true);
+        $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
+        $response = $sut->request('GET', 'http://localhost:8057/404');
+
+        try {
+            $chunkCount = 0;
+            foreach ($sut->stream([$response]) as $chunk) {
+                ++$chunkCount;
+            }
+            $this->fail('Response should have thrown an exception');
+        } catch (ClientException $e) {
+            // no-op
+        }
+
+        $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
+        $this->assertCount(1, $events = $sections['__root__']->getEvents());
+        $this->assertArrayHasKey('GET http://localhost:8057/404', $events);
+        $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057/404']->getPeriods()));
+    }
+
+    public function testStopwatchDestruct()
+    {
+        $sw = new Stopwatch(true);
+        $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
+        $sut->request('GET', 'http://localhost:8057');
+
+        $this->assertArrayHasKey('__root__', $sections = $sw->getSections());
+        $this->assertCount(1, $events = $sections['__root__']->getEvents());
+        $this->assertArrayHasKey('GET http://localhost:8057', $events);
+        $this->assertCount(1, $events['GET http://localhost:8057']->getPeriods());
+        $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
     }
 }

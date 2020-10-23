@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GatewayAPI;
+namespace Symfony\Component\Notifier\Bridge\GatewayApi;
 
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
@@ -20,10 +20,10 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
  * @experimental in 5.2
  */
-final class GatewayAPITransportFactory extends AbstractTransportFactory
+final class GatewayApiTransportFactory extends AbstractTransportFactory
 {
     /**
-     * @return GatewayAPITransport
+     * @return GatewayApiTransport
      */
     public function create(Dsn $dsn): TransportInterface
     {
@@ -34,7 +34,7 @@ final class GatewayAPITransportFactory extends AbstractTransportFactory
         $port = $dsn->getPort();
 
         if ('gatewayapi' === $scheme) {
-            return (new GatewayAPITransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+            return (new GatewayApiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
         }
 
         throw new UnsupportedSchemeException($dsn, 'gatewayapi', $this->getSupportedSchemes());

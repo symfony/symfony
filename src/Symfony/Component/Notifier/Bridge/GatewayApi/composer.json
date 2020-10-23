@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Component\\Notifier\\Bridge\\GatewayAPI\\": ""
+            "Symfony\\Component\\Notifier\\Bridge\\GatewayApi\\": ""
         },
         "exclude-from-classmap": [
             "/Tests/"

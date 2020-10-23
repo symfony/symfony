@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\GatewayAPI;
+namespace Symfony\Component\Notifier\Bridge\GatewayApi;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
  * @experimental in 5.2
  */
-final class GatewayAPITransport extends AbstractTransport
+final class GatewayApiTransport extends AbstractTransport
 {
     protected const HOST = 'gatewayapi.com';
 

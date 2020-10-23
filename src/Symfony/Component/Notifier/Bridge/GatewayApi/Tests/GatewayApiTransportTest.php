@@ -35,8 +35,19 @@ final class GatewayApiTransportTest extends TestCase
         $this->assertNotNull($sentMessage);
     }
 
-    private function getTransport(MockHttpClient $client): GatewayApiTransport
+    public function testSupportsSmsMessage(): void
     {
+        $transport = $this->getTransport();
+        $message = new SmsMessage("3333333333", "Test Messgage");
+        $this->assertTrue($transport->supports($message));
+    }
+
+    private function getTransport(MockHttpClient $client = null): GatewayApiTransport
+    {
+        if($client == null) {
+            $this->createMock(ResponseInterface::class);
+        }
+
         return (new GatewayApiTransport(
             'authtoken',
             'Symfony',

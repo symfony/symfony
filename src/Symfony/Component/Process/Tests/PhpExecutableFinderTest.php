@@ -66,14 +66,15 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $ver = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('php', true);
-        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$ver;
+        $version = \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
+        $dir = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . uniqid('symfony', true);
+        $file = $dir . \DIRECTORY_SEPARATOR . 'php' . $version;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);
+        chmod($file, 0777);
 
-        $this->assertEquals($file, $f->findByVersion($ver, [$dir]), '::findByVersion() returns the executable PHP');
+        $this->assertEquals($file, $f->findByVersion($version, [$dir]), '::findByVersion() returns the executable PHP');
 
         unlink($file);
         rmdir($dir);
@@ -86,15 +87,16 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $ver1 = \PHP_MAJOR_VERSION.'.'.(\PHP_MINOR_VERSION + 1);
-        $ver2 = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('php', true);
-        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$ver2;
+        $version = \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
+        $versionWrong = \PHP_MAJOR_VERSION . '.' . (\PHP_MINOR_VERSION + 1);
+        $dir = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . uniqid('symfony', true);
+        $file = $dir . \DIRECTORY_SEPARATOR . 'php' . $version;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);
+        chmod($file, 0777);
 
-        $this->assertEquals($file, $f->tryVersions([$ver1, $ver2]), '::tryVersions() returns the executable PHP');
+        $this->assertEquals($file, $f->tryVersions([$versionWrong, $version], [$dir]), '::tryVersions() returns the executable PHP');
 
         unlink($file);
         rmdir($dir);

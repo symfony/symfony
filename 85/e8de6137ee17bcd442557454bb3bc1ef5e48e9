@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by marcin-kruk at 2020-10-21T22:15:08Z
+
+It seems that fabbot is asking me to fix something I didn't change - an exception message formatting in a different method.
+I updated my branch with upstream and it's up to date, so it's not the reason.
+Any ideas why it failed and how to sort it out?

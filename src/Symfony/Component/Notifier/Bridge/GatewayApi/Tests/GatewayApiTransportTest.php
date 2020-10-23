@@ -5,15 +5,8 @@ namespace Symfony\Component\Notifier\Bridge\GatewayApi\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransport;
-use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GatewayApiTransportTest extends TestCase
@@ -30,7 +23,7 @@ final class GatewayApiTransportTest extends TestCase
         });
 
         $transport = $this->getTransport($client);
-        $message = new SmsMessage("3333333333", "Test Messgage");
+        $message = new SmsMessage('3333333333', 'Test Messgage');
         $sentMessage = $transport->send($message);
         $this->assertNotNull($sentMessage);
     }
@@ -38,20 +31,20 @@ final class GatewayApiTransportTest extends TestCase
     public function testSupportsSmsMessage(): void
     {
         $transport = $this->getTransport();
-        $message = new SmsMessage("3333333333", "Test Messgage");
+        $message = new SmsMessage('3333333333', 'Test Messgage');
         $this->assertTrue($transport->supports($message));
     }
 
     public function testNotSupportsChatMessage(): void
     {
         $transport = $this->getTransport();
-        $message = new ChatMessage("3333333333");
+        $message = new ChatMessage('3333333333');
         $this->assertFalse($transport->supports($message));
     }
 
     private function getTransport(MockHttpClient $client = null): GatewayApiTransport
     {
-        if($client == null) {
+        if (null == $client) {
             $this->createMock(ResponseInterface::class);
         }
 

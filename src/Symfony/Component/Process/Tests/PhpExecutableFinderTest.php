@@ -41,7 +41,7 @@ class PhpExecutableFinderTest extends TestCase
         $f = new PhpExecutableFinder();
 
         $current = \PHP_BINARY;
-        $name = \basename($current);
+        $name = basename($current);
 
         $this->assertEquals($current, $f->findByName($name), '::findByName() returns the executable PHP');
     }
@@ -54,7 +54,7 @@ class PhpExecutableFinderTest extends TestCase
         $f = new PhpExecutableFinder();
 
         $current = \PHP_BINARY;
-        $real = \basename($current);
+        $real = basename($current);
 
         $this->assertEquals($current, $f->tryNames(['php-foo', $real]), '::tryNames() returns the executable PHP');
     }
@@ -66,9 +66,9 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $ver = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('php', true);
-        $file = $dir.DIRECTORY_SEPARATOR.'php'.$ver;
+        $ver = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('php', true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$ver;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);
@@ -86,10 +86,10 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $ver1 = PHP_MAJOR_VERSION.'.'.(PHP_MINOR_VERSION + 1);
-        $ver2 = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('php', true);
-        $file = $dir.DIRECTORY_SEPARATOR.'php'.$ver2;
+        $ver1 = \PHP_MAJOR_VERSION.'.'.(\PHP_MINOR_VERSION + 1);
+        $ver2 = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('php', true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$ver2;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);

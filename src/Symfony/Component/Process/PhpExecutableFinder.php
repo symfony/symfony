@@ -78,8 +78,8 @@ class PhpExecutableFinder
     /**
      * Finds the PHP executable by a specific name.
      *
-     * @param string $name
-     * @param array  $extraDirs Additional dirs to check into
+     * @param array $extraDirs Additional dirs to check into
+     *
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function findByName(string $name, array $extraDirs = []): ?string
@@ -103,6 +103,7 @@ class PhpExecutableFinder
      *
      * @param string[] $names
      * @param array    $extraDirs Additional dirs to check into
+     *
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function tryNames(array $names, array $extraDirs = []): ?string
@@ -121,6 +122,7 @@ class PhpExecutableFinder
      *
      * @param string $version   A version string in the form `x.y`
      * @param array  $extraDirs Additional dirs to check into
+     *
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function findByVersion(string $version, array $extraDirs = [])
@@ -142,6 +144,7 @@ class PhpExecutableFinder
      *
      * @param string[] $versions  A list of version strings in the form `x.y`
      * @param array    $extraDirs Additional dirs to check into
+     *
      * @return string|null The PHP executable path or NULL if it cannot be found
      */
     public function tryVersions(array $versions, array $extraDirs = [])

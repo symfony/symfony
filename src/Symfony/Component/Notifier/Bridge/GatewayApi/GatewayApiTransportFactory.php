@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\GatewayApi;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -32,6 +33,14 @@ final class GatewayApiTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $from = $dsn->getOption('from');
         $port = $dsn->getPort();
+
+        if (!$from) {
+            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
+        }
+
+        if (!$authToken) {
+            throw new IncompleteDsnException('Missing auth token.', $dsn->getOriginalDsn());
+        }
 
         if ('gatewayapi' === $scheme) {
             return (new GatewayApiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);

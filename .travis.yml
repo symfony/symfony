@@ -64,7 +64,7 @@ before_install:
       cp .github/composer-config.json ~/.composer/config.json
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
-      export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'
+      export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       find ~/.phpenv -name xdebug.ini -delete
 
@@ -201,13 +201,15 @@ install:
       git config --global user.email ""
       git config --global user.name "Symfony"
 
+      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*')
+
       if [[ ! $deps ]]; then
-          php .github/build-packages.php HEAD^ $TRAVIS_BRANCH src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
+          php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
           echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json &&
-          php .github/build-packages.php HEAD^ $TRAVIS_BRANCH $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | sort) &&
+          php .github/build-packages.php HEAD^ $SYMFONY_VERSION $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | sort) &&
           mv composer.json composer.json.phpunit &&
           mv composer.json.orig composer.json
       fi
@@ -224,8 +226,6 @@ install:
           git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
-      else
-        export SYMFONY_VERSION=$TRAVIS_BRANCH
       fi
 
     - |
@@ -269,7 +269,7 @@ install:
               return
           fi
           phpenv global $PHP
-
+          rm vendor/composer/package-versions-deprecated -Rf
           ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
@@ -318,6 +318,7 @@ install:
 
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
+                  echo '' > vendor/composer/platform_check.php
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/
               fi
           fi

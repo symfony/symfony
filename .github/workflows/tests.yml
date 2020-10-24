@@ -52,13 +52,11 @@ jobs:
                     extensions: "memcached,redis,xsl"
                     ini-values: "memory_limit=-1"
                     php-version: "${{ matrix.php }}"
-                    tools: flex
 
             -   name: Configure composer
                 run: |
                     ([ -d ~/.composer ] || mkdir ~/.composer) && cp .github/composer-config.json ~/.composer/config.json
-                    BRANCH_REF=${GITHUB_BASE_REF:-$GITHUB_REF}
-                    echo "COMPOSER_ROOT_VERSION=${BRANCH_REF:11}.x-dev" >> $GITHUB_ENV
+                    echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*').x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory
                 id: composer-cache
@@ -93,6 +91,7 @@ jobs:
                 if: matrix.php == '7.4'
                 run: |
                     [ -d .phpunit ] && mv .phpunit .phpunit.bak
+                    echo '' > vendor/composer/platform_check.php
                     wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
                     docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.4-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
                     sudo rm -rf .phpunit

@@ -16,8 +16,10 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -32,6 +34,11 @@ class ChainAdapterTest extends AdapterTestCase
         }
 
         return new ChainAdapter([new ArrayAdapter($defaultLifetime), new ExternalAdapter($defaultLifetime), new FilesystemAdapter('', $defaultLifetime)], $defaultLifetime);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
 
     public function testEmptyAdaptersException()
@@ -185,6 +192,48 @@ class ChainAdapterTest extends AdapterTestCase
 
         $item = $adapter1->getItem('key1');
         $this->assertFalse($item->isHit());
+    }
+
+    public function testExpirationOnAllAdapters()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $itemValidator = function (CacheItem $item) {
+            $refl = new \ReflectionObject($item);
+            $propExpiry = $refl->getProperty('expiry');
+            $propExpiry->setAccessible(true);
+            $expiry = $propExpiry->getValue($item);
+            $this->assertGreaterThan(10, $expiry - time(), 'Item should be saved with the given ttl, not the default for the adapter.');
+
+            return true;
+        };
+
+        $adapter1 = $this->getMockBuilder(FilesystemAdapter::class)
+            ->setConstructorArgs(['', 2])
+            ->setMethods(['save'])
+            ->getMock();
+        $adapter1->expects($this->once())
+            ->method('save')
+            ->with($this->callback($itemValidator))
+            ->willReturn(true);
+
+        $adapter2 = $this->getMockBuilder(FilesystemAdapter::class)
+            ->setConstructorArgs(['', 4])
+            ->setMethods(['save'])
+            ->getMock();
+        $adapter2->expects($this->once())
+            ->method('save')
+            ->with($this->callback($itemValidator))
+            ->willReturn(true);
+
+        $cache = new ChainAdapter([$adapter1, $adapter2], 6);
+        $cache->get('test_key', function (ItemInterface $item) {
+            $item->expiresAfter(15);
+
+            return 'chain';
+        });
     }
 
     private function getPruneableMock(): AdapterInterface

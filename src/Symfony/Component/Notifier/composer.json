@@ -28,8 +28,9 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.1"
-    }
+<<<<<<< HEAD:src/Symfony/Component/Notifier/composer.json
+    "minimum-stability": "dev"
+=======
+    "minimum-stability": "dev"
+>>>>>>> 4.4:src/Symfony/Component/Debug/composer.json
 }

@@ -19,6 +19,14 @@ use SebastianBergmann\Exporter\Exporter;
 trait ConstraintTraitForV6
 {
     /**
+     * @return bool|null
+     */
+    public function evaluate($other, $description = '', $returnResult = false)
+    {
+        return $this->doEvaluate($other, $description, $returnResult);
+    }
+
+    /**
      * @return int
      */
     public function count()
@@ -84,6 +92,25 @@ trait ConstraintTraitForV6
     private function doCount()
     {
         return 1;
+    }
+
+    private function doEvaluate($other, $description, $returnResult)
+    {
+        $success = false;
+
+        if ($this->matches($other)) {
+            $success = true;
+        }
+
+        if ($returnResult) {
+            return $success;
+        }
+
+        if (!$success) {
+            $this->fail($other, $description);
+        }
+
+        return null;
     }
 
     private function doFailureDescription($other)

@@ -26,8 +26,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.1"
-    }
+    "minimum-stability": "dev"
 }

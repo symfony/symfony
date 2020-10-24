@@ -35,11 +35,12 @@
             "/Tests/"
         ]
     },
+<<<<<<< HEAD
     "bin": [
         "Resources/bin/yaml-lint"
     ],
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.1"
-    }
+    "minimum-stability": "dev"
+=======
+    "minimum-stability": "dev"
+>>>>>>> 4.4
 }

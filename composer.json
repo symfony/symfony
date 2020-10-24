@@ -169,8 +169,5 @@
             "url": "src/Symfony/Contracts"
         }
     ],
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.1"
-    }
+    "minimum-stability": "dev"
 }

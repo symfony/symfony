@@ -334,6 +334,58 @@
                 <source>This value should be valid JSON.</source>
                 <target>Această valoare trebuie să fie un JSON valid.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Acest set ar trebui să conțină numai elemente unice.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Această valoare ar trebui să fie pozitivă.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Această valoare trebuie să fie pozitivă sau zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Această valoare ar trebui să fie negativă.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Această valoare trebuie să fie negativă sau zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Această valoare nu este un fus orar valid.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Această parolă a fost compromisă și nu poate fi utilizată. Vă rugăm să utilizați o altă parolă.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Această valoare trebuie să fie între {{ min }} și {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Această valoare nu este un numele gazdei valid.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Numărul de elemente din această colecție ar trebui să fie un multiplu al {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Această valoare trebuie să îndeplinească cel puțin una dintre următoarele reguli:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Fiecare element din acest set ar trebui să îndeplinească propriul set de reguli.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Această valoare nu este un număr internațional de identificare (ISIN) valabil.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-10-22T10:12:25Z
+
+Such renaming makes sense to me
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-22T14:34:22Z
+
+Thank you. PR is updated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-23T13:12:12Z
+
+@Nyholm Why did you revert the service renaming?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-23T13:27:18Z
+
+Because the tests was failing all over the place. :(
+
+The `limiter` service is abstract and all our `LimiterInterface` services uses that abstract service. They are created with names `limiter.acme`. Where `acme` is just the thing added to exiting service. So they would be named `limiter_factory.acme`.
+
+I tried searching for all references in other components and fixing the issue but I couldn't really. I can try an another search if you want.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-23T13:29:14Z
+
+Works for me as-is. Thanks for explaining :)

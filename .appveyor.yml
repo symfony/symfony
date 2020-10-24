@@ -49,7 +49,7 @@ install:
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex
     - git config --global user.email ""
     - git config --global user.name "Symfony"
-    - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit src\Symfony\Contracts
+    - php .github/build-packages.php "HEAD^" %APPVEYOR_REPO_BRANCH% src\Symfony\Bridge\PhpUnit src\Symfony\Contracts
     - SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev
     - php composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install

@@ -61,8 +61,5 @@
             "/Http/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "4.4"
-    }
+    "minimum-stability": "dev"
 }

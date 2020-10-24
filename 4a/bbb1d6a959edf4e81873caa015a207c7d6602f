@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-20T13:55:09Z
+
+I just found https://github.com/symfony/symfony/pull/30561 (which introduced this regex) :
+
+> Better be sure CR/LF/etc cannot be passed inside raw header values, opening potential security risks.
+
+Should we still check for these characters, to make sure they are not inside the bearer?

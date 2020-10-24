@@ -14,7 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\RateLimiter\FixedWindowLimiter;
-use Symfony\Component\RateLimiter\RateLimiter;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
@@ -61,6 +61,6 @@ class LimiterTest extends TestCase
 
     private function createFactory(array $options)
     {
-        return new RateLimiter($options, $this->createMock(StorageInterface::class), $this->createMock(LockFactory::class));
+        return new RateLimiterFactory($options, $this->createMock(StorageInterface::class), $this->createMock(LockFactory::class));
     }
 }

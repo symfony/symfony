@@ -10,7 +10,6 @@ init:
     - SET PATH=c:\php;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
-    - SET "SYMFONY_REQUIRE=>=3.4"
     - SET ANSICON=121x90 (121x90)
     - SET SYMFONY_PHPUNIT_VERSION=4.8
     - SET SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
@@ -49,18 +48,23 @@ install:
     - echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
     - copy /Y php.ini-min php.ini
     - echo extension=php_openssl.dll >> php.ini
+    - echo extension=php_curl.dll >> php.ini
+    - echo curl.cainfo=c:\php\cacert.pem >> php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/1.9.0/composer.phar)
-    - php composer.phar self-update
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://github.com/composer/composer/releases/download/2.0.0/composer.phar)
+    - php composer.phar self-update --2
     - copy /Y .github\composer-config.json %APPDATA%\Composer\config.json
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex
     - git config --global user.email ""
     - git config --global user.name "Symfony"
-    - php .github/build-packages.php "HEAD^" %APPVEYOR_REPO_BRANCH% src\Symfony\Bridge\PhpUnit
-    - SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev
-    - php composer.phar config platform.php 5.5.9
-    - php composer.phar update --no-progress --no-suggest --ansi
+    - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep branch-version composer.json | grep -o '[0-9.]*'"`) DO (SET SYMFONY_VERSION=%%F)
+    - php .github/build-packages.php "HEAD^" %SYMFONY_VERSION% src\Symfony\Bridge\PhpUnit
+    - SET "SYMFONY_REQUIRE=>=%SYMFONY_VERSION%"
+    - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
+    - php composer.phar config --global platform.php 5.5.9
+    - php composer.phar update --no-progress --ansi
     - php phpunit install
+    - break > .phpunit/phpunit-4.8-0/vendor/composer/platform_check.php
 
 test_script:
     - SET X=0

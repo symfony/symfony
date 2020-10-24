@@ -133,5 +133,8 @@
     "autoload-dev": {
         "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-version": "3.4"
+    }
 }

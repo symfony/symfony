@@ -57,6 +57,18 @@ Monolog
  * The `$actionLevel` constructor argument of `Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy` has been deprecated and replaced by the `$inner` one which expects an ActivationStrategyInterface to decorate instead. `Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy` will become final in 6.0.
  * The `$actionLevel` constructor argument of `Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy` has been deprecated and replaced by the `$inner` one which expects an ActivationStrategyInterface to decorate instead. `Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy` will become final in 6.0
 
+Notifier
+--------
+
+ * [BC BREAK] The `TransportInterface::send()` and `AbstractTransport::doSend()` methods changed to return a `?SentMessage` instance instead of `void`.
+ * [BC BREAK] Changed the type-hint of the `$recipient` argument in the `as*Message()` method
+   of `EmailNotificationInterface` and `SmsNotificationInterface` to `EmailRecipientInterface`
+   and `SmsRecipientInterface`.
+ * [BC BREAK] Removed the `AdminRecipient`.
+ * [BC BREAK] Changed the type-hint of the `$recipient` argument in `NotifierInterface::send()`,
+   `Notifier::getChannels()`, `ChannelInterface::notifiy()` and `ChannelInterface::supports()` to
+   `RecipientInterface`.
+
 PropertyAccess
 --------------
 

@@ -31,8 +31,5 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
-    },
-    "extra": {
-        "branch-version": "3.4"
     }
 }

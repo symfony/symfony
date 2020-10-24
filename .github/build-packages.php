@@ -1,7 +1,7 @@
 <?php
 
 if (3 > $_SERVER['argc']) {
-    echo "Usage: branch dir1 dir2 ... dirN\n";
+    echo "Usage: branch version dir1 dir2 ... dirN\n";
     exit(1);
 }
 chdir(dirname(__DIR__));
@@ -14,6 +14,7 @@ if ($json !== $package = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
 $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($dirs))));
+$version = array_shift($dirs);
 
 $packages = array();
 $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
@@ -50,11 +51,7 @@ foreach ($dirs as $k => $dir) {
         passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
     }
 
-    if (!isset($package->extra->{'branch-version'})) {
-        echo "Missing \"branch-version\" in composer.json's \"extra\".\n";
-        exit(1);
-    }
-    $package->version = $package->extra->{'branch-version'}.'.x-dev';
+    $package->version = (isset($package->extra->{'branch-version'}) ? $package->extra->{'branch-version'} : $version).'.x-dev';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 

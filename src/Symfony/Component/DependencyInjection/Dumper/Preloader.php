@@ -94,7 +94,7 @@ class Preloader
 
     private static function preloadType(?\ReflectionType $t, array &$preloaded): void
     {
-        if (!$t || $t->isBuiltin()) {
+        if (!$t) {
             return;
         }
 

@@ -37,6 +37,7 @@
         "bin/simple-phpunit"
     ],
     "minimum-stability": "dev",
+    "extra": {
         "thanks": {
             "name": "phpunit/phpunit",
             "url": "https://github.com/sebastianbergmann/phpunit"

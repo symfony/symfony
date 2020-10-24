@@ -35,12 +35,8 @@
             "/Tests/"
         ]
     },
-<<<<<<< HEAD
     "bin": [
         "Resources/bin/yaml-lint"
     ],
     "minimum-stability": "dev"
-=======
-    "minimum-stability": "dev"
->>>>>>> 4.4
 }

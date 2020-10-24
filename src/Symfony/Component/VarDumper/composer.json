@@ -45,8 +45,5 @@
     "bin": [
         "Resources/bin/var-dump-server"
     ],
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.2"
-    }
+    "minimum-stability": "dev"
 }

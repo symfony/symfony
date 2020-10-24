@@ -64,21 +64,18 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
             return $node;
         }
 
-        if ($node instanceof FilterExpression && \in_array($node->getNode('filter')->getAttribute('value'), ['trans', 'transchoice'])) {
+        if ($node instanceof FilterExpression && 'trans' === $node->getNode('filter')->getAttribute('value')) {
             $arguments = $node->getNode('arguments');
-            $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
-                if (!$arguments->hasNode('domain') && !$arguments->hasNode($ind)) {
+                if (!$arguments->hasNode('domain') && !$arguments->hasNode(1)) {
                     $arguments->setNode('domain', $this->scope->get('domain'));
                 }
-            } else {
-                if (!$arguments->hasNode($ind)) {
-                    if (!$arguments->hasNode($ind - 1)) {
-                        $arguments->setNode($ind - 1, new ArrayExpression([], $node->getTemplateLine()));
-                    }
-
-                    $arguments->setNode($ind, $this->scope->get('domain'));
+            } elseif (!$arguments->hasNode(1)) {
+                if (!$arguments->hasNode(0)) {
+                    $arguments->setNode(0, new ArrayExpression([], $node->getTemplateLine()));
                 }
+
+                $arguments->setNode(1, $this->scope->get('domain'));
             }
         } elseif ($node instanceof TransNode) {
             if (!$node->hasNode('domain')) {

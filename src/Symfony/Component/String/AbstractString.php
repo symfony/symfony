@@ -98,7 +98,6 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public function after($needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
-        $str->string = '';
         $i = \PHP_INT_MAX;
 
         foreach ((array) $needle as $n) {
@@ -130,7 +129,6 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public function afterLast($needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
-        $str->string = '';
         $i = null;
 
         foreach ((array) $needle as $n) {
@@ -167,7 +165,6 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public function before($needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
-        $str->string = '';
         $i = \PHP_INT_MAX;
 
         foreach ((array) $needle as $n) {
@@ -199,7 +196,6 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     public function beforeLast($needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
-        $str->string = '';
         $i = null;
 
         foreach ((array) $needle as $n) {

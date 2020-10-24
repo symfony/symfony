@@ -191,7 +191,7 @@ install:
           git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
           git rm -rq src/Symfony/Bridge/PhpUnit
           git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
-          export SYMFONY_VERSION=$(cat src/Symfony/Bridge/PhpUnit/composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9.]*')
+          export SYMFONY_VERSION=$(curl -s https://api.github.com/repos/symfony/symfony/pulls/$SYMFONY_PHPUNIT_BRIDGE_PR | jq -r .base.ref)
           sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_VERSION'.x@dev"/' composer.json
           rm -rf .phpunit
       fi
@@ -202,12 +202,12 @@ install:
       git config --global user.name "Symfony"
 
       if [[ ! $deps ]]; then
-          php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
+          php .github/build-packages.php HEAD^ $TRAVIS_BRANCH src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
           echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json &&
-          php .github/build-packages.php HEAD^ $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | sort) &&
+          php .github/build-packages.php HEAD^ $TRAVIS_BRANCH $(find src/Symfony -mindepth 2 -type f -name composer.json -printf '%h\n' | sort) &&
           mv composer.json composer.json.phpunit &&
           mv composer.json.orig composer.json
       fi
@@ -220,12 +220,12 @@ install:
       # For the feature-branch, when deps=high, the version before it is checked out and tested with the locally patched components
       if [[ $deps = high && $TRAVIS_BRANCH = *.x ]]; then
           export FLIP='🙃'
-          export SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//) &&
+          export SYMFONY_VERSION=$(git ls-remote -q --heads | grep -o '/[1-9]\.[0-9].*' | tail -n 1 | sed s/.//) &&
           git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       else
-        export SYMFONY_VERSION=$(cat composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9.]*')
+        export SYMFONY_VERSION=$TRAVIS_BRANCH
       fi
 
     - |
@@ -252,7 +252,7 @@ install:
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
-      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"branch-version". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
+      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*') ]] && export LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi

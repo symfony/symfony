@@ -37,8 +37,5 @@
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.2"
-    }
+    "minimum-stability": "dev"
 }

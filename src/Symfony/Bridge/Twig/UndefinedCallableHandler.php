@@ -22,7 +22,6 @@ class UndefinedCallableHandler
     private static $filterComponents = [
         'humanize' => 'form',
         'trans' => 'translation',
-        'transchoice' => 'translation',
         'yaml_encode' => 'yaml',
         'yaml_dump' => 'yaml',
     ];

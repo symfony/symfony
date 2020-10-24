@@ -41,7 +41,7 @@ class DeprecationTest extends TestCase
         }
 
         self::$vendorDir = $vendorDir;
-        mkdir($vendorDir.'/myfakevendor/myfakepackage2');
+        @mkdir($vendorDir.'/myfakevendor/myfakepackage2');
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile1.php');
         touch($vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php');
         touch($vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php');

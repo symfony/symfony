@@ -597,6 +597,37 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['awesome', 'Symfony is awesome', 11, 7],
             ['awesome', 'Symfony is awesome', -7, null],
             ['awe', 'Symfony is awesome', -7, -4],
+            ['S', 'Symfony is awesome', -42, 1],
+            ['', 'Symfony is awesome', 42, 1],
+            ['', 'Symfony is awesome', 0, -42],
+        ];
+    }
+
+    /**
+     * @dataProvider provideSplice
+     */
+    public function testSplice(string $expected, int $start, int $length = null)
+    {
+        $this->assertEquals(
+            static::createFromString($expected),
+            static::createFromString('Symfony is awesome')->splice('X', $start, $length)
+        );
+    }
+
+    public static function provideSplice()
+    {
+        return [
+            ['X is awesome', 0, 7],
+            ['SymfonyXis awesome', 7, 1],
+            ['Symfony X awesome', 8, 2],
+            ['Symfony X', 8, null],
+            ['Symfony isXawesome', 10, 1],
+            ['Symfony is X', 11, 7],
+            ['Symfony is X', -7, null],
+            ['Symfony is Xsome', -7, -4],
+            ['Xymfony is awesome', -42, 1],
+            ['Symfony is awesomeX', 42, 1],
+            ['XSymfony is awesome', 0, -42],
         ];
     }
 
@@ -766,12 +797,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideBeforeAfter()
     {
         return [
-            ['', '', 'hello world', 0, true],
-            ['', '', 'hello world', 0, false],
-            ['', 'w', 'hello World', 0, true],
-            ['', 'w', 'hello World', 0, false],
-            ['', 'o', 'hello world', 10, true],
-            ['', 'o', 'hello world', 10, false],
+            ['hello world', '', 'hello world', 0, true],
+            ['hello world', '', 'hello world', 0, false],
+            ['hello World', 'w', 'hello World', 0, true],
+            ['hello World', 'w', 'hello World', 0, false],
+            ['hello world', 'o', 'hello world', 10, true],
+            ['hello world', 'o', 'hello world', 10, false],
             ['hello ', 'w', 'hello world', 0, true],
             ['world', 'w', 'hello world', 0, false],
             ['hello W', 'O', 'hello WORLD', 0, true],
@@ -794,12 +825,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideBeforeAfterIgnoreCase()
     {
         return [
-            ['', '', 'hello world', 0, true],
-            ['', '', 'hello world', 0, false],
-            ['', 'foo', 'hello world', 0, true],
-            ['', 'foo', 'hello world', 0, false],
-            ['', 'o', 'hello world', 10, true],
-            ['', 'o', 'hello world', 10, false],
+            ['hello world', '', 'hello world', 0, true],
+            ['hello world', '', 'hello world', 0, false],
+            ['hello world', 'foo', 'hello world', 0, true],
+            ['hello world', 'foo', 'hello world', 0, false],
+            ['hello world', 'o', 'hello world', 10, true],
+            ['hello world', 'o', 'hello world', 10, false],
             ['hello ', 'w', 'hello world', 0, true],
             ['world', 'w', 'hello world', 0, false],
             ['hello ', 'W', 'hello world', 0, true],
@@ -822,12 +853,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideBeforeAfterLast()
     {
         return [
-            ['', '', 'hello world', 0, true],
-            ['', '', 'hello world', 0, false],
-            ['', 'L', 'hello world', 0, true],
-            ['', 'L', 'hello world', 0, false],
-            ['', 'o', 'hello world', 10, true],
-            ['', 'o', 'hello world', 10, false],
+            ['hello world', '', 'hello world', 0, true],
+            ['hello world', '', 'hello world', 0, false],
+            ['hello world', 'L', 'hello world', 0, true],
+            ['hello world', 'L', 'hello world', 0, false],
+            ['hello world', 'o', 'hello world', 10, true],
+            ['hello world', 'o', 'hello world', 10, false],
             ['hello wor', 'l', 'hello world', 0, true],
             ['ld', 'l', 'hello world', 0, false],
             ['hello w', 'o', 'hello world', 0, true],
@@ -851,12 +882,12 @@ abstract class AbstractAsciiTestCase extends TestCase
     public static function provideBeforeAfterLastIgnoreCase()
     {
         return [
-            ['', '', 'hello world', 0, true],
-            ['', '', 'hello world', 0, false],
-            ['', 'FOO', 'hello world', 0, true],
-            ['', 'FOO', 'hello world', 0, false],
-            ['', 'o', 'hello world', 10, true],
-            ['', 'o', 'hello world', 10, false],
+            ['hello world', '', 'hello world', 0, true],
+            ['hello world', '', 'hello world', 0, false],
+            ['hello world', 'FOO', 'hello world', 0, true],
+            ['hello world', 'FOO', 'hello world', 0, false],
+            ['hello world', 'o', 'hello world', 10, true],
+            ['hello world', 'o', 'hello world', 10, false],
             ['hello wor', 'l', 'hello world', 0, true],
             ['ld', 'l', 'hello world', 0, false],
             ['hello wor', 'L', 'hello world', 0, true],

@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Account is locked.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Too many failed login attempts, please try again later.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Invalid or expired login link.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

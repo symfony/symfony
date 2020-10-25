@@ -275,9 +275,10 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setTrace($trace, $file, $line): self
+    public function setTrace($trace, $file = null, $line = null): self
     {
         $this->trace = [];
+        if ($file)
         $this->trace[] = [
             'namespace' => '',
             'short_class' => '',
@@ -357,6 +358,18 @@ class FlattenException
 
     public function getTraceAsString(): string
     {
+        if ($this->traceAsString === null) {
+            $this->traceAsString = '';
+            if ($this->trace !== null) {
+                foreach ($this->trace as $i => $trace) {
+                    if ($i === 0) {
+                        continue;
+                    }
+                    $this->traceAsString .= sprintf('#%d %s(%s): %s%s%s()', $i-1, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']).PHP_EOL;
+                }
+            }
+        }
+
         return $this->traceAsString;
     }
 

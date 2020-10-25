@@ -29,6 +29,10 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class FlattenExceptionTest extends TestCase
 {
@@ -403,6 +407,22 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertSame($exception->getTraceAsString(), $flattened->getTraceAsString());
         $this->assertSame($exception->__toString(), $flattened->getAsString());
+    }
+
+    public function testSerialize()
+    {
+        $serializer = new Serializer([new ArrayDenormalizer(), new ObjectNormalizer()], [new JsonEncoder()]);
+
+        $flattened = FlattenException::createFromThrowable(new \LogicException('Bad things happened'));
+        $trace = $flattened->getTraceAsString();
+        $data = $serializer->serialize($flattened, 'json');
+
+        $restored = $serializer->deserialize($data, FlattenException::class, 'json');
+        $restoredTrace = $restored->getTraceAsString();
+
+        // Verify that they look kind of similar.
+        $this->assertEquals(substr($trace, 0, 100), substr($restoredTrace, 0, 100));
+        $this->assertEquals(count(explode(PHP_EOL, $trace)), count(explode(PHP_EOL, $restoredTrace)));
     }
 
     private function createException($foo): \Exception

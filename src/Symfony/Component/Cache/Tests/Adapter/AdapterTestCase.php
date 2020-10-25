@@ -116,11 +116,11 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $item = $cache->getItem('foo');
 
-        $expected = [
-            CacheItem::METADATA_EXPIRY => 9.5 + time(),
-            CacheItem::METADATA_CTIME => 1000,
-        ];
-        $this->assertEqualsWithDelta($expected, $item->getMetadata(), .6, 'Item metadata should embed expiry and ctime.');
+        $metadata = $item->getMetadata();
+        $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
+        $this->assertEqualsWithDelta(1000, $metadata[CacheItem::METADATA_CTIME], 6);
+        $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
+        $this->assertEqualsWithDelta(9.5 + time(), $metadata[CacheItem::METADATA_EXPIRY], 0.6);
     }
 
     public function testDefaultLifeTime()

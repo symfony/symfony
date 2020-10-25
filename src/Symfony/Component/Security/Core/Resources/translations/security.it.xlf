@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>L'account è bloccato.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Troppi tentaivi di login falliti. Riprova tra un po'.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Link di login scaduto o non valido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -89,6 +89,6 @@ DUMP
             'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
         ]);
 
-        return $process->setTimeout(9);
+        return $process->setTimeout('\\' === \DIRECTORY_SEPARATOR ? 19 : 9);
     }
 }

@@ -134,8 +134,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         foreach ($authenticators as $authenticator) {
             // recheck if the authenticator still supports the listener. supports() is called
             // eagerly (before token storage is initialized), whereas authenticate() is called
-            // lazily (after initialization). This is important for e.g. the AnonymousAuthenticator
-            // as its support is relying on the (initialized) token in the TokenStorage.
+            // lazily (after initialization).
             if (false === $authenticator->supports($request)) {
                 if (null !== $this->logger) {
                     $this->logger->debug('Skipping the "{authenticator}" authenticator as it did not support the request.', ['authenticator' => \get_class($authenticator)]);

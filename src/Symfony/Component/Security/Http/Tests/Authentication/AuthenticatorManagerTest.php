@@ -73,7 +73,7 @@ class AuthenticatorManagerTest extends TestCase
     {
         // the attribute stores the supported authenticators, returning false now
         // means support changed between calling supports() and authenticateRequest()
-        // (which is the case with lazy firewalls and e.g. the AnonymousAuthenticator)
+        // (which is the case with lazy firewalls)
         $authenticator = $this->createAuthenticator(false);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 

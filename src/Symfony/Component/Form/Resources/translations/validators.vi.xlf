@@ -114,6 +114,26 @@
                 <source>Please provide a valid phone number.</source>
                 <target>Vui lòng cung cấp số điện thoại hợp lệ.</target>
             </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Hộp kiểm có một giá trị không hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Vui lòng nhập địa chỉ email hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Vui lòng chọn một phương án hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Vui lòng nhập một phạm vi hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Vui lòng nhập một tuần hợp lệ.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

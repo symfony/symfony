@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>Každý prvek v této kolekci musí splňovat svá vlastní omezení.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Tato hodnota není platné mezinárodní identifikační číslo cenného papíru (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

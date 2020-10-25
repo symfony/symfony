@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Акаунта е заключен.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Твърде много грешни опити за вход, моля опитайте по-късно.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Невалиден или изтекъл линк за вход.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

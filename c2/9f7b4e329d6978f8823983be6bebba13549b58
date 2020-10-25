@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-25T17:41:23Z
+
+Shall we also add `symfony/filesystem` to `require-dev` of `symfony/cache`? 🤔
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-25T17:42:49Z
+
+symfony/cache has a dev dependency on symfony/config. So symfony/filesystem is already added. But sure. It is better to be explicit

@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**

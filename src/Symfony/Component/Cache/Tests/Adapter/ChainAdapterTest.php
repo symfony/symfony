@@ -38,7 +38,7 @@ class ChainAdapterTest extends AdapterTestCase
 
     public static function tearDownAfterClass(): void
     {
-        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+        (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
     public function testEmptyAdaptersException()

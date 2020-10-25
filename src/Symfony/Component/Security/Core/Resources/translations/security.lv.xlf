@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Konts ir slēgts.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Pārāk daudz atteiktu ieejas mēģinājumu, lūdzu, mēģiniet vēlreiz vēlāk.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ieejas saite ir nederīga vai arī tai ir beidzies derīguma termiņš.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

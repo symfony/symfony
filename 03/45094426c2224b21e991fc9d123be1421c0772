@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-25T16:44:18Z
+
+Awesome. Thank you.
+
+Could you also add translation to the Form component and Security core?
+
+- src/Symfony/Component/Form/Resources/translations/validators.bg.xlf
+- src/Symfony/Component/Security/Core/Resources/translations/security.bg.xlf

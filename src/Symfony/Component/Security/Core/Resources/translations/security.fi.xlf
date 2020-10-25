@@ -4,71 +4,75 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Грешка при автентикация.</target>
+                <target>Autentikointi poikkeus tapahtui.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Удостоверението за автентикация не е открито.</target>
+                <target>Autentikoinnin tunnistetietoja ei löydetty.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Заявката за автентикация не може да бъде обработената поради системна грешка.</target>
+                <target>Autentikointipyyntöä ei voitu käsitellä järjestelmäongelman vuoksi.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Невалидно удостоверение за автентикация.</target>
+                <target>Virheelliset tunnistetiedot.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Това cookie вече се ползва от някой друг.</target>
+                <target>Eväste on jo jonkin muun käytössä.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Нямате права за достъп до този ресурс.</target>
+                <target>Ei oikeutta resurssiin.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
-                <target>Невалиден CSRF токен.</target>
+                <target>Virheellinen CSRF tunnus.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>Digest nonce has expired.</source>
+                <target>Digest nonce on vanhentunut.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>No authentication provider found to support the authentication token.</source>
-                <target>Не е открит провайдър, който да поддържа този токен за автентикация.</target>
+                <target>Autentikointi tunnukselle ei löydetty tuettua autentikointi tarjoajaa.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Сесията не е достъпна, или времето за достъп е изтекло, или кукитата не са разрешени.</target>
+                <target>Sessio ei ole saatavilla, se on joko vanhentunut tai evästeet eivät ole käytössä.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
-                <target>Токена не е открит.</target>
+                <target>Tunnusta ei löytynyt.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Потребителското име не е открито.</target>
+                <target>Käyttäjätunnusta ei löydetty.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Акаунта е изтекъл.</target>
+                <target>Tili on vanhentunut.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Удостоверението за автентикация е изтекло.</target>
+                <target>Tunnistetiedot ovat vanhentuneet.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Акаунта е деактивиран.</target>
+                <target>Tili on poistettu käytöstä.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>Акаунта е заключен.</target>
+                <target>Tili on lukittu.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Твърде много грешни опити за вход, моля опитайте по-късно.</target>
+                <target>Liian monta epäonnistunutta kirjautumisyritystä, yritä myöhemmin uudelleen.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Невалиден или изтекъл линк за вход.</target>
+                <target>Virheellinen tai vanhentunut kirjautumislinkki.</target>
             </trans-unit>
         </body>
     </file>

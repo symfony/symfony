@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Firewall\AbstractListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -26,7 +26,7 @@ interface AuthenticatorManagerInterface
     /**
      * Called to see if authentication should be attempted on this request.
      *
-     * @see AbstractListener::supports()
+     * @see FirewallListenerInterface::supports()
      */
     public function supports(Request $request): ?bool;
 

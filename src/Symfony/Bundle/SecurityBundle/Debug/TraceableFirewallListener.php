@@ -15,7 +15,7 @@ use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Http\Firewall\AbstractListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 /**
  * Firewall collecting called listeners.
@@ -41,7 +41,7 @@ final class TraceableFirewallListener extends FirewallListener
                 \Closure::bind(function () use (&$wrappedLazyListeners, &$wrappedListeners) {
                     $listeners = [];
                     foreach ($this->listeners as $listener) {
-                        if ($listener instanceof AbstractListener) {
+                        if ($listener instanceof FirewallListenerInterface) {
                             $listener = new WrappedLazyListener($listener);
                             $listeners[] = $listener;
                             $wrappedLazyListeners[] = $listener;
@@ -58,7 +58,7 @@ final class TraceableFirewallListener extends FirewallListener
 
                 $listener($event);
             } else {
-                $wrappedListener = $listener instanceof AbstractListener ? new WrappedLazyListener($listener) : new WrappedListener($listener);
+                $wrappedListener = $listener instanceof FirewallListenerInterface ? new WrappedLazyListener($listener) : new WrappedListener($listener);
                 $wrappedListener($event);
                 $wrappedListeners[] = $wrappedListener->getInfo();
             }

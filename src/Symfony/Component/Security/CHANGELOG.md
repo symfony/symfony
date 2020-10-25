@@ -14,6 +14,7 @@ CHANGELOG
  * Added a CurrentUser attribute to force the UserValueResolver to resolve an argument to the current user.
  * Added `LoginThrottlingListener`.
  * Added `LoginLinkAuthenticator`.
+ * Moved methods `supports()` and `authenticate()` from `AbstractListener` to `FirewallListenerInterface`.
 
 5.1.0
 -----

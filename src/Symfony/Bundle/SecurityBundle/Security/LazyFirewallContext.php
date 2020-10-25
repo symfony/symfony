@@ -14,8 +14,8 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
-use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 /**
@@ -46,9 +46,9 @@ class LazyFirewallContext extends FirewallContext
         $lazy = $request->isMethodCacheable();
 
         foreach (parent::getListeners() as $listener) {
-            if (!$lazy || !$listener instanceof AbstractListener) {
+            if (!$lazy || !$listener instanceof FirewallListenerInterface) {
                 $listeners[] = $listener;
-                $lazy = $lazy && $listener instanceof AbstractListener;
+                $lazy = $lazy && $listener instanceof FirewallListenerInterface;
             } elseif (false !== $supports = $listener->supports($request)) {
                 $listeners[] = [$listener, 'authenticate'];
                 $lazy = null === $supports;

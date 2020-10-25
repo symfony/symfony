@@ -9,11 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter;
+namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
+use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\RateLimit;
+use Symfony\Component\RateLimiter\Reservation;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 

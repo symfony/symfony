@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter;
+namespace Symfony\Component\RateLimiter\Policy;
 
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
+use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

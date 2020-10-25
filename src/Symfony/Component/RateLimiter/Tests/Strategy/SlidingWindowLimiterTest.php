@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter\Tests;
+namespace Symfony\Component\RateLimiter\Tests\Policy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
-use Symfony\Component\RateLimiter\SlidingWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 /**

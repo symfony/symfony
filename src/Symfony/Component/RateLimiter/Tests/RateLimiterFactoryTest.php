@@ -13,12 +13,12 @@ namespace Symfony\Component\RateLimiter\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\RateLimiter\FixedWindowLimiter;
-use Symfony\Component\RateLimiter\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\NoLimiter;
+use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\RateLimiter\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
-use Symfony\Component\RateLimiter\TokenBucketLimiter;
 
 class RateLimiterFactoryTest extends TestCase
 {
@@ -35,7 +35,7 @@ class RateLimiterFactoryTest extends TestCase
     public function validConfigProvider()
     {
         yield [TokenBucketLimiter::class, [
-            'strategy' => 'token_bucket',
+            'policy' => 'token_bucket',
             'id' => 'test',
             'limit' => 5,
             'rate' => [
@@ -43,19 +43,19 @@ class RateLimiterFactoryTest extends TestCase
             ],
         ]];
         yield [FixedWindowLimiter::class, [
-            'strategy' => 'fixed_window',
+            'policy' => 'fixed_window',
             'id' => 'test',
             'limit' => 5,
             'interval' => '5 seconds',
         ]];
         yield [SlidingWindowLimiter::class, [
-            'strategy' => 'sliding_window',
+            'policy' => 'sliding_window',
             'id' => 'test',
             'limit' => 5,
             'interval' => '5 seconds',
         ]];
         yield [NoLimiter::class, [
-            'strategy' => 'no_limit',
+            'policy' => 'no_limit',
             'id' => 'test',
         ]];
     }
@@ -73,7 +73,7 @@ class RateLimiterFactoryTest extends TestCase
     public function invalidConfigProvider()
     {
         yield [MissingOptionsException::class, [
-            'strategy' => 'token_bucket',
+            'policy' => 'token_bucket',
         ]];
     }
 }

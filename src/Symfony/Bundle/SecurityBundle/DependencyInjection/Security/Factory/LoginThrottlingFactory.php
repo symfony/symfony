@@ -73,7 +73,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             }
 
             $limiterOptions = [
-                'strategy' => 'fixed_window',
+                'policy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
                 'interval' => '1 minute',
             ];

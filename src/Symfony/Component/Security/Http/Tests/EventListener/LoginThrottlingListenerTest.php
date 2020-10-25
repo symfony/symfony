@@ -37,13 +37,13 @@ class LoginThrottlingListenerTest extends TestCase
 
         $localLimiter = new RateLimiterFactory([
             'id' => 'login',
-            'strategy' => 'fixed_window',
+            'policy' => 'fixed_window',
             'limit' => 3,
             'interval' => '1 minute',
         ], new InMemoryStorage());
         $globalLimiter = new RateLimiterFactory([
             'id' => 'login',
-            'strategy' => 'fixed_window',
+            'policy' => 'fixed_window',
             'limit' => 6,
             'interval' => '1 minute',
         ], new InMemoryStorage());

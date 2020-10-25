@@ -22,7 +22,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 $limiter = new RateLimiterFactory([
     'id' => 'login',
-    'strategy' => 'token_bucket',
+    'policy' => 'token_bucket',
     'limit' => 10,
     'rate' => ['interval' => '15 minutes'],
 ], new InMemoryStorage());

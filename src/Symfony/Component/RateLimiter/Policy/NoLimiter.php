@@ -9,7 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\RateLimiter;
+namespace Symfony\Component\RateLimiter\Policy;
+
+use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\RateLimit;
+use Symfony\Component\RateLimiter\Reservation;
 
 /**
  * Implements a non limiting limiter.

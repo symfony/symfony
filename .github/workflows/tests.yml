@@ -106,7 +106,8 @@ jobs:
 
             -   name: Configure composer
                 run: |
-                    ([ -d ~/.composer ] || mkdir ~/.composer) && cp .github/composer-config.json ~/.composer/config.json
+                    COMPOSER_HOME="$(composer config home)"
+                    ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
                     echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*').x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory

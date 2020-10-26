@@ -1,5 +1,6 @@
 {
     "config": {
+        "platform-check": false,
         "preferred-install": {
             "symfony/form": "source",
             "symfony/http-kernel": "source",

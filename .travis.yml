@@ -318,7 +318,6 @@ install:
 
               if [[ $PHP = ${MIN_PHP%.*} ]]; then
                   export PHP=$MIN_PHP
-                  echo '' > vendor/composer/platform_check.php
                   tfold src/Symfony/Component/Process.sigchild SYMFONY_DEPRECATIONS_HELPER=weak php-$MIN_PHP/sapi/cli/php ./phpunit --colors=always src/Symfony/Component/Process/
               fi
           fi

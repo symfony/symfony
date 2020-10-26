@@ -144,6 +144,9 @@ before_install:
           if [[ $PHP != nightly ]]; then
               echo extension = memcached.so >> $INI
           fi
+          if [[ $PHP = 7.1 ]]; then
+              echo extension = mbstring.so >> $INI
+          fi
       done
 
     - |

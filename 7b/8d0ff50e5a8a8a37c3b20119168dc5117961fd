@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by miromichalicka at 2020-10-26T13:08:57Z
+
+The fabbot.io error is false positive, there really shouldn't be double `s` in the word.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-26T13:10:16Z
+
+Correct. Fabbot does not handle Slovak really well =)

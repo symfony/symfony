@@ -288,6 +288,7 @@ install:
               return
           fi
           phpenv global ${PHP/hhvm*/hhvm}
+          composer self-update --2
           rm vendor/composer/package-versions-deprecated -Rf
           if [[ $PHP = 7.* ]]; then
               ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)

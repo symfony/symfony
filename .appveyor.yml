@@ -64,7 +64,6 @@ install:
     - php composer.phar config --global platform.php 5.5.9
     - php composer.phar update --no-progress --ansi
     - php phpunit install
-    - break > .phpunit/phpunit-4.8-0/vendor/composer/platform_check.php
 
 test_script:
     - SET X=0

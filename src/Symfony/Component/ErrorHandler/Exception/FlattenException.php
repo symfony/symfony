@@ -278,17 +278,19 @@ class FlattenException
     public function setTrace($trace, $file = null, $line = null): self
     {
         $this->trace = [];
-        if ($file)
-        $this->trace[] = [
-            'namespace' => '',
-            'short_class' => '',
-            'class' => '',
-            'type' => '',
-            'function' => '',
-            'file' => $file,
-            'line' => $line,
-            'args' => [],
-        ];
+        if (null !== $file) {
+            $this->trace[] = [
+                'namespace' => '',
+                'short_class' => '',
+                'class' => '',
+                'type' => '',
+                'function' => '',
+                'file' => $file,
+                'line' => $line,
+                'args' => [],
+            ];
+        }
+
         foreach ($trace as $entry) {
             $class = '';
             $namespace = '';
@@ -358,14 +360,14 @@ class FlattenException
 
     public function getTraceAsString(): string
     {
-        if ($this->traceAsString === null) {
+        if (null === $this->traceAsString) {
             $this->traceAsString = '';
-            if ($this->trace !== null) {
+            if (null !== $this->trace) {
                 foreach ($this->trace as $i => $trace) {
-                    if ($i === 0) {
+                    if (0 === $i) {
                         continue;
                     }
-                    $this->traceAsString .= sprintf('#%d %s(%s): %s%s%s()', $i-1, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']).PHP_EOL;
+                    $this->traceAsString .= sprintf('#%d %s(%s): %s%s%s()', $i - 1, $trace['file'], $trace['line'], $trace['class'], $trace['type'], $trace['function']).\PHP_EOL;
                 }
             }
         }

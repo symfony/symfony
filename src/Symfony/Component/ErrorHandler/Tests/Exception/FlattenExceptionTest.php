@@ -422,7 +422,7 @@ class FlattenExceptionTest extends TestCase
 
         // Verify that they look kind of similar.
         $this->assertEquals(substr($trace, 0, 100), substr($restoredTrace, 0, 100));
-        $this->assertEquals(count(explode(PHP_EOL, $trace)), count(explode(PHP_EOL, $restoredTrace)));
+        $this->assertEquals(\count(explode(\PHP_EOL, $trace)), \count(explode(\PHP_EOL, $restoredTrace)));
     }
 
     private function createException($foo): \Exception

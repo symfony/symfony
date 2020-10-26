@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Účet je zablokovaný.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Príliš mnoho neúspešných pokusov o prihlásenie. Skúste to prosím znovu neskôr.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Neplatný alebo expirovaný odkaz na prihlásenie.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

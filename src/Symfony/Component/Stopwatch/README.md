@@ -33,6 +33,10 @@ $event = $stopwatch->stop('eventName');
 $stopwatch->stopSection('phase_1');
 ```
 
+Framework User?
+---------------
+The documentation on how to use the Stopwatch inside the Symfony Framework is at https://symfony.com/doc/4.4/performance.html#custom-profiling
+
 Resources
 ---------
 

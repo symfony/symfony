@@ -33,6 +33,7 @@ install:
     - echo max_execution_time=1200 >> php.ini-min
     - echo date.timezone="America/Los_Angeles" >> php.ini-min
     - echo extension_dir=ext >> php.ini-min
+    - echo extension=php_mbstring.dll >> php.ini-min
     - copy /Y php.ini-min php.ini-max
     - echo zend_extension=php_opcache.dll >> php.ini-max
     - echo opcache.enable_cli=1 >> php.ini-max

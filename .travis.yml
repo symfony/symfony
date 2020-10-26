@@ -60,8 +60,7 @@ before_install:
           [ -d /usr/lib/openldap ] && ln -s /usr/lib/openldap /tmp/slapd-modules || ln -s /usr/lib/ldap /tmp/slapd-modules
       fi
       slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
-      [ -d ~/.composer ] || mkdir ~/.composer
-      cp .github/composer-config.json ~/.composer/config.json
+      cp .github/composer-config.json "$(composer config home)/config.json"
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --no-suggest --ansi'

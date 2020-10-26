@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Account is geblokkeerd.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Te veel onjuiste inlogpogingen, probeer het later nogmaals.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ongeldige of verlopen inloglink.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

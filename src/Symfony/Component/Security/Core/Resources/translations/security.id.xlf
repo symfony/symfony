@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Akun terkunci.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Terlalu banyak percobaan login yang salah, Silahkan coba lagi nanti.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Link login salah atau sudah kadaluwarsa.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

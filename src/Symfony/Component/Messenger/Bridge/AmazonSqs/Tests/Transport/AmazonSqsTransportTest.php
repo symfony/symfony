@@ -11,17 +11,55 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\ServerException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AmazonSqsTransportTest extends TestCase
 {
+    /**
+     * @var MockObject|Connection
+     */
+    private $connection;
+
+    /**
+     * @var MockObject|ReceiverInterface
+     */
+    private $receiver;
+
+    /**
+     * @var MockObject|SenderInterface|MessageCountAwareInterface
+     */
+    private $sender;
+
+    /**
+     * @var AmazonSqsTransport
+     */
+    private $transport;
+
+    protected function setUp(): void
+    {
+        $this->connection = $this->createMock(Connection::class);
+        // Mocking the concrete receiver class because mocking multiple interfaces is deprecated
+        $this->receiver = $this->createMock(AmazonSqsReceiver::class);
+        $this->sender = $this->createMock(SenderInterface::class);
+
+        $this->transport = new AmazonSqsTransport($this->connection, null, $this->receiver, $this->sender);
+    }
+
     public function testItIsATransport()
     {
         $transport = $this->getTransport();
@@ -58,11 +96,87 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertInstanceOf(MessageCountAwareInterface::class, $transport);
     }
 
+    public function testItCanGetMessagesViaTheReceiver(): void
+    {
+        $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
+        $this->receiver->expects($this->once())->method('get')->willReturn($envelopes);
+        $this->assertSame($envelopes, $this->transport->get());
+    }
+
+    public function testItCanAcknowledgeAMessageViaTheReceiver(): void
+    {
+        $envelope = new Envelope(new \stdClass());
+        $this->receiver->expects($this->once())->method('ack')->with($envelope);
+        $this->transport->ack($envelope);
+    }
+
+    public function testItCanRejectAMessageViaTheReceiver(): void
+    {
+        $envelope = new Envelope(new \stdClass());
+        $this->receiver->expects($this->once())->method('reject')->with($envelope);
+        $this->transport->reject($envelope);
+    }
+
+    public function testItCanGetMessageCountViaTheReceiver(): void
+    {
+        $messageCount = 15;
+        $this->receiver->expects($this->once())->method('getMessageCount')->willReturn($messageCount);
+        $this->assertSame($messageCount, $this->transport->getMessageCount());
+    }
+
+    public function testItCanSendAMessageViaTheSender(): void
+    {
+        $envelope = new Envelope(new \stdClass());
+        $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $this->assertSame($envelope, $this->transport->send($envelope));
+    }
+
+    public function testItCanSetUpTheConnection(): void
+    {
+        $this->connection->expects($this->once())->method('setup');
+        $this->transport->setup();
+    }
+
+    public function testItConvertsHttpExceptionDuringSetupIntoTransportException(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('setup')
+            ->willThrowException($this->createHttpException());
+
+        $this->expectException(TransportException::class);
+
+        $this->transport->setup();
+    }
+
+    public function testItCanResetTheConnection(): void
+    {
+        $this->connection->expects($this->once())->method('reset');
+        $this->transport->reset();
+    }
+
+    public function testItConvertsHttpExceptionDuringResetIntoTransportException(): void
+    {
+        $this->connection
+            ->expects($this->once())
+            ->method('reset')
+            ->willThrowException($this->createHttpException());
+
+        $this->expectException(TransportException::class);
+
+        $this->transport->reset();
+    }
+
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)
     {
         $serializer = $serializer ?: $this->getMockBuilder(SerializerInterface::class)->getMock();
         $connection = $connection ?: $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
 
         return new AmazonSqsTransport($connection, $serializer);
+    }
+
+    private function createHttpException(): HttpException
+    {
+        return new ServerException($this->createMock(ResponseInterface::class));
     }
 }

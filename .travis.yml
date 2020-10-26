@@ -268,6 +268,7 @@ install:
               return
           fi
           phpenv global $PHP
+          composer self-update --2
           rm vendor/composer/package-versions-deprecated -Rf
           ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           tfold 'composer update' $COMPOSER_UP

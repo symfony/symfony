@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>حساب کاربری قفل گردیده است.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>تلاش‌های ناموفق زیادی برای ورود صورت گرفته است، لطفاً بعداً دوباره تلاش کنید.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>لینک ورود نامعتبر یا تاریخ‌گذشته است.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

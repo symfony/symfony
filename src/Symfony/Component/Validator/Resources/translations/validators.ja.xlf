@@ -374,6 +374,18 @@
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
                 <target>要素の数は{{ compared_value }}の倍数でなければなりません。</target>
             </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>以下の制約のうち少なくとも1つを満たす必要があります:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>コレクションの各要素は、それぞれの制約を満たす必要があります。</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>この値は有効な国際証券識別番号（ISIN）ではありません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

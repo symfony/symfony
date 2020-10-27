@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\LazyResponseException;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
+use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 /**
  * Wraps a lazy security listener.
@@ -27,7 +28,7 @@ final class WrappedLazyListener extends AbstractListener
 {
     use TraceableListenerTrait;
 
-    public function __construct(AbstractListener $listener)
+    public function __construct(FirewallListenerInterface $listener)
     {
         $this->listener = $listener;
     }

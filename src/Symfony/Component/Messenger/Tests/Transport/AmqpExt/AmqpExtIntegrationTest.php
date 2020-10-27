@@ -161,6 +161,9 @@ class AmqpExtIntegrationTest extends TestCase
         $signalTime = microtime(true);
         $timedOutTime = time() + 10;
 
+        // wait for worker started and registered the signal handler
+        usleep(100 * 1000); // 100ms
+
         // immediately after the process has started "booted", kill it
         $process->signal(15);
 

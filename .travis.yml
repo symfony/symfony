@@ -292,6 +292,9 @@ install:
           rm vendor/composer/package-versions-deprecated -Rf
           if [[ $PHP = 7.* ]]; then
               ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
+              if [[ $PHP != 7.4 ]]; then
+                  ([[ $deps ]] && cd src/Symfony/Bridge/ProxyManager; composer require --dev --no-update composer/package-versions-deprecated ^1.0)
+              fi
           fi
           tfold 'composer update' $COMPOSER_UP
           if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then

@@ -78,14 +78,6 @@ before_install:
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       find ~/.phpenv -name xdebug.ini -delete
 
-      if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then
-          composer () {
-              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer config platform.php $(echo ' <?php echo preg_replace("/-.*/", "", PHP_VERSION);' | php /dev/stdin)
-              $HOME/.phpenv/versions/7.1/bin/php $HOME/.phpenv/versions/7.1/bin/composer $*
-          }
-          export -f composer
-      fi
-
       nanoseconds () {
           local cmd="date"
           local format="+%s%N"
@@ -268,7 +260,9 @@ install:
       else
           export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
       fi
-      composer global require --no-progress --no-scripts --no-plugins symfony/flex
+      if [[ ! $TRAVIS_PHP_VERSION = 5.* ]]; then
+          composer global require --no-progress --no-scripts --no-plugins symfony/flex
+      fi
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
@@ -304,11 +298,7 @@ install:
               ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.0; composer require --dev --no-update mongodb/mongodb ~1.5.0)
           fi
           tfold 'composer update' $COMPOSER_UP
-          if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then
-              tfold 'phpunit install' 'composer global remove symfony/flex && ./phpunit install && composer global require --no-progress --no-scripts --no-plugins symfony/flex'
-          else
-              tfold 'phpunit install' ./phpunit install
-          fi
+          tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP && $PHPUNIT_X$LEGACY'"
           elif [[ $deps = low ]]; then

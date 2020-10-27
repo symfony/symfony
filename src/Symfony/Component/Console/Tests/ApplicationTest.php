@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -1808,6 +1809,39 @@ class ApplicationTest extends TestCase
         $app->setCommandLoader($loader);
         $app->get('test');
     }
+
+    /**
+     * @requires extension pcntl
+     */
+    public function testSignal()
+    {
+        $command = new SignableCommand();
+
+        $dispatcherCalled = false;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.signal', function () use (&$dispatcherCalled) {
+            $dispatcherCalled = true;
+        });
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($dispatcher);
+        $application->setSignalsToDispatchEvent(SIGALRM);
+        $application->add($command);
+
+        $this->assertFalse($command->signaled);
+        $this->assertFalse($dispatcherCalled);
+
+        $this->assertSame(0, $application->run(new ArrayInput(['signal'])));
+        $this->assertFalse($command->signaled);
+        $this->assertFalse($dispatcherCalled);
+
+        $command->loop = 100000;
+        pcntl_alarm(1);
+        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertTrue($command->signaled);
+        $this->assertTrue($dispatcherCalled);
+    }
 }
 
 class CustomApplication extends Application
@@ -1863,5 +1897,35 @@ class DisabledCommand extends Command
     public function isEnabled(): bool
     {
         return false;
+    }
+}
+
+class SignableCommand extends Command implements SignalableCommandInterface
+{
+    public $signaled = false;
+    public $loop = 100;
+
+    protected static $defaultName = 'signal';
+
+    public function getSubscribedSignals(): array
+    {
+        return [SIGALRM];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $this->signaled = true;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        for ($i = 0; $i < $this->loop; ++$i) {
+            usleep(100);
+            if ($this->signaled) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 }

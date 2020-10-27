@@ -286,23 +286,6 @@ class Application implements ResetInterface
             $command = $this->find($alternative);
         }
 
-        if ($this->dispatcher && $this->signalRegistry) {
-            foreach ($this->signalsToDispatchEvent as $signal) {
-                $event = new ConsoleSignalEvent($command, $input, $output, $signal);
-
-                $this->signalRegistry->register($signal, function ($signal, $hasNext) use ($event) {
-                    $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
-
-                    // No more handlers, we try to simulate PHP default behavior
-                    if (!$hasNext) {
-                        if (!\in_array($signal, [\SIGUSR1, \SIGUSR2], true)) {
-                            exit(0);
-                        }
-                    }
-                });
-            }
-        }
-
         $this->runningCommand = $command;
         $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
@@ -961,6 +944,24 @@ class Application implements ResetInterface
             if (!$this->signalRegistry) {
                 throw new RuntimeException('Unable to subscribe to signal events. Make sure that the `pcntl` extension is installed and that "pcntl_*" functions are not disabled by your php.ini\'s "disable_functions" directive.');
             }
+
+            if ($this->dispatcher) {
+                foreach ($this->signalsToDispatchEvent as $signal) {
+                    $event = new ConsoleSignalEvent($command, $input, $output, $signal);
+
+                    $this->signalRegistry->register($signal, function ($signal, $hasNext) use ($event) {
+                        $this->dispatcher->dispatch($event, ConsoleEvents::SIGNAL);
+
+                        // No more handlers, we try to simulate PHP default behavior
+                        if (!$hasNext) {
+                            if (!\in_array($signal, [\SIGUSR1, \SIGUSR2], true)) {
+                                exit(0);
+                            }
+                        }
+                    });
+                }
+            }
+
             foreach ($command->getSubscribedSignals() as $signal) {
                 $this->signalRegistry->register($signal, [$command, 'handleSignal']);
             }

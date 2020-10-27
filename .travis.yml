@@ -173,6 +173,8 @@ before_install:
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
           export PHP=$PHP
           phpenv global $PHP
+          composer self-update
+          composer self-update --2
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           if [[ $PHP = 5.* ]]; then
               tfold ext.apcu tpecl apcu-4.0.11 apcu.so $INI
@@ -277,7 +279,16 @@ install:
 
     - |
       # phpinfo
-      php -i
+      phpinfo() {
+          phpenv global $1
+          php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+          php -i
+      }
+      export -f phpinfo
+
+      for PHP in $TRAVIS_PHP_VERSION $php_extra; do
+          tfold $PHP phpinfo $PHP
+      done
 
     - |
       run_tests () {

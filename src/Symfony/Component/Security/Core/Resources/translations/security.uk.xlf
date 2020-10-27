@@ -66,6 +66,14 @@
                 <source>Account is locked.</source>
                 <target>Обліковий запис заблоковано.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Забагато невдалих спроб входу. Будь ласка, спробуйте пізніше.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Посилання для входу недійсне, або термін його дії закінчився.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

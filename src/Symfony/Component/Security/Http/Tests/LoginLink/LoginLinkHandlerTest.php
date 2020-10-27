@@ -46,6 +46,7 @@ class LoginLinkHandlerTest extends TestCase
 
     /**
      * @dataProvider provideCreateLoginLinkData
+     * @group time-sensitive
      */
     public function testCreateLoginLink($user, array $extraProperties)
     {

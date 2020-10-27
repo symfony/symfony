@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by abame at 2020-10-26T21:20:01Z
+
+I don't understand why the typo check is failing when that's the correct word in Albanian.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-26T21:27:27Z
+
+It is failing because Fabbot only speaks English. We can ignore that. =)

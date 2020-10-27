@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2020-10-26T23:37:25Z
+
+As suggested by @chalasr, this could even be considered a "new feature". WDYT?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-27T06:55:17Z
+
+If we're not comfortable with merging it in 3.4, let's move it to 5.x (last call for 5.2).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2020-10-27T07:57:09Z
+
+done

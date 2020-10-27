@@ -35,6 +35,20 @@ class PreloaderTest extends TestCase
     }
 
     /**
+     * @requires PHP 7.4
+     */
+    public function testPreloadSkipsNonExistingInterface()
+    {
+        $r = new \ReflectionMethod(Preloader::class, 'doPreload');
+        $r->setAccessible(true);
+
+        $preloaded = [];
+
+        $r->invokeArgs(null, ['Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface', &$preloaded]);
+        self::assertFalse(class_exists('Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface', false));
+    }
+
+    /**
      * @requires PHP 8
      */
     public function testPreloadUnion()

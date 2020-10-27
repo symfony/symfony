@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-10-26T11:52:32Z
+
+Hmm, I'm not very sure about these changes. But the listener logic is quite complex, so I might completely miss something. What I see:
+
+* The only requirement for firewall listeners is to be callable: https://github.com/symfony/symfony/blob/93d0276d8c003ebbfbb173aa557efc1b826b521d/src/Symfony/Component/Security/Http/Firewall.php#L110-L119
+* Only the `AbstractListener` implements this callable functionality using `supports()`/`authenticate()`: https://github.com/symfony/symfony/blob/93d0276d8c003ebbfbb173aa557efc1b826b521d/src/Symfony/Component/Security/Http/Firewall/AbstractListener.php#L24-L29
+
+So, it should be possible to have a class with just an `__invoke()` and `getPriority()` method, right? `AbstractListener` is only relevant when you want your listener to support laziness.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-26T14:13:56Z
+
+> AbstractListener is only relevant when you want your listener to support laziness.
+
+Actually `supports()` is also relevant for listeners that don't need laziness (yet), as they can opt-in using the special `null` return type for this method.
+
+At the time lazy firewalls were introduced, @nicolas-grekas and I talked about deprecating not extending `AbstractListener` at some point, so that we have a consistent API for firewall listeners (see https://github.com/orgs/symfony/projects/1#card-30499343).
+I'm still a bit annoyed by the fact we need to rely on inheritance instead of a clear contract if we do so.
+
+Meanwhile we are reintroducing an interface which, right now, only covers the priority feature.
+This PR takes it as an opportunity to not force extending a base class, making the concept more structured and more flexible. That's worth the hassle to me.
+
+About adding `__invoke()` to the contract, I'm mitigated:  should we just accept `callable|FirewallListenerinterface` for firewall listeners?
+The interface allows you to opt-in into more complex features like priority, laziness and the ability to separate concerns between the guard clause and the actual authentication logic.
+
+Does this make sense?

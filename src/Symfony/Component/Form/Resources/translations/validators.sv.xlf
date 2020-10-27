@@ -48,11 +48,11 @@
             </trans-unit>
             <trans-unit id="107">
                 <source>Please enter a valid date and time.</source>
-                <target>Ange datum och tid.</target>
+                <target>Ange ett giltigt datum och tid.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Please enter a valid date.</source>
-                <target>Ange ett datum.</target>
+                <target>Ange ett giltigt datum.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Please select a valid file.</source>
@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="120">
                 <source>Please select a valid timezone.</source>
-                <target>Välj tidszon.</target>
+                <target>Välj en tidszon.</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>Please enter a valid URL.</source>
@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>Please enter a valid week.</source>
-                <target>Ange en vecka.</target>
+                <target>Ange en giltig vecka.</target>
             </trans-unit>
         </body>
     </file>

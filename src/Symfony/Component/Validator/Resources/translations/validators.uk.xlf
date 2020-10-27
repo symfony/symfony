@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>Кожен елемент цієї колекції повинен задовольняти власному набору обмежень.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Це значення не є дійсним міжнародним ідентифікаційним номером цінних паперів (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

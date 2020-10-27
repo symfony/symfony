@@ -106,7 +106,7 @@ final class Preloader
 
                 self::preloadType($m->getReturnType(), $preloaded);
             }
-        } catch (\ReflectionException $e) {
+        } catch (\Throwable $e) {
             // ignore missing classes
         }
     }

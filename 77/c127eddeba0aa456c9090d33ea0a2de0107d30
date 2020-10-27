@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-27T13:36:11Z
+
+Looks like Travis is trying to run Composer with Flex on PHP 5.5 now and crashes.

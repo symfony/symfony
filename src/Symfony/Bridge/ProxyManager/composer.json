@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
+        "composer/package-versions-deprecated": "^1.8",
         "symfony/dependency-injection": "~3.4|~4.0",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0"
     },

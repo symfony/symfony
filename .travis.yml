@@ -265,7 +265,7 @@ install:
       export -f phpinfo
 
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          tfold $PHP phpinfo $PHP
+          tfold phpinfo phpinfo $PHP
       done
 
     - |

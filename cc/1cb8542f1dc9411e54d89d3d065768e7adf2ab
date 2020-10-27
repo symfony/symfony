@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-26T14:42:16Z
+
+I've found info outputs like this super helpful in my CI. I do them for PHP versions and versions of static tools.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-26T16:21:16Z
+
+Unrelated to the issue, here is the fix: https://github.com/symfony/symfony/commit/255f1e3478caf9b8e8dfb843e448074bce594949
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-26T16:42:18Z
+
+Hm I never said this PR was fixing the linked issue.
+
+Displaying the info of PHP 7.2, when running the "5.6 + 7.0 + 7.1 + 7.2" test-suite is useless.
+The purpose of this PR was to display the PHP info of all tested versions (and not only the last version)
+
+If we don't need this, then I suggest to remove this step.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-26T16:50:34Z
+
+Please don't merge it before CI green. I'm not 100% confident with the syntax

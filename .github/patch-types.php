@@ -5,7 +5,7 @@ if (false === getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
     exit(1);
 }
 
-require __DIR__.'/../.phpunit/phpunit-8.3-0/vendor/autoload.php';
+require __DIR__.'/../.phpunit/phpunit/vendor/autoload.php';
 
 file_put_contents(__DIR__.'/../vendor/autoload.php', preg_replace('/^return (Composer.*);/m', <<<'EOTXT'
 $loader = \1;

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-25T11:35:46Z
+
+Did you check if this problem exists on 4.4 as well? If yes, we need to fix it there.
+
+---------------------------------------------------------------------------
+
+by rgeraads at 2020-10-25T11:38:53Z
+
+@derrabus looks like it! https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/DependencyInjection/Dumper/Preloader.php#L90-L92
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-25T12:28:14Z
+
+> @derrabus looks like it!
+
+Can you rebase your changes on 4.4 then? If not, that's okay as well. I can do that while merging.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-25T12:31:41Z
+
+Oh, and thank you very much for your PR, of course. 😃
+
+---------------------------------------------------------------------------
+
+by rgeraads at 2020-10-25T13:06:00Z
+
+> Can you rebase your changes on 4.4 then? If not, that's okay as well. I can do that while merging.
+
+I rebased it now. Will you port the fix to 5.1 then?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-25T13:15:38Z
+
+> Will you port the fix to 5.1 then?
+
+The branches are merged periodically. Changes merged to the 4.4 branch will also be shipped with the next 5.1 release.

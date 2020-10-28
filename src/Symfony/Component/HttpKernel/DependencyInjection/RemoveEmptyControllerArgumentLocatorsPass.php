@@ -42,7 +42,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
-                list($id, $action) = explode('::', $controller);
+                [$id, $action] = explode('::', $controller);
 
                 if ($container->hasAlias($id)) {
                     continue;

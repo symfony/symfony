@@ -404,7 +404,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     try {
                         $result[self::VALUE] = $object->$name();
                     } catch (\TypeError $e) {
-                        list($trace) = $e->getTrace();
+                        [$trace] = $e->getTrace();
 
                         // handle uninitialized properties in PHP >= 7
                         if (__FILE__ === $trace['file']

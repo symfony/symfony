@@ -473,7 +473,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
             return $this;
         }
 
-        list($expectedValue, $expectedGroup, $expectedConstraints, $violation) = $this->expectedValidate[$this->validateCalls];
+        [$expectedValue, $expectedGroup, $expectedConstraints, $violation] = $this->expectedValidate[$this->validateCalls];
 
         Assert::assertSame($expectedValue, $value);
         $expectedConstraints($constraints);

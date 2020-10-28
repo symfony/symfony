@@ -430,7 +430,7 @@ class XmlFileLoader extends FileLoader
 
         // resolve definitions
         uksort($definitions, 'strnatcmp');
-        foreach (array_reverse($definitions) as $id => list($domElement, $file)) {
+        foreach (array_reverse($definitions) as $id => [$domElement, $file]) {
             if (null !== $definition = $this->parseDefinition($domElement, $file, new Definition())) {
                 $this->setDefinition($id, $definition);
             }

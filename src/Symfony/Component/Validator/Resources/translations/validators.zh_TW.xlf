@@ -344,7 +344,7 @@
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>數值應或未正數，或為零。</target>
+                <target>數值應是正數，或為零。</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
@@ -352,7 +352,7 @@
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>數值應或未負數，或為零。</target>
+                <target>數值應是負數，或為零。</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -360,11 +360,31 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>依據您的密碼，發生數據泄露，請勿使用改密碼。請更換密碼。</target>
+                <target>此密碼已被泄露，切勿使用。請更換密碼。</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>該數值應在 {{ min }} 和 {{ max }} 之間。</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>該數值不是有效的主機名稱。</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>該集合內的元素數量得是 {{ compared_value }} 的倍數。</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>該數值需符合以下其中一個約束：</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>該集合內的每個元素需符合元素本身規定的約束。</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>該數值不是有效的國際證券識別碼 （ISIN）。</target>
             </trans-unit>
         </body>
     </file>

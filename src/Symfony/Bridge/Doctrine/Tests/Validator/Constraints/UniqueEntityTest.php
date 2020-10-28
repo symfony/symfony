@@ -28,7 +28,7 @@ class UniqueEntityTest extends TestCase
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */
-        list($constraint) = $metadata->getConstraints();
+        [$constraint] = $metadata->getConstraints();
         self::assertSame(['email'], $constraint->fields);
         self::assertTrue($constraint->ignoreNull);
         self::assertSame('doctrine.orm.validator.unique', $constraint->validatedBy());
@@ -42,7 +42,7 @@ class UniqueEntityTest extends TestCase
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */
-        list($constraint) = $metadata->getConstraints();
+        [$constraint] = $metadata->getConstraints();
         self::assertSame(['isbn'], $constraint->fields);
         self::assertSame('my_own_validator', $constraint->validatedBy());
         self::assertSame('my_own_entity_manager', $constraint->em);
@@ -57,7 +57,7 @@ class UniqueEntityTest extends TestCase
         self::assertTrue($loader->loadClassMetadata($metadata));
 
         /** @var UniqueEntity $constraint */
-        list($constraint) = $metadata->getConstraints();
+        [$constraint] = $metadata->getConstraints();
         self::assertSame('uuid', $constraint->fields);
         self::assertSame('id', $constraint->errorPath);
         self::assertSame('some attached data', $constraint->payload);

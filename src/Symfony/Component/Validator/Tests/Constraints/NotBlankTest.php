@@ -37,11 +37,11 @@ class NotBlankTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertFalse($aConstraint->allowNull);
         self::assertNull($aConstraint->normalizer);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertTrue($bConstraint->allowNull);
         self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame('myMessage', $bConstraint->message);

@@ -58,16 +58,16 @@ class ExpressionLanguageSyntaxTest extends TestCase
         $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->service);
         self::assertNull($aConstraint->allowedVariables);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('my_service', $bConstraint->service);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionLanguageSyntaxDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['foo', 'bar'], $cConstraint->allowedVariables);
         self::assertSame(['my_group'], $cConstraint->groups);
     }

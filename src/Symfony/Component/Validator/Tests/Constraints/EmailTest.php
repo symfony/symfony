@@ -70,7 +70,7 @@ class EmailTest extends TestCase
         self::assertSame(Email::VALIDATION_MODE_HTML5, $bConstraint->mode);
         self::assertSame('trim', $bConstraint->normalizer);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

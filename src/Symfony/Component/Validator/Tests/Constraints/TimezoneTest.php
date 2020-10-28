@@ -73,16 +73,16 @@ class TimezoneTest extends TestCase
         $metadata = new ClassMetadata(TimezoneDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(\DateTimeZone::ALL, $aConstraint->zone);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(\DateTimeZone::PER_COUNTRY, $bConstraint->zone);
         self::assertSame('DE', $bConstraint->countryCode);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'TimezoneDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

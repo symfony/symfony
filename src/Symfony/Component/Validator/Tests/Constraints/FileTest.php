@@ -149,15 +149,15 @@ class FileTest extends TestCase
         $metadata = new ClassMetadata(FileDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->maxSize);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(100, $bConstraint->maxSize);
         self::assertSame('myMessage', $bConstraint->notFoundMessage);
         self::assertSame(['Default', 'FileDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(100000, $cConstraint->maxSize);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);

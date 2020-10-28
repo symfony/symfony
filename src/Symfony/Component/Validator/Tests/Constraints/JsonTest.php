@@ -27,11 +27,11 @@ class JsonTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'JsonDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

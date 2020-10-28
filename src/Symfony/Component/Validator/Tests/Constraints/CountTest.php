@@ -27,12 +27,12 @@ class CountTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(42, $aConstraint->min);
         self::assertSame(42, $aConstraint->max);
         self::assertNull($aConstraint->divisibleBy);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(1, $bConstraint->min);
         self::assertSame(4711, $bConstraint->max);
         self::assertNull($bConstraint->divisibleBy);
@@ -40,7 +40,7 @@ class CountTest extends TestCase
         self::assertSame('myMaxMessage', $bConstraint->maxMessage);
         self::assertSame(['Default', 'CountDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertNull($cConstraint->min);
         self::assertNull($cConstraint->max);
         self::assertSame(10, $cConstraint->divisibleBy);

@@ -26,16 +26,16 @@ class ExpressionTest extends TestCase
         $metadata = new ClassMetadata(ExpressionDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('value == "1"', $aConstraint->expression);
         self::assertSame([], $aConstraint->values);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('value == "1"', $bConstraint->expression);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'ExpressionDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame('value == someVariable', $cConstraint->expression);
         self::assertSame(['someVariable' => 42], $cConstraint->values);
         self::assertSame(['foo'], $cConstraint->groups);

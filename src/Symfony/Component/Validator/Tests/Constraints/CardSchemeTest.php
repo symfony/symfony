@@ -27,15 +27,15 @@ class CardSchemeTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame([CardScheme::MASTERCARD, CardScheme::VISA], $aConstraint->schemes);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame([CardScheme::AMEX], $bConstraint->schemes);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'CardSchemeDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame([CardScheme::DINERS], $cConstraint->schemes);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);

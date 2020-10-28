@@ -26,15 +26,15 @@ class TypeTest extends TestCase
         $metadata = new ClassMetadata(TypeDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('integer', $aConstraint->type);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(\DateTime::class, $bConstraint->type);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'TypeDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['string', 'array'], $cConstraint->type);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);

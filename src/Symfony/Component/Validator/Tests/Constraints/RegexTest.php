@@ -118,19 +118,19 @@ class RegexTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame('/^[0-9]+$/', $aConstraint->pattern);
         self::assertTrue($aConstraint->match);
         self::assertNull($aConstraint->normalizer);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame('/^[0-9]+$/', $bConstraint->pattern);
         self::assertSame('[0-9]+', $bConstraint->htmlPattern);
         self::assertFalse($bConstraint->match);
         self::assertSame(['Default', 'RegexDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

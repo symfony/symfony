@@ -57,12 +57,12 @@ class UserPasswordTest extends TestCase
         $metadata = new ClassMetadata(UserPasswordDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'UserPasswordDummy'], $bConstraint->groups);
         self::assertNull($bConstraint->payload);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

@@ -27,16 +27,16 @@ class DivisibleByTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertSame(2, $aConstraint->value);
         self::assertNull($aConstraint->propertyPath);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(4711, $bConstraint->value);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'DivisibleByDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertNull($cConstraint->value);
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);

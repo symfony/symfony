@@ -27,20 +27,20 @@ class ImageTest extends TestCase
         $loader = new AnnotationLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        list($aConstraint) = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->minWidth);
         self::assertNull($aConstraint->maxWidth);
         self::assertNull($aConstraint->minHeight);
         self::assertNull($aConstraint->maxHeight);
 
-        list($bConstraint) = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame(50, $bConstraint->minWidth);
         self::assertSame(200, $bConstraint->maxWidth);
         self::assertSame(50, $bConstraint->minHeight);
         self::assertSame(200, $bConstraint->maxHeight);
         self::assertSame(['Default', 'ImageDummy'], $bConstraint->groups);
 
-        list($cConstraint) = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(100000, $cConstraint->maxSize);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);

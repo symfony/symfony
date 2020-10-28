@@ -29,7 +29,7 @@ class Registry
 
     public function has(object $subject, string $workflowName = null): bool
     {
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 return true;
             }
@@ -45,7 +45,7 @@ class Registry
     {
         $matched = [];
 
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 $matched[] = $workflow;
             }
@@ -72,7 +72,7 @@ class Registry
     public function all(object $subject): array
     {
         $matched = [];
-        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+        foreach ($this->workflows as [$workflow, $supportStrategy]) {
             if ($supportStrategy->supports($workflow, $subject)) {
                 $matched[] = $workflow;
             }

@@ -90,7 +90,7 @@ class MoFileLoader extends FileLoader
             $singularId = fread($stream, $length);
 
             if (false !== strpos($singularId, "\000")) {
-                list($singularId, $pluralId) = explode("\000", $singularId);
+                [$singularId, $pluralId] = explode("\000", $singularId);
             }
 
             fseek($stream, $offsetTranslated + $i * 8);

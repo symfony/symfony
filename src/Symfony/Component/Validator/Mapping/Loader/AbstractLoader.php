@@ -69,7 +69,7 @@ abstract class AbstractLoader implements LoaderInterface
         if (false !== strpos($name, '\\') && class_exists($name)) {
             $className = (string) $name;
         } elseif (false !== strpos($name, ':')) {
-            list($prefix, $className) = explode(':', $name, 2);
+            [$prefix, $className] = explode(':', $name, 2);
 
             if (!isset($this->namespaces[$prefix])) {
                 throw new MappingException(sprintf('Undefined namespace prefix "%s".', $prefix));

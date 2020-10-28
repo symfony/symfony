@@ -134,7 +134,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         $optionsInArray = explode('&', $options);
 
         foreach ($optionsInArray as $option) {
-            list($key, $value) = explode('=', $option);
+            [$key, $value] = explode('=', $option);
 
             if (\in_array($key, static::VALID_DSN_OPTIONS, true)) {
                 $results[$key] = $value;

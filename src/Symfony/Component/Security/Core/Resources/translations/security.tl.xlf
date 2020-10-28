@@ -48,19 +48,27 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Ang akawnt ay nag-expire na.</target>
+                <target>Ang account ay nag-expire na.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>.ng mga kinakailangang dokumento ay nag expire na.</target>
+                <target>Ang mga kinakailangang dokumento ay nag expire na.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Ang akawnt ay hindi pinagana.</target>
+                <target>Ang account ay hindi pinagana.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>ng akawnt ay nakasara.</target>
+                <target>Ang account ay nakasara.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Madaming bagsak na pagtatangka, pakisubukan ulit mamaya.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Inbalido o nagexpire na ang link para makapaglogin.</target>
             </trans-unit>
         </body>
     </file>

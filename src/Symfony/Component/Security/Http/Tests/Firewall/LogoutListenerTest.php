@@ -28,9 +28,9 @@ class LogoutListenerTest extends TestCase
     public function testHandleUnmatchedPath()
     {
         $dispatcher = $this->getEventDispatcher();
-        list($listener, , $httpUtils, $options) = $this->getListener($dispatcher);
+        [$listener, , $httpUtils, $options] = $this->getListener($dispatcher);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $logoutEventDispatched = false;
         $dispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) use (&$logoutEventDispatched) {
@@ -52,9 +52,9 @@ class LogoutListenerTest extends TestCase
         $tokenManager = $this->getTokenManager();
         $dispatcher = $this->getEventDispatcher();
 
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($dispatcher, $tokenManager);
+        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher, $tokenManager);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $request->query->set('_csrf_token', 'token');
 
@@ -90,9 +90,9 @@ class LogoutListenerTest extends TestCase
     public function testHandleMatchedPathWithoutCsrfValidation()
     {
         $dispatcher = $this->getEventDispatcher();
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($dispatcher);
+        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -123,9 +123,9 @@ class LogoutListenerTest extends TestCase
     {
         $this->expectException('RuntimeException');
 
-        list($listener, , $httpUtils, $options) = $this->getListener();
+        [$listener, , $httpUtils, $options] = $this->getListener();
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -140,9 +140,9 @@ class LogoutListenerTest extends TestCase
         $this->expectException('Symfony\Component\Security\Core\Exception\LogoutException');
         $tokenManager = $this->getTokenManager();
 
-        list($listener, , $httpUtils, $options) = $this->getListener(null, $tokenManager);
+        [$listener, , $httpUtils, $options] = $this->getListener(null, $tokenManager);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $request->query->set('_csrf_token', 'token');
 
@@ -168,12 +168,12 @@ class LogoutListenerTest extends TestCase
         $this->expectDeprecation('Since symfony/security-http 5.1: Calling "%s::addHandler" is deprecated, register a listener on the "%s" event instead.');
 
         $logoutSuccessHandler = $this->createMock(LogoutSuccessHandlerInterface::class);
-        list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($logoutSuccessHandler);
+        [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($logoutSuccessHandler);
 
         $token = $this->getToken();
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')

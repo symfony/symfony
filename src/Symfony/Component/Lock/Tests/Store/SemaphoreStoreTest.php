@@ -61,7 +61,7 @@ class SemaphoreStoreTest extends AbstractStoreTest
         if ('------ Semaphore Status --------' !== $lines[0]) {
             throw new \Exception('Failed to extract list of opened semaphores. Expected a Semaphore status, got '.implode(\PHP_EOL, $lines));
         }
-        list($key, $value) = explode(' = ', $lines[1]);
+        [$key, $value] = explode(' = ', $lines[1]);
         if ('used arrays' !== $key) {
             throw new \Exception('Failed to extract list of opened semaphores. Expected a "used arrays" key, got '.implode(\PHP_EOL, $lines));
         }

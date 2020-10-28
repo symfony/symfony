@@ -133,7 +133,7 @@ class Cookie
             throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
-        list($name, $value) = explode('=', array_shift($parts), 2);
+        [$name, $value] = explode('=', array_shift($parts), 2);
 
         $values = [
             'name' => trim($name),

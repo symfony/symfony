@@ -104,7 +104,7 @@ class GuardAuthenticationFactoryTest extends TestCase
             'authenticators' => ['authenticator123'],
             'entry_point' => null,
         ];
-        list($container, $entryPointId) = $this->executeCreate($config, null);
+        [$container, $entryPointId] = $this->executeCreate($config, null);
         $this->assertEquals('authenticator123', $entryPointId);
 
         $providerDefinition = $container->getDefinition('security.authentication.provider.guard.my_firewall');
@@ -127,7 +127,7 @@ class GuardAuthenticationFactoryTest extends TestCase
             'authenticators' => ['authenticator123'],
             'entry_point' => null,
         ];
-        list(, $entryPointId) = $this->executeCreate($config, 'some_default_entry_point');
+        [, $entryPointId] = $this->executeCreate($config, 'some_default_entry_point');
         $this->assertEquals('some_default_entry_point', $entryPointId);
     }
 
@@ -160,7 +160,7 @@ class GuardAuthenticationFactoryTest extends TestCase
             'authenticators' => ['authenticator123', 'authenticatorABC'],
             'entry_point' => 'authenticatorABC',
         ];
-        list(, $entryPointId) = $this->executeCreate($config, null);
+        [, $entryPointId] = $this->executeCreate($config, null);
         $this->assertEquals('authenticatorABC', $entryPointId);
     }
 
@@ -196,7 +196,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $userProviderId = 'my_user_provider';
 
         $factory = new GuardAuthenticationFactory();
-        list(, , $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
+        [, , $entryPointId] = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 
         return [$container, $entryPointId];
     }

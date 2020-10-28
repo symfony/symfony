@@ -191,7 +191,7 @@ class DoctrineDataCollector extends DataCollector
                 }
             }
 
-            list($query['params'][$j], $explainable, $runnable) = $this->sanitizeParam($param, $e);
+            [$query['params'][$j], $explainable, $runnable] = $this->sanitizeParam($param, $e);
             if (!$explainable) {
                 $query['explainable'] = false;
             }
@@ -227,7 +227,7 @@ class DoctrineDataCollector extends DataCollector
             $a = [];
             $explainable = $runnable = true;
             foreach ($var as $k => $v) {
-                list($value, $e, $r) = $this->sanitizeParam($v, null);
+                [$value, $e, $r] = $this->sanitizeParam($v, null);
                 $explainable = $explainable && $e;
                 $runnable = $runnable && $r;
                 $a[$k] = $value;

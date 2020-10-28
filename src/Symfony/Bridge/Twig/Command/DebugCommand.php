@@ -147,7 +147,7 @@ EOF
                     $shortnames[] = str_replace('\\', '/', $file->getRelativePathname());
                 }
 
-                list($namespace, $shortname) = $this->parseTemplateName($name);
+                [$namespace, $shortname] = $this->parseTemplateName($name);
                 $alternatives = $this->findAlternatives($shortname, $shortnames);
                 if (FilesystemLoader::MAIN_NAMESPACE !== $namespace) {
                     $alternatives = array_map(function ($shortname) use ($namespace) {
@@ -452,7 +452,7 @@ EOF
 
     private function findTemplateFiles(string $name): array
     {
-        list($namespace, $shortname) = $this->parseTemplateName($name);
+        [$namespace, $shortname] = $this->parseTemplateName($name);
 
         $files = [];
         foreach ($this->getFilesystemLoaders() as $loader) {

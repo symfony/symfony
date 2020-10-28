@@ -474,8 +474,8 @@ class Filesystem
             return $result;
         };
 
-        list($endPath, $endDriveLetter) = $splitDriveLetter($endPath);
-        list($startPath, $startDriveLetter) = $splitDriveLetter($startPath);
+        [$endPath, $endDriveLetter] = $splitDriveLetter($endPath);
+        [$startPath, $startDriveLetter] = $splitDriveLetter($startPath);
 
         $startPathArr = $splitPath($startPath);
         $endPathArr = $splitPath($endPath);
@@ -617,7 +617,7 @@ class Filesystem
      */
     public function tempnam($dir, $prefix)
     {
-        list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
+        [$scheme, $hierarchy] = $this->getSchemeAndHierarchy($dir);
 
         // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
         if (null === $scheme || 'file' === $scheme || 'gs' === $scheme) {

@@ -41,11 +41,11 @@ class ResolveBindingsPass extends AbstractRecursivePass
         try {
             parent::process($container);
 
-            foreach ($this->unusedBindings as list($key, $serviceId, $bindingType, $file)) {
+            foreach ($this->unusedBindings as [$key, $serviceId, $bindingType, $file]) {
                 $argumentType = $argumentName = $message = null;
 
                 if (false !== strpos($key, ' ')) {
-                    list($argumentType, $argumentName) = explode(' ', $key, 2);
+                    [$argumentType, $argumentName] = explode(' ', $key, 2);
                 } elseif ('$' === $key[0]) {
                     $argumentName = $key;
                 } else {
@@ -117,7 +117,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
         $bindingNames = [];
 
         foreach ($bindings as $key => $binding) {
-            list($bindingValue, $bindingId, $used, $bindingType, $file) = $binding->getValues();
+            [$bindingValue, $bindingId, $used, $bindingType, $file] = $binding->getValues();
             if ($used) {
                 $this->usedBindings[$bindingId] = true;
                 unset($this->unusedBindings[$bindingId]);
@@ -156,7 +156,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
         }
 
         foreach ($calls as $i => $call) {
-            list($method, $arguments) = $call;
+            [$method, $arguments] = $call;
 
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
@@ -210,7 +210,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
         }
 
         if ($constructor) {
-            list(, $arguments) = array_pop($calls);
+            [, $arguments] = array_pop($calls);
 
             if ($arguments !== $value->getArguments()) {
                 $value->setArguments($arguments);
@@ -229,7 +229,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
      */
     private function getBindingValue(BoundArgument $binding)
     {
-        list($bindingValue, $bindingId) = $binding->getValues();
+        [$bindingValue, $bindingId] = $binding->getValues();
 
         $this->usedBindings[$bindingId] = true;
         unset($this->unusedBindings[$bindingId]);

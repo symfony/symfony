@@ -202,7 +202,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
     public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
     {
-        list($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType) = current($this->provideAllInvalidComparisons());
+        [$dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType] = current($this->provideAllInvalidComparisons());
 
         $constraint = $this->createConstraint(['propertyPath' => 'value']);
         $constraint->message = 'Constraint Message';

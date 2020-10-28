@@ -300,7 +300,7 @@ class DebugClassLoader
                     $hasCall = $refl->hasMethod('__call');
                     $hasStaticCall = $refl->hasMethod('__callStatic');
                     foreach (self::$method[$use] as $method) {
-                        list($interface, $name, $static, $description) = $method;
+                        [$interface, $name, $static, $description] = $method;
                         if ($static ? $hasStaticCall : $hasCall) {
                             continue;
                         }
@@ -335,12 +335,12 @@ class DebugClassLoader
             }
 
             if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
-                list($declaringClass, $message) = self::$finalMethods[$parent][$method->name];
+                [$declaringClass, $message] = self::$finalMethods[$parent][$method->name];
                 $deprecations[] = sprintf('The "%s::%s()" method is considered final%s. It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
             }
 
             if (isset(self::$internalMethods[$class][$method->name])) {
-                list($declaringClass, $message) = self::$internalMethods[$class][$method->name];
+                [$declaringClass, $message] = self::$internalMethods[$class][$method->name];
                 if (strncmp($ns, $declaringClass, $len)) {
                     $deprecations[] = sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
                 }
@@ -388,7 +388,7 @@ class DebugClassLoader
                     $definedParameters[$parameter->name] = true;
                 }
             }
-            foreach ($matches as list(, $parameterType, $parameterName)) {
+            foreach ($matches as [, $parameterType, $parameterName]) {
                 if (!isset($definedParameters[$parameterName])) {
                     $parameterType = trim($parameterType);
                     self::$annotatedParameters[$class][$method->name][$parameterName] = sprintf('The "%%s::%s()" method will require a new "%s$%s" argument in the next major version of its %s "%s", not defining it is deprecated.', $method->name, $parameterType ? $parameterType.' ' : '', $parameterName, interface_exists($class) ? 'interface' : 'parent class', $method->class);

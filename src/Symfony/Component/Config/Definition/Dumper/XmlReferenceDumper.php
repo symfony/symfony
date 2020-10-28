@@ -53,7 +53,7 @@ class XmlReferenceDumper
             });
 
             if (\count($remapping)) {
-                list($singular) = current($remapping);
+                [$singular] = current($remapping);
                 $rootName = $singular;
             }
         }

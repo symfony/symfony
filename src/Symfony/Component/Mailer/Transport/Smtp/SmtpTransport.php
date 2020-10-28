@@ -290,7 +290,7 @@ class SmtpTransport extends AbstractTransport
             throw new TransportException(sprintf('Expected response code "%s" but got an empty response.', implode('/', $codes)));
         }
 
-        list($code) = sscanf($response, '%3d');
+        [$code] = sscanf($response, '%3d');
         $valid = \in_array($code, $codes);
 
         if (!$valid) {

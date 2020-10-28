@@ -91,7 +91,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
         }
 
         foreach (explode("\r\n", $result) as $line) {
-            list($hashSuffix, $count) = explode(':', $line);
+            [$hashSuffix, $count] = explode(':', $line);
 
             if ($hashPrefix.$hashSuffix === $hash && $constraint->threshold <= (int) $count) {
                 $this->context->buildViolation($constraint->message)

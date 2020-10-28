@@ -163,7 +163,7 @@ EOF;
         if (2 !== \count($values) || !isset($values[0], $values[1])) {
             $this->keys = $this->values = [];
         } else {
-            list($this->keys, $this->values) = $values;
+            [$this->keys, $this->values] = $values;
         }
     }
 }

@@ -589,7 +589,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
-        list($class) = explode(':', $config['dsn'], 2);
+        [$class] = explode(':', $config['dsn'], 2);
         if ('file' !== $class) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }

@@ -175,28 +175,28 @@ class CsrfTokenManagerTest extends TestCase
     {
         $data = [];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['', new CsrfTokenManager($generator, $storage, ''), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['https-', new CsrfTokenManager($generator, $storage), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['aNamespace-', new CsrfTokenManager($generator, $storage, 'aNamespace-'), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['https-', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['generated-', new CsrfTokenManager($generator, $storage, function () {
             return 'generated-';
         }), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
-        list($generator, $storage) = $this->getGeneratorAndStorage();
+        [$generator, $storage] = $this->getGeneratorAndStorage();
         $data[] = ['', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
         return $data;

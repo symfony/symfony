@@ -113,7 +113,7 @@ class XmlFileLoader extends FileLoader
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, \PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, \PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options, $condition, $paths) = $this->parseConfigs($node, $path);
+        [$defaults, $requirements, $options, $condition, $paths] = $this->parseConfigs($node, $path);
 
         if (!$paths && '' === $node->getAttribute('path')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $path));
@@ -159,7 +159,7 @@ class XmlFileLoader extends FileLoader
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, \PREG_SPLIT_NO_EMPTY) : null;
         $trailingSlashOnRoot = $node->hasAttribute('trailing-slash-on-root') ? XmlUtils::phpize($node->getAttribute('trailing-slash-on-root')) : true;
 
-        list($defaults, $requirements, $options, $condition, /* $paths */, $prefixes) = $this->parseConfigs($node, $path);
+        [$defaults, $requirements, $options, $condition, /* $paths */, $prefixes] = $this->parseConfigs($node, $path);
 
         if ('' !== $prefix && $prefixes) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "prefix" attribute and <prefix> child nodes.', $path));

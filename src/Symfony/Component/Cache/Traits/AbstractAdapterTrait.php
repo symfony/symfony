@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Traits;
 
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

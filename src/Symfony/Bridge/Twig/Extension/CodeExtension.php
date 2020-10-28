@@ -72,7 +72,7 @@ class CodeExtension extends AbstractExtension
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
-            list($class, $method) = explode('::', $method, 2);
+            [$class, $method] = explode('::', $method, 2);
             $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
             $result = sprintf('<abbr title="%s">%1$s</abbr>', $method);

@@ -51,7 +51,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
         $builder = $container->getDefinition($this->builderService);
         $calls = [];
 
-        foreach ($builder->getMethodCalls() as list($method, $arguments)) {
+        foreach ($builder->getMethodCalls() as [$method, $arguments]) {
             if ('setTranslator' === $method) {
                 if (!$arguments[0] instanceof Reference) {
                     $translator = $arguments[0];

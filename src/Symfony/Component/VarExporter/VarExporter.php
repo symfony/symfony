@@ -71,7 +71,7 @@ final class VarExporter
         $values = [];
         $states = [];
         foreach ($objectsPool as $i => $v) {
-            list(, $classes[], $values[], $wakeup) = $objectsPool[$v];
+            [, $classes[], $values[], $wakeup] = $objectsPool[$v];
             if (0 < $wakeup) {
                 $states[$wakeup] = $i;
             } elseif (0 > $wakeup) {

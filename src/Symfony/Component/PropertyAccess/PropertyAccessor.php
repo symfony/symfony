@@ -202,7 +202,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
-            list(, $expectedType, $actualType) = $matches;
+            [, $expectedType, $actualType] = $matches;
 
             throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $expectedType, 'NULL' === $actualType ? 'null' : $actualType, $propertyPath), 0, $previous);
         }
@@ -392,7 +392,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 try {
                     $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
                 } catch (\TypeError $e) {
-                    list($trace) = $e->getTrace();
+                    [$trace] = $e->getTrace();
 
                     // handle uninitialized properties in PHP >= 7
                     if (__FILE__ === $trace['file']

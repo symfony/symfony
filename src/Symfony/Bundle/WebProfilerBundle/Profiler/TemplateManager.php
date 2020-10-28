@@ -76,7 +76,7 @@ class TemplateManager
                 continue;
             }
 
-            list($name, $template) = $arguments;
+            [$name, $template] = $arguments;
 
             if (!$this->profiler->has($name) || !$profile->hasCollector($name)) {
                 continue;

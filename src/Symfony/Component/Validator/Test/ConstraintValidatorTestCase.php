@@ -413,7 +413,7 @@ class AssertingContextualValidator implements ContextualValidatorInterface
     {
         Assert::assertFalse($this->expectNoValidate, 'No validation calls have been expected.');
 
-        list($expectedValue, $expectedGroup, $expectedConstraints) = $this->expectedValidate[++$this->validateCalls];
+        [$expectedValue, $expectedGroup, $expectedConstraints] = $this->expectedValidate[++$this->validateCalls];
 
         Assert::assertSame($expectedValue, $value);
         $expectedConstraints($constraints);

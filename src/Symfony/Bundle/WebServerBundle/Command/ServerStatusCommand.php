@@ -80,7 +80,7 @@ EOF
         $server = new WebServer($this->pidFileDirectory);
         if ($filter = $input->getOption('filter')) {
             if ($server->isRunning($input->getOption('pidfile'))) {
-                list($host, $port) = explode(':', $address = $server->getAddress($input->getOption('pidfile')));
+                [$host, $port] = explode(':', $address = $server->getAddress($input->getOption('pidfile')));
                 if ('address' === $filter) {
                     $output->write($address);
                 } elseif ('host' === $filter) {

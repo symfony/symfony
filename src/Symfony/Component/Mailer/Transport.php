@@ -83,7 +83,7 @@ class Transport
 
     public function fromString(string $dsn): TransportInterface
     {
-        list($transport, $offset) = $this->parseDsn($dsn);
+        [$transport, $offset] = $this->parseDsn($dsn);
         if ($offset !== \strlen($dsn)) {
             throw new InvalidArgumentException(sprintf('The DSN has some garbage at the end: "%s".', substr($dsn, $offset)));
         }
@@ -111,7 +111,7 @@ class Transport
                     ++$offset;
                     $args = [];
                     while (true) {
-                        list($arg, $offset) = $this->parseDsn($dsn, $offset);
+                        [$arg, $offset] = $this->parseDsn($dsn, $offset);
                         $args[] = $arg;
                         if (\strlen($dsn) === $offset) {
                             break;

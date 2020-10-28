@@ -568,7 +568,7 @@ EOF;
                 }
             }
 
-            foreach ($this->serviceCalls as $id => list($callCount, $behavior)) {
+            foreach ($this->serviceCalls as $id => [$callCount, $behavior]) {
                 if ('service_container' !== $id && $id !== $cId
                     && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior
                     && $this->container->has($id)
@@ -878,7 +878,7 @@ EOF;
             $targetId = (string) $this->container->getAlias($targetId);
         }
 
-        list($callCount, $behavior) = $this->serviceCalls[$targetId];
+        [$callCount, $behavior] = $this->serviceCalls[$targetId];
 
         if ($id === $targetId) {
             return $this->addInlineService($id, $definition, $definition);
@@ -934,7 +934,7 @@ EOTXT
         $code = '';
 
         if ($isSimpleInstance = $isRootInstance = null === $inlineDef) {
-            foreach ($this->serviceCalls as $targetId => list($callCount, $behavior, $byConstructor)) {
+            foreach ($this->serviceCalls as $targetId => [$callCount, $behavior, $byConstructor]) {
                 if ($byConstructor && isset($this->circularReferences[$id][$targetId]) && !$this->circularReferences[$id][$targetId]) {
                     $code .= $this->addInlineReference($id, $definition, $targetId, $forConstructor);
                 }
@@ -1004,7 +1004,7 @@ EOTXT
         }
 
         foreach ($definitions as $id => $definition) {
-            if (!(list($file, $code) = $services[$id]) || null !== $file) {
+            if (!([$file, $code] = $services[$id]) || null !== $file) {
                 continue;
             }
             if ($definition->isPublic()) {
@@ -1022,7 +1022,7 @@ EOTXT
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if ((list($file, $code) = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
+            if (([$file, $code] = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
                 if (!$definition->isShared()) {
                     $i = strpos($code, "\n\ninclude_once ");
                     if (false !== $i && false !== $i = strpos($code, "\n\n", 2 + $i)) {
@@ -1732,7 +1732,7 @@ EOF;
                     return sprintf('new \%s($this->getService, [%s%s], [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '', $serviceTypes, $serviceTypes ? "\n        " : '');
                 }
             } finally {
-                list($this->definitionVariables, $this->referenceVariables) = $scope;
+                [$this->definitionVariables, $this->referenceVariables] = $scope;
             }
         } elseif ($value instanceof Definition) {
             if ($value->hasErrors() && $e = $value->getErrors()) {

@@ -220,7 +220,7 @@ class BinaryFileResponse extends Response
                 // @link https://www.nginx.com/resources/wiki/start/topics/examples/x-accel/#x-accel-redirect
                 $parts = HeaderUtils::split($request->headers->get('X-Accel-Mapping', ''), ',=');
                 foreach ($parts as $part) {
-                    list($pathPrefix, $location) = $part;
+                    [$pathPrefix, $location] = $part;
                     if (substr($path, 0, \strlen($pathPrefix)) === $pathPrefix) {
                         $path = $location.substr($path, \strlen($pathPrefix));
                         // Only set X-Accel-Redirect header if a valid URI can be produced
@@ -240,7 +240,7 @@ class BinaryFileResponse extends Response
                 $range = $request->headers->get('Range');
 
                 if (0 === strpos($range, 'bytes=')) {
-                    list($start, $end) = explode('-', substr($range, 6), 2) + [0];
+                    [$start, $end] = explode('-', substr($range, 6), 2) + [0];
 
                     $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 

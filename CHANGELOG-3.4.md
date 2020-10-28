@@ -7,6 +7,21 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.46 (2020-10-28)
+
+ * bug #38669 [Serializer] fix decoding float XML attributes starting with 0 (Marcin Kruk)
+ * bug #38595 [TwigBridge] do not translate null placeholders or titles (xabbuh)
+ * bug #38652 [Filesystem] Check if failed unlink was caused by permission denied (Nyholm)
+ * bug #38604 [DoctrineBridge] indexBy does not refer to attributes, but to column names (xabbuh)
+ * bug #38606 [WebProfilerBundle] Hide debug toolbar in print view (jt2k)
+ * bug #38582 [DI] Fix Reflection file name with eval()\'d code (maxime-aknin)
+ * bug #38516 [HttpFoundation] Fix Range Requests (BattleRattle)
+ * bug #38510 [PropertyInfo] Support for the mixed type (derrabus)
+ * bug #38444 [PhpUnitBridge] fix running parallel tests with phpunit 9 (nicolas-grekas)
+ * bug #38442 [VarDumper] fix truncating big arrays (nicolas-grekas)
+ * bug #38380 [Form] propagate validation groups to subforms (johanderuijter, xabbuh)
+ * bug #38360 [BrowserKit] Cookie expiration at current timestamp (iquito)
+
 * 3.4.45 (2020-09-27)
 
  * bug #38228 [Yaml Parser] Fix edge cases when parsing multiple documents (digilist)

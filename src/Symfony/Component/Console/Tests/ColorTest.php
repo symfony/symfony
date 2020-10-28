@@ -40,4 +40,20 @@ class ColorTest extends TestCase
         $color = new Color('#ffffff', '#000000');
         $this->assertSame("\033[38;2;255;255;255;48;2;0;0;0m \033[39;49m", $color->apply(' '));
     }
+
+    public function testDegradedTrueColors()
+    {
+        $colorterm = getenv('COLORTERM');
+        putenv('COLORTERM=');
+
+        try {
+            $color = new Color('#f00', '#ff0');
+            $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
+
+            $color = new Color('#c0392b', '#f1c40f');
+            $this->assertSame("\033[31;43m \033[39;49m", $color->apply(' '));
+        } finally {
+            putenv('COLORTERM='.$colorterm);
+        }
+    }
 }

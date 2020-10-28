@@ -110,6 +110,7 @@ class FormLoginTest extends AbstractWebTestCase
 
     /**
      * @dataProvider provideInvalidCredentials
+     * @group time-sensitive
      */
     public function testLoginThrottling($username, $password)
     {

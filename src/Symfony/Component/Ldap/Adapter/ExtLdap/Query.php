@@ -175,7 +175,6 @@ class Query extends AbstractQuery
     {
         $con = $this->connection->getResource();
         $this->controlPagedResultResponse($con, 0, '');
-        $this->serverctrls = [];
 
         // This is a workaround for a bit of a bug in the above invocation
         // of ldap_control_paged_result. Instead of indicating to extldap that
@@ -226,16 +225,23 @@ class Query extends AbstractQuery
     /**
      * Retrieve LDAP pagination cookie.
      *
-     * @param resource $con
-     * @param resource $result
+     * @param resource   $con
+     * @param resource|0 $result
      */
     private function controlPagedResultResponse($con, $result, string $cookie = ''): string
     {
+        $this->serverctrls = [];
+
         if (\PHP_VERSION_ID < 70300) {
             ldap_control_paged_result_response($con, $result, $cookie);
 
             return $cookie;
         }
+
+        if (0 === $result) {
+            return '';
+        }
+
         ldap_parse_result($con, $result, $errcode, $matcheddn, $errmsg, $referrals, $controls);
 
         return $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';

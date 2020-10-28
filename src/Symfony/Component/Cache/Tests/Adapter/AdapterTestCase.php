@@ -118,9 +118,9 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $metadata = $item->getMetadata();
         $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
-        $this->assertEqualsWithDelta(1000, $metadata[CacheItem::METADATA_CTIME], 6);
+        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 10);
         $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
-        $this->assertEqualsWithDelta(9.5 + time(), $metadata[CacheItem::METADATA_EXPIRY], 0.6);
+        $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }
 
     public function testDefaultLifeTime()

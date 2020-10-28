@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Tests;
+namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,7 +69,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
         $this->successHandler->expects($this->never())
             ->method('onAuthenticationSuccess');
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestSuccessHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestSuccessHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token)
@@ -88,7 +88,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
         $this->successHandler->expects($this->never())
             ->method('onAuthenticationSuccess');
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestSuccessHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestSuccessHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token)
@@ -105,7 +105,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
             ->with($this->request, $this->token)
             ->willReturn($this->response);
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestSuccessHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestSuccessHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token)
@@ -137,7 +137,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
         $this->failureHandler->expects($this->never())
             ->method('onAuthenticationFailure');
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestFailureHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestFailureHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $this->authenticationException)
@@ -156,7 +156,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
         $this->failureHandler->expects($this->never())
             ->method('onAuthenticationFailure');
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestFailureHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestFailureHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $this->authenticationException)
@@ -173,7 +173,7 @@ class SimpleAuthenticationHandlerTest extends TestCase
             ->with($this->request, $this->authenticationException)
             ->willReturn($this->response);
 
-        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\TestFailureHandlerInterface');
+        $authenticator = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Tests\Authentication\TestFailureHandlerInterface');
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $this->authenticationException)

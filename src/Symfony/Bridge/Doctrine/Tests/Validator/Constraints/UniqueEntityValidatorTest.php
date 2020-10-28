@@ -114,7 +114,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->method('hasField')
             ->willReturn(true)
         ;
-        $refl = $this->createStub(\ReflectionProperty::class);
+        $refl = $this->createMock(\ReflectionProperty::class);
         $refl
             ->method('getValue')
             ->willReturn(true)

@@ -79,7 +79,6 @@ class TranslationUpdateCommand extends Command
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
-                new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
                 new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
@@ -281,10 +280,6 @@ EOF
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
-        }
-
-        if (true === $input->getOption('no-backup')) {
-            $this->writer->disableBackup();
         }
 
         // save the files

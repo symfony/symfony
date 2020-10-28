@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Ang uri ng file ng mime ay hindi balido ({{ type }}).Ang mga pinapayagang uri ng mime ay ang  {{ types }}.</target>
+                <target>Ang uri ng file ng mime ay hindi balido ({{ type }}). Ang mga pinapayagang uri ng mime ay ang  {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>Ang halaga nito ay masyadong mahaba.Ito ay dapat na {{ limit }} karakter o maliit pa.|Ang halaga nito ay masyadong mahaba. Ito ay dapat na {{ limit }} mga karakter o maliit pa.</target>
+                <target>Ang halaga nito ay masyadong mahaba. Ito ay dapat na {{ limit }} karakter o maliit pa.|Ang halaga nito ay masyadong mahaba. Ito ay dapat na {{ limit }} mga karakter o maliit pa.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
@@ -268,7 +268,7 @@
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Ang halagang ito ay dapat mas mmaliit o magkapareha sa {{ compared_value }}.</target>
+                <target>Ang halagang ito ay dapat mas maliit o magkapareha sa {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
@@ -284,7 +284,7 @@
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>ng ratio ng imahe ay masyadong maliit ({{ ratio }}). Ang pinamaliit na ratio ay {{ min_ratio }}.</target>
+                <target>Ang ratio ng imahe ay masyadong maliit ({{ ratio }}). Ang pinakamaliit na ratio ay {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
@@ -296,7 +296,7 @@
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>Ang orientasyon ng imahe ay nakaportrait ({{ width }}x{{ height }}px). PAng mga imaheng nakaportrait ang orientasyon ay hindi pwede.</target>
+                <target>Ang orientasyon ng imahe ay nakaportrait ({{ width }}x{{ height }}px). Ang mga imaheng nakaportrait ang orientasyon ay hindi pwede.</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
@@ -373,6 +373,14 @@
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
                 <target>Ang bilang ng mga elemento sa koleksyon na ito ay dapat multiple ng {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Ang halagang ito ay dapat masunod ang kahit na isang sumusunod na batayan.</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Ang bawat elemento sa koleksyon na ito ay dapat masunod ang nararapat na batayan.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>

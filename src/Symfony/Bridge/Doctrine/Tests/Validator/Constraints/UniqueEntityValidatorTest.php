@@ -114,17 +114,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->method('hasField')
             ->willReturn(true)
         ;
-        $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
-            ->setConstructorArgs([$reflParser, 'property-name'])
-            ->setMethods(['getValue'])
-            ->getMock()
-        ;
+        $refl = $this->createStub(\ReflectionProperty::class);
         $refl
-            ->expects($this->any())
             ->method('getValue')
             ->willReturn(true)
         ;

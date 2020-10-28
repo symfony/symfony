@@ -3,7 +3,7 @@ CHANGELOG
 
 5.1.0
 -----
-
+ * Removed `--no-backup` option from `translation:update` command (broken since `5.0.0`)
  * Added link to source for controllers registered as named services
  * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)
  * Added the `framework.router.default_uri` configuration option to configure the default `RequestContext`

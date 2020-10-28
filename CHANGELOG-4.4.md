@@ -7,6 +7,35 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.16 (2020-10-28)
+
+ * bug #38713 [DI] Fix Preloader exception when preloading a class with an unknown parent/interface (rgeraads)
+ * bug #38647 [HttpClient] relax auth bearer format requirements (xabbuh)
+ * bug #38699 [DependencyInjection] Preload classes with union types correctly (derrabus)
+ * bug #38669 [Serializer] fix decoding float XML attributes starting with 0 (Marcin Kruk)
+ * bug #38680 [PhpUnitBridge] Support new expect methods in test case polyfill (alcaeus)
+ * bug #38681 [PHPUnitBridge] Support PHPUnit 8 and PHPUnit 9 in constraint compatibility trait (alcaeus)
+ * bug #38679 [PhpUnitBridge] Add missing exporter function for PHPUnit 7 (alcaeus)
+ * bug #38595 [TwigBridge] do not translate null placeholders or titles (xabbuh)
+ * bug #38635 [Cache] Use correct expiry in ChainAdapter (Nyholm)
+ * bug #38652 [Filesystem] Check if failed unlink was caused by permission denied (Nyholm)
+ * bug #38645 [PropertyAccess] forward the caught exception (xabbuh)
+ * bug #38604 [DoctrineBridge] indexBy does not refer to attributes, but to column names (xabbuh)
+ * bug #38606 [WebProfilerBundle] Hide debug toolbar in print view (jt2k)
+ * bug #38582 [DI] Fix Reflection file name with eval()\'d code (maxime-aknin)
+ * bug #38516 [HttpFoundation] Fix Range Requests (BattleRattle)
+ * bug #38553 [Lock] Reset Key lifetime time before we acquire it (Nyholm)
+ * bug #38551 Remove content-type check on toArray methods (jderusse)
+ * bug #38544 [DI] fix dumping env vars (nicolas-grekas)
+ * bug #38530 [HttpClient] fix reading the body after a ClientException (nicolas-grekas)
+ * bug #38510 [PropertyInfo] Support for the mixed type (derrabus)
+ * bug #38493 [HttpClient] Fix CurlHttpClient memory leak (HypeMC)
+ * bug #38456 [Cache] skip igbinary < 3.1.6 (nicolas-grekas)
+ * bug #38392 [Ldap] Bypass the use of `ldap_control_paged_result` on PHP >= 7.3 (lucasaba)
+ * bug #38444 [PhpUnitBridge] fix running parallel tests with phpunit 9 (nicolas-grekas)
+ * bug #38442 [VarDumper] fix truncating big arrays (nicolas-grekas)
+ * bug #38433 [Mime] Fix serialization of RawMessage (gilbertsoft)
+
 * 4.4.15 (2020-10-04)
 
  * bug #36291 [Lock] Fix StoreFactory to accept same DSN syntax as AbstractAdapter (Jontsa)

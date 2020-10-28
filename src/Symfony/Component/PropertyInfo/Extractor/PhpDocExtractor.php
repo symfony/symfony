@@ -77,7 +77,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
-        list($docBlock) = $this->getDocBlock($class, $property);
+        [$docBlock] = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -107,7 +107,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var $docBlock DocBlock */
-        list($docBlock) = $this->getDocBlock($class, $property);
+        [$docBlock] = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -123,7 +123,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getTypes(string $class, string $property, array $context = []): ?array
     {
         /** @var $docBlock DocBlock */
-        list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
+        [$docBlock, $source, $prefix] = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
@@ -176,11 +176,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                 $data = [$docBlock, self::PROPERTY, null];
                 break;
 
-            case list($docBlock) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
+            case [$docBlock] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
                 $data = [$docBlock, self::ACCESSOR, null];
                 break;
 
-            case list($docBlock, $prefix) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
+            case [$docBlock, $prefix] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
                 $data = [$docBlock, self::MUTATOR, $prefix];
                 break;
 

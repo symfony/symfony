@@ -146,7 +146,7 @@ class FileType extends AbstractType
         $messageParameters = [];
 
         if (\UPLOAD_ERR_INI_SIZE === $errorCode) {
-            list($limitAsString, $suffix) = $this->factorizeSizes(0, self::getMaxFilesize());
+            [$limitAsString, $suffix] = $this->factorizeSizes(0, self::getMaxFilesize());
             $messageTemplate = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
             $messageParameters = [
                 '{{ limit }}' => $limitAsString,

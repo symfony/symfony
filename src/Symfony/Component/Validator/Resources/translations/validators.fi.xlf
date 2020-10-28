@@ -336,7 +336,7 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Tämä ryhmä tulisi sisältää vain yksilöllisiä arvoja.</target>
+                <target>Tämän ryhmän tulisi sisältää vain yksilöllisiä arvoja.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
@@ -365,6 +365,26 @@
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Arvon tulisi olla välillä {{ min }} - {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Arvo ei ole kelvollinen laitenimi (hostname).</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Ryhmässä olevien elementtien määrän pitää olla monikerta luvulle {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Tämän arvon tulee läpäistä vähintään yksi seuraavista tarkistuksista:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Ryhmän jokaisen elementin tulee läpäistä omat tarkistuksensa.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Tämä arvo ei ole kelvollinen ISIN-koodi (International Securities Identification Number).</target>
             </trans-unit>
         </body>
     </file>

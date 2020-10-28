@@ -47,8 +47,7 @@
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "~2.4|^3.0",
-        "doctrine/orm": "^2.6.3",
-        "doctrine/reflection": "~1.0"
+        "doctrine/orm": "^2.6.3"
     },
     "conflict": {
         "phpunit/phpunit": "<5.4.3",

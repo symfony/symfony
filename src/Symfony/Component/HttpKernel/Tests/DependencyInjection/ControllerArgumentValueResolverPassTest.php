@@ -39,7 +39,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setDefinition('argument_resolver', $definition);
 
-        foreach ($services as $id => list($tag)) {
+        foreach ($services as $id => [$tag]) {
             $container->register($id)->addTag('controller.argument_value_resolver', $tag);
         }
 
@@ -72,7 +72,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $container->register('debug.stopwatch', Stopwatch::class);
         $container->setDefinition('argument_resolver', $definition);
 
-        foreach ($services as $id => list($tag)) {
+        foreach ($services as $id => [$tag]) {
             $container->register($id)->addTag('controller.argument_value_resolver', $tag);
         }
 

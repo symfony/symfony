@@ -338,7 +338,7 @@ final class FinalArrayIterator extends \ArrayIterator
         if ('' === $data) {
             throw new \InvalidArgumentException('Serialized data is empty.');
         }
-        list(, $data) = unserialize($data);
+        [, $data] = unserialize($data);
         parent::unserialize($data);
     }
 }
@@ -392,7 +392,7 @@ class FooSerializable implements \Serializable
 
     public function unserialize($str)
     {
-        list($this->foo) = unserialize($str);
+        [$this->foo] = unserialize($str);
     }
 }
 
@@ -405,7 +405,7 @@ class Php74Serializable implements \Serializable
 
     public function __unserialize(array $data)
     {
-        list($this->foo) = $data;
+        [$this->foo] = $data;
     }
 
     public function __sleep(): array

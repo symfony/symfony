@@ -43,7 +43,7 @@ class ChannelListener extends AbstractListener
      */
     public function supports(Request $request): ?bool
     {
-        list(, $channel) = $this->map->getPatterns($request);
+        [, $channel] = $this->map->getPatterns($request);
 
         if ('https' === $channel && !$request->isSecure()) {
             if (null !== $this->logger) {

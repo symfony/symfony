@@ -235,7 +235,7 @@ abstract class CompleteConfigurationTest extends TestCase
         }
 
         $matcherIds = [];
-        foreach ($rules as list($matcherId, $attributes, $channel)) {
+        foreach ($rules as [$matcherId, $attributes, $channel]) {
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertArrayNotHasKey($matcherId, $matcherIds);

@@ -30,7 +30,7 @@ class LogoutListenerTest extends TestCase
         $dispatcher = $this->getEventDispatcher();
         list($listener, , $httpUtils, $options) = $this->getListener($dispatcher);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $logoutEventDispatched = false;
         $dispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) use (&$logoutEventDispatched) {
@@ -54,7 +54,7 @@ class LogoutListenerTest extends TestCase
 
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($dispatcher, $tokenManager);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $request->query->set('_csrf_token', 'token');
 
@@ -92,7 +92,7 @@ class LogoutListenerTest extends TestCase
         $dispatcher = $this->getEventDispatcher();
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener($dispatcher);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -125,7 +125,7 @@ class LogoutListenerTest extends TestCase
 
         list($listener, , $httpUtils, $options) = $this->getListener();
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -140,9 +140,9 @@ class LogoutListenerTest extends TestCase
         $this->expectException('Symfony\Component\Security\Core\Exception\LogoutException');
         $tokenManager = $this->getTokenManager();
 
-        list($listener, , $httpUtils, $options) = $this->getListener(null, $tokenManager);
+        [$listener, , $httpUtils, $options] = $this->getListener(null, $tokenManager);
 
-        list($event, $request) = $this->getGetResponseEvent();
+        [$event, $request] = $this->getGetResponseEvent();
 
         $request->query->set('_csrf_token', 'token');
 

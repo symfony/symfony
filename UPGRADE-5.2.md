@@ -39,6 +39,11 @@ Form
  $builder->setDataMapper(new DataMapper(new PropertyPathAccessor()));
  ```
 
+HttpFoundation
+--------------
+
+ * Deprecated not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()`; wrap your filter in a closure instead.
+
 Lock
 ----
 

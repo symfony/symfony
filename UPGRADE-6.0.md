@@ -66,6 +66,7 @@ HttpFoundation
  * Removed `Response::create()`, `JsonResponse::create()`,
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
+ * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `InvalidArgumentException`; wrap your filter in a closure instead.
 
 HttpKernel
 ----------

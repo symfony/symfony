@@ -10,6 +10,7 @@ CHANGELOG
  * added ability to use comma separated ip addresses for `RequestMatcher::matchIps()`
  * added `Request::toArray()` to parse a JSON request body to an array
  * added `RateLimiter\RequestRateLimiterInterface` and `RateLimiter\AbstractRequestRateLimiter`
+ * deprecated not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()`; wrap your filter in a closure instead.
 
 5.1.0
 -----

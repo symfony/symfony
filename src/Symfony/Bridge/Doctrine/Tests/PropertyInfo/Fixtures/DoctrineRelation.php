@@ -49,4 +49,10 @@ class DoctrineRelation
      * @Column(type="foo")
      */
     private $customType;
+
+    /**
+     * @Column(type="guid", name="different_than_field")
+     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="indexedBaz")
+     */
+    protected $bazField;
 }

@@ -122,4 +122,9 @@ class DoctrineDummy
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="customType", indexBy="customType")
      */
     private $indexedByCustomType;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="bazField", indexBy="bazField")
+     */
+    protected $indexedBaz;
 }

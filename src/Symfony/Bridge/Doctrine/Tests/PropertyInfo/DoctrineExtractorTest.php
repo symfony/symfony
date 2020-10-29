@@ -76,6 +76,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedFoo',
             'indexedByDt',
             'indexedByCustomType',
+            'indexedBaz'
         ]);
 
         $this->assertEquals(
@@ -179,6 +180,14 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['indexedByCustomType', null],
+            ['indexedBaz', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                'Doctrine\Common\Collections\Collection',
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+            )]]
         ];
 
         if (class_exists(Types::class)) {

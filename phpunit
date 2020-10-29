@@ -8,17 +8,12 @@ if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    if (\PHP_VERSION_ID >= 70200) {
-        if (false === getenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT') && false !== strpos(@file_get_contents(__DIR__.'/src/Symfony/Component/HttpKernel/Kernel.php'), 'const MAJOR_VERSION = 3;')) {
-            putenv('SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1');
-        }
-        if (\PHP_VERSION_ID < 70300) {
-            putenv('SYMFONY_PHPUNIT_VERSION=8.5');
-        } else {
-            putenv('SYMFONY_PHPUNIT_VERSION=9.4');
-        }
-    } elseif (\PHP_VERSION_ID >= 70000) {
-        putenv('SYMFONY_PHPUNIT_VERSION=6.5');
+    if (\PHP_VERSION_ID < 70200) {
+        putenv('SYMFONY_PHPUNIT_VERSION=7.5');
+    } elseif (\PHP_VERSION_ID < 70300) {
+        putenv('SYMFONY_PHPUNIT_VERSION=8.5');
+    } else {
+        putenv('SYMFONY_PHPUNIT_VERSION=9.4');
     }
 }
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {

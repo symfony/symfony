@@ -30,6 +30,24 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
     public const UNDEFINED_DOMAIN = '_undefined';
 
     private $enabled = false;
+    /**
+     * This array stores found messages.
+     *
+     * The data structure of this array is as follows:
+     *
+     *     [
+     *         0 => [
+     *             0 => 'message',
+     *             1 => 'domain',
+     *             2 => [
+     *                 'variable1',
+     *                 'variable2',
+     *                 ...
+     *             ]
+     *         ],
+     *         ...
+     *     ]
+     */
     private $messages = [];
 
     public function enable(): void
@@ -67,6 +85,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $this->messages[] = [
                 $node->getNode('node')->getAttribute('value'),
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
+                $this->getReadVariablesFromArguments($node->getNode('arguments'), 0),
             ];
         } elseif (
             $node instanceof FilterExpression &&
@@ -74,12 +93,20 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $node->getNode('node') instanceof FunctionExpression &&
             't' === $node->getNode('node')->getAttribute('name')
         ) {
-            $nodeArguments = $node->getNode('node')->getNode('arguments');
+            // extract t() nodes with a trans filter applied
+            $filterNodeArguments = $node->getNode('arguments');
+            $functionNodeArguments = $node->getNode('node')->getNode('arguments');
 
-            if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
+            if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
+                // Get domain from filter (if available) this will support also "trans_default_domain"
+                // but fallback to the function argument to support the following:
+                // {{ t("new key", {}, "domain") | trans() }}
+                $domain = $this->getReadDomainFromArguments($filterNodeArguments, 1) ?? $this->getReadDomainFromArguments($functionNodeArguments, 2);
+
                 $this->messages[] = [
-                    $this->getReadMessageFromArguments($nodeArguments, 0),
-                    $this->getReadDomainFromArguments($nodeArguments, 2),
+                    $this->getReadMessageFromArguments($functionNodeArguments, 0),
+                    $domain,
+                    $this->getReadVariablesFromArguments($functionNodeArguments, 1),
                 ];
             }
         } elseif ($node instanceof TransNode) {
@@ -87,6 +114,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $this->messages[] = [
                 $node->getNode('body')->getAttribute('data'),
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
+                $this->getReadVariablesFromArguments($node, 0),
             ];
         } elseif (
             $node instanceof FilterExpression &&
@@ -139,6 +167,39 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         }
 
         return null;
+    }
+
+    private function getReadVariablesFromArguments(Node $arguments, int $index): array
+    {
+        if ($arguments->hasNode('vars')) {
+            $argument = $arguments->getNode('vars');
+        } elseif ($arguments->hasNode($index)) {
+            $argument = $arguments->getNode($index);
+        } else {
+            return [];
+        }
+
+        return $this->getReadVariablesFromNode($argument);
+    }
+
+    private function getReadVariablesFromNode(Node $node): ?array
+    {
+        if (!empty($node)) {
+            $variables = [];
+
+            foreach ($node as $key => $variable) {
+                // Odd children are variable names, even ones are values
+                if ($key % 2 == 1) {
+                    continue;
+                }
+
+                $variables[] = $variable->getAttribute('value');
+            }
+
+            return $variables;
+        }
+
+        return [];
     }
 
     private function getReadDomainFromArguments(Node $arguments, int $index): ?string

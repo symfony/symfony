@@ -240,6 +240,14 @@ EOF
                 $currentMessages = array_diff_key($newMessages, $result->all($domain));
                 $result->replace($currentMessages, $domain);
                 $result->replace($allIntlMessages + $newMessages, $intlDomain);
+
+                // Move new metadata
+                foreach ($newMessages as $key => $message) {
+                    if (null !== $extractedCatalogue->getMetadata($key, $domain)) {
+                        $result->setMetadata($key, $extractedCatalogue->getMetadata($key, $domain), $intlDomain);
+                        $extractedCatalogue->deleteMetadata($key, $domain);
+                    }
+                }
             }
         }
 

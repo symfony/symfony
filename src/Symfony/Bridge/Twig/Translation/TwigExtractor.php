@@ -78,7 +78,18 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
         $this->twig->parse($this->twig->tokenize(new Source($template, '')));
 
         foreach ($visitor->getMessages() as $message) {
-            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
+            $id = trim($message[0]);
+
+            $catalogue->set($id, $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
+
+            if (!empty($message[2])) {
+                $catalogue->setMetadata($id, ['notes' => [
+                    [
+                        'category' => 'symfony-extractor-variables',
+                        'content' => 'Available variables: ' . join(', ', $message[2]),
+                    ]
+                ]], $message[1] ?: $this->defaultDomain);
+            }
         }
 
         $visitor->disable();

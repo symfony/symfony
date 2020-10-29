@@ -48,7 +48,7 @@ class TranslationNodeVisitorTest extends TestCase
             0
         );
 
-        $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN]]);
+        $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN, []]]);
     }
 
     public function getMessagesExtractionTestData()
@@ -57,10 +57,10 @@ class TranslationNodeVisitorTest extends TestCase
         $domain = 'domain';
 
         return [
-            [TwigNodeProvider::getTransFilter($message), [[$message, null]]],
-            [TwigNodeProvider::getTransTag($message), [[$message, null]]],
-            [TwigNodeProvider::getTransFilter($message, $domain), [[$message, $domain]]],
-            [TwigNodeProvider::getTransTag($message, $domain), [[$message, $domain]]],
+            [TwigNodeProvider::getTransFilter($message), [[$message, null, []]]],
+            [TwigNodeProvider::getTransTag($message), [[$message, null, []]]],
+            [TwigNodeProvider::getTransFilter($message, $domain), [[$message, $domain, []]]],
+            [TwigNodeProvider::getTransTag($message, $domain), [[$message, $domain, []]]],
         ];
     }
 }

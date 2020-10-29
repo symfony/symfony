@@ -182,25 +182,58 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    private function skipMethodArgument(\Iterator $tokenIterator)
+    /**
+     * @return string[]
+     */
+    private function getArrayKeys(\Iterator $tokenIterator)
     {
-        $openBraces = 0;
+        $keys = [];
 
-        for (; $tokenIterator->valid(); $tokenIterator->next()) {
+        // Skip opening "["
+        $tokenIterator->next();
+
+        while ($tokenIterator->valid()) {
+            $this->seekToNextRelevantToken($tokenIterator);
             $t = $tokenIterator->current();
 
-            if ('[' === $t[0] || '(' === $t[0]) {
-                ++$openBraces;
+            // End of main array
+            if (']' === $t[0]) {
+                // Skip following ","
+                $tokenIterator->next();
+
+                return $keys;
             }
 
-            if (']' === $t[0] || ')' === $t[0]) {
-                --$openBraces;
-            }
+            // Get array key
+            $keys[] = $this->getValue($tokenIterator);
 
-            if ((0 === $openBraces && ',' === $t[0]) || (-1 === $openBraces && ')' === $t[0])) {
-                break;
+            // Skip value
+            $openBraces = 0;
+            for (; $tokenIterator->valid(); $tokenIterator->next()) {
+                $t = $tokenIterator->current();
+
+                if ('[' === $t[0] || '(' === $t[0]) {
+                    ++$openBraces;
+                }
+
+                if (']' === $t[0] || ')' === $t[0]) {
+                    --$openBraces;
+                }
+
+                if (0 === $openBraces && ',' === $t[0]) {
+                    // Skip following ","
+                    $tokenIterator->next();
+
+                    break;
+                }
+
+                if (-1 === $openBraces && ']' === $t[0]) {
+                    break;
+                }
             }
         }
+
+        return $keys;
     }
 
     /**
@@ -274,6 +307,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             foreach ($this->sequences as $sequence) {
                 $message = '';
                 $domain = 'messages';
+                $variables = [];
                 $tokenIterator->seek($key);
 
                 foreach ($sequence as $sequenceKey => $item) {
@@ -289,7 +323,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                             break;
                         }
                     } elseif (self::METHOD_ARGUMENTS_TOKEN === $item) {
-                        $this->skipMethodArgument($tokenIterator);
+                        $variables = $this->getArrayKeys($tokenIterator);
                     } elseif (self::DOMAIN_TOKEN === $item) {
                         $domainToken = $this->getValue($tokenIterator);
                         if ('' !== $domainToken) {
@@ -308,6 +342,16 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
                     $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];
                     $catalog->setMetadata($message, $metadata, $domain);
+
+                    if (!empty($variables)) {
+                        $catalog->setMetadata($message, ['notes' => [
+                            [
+                                'category' => 'symfony-extractor-variables',
+                                'content' => 'Available variables: ' . join(', ', $variables),
+                            ]
+                        ]], $domain);
+                    }
+
                     break;
                 }
             }

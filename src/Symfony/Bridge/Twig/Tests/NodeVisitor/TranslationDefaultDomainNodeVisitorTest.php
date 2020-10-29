@@ -47,7 +47,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, self::$domain]], $visitor->getMessages());
+        $this->assertEquals([[self::$message, self::$domain, []]], $visitor->getMessages());
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
@@ -73,7 +73,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals([[self::$message, null]], $visitor->getMessages());
+        $this->assertEquals([[self::$message, null, []]], $visitor->getMessages());
     }
 
     public function getDefaultDomainAssignmentTestData()

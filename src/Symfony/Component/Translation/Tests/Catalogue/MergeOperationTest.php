@@ -67,6 +67,19 @@ class MergeOperationTest extends AbstractOperationTest
         );
     }
 
+    public function testGetResultWithMixedDomains()
+    {
+        $this->assertEquals(
+            new MessageCatalogue('en', [
+                'messages' => ['a' => 'old_a'],
+            ]),
+            $this->createOperation(
+                new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),
+                new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'new_a']])
+            )->getResult()
+        );
+    }
+
     public function testGetResultWithMetadata()
     {
         $leftCatalogue = new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]);

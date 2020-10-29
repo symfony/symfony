@@ -49,10 +49,9 @@ class TargetOperation extends AbstractOperation
         foreach ($this->source->all($domain) as $id => $message) {
             if ($this->target->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
-                $d = $this->target->defines($id, $intlDomain) ? $intlDomain : $domain;
-                $this->result->add([$id => $message], $d);
-                if (null !== $keyMetadata = $this->source->getMetadata($id, $d)) {
-                    $this->result->setMetadata($id, $keyMetadata, $d);
+                $this->result->add([$id => $message], $this->source->defines($id, $intlDomain) ? $intlDomain : $domain);
+                if (null !== $keyMetadata = $this->source->getMetadata($id, $this->source->defines($id, $intlDomain) ? $intlDomain : $domain)) {
+                    $this->result->setMetadata($id, $keyMetadata, $this->source->defines($id, $intlDomain) ? $intlDomain : $domain);
                 }
             } else {
                 $this->messages[$domain]['obsolete'][$id] = $message;
@@ -63,10 +62,9 @@ class TargetOperation extends AbstractOperation
             if (!$this->source->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->messages[$domain]['new'][$id] = $message;
-                $d = $this->target->defines($id, $intlDomain) ? $intlDomain : $domain;
-                $this->result->add([$id => $message], $d);
-                if (null !== $keyMetadata = $this->target->getMetadata($id, $d)) {
-                    $this->result->setMetadata($id, $keyMetadata, $d);
+                $this->result->add([$id => $message], $this->target->defines($id, $intlDomain) ? $intlDomain : $domain);
+                if (null !== $keyMetadata = $this->target->getMetadata($id, $this->target->defines($id, $intlDomain) ? $intlDomain : $domain)) {
+                    $this->result->setMetadata($id, $keyMetadata, $this->target->defines($id, $intlDomain) ? $intlDomain : $domain);
                 }
             }
         }

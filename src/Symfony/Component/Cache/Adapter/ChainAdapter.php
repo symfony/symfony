@@ -74,11 +74,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $item->metadata = $item->newMetadata = $sourceItem->metadata = $sourceMetadata;
 
                 if (isset($item->metadata[CacheItem::METADATA_EXPIRY])) {
-                    if (\is_int($expiry = $item->metadata[CacheItem::METADATA_EXPIRY])) {
-                        $item->expiresAt(\DateTime::createFromFormat('U', $expiry));
-                    } else {
-                        $item->expiresAt(\DateTime::createFromFormat('U.u', sprintf('%.3F', $expiry)));
-                    }
+                    $item->expiresAt(\DateTime::createFromFormat('U.u', sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
                 }

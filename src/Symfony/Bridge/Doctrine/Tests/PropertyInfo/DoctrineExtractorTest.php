@@ -76,7 +76,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedFoo',
             'indexedByDt',
             'indexedByCustomType',
-            'indexedBaz'
+            'indexedBaz',
         ]);
 
         $this->assertEquals(
@@ -187,7 +187,7 @@ class DoctrineExtractorTest extends TestCase
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
-            )]]
+            )]],
         ];
 
         if (class_exists(Types::class)) {

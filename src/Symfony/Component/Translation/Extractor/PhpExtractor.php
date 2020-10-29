@@ -347,8 +347,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                         $catalog->setMetadata($message, ['notes' => [
                             [
                                 'category' => 'symfony-extractor-variables',
-                                'content' => 'Available variables: ' . join(', ', $variables),
-                            ]
+                                'content' => 'Available variables: '.implode(', ', $variables),
+                            ],
                         ]], $domain);
                     }
 

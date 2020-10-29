@@ -86,8 +86,8 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
                 $catalogue->setMetadata($id, ['notes' => [
                     [
                         'category' => 'symfony-extractor-variables',
-                        'content' => 'Available variables: ' . join(', ', $message[2]),
-                    ]
+                        'content' => 'Available variables: '.implode(', ', $message[2]),
+                    ],
                 ]], $message[1] ?: $this->defaultDomain);
             }
         }

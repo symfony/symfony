@@ -189,7 +189,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
 
             foreach ($node as $key => $variable) {
                 // Odd children are variable names, even ones are values
-                if ($key % 2 == 1) {
+                if (1 == $key % 2) {
                     continue;
                 }
 

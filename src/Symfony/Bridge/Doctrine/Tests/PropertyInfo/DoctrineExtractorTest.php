@@ -78,6 +78,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedBaz',
             'indexedByDt',
             'indexedByCustomType',
+            'indexedBuz',
         ]);
 
         $this->assertEquals(
@@ -197,6 +198,14 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['indexedByCustomType', null],
+            ['indexedBuz', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
         ];
 
         if (class_exists(Types::class)) {

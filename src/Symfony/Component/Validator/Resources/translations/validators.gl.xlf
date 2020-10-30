@@ -330,6 +330,62 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Este Código de identificación bancaria (BIC) non está asociado co IBAN {{ iban }}.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Este valor debería ser un JSON válido.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Esta colección só debería ter elementos únicos.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Este valor debería ser positivo.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Este valor debe ser positivo ou igual a cero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Este valor debe ser negativo.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Este valor debe ser negativo ou igual a cero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Este valor non é unha zona horaria válida.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Este contrasinal non se pode usar porque está incluído nunha lista de contrasinais públicos obtidos grazas a fallos de seguridade noutros sitios e aplicacións. Utiliza outro contrasinal.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Este valor debe estar comprendido entre {{min}} e {{max}}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Este valor non é un nome de host válido.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>O número de elementos desta colección debería ser múltiplo de {{compare_value}}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Este valor debe cumprir polo menos unha das seguintes restricións:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Cada elemento desta colección debe satisfacer o seu propio conxunto de restricións.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Este valor non é un número de identificación de valores internacionais (ISIN) válido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -7,8 +7,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Piergiuseppe Longo",
-            "email": "piergiuseppe.longo@gmail.com"
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
         },
         {
             "name": "Symfony Community",

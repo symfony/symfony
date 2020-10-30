@@ -341,16 +341,15 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     $metadata = $catalog->getMetadata($message, $domain) ?? [];
                     $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
                     $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];
-                    $catalog->setMetadata($message, $metadata, $domain);
 
                     if (!empty($variables)) {
-                        $catalog->setMetadata($message, ['notes' => [
-                            [
+                        $metadata['notes'][] = [
                                 'category' => 'symfony-extractor-variables',
                                 'content' => 'Available variables: '.implode(', ', $variables),
-                            ],
-                        ]], $domain);
+                        ];
                     }
+
+                    $catalog->setMetadata($message, $metadata, $domain);
 
                     break;
                 }

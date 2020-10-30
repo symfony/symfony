@@ -45,7 +45,7 @@ trait ConstraintTraitForV7
 
     protected function exporter(): Exporter
     {
-        if (null !== $this->exporter) {
+        if (null === $this->exporter) {
             $this->exporter = new Exporter();
         }
 

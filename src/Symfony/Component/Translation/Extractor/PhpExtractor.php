@@ -188,16 +188,24 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     private function getArrayKeys(\Iterator $tokenIterator)
     {
         $keys = [];
+        $isShortArray = '[' === $this->normalizeToken($tokenIterator->current());
+        $closingBracket = $isShortArray ? ']' : ')';
 
-        // Skip opening "["
-        $tokenIterator->next();
+        if ($isShortArray) {
+            // Skip opening "["
+            $tokenIterator->next();
+        } else {
+            // Skip opening "array("
+            $tokenIterator->next();
+            $tokenIterator->next();
+        }
 
         while ($tokenIterator->valid()) {
             $this->seekToNextRelevantToken($tokenIterator);
             $t = $tokenIterator->current();
 
             // End of main array
-            if (']' === $t[0]) {
+            if ($closingBracket === $t[0]) {
                 // Skip following ","
                 $tokenIterator->next();
 
@@ -227,7 +235,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     break;
                 }
 
-                if (-1 === $openBraces && ']' === $t[0]) {
+                if (-1 === $openBraces && $closingBracket === $t[0]) {
                     break;
                 }
             }

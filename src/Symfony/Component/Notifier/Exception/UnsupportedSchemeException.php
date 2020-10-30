@@ -108,6 +108,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Gitter\GitterTransportFactory::class,
             'package' => 'symfony/gitter-notifier',
         ],
+        'telnyx' => [
+            'class' => Bridge\Telnyx\TelnyxTransportFactory::class,
+            'package' => 'symfony/telnyx-notifier',
+        ],
     ];
 
     /**

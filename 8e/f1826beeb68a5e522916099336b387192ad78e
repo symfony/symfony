@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-30T16:18:27Z
+
+Let me know when you are ready for a review
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-30T16:24:21Z
+
+Btw, you (usually) dont need to squash the commits. That is taken care of when we merge.
+
+---------------------------------------------------------------------------
+
+by tambait at 2020-10-30T16:29:01Z
+
+> Let me know when you are ready for a review
+
+Should be ready for the review now. I put both Security & Form validator missing translations into this PR.
+
+---------------------------------------------------------------------------
+
+by tambait at 2020-10-30T16:49:44Z
+
+> You translated 3 languages all at once. That is impressive. =)
+
+Serbian (Latin & Cyrillic script ), Bosnian (bs), Croatian (hr) and Montenegrian are four variants of one polycentric Serbo-Croatian language (sh) so they all differ slightly :)

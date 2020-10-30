@@ -114,6 +114,26 @@
                 <source>Please provide a valid phone number.</source>
                 <target>Молим наведите исправан број телефона.</target>
             </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Поље за потврду садржи неисправну вредност.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Молим упишите исправну email адресу.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Молим изаберите исправну опцију.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Молим изаберите исправан опсег.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Молим упишите исправну седмицу.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

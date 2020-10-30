@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-30T11:34:23Z
+
+While we're at it: `symfony/property-access`, `symfony/property-info` and `symfony/serializer` should also not be mandatory dependencies of the Mime component.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-30T13:19:20Z
+
+Sorry, I should have been more precise here. The three packages I mentioned need to be dev dependencies as well. Sorry for the confusion.

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor;
 
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -109,6 +110,78 @@ EOF;
                 'typecast' => 'prefixtypecast',
             ],
         ];
+
+        // Expected metadata (variables)
+        $expectedVariables = [
+            'messages' => [
+                'translatable single-quoted key' => null,
+                'translatable double-quoted key' => null,
+                'translatable heredoc key' => null,
+                'translatable nowdoc key' => null,
+                "translatable double-quoted key with whitespace and escaped \$\n\" sequences" => null,
+                'translatable single-quoted key with whitespace and nonescaped \$\n\' sequences' => null,
+                'translatable single-quoted key with "quote mark at the end"' => null,
+                'translatable '.$expectedHeredoc => null,
+                'translatable '.$expectedNowdoc => null,
+                'translatable concatenated message with heredoc and nowdoc' => null,
+                'translatable default domain' => null,
+                'translatable-fqn single-quoted key' => null,
+                'translatable-fqn double-quoted key' => null,
+                'translatable-fqn heredoc key' => null,
+                'translatable-fqn nowdoc key' => null,
+                "translatable-fqn double-quoted key with whitespace and escaped \$\n\" sequences" => null,
+                'translatable-fqn single-quoted key with whitespace and nonescaped \$\n\' sequences' => null,
+                'translatable-fqn single-quoted key with "quote mark at the end"' => null,
+                'translatable-fqn '.$expectedHeredoc => null,
+                'translatable-fqn '.$expectedNowdoc => null,
+                'translatable-fqn concatenated message with heredoc and nowdoc' => null,
+                'translatable-fqn default domain' => null,
+                'translatable-short single-quoted key' => null,
+                'translatable-short double-quoted key' => null,
+                'translatable-short heredoc key' => null,
+                'translatable-short nowdoc key' => null,
+                "translatable-short double-quoted key with whitespace and escaped \$\n\" sequences" => null,
+                'translatable-short single-quoted key with whitespace and nonescaped \$\n\' sequences' => null,
+                'translatable-short single-quoted key with "quote mark at the end"' => null,
+                'translatable-short '.$expectedHeredoc => null,
+                'translatable-short '.$expectedNowdoc => null,
+                'translatable-short concatenated message with heredoc and nowdoc' => null,
+                'translatable-short default domain' => null,
+                'single-quoted key' => null,
+                'double-quoted key' => null,
+                'heredoc key' => null,
+                'nowdoc key' => null,
+                "double-quoted key with whitespace and escaped \$\n\" sequences" => null,
+                'single-quoted key with whitespace and nonescaped \$\n\' sequences' => null,
+                'single-quoted key with "quote mark at the end"' => null,
+                $expectedHeredoc => null,
+                $expectedNowdoc => null,
+                'concatenated message with heredoc and nowdoc' => null,
+                'default domain' => null,
+            ],
+            'not_messages' => [
+                'translatable other-domain-test-no-params-short-array' => null,
+                'translatable other-domain-test-no-params-long-array' => null,
+                'translatable other-domain-test-params-short-array' => 'Available variables: foo',
+                'translatable other-domain-test-params-long-array' => 'Available variables: foo',
+                'translatable typecast' => 'Available variables: a',
+                'translatable-fqn other-domain-test-no-params-short-array' => null,
+                'translatable-fqn other-domain-test-no-params-long-array' => null,
+                'translatable-fqn other-domain-test-params-short-array' => 'Available variables: foo',
+                'translatable-fqn other-domain-test-params-long-array' => 'Available variables: foo',
+                'translatable-fqn typecast' => 'Available variables: a',
+                'translatable-short other-domain-test-no-params-short-array' => null,
+                'translatable-short other-domain-test-no-params-long-array' => null,
+                'translatable-short other-domain-test-params-short-array' => 'Available variables: foo',
+                'translatable-short other-domain-test-params-long-array' => 'Available variables: foo',
+                'translatable-short typecast' => 'Available variables: a',
+                'other-domain-test-no-params-short-array' => null,
+                'other-domain-test-no-params-long-array' => null,
+                'other-domain-test-params-short-array' => 'Available variables: foo',
+                'other-domain-test-params-long-array' => 'Available variables: foo',
+                'typecast' => 'Available variables: a',
+            ],
+        ];
         $actualCatalogue = $catalogue->all();
 
         $this->assertEquals($expectedCatalogue, $actualCatalogue);
@@ -128,6 +201,17 @@ EOF;
         $filename = str_replace(\DIRECTORY_SEPARATOR, '/', __DIR__).'/../fixtures/extractor/translation.html.php';
         $this->assertEquals(['sources' => [$filename.':2']], $catalogue->getMetadata('single-quoted key'));
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
+
+        // Check variables metadata
+        foreach (array_keys($actualCatalogue) as $domain) {echo "[{$domain}]\n";
+            foreach (array_keys($actualCatalogue[$domain]) as $id) {
+                $this->assertTrue(array_key_exists($id, $expectedVariables[$domain]), 'Metadata for domain "'.$domain.'" and id "'.$id.'" was not expected!');
+
+                $extractedVariables = $this->getVariablesNoteContentFromMetadata($catalogue->getMetadata($id, $domain));
+
+                $this->assertEquals($expectedVariables[$domain][$id], $extractedVariables);
+            }
+        }
     }
 
     /**
@@ -174,5 +258,22 @@ EOF;
             [new \ArrayObject(glob($directory.'*'))],
             [new \ArrayObject($splFiles)],
         ];
+    }
+
+    private function getVariablesNoteContentFromMetadata(array $metadata)
+    {
+        /**
+         *     $metadata = [
+         *         'notes' => [
+         *             0 => [
+         *                 'category' => 'symfony-extractor-variables',
+         *                 'content' => 'Available variables: var1, var2',
+         *             ],
+         *             ...
+         *         ],
+         *         ...
+         *     ]
+         */
+        return array_filter($metadata['notes'] ?? [], function ($note) { return $note['category'] === 'symfony-extractor-variables'; })[0]['content'] ?? null;
     }
 }

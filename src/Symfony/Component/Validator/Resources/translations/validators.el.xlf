@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Πρέπει να επιλέξετε τουλάχιστον {{ limit }} επιλογή.|Πρέπει να επιλέξετε τουλάχιστον {{ limit }} επιλογές.</target>
+                <target>Πρέπει να επιλέξτε τουλάχιστον {{ limit }} επιλογή.|Πρέπει να επιλέξτε τουλάχιστον {{ limit }} επιλογές.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Πρέπει να επιλέξετε το πολύ {{ limit }} επιλογή.|Πρέπει να επιλέξετε το πολύ {{ limit }} επιλογές.</target>
+                <target>Πρέπει να επιλέξτε το πολύ {{ limit }} επιλογή.|Πρέπει να επιλέξτε το πολύ {{ limit }} επιλογές.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -329,6 +329,62 @@
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Αυτός ο κωδικός BIC δεν σχετίζεται με το IBAN {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι έγκυρο JSON.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Αυτή η συλλογή θα πρέπει να περιέχει μόνο μοναδικά στοιχεία.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι θετική.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι θετική ή μηδενική.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι αρνητική.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι αρνητική ή μηδενική.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Αυτή η τιμή θα δέν είναι έγκυρη ζώνη ώρας.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Αυτός ο κωδικός πρόσβασης έχει διερρεύσει σε παραβίαση δεδομένων. Παρακαλούμε να χρησιμοποιήσετε έναν άλλο κωδικό.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Αυτή η τιμή θα πρέπει να είναι μεταξύ {{ min }} και {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Αυτή η τιμή δέν είναι έγκυρο όνομα υποδοχής.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Το νούμερο των στοιχείων σε αυτή τη συλλογή θα πρέπει να είναι πολλαπλάσιο του {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Αυτή η τιμή θα πρέπει να ικανοποιεί τουλάχιστον έναν απο τους παρακάτω περιορισμούς: </target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Κάθε στοιχείο σε αυτή τη συλλογή θα πρέπει να ικανοποιεί το δικό του σύνολο περιορισμών.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Αυτή η τιμή δέν είναι έγυρο International Securities Identification Number (ISIN).</target>
             </trans-unit>
         </body>
     </file>

@@ -180,7 +180,7 @@ class Request
     protected $format;
 
     /**
-     * @var SessionInterface
+     * @var SessionInterface|callable
      */
     protected $session;
 

@@ -382,6 +382,10 @@
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
                 <target>A gyűjtemény minden elemének meg kell felelni a saját feltételeinek.</target>
             </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Ez az érték nem egy érvényes nemzetközi értékpapír-azonosító szám (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

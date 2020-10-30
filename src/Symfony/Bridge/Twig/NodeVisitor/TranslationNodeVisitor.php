@@ -94,18 +94,12 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             't' === $node->getNode('node')->getAttribute('name')
         ) {
             // extract t() nodes with a trans filter applied
-            $filterNodeArguments = $node->getNode('arguments');
             $functionNodeArguments = $node->getNode('node')->getNode('arguments');
 
             if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
-                // Get domain from filter (if available) this will support also "trans_default_domain"
-                // but fallback to the function argument to support the following:
-                // {{ t("new key", {}, "domain") | trans() }}
-                $domain = $this->getReadDomainFromArguments($filterNodeArguments, 1) ?? $this->getReadDomainFromArguments($functionNodeArguments, 2);
-
                 $this->messages[] = [
                     $this->getReadMessageFromArguments($functionNodeArguments, 0),
-                    $domain,
+                    $this->getReadDomainFromArguments($functionNodeArguments, 2),
                     $this->getReadVariablesFromArguments($functionNodeArguments, 1),
                 ];
             }

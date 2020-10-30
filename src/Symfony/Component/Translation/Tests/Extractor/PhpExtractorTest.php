@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Tests\Extractor;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Extractor\PhpExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -203,9 +202,9 @@ EOF;
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
 
         // Check variables metadata
-        foreach (array_keys($actualCatalogue) as $domain) {echo "[{$domain}]\n";
+        foreach (array_keys($actualCatalogue) as $domain) {
             foreach (array_keys($actualCatalogue[$domain]) as $id) {
-                $this->assertTrue(array_key_exists($id, $expectedVariables[$domain]), 'Metadata for domain "'.$domain.'" and id "'.$id.'" was not expected!');
+                $this->assertArrayHasKey($id, $expectedVariables[$domain], 'Metadata for domain "'.$domain.'" and id "'.$id.'" was not expected!');
 
                 $extractedVariables = $this->getVariablesNoteContentFromMetadata($catalogue->getMetadata($id, $domain));
 
@@ -262,7 +261,7 @@ EOF;
 
     private function getVariablesNoteContentFromMetadata(array $metadata)
     {
-        /**
+        /*
          *     $metadata = [
          *         'notes' => [
          *             0 => [
@@ -274,6 +273,6 @@ EOF;
          *         ...
          *     ]
          */
-        return array_filter($metadata['notes'] ?? [], function ($note) { return $note['category'] === 'symfony-extractor-variables'; })[0]['content'] ?? null;
+        return array_filter($metadata['notes'] ?? [], function ($note) { return 'symfony-extractor-variables' === $note['category']; })[0]['content'] ?? null;
     }
 }

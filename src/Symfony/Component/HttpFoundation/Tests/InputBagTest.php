@@ -48,6 +48,17 @@ class InputBagTest extends TestCase
     /**
      * @group legacy
      */
+    public function testFilterCallback()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+
+        $this->expectDeprecation('Since symfony/http-foundation 5.2: Not passing a Closure together with FILTER_CALLBACK to "Symfony\Component\HttpFoundation\InputBag::filter()" is deprecated. Wrap your filter in a closure instead.');
+        $this->assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testSetWithNonStringishOrArrayIsDeprecated()
     {
         $bag = new InputBag();

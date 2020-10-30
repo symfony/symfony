@@ -12,11 +12,14 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $this->testAll();
@@ -174,6 +177,17 @@ class ParameterBagTest extends TestCase
         ]), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testFilterCallback()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->expectDeprecation('Since symfony/http-foundation 5.2: Not passing a Closure together with FILTER_CALLBACK to "Symfony\Component\HttpFoundation\ParameterBag::filter()" is deprecated. Wrap your filter in a closure instead.');
+        $this->assertSame('BAR', $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']));
     }
 
     public function testGetIterator()

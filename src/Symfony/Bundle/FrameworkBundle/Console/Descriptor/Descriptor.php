@@ -15,9 +15,12 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
@@ -41,6 +44,10 @@ abstract class Descriptor implements DescriptorInterface
     public function describe(OutputInterface $output, mixed $object, array $options = [])
     {
         $this->output = $output;
+
+        if ($object instanceof ContainerBuilder) {
+            (new AnalyzeServiceReferencesPass(false, false))->process($object);
+        }
 
         switch (true) {
             case $object instanceof RouteCollection:
@@ -85,6 +92,10 @@ abstract class Descriptor implements DescriptorInterface
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_debug_type($object)));
         }
+
+        if ($object instanceof ContainerBuilder) {
+            $object->getCompiler()->getServiceReferenceGraph()->clear();
+        }
     }
 
     protected function getOutput(): OutputInterface
@@ -125,7 +136,7 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void;
 
-    abstract protected function describeContainerDefinition(Definition $definition, array $options = []);
+    abstract protected function describeContainerDefinition(Definition $definition, array $options = [], ContainerBuilder $builder = null);
 
     abstract protected function describeContainerAlias(Alias $alias, array $options = [], ContainerBuilder $builder = null);
 
@@ -357,5 +368,16 @@ abstract class Descriptor implements DescriptorInterface
         ksort($envs);
 
         return array_values($envs);
+    }
+
+    protected function getServiceEdges(ContainerBuilder $builder, string $serviceId): array
+    {
+        try {
+            return array_map(function (ServiceReferenceGraphEdge $edge) {
+                return $edge->getSourceNode()->getId();
+            }, $builder->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges());
+        } catch (InvalidArgumentException $exception) {
+            return [];
+        }
     }
 }

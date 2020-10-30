@@ -12,5 +12,6 @@
   Autowired        no                                                              
   Autoconfigured   no                                                              
   Arguments        Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum::FOO  
+  Usages           none                                                            
  ---------------- ---------------------------------------------------------------- 
 

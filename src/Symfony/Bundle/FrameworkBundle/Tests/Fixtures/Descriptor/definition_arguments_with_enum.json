@@ -11,5 +11,6 @@
         "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::FOO"
     ],
     "file": null,
-    "tags": []
+    "tags": [],
+    "usages": []
 }

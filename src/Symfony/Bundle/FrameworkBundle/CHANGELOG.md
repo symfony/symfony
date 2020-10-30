@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate the `Symfony\Component\Serializer\Normalizer\ObjectNormalizer` and
    `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` autowiring aliases, type-hint against
    `Symfony\Component\Serializer\Normalizer\NormalizerInterface` or implement `NormalizerAwareInterface` instead
+ * Add service usages list to the `debug:container` command output
 
 6.1
 ---

@@ -34,14 +34,38 @@ EOF
 EOF
 ); ?>
 
-<?php echo $view['translator']->trans('other-domain-test-no-params-short-array', [], 'not_messages'); ?>
+<?php $view['translator']->trans('test-no-params-short-array', []); ?>
 
-<?php echo $view['translator']->trans('other-domain-test-no-params-long-array', [], 'not_messages'); ?>
+<?php $view['translator']->trans('test-no-params-long-array', array()); ?>
 
-<?php echo $view['translator']->trans('other-domain-test-params-short-array', ['foo' => 'bar'], 'not_messages'); ?>
+<?php $view['translator']->trans('test-params-short-array', ['foo' => 'bar']); ?>
 
-<?php echo $view['translator']->trans('other-domain-test-params-long-array', ['foo' => 'bar'], 'not_messages'); ?>
+<?php $view['translator']->trans('test-params-long-array', array('foo' => 'bar')); ?>
 
-<?php echo $view['translator']->trans('typecast', ['a' => (int) '123'], 'not_messages'); ?>
+<?php $view['translator']->trans('test-multiple-params-short-array', ['foo' => 'bar', 'foz' => 'baz']); ?>
 
-<?php echo $view['translator']->trans('default domain', [], null); ?>
+<?php $view['translator']->trans('test-multiple-params-long-array', array('foo' => 'bar', 'foz' => 'baz')); ?>
+
+<?php $view['translator']->trans('test-params-trailing-comma-short-array', ['foo' => 'bar',]); ?>
+
+<?php $view['translator']->trans('test-params-trailing-comma-long-array', array('foo' => 'bar',)); ?>
+
+<?php $view['translator']->trans('typecast-short-array', ['a' => (int) '123']); ?>
+
+<?php $view['translator']->trans('typecast-long-array', array('a' => (int) '123')); ?>
+
+<?php $view['translator']->trans('other-domain-test-no-params-short-array', [], 'not_messages'); ?>
+
+<?php $view['translator']->trans('other-domain-test-no-params-long-array', array(), 'not_messages'); ?>
+
+<?php $view['translator']->trans('other-domain-test-params-short-array', ['foo' => 'bar'], 'not_messages'); ?>
+
+<?php $view['translator']->trans('other-domain-test-params-long-array', array('foo' => 'bar'), 'not_messages'); ?>
+
+<?php $view['translator']->trans('other-domain-typecast-short-array', ['a' => (int) '123'], 'not_messages'); ?>
+
+<?php $view['translator']->trans('other-domain-typecast-long-array', array('a' => (int) '123'), 'not_messages'); ?>
+
+<?php $view['translator']->trans('default-domain-short-array', [], null); ?>
+
+<?php $view['translator']->trans('default-domain-long-array', array(), null); ?>

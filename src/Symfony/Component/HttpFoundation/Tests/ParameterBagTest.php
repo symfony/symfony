@@ -43,6 +43,21 @@ class ParameterBagTest extends TestCase
         $bag->all('foo');
     }
 
+    public function testAllWithDefaultKey()
+    {
+        $bag = new ParameterBag(['foo' => ['bar', 'baz'], 'null' => null]);
+
+        $this->assertEquals(['bar', 'baz'], $bag->all('foo', ['qux']), '->all() gets the value of a parameter');
+        $this->assertEquals(['qux'], $bag->all('unknown', ['qux']), '->all() returns an given default array if a parameter is not defined');
+    }
+
+    public function testAllThrowsForNonArrayDefaults()
+    {
+        $this->expectException(\TypeError::class);
+        $bag = new ParameterBag(['foo' => 'bar', 'null' => null]);
+        $bag->all('foo', 12345);
+    }
+
     public function testKeys()
     {
         $bag = new ParameterBag(['foo' => 'bar']);

@@ -37,7 +37,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of parameters
      */
-    public function all(/*string $key = null*/)
+    public function all(/*string $key = null, array $default = []*/)
     {
         $key = \func_num_args() > 0 ? func_get_arg(0) : null;
 
@@ -45,7 +45,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
             return $this->parameters;
         }
 
-        if (!\is_array($value = $this->parameters[$key] ?? [])) {
+        $default = \func_num_args() > 1 ? func_get_arg(1) : [];
+        if (!\is_array($default)) {
+            throw new \TypeError(sprintf('Unexpected value for default value: expecting "array", got "%s".', get_debug_type($default)));
+        }
+
+        if (!\is_array($value = $this->parameters[$key] ?? $default)) {
             throw new BadRequestException(sprintf('Unexpected value for parameter "%s": expecting "array", got "%s".', $key, get_debug_type($value)));
         }
 

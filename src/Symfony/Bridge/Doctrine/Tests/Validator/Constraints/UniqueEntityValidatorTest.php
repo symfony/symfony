@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    const EM_NAME = 'foo';
+    private const EM_NAME = 'foo';
 
     /**
      * @var ObjectManager

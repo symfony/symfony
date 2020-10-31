@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  */
 class BCryptPasswordEncoderTest extends TestCase
 {
-    const PASSWORD = 'password';
-    const VALID_COST = '04';
+    private const PASSWORD = 'password';
+    private const VALID_COST = '04';
 
     public function testCostBelowRange()
     {

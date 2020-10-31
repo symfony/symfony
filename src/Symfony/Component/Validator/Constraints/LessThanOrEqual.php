@@ -20,7 +20,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class LessThanOrEqual extends AbstractComparison
 {
-    const TOO_HIGH_ERROR = '30fbb013-d015-4232-8b3b-8f3be97a7e14';
+    public const TOO_HIGH_ERROR = '30fbb013-d015-4232-8b3b-8f3be97a7e14';
 
     protected static $errorNames = [
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',

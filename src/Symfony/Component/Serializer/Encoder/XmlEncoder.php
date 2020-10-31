@@ -29,34 +29,34 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 {
     use SerializerAwareTrait;
 
-    const FORMAT = 'xml';
+    public const FORMAT = 'xml';
 
-    const AS_COLLECTION = 'as_collection';
+    public const AS_COLLECTION = 'as_collection';
 
     /**
      * An array of ignored XML node types while decoding, each one of the DOM Predefined XML_* constants.
      */
-    const DECODER_IGNORED_NODE_TYPES = 'decoder_ignored_node_types';
+    public const DECODER_IGNORED_NODE_TYPES = 'decoder_ignored_node_types';
 
     /**
      * An array of ignored XML node types while encoding, each one of the DOM Predefined XML_* constants.
      */
-    const ENCODER_IGNORED_NODE_TYPES = 'encoder_ignored_node_types';
-    const ENCODING = 'xml_encoding';
-    const FORMAT_OUTPUT = 'xml_format_output';
+    public const ENCODER_IGNORED_NODE_TYPES = 'encoder_ignored_node_types';
+    public const ENCODING = 'xml_encoding';
+    public const FORMAT_OUTPUT = 'xml_format_output';
 
     /**
      * A bit field of LIBXML_* constants.
      */
-    const LOAD_OPTIONS = 'load_options';
-    const REMOVE_EMPTY_TAGS = 'remove_empty_tags';
-    const ROOT_NODE_NAME = 'xml_root_node_name';
-    const STANDALONE = 'xml_standalone';
+    public const LOAD_OPTIONS = 'load_options';
+    public const REMOVE_EMPTY_TAGS = 'remove_empty_tags';
+    public const ROOT_NODE_NAME = 'xml_root_node_name';
+    public const STANDALONE = 'xml_standalone';
 
     /** @deprecated The constant TYPE_CASE_ATTRIBUTES is deprecated since version 4.4 and will be removed in version 5. Use TYPE_CAST_ATTRIBUTES instead. */
-    const TYPE_CASE_ATTRIBUTES = 'xml_type_cast_attributes';
-    const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
-    const VERSION = 'xml_version';
+    public const TYPE_CASE_ATTRIBUTES = 'xml_type_cast_attributes';
+    public const TYPE_CAST_ATTRIBUTES = 'xml_type_cast_attributes';
+    public const VERSION = 'xml_version';
 
     private $defaultContext = [
         self::AS_COLLECTION => false,

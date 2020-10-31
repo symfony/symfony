@@ -34,7 +34,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class XmlFileLoader extends FileLoader
 {
-    const NS = 'http://symfony.com/schema/dic/services';
+    public const NS = 'http://symfony.com/schema/dic/services';
 
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
 

@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 abstract class AbstractConfigurator
 {
-    const FACTORY = 'unknown';
+    public const FACTORY = 'unknown';
 
     /** @internal */
     protected $definition;

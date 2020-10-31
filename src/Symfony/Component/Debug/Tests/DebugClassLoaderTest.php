@@ -380,7 +380,7 @@ class ClassLoader
         if (TestingUnsilencing::class === $class) {
             eval('-- parse error --');
         } elseif (TestingStacking::class === $class) {
-            eval('namespace '.__NAMESPACE__.'; class TestingStacking { function foo() {} }');
+            eval('namespace '.__NAMESPACE__.'; class TestingStacking { publicfunction foo() {} }');
         } elseif (TestingCaseMismatch::class === $class) {
             eval('namespace '.__NAMESPACE__.'; class TestingCaseMisMatch {}');
         } elseif (__NAMESPACE__.'\Fixtures\Psr4CaseMismatch' === $class) {

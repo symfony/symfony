@@ -28,11 +28,11 @@ use Symfony\Component\Validator\Tests\Fixtures\Reference;
  */
 abstract class AbstractValidatorTest extends TestCase
 {
-    const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    public const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
-    const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
+    public const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
 
-    const LAZY_PROPERTY = 'Symfony\Component\Validator\Validator\LazyProperty';
+    public const LAZY_PROPERTY = 'Symfony\Component\Validator\Validator\LazyProperty';
 
     /**
      * @var FakeMetadataFactory

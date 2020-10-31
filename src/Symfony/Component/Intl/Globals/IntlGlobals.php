@@ -23,17 +23,17 @@ abstract class IntlGlobals
     /**
      * Indicates that no error occurred.
      */
-    const U_ZERO_ERROR = 0;
+    public const U_ZERO_ERROR = 0;
 
     /**
      * Indicates that an invalid argument was passed.
      */
-    const U_ILLEGAL_ARGUMENT_ERROR = 1;
+    public const U_ILLEGAL_ARGUMENT_ERROR = 1;
 
     /**
      * Indicates that the parse() operation failed.
      */
-    const U_PARSE_ERROR = 9;
+    public const U_PARSE_ERROR = 9;
 
     /**
      * All known error codes.

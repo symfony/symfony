@@ -23,7 +23,7 @@ class DoctrineFooType extends Type
     /**
      * Type name.
      */
-    const NAME = 'foo';
+    public const NAME = 'foo';
 
     /**
      * {@inheritdoc}

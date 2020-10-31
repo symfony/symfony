@@ -76,15 +76,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     private static $freshCache = [];
 
-    const VERSION = '4.4.17-DEV';
-    const VERSION_ID = 40417;
-    const MAJOR_VERSION = 4;
-    const MINOR_VERSION = 4;
-    const RELEASE_VERSION = 17;
-    const EXTRA_VERSION = 'DEV';
+    public const VERSION = '4.4.17-DEV';
+    public const VERSION_ID = 40417;
+    public const MAJOR_VERSION = 4;
+    public const MINOR_VERSION = 4;
+    public const RELEASE_VERSION = 17;
+    public const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '11/2022';
-    const END_OF_LIFE = '11/2023';
+    public const END_OF_MAINTENANCE = '11/2022';
+    public const END_OF_LIFE = '11/2023';
 
     public function __construct(string $environment, bool $debug)
     {

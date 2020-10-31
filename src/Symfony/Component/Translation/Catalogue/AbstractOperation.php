@@ -141,10 +141,55 @@ abstract class AbstractOperation implements OperationInterface
         foreach ($this->getDomains() as $domain) {
             if (!isset($this->messages[$domain])) {
                 $this->processDomain($domain);
+                $this->processVariablesMetadata($domain);
             }
         }
 
         return $this->result;
+    }
+
+    /**
+     * Variables metadata should be updated according to target.
+     */
+    protected function processVariablesMetadata(string $domain)
+    {
+        $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+
+        foreach ($this->target->all($domain) as $id => $message) {
+            if ($this->source->has($id, $domain)) {
+                $targetDomain = $this->target->defines($id, $intlDomain) ? $intlDomain : $domain;
+                $sourceDomain = $this->source->defines($id, $intlDomain) ? $intlDomain : $domain;
+                $sourceMetadata = $this->result->getMetadata($id, $sourceDomain) ?? [];
+                $variablesNote = null;
+
+                // Get target variables note
+                foreach ($this->target->getMetadata($id, $targetDomain)['notes'] ?? [] as $note) {
+                    if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
+                        $variablesNote = $note;
+
+                        break;
+                    }
+                }
+
+                if ($variablesNote) {
+                    // Update old variables note (if any)
+                    if (isset($metadata['notes'])) {
+                        foreach ($sourceMetadata['notes'] as $index => $note) {
+                            if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
+                                $sourceMetadata['notes'][$index] = $variablesNote;
+
+                                break;
+                            }
+                        }
+                    } else {
+                        $sourceMetadata['notes'][] = $variablesNote;
+                    }
+
+
+                    $this->result->setMetadata($id, $sourceMetadata, $sourceDomain);
+                }
+            }
+        }
     }
 
     /**

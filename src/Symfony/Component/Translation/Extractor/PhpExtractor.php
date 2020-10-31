@@ -189,7 +189,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     {
         $keys = [];
         $isShortArray = '[' === $this->normalizeToken($tokenIterator->current());
-        $closingBracket = $isShortArray ? ']' : ')';
+        $mainClosingSymbol = $isShortArray ? ']' : ')';
 
         if ($isShortArray) {
             // Skip opening "["
@@ -205,7 +205,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             $t = $tokenIterator->current();
 
             // End of main array
-            if ($closingBracket === $t[0]) {
+            if ($mainClosingSymbol === $t[0]) {
                 // Skip following ","
                 $tokenIterator->next();
 
@@ -235,7 +235,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     break;
                 }
 
-                if (-1 === $openBraces && $closingBracket === $t[0]) {
+                if (-1 === $openBraces && $mainClosingSymbol === $t[0]) {
                     break;
                 }
             }

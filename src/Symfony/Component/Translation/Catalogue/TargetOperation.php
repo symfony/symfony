@@ -47,11 +47,13 @@ class TargetOperation extends AbstractOperation
         // because doing so will not exclude messages like {x: x ∈ source ∧ x ∉ target.all ∧ x ∈ target.fallback}
 
         foreach ($this->source->all($domain) as $id => $message) {
+            $sourceDomain = $this->source->defines($id, $intlDomain) ? $intlDomain : $domain;
+
             if ($this->target->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
-                $this->result->add([$id => $message], $this->source->defines($id, $intlDomain) ? $intlDomain : $domain);
-                if (null !== $keyMetadata = $this->source->getMetadata($id, $this->source->defines($id, $intlDomain) ? $intlDomain : $domain)) {
-                    $this->result->setMetadata($id, $keyMetadata, $this->source->defines($id, $intlDomain) ? $intlDomain : $domain);
+                $this->result->add([$id => $message], $sourceDomain);
+                if (null !== $keyMetadata = $this->source->getMetadata($id, $sourceDomain)) {
+                    $this->result->setMetadata($id, $keyMetadata, $sourceDomain);
                 }
             } else {
                 $this->messages[$domain]['obsolete'][$id] = $message;
@@ -59,12 +61,14 @@ class TargetOperation extends AbstractOperation
         }
 
         foreach ($this->target->all($domain) as $id => $message) {
+            $targetDomain = $this->target->defines($id, $intlDomain) ? $intlDomain : $domain;
+
             if (!$this->source->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->messages[$domain]['new'][$id] = $message;
-                $this->result->add([$id => $message], $this->target->defines($id, $intlDomain) ? $intlDomain : $domain);
-                if (null !== $keyMetadata = $this->target->getMetadata($id, $this->target->defines($id, $intlDomain) ? $intlDomain : $domain)) {
-                    $this->result->setMetadata($id, $keyMetadata, $this->target->defines($id, $intlDomain) ? $intlDomain : $domain);
+                $this->result->add([$id => $message], $targetDomain);
+                if (null !== $keyMetadata = $this->target->getMetadata($id, $targetDomain)) {
+                    $this->result->setMetadata($id, $keyMetadata, $targetDomain);
                 }
             }
         }

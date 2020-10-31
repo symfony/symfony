@@ -31,6 +31,13 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
 
     private $enabled = false;
     /**
+     * This class cannot read nodes backwards.
+     * We need a way to track when we encounter a "|trans()" filter containing
+     * a "t()" function in order to avoid processing that same function again
+     * as if it was used alone.
+     */
+    private $skipTFunctionAfterFilter = false;
+    /**
      * This array stores found messages.
      *
      * The data structure of this array is as follows:
@@ -95,6 +102,29 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         ) {
             // extract t() nodes with a trans filter applied
             $functionNodeArguments = $node->getNode('node')->getNode('arguments');
+
+            if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
+                $this->messages[] = [
+                    $this->getReadMessageFromArguments($functionNodeArguments, 0),
+                    $this->getReadDomainFromArguments($functionNodeArguments, 2),
+                    $this->getReadVariablesFromArguments($functionNodeArguments, 1),
+                ];
+
+                // Avoid processing this "t()" function twice
+                $this->skipTFunctionAfterFilter = true;
+            }
+        } elseif (
+            $node instanceof FunctionExpression &&
+            't' === $node->getAttribute('name')
+        ) {
+            // extract t() nodes without a trans filter applied
+            if ($this->skipTFunctionAfterFilter) {
+                $this->skipTFunctionAfterFilter = false;
+
+                return $node;
+            }
+
+            $functionNodeArguments = $node->getNode('arguments');
 
             if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
                 $this->messages[] = [

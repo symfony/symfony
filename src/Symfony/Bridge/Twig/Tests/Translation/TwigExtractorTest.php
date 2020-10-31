@@ -118,7 +118,7 @@ class TwigExtractorTest extends TestCase
             ['{% trans_default_domain \'another-domain\' %}{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}) }}', ['trans_filter_with_variable_as_param' => ['another-domain', 'var1, var2']]],
             ['{% trans_default_domain \'another-domain\' %}{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') }}', ['trans_filter_with_variable_as_param' => ['domain', 'var1, var2']]],
 
-            // t() function
+            // t() function with |trans() filter
             // Be careful: the t() function creates a TranslatableMessage object which overrides the domain set with 'trans_default_domain' (no domain specified = 'messages').
             ['{{ t(\'t_function_with_variables_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans }}', ['t_function_with_variables_with_trans_filter' => ['messages', 'var1, var2']]],
             ['{{ t(\'t_function_with_variables_and_domain_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans }}', ['t_function_with_variables_and_domain_with_trans_filter' => ['domain', 'var1, var2']]],
@@ -128,6 +128,15 @@ class TwigExtractorTest extends TestCase
             ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_and_domain_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans }}', ['t_function_with_variables_and_domain_with_trans_filter' => ['domain', 'var1, var2']]],
             ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans(\'en\') }}', ['t_function_with_variables_with_trans_filter_and_locale' => ['messages', 'var1, var2']]], // Be careful! (read note above)
             ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_and_domain_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans(\'en\') }}', ['t_function_with_variables_and_domain_with_trans_filter_and_locale' => ['domain', 'var1, var2']]],
+
+            // t() function alone (e.g. as a variable value)
+            // Be careful: the t() function creates a TranslatableMessage object which overrides the domain set with 'trans_default_domain' (no domain specified = 'messages').
+            ['{% set t_function_in_a_variable =  t(\'t_function_in_a_variable\') %}{{ t_function_in_a_variable|trans }}', ['t_function_in_a_variable' => ['messages', null]]],
+            ['{% set t_function_with_variables_in_a_variable =  t(\'t_function_with_variables_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}) %}{{ t_function_with_variables_in_a_variable|trans }}', ['t_function_with_variables_in_a_variable' => ['messages', 'var1, var2']]],
+            ['{% set t_function_with_variables_and_domain_in_a_variable =  t(\'t_function_with_variables_and_domain_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') %}{{ t_function_with_variables_and_domain_in_a_variable|trans }}', ['t_function_with_variables_and_domain_in_a_variable' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{% set t_function_in_a_variable =  t(\'t_function_in_a_variable\') %}{{ t_function_in_a_variable|trans }}', ['t_function_in_a_variable' => ['messages', null]]],
+            ['{% trans_default_domain \'another-domain\' %}{% set t_function_with_variables_in_a_variable =  t(\'t_function_with_variables_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}) %}{{ t_function_with_variables_in_a_variable|trans }}', ['t_function_with_variables_in_a_variable' => ['messages', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{% set t_function_with_variables_and_domain_in_a_variable =  t(\'t_function_with_variables_and_domain_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') %}{{ t_function_with_variables_and_domain_in_a_variable|trans }}', ['t_function_with_variables_and_domain_in_a_variable' => ['domain', 'var1, var2']]],
 
             // concat translations
             ['{{ ("new" ~ " key") | trans() }}', ['new key' => ['messages', null]]],

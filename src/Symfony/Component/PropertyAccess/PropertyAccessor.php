@@ -612,6 +612,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             'enable_magic_methods_extraction' => $this->magicMethodsFlags,
             'enable_constructor_extraction' => false,
             'enable_adder_remover_extraction' => $useAdderAndRemover,
+            'value' => $value,
         ]);
 
         if (isset($item)) {

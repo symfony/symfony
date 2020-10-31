@@ -388,6 +388,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
 
             $method = $reflClass->getMethod($methodName);
+            /** @var \ReflectionParameter $parameter */
+            $parameter = $method->getParameters()[0];
+            if (\array_key_exists('value', $context) && null === $context['value'] && !$parameter->allowsNull()) {
+                $errors[] = sprintf('The method "%s" in class "%s" was found but does not allow null.', $methodName, $class);
+                continue;
+            }
 
             if (!\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
                 return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisiblityForMethod($method), $method->isStatic());

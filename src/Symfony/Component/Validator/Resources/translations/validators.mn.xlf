@@ -131,20 +131,20 @@
                 <target>Энэ утга зөвхөн тоо байна.</target>
             </trans-unit>
             <trans-unit id="36">
-                <source>This value is not a valid country.</source>
-                <target>Энэ утга үнэн бодит улс биш байна.</target>
-            </trans-unit>
-            <trans-unit id="37">
                 <source>This file is not a valid image.</source>
                 <target>Файл зураг биш байна.</target>
             </trans-unit>
-            <trans-unit id="38">
+            <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
                 <target>IP хаяг зөв биш байна.</target>
             </trans-unit>
-            <trans-unit id="39">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Энэ утга үнэн зөв хэл биш байна .</target>
+                <target>Энэ утга үнэн зөв хэл биш байна.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Энэ утга үнэн зөв байршил биш байна.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>

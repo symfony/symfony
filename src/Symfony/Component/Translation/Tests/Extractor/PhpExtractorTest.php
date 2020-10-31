@@ -136,6 +136,7 @@ EOF;
                 'typecast-long-array' => 'prefixtypecast-long-array',
                 'default-domain-short-array' => 'prefixdefault-domain-short-array',
                 'default-domain-long-array' => 'prefixdefault-domain-long-array',
+                'message-used-multiple-times' => 'prefixmessage-used-multiple-times',
             ],
             'not_messages' => [
                 // translatable.html.php
@@ -270,6 +271,7 @@ EOF;
                 'typecast-long-array' => 'Available variables: a',
                 'default-domain-short-array' => null,
                 'default-domain-long-array' => null,
+                'message-used-multiple-times' => 'Available variables: var1, var2, var3',
             ],
             'not_messages' => [
                 // translatable.html.php

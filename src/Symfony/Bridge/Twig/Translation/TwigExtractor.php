@@ -85,11 +85,26 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 
             if (!empty($extractedMessage[2])) {
                 $metadata = $catalogue->getMetadata($message, $domain);
-
-                $metadata['notes'][] = [
+                $variablesNote = [
                     'category' => 'symfony-extractor-variables',
                     'content' => 'Available variables: '.implode(', ', $extractedMessage[2]),
                 ];
+
+                // Update old variables note (if any)
+                if (isset($metadata['notes'])) {
+                    foreach ($metadata['notes'] as $index => $note) {
+                        if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
+                            // Keep the higher variables count
+                            if (count($extractedMessage[2]) > substr_count($note['content'], ',')) {
+                                $metadata['notes'][$index] = $variablesNote;
+                            }
+
+                            break;
+                        }
+                    }
+                } else {
+                    $metadata['notes'][] = $variablesNote;
+                }
 
                 $catalogue->setMetadata($message, $metadata, $domain);
             }

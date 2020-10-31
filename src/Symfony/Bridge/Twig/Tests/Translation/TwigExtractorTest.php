@@ -138,6 +138,9 @@ class TwigExtractorTest extends TestCase
             ['{% trans_default_domain \'another-domain\' %}{% set t_function_with_variables_in_a_variable =  t(\'t_function_with_variables_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}) %}{{ t_function_with_variables_in_a_variable|trans }}', ['t_function_with_variables_in_a_variable' => ['messages', 'var1, var2']]],
             ['{% trans_default_domain \'another-domain\' %}{% set t_function_with_variables_and_domain_in_a_variable =  t(\'t_function_with_variables_and_domain_in_a_variable\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') %}{{ t_function_with_variables_and_domain_in_a_variable|trans }}', ['t_function_with_variables_and_domain_in_a_variable' => ['domain', 'var1, var2']]],
 
+            // Check behavior when the same key is used multiple times (no duplicate notes, keep higher variables count)
+            ['{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} %}message_used_multiple_times{% endtrans %}{% trans with {\'var1\': \'val1\', \'var2\': \'val2\', \'var3\': \'val3\'} %}message_used_multiple_times{% endtrans %}{% trans with {\'var1\': \'val1\'} %}message_used_multiple_times{% endtrans %}', ['message_used_multiple_times' => ['messages', 'var1, var2, var3']]],
+
             // concat translations
             ['{{ ("new" ~ " key") | trans() }}', ['new key' => ['messages', null]]],
             ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => ['messages', null]]],

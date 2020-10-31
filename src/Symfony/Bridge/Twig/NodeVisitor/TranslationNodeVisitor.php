@@ -40,8 +40,8 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
      *             0 => 'message',
      *             1 => 'domain',
      *             2 => [
-     *                 'variable1',
-     *                 'variable2',
+     *                 0 => 'variable1',
+     *                 1 => 'variable2',
      *                 ...
      *             ]
      *         ],

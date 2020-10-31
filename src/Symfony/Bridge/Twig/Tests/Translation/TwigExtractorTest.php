@@ -22,6 +22,9 @@ use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
+    const VARIABLES_NOTE_CATEGORY = 'symfony-extractor-variables';
+    const VARIABLES_NOTE_PREFIX = 'Available variables: ';
+
     /**
      * @dataProvider getExtractData
      */
@@ -48,42 +51,92 @@ class TwigExtractorTest extends TestCase
             $this->assertSame($catalogue->all(), $messages);
         }
 
-        foreach ($messages as $key => $domain) {
-            $this->assertTrue($catalogue->has($key, $domain));
-            $this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
+        foreach ($messages as $key => $data) {
+            $this->assertTrue($catalogue->has($key, $data[0]));
+            $this->assertEquals('prefix'.$key, $catalogue->get($key, $data[0]));
+
+            // Check variables
+            if ($notes = $catalogue->getMetadata($key, $data[0])['notes'] ?? null) {
+                foreach ($notes as $note) {
+                    if (isset($note['category']) && self::VARIABLES_NOTE_CATEGORY === $note['category']) {
+                        $this->assertEquals(self::VARIABLES_NOTE_PREFIX.$data[1], $note['content']);
+
+                        break;
+                    }
+                }
+            }
         }
     }
 
     public function getExtractData()
     {
+        /*
+         *    [
+         *        0 => 'TWIG_TEMPLATE',
+         *        1 => [
+         *            'message_key' => [
+         *                0 => 'domain',
+         *                1 => 'var1, var2'|null, // Complete message is 'Available variables: var1, var2'
+         *                ...
+         *            ]
+         *        ],
+         *        ...
+         *    ]
+         */
         return [
-            ['{{ "new key" | trans() }}', ['new key' => 'messages']],
-            ['{{ "new key" | trans() | upper }}', ['new key' => 'messages']],
-            ['{{ "new key" | trans({}, "domain") }}', ['new key' => 'domain']],
-            ['{% trans %}new key{% endtrans %}', ['new key' => 'messages']],
-            ['{% trans %}  new key  {% endtrans %}', ['new key' => 'messages']],
-            ['{% trans from "domain" %}new key{% endtrans %}', ['new key' => 'domain']],
-            ['{% set foo = "new key" | trans %}', ['new key' => 'messages']],
-            ['{{ 1 ? "new key" | trans : "another key" | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
-            ['{{ t("new key") | trans() }}', ['new key' => 'messages']],
-            ['{{ t("new key", {}, "domain") | trans() }}', ['new key' => 'domain']],
-            ['{{ 1 ? t("new key") | trans : t("another key") | trans }}', ['new key' => 'messages', 'another key' => 'messages']],
+            ['{{ "new key" | trans() }}', ['new key' => ['messages', null]]],
+            ['{{ "new key" | trans() | upper }}', ['new key' => ['messages', null]]],
+            ['{{ "new key" | trans({}, "domain") }}', ['new key' => ['domain', null]]],
+            ['{% trans %}new key{% endtrans %}', ['new key' => ['messages', null]]],
+            ['{% trans %}  new key  {% endtrans %}', ['new key' => ['messages', null]]],
+            ['{% trans from "domain" %}new key{% endtrans %}', ['new key' => ['domain', null]]],
+            ['{% set foo = "new key" | trans %}', ['new key' => ['messages', null]]],
+            ['{{ 1 ? "new key" | trans : "another key" | trans }}', ['new key' => ['messages', null], 'another key' => ['messages', null]]],
+            ['{{ t("new key") | trans() }}', ['new key' => ['messages', null]]],
+            ['{{ t("new key", {}, "domain") | trans() }}', ['new key' => ['domain', null]]],
+            ['{{ 1 ? t("new key") | trans : t("another key") | trans }}', ['new key' => ['messages', null], 'another key' => ['messages', null]]],
 
             // make sure 'trans_default_domain' tag is supported
-            ['{% trans_default_domain "domain" %}{{ "new key"|trans }}', ['new key' => 'domain']],
-            ['{% trans_default_domain "domain" %}{% trans %}new key{% endtrans %}', ['new key' => 'domain']],
+            ['{% trans_default_domain "domain" %}{{ "new key"|trans }}', ['new key' => ['domain', null]]],
+            ['{% trans_default_domain "domain" %}{% trans %}new key{% endtrans %}', ['new key' => ['domain', null]]],
 
             // make sure this works with twig's named arguments
-            ['{{ "new key" | trans(domain="domain") }}', ['new key' => 'domain']],
+            ['{{ "new key" | trans(domain="domain") }}', ['new key' => ['domain', null]]],
+
+            // make sure this works with variables
+            // trans tag
+            ['{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} %}trans_tag_with_variables{% endtrans %}', ['trans_tag_with_variables' => ['messages', 'var1, var2']]],
+            ['{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} from \'domain\' %}trans_tag_with_variables_and_domain{% endtrans %}', ['trans_tag_with_variables_and_domain' => ['domain', 'var1, var2']]],
+            ['{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} from \'domain\' into \'en\'%}trans_tag_with_variables_and_domain_and_locale{% endtrans %}', ['trans_tag_with_variables_and_domain_and_locale' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} %}trans_tag_with_variables{% endtrans %}', ['trans_tag_with_variables' => ['another-domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} from \'domain\' %}trans_tag_with_variables_and_domain{% endtrans %}', ['trans_tag_with_variables_and_domain' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{% trans with {\'var1\': \'val1\', \'var2\': \'val2\'} from \'domain\' into \'en\'%}trans_tag_with_variables_and_domain_and_locale{% endtrans %}', ['trans_tag_with_variables_and_domain_and_locale' => ['domain', 'var1, var2']]],
+
+            // |trans() filter
+            ['{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}) }}', ['trans_filter_with_variable_as_param' => ['messages', 'var1, var2']]],
+            ['{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') }}', ['trans_filter_with_variable_as_param' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}) }}', ['trans_filter_with_variable_as_param' => ['another-domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{{ \'trans_filter_with_variable_as_param\'|trans({\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\') }}', ['trans_filter_with_variable_as_param' => ['domain', 'var1, var2']]],
+
+            // t() function
+            // Be careful: the t() function creates a TranslatableMessage object which overrides the domain set with 'trans_default_domain' (no domain specified = 'messages').
+            ['{{ t(\'t_function_with_variables_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans }}', ['t_function_with_variables_with_trans_filter' => ['messages', 'var1, var2']]],
+            ['{{ t(\'t_function_with_variables_and_domain_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans }}', ['t_function_with_variables_and_domain_with_trans_filter' => ['domain', 'var1, var2']]],
+            ['{{ t(\'t_function_with_variables_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans(\'en\') }}', ['t_function_with_variables_with_trans_filter_and_locale' => ['messages', 'var1, var2']]],
+            ['{{ t(\'t_function_with_variables_and_domain_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans(\'en\') }}', ['t_function_with_variables_and_domain_with_trans_filter_and_locale' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{{    t(\'t_function_with_variables_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans }}', ['t_function_with_variables_with_trans_filter' => ['messages', 'var1, var2']]], // Be careful! (read note above)
+            ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_and_domain_with_trans_filter\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans }}', ['t_function_with_variables_and_domain_with_trans_filter' => ['domain', 'var1, var2']]],
+            ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'})|trans(\'en\') }}', ['t_function_with_variables_with_trans_filter_and_locale' => ['messages', 'var1, var2']]], // Be careful! (read note above)
+            ['{% trans_default_domain \'another-domain\' %}{{ t(\'t_function_with_variables_and_domain_with_trans_filter_and_locale\', {\'var1\': \'val1\', \'var2\': \'val2\'}, \'domain\')|trans(\'en\') }}', ['t_function_with_variables_and_domain_with_trans_filter_and_locale' => ['domain', 'var1, var2']]],
 
             // concat translations
-            ['{{ ("new" ~ " key") | trans() }}', ['new key' => 'messages']],
-            ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => 'messages']],
-            ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => 'domain']],
-            ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => 'domain']],
+            ['{{ ("new" ~ " key") | trans() }}', ['new key' => ['messages', null]]],
+            ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => ['messages', null]]],
+            ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => ['domain', null]]],
+            ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => ['domain', null]]],
             // if it has a variable or other expression, we can not extract it
             ['{% set foo = "new" %} {{ ("new " ~ foo ~ "key") | trans() }}', []],
-            ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => 'messages']],
+            ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => ['messages', null]]],
         ];
     }
 

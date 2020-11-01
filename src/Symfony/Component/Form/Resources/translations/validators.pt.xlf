@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="28">
                 <source>This form should not contain extra fields.</source>
-                <target>Este formulário não deveria conter campos extra.</target>
+                <target>Este formulário não deveria possuir mais campos.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>O arquivo enviado é muito grande. Por favor, tente enviar um ficheiro mais pequeno.</target>
+                <target>O arquivo enviado é muito grande. Por favor, tente enviar um arquivo menor.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>O token CSRF é inválido. Por favor submeta o formulário novamente.</target>
+                <target>O token CSRF está inválido. Por favor, tente enviar o formulário novamente.</target>
             </trans-unit>
         </body>
     </file>

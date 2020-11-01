@@ -17,7 +17,7 @@
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
                 <target>Este valor non é unha cor HTML5 válida.</target>
-            </trans-unit>.
+            </trans-unit>
             <trans-unit id="100">
                 <source>Please enter a valid birthdate.</source>
                 <target>Insire unha data de aniversario válida.</target>

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-01T18:38:45Z
+
+The original PR #38939 only added it in SecurityCore, not the Security package.
+
+What I fail to understand is why the CI didn't fail in #38939?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-01T18:51:46Z
+
+@Nyholm it actually failed: https://travis-ci.com/github/symfony/symfony/jobs/423540387#L7036
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-01T18:52:49Z
+
+It did! Good.
+
+But the foldable output was not helping..
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-01T18:54:17Z
+
+Oh wow, yes, why was a failed run folded? 😱

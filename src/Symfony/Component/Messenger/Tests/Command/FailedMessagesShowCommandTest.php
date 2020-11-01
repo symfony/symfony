@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Envelope;
@@ -233,5 +234,45 @@ EOF
 
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
+    }
+
+    public function testVeryVerboseOutputForSingleMessageContainsExceptionWithTrace()
+    {
+        $exception = new \RuntimeException('Things are bad!');
+        $exceptionLine = __LINE__ - 1;
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(0),
+            new ErrorDetailsStamp($exception),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with(42)->willReturn($envelope);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', $receiver);
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => 42], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
+        $this->assertStringMatchesFormat(sprintf(<<<'EOF'
+%%A
+Exception:
+==========
+
+RuntimeException {
+  message: "Things are bad!"
+  code: 0
+  file: "%s"
+  line: %d
+  trace: {
+    %%s%%eTests%%eCommand%%eFailedMessagesShowCommandTest.php:%d {
+      Symfony\Component\Messenger\Tests\Command\FailedMessagesShowCommandTest->testVeryVerboseOutputForSingleMessageContainsExceptionWithTrace()
+      › {
+      ›     $exception = new \RuntimeException('Things are bad!');
+      ›     $exceptionLine = __LINE__ - 1;
+    }
+%%A
+EOF
+            ,
+            __FILE__, $exceptionLine, $exceptionLine),
+            $tester->getDisplay(true));
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
@@ -156,6 +157,9 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])
+
+        ->set('messenger.failure.add_error_details_stamp_listener', AddErrorDetailsStampListener::class)
+            ->tag('kernel.event_subscriber')
 
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)
             ->args([

@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Hierdie vorm moet nie ekstra velde bevat nie.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Die opgelaaide lêer was te groot. Probeer asseblief 'n kleiner lêer.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>Die CSRF-teken is ongeldig. Probeer asseblief om die vorm weer in te dien.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Hierdie waarde is nie 'n geldige HTML5 kleur nie.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>Please enter a valid birthdate.</source>
+                <target>Voer asseblief 'n geldige geboortedatum in.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>Die gekiesde opsie is nie geldig nie.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>Die versameling is nie geldig nie.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>Please select a valid color.</source>
+                <target>Kies asseblief 'n geldige kleur.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>Please select a valid country.</source>
+                <target>Kies asseblief 'n geldige land.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>Please select a valid currency.</source>
+                <target>Kies asseblief 'n geldige geldeenheid.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>Please choose a valid date interval.</source>
+                <target>Kies asseblief 'n geldige datum interval.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Please enter a valid date and time.</source>
+                <target>Voer asseblilef 'n geldige datum en tyd in.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Please enter a valid date.</source>
+                <target>Voer asseblief 'n geldige datum in.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Please select a valid file.</source>
+                <target>Kies asseblief 'n geldige lêer.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>Die versteekte veld is nie geldig nie.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>Please enter an integer.</source>
+                <target>Voer asseblief 'n geldige heeltal in.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>Please select a valid language.</source>
+                <target>Kies assblief 'n geldige taal.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>Please select a valid locale.</source>
+                <target>Voer assebliefn 'n geldige locale in.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>Please enter a valid money amount.</source>
+                <target>Voer asseblief 'n geldige bedrag in.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Please enter a number.</source>
+                <target>Voer asseblief 'n nommer in.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>Die wagwoord is ongeldig.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>Please enter a percentage value.</source>
+                <target>Voer asseblief 'n geldige persentasie waarde in.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>Die waardes is nie dieselfde nie.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>Please enter a valid time.</source>
+                <target>Voer asseblief 'n geldige tyd in time.</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>Please select a valid timezone.</source>
+                <target>Kies asseblief 'n geldige tydsone.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>Please enter a valid URL.</source>
+                <target>Voer asseblief 'n geldige URL in.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>Please enter a valid search term.</source>
+                <target>Voer asseblief 'n geldige soek term in.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>Please provide a valid phone number.</source>
+                <target>Verskaf asseblief 'n geldige telefoonnommer.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Die blokkie het 'n ongeldige waarde.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Voer asseblief 'n geldige e-pos adres in.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Kies asseblief 'n geldige opsie.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Kies asseblief 'n geldige reeks.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Voer assblief 'n geldige week in.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

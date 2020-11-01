@@ -334,6 +334,58 @@
                 <source>This value should be valid JSON.</source>
                 <target>Hierdie waarde moet geldige JSON wees.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Hierdie versameling moet net unieke elemente bevat.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Hierdie waarde moet positief wees.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Hierdie waarde moet positief of nul wees.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Hierdie waarde moet negatief wees.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Hierdie waarde moet negatief of nul wees.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Hierdie waarde is nie 'n geldige tydsone nie.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>This password has been leaked in a data breach, it must not be used. Please use another password.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Hierdie waarde moet tussen {{ min }} en {{ max }} wees.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Hierdie waarde is nie 'n geldige gasheernaam nie.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Die hoeveelheid elemente in hierdie versameling moet 'n meelvoud van {{ compared_value }} wees.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Hierdie waarde moet voldoen aan ten minste een van hierdie beperkings:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Elke element van hierdie versameling moet voldoen aan hulle eie beperkings.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Hierdie waarde is nie 'n geldige Internasionale veiligheidsidentifikasienommer (ISIN) nie.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -25,7 +25,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
  */
 class AdapterTest extends LdapTestCase
 {
-    const PAGINATION_REQUIRED_CONFIG = [
+    private const PAGINATION_REQUIRED_CONFIG = [
         'options' => [
             'protocol_version' => 3,
         ],

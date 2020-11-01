@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
  */
 class BundleEntryReaderTest extends TestCase
 {
-    const RES_DIR = '/res/dir';
+    private const RES_DIR = '/res/dir';
 
     /**
      * @var BundleEntryReader

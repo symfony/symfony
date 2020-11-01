@@ -20,9 +20,9 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
  */
 class DataUriNormalizerTest extends TestCase
 {
-    const TEST_GIF_DATA = 'data:image/gif;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=';
-    const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';
-    const TEST_TXT_CONTENT = "Kévin Dunglas\n";
+    private const TEST_GIF_DATA = 'data:image/gif;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=';
+    private const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';
+    private const TEST_TXT_CONTENT = "Kévin Dunglas\n";
 
     /**
      * @var DataUriNormalizer

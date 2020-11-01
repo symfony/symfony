@@ -92,13 +92,12 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('trusted_headers')
                     ->fixXmlConfig('trusted_header')
                     ->performNoDeepMerging()
-                    ->defaultValue(['x-forwarded-all', '!x-forwarded-host', '!x-forwarded-prefix'])
+                    ->defaultValue(['x-forwarded-for', 'x-forwarded-port', 'x-forwarded-proto'])
                     ->beforeNormalization()->ifString()->then(function ($v) { return $v ? array_map('trim', explode(',', $v)) : []; })->end()
                     ->enumPrototype()
                         ->values([
                             'forwarded',
                             'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port',
-                            'x-forwarded-all', '!x-forwarded-host', '!x-forwarded-prefix',
                         ])
                     ->end()
                 ->end()

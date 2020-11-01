@@ -67,6 +67,7 @@ HttpFoundation
    `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
    `__construct()` instead)
  * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `InvalidArgumentException`; wrap your filter in a closure instead.
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead.
 
 HttpKernel
 ----------

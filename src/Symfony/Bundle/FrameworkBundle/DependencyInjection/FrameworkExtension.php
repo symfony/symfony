@@ -2294,13 +2294,6 @@ class FrameworkExtension extends Extension
                 case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
                 case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
                 case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
-                case '!x-forwarded-host': $trustedHeaders &= ~Request::HEADER_X_FORWARDED_HOST; break;
-                case 'x-forwarded-all':
-                    if (!\in_array('!x-forwarded-prefix', $headers)) {
-                        throw new LogicException('When using "x-forwarded-all" in "framework.trusted_headers", "!x-forwarded-prefix" must be explicitly listed until support for X-Forwarded-Prefix is implemented.');
-                    }
-                    $trustedHeaders |= Request::HEADER_X_FORWARDED_ALL;
-                    break;
             }
         }
 

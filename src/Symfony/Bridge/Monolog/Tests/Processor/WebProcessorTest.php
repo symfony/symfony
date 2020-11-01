@@ -38,7 +38,7 @@ class WebProcessorTest extends TestCase
 
     public function testUseRequestClientIp()
     {
-        Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_ALL);
+        Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_FOR);
         [$event, $server] = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
 
         $processor = new WebProcessor();

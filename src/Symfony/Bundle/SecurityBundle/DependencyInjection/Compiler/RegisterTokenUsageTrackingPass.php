@@ -45,8 +45,12 @@ class RegisterTokenUsageTrackingPass implements CompilerPassInterface
             $container->setAlias('security.token_storage', 'security.untracked_token_storage')->setPublic(true);
             $container->getDefinition('security.untracked_token_storage')->addTag('kernel.reset', ['method' => 'reset']);
         } elseif ($container->hasDefinition('security.context_listener')) {
-            $container->getDefinition('security.context_listener')
-                ->setArgument(6, [new Reference('security.token_storage'), 'enableUsageTracking']);
+            $tokenStorageClass = $container->getParameterBag()->resolveValue($container->findDefinition('security.token_storage')->getClass());
+
+            if (method_exists($tokenStorageClass, 'enableUsageTracking')) {
+                $container->getDefinition('security.context_listener')
+                    ->setArgument(6, [new Reference('security.token_storage'), 'enableUsageTracking']);
+            }
         }
     }
 }

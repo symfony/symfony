@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>Paskyra yra užblokuota.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą vėliau.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Netinkama arba pasibaigusio galiojimo laiko prisijungimo nuoroda.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -28,7 +28,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 class Connection
 {
     private const DEFAULT_OPTIONS = [
-        'stream' => 'messages',
+        'stream' => 'messenger_messages',
         'group' => 'symfony',
         'consumer' => 'consumer',
         'auto_setup' => true,

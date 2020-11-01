@@ -107,7 +107,7 @@ class Connection
 
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
-                'exchange_name' => 'delays',
+                'exchange_name' => 'messenger_delays',
                 'queue_name_pattern' => 'delay_%exchange_name%_%routing_key%_%delay%',
             ],
         ], $connectionOptions);
@@ -143,7 +143,7 @@ class Connection
      *     * arguments: Extra arguments
      *   * delay:
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
-     *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
+     *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "messenger_delays")
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * prefetch_count: set channel prefetch count
      *
@@ -176,7 +176,7 @@ class Connection
 
         $useAmqps = 0 === strpos($dsn, 'amqps://');
         $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
-        $exchangeName = $pathParts[1] ?? 'messages';
+        $exchangeName = $pathParts[1] ?? 'messenger_messages';
         parse_str($parsedUrl['query'] ?? '', $parsedQuery);
         $port = $useAmqps ? 5671 : 5672;
 

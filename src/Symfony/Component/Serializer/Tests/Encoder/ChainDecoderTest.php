@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Encoder\ChainDecoder;
 
 class ChainDecoderTest extends TestCase
 {
-    const FORMAT_1 = 'format1';
-    const FORMAT_2 = 'format2';
-    const FORMAT_3 = 'format3';
+    private const FORMAT_1 = 'format1';
+    private const FORMAT_2 = 'format2';
+    private const FORMAT_3 = 'format3';
 
     private $chainDecoder;
     private $decoder1;

@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransfo
 
 class BooleanToStringTransformerTest extends TestCase
 {
-    const TRUE_VALUE = '1';
+    private const TRUE_VALUE = '1';
 
     /**
      * @var BooleanToStringTransformer

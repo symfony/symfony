@@ -34,10 +34,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapperTest extends TestCase
 {
-    const LEVEL_0 = 0;
-    const LEVEL_1 = 1;
-    const LEVEL_1B = 2;
-    const LEVEL_2 = 3;
+    private const LEVEL_0 = 0;
+    private const LEVEL_1 = 1;
+    private const LEVEL_1B = 2;
+    private const LEVEL_2 = 3;
 
     /**
      * @var EventDispatcherInterface

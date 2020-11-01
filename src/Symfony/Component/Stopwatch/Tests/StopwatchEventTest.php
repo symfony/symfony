@@ -23,7 +23,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class StopwatchEventTest extends TestCase
 {
-    const DELTA = 37;
+    private const DELTA = 37;
 
     public function testGetOrigin()
     {

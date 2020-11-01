@@ -27,11 +27,9 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyGetterInterface;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
-    const CLASS_NAME = Entity::class;
-    const PARENT_CLASS = EntityParent::class;
-    const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
-    const INTERFACE_B_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB';
-    const PARENT_INTERFACE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParentInterface';
+    private const CLASS_NAME = Entity::class;
+    private const PARENT_CLASS = EntityParent::class;
+    private const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
 
     public function testLoadClassMetadataWithInterface()
     {

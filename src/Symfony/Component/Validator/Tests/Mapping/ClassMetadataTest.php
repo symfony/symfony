@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
 class ClassMetadataTest extends TestCase
 {
-    const CLASSNAME = Entity::class;
-    const PARENTCLASS = EntityParent::class;
-    const PROVIDERCLASS = GroupSequenceProviderEntity::class;
-    const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
+    private const CLASSNAME = Entity::class;
+    private const PARENTCLASS = EntityParent::class;
+    private const PROVIDERCLASS = GroupSequenceProviderEntity::class;
+    private const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
 

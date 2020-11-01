@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
  */
 class Argon2iPasswordEncoderTest extends TestCase
 {
-    const PASSWORD = 'password';
+    private const PASSWORD = 'password';
 
     protected function setUp(): void
     {

@@ -23,7 +23,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StopwatchTest extends TestCase
 {
-    const DELTA = 20;
+    private const DELTA = 20;
 
     public function testStart()
     {

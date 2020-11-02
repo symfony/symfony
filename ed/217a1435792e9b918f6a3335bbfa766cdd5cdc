@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-01T19:35:09Z
+
+Well, this would make our tests pass. But my understanding is that the TTY detection that you use to skip the test is part of what we want to test here. Let's say we would break that detection logic. We would never know because the corresponding tests would flip from green to skipped. 😕
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-01T23:14:12Z
+
+Is it testing `Process::isTtySupported()`?
+
+Isn't it testing that the `Process` is using `UnixPipes` and handle the exit code correctly?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-02T07:07:08Z
+
+PR updated. Thank you
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-02T08:23:33Z
+
+@Nyholm If I change `Process::isTtySupported()` to always return `false`, those two tests are the only ones failing.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-02T08:28:29Z
+
+If `Process::isTtySupported()` always returns `false`, then these two tests will be skipped.
+
+If `Process::isTtySupported()` always returns true, yes, these will fail.
+
+What alternative strategy do you have to solve #38946?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-02T08:40:28Z
+
+> What alternative strategy do you have to solve #38946?
+
+None. 😕

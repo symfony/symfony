@@ -213,7 +213,7 @@ install:
       git config --global user.email ""
       git config --global user.name "Symfony"
 
-      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*')
+      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*')
 
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit

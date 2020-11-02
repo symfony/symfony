@@ -35,9 +35,10 @@ class SortableIteratorTest extends RealIteratorTestCase
                 case SortableIterator::SORT_BY_ACCESSED_TIME:
                     touch(self::toAbsolute('.git'));
                     sleep(1);
-                    file_get_contents(self::toAbsolute('.bar'));
+                    touch(self::toAbsolute('.bar'), time());
                     break;
                 case SortableIterator::SORT_BY_CHANGED_TIME:
+                    sleep(1);
                     file_put_contents(self::toAbsolute('test.php'), 'foo');
                     sleep(1);
                     file_put_contents(self::toAbsolute('test.py'), 'foo');

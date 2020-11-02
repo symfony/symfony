@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2020-10-29T21:25:05Z
+
+I don't want to spam original issue regarding testing results of this PR. I've just retested this with the zip I attached in issue, I can confirm promising results: getting 4s with a patch and ~49s without this patch.
+
+I've also retested my normal project from which I extracted the demo, there time didn't change much (which makes sense, I already replaced injections of these problematic services with container injections there). This time I used your [link to 4.4 file](https://github.com/jderusse/symfony/blob/perf-circular-44/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php), perhaps during my previous testing I applied patch in this PR manually wrong and that resulted in some infinite loop.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-29T22:22:40Z
+
+Thank you @ostrolucky for your tests.
+
+This PR changes a lot of things in the way the container is Dumped, The output of the circularReferences before and after the PR are not comparable but the dumped container is identical in the cases I tested.
+
+I think we should test this PR is several different configuration to be sure.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-30T16:51:41Z
+
+Rework a little bit the implementation with the help of @nicolas-grekas
+
+Now reduced by 88% CPU time for the same memory usage https://blackfire.io/profiles/compare/ba4c464a-4449-4633-99a8-fcf31bcc948c/graph

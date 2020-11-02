@@ -20,11 +20,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class SessionListenerTest extends TestCase
 {
@@ -177,5 +179,37 @@ class SessionListenerTest extends TestCase
 
         $this->assertTrue($response->headers->has('Expires'));
         $this->assertLessThanOrEqual((new \DateTime('now', new \DateTimeZone('UTC'))), (new \DateTime($response->headers->get('Expires'))));
+    }
+
+    public function testGetSessionIsCalledOnce()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $sessionStorage = $this->getMockBuilder(NativeSessionStorage::class)->getMock();
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+
+        $sessionStorage->expects($this->once())
+            ->method('setOptions')
+            ->with(['cookie_secure' => true]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($masterRequest = new Request([], [], [], [], [], ['HTTPS' => 'on']));
+
+        $container = new Container();
+        $container->set('session_storage', $sessionStorage);
+        $container->set('session', $session);
+        $container->set('request_stack', $requestStack);
+
+        $event = new GetResponseEvent($kernel, $masterRequest, HttpKernelInterface::MASTER_REQUEST);
+
+        $listener = new SessionListener($container);
+        $listener->onKernelRequest($event);
+
+        $subRequest = $masterRequest->duplicate();
+        // at this point both master and subrequest have a closure to build the session
+
+        $masterRequest->getSession();
+
+        // calling the factory on the subRequest should not trigger a second call to storage->sesOptions()
+        $subRequest->getSession();
     }
 }

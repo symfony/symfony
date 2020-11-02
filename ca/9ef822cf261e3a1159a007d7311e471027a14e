@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-31T14:13:23Z
+
+Great. Thank you.
+
+Your reproducer repo is helpful indeed. Could we do a test here on this repo too? Just to make sure this never breaks again?
+
+---------------------------------------------------------------------------
+
+by villfa at 2020-10-31T15:07:16Z
+
+Do you have an idea how to test it?
+
+AppVeyor runs the tests only with PHP 7.2.5.
+Travis cannot run the tests on Windows.
+GH actions fail with this message: `Error: Container operations are only supported on Linux runners` (see https://github.com/villfa/symfony/runs/1336114965)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-31T15:12:26Z
+
+Hm. I’m not sure. @derrabus maybe have some input?
+
+Maybe start by adding the same github action test as in your test repo?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-31T22:32:02Z
+
+@Nyholm PHP 8 on Windows does not happen on our CI yet. If someone with a Windows machine could confirm the bug and the solution, I think we can merge this without a test.

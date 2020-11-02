@@ -45,6 +45,9 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v2
 
+            - name: Populate LDAP
+                  uses: ./.github/actions/populate-ldap
+
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
@@ -87,6 +90,8 @@ jobs:
                     MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
                     MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
                     MEMCACHED_HOST: localhost
+                    LDAP_HOST: localhost
+                    LDAP_PORT: 3389
 
             -   name: Run HTTP push tests
                 if: matrix.php == '7.4'

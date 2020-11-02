@@ -25,12 +25,6 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
  */
 class AdapterTest extends LdapTestCase
 {
-    private const PAGINATION_REQUIRED_CONFIG = [
-        'options' => [
-            'protocol_version' => 3,
-        ],
-    ];
-
     public function testLdapEscape()
     {
         $ldap = new Adapter();
@@ -122,7 +116,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPagination()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig(), static::PAGINATION_REQUIRED_CONFIG));
+        $ldap = new Adapter(array_merge($this->getLdapConfig()));
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
         $entries = $this->setupTestUsers($ldap);
 
@@ -205,7 +199,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPaginationLimits()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig(), static::PAGINATION_REQUIRED_CONFIG));
+        $ldap = new Adapter(array_merge($this->getLdapConfig()));
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
         $entries = $this->setupTestUsers($ldap);

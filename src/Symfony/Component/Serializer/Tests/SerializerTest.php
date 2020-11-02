@@ -16,7 +16,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\AggregableExceptionInterface;
+use Symfony\Component\Serializer\Exception\AggregatedException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -30,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -42,6 +46,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
@@ -639,6 +644,52 @@ class SerializerTest extends TestCase
             $expectedData,
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
+    }
+
+    public function testCollectDenormalizationErrors()
+    {
+        $jsonData = '{"int":"string","array":"string","arrayOfObjects":[{"date":"string"}],"stringArrayOfObjects":"string","object":{"foo":"1","bar":"1"},"variadicObject":{"foo":1,"args":[{"foo":"1"},{"foo":1},{"foo":"1","args":1}]}}';
+
+        $expected = [
+            'int' => 'The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsDummy" must be one of "int" ("string" given).',
+            'array' => 'The type of the "array" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsDummy" must be one of "array" ("string" given).',
+            'arrayOfObjects.date' => 'DateTimeImmutable::__construct(): Failed to parse time string (string) at position 0 (s): The timezone could not be found in the database',
+            'stringArrayOfObjects' => 'Data expected to be an array, string given.',
+            'object.foo' => 'The type of the "foo" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsObjectDummy" must be one of "int" ("string" given).',
+            'object.bar' => 'The type of the "bar" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsObjectDummy" must be one of "int" ("string" given).',
+            'object.baz' => 'Cannot create an instance of "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsObjectDummy" from serialized data because its constructor requires parameter "baz" to be present.',
+            'variadicObject.args.0.foo' => 'The type of the "foo" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsVariadicObjectDummy" must be one of "int" ("string" given).',
+            'variadicObject.args.2.foo' => 'The type of the "foo" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsVariadicObjectDummy" must be one of "int" ("string" given).',
+            'variadicObject.args.2.args' => 'Cannot create an instance of "Symfony\Component\Serializer\Tests\Fixtures\CollectErrorsVariadicObjectDummy" from serialized data because the variadic parameter "args" can only accept an array.',
+        ];
+
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer(
+            [
+                new DateTimeNormalizer(),
+                new ObjectNormalizer(null, null, null, $extractor),
+                new ArrayDenormalizer(),
+            ],
+            [
+                'json' => new JsonEncoder(),
+            ]
+        );
+
+        try {
+            $serializer->deserialize($jsonData, CollectErrorsDummy::class, 'json', [
+                Serializer::COLLECT_EXCEPTIONS => true,
+            ]);
+        } catch (AggregatedException $exception) {
+            $this->assertEquals(
+                $expected,
+                array_map(
+                    static function (AggregableExceptionInterface $exception) {
+                        return $exception->getMessage();
+                    },
+                    $exception->all()
+                )
+            );
+        }
     }
 }
 

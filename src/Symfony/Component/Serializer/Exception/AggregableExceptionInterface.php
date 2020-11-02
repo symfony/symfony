@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Serializer\Exception;
 
-/**
- * @author Maxime VEBER <maxime.veber@nekland.fr>
- */
-class MissingConstructorArgumentsException extends RuntimeException implements AggregableExceptionInterface
+interface AggregableExceptionInterface extends ExceptionInterface
 {
 }

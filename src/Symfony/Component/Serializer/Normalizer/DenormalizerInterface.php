@@ -25,6 +25,11 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 interface DenormalizerInterface
 {
     /**
+     * Collects denormalization exceptions instead of throwing out the first one.
+     */
+    public const COLLECT_EXCEPTIONS = 'collect_exceptions';
+
+    /**
      * Denormalizes data back into an object of the given class.
      *
      * @param mixed  $data    Data to restore

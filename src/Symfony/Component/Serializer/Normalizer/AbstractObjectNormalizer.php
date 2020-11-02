@@ -18,6 +18,8 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\AggregableExceptionInterface;
+use Symfony\Component\Serializer\Exception\AggregatedException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -311,6 +313,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
+        $aggregatedException = new AggregatedException();
+
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
@@ -331,16 +335,29 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
             try {
-                $this->setAttributeValue($object, $attribute, $value, $format, $context);
-            } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
+                $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
+                try {
+                    $this->setAttributeValue($object, $attribute, $value, $format, $context);
+                } catch (InvalidArgumentException $e) {
+                    throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
+                }
+            } catch (AggregableExceptionInterface $e) {
+                if (!($context[self::COLLECT_EXCEPTIONS] ?? false)) {
+                    throw $e;
+                }
+
+                $aggregatedException->put($attribute, $e);
+                continue;
             }
         }
 
         if (!empty($extraAttributes)) {
             throw new ExtraAttributesException($extraAttributes);
+        }
+
+        if (($context[self::COLLECT_EXCEPTIONS] ?? false) && !$aggregatedException->isEmpty) {
+            throw $aggregatedException;
         }
 
         return $object;

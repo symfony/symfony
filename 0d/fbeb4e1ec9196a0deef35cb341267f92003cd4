@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-27T17:34:59Z
+
+Shouldn't this PR targets the branch where classes were introduced?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-10-27T21:21:54Z
+
+@jderusse I don't know. My last PR's including unit tests for the Notifier was targeting master (https://github.com/symfony/symfony/pull/38315/files) so I thought targeting 5.x is fine here.
+But if there is any rule I'm happy to target another branch.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-10-28T07:03:22Z
+
+5.x is correct.

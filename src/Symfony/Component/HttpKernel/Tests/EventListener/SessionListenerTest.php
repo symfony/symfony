@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
@@ -202,7 +201,7 @@ class SessionListenerTest extends TestCase
         $container->set('session', $session);
         $container->set('request_stack', $requestStack);
 
-        $event = new GetResponseEvent($kernel, $masterRequest, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $masterRequest, HttpKernelInterface::MASTER_REQUEST);
 
         $listener = new SessionListener($container);
         $listener->onKernelRequest($event);

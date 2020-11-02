@@ -175,6 +175,6 @@
     ],
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "5.2"
+        "branch-version": "5.x"
     }
 }

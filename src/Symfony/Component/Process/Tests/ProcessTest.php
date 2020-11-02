@@ -476,6 +476,10 @@ class ProcessTest extends TestCase
             $this->markTestSkipped('Windows does not have /dev/tty support');
         }
 
+        if (!Process::isTtySupported()) {
+            $this->markTestSkipped('There is no TTY support');
+        }
+
         $process = $this->getProcess('echo "foo" >> /dev/null && '.$this->getProcessForCode('usleep(100000);')->getCommandLine());
         $process->setTty(true);
         $process->start();
@@ -489,6 +493,10 @@ class ProcessTest extends TestCase
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows does have /dev/tty support');
+        }
+
+        if (!Process::isTtySupported()) {
+            $this->markTestSkipped('There is no TTY support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
@@ -1433,16 +1441,7 @@ class ProcessTest extends TestCase
         $p = Process::fromShellCommandline(sprintf('"%s" -r %s "a" "" "b"', self::$phpBin, escapeshellarg('print_r($argv);')));
         $p->run();
 
-        $expected = <<<EOTXT
-Array
-(
-    [0] => -
-    [1] => a
-    [2] => 
-    [3] => b
-)
-
-EOTXT;
+        $expected = "Array\n(\n    [0] => -\n    [1] => a\n    [2] => \n    [3] => b\n)\n";
         $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 

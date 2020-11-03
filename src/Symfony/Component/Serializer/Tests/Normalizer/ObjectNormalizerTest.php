@@ -43,6 +43,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\MaxDepthTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipUninitializedPropertiesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 /**
@@ -59,6 +60,7 @@ class ObjectNormalizerTest extends TestCase
     use MaxDepthTestTrait;
     use ObjectToPopulateTestTrait;
     use SkipNullValuesTestTrait;
+    use SkipUninitializedPropertiesTestTrait;
     use TypeEnforcementTestTrait;
 
     /**
@@ -502,6 +504,13 @@ class ObjectNormalizerTest extends TestCase
     // skip null
 
     protected function getNormalizerForSkipNullValues(): ObjectNormalizer
+    {
+        return new ObjectNormalizer();
+    }
+
+    // skip uninitialized
+
+    protected function getNormalizerForSkipUninitializedProperties(): ObjectNormalizer
     {
         return new ObjectNormalizer();
     }

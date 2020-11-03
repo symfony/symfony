@@ -52,24 +52,24 @@ class TraceableResponse implements ResponseInterface
 
     public function getContent(bool $throw = true): string
     {
-        $this->content = $this->response->getContent(false);
-
-        if ($throw) {
-            $this->checkStatusCode($this->response->getStatusCode());
+        try {
+            return $this->content = $this->response->getContent(false);
+        } finally {
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
+            }
         }
-
-        return $this->content;
     }
 
     public function toArray(bool $throw = true): array
     {
-        $this->content = $this->response->toArray(false);
-
-        if ($throw) {
-            $this->checkStatusCode($this->response->getStatusCode());
+        try {
+            return $this->content = $this->response->toArray(false);
+        } finally {
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
+            }
         }
-
-        return $this->content;
     }
 
     public function cancel(): void

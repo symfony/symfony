@@ -121,7 +121,7 @@ class SymfonyTestsListenerTrait
         $suiteName = $suite->getName();
 
         foreach ($suite->tests() as $test) {
-            if (!($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)) {
+            if (!($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
                 continue;
             }
             if (null === Test::getPreserveGlobalStateSettings(\get_class($test), $test->getName(false))) {
@@ -156,7 +156,7 @@ class SymfonyTestsListenerTrait
             $testSuites = [$suite];
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($test instanceof TestSuite) {
+                    if ($test instanceof \PHPUnit_Framework_TestSuite || $test instanceof TestSuite) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
@@ -172,12 +172,19 @@ class SymfonyTestsListenerTrait
                 }
             }
         } elseif (2 === $this->state) {
+            $suites = [$suite];
             $skipped = [];
-            foreach ($suite->tests() as $test) {
-                if (!($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)
-                    || isset($this->wasSkipped[$suiteName]['*'])
-                    || isset($this->wasSkipped[$suiteName][$test->getName()])) {
-                    $skipped[] = $test;
+            while ($s = array_shift($suites)) {
+                foreach ($s->tests() as $test) {
+                    if ($test instanceof \PHPUnit_Framework_TestSuite || $test instanceof TestSuite) {
+                        $suites[] = $test;
+                        continue
+                    }
+                    if (($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)
+                        && isset($this->wasSkipped[\get_class($test)][$test->getName()])
+                    ) {
+                        $skipped[] = $test;
+                    }
                 }
             }
             $suite->setTests($skipped);
@@ -187,21 +194,13 @@ class SymfonyTestsListenerTrait
     public function addSkippedTest($test, \Exception $e, $time)
     {
         if (0 < $this->state) {
-            if ($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase) {
-                $class = \get_class($test);
-                $method = $test->getName();
-            } else {
-                $class = $test->getName();
-                $method = '*';
-            }
-
-            $this->isSkipped[$class][$method] = 1;
+            $this->isSkipped[\get_class($test)][$test->getName()] = 1;
         }
     }
 
     public function startTest($test)
     {
-        if (-2 < $this->state && ($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)) {
+        if (-2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
             // This event is triggered before the test is re-run in isolation
             if ($this->willBeIsolated($test)) {
                 $this->runsInSeparateProcess = tempnam(sys_get_temp_dir(), 'deprec');
@@ -291,7 +290,7 @@ class SymfonyTestsListenerTrait
             $this->expectedDeprecations = $this->gatheredDeprecations = [];
             $this->previousErrorHandler = null;
         }
-        if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit\Framework\TestCase || $test instanceof TestCase)) {
+        if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
             if (\in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);
             }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -57,6 +58,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * when normalizing or omitted.
      */
     public const SKIP_NULL_VALUES = 'skip_null_values';
+
+    /**
+     * Flag to control whether uninitialized fields should be skipped
+     * when normalizing.
+     */
+    public const SKIP_UNINITIALIZED_PROPERTIES = 'skip_uninitialized_properties';
 
     /**
      * Callback to allow to set a value for an attribute when the max depth has
@@ -175,7 +182,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            $attributeValue = null;
+            try {
+                $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            } catch (UninitializedPropertyException $e) {
+                if (isset($context[self::SKIP_UNINITIALIZED_PROPERTIES])) {
+                    continue;
+                }
+
+                throw $e;
+            }
+
             if ($maxDepthReached) {
                 $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }

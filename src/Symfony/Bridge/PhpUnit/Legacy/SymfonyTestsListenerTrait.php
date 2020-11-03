@@ -180,7 +180,7 @@ class SymfonyTestsListenerTrait
                 foreach ($s->tests() as $test) {
                     if ($test instanceof \PHPUnit_Framework_TestSuite || $test instanceof TestSuite) {
                         $suites[] = $test;
-                        continue
+                        continue;
                     }
                     if (($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)
                         && isset($this->wasSkipped[\get_class($test)][$test->getName()])

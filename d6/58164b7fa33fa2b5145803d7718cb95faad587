@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-01T17:35:13Z
+
+> Could you please confirm that `ErrorDetailsStamp` is serialized/deserialized correctly after `bin/console messenger:failed:show <id> -vvv`?
+
+Yes, I tested this by installing the skeleton (dev-5.x), configuring Messenger, adding these lines in the vendor directory and removing the cache directory. After doing that, the errors of failed messages were indeed shown when running `messenger:failure:show <id> -vv`.

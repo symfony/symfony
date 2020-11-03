@@ -9,6 +9,7 @@ CHANGELOG
  * added `FormErrorNormalizer`
  * added `MimeMessageNormalizer`
  * serializer mapping can be configured using php attributes
+ * added `skip_uninitialized_properties` context option to not serialize uninitialized properties
 
 5.1.0
 -----

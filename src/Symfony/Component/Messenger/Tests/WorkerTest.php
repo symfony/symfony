@@ -21,12 +21,14 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -243,6 +245,41 @@ class WorkerTest extends TestCase
 
         // make sure they were processed in the correct order
         $this->assertSame([$envelope1, $envelope2, $envelope3, $envelope4, $envelope5, $envelope6], $processedEnvelopes);
+    }
+
+    public function testWorkerLimitQueues()
+    {
+        $envelope = [new Envelope(new DummyMessage('message1'))];
+        $receiver = $this->createMock(QueueReceiverInterface::class);
+        $receiver->expects($this->once())
+            ->method('getFromQueues')
+            ->with(['foo'])
+            ->willReturn($envelope)
+        ;
+        $receiver->expects($this->never())
+            ->method('get')
+        ;
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run(['queues' => ['foo']]);
+    }
+
+    public function testWorkerLimitQueuesUnsupported()
+    {
+        $receiver1 = $this->createMock(QueueReceiverInterface::class);
+        $receiver2 = $this->createMock(ReceiverInterface::class);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
+        $worker->run(['queues' => ['foo']]);
     }
 
     public function testWorkerMessageReceivedEventMutability()

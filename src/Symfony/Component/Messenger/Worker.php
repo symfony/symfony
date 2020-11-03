@@ -22,8 +22,10 @@ use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -57,6 +59,7 @@ class Worker
      *
      * Valid options are:
      *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
+     *  * queues: The queue names to consume from, instead of consuming from all queues. When this is used, all receivers must implement the QueueReceiverInterface
      */
     public function run(array $options = []): void
     {
@@ -65,11 +68,25 @@ class Worker
         $options = array_merge([
             'sleep' => 1000000,
         ], $options);
+        $queueNames = $options['queues'] ?? false;
+
+        if ($queueNames) {
+            // if queue names are specified, all receivers must implement the QueueReceiverInterface
+            foreach ($this->receivers as $transportName => $receiver) {
+                if (!$receiver instanceof QueueReceiverInterface) {
+                    throw new RuntimeException(sprintf('Receiver for "%s" does not implement "%s".', $transportName, QueueReceiverInterface::class));
+                }
+            }
+        }
 
         while (false === $this->shouldStop) {
             $envelopeHandled = false;
             foreach ($this->receivers as $transportName => $receiver) {
-                $envelopes = $receiver->get();
+                if ($queueNames) {
+                    $envelopes = $receiver->getFromQueues($queueNames);
+                } else {
+                    $envelopes = $receiver->get();
+                }
 
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;

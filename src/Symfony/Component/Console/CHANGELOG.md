@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added `GithubActionReporter` to render annotations in a Github Action
+
 5.2.0
 -----
 

@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
+ *
+ * @group legacy
  */
 abstract class AbstractNumberFormatterTest extends TestCase
 {

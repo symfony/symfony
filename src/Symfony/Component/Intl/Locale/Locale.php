@@ -23,6 +23,8 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class Locale
 {

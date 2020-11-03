@@ -10,12 +10,26 @@
  */
 
 use Symfony\Component\Intl\Collator\Collator as IntlCollator;
+use Symfony\Polyfill\Intl\Icu\Collator as CollatorPolyfill;
 
-/**
- * Stub implementation for the Collator class of the intl extension.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-class Collator extends IntlCollator
-{
+if (!class_exists(CollatorPolyfill::class)) {
+    trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
+    /**
+     * Stub implementation for the Collator class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     */
+    class Collator extends IntlCollator
+    {
+    }
+} else {
+    /**
+     * Stub implementation for the Collator class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     */
+    class Collator extends CollatorPolyfill
+    {
+    }
 }

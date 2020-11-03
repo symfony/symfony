@@ -75,8 +75,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
+            sprintf('<comment>%s<comment/>', OutputFormatter::escapeTrailingBackslash($message)),
+            sprintf('<comment>%s<comment/>', str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ]);
         $this->newLine();
     }
@@ -88,8 +88,8 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln([
-            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
-            sprintf('<comment>%s</>', str_repeat('-', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
+            sprintf('<comment>%s<comment/>', OutputFormatter::escapeTrailingBackslash($message)),
+            sprintf('<comment>%s<comment/>', str_repeat('-', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ]);
         $this->newLine();
     }

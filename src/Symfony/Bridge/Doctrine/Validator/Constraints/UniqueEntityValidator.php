@@ -175,8 +175,8 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setCause($result)
         ;
         foreach ($fields as $field) {
-            $invalidValue = ($criteria[$field]) ? $this->formatWithIdentifiers($em, $class, $criteria[$field]) : "";
-            $constraintViolationBuilder->setParameter(\sprintf('{{ %s }}', $field), $invalidValue);
+            $invalidValue = ($criteria[$field]) ? $this->formatWithIdentifiers($em, $class, $criteria[$field]) : '';
+            $constraintViolationBuilder->setParameter(sprintf('{{ %s }}', $field), $invalidValue);
         }
 
         $constraintViolationBuilder->addViolation();

@@ -57,10 +57,11 @@ class Connection
     /** @var string|null */
     private $queueUrl;
 
-    public function __construct(array $configuration, SqsClient $client = null)
+    public function __construct(array $configuration, SqsClient $client = null, string $queueUrl = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
+        $this->queueUrl = $queueUrl;
     }
 
     public function __destruct()
@@ -140,7 +141,18 @@ class Connection
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
 
-        return new self($configuration, new SqsClient($clientConfiguration, null, $client));
+        // When the DNS looks like a QueueUrl, we can directly inject it in the connection
+        // https://sqs.REGION.amazonaws.com/ACCOUNT/QUEUE
+        $queueUrl = null;
+        if (
+            'https' === $parsedUrl['scheme']
+            && ($parsedUrl['host'] ?? 'default') === "sqs.{$clientConfiguration['region']}.amazonaws.com"
+            && ($parsedUrl['path'] ?? '/') === "/{$configuration['account']}/{$configuration['queue_name']}"
+        ) {
+            $queueUrl = 'https://'.$parsedUrl['host'].$parsedUrl['path'];
+        }
+
+        return new self($configuration, new SqsClient($clientConfiguration, null, $client), $queueUrl);
     }
 
     public function get(): ?array

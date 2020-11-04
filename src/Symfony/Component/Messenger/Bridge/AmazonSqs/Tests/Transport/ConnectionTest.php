@@ -92,7 +92,7 @@ class ConnectionTest extends TestCase
     {
         $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
         $this->assertEquals(
-            new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'us-east-2', 'endpoint' => 'https://sqs.us-east-2.amazonaws.com', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'us-east-2', 'endpoint' => 'https://sqs.us-east-2.amazonaws.com', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient), 'https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4'),
             Connection::fromDsn('https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4', [], $httpClient)
         );
     }
@@ -258,5 +258,58 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $connection->get();
+    }
+
+    /**
+     * @dataProvider provideQueueUrl
+     */
+    public function testInjectQueueUrl(string $dsn, string $queueUrl)
+    {
+        $connection = Connection::fromDsn($dsn);
+
+        $r = new \ReflectionObject($connection);
+        $queueProperty = $r->getProperty('queueUrl');
+        $queueProperty->setAccessible(true);
+
+        $this->assertSame($queueUrl, $queueProperty->getValue($connection));
+    }
+
+    public function provideQueueUrl()
+    {
+        yield ['https://sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
+        yield ['https://KEY:SECRET@sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
+        yield ['https://sqs.us-east-2.amazonaws.com/123456/queue?auto_setup=1', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
+    }
+
+    /**
+     * @dataProvider provideNotQueueUrl
+     */
+    public function testNotInjectQueueUrl(string $dsn)
+    {
+        $connection = Connection::fromDsn($dsn);
+
+        $r = new \ReflectionObject($connection);
+        $queueProperty = $r->getProperty('queueUrl');
+        $queueProperty->setAccessible(true);
+
+        $this->assertNull($queueProperty->getValue($connection));
+    }
+
+    public function provideNotQueueUrl()
+    {
+        yield ['https://sqs.us-east-2.amazonaws.com/queue'];
+        yield ['https://us-east-2/123456/ab1-MyQueue-A2BCDEF3GHI4'];
+        yield ['sqs://default/queue'];
+    }
+
+    public function testGetQueueUrlNotCalled()
+    {
+        $client = $this->getMockBuilder(SqsClient::class)->getMock();
+        $connection = new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4');
+
+        $client->expects($this->never())->method('getQueueUrl');
+        $client->expects($this->once())->method('deleteMessage');
+
+        $connection->delete('id');
     }
 }

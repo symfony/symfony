@@ -9,6 +9,8 @@ CHANGELOG
  * Add `enum` env var processor
  * Add `shuffle` env var processor
  * Allow #[When] to be extended
+ * Change the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface $container)`
+ * Deprecate calling `ContainerAwareTrait::setContainer()` without arguments
 
 6.1
 ---

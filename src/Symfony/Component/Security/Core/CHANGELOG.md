@@ -4,7 +4,9 @@ CHANGELOG
 6.2
 ---
 
-* Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Deprecate the `Security` class, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
+ * Change the signature of `TokenStorageInterface::setToken()` to `setToken(?TokenInterface $token)`
+ * Deprecate calling `TokenStorage::setToken()` or `UsageTrackingTokenStorage::setToken()` without arguments
 
 6.0
 ---

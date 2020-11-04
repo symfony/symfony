@@ -46,6 +46,10 @@ final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceS
 
     public function setToken(TokenInterface $token = null): void
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/security-core', '6.2', 'Calling "%s()" without any arguments is deprecated. Please explicitly pass null if you want to unset the token.', __METHOD__);
+        }
+
         $this->storage->setToken($token);
 
         if ($token && $this->shouldTrackUsage()) {

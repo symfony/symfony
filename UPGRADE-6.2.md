@@ -1,6 +1,11 @@
 UPGRADE FROM 6.1 to 6.2
 =======================
 
+DependencyInjection
+-------------------
+
+ * The signature of `ContainerAwareInterface::setContainer()` has been updated to `setContainer(?ContainerInterface $container)`; explicitly pass `null` if you want to unset the container
+
 FrameworkBundle
 ---------------
 
@@ -37,6 +42,7 @@ Security
  * Deprecate the `Symfony\Component\Security\Core\Security` class and service, use `Symfony\Bundle\SecurityBundle\Security\Security` instead
  * Passing empty username or password parameter when using `JsonLoginAuthenticator` is not supported anymore
  * Add `$lifetime` parameter to `LoginLinkHandlerInterface::createLoginLink()`
+ * The signature of `TokenStorageInterface::setToken()` has been updated to `setToken(?TokenInterface $token)`; explicitly pass `null` if you want to unset the token
 
 Validator
 ---------

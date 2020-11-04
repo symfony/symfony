@@ -125,6 +125,7 @@ use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
@@ -2390,6 +2391,7 @@ class FrameworkExtension extends Extension
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
+            MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoftteams',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/notifier'];

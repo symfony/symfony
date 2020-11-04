@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-01T15:26:09Z
+
+@yceruto, Is it a good idea to move something like `ThrownExceptionDetails` to the ErrorHandler component?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-01T16:23:43Z
+
+I think the Travis error in 7.4 is because we need to require symfony/var-dumper:5.3 in messenger's composer.json's require-dev.
+
+We also need to update branch alias is VarDumps's composer.json.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-11-01T16:58:22Z
+
+We have a `CliErrorRenderer` class prepared to do this job, maybe we could use it instead of creating another class to format this specific exception. Could you take a look at it?
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-01T21:11:11Z
+
+> We have a `CliErrorRenderer` class prepared to do this job, maybe we could use it instead of creating another class to format this specific exception. Could you take a look at it?
+
+That's what I tried first. However, the `CliErrorRender` is only capable of rendering `Throwable`s, and we are not able to reconstruct a `Throwable` from the storend data here. I tried adding a method to the `CliErrorRenderer` capable of rendering `FlattenException`, but directly using the VarDumper made more sense to me.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T10:05:45Z
+
+> I think the Travis error in 7.4 is because we need to require symfony/var-dumper:5.3 in messenger's composer.json's require-dev.
+>
+> We also need to update branch alias is VarDumps's composer.json.
+
+@Nyholm that's indeed the reason with the test fails on Travis: the version of symfony/var-dumper used in the tests of symfony/messenger doesn't include the changes I made to the VarDumper component in this PR. I added `"symfony/var-dumper": "^5.3"` to Messenger's require-dev in composer.json and added branch alias `"dev-main": "5.3-dev"` in the VarDumper's composer.json, but it still does not install the version including the changes in this PR. I probably need to replace `dev-main` with something else, but I have no idea with what. Could you help me out?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-02T10:36:53Z
+
+> I tried adding a method to the CliErrorRenderer capable of rendering FlattenException, but directly using the VarDumper made more sense to me.
+
+We could use a custom caster attached to the cloner used by the messenger component.
+That could prevent adding a new class.
+We do this in HttpKernel's DataCollector already.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T11:00:44Z
+
+> We could use a custom caster attached to the cloner used by the messenger component.
+
+Good suggestion! I'll look into this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-02T11:30:38Z
+
+Before pushing the update, can you please just remove the added branch-alias in the component,
+and update the root composer.json of symfony/symfony by replacing 5.2 by 5.x in the branch-version entry?
+I'd like to see if that will fix the CI.
+Thanks.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T12:33:45Z
+
+> Before pushing the update, can you please just remove the added branch-alias in the component,
+> and update the root composer.json of symfony/symfony by replacing 5.2 by 5.x in the branch-version entry?
+
+@nicolas-grekas thanks for you help. Unfortunately, that doesn't seem to work either, see the Travis build.
+
+What do you want me to do? Make other composer.json changes or push the suggested changes that do not involve modifications in the VarDumper componed?
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T15:37:04Z
+
+@nicolas-grekas The changes you pushed seem to work, all Messenger tests pass now. The only thing that is missing to make the VarDumper tests pass as well was a dev-depencency version bump of symfony/messenger to "^5.3" in the VarDumper's composer.json. I added that one.
+
+Let me know when I can remove all unrelated composer.json changes from this MR and update the code to a change in only the Messenger component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-02T15:49:12Z
+
+> The changes you pushed seem to work, all Messenger tests pass now
+
+yep, thanks for giving us a good use case to fix this :) This is now merged into 4.4 up to master, you can rebase, and you can also replace the implementation completely with the custom caster.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T15:52:27Z
+
+Will do! Not sure why the VarDumper tests still cannot find the `ThrownExceptionDetails` class though... Any idea?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-02T15:53:54Z
+
+> Not sure why the VarDumper tests still cannot find the ThrownExceptionDetails class though... Any idea?
+
+you'd need to add messenger as a dev-dep of var-dumper.
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-02T15:55:11Z
+
+> > Not sure why the VarDumper tests still cannot find the ThrownExceptionDetails class though... Any idea?
+>
+> you'd need to add messenger as a dev-dep of var-dumper.
+
+Right, of course, sorry, was confusing it with the ErrorHandler component for some reason. Thanks!
+
+---------------------------------------------------------------------------
+
+by jeroennoten at 2020-11-03T07:42:19Z
+
+@nicolas-grekas I made the changes you suggested resulting in only one changed source file and one changed test file. Could somebody please remove the VarDumper label from this PR?

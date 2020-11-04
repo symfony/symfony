@@ -51,13 +51,13 @@ final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
-            } else {
-                $var = $this->getVarName();
-                $name = new AssignNameExpression($var, $node->getTemplateLine());
-                $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
-
-                return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
             }
+
+            $var = $this->getVarName();
+            $name = new AssignNameExpression($var, $node->getTemplateLine());
+            $this->scope->set('domain', new NameExpression($var, $node->getTemplateLine()));
+
+            return new SetNode(false, new Node([$name]), new Node([$node->getNode('expr')]), $node->getTemplateLine());
         }
 
         if (!$this->scope->has('domain')) {

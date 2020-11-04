@@ -472,7 +472,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     {
         if (\is_array($val)) {
             return $this->buildXml($node, $val);
-        } elseif ($val instanceof \SimpleXMLElement) {
+        }
+
+        if ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {

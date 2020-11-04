@@ -52,7 +52,9 @@ class SortableIterator implements \IteratorAggregate
             $this->sort = static function (\SplFileInfo $a, \SplFileInfo $b) use ($order) {
                 if ($a->isDir() && $b->isFile()) {
                     return -$order;
-                } elseif ($a->isFile() && $b->isDir()) {
+                }
+
+                if ($a->isFile() && $b->isDir()) {
                     return $order;
                 }
 

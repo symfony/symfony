@@ -168,7 +168,9 @@ class QuestionHelper extends Helper
 
         if ($validator = $question->getValidator()) {
             return \call_user_func($question->getValidator(), $default);
-        } elseif ($question instanceof ChoiceQuestion) {
+        }
+
+        if ($question instanceof ChoiceQuestion) {
             $choices = $question->getChoices();
 
             if (!$question->isMultiselect()) {
@@ -268,7 +270,9 @@ class QuestionHelper extends Helper
             if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
                 shell_exec(sprintf('stty %s', $sttyMode));
                 throw new MissingInputException('Aborted.');
-            } elseif ("\177" === $c) { // Backspace Character
+            }
+
+            if ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
                     $cursor->moveLeft(s($fullChoice)->slice(-1)->width(false));

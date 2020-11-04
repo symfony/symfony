@@ -123,7 +123,9 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
 
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
-        } elseif (!$this->container->hasDefinition($id = (string) $value)) {
+        }
+
+        if (!$this->container->hasDefinition($id = (string) $value)) {
             return $value;
         }
 

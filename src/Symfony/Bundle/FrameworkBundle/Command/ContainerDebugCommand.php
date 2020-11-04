@@ -207,7 +207,9 @@ EOF
         $name = $input->getArgument('name');
         if ((null !== $name) && ($optionsCount > 0)) {
             throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
-        } elseif ((null === $name) && $optionsCount > 1) {
+        }
+
+        if ((null === $name) && $optionsCount > 1) {
             throw new InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
         }
     }

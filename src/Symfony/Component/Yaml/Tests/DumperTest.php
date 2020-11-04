@@ -93,7 +93,9 @@ EOF;
                 $test = $this->parser->parse($yaml);
                 if (isset($test['dump_skip']) && $test['dump_skip']) {
                     continue;
-                } elseif (isset($test['todo']) && $test['todo']) {
+                }
+
+                if (isset($test['todo']) && $test['todo']) {
                     // TODO
                 } else {
                     eval('$expected = '.trim($test['php']).';');

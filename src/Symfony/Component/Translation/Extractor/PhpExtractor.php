@@ -269,7 +269,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     if ($this->normalizeToken($tokenIterator->current()) === $item) {
                         $tokenIterator->next();
                         continue;
-                    } elseif (self::MESSAGE_TOKEN === $item) {
+                    }
+
+                    if (self::MESSAGE_TOKEN === $item) {
                         $message = $this->getValue($tokenIterator);
 
                         if (\count($sequence) === ($sequenceKey + 1)) {

@@ -224,7 +224,9 @@ class PrototypedArrayNode extends ArrayNode
                     $ex->setPath($this->getPath());
 
                     throw $ex;
-                } elseif (isset($v[$this->keyAttribute])) {
+                }
+
+                if (isset($v[$this->keyAttribute])) {
                     $k = $v[$this->keyAttribute];
 
                     // remove the key attribute when required

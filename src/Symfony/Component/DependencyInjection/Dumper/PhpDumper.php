@@ -1732,7 +1732,9 @@ EOF;
             }
 
             return sprintf('[%s]', implode(', ', $code));
-        } elseif ($value instanceof ArgumentInterface) {
+        }
+
+        if ($value instanceof ArgumentInterface) {
             $scope = [$this->definitionVariables, $this->referenceVariables];
             $this->definitionVariables = $this->referenceVariables = null;
 
@@ -1854,15 +1856,15 @@ EOF;
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter($match[1]);
-            } else {
-                $replaceParameters = function ($match) {
-                    return "'.".$this->dumpParameter($match[2]).".'";
-                };
-
-                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
-
-                return $code;
             }
+
+            $replaceParameters = function ($match) {
+                return "'.".$this->dumpParameter($match[2]).".'";
+            };
+
+            $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
+
+            return $code;
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
         } elseif (\is_object($value) || \is_resource($value)) {

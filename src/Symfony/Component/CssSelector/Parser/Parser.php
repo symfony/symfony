@@ -317,7 +317,9 @@ class Parser implements ParserInterface
 
             if ($next->isDelimiter([']'])) {
                 return new Node\AttributeNode($selector, $namespace, $attribute, 'exists', null);
-            } elseif ($next->isDelimiter(['='])) {
+            }
+
+            if ($next->isDelimiter(['='])) {
                 $operator = '=';
             } elseif ($next->isDelimiter(['^', '$', '*', '~', '|', '!'])
                 && $stream->getPeek()->isDelimiter(['='])

@@ -637,9 +637,9 @@ class Inline
 
                 if ('-' === $scalar[0]) {
                     return -octdec($value);
-                } else {
-                    return octdec($value);
                 }
+
+                return octdec($value);
 
             // Optimize for returning strings.
             // no break

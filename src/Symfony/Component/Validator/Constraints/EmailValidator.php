@@ -86,7 +86,9 @@ class EmailValidator extends ConstraintValidator
                     ->addViolation();
 
                 return;
-            } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
+            }
+
+            if (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)

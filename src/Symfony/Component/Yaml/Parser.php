@@ -745,7 +745,9 @@ class Parser
         try {
             if ('' !== $value && '{' === $value[0]) {
                 return Inline::parse($this->lexInlineMapping($value), $flags, $this->refs);
-            } elseif ('' !== $value && '[' === $value[0]) {
+            }
+
+            if ('' !== $value && '[' === $value[0]) {
                 return Inline::parse($this->lexInlineSequence($value), $flags, $this->refs);
             }
 

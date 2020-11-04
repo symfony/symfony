@@ -35,7 +35,9 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('container.env_var_processor') as $id => $tags) {
             if (!$r = $container->getReflectionClass($class = $container->getDefinition($id)->getClass())) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-            } elseif (!$r->isSubclassOf(EnvVarProcessorInterface::class)) {
+            }
+
+            if (!$r->isSubclassOf(EnvVarProcessorInterface::class)) {
                 throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, EnvVarProcessorInterface::class));
             }
             foreach ($class::getProvidedTypes() as $prefix => $type) {

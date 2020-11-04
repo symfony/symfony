@@ -147,7 +147,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             $this->evalTemplate = null;
 
             return ob_get_clean();
-        } elseif ($this->evalTemplate instanceof StringStorage) {
+        }
+
+        if ($this->evalTemplate instanceof StringStorage) {
             extract($this->evalParameters, \EXTR_SKIP);
             $this->evalParameters = null;
 

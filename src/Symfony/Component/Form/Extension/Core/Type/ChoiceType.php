@@ -289,13 +289,19 @@ class ChoiceType extends AbstractType
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return null;
-            } elseif ($options['required'] && ($options['expanded'] || isset($options['attr']['size']) && $options['attr']['size'] > 1)) {
+            }
+
+            if ($options['required'] && ($options['expanded'] || isset($options['attr']['size']) && $options['attr']['size'] > 1)) {
                 // placeholder for required radio buttons or a select with size > 1 does not make sense
                 return null;
-            } elseif (false === $placeholder) {
+            }
+
+            if (false === $placeholder) {
                 // an empty value should be added but the user decided otherwise
                 return null;
-            } elseif ($options['expanded'] && '' === $placeholder) {
+            }
+
+            if ($options['expanded'] && '' === $placeholder) {
                 // never use an empty label for radio buttons
                 return 'None';
             }

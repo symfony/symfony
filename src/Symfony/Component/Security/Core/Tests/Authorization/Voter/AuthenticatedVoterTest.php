@@ -65,12 +65,16 @@ class AuthenticatedVoterTest extends TestCase
     {
         if ('fully' === $authenticated) {
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        } elseif ('remembered' === $authenticated) {
-            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
-        } elseif ('impersonated' === $authenticated) {
-            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken')->disableOriginalConstructor()->getMock();
-        } else {
-            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(['', ''])->getMock();
         }
+
+        if ('remembered' === $authenticated) {
+            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
+        }
+
+        if ('impersonated' === $authenticated) {
+            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken')->disableOriginalConstructor()->getMock();
+        }
+
+        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(['', ''])->getMock();
     }
 }

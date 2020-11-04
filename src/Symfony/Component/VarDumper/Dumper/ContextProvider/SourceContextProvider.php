@@ -61,7 +61,9 @@ final class SourceContextProvider implements ContextProviderInterface
                         $line = $trace[$i]['line'];
 
                         break;
-                    } elseif (isset($trace[$i]['object']) && $trace[$i]['object'] instanceof Template) {
+                    }
+
+                    if (isset($trace[$i]['object']) && $trace[$i]['object'] instanceof Template) {
                         $template = $trace[$i]['object'];
                         $name = $template->getTemplateName();
                         $src = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : false);

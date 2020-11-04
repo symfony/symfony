@@ -341,9 +341,9 @@ class ConfigurationTest extends TestCase
             'secret' => 's3cr3t',
             'trusted_hosts' => [],
             'trusted_headers' => [
-                'x-forwarded-all',
-                '!x-forwarded-host',
-                '!x-forwarded-prefix',
+                'x-forwarded-for',
+                'x-forwarded-port',
+                'x-forwarded-proto',
             ],
             'csrf_protection' => [
                 'enabled' => false,

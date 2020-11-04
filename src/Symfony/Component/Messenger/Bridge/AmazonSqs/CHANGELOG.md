@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Made it possible to re-use the Connection configuration processing logic
+   outside the Connection class, e.g. to enable instantiating an SqsClient
+   on your own.
+
 5.2.0
 -----
 

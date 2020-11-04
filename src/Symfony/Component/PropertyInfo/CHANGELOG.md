@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+* Added ability to have union types in `Type` class.
+
 5.2.0
 -----
 

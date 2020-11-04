@@ -61,11 +61,19 @@ abstract class AbstractUidType extends Type
             return $value->toRfc4122();
         }
 
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return null;
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', AbstractUid::class]);
+        if (!\is_string($value)) {
+            throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'string', AbstractUid::class]);
+        }
+
+        try {
+            return $this->getUidClass()::fromString($value)->toRfc4122();
+        } catch (\InvalidArgumentException $e) {
+            throw ConversionException::conversionFailed($value, $this->getName());
+        }
     }
 
     /**

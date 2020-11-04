@@ -68,11 +68,14 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testNotSupportedUlidStringConversionToDatabaseValue()
+    public function testUlidStringConvertsToDatabaseValue()
     {
-        $this->expectException(ConversionException::class);
+        $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
+        $ulid = Ulid::fromString(self::DUMMY_ULID);
 
-        $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
+        $expected = $ulid->toRfc4122();
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+* changed the signature of `ContainerAwareInterface::setContainer()` to `setContainer(?ContainerInterface $container)`
+* deprecated calling `ContainerAwareTrait::setContainer()` without arguments
+
 5.2.0
 -----
 

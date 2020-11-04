@@ -26,7 +26,8 @@ DependencyInjection
  * Removed `Alias::getDeprecationMessage()`, use `Alias::getDeprecation()` instead.
  * The `inline()` function from the PHP-DSL has been removed, use `inline_service()` instead.
  * The `ref()` function from the PHP-DSL has been removed, use `service()` instead.
- * Removed `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
+ * Removed `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead.
+ * The signatures of `ContainerAwareInterface::setContainer()` and `ContainerAwareTrait::setContainer()` have been updated to `setContainer(?ContainerInterface $container)`. When calling one of those methods, explicitly pass `null` if you want to unset the container.
 
 Dotenv
 ------
@@ -153,6 +154,7 @@ Security
    in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`,
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
+ * The signatures of `TokenStorageInterface::setToken()`, `TokenStorage::setToken()` and `UsageTrackingTokenStorage::setToken()` have been updated to `setToken(?TokenInterface $token)`. When calling one of those methods, explicitly pass `null` if you want to unset the token.
 
 TwigBundle
 ----------

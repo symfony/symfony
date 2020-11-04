@@ -12,11 +12,30 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token\Storage;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class TokenStorageTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
+    public function testGetSetTokenLegacy()
+    {
+        $tokenStorage = new TokenStorage();
+        $token = new UsernamePasswordToken('username', 'password', 'provider');
+        $tokenStorage->setToken($token);
+        $this->assertSame($token, $tokenStorage->getToken());
+
+        $this->expectDeprecation('Since symfony/security-core 5.3: Calling "Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::setToken()" without any arguments is deprecated. Please explicitly pass null if you want to unset the token.');
+
+        $tokenStorage->setToken();
+        $this->assertNull($tokenStorage->getToken());
+    }
+
     public function testGetSetToken()
     {
         $tokenStorage = new TokenStorage();
@@ -24,5 +43,7 @@ class TokenStorageTest extends TestCase
         $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage->setToken($token);
         $this->assertSame($token, $tokenStorage->getToken());
+        $tokenStorage->setToken(null);
+        $this->assertNull($tokenStorage->getToken());
     }
 }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -21,6 +22,11 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Caster\TraceStub;
+use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -121,7 +127,7 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         if ($io->isVeryVerbose()) {
             $io->title('Message:');
-            $dump = new Dumper($io);
+            $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
             $flattenException = null;
@@ -130,7 +136,7 @@ abstract class AbstractFailedMessagesCommand extends Command
             } elseif (null !== $lastRedeliveryStampWithException) {
                 $flattenException = $lastRedeliveryStampWithException->getFlattenException();
             }
-            $io->writeln(null === $flattenException ? '(no data)' : $flattenException->getTraceAsString());
+            $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }
@@ -171,5 +177,27 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
 
         return null;
+    }
+
+    private function createCloner(): ?ClonerInterface
+    {
+        if (!class_exists(VarCloner::class)) {
+            return null;
+        }
+
+        $cloner = new VarCloner();
+        $cloner->addCasters([FlattenException::class => function (FlattenException $flattenException, array $a, Stub $stub): array {
+            $stub->class = $flattenException->getClass();
+
+            return [
+                Caster::PREFIX_VIRTUAL.'message' => $flattenException->getMessage(),
+                Caster::PREFIX_VIRTUAL.'code' => $flattenException->getCode(),
+                Caster::PREFIX_VIRTUAL.'file' => $flattenException->getFile(),
+                Caster::PREFIX_VIRTUAL.'line' => $flattenException->getLine(),
+                Caster::PREFIX_VIRTUAL.'trace' => new TraceStub($flattenException->getTrace()),
+            ];
+        }]);
+
+        return $cloner;
     }
 }

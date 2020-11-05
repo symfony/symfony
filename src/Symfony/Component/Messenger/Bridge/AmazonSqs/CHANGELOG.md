@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added new `debug` option to log HTTP requests and responses.
+
 5.2.0
 -----
 

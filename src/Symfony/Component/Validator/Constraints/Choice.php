@@ -69,7 +69,7 @@ class Choice extends Constraint
         if (\is_array($choices) && \is_string(key($choices))) {
             $options = array_merge($choices, $options);
         } elseif (null !== $choices) {
-            $options['choices'] = $choices;
+            $options['value'] = $choices;
         }
 
         parent::__construct($options, $groups, $payload);

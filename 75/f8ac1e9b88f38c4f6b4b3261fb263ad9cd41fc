@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-04T21:44:41Z
+
+Thanks for your quick response! This solution works for me, it should be BC (the `OutputFormatter` is clonable). I've quickly verified this fix and it indeed fixes the cases described in the issue.
+
+I think it's a good idea to add a test for this, to make sure we don't break it in a later patch version. And maybe add a code comment that this is only done when `$formatter === null` for BC reasons?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-05T09:55:16Z
+
+> I think it's a good idea to add a test for this
+
+Added unit tests.

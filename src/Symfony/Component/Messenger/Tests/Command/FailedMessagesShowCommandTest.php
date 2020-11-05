@@ -32,7 +32,7 @@ class FailedMessagesShowCommandTest extends TestCase
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
-        $errorStamp = new ErrorDetailsStamp(new \Exception('Things are bad!', 123));
+        $errorStamp = ErrorDetailsStamp::create(new \Exception('Things are bad!', 123));
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
@@ -69,7 +69,7 @@ EOF
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp1 = new RedeliveryStamp(0);
-        $errorStamp = new ErrorDetailsStamp(new \Exception('Things are bad!', 123));
+        $errorStamp = ErrorDetailsStamp::create(new \Exception('Things are bad!', 123));
         $redeliveryStamp2 = new RedeliveryStamp(0);
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
@@ -154,7 +154,7 @@ EOF
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
-        $errorStamp = new ErrorDetailsStamp(new \RuntimeException('Things are bad!'));
+        $errorStamp = ErrorDetailsStamp::create(new \RuntimeException('Things are bad!'));
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
@@ -201,7 +201,7 @@ EOF
             new TransportMessageIdStamp(15),
             $sentToFailureStamp,
             new RedeliveryStamp(0),
-            new ErrorDetailsStamp(new \RuntimeException('Things are bad!')),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope]);
@@ -244,7 +244,7 @@ EOF
             new TransportMessageIdStamp(15),
             new SentToFailureTransportStamp('async'),
             new RedeliveryStamp(0),
-            new ErrorDetailsStamp($exception),
+            ErrorDetailsStamp::create($exception),
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(42)->willReturn($envelope);

@@ -471,7 +471,7 @@ EOF;
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if (!$node->getValue() instanceof Definition || $sourceId === $id || $edge->isLazy() || $edge->isWeak()) {
+            if (!$node->getValue() instanceof Definition || $sourceId === $id || $edge->isWeak()) {
                 continue;
             }
 

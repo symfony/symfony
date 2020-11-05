@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
@@ -116,6 +117,18 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame($response, $r);
         $this->assertGreaterThan(1, \count($chunks));
         $this->assertSame('Symfony is awesome!', implode('', $chunks));
+    }
+
+    public function testToArrayChecksStatusCodeBeforeDecoding()
+    {
+        $this->expectException(ClientExceptionInterface::class);
+
+        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = function (): MockResponse {
+            return new MockResponse('Errored.', ['http_code' => 400]);
+        }));
+
+        $response = $sut->request('GET', 'https://example.com/foo/bar');
+        $response->toArray();
     }
 
     public function testStopwatch()

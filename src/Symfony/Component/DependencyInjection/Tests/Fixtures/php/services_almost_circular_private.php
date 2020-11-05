@@ -36,6 +36,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'manager' => 'getManagerService',
             'manager2' => 'getManager2Service',
             'manager3' => 'getManager3Service',
+            'monolog.logger' => 'getMonolog_LoggerService',
             'root' => 'getRootService',
             'subscriber' => 'getSubscriberService',
         ];
@@ -77,7 +78,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'level5' => true,
             'level6' => true,
             'logger2' => true,
+            'mailer.transport' => true,
+            'mailer.transport_factory' => true,
+            'mailer.transport_factory.amazon' => true,
             'manager4' => true,
+            'monolog.logger_2' => true,
             'multiuse1' => true,
             'subscriber2' => true,
         ];
@@ -353,6 +358,20 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     }
 
     /**
+     * Gets the public 'monolog.logger' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMonolog_LoggerService()
+    {
+        $this->services['monolog.logger'] = $instance = new \stdClass();
+
+        $instance->handler = ($this->privates['mailer.transport'] ?? $this->getMailer_TransportService());
+
+        return $instance;
+    }
+
+    /**
      * Gets the public 'root' shared service.
      *
      * @return \stdClass
@@ -412,6 +431,34 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         $this->privates['level5'] = $instance = new \stdClass($a);
 
         $a->call($instance);
+
+        return $instance;
+    }
+
+    /**
+     * Gets the private 'mailer.transport' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMailer_TransportService()
+    {
+        return $this->privates['mailer.transport'] = (new \FactoryCircular(new RewindableGenerator(function () {
+            yield 0 => ($this->privates['mailer.transport_factory.amazon'] ?? $this->getMailer_TransportFactory_AmazonService());
+        }, 1)))->create();
+    }
+
+    /**
+     * Gets the private 'mailer.transport_factory.amazon' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMailer_TransportFactory_AmazonService()
+    {
+        $a = new \stdClass();
+
+        $this->privates['mailer.transport_factory.amazon'] = $instance = new \stdClass($a);
+
+        $a->handler = ($this->privates['mailer.transport'] ?? $this->getMailer_TransportService());
 
         return $instance;
     }

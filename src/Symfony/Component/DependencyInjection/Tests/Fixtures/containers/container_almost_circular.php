@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -7,6 +8,24 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCa
 
 $public = 'public' === $visibility;
 $container = new ContainerBuilder();
+
+// monolog-like + handler that require monolog
+
+$container->register('monolog.logger', 'stdClass')->setPublic(true)
+    ->setProperty('handler', new Reference('mailer.transport'));
+
+$container->register('mailer.transport', 'stdClass')->setPublic($public)
+    ->setFactory([new Reference('mailer.transport_factory'), 'create']);
+
+$container->register('mailer.transport_factory', FactoryCircular::class)->setPublic($public)
+    ->addArgument(new TaggedIteratorArgument('mailer.transport'));
+
+$container->register('mailer.transport_factory.amazon', 'stdClass')->setPublic($public)
+    ->addArgument(new Reference('monolog.logger_2'))
+    ->addTag('mailer.transport');
+
+$container->register('monolog.logger_2', 'stdClass')->setPublic($public)
+    ->setProperty('handler', new Reference('mailer.transport'));
 
 // same visibility for deps
 

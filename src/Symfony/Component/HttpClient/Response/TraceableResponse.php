@@ -95,6 +95,10 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
             if ($this->event && $this->event->isStarted()) {
                 $this->event->stop();
             }
+
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
+            }
         }
     }
 
@@ -115,6 +119,10 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
         } finally {
             if ($this->event && $this->event->isStarted()) {
                 $this->event->stop();
+            }
+
+            if ($throw) {
+                $this->checkStatusCode($this->response->getStatusCode());
             }
         }
     }

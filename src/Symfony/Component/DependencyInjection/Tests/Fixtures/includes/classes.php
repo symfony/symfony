@@ -111,6 +111,23 @@ class LazyContext
     }
 }
 
+class FactoryCircular
+{
+    public $services;
+
+    public function __construct($services)
+    {
+        $this->services = $services;
+    }
+
+    public function create()
+    {
+        foreach ($this->services as $service) {
+            return $service;
+        }
+    }
+}
+
 class FoobarCircular
 {
     public function __construct(FooCircular $foo)

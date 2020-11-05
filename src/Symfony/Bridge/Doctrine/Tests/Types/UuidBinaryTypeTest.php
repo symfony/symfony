@@ -52,11 +52,21 @@ class UuidBinaryTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testNotSupportedStringUuidConversionToDatabaseValue()
+    public function testStringUuidConvertsToDatabaseValue()
+    {
+        $uuid = self::DUMMY_UUID;
+
+        $expected = uuid_parse(self::DUMMY_UUID);
+        $actual = $this->type->convertToDatabaseValue($uuid, $this->platform);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testInvalidUuidConversionForDatabaseValue()
     {
         $this->expectException(ConversionException::class);
 
-        $this->type->convertToDatabaseValue(self::DUMMY_UUID, $this->platform);
+        $this->type->convertToDatabaseValue('abcdefg', $this->platform);
     }
 
     public function testNullConversionForDatabaseValue()

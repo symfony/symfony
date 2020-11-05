@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-05T20:48:24Z
+
+Your fix looks right, but Travis still reports the failing test. 🤔
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-05T20:50:50Z
+
+Also, we need to target 4.4 with the PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-05T20:56:25Z
+
+Thank you for the review.
+
+I target 4.4 now.
+
+The test is failing because my changes is not considered on the CI run.
+
+---------------------------------------------------------------------------
+
+by wkania at 2020-11-05T21:06:58Z
+
+So it's because of this https://github.com/doctrine/dbal/pull/4410

@@ -1054,6 +1054,9 @@ class PhpDumperTest extends TestCase
 
         $container = new $container();
 
+        $logger = $container->get('monolog.logger');
+        $this->assertEquals(new \stdClass(), $logger->handler);
+
         $foo = $container->get('foo');
         $this->assertSame($foo, $foo->bar->foobar->foo);
 

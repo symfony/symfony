@@ -1372,6 +1372,10 @@ class ContainerBuilderTest extends TestCase
     public function testAlmostCircular($visibility)
     {
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
+        $container->compile();
+
+        $logger = $container->get('monolog.logger');
+        $this->assertEquals(new \stdClass(), $logger->handler);
 
         $foo = $container->get('foo');
         $this->assertSame($foo, $foo->bar->foobar->foo);

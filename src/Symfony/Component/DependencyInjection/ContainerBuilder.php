@@ -1220,7 +1220,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $this->resolveServices($reference);
             };
         } elseif ($value instanceof IteratorArgument) {
-            $value = new RewindableGenerator(function () use ($value) {
+            $value = new RewindableGenerator(function () use ($value, &$inlineServices) {
                 foreach ($value->getValues() as $k => $v) {
                     foreach (self::getServiceConditionals($v) as $s) {
                         if (!$this->has($s)) {
@@ -1228,12 +1228,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                         }
                     }
                     foreach (self::getInitializedConditionals($v) as $s) {
-                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)) {
+                        if (!$this->doGet($s, ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE, $inlineServices)) {
                             continue 2;
                         }
                     }
 
-                    yield $k => $this->resolveServices($v);
+                    yield $k => $this->doResolveServices($v, $inlineServices);
                 }
             }, function () use ($value): int {
                 $count = 0;

@@ -2465,6 +2465,18 @@ YAML;
         // (before, there was no \n after row2)
         $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
+
+    public function testParsingMultidimensionalCollectionOverMultipleLines()
+    {
+        $yaml = <<<YAML
+[
+    ["entry1", {}],
+    ["entry2"]
+]
+YAML;
+
+        $this->assertSame([['entry1', []], ['entry2']], $this->parser->parse($yaml));
+    }
 }
 
 class B

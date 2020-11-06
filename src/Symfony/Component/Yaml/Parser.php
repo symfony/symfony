@@ -1240,9 +1240,15 @@ class Parser
         }
 
         $value = $yaml;
+        $collectionLevel = 1;
 
         while ($this->moveToNextLine()) {
-            for ($i = 1; isset($this->currentLine[$i]) && ']' !== $this->currentLine[$i]; ++$i) {
+            for ($i = 1; isset($this->currentLine[$i]) && $collectionLevel >= 1; ++$i) {
+                if ('[' === $this->currentLine[$i]) {
+                    ++$collectionLevel;
+                } elseif (']' === $this->currentLine[$i]) {
+                    --$collectionLevel;
+                }
             }
 
             $trimmedValue = trim($this->currentLine);
@@ -1253,7 +1259,7 @@ class Parser
 
             $value .= $trimmedValue;
 
-            if (isset($this->currentLine[$i]) && ']' === $this->currentLine[$i]) {
+            if (0 === $collectionLevel) {
                 break;
             }
         }

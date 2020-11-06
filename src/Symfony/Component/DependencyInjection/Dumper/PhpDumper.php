@@ -407,24 +407,42 @@ EOF;
             }
 
             $newNodes = [];
-            if (!$this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes)) {
+            if (!$circular = $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes)) {
                 foreach ($newNodes as $newNodeId => $_) {
                     $checkedNodes[$newNodeId] = [];
                 }
                 continue;
             }
 
-            $nodesToFlatten = $newNodes;
+            // Remove all nodes that are not in a circular loop
+            // $checkedNodes contains [parents][child] references
+            // $newNodes contains [child][parents] references
+            // $circular contains nodes involved in loops
+            foreach (array_diff_key($newNodes, $circular) as $newNodeId => $usedBy) {
+                foreach ($usedBy as $parentId => $_) {
+                    unset($checkedNodes[$parentId][$newNodeId]);
+                }
+                foreach ($checkedNodes[$newNodeId] as $depId => $_) {
+                    // remove the reverse reference
+                    unset($newNodes[$depId][$newNodeId]);
+                }
+                $checkedNodes[$newNodeId] = [];
+                unset($newNodes[$newNodeId]);
+            }
+
+            $nodesToFlatten = array_intersect_key($checkedNodes, $newNodes);
             do {
                 $changedNodes = [];
-                foreach ($nodesToFlatten as $newNodeId => $_) {
+                foreach ($nodesToFlatten as $newNodeId => $children) {
                     $deps = &$checkedNodes[$newNodeId];
-                    foreach ($deps as $id => [$path, $depsByConstructor]) {
+                    foreach ($children as $id => $_) {
+                        [$path, $depsByConstructor] = $deps[$id];
                         foreach ($checkedNodes[$id] as $depsId => [$subPath, $subDepsByConstructor]) {
                             if (!isset($deps[$depsId]) || ($depsByConstructor && $subDepsByConstructor && !$deps[$depsId][1])) {
-                                array_unshift($subPath, $id);
-                                $deps[$depsId] = [$subPath, $depsByConstructor && $subDepsByConstructor];
-                                $changedNodes += $newNodes[$newNodeId] ?? [];
+                                $deps[$depsId] = [array_merge($path, [$id], $subPath), $depsByConstructor && $subDepsByConstructor];
+                                foreach ($newNodes[$newNodeId] as $parentId => $_) {
+                                    $changedNodes[$parentId][$newNodeId] = true;
+                                }
                             }
                         }
                     }
@@ -435,6 +453,7 @@ EOF;
                 if (null !== $n = $checkedNodes[$newNodeId][$newNodeId] ?? null) {
                     $this->addCircularReferences($newNodeId, $n[0], $n[1]);
                 }
+                $checkedNodes[$newNodeId] = [];
             }
         }
 
@@ -442,23 +461,31 @@ EOF;
         $this->singleUsePrivateIds = array_diff_key($this->singleUsePrivateIds, $this->circularReferences);
     }
 
-    private function collectCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$newNodes, array $path = []): bool
+    private function collectCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$newNodes, array $path = []): array
     {
         $path[$sourceId] = true;
         $checkedNodes[$sourceId] = [];
         $newNodes[$sourceId] = [];
-        $circular = false;
+        $circular = [];
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if (!$node->getValue() instanceof Definition || $sourceId === $id || $edge->isWeak()) {
+            if (!$node->getValue() instanceof Definition || $sourceId === $id || ($edge->isLazy() && !$edge->isReferencedByConstructor()) || $edge->isWeak()) {
                 continue;
             }
 
             if (isset($path[$id])) {
-                $circular = true;
+                $started = false;
+                foreach ($path as $k => $_) {
+                    if ($started) {
+                        $circular[$k] = true;
+                    } elseif ($k === $id) {
+                        $started = true;
+                        $circular[$k] = true;
+                    }
+                }
             } elseif (!isset($checkedNodes[$id])) {
-                $circular = $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes, $path) || $circular;
+                $circular += $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes, $path);
             }
 
             $checkedNodes[$sourceId][$id] = [[], $edge->isReferencedByConstructor()];

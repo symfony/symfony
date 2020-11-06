@@ -155,7 +155,7 @@ trait FilesystemCommonTrait
     /**
      * @internal
      */
-    public static function throwError($type, $message, $file, $line)
+    public static function throwError($type, $message, $file = '', $line = 0)
     {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }

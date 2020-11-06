@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\Mapping;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\MappingException;
@@ -35,6 +36,7 @@ class AnnotationLoader implements LoaderInterface
         Groups::class => true,
         Ignore:: class => true,
         MaxDepth::class => true,
+        Mapping::class => true,
         SerializedName::class => true,
     ];
 
@@ -55,15 +57,6 @@ class AnnotationLoader implements LoaderInterface
         $loaded = false;
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
-
-        foreach ($this->loadAnnotations($reflectionClass) as $annotation) {
-            if ($annotation instanceof DiscriminatorMap) {
-                $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
-                    $annotation->getTypeProperty(),
-                    $annotation->getMapping()
-                ));
-            }
-        }
 
         foreach ($reflectionClass->getProperties() as $property) {
             if (!isset($attributesMetadata[$property->name])) {
@@ -133,6 +126,38 @@ class AnnotationLoader implements LoaderInterface
                 }
 
                 $loaded = true;
+            }
+        }
+
+        foreach ($this->loadAnnotations($reflectionClass) as $annotation) {
+            if ($annotation instanceof DiscriminatorMap) {
+                $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
+                    $annotation->getTypeProperty(),
+                    $annotation->getMapping()
+                ));
+            } elseif ($annotation instanceof Mapping) {
+                foreach ($annotation->getAttributes() as $attribute) {
+                    if (!isset($attributesMetadata[$attribute->getName()])) {
+                        $attributesMetadata[$attribute->getName()] = new AttributeMetadata($attribute->getName());
+                        $classMetadata->addAttributeMetadata($attributesMetadata[$attribute->getName()]);
+                    }
+
+                    foreach ($attribute->getGroups() as $group) {
+                        $attributesMetadata[$attribute->getName()]->addGroup($group);
+                    }
+                    foreach ($annotation->getGroups() as $group) {
+                        $attributesMetadata[$attribute->getName()]->addGroup($group);
+                    }
+
+                    if (null === $attributesMetadata[$attribute->getName()]->getMaxDepth()) {
+                        $attributesMetadata[$attribute->getName()]
+                            ->setMaxDepth($attribute->getMaxDepth() ?? $annotation->getMaxDepth());
+                    }
+
+                    if (null === $attributesMetadata[$attribute->getName()]->getSerializedName()) {
+                        $attributesMetadata[$attribute->getName()]->setSerializedName($attribute->getSerializedName());
+                    }
+                }
             }
         }
 

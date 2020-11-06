@@ -90,6 +90,32 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
+    public function testLoadSerialize()
+    {
+        $classMetadata = new ClassMetadata($this->getNamespace().'\MappingDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(1, $attributesMetadata['foo']->getMaxDepth());
+        $this->assertEquals(2, $attributesMetadata['bar']->getMaxDepth());
+        $this->assertEquals(3, $attributesMetadata['baz']->getMaxDepth());
+        $this->assertEquals(4, $attributesMetadata['qux']->getMaxDepth());
+        $this->assertEquals(5, $attributesMetadata['quux']->getMaxDepth());
+        $this->assertEquals(6, $attributesMetadata['quuz']->getMaxDepth());
+
+        $this->assertEquals(['groupAttributes'], $attributesMetadata['foo']->getGroups());
+        $this->assertEquals(['groupProperty', 'groupAttributes'], $attributesMetadata['bar']->getGroups());
+        $this->assertEquals(['groupAttribute', 'groupAttributes'], $attributesMetadata['baz']->getGroups());
+        $this->assertEquals(['groupProperty', 'groupAttribute', 'groupAttributes'], $attributesMetadata['qux']->getGroups());
+        $this->assertEquals(['groupMethod', 'groupAttributes'], $attributesMetadata['quux']->getGroups());
+        $this->assertEquals(['groupMethod', 'groupAttribute', 'groupAttributes'], $attributesMetadata['quuz']->getGroups());
+
+        $this->assertEquals('barOk', $attributesMetadata['bar']->getSerializedName());
+        $this->assertEquals('bazOk', $attributesMetadata['baz']->getSerializedName());
+        $this->assertEquals('quuxOk', $attributesMetadata['quux']->getSerializedName());
+        $this->assertEquals('quuzOk', $attributesMetadata['quuz']->getSerializedName());
+    }
+
     public function testLoadClassMetadataAndMerge()
     {
         $classMetadata = new ClassMetadata($this->getNamespace().'\GroupDummy');
@@ -114,5 +140,6 @@ abstract class AnnotationLoaderTest extends TestCase
     }
 
     abstract protected function createLoader(): AnnotationLoader;
+
     abstract protected function getNamespace(): string;
 }

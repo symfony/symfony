@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added support for configuring PHP error level to log levels
+
 5.2.0
 -----
 

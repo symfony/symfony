@@ -38,7 +38,7 @@
         "symfony/cache": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
-        "symfony/property-info": "^4.4|^5.0",
+        "symfony/property-info": "^5.3",
         "symfony/translation": "^4.4|^5.0",
         "doctrine/annotations": "~1.7",
         "doctrine/cache": "~1.0",

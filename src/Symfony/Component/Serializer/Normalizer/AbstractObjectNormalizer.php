@@ -373,7 +373,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return null;
             }
 
-            $collectionValueType = $type->isCollection() ? $type->getCollectionValueType() : null;
+            $collectionValueType = $type->isCollection() ? $type->getCollectionValueTypes()[0] ?? null : null;
 
             // Fix a collection that contains the only one element
             // This is special to xml format only
@@ -431,18 +431,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $builtinType = Type::BUILTIN_TYPE_OBJECT;
                 $class = $collectionValueType->getClassName().'[]';
 
-                if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
-                    $context['key_type'] = $collectionKeyType;
+                if (null !== $collectionKeyType = $type->getCollectionKeyTypes()) {
+                    [$context['key_type']] = $collectionKeyType;
                 }
-            } elseif ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueType()) && Type::BUILTIN_TYPE_ARRAY === $collectionValueType->getBuiltinType()) {
+            } elseif ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueTypes()) && \count($collectionValueType) > 0 && Type::BUILTIN_TYPE_ARRAY === $collectionValueType[0]->getBuiltinType()) {
                 // get inner type for any nested array
-                $innerType = $collectionValueType;
+                [$innerType] = $collectionValueType;
 
                 // note that it will break for any other builtinType
                 $dimensions = '[]';
-                while (null !== $innerType->getCollectionValueType() && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
+                while (null !== $innerType->getCollectionValueTypes() && Type::BUILTIN_TYPE_ARRAY === $innerType->getBuiltinType()) {
                     $dimensions .= '[]';
-                    $innerType = $innerType->getCollectionValueType();
+                    [$innerType] = $innerType->getCollectionValueTypes();
                 }
 
                 if (null !== $innerType->getClassName()) {

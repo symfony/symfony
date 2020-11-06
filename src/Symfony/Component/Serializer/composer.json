@@ -34,7 +34,7 @@
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
-        "symfony/property-info": "^4.4|^5.0",
+        "symfony/property-info": "^5.3",
         "symfony/uid": "^5.1",
         "symfony/validator": "^4.4|^5.0",
         "symfony/var-exporter": "^4.4|^5.0",

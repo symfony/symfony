@@ -406,69 +406,42 @@ EOF;
                 $this->singleUsePrivateIds[$id] = $id;
             }
 
-            $newNodes = [];
-            if (!$this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes)) {
-                foreach ($newNodes as $newNodeId => $_) {
-                    $checkedNodes[$newNodeId] = [];
-                }
-                continue;
-            }
-
-            $nodesToFlatten = $newNodes;
-            do {
-                $changedNodes = [];
-                foreach ($nodesToFlatten as $newNodeId => $_) {
-                    $deps = &$checkedNodes[$newNodeId];
-                    foreach ($deps as $id => [$path, $depsByConstructor]) {
-                        foreach ($checkedNodes[$id] as $depsId => [$subPath, $subDepsByConstructor]) {
-                            if (!isset($deps[$depsId]) || ($depsByConstructor && $subDepsByConstructor && !$deps[$depsId][1])) {
-                                array_unshift($subPath, $id);
-                                $deps[$depsId] = [$subPath, $depsByConstructor && $subDepsByConstructor];
-                                $changedNodes += $newNodes[$newNodeId] ?? [];
-                            }
-                        }
-                    }
-                }
-            } while ($nodesToFlatten = $changedNodes);
-
-            foreach ($newNodes as $newNodeId => $_) {
-                if (null !== $n = $checkedNodes[$newNodeId][$newNodeId] ?? null) {
-                    $this->addCircularReferences($newNodeId, $n[0], $n[1]);
-                }
-            }
+            $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes);
         }
 
         $this->container->getCompiler()->getServiceReferenceGraph()->clear();
         $this->singleUsePrivateIds = array_diff_key($this->singleUsePrivateIds, $this->circularReferences);
     }
 
-    private function collectCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$newNodes, array $path = []): bool
+    private function collectCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array $path = [], bool $byConstructor = true): void
     {
-        $path[$sourceId] = true;
-        $checkedNodes[$sourceId] = [];
-        $newNodes[$sourceId] = [];
-        $circular = false;
+        $path[$sourceId] = $byConstructor;
+        $checkedNodes[$sourceId] = true;
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if (!$node->getValue() instanceof Definition || $sourceId === $id || $edge->isWeak()) {
+
+            if (!($definition = $node->getValue()) instanceof Definition || $sourceId === $id || ($edge->isLazy() && ($this->proxyDumper ?? $this->getProxyDumper())->isProxyCandidate($definition)) || $edge->isWeak()) {
                 continue;
             }
 
             if (isset($path[$id])) {
-                $circular = true;
+                $loop = null;
+                $loopByConstructor = $edge->isReferencedByConstructor();
+                foreach ($path as $k => $pathByConstructor) {
+                    if (null !== $loop) {
+                        $loop[] = $k;
+                        $loopByConstructor = $loopByConstructor && $pathByConstructor;
+                    } elseif ($k === $id) {
+                        $loop = [];
+                    }
+                }
+                $this->addCircularReferences($id, $loop, $loopByConstructor);
             } elseif (!isset($checkedNodes[$id])) {
-                $circular = $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $newNodes, $path) || $circular;
-            }
-
-            $checkedNodes[$sourceId][$id] = [[], $edge->isReferencedByConstructor()];
-            if (isset($newNodes[$id])) {
-                $newNodes[$id][$sourceId] = true;
+                $this->collectCircularReferences($id, $node->getOutEdges(), $checkedNodes, $path, $edge->isReferencedByConstructor());
             }
         }
         unset($path[$sourceId]);
-
-        return $circular;
     }
 
     private function addCircularReferences(string $sourceId, array $currentPath, bool $byConstructor)

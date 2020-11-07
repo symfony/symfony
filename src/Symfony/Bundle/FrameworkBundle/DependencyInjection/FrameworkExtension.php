@@ -965,11 +965,11 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $config['default_uri']);
         }
 
-        if ($this->annotationsConfigEnabled) {
+        if (\PHP_VERSION_ID >= 80000 || $this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', ['priority' => -10])
-                ->addArgument(new Reference('annotation_reader'));
+                ->addArgument(new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
             $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)
@@ -1564,13 +1564,13 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
-            if (!$this->annotationsConfigEnabled) {
+            if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
             }
 
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
-                [new Reference('annotation_reader')]
+                [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
             );
             $annotationLoader->setPublic(false);
 

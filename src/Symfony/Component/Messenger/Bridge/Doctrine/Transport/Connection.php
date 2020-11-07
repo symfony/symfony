@@ -341,7 +341,7 @@ class Connection implements ResetInterface
         return $stmt;
     }
 
-    private function executeStatement(string $sql, array $parameters = [], array $types = [])
+    protected function executeStatement(string $sql, array $parameters = [], array $types = [])
     {
         try {
             if (method_exists($this->driverConnection, 'executeStatement')) {

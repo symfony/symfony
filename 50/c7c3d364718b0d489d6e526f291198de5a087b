@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by benji07 at 2020-11-06T10:55:34Z
+
+i just saw that we have a special key inside the $options array `value`, maybe i can use it instead of the `getDefaultOption()` method (that's the way used in constraints like Count, DateTime, Isbn, ...)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-06T23:31:25Z
+
+> i just saw that we have a special key inside the $options array `value`, maybe i can use it instead of the `getDefaultOption()` method (that's the way used in constraints like Count, DateTime, Isbn, ...)
+
+Yes, `value` should work as well.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-06T23:35:24Z
+
+Oh, for the two new files: Can you please add the usual file header (`This file is part of the Symfony package.` etc.) that you can find in other PHP files?

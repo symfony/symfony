@@ -46,4 +46,12 @@ class NotCompromisedPassword extends Constraint
         $this->threshold = $threshold ?? $this->threshold;
         $this->skipOnError = $skipOnError ?? $this->skipOnError;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

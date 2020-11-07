@@ -46,4 +46,12 @@ class Luhn extends Constraint
 
         $this->message = $message ?? $this->message;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

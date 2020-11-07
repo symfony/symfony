@@ -46,4 +46,12 @@ class NotBlank extends Constraint
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

@@ -49,4 +49,12 @@ class Country extends Constraint
         $this->message = $message ?? $this->message;
         $this->alpha3 = $alpha3 ?? $this->alpha3;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

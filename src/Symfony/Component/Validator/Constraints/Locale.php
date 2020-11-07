@@ -49,4 +49,12 @@ class Locale extends Constraint
         $this->message = $message ?? $this->message;
         $this->canonicalize = $canonicalize ?? $this->canonicalize;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

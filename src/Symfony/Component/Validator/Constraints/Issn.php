@@ -57,4 +57,12 @@ class Issn extends Constraint
         $this->caseSensitive = $caseSensitive ?? $this->caseSensitive;
         $this->requireHyphen = $requireHyphen ?? $this->requireHyphen;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'message';
+    }
 }

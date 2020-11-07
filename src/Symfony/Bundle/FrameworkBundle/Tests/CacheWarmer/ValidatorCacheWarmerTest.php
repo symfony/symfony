@@ -26,7 +26,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/author.yml');
         $validatorBuilder->addMethodMapping('loadValidatorMetadata');
-        $validatorBuilder->enableAnnotationMapping();
+        $validatorBuilder->enableAnnotationMapping(true)->addDefaultDoctrineAnnotationReader();
 
         $file = sys_get_temp_dir().'/cache-validator.php';
         @unlink($file);
@@ -46,7 +46,7 @@ class ValidatorCacheWarmerTest extends TestCase
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/categories.yml');
-        $validatorBuilder->enableAnnotationMapping();
+        $validatorBuilder->enableAnnotationMapping(true)->addDefaultDoctrineAnnotationReader();
 
         $file = sys_get_temp_dir().'/cache-validator-with-annotations.php';
         @unlink($file);

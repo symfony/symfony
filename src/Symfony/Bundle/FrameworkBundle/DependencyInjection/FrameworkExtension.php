@@ -1303,11 +1303,14 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            if (!$this->annotationsConfigEnabled) {
-                throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
+            if (!$this->annotationsConfigEnabled && \PHP_VERSION_ID < 80000) {
+                throw new \LogicException('"enable_annotations" on the validator cannot be set as Doctrine Annotations support is disabled.');
             }
 
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', [new Reference('annotation_reader')]);
+            $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
+            if ($this->annotationsConfigEnabled) {
+                $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
+            }
         }
 
         if (\array_key_exists('static_method', $config) && $config['static_method']) {

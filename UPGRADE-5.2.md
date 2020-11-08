@@ -126,6 +126,36 @@ Validator
 
  * Deprecated the `NumberConstraintTrait` trait.
 
+ * Deprecated setting a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`
+
+   Before:
+
+   ```php
+   $builder->enableAnnotationMapping($reader);
+   ```
+
+   After:
+
+   ```php
+   $builder->enableAnnotationMapping(true)
+       ->setDoctrineAnnotationReader($reader);
+   ```
+
+ * Deprecated creating a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`
+
+   Before:
+
+   ```php
+   $builder->enableAnnotationMapping();
+   ```
+
+   After:
+
+   ```php
+   $builder->enableAnnotationMapping(true)
+       ->addDefaultDoctrineAnnotationReader();
+   ```
+
 Security
 --------
 

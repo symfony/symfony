@@ -26,8 +26,7 @@ class Entry
         $this->dn = $dn;
         $this->lowerMap = [];
 
-        foreach ($attributes as $key => $attribute)
-        {
+        foreach ($attributes as $key => $attribute) {
             $this->setAttribute($key, $attribute);
         }
     }
@@ -45,8 +44,8 @@ class Entry
     /**
      * Returns whether an attribute exists.
      *
-     * @param string $name The name of the attribute
-     * @param bool $caseSensitive Whether the check should be case-sensitive
+     * @param string $name          The name of the attribute
+     * @param bool   $caseSensitive Whether the check should be case-sensitive
      *
      * @return bool
      */
@@ -67,8 +66,8 @@ class Entry
      * As LDAP can return multiple values for a single attribute,
      * this value is returned as an array.
      *
-     * @param string $name The name of the attribute
-     * @param bool $caseSensitive Whether the attribute name is case-sensitive
+     * @param string $name          The name of the attribute
+     * @param bool   $caseSensitive Whether the attribute name is case-sensitive
      *
      * @return array|null
      */
@@ -114,8 +113,8 @@ class Entry
     /**
      * Get the attribute key.
      *
-     * @param string $name The attribute name
-     * @param bool $caseSensitive Whether the attribute name is case-sensitive
+     * @param string $name          The attribute name
+     * @param bool   $caseSensitive Whether the attribute name is case-sensitive
      *
      * @return string|null
      */

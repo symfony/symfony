@@ -29,7 +29,7 @@ class EntryTest extends TestCase
         $this->assertFalse($entry->hasAttribute('givenname', true));
         $this->assertTrue($entry->hasAttribute('givenname', false));
 
-        $this->assertSame(null, $entry->getAttribute('givenname', true));
+        $this->assertNull($entry->getAttribute('givenname', true));
         $this->assertSame($givenName, $entry->getAttribute('givenname', false)[0]);
 
         $firstName = 'Fabien';

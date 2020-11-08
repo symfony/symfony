@@ -66,9 +66,9 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $version = \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
-        $dir = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . uniqid('symfony', true);
-        $file = $dir . \DIRECTORY_SEPARATOR . 'php' . $version;
+        $version = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('symfony', true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$version;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);
@@ -87,10 +87,10 @@ class PhpExecutableFinderTest extends TestCase
     {
         $f = new PhpExecutableFinder();
 
-        $version = \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
-        $versionWrong = \PHP_MAJOR_VERSION . '.' . (\PHP_MINOR_VERSION + 1);
-        $dir = sys_get_temp_dir() . \DIRECTORY_SEPARATOR . uniqid('symfony', true);
-        $file = $dir . \DIRECTORY_SEPARATOR . 'php' . $version;
+        $version = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
+        $versionWrong = \PHP_MAJOR_VERSION.'.'.(\PHP_MINOR_VERSION + 1);
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('symfony', true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'php'.$version;
 
         mkdir($dir);
         copy(\PHP_BINARY, $file);

@@ -244,6 +244,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
 
     public function reset()
     {
+        $this->idReaders = [];
         $this->entityLoaders = [];
     }
 

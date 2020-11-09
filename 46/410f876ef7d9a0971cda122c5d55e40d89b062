@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-11-07T20:33:55Z
+
+would be great to have tests covering that
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-07T21:04:20Z
+
+> would be great to have tests covering that
+
+This is already covered by https://github.com/symfony/symfony/blob/7b4d22f8d0bc443c2e972253250ebfb5ccdca499/src/Symfony/Component/Ldap/Tests/Adapter/ExtLdap/AdapterTest.php#L132-L135 . With a local LDAP runing, the test suite failed without this patch.
+
+note: Tests are not executed in our CI=> This should be solved by #39030
+
+This PR is about fixing the issue in case neither #38875 is updated with the correct fix, nor #39030 is accepted/ready to merge.

@@ -174,7 +174,7 @@ class Query extends AbstractQuery
     private function resetPagination()
     {
         $con = $this->connection->getResource();
-        $this->controlPagedResultResponse($con, 0, '');
+        $this->controlPagedResult($con, 0, '');
         $this->serverctrls = [];
 
         // This is a workaround for a bit of a bug in the above invocation

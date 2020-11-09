@@ -51,6 +51,7 @@ Messenger
 SecurityBundle
 --------------
 
+ * Deprecate `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
  * Deprecate `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services, the logic is moved into the
    `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Deprecate not setting `$authenticatorManagerEnabled` to `true` in `SecurityDataCollector` and `DebugFirewallCommand`

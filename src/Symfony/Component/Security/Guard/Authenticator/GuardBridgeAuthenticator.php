@@ -95,6 +95,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         return $passport;
     }
 
+    public function getGuardAuthenticator(): GuardAuthenticatorInterface
+    {
+        return $this->guard;
+    }
+
     private function getUser($credentials): UserInterface
     {
         $user = $this->guard->getUser($credentials, $this->userProvider);

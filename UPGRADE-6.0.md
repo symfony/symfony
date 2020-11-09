@@ -394,6 +394,7 @@ Security
 SecurityBundle
 --------------
 
+ * Remove `FirewallConfig::getListeners()`, use `FirewallConfig::getAuthenticators()` instead
  * Remove `security.authentication.basic_entry_point` and `security.authentication.retry_entry_point` services,
    the logic is moved into the `HttpBasicAuthenticator` and `ChannelListener` respectively
  * Remove `SecurityFactoryInterface` and `SecurityExtension::addSecurityListenerFactory()` in favor of

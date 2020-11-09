@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bridge\Twig\Extension\LogoutUrlExtension;
+use Symfony\Bundle\SecurityBundle\Debug\Authenticator\TraceableAuthenticatorManagerListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -504,6 +505,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->replaceArgument(0, new Reference($managerId))
             ;
 
+            if ($container->hasDefinition('debug.security.firewall') && $this->authenticatorManagerEnabled) {
+                $container
+                    ->register('debug.security.firewall.authenticator.'.$id, TraceableAuthenticatorManagerListener::class)
+                    ->setDecoratedService('security.firewall.authenticator.'.$id)
+                    ->setArguments([new Reference('debug.security.firewall.authenticator.'.$id.'.inner')])
+                ;
+            }
+
             // user checker listener
             $container
                 ->setDefinition('security.listener.user_checker.'.$id, new ChildDefinition('security.listener.user_checker'))
@@ -542,8 +551,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         foreach ($this->getSortedFactories() as $factory) {
             $key = str_replace('-', '_', $factory->getKey());
-            if (\array_key_exists($key, $firewall)) {
+            if ('custom_authenticators' !== $key && \array_key_exists($key, $firewall)) {
                 $listenerKeys[] = $key;
+            }
+        }
+
+        if ($firewall['custom_authenticators'] ?? false) {
+            foreach ($firewall['custom_authenticators'] as $customAuthenticatorId) {
+                $listenerKeys[] = $customAuthenticatorId;
             }
         }
 

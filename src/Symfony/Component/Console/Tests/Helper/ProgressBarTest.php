@@ -210,7 +210,7 @@ class ProgressBarTest extends TestCase
 
         // max in construct, explicit format before
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         $bar->advance(10);
         $bar->finish();
@@ -220,7 +220,7 @@ class ProgressBarTest extends TestCase
 
         // max in start, explicit format before
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start(10);
         $bar->advance(10);
         $bar->finish();
@@ -828,7 +828,7 @@ class ProgressBarTest extends TestCase
     public function testSetFormat()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(
@@ -837,7 +837,7 @@ class ProgressBarTest extends TestCase
         );
 
         $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
-        $bar->setFormat('normal');
+        $bar->setFormat(ProgressBar::FORMAT_NORMAL);
         $bar->start();
         rewind($output->getStream());
         $this->assertEquals(

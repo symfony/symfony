@@ -72,10 +72,13 @@ class DoctrineExtractorTest extends TestCase
         $expected = array_merge($expected, [
             'foo',
             'bar',
+            'indexedRguid',
             'indexedBar',
             'indexedFoo',
+            'indexedBaz',
             'indexedByDt',
             'indexedByCustomType',
+            'indexedBuz',
         ]);
 
         $this->assertEquals(
@@ -151,6 +154,14 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_INT),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
             )]],
+            ['indexedRguid', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                'Doctrine\Common\Collections\Collection',
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
+            )]],
             ['indexedBar', [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
@@ -167,6 +178,14 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_STRING),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation')
             )]],
+            ['indexedBaz', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_INT),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
             ['simpleArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))]],
             ['customFoo', null],
             ['notMapped', null],
@@ -179,6 +198,14 @@ class DoctrineExtractorTest extends TestCase
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['indexedByCustomType', null],
+            ['indexedBuz', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                Collection::class,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
         ];
 
         if (class_exists(Types::class)) {

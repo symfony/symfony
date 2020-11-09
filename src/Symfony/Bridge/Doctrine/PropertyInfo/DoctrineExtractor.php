@@ -110,10 +110,24 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 $associationMapping = $metadata->getAssociationMapping($property);
 
                 if (isset($associationMapping['indexBy'])) {
-                    $indexColumn = $associationMapping['indexBy'];
                     /** @var ClassMetadataInfo $subMetadata */
                     $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
-                    $typeOfField = $subMetadata->getTypeOfField($subMetadata->getFieldForColumn($indexColumn));
+
+                    // Check if indexBy value is a property
+                    $fieldName = $associationMapping['indexBy'];
+                    if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
+                        $fieldName = $subMetadata->getFieldForColumn($associationMapping['indexBy']);
+                        //Not a property, maybe a column name?
+                        if (null === ($typeOfField = $subMetadata->getTypeOfField($fieldName))) {
+                            //Maybe the column name is the association join column?
+                            $associationMapping = $subMetadata->getAssociationMapping($fieldName);
+
+                            /** @var ClassMetadataInfo $subMetadata */
+                            $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
+                            $subMetadata = $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
+                            $typeOfField = $subMetadata->getTypeOfField($indexProperty);
+                        }
+                    }
 
                     if (!$collectionKeyType = $this->getPhpType($typeOfField)) {
                         return null;

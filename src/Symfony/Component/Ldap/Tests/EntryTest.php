@@ -26,10 +26,10 @@ class EntryTest extends TestCase
             'givenName' => [$givenName],
         ]);
 
-        $this->assertFalse($entry->hasAttribute('givenname', true));
+        $this->assertFalse($entry->hasAttribute('givenname'));
         $this->assertTrue($entry->hasAttribute('givenname', false));
 
-        $this->assertNull($entry->getAttribute('givenname', true));
+        $this->assertNull($entry->getAttribute('givenname'));
         $this->assertSame($givenName, $entry->getAttribute('givenname', false)[0]);
 
         $firstName = 'Fabien';

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-10-28T12:27:49Z
+
+Please check #38861 also.
+
+---------------------------------------------------------------------------
+
+by juanmiguelbesada at 2020-10-28T20:32:48Z
+
+I will take a look
+
+---------------------------------------------------------------------------
+
+by bwach at 2020-10-30T11:14:17Z
+
+> People at Doctrine says it could/shoud be a property ([doctrine/orm#8018 (comment)](https://github.com/doctrine/orm/issues/8018#issuecomment-586008227))
+> Which leads to issue in Symfony: #38861
+>
+> Given this is not clear, I suggest to supports both cases:
+>
+>     * IndexBy point to a property
+>
+>     * IndexBy point to a column_name
+
+This is also reflected in description for ClassMetadataInfo which we use here (depending on how you understand the whole paragraph)
+
+https://github.com/doctrine/orm/blob/c1943624ab1260c629316bab104dc5130c060154/lib/Doctrine/ORM/Mapping/ClassMetadataInfo.php#L516
+
+describing "indexBy" as:
+
+`Specification of a field on target-entity that is used to index the collection by.`
+
+So it should be one of the fields on the entity, not a column.
+I guess  the problem in the long run is that doctrine doesn't validate this, so you can type anything into the "indexBy" annotation and it will still work.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-02T12:54:33Z
+
+How does Doctrine behave for one or the other? Does it ignore the attribute? Does it try to map the column to a property or vice versa?
+
+---------------------------------------------------------------------------
+
+by juanmiguelbesada at 2020-11-05T06:58:49Z
+
+PR updated fixing #38861 (I hope) and adding tests

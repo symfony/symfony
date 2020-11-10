@@ -42,6 +42,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
             'file' => $object->getFile(),
             'line' => $object->getLine(),
             'previous' => null === $object->getPrevious() ? null : $this->normalize($object->getPrevious(), $format, $context),
+            'status_text' => $object->getStatusText(),
             'trace' => $object->getTrace(),
             'trace_as_string' => $object->getTraceAsString(),
         ];
@@ -73,6 +74,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         $object->setClass($data['class']);
         $object->setFile($data['file']);
         $object->setLine($data['line']);
+        $object->setStatusText($data['status_text']);
         $object->setHeaders((array) $data['headers']);
 
         if (isset($data['previous'])) {

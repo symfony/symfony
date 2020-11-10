@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Jean85 at 2020-11-05T16:24:55Z
+
+@Nyholm you said in https://github.com/symfony/symfony/issues/38792#issuecomment-716221129 that we don't use `FlattenException` anymore, but it's still present inside the `ErrorDetailsStamp`, and it still doesn't deserialize well, as the current test failure highlights:
+```) Symfony\Component\Messenger\Tests\Stamp\ErrorDetailsStampTest::testDeserialization
+Failed asserting that two objects are equal.
+--- Expected
++++ Actual
+@@ @@
+         'message' => 'exception message'
+         'code' => 0
+         'previous' => null
+-        'trace' => Array (...)
+-        'traceAsString' => '#0 /home/alai/workspace/OSS/s...{main}'
++        'trace' => null
++        'traceAsString' => null
+         'class' => 'Exception'
+         'statusCode' => 500
+         'statusText' => 'Internal Server Error'
+@@ @@
+         'headers' => Array ()
+         'file' => '/home/alai/workspace/OSS/symf...st.php'
+         'line' => 52
+-        'asString' => null
++        'asString' => 'Exception: exception message ...{main}'
+     )
+ )
+```
+What should I do?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-06T17:55:19Z
+
+@yceruto could you have a look at this PR please?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-11-06T19:14:25Z
+
+There is a `FlattenExceptionNormalizer` to serialize/deserialize it correctly, and alternatively you could use `PropertyNormalizer` too.
+
+Did you find a new problem after this fix https://github.com/symfony/symfony/pull/38941?

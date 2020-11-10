@@ -364,6 +364,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('supports')
+                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->ifString()
                                             ->then(function ($v) { return [$v]; })
@@ -380,6 +381,7 @@ class Configuration implements ConfigurationInterface
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->arrayNode('initial_marking')
+                                    ->performNoDeepMerging()
                                         ->beforeNormalization()->castToArray()->end()
                                         ->defaultValue([])
                                         ->prototype('scalar')->end()
@@ -412,6 +414,7 @@ class Configuration implements ConfigurationInterface
                                         ->example(['workflow.enter', 'workflow.transition'])
                                     ->end()
                                     ->arrayNode('places')
+                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($places) {
@@ -457,6 +460,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('transitions')
+                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($transitions) {

@@ -60,6 +60,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         return self::DISABLED !== $this->mode;
     }
 
+    public function setMode(int $mode): void
+    {
+        if (self::DISABLED !== $mode && self::ENABLED !== $mode) {
+            throw new \InvalidArgumentException(sprintf('Invalid value provided for mode, use one of "%s::DISABLED" or "%s::ENABLED".', self::class, self::class));
+        }
+
+        $this->mode = $mode;
+    }
+
     public function onKernelResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();

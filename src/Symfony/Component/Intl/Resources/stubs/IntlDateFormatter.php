@@ -10,14 +10,30 @@
  */
 
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter as BaseIntlDateFormatter;
+use Symfony\Polyfill\Intl\Icu\IntlDateFormatter as IntlDateFormatterPolyfill;
 
-/**
- * Stub implementation for the IntlDateFormatter class of the intl extension.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @see BaseIntlDateFormatter
- */
-class IntlDateFormatter extends BaseIntlDateFormatter
-{
+if (!class_exists(IntlDateFormatterPolyfill::class)) {
+    trigger_deprecation('symfony/intl', '5.3', 'Polyfills are deprecated, try running "composer require symfony/polyfill-intl-icu ^1.21" instead.');
+
+    /**
+     * Stub implementation for the IntlDateFormatter class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     *
+     * @see BaseIntlDateFormatter
+     */
+    class IntlDateFormatter extends BaseIntlDateFormatter
+    {
+    }
+} else {
+    /**
+     * Stub implementation for the IntlDateFormatter class of the intl extension.
+     *
+     * @author Bernhard Schussek <bschussek@gmail.com>
+     *
+     * @see BaseIntlDateFormatter
+     */
+    class IntlDateFormatter extends IntlDateFormatterPolyfill
+    {
+    }
 }

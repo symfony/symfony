@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Exception;
  * Base exception class for not implemented behaviors of the intl extension in the Locale component.
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 class NotImplementedException extends RuntimeException
 {

@@ -19,6 +19,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
  * @author Igor Wiedler <igor@wiedler.ch>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 class TimezoneTransformer extends Transformer
 {

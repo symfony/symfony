@@ -1,11 +1,7 @@
 Intl Component
 =============
 
-A PHP replacement layer for the C intl extension that also provides access to
-the localization data of the ICU library.
-
-The replacement layer is limited to the locale "en". If you want to use other
-locales, you should [install the intl PHP extension][0] instead.
+This package provides access to the CLDR localization data of the ICU library.
 
 Resources
 ---------
@@ -17,5 +13,3 @@ Resources
     in the [main Symfony repository](https://github.com/symfony/symfony)
   * [Docker images with intl support](https://hub.docker.com/r/jakzal/php-intl)
     (for the Intl component development)
-
-[0]: https://php.net/intl.setup

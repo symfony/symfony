@@ -364,7 +364,6 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('supports')
-                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->ifString()
                                             ->then(function ($v) { return [$v]; })
@@ -381,7 +380,6 @@ class Configuration implements ConfigurationInterface
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->arrayNode('initial_marking')
-                                    ->performNoDeepMerging()
                                         ->beforeNormalization()->castToArray()->end()
                                         ->defaultValue([])
                                         ->prototype('scalar')->end()
@@ -414,7 +412,6 @@ class Configuration implements ConfigurationInterface
                                         ->example(['workflow.enter', 'workflow.transition'])
                                     ->end()
                                     ->arrayNode('places')
-                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($places) {
@@ -460,7 +457,6 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('transitions')
-                                        ->performNoDeepMerging()
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($transitions) {
@@ -544,16 +540,16 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
                                 ->end()
                                 ->beforeNormalization()
-                                        ->always()
-                                        ->then(function ($values) {
-                                            // Special case to deal with XML when the user wants an empty array
-                                            if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
-                                                $values['events_to_dispatch'] = [];
-                                                unset($values['event_to_dispatch']);
-                                            }
+                                    ->always()
+                                    ->then(function ($values) {
+                                        // Special case to deal with XML when the user wants an empty array
+                                        if (\array_key_exists('event_to_dispatch', $values) && null === $values['event_to_dispatch']) {
+                                            $values['events_to_dispatch'] = [];
+                                            unset($values['event_to_dispatch']);
+                                        }
 
-                                            return $values;
-                                        })
+                                        return $values;
+                                    })
                                 ->end()
                             ->end()
                         ->end()

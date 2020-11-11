@@ -397,6 +397,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
+            // config already exists with a string key.
+            foreach ($leftSide as $key => $value) {
+                if (is_string($key) && $value === $v) {
+                    continue 2;
+                }
+            }
+
             $leftSide[$k] = $this->children[$k]->merge($leftSide[$k], $v);
         }
 

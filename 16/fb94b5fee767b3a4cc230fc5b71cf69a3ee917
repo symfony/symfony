@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-16T14:07:21Z
+
+Thank you
+
+I like the idea of this because I know there are a lot of parameters to set when you want to test some custom requests. I am not sure it is a good idea to hard code the content type to `application/json`. I build all my APIs with [Json:API](https://jsonapi.org/) format which requires a content type of `application/vnd.api+json`. So I cannot leverage this feature in the current state.
+
+Just FYI. There is a [small package](https://github.com/nebkam/fluent-test) from @nebkam that I like. It has a `RequestBuilder` to solve the same problem as this PR is trying to solve.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-10-20T11:42:47Z
+
+@nicolas-grekas changelog is updated.
+
+fabbot is failing because of https://github.com/symfony/symfony/pull/38596#discussion_r506252931 and https://github.com/symfony/symfony/pull/38596#discussion_r506260917.
+
+Let me now if I need to change something.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2020-10-20T12:00:35Z
+
+@Nyholm I think we should go here with `application/json` as we do the same in [JsonResponse](https://github.com/symfony/symfony/blob/6987862d97166c6d2f9882285eca93b03ffc7b5e/src/Symfony/Component/HttpFoundation/JsonResponse.php#L214) which sets there the `Content-Type` to `application/json` and I think this both should match.

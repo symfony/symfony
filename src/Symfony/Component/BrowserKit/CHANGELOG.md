@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * [BC BREAK] Request parameters are now casted to string in `Request::__construct()`.
+
 4.3.0
 -----
 

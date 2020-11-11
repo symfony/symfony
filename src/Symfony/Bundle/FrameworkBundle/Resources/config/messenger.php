@@ -128,6 +128,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('messenger.transport.sqs.factory', AmazonSqsTransportFactory::class)
+            ->args([
+                service('logger')->ignoreOnInvalid(),
+            ])
 
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 

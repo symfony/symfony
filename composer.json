@@ -138,6 +138,7 @@
         "twig/markdown-extra": "^2.12"
     },
     "conflict": {
+        "async-aws/core": "<1.5",
         "doctrine/dbal": "<2.10",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",

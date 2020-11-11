@@ -162,6 +162,24 @@ abstract class AbstractBrowser
     }
 
     /**
+     * Converts the request parameters into a JSON string and uses it as request content.
+     */
+    public function jsonRequest(string $method, string $uri, array $parameters = [], array $server = [], bool $changeHistory = true): Crawler
+    {
+        $content = json_encode($parameters);
+
+        $this->setServerParameter('CONTENT_TYPE', 'application/json');
+        $this->setServerParameter('HTTP_ACCEPT', 'application/json');
+
+        try {
+            return $this->request($method, $uri, [], [], $server, $content, $changeHistory);
+        } finally {
+            unset($this->server['CONTENT_TYPE']);
+            unset($this->server['HTTP_ACCEPT']);
+        }
+    }
+
+    /**
      * Returns the History instance.
      *
      * @return History A History instance

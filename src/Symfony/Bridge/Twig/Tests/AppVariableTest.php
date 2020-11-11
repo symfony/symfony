@@ -120,10 +120,29 @@ class AppVariableTest extends TestCase
         $this->appVariable->getEnvironment();
     }
 
+    public function testEnvironmentNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getEnvironment());
+    }
+
     public function testDebugNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getDebug();
+    }
+
+    public function testDebugNotSetStrictVariables()
+    {
+        $this->setTwig(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getDebug();
+    }
+
+    public function testDebugNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getDebug());
     }
 
     public function testGetTokenWithTokenStorageNotSet()
@@ -132,10 +151,36 @@ class AppVariableTest extends TestCase
         $this->appVariable->getToken();
     }
 
+    public function testGetTokenWithTokenStorageNotSetStrictVariables()
+    {
+        $this->setTwig(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getToken();
+    }
+
+    public function testGetTokenWithTokenStorageNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getToken());
+    }
+
     public function testGetUserWithTokenStorageNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getUser();
+    }
+
+    public function testGetUserWithTokenStorageNotSetStrictVariables()
+    {
+        $this->setTwig(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getUser();
+    }
+
+    public function testGetUserWithTokenStorageNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getUser());
     }
 
     public function testGetRequestWithRequestStackNotSet()
@@ -144,10 +189,36 @@ class AppVariableTest extends TestCase
         $this->appVariable->getRequest();
     }
 
+    public function testGetRequestWithRequestStackNotSetStrictVariables()
+    {
+        $this->setTwig(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getRequest();
+    }
+
+    public function testGetRequestWithRequestStackNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getRequest());
+    }
+
     public function testGetSessionWithRequestStackNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
+    }
+
+    public function testGetSessionWithRequestStackNotSetStrictVariables()
+    {
+        $this->setTwig(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getSession();
+    }
+
+    public function testGetSessionWithRequestStackNotSetNotStrictVariables()
+    {
+        $this->setTwig(false);
+        $this->assertNull($this->appVariable->getSession());
     }
 
     public function testGetFlashesWithNoRequest()
@@ -261,5 +332,12 @@ class AppVariableTest extends TestCase
         $this->setRequestStack($request);
 
         return $flashMessages;
+    }
+
+    private function setTwig(bool $strictVariables = true)
+    {
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig->method('isStrictVariables')->willReturn($strictVariables);
+        $this->appVariable->setTwig($twig);
     }
 }

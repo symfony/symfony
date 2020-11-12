@@ -12,5 +12,7 @@
                 <argument type="service" id="mime_types" />
             </call>
         </service>
+        <service id="Symfony\Component\Mime\MimeTypesInterface" alias="mime_types" />
+        <service id="Symfony\Component\Mime\MimeTypeGuesserInterface" alias="mime_types" />
     </services>
 </container>

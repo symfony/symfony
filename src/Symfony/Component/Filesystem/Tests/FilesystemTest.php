@@ -1720,6 +1720,18 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertStringEqualsFile($filename, 'bar');
     }
 
+    public function testDumpRemovesTmpFilesOnFailure()
+    {
+        $expected = scandir(__DIR__, \SCANDIR_SORT_ASCENDING);
+
+        try {
+            $this->filesystem->dumpFile(__DIR__.'/Fixtures', 'bar');
+            $this->fail('IOException expected.');
+        } catch (IOException $e) {
+            $this->assertSame($expected, scandir(__DIR__, \SCANDIR_SORT_ASCENDING));
+        }
+    }
+
     public function testDumpKeepsExistingPermissionsWhenOverwritingAnExistingFile()
     {
         $this->markAsSkippedIfChmodIsMissing();

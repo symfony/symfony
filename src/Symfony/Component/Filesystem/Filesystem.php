@@ -658,13 +658,17 @@ class Filesystem
         // when the filesystem supports chmod.
         $tmpFile = $this->tempnam($dir, basename($filename));
 
-        if (false === @file_put_contents($tmpFile, $content)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        try {
+            if (false === @file_put_contents($tmpFile, $content)) {
+                throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+            }
+
+            @chmod($tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
+
+            $this->rename($tmpFile, $filename, true);
+        } finally {
+            @unlink($tmpFile);
         }
-
-        @chmod($tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
-
-        $this->rename($tmpFile, $filename, true);
     }
 
     /**

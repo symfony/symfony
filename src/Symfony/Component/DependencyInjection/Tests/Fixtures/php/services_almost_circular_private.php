@@ -37,6 +37,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'manager2' => 'getManager2Service',
             'manager3' => 'getManager3Service',
             'monolog.logger' => 'getMonolog_LoggerService',
+            'pA' => 'getPAService',
             'root' => 'getRootService',
             'subscriber' => 'getSubscriberService',
         ];
@@ -84,6 +85,9 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'manager4' => true,
             'monolog.logger_2' => true,
             'multiuse1' => true,
+            'pB' => true,
+            'pC' => true,
+            'pD' => true,
             'subscriber2' => true,
         ];
     }
@@ -372,6 +376,28 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     }
 
     /**
+     * Gets the public 'pA' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getPAService()
+    {
+        $a = new \stdClass();
+
+        $b = ($this->privates['pC'] ?? $this->getPCService());
+
+        if (isset($this->services['pA'])) {
+            return $this->services['pA'];
+        }
+
+        $this->services['pA'] = $instance = new \stdClass($a, $b);
+
+        $a->d = ($this->privates['pD'] ?? $this->getPDService());
+
+        return $instance;
+    }
+
+    /**
      * Gets the public 'root' shared service.
      *
      * @return \stdClass
@@ -477,5 +503,35 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         $a->listener = [0 => ($this->services['listener4'] ?? $this->getListener4Service())];
 
         return $instance;
+    }
+
+    /**
+     * Gets the private 'pC' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getPCService($lazyLoad = true)
+    {
+        $this->privates['pC'] = $instance = new \stdClass();
+
+        $instance->d = ($this->privates['pD'] ?? $this->getPDService());
+
+        return $instance;
+    }
+
+    /**
+     * Gets the private 'pD' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getPDService()
+    {
+        $a = ($this->services['pA'] ?? $this->getPAService());
+
+        if (isset($this->privates['pD'])) {
+            return $this->privates['pD'];
+        }
+
+        return $this->privates['pD'] = new \stdClass($a);
     }
 }

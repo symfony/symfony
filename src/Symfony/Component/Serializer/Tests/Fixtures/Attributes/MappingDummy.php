@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\Mapping;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
-#[Mapping(attributes: ['foo', 'bar', ['name' => 'baz', 'groups' => 'groupAttribute'], ['name'=> 'qux', 'groups' => 'groupAttribute'], 'quux', ['name' => 'quuz', 'groups' => 'groupAttribute'], groups: 'groupAttributes']
-#[Mapping(attributes: ['foo', 'bar', ['name' => 'baz', 'maxDepth' => 3], ['name'=> 'qux', 'maxDepth' => 99], 'quux', ['name' => 'quuz', 'maxDepth' => 99], maxDepth: 1]
-#[Mapping(attributes: [['name' => 'bar', 'serializedName' => 'barError'], ['name' => 'baz', 'serializedName' => 'bazOk'], ['name' => 'quux', 'serializedName' => 'quuxOk'], ['name' => 'quuz', 'serializedName' => 'quuzError']]
+#[Mapping(attributes: ['foo', 'bar', ['name' => 'baz', 'groups' => 'groupAttribute'], ['name'=> 'qux', 'groups' => 'groupAttribute'], 'quux', ['name' => 'quuz', 'groups' => 'groupAttribute']], groups: 'groupAttributes')]
+#[Mapping(attributes: ['foo', 'bar', ['name' => 'baz', 'maxDepth' => 3], ['name'=> 'qux', 'maxDepth' => 99], 'quux', ['name' => 'quuz', 'maxDepth' => 99]], maxDepth: 1)]
+#[Mapping(attributes: [['name' => 'bar', 'serializedName' => 'barError'], ['name' => 'baz', 'serializedName' => 'bazOk'], ['name' => 'quux', 'serializedName' => 'quuxOk'], ['name' => 'quuz', 'serializedName' => 'quuzError']])]
 class MappingDummy
 {
     public $foo;

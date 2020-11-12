@@ -76,7 +76,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
 
         $targetObject = $this->valueHolder%s;
 
-        $backtrace = debug_backtrace(false);
+        $backtrace = debug_backtrace(false%S);
         trigger_error(
             sprintf(
                 'Undefined property: %s::$%s in %s on line %s',
@@ -114,8 +114,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
 
         $targetObject = $this->valueHolder%s;
 
-        unset($targetObject->$name);
-return;
+        unset($targetObject->$name);%S
     }
 
     public function __clone()

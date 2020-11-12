@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by PhilETaylor at 2020-11-11T21:14:17Z
+
+I have tested this against my reproducer in #39056 and Im pleased to report it fixes the reported issue.

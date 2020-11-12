@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-02T07:57:12Z
+
+If you rebase your pr, then Travis will be green (if everything is alright).
+
+Travis for 4.4 was red when you started this pr.
+
+---------------------------------------------------------------------------
+
+by ScullWM at 2020-11-12T10:54:32Z
+
+Hi @Nyholm
+I've finally fixed this Travis bug with the version 7.3 & 7.4. I had to add `symfony-kernel` in dev requirement to be able to test this dataCollector :+1:
+
+It's all green now :)

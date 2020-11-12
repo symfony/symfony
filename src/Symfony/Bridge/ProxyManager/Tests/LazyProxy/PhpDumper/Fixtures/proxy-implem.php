@@ -114,8 +114,8 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
 
         $targetObject = $this->valueHolder%s;
 
-        unset($targetObject->$name);%S
-    }
+        unset($targetObject->$name);
+%a  }
 
     public function __clone()
     {

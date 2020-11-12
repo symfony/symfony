@@ -1242,7 +1242,7 @@ class Parser
         $value = $yaml;
 
         while ($this->moveToNextLine()) {
-            for ($i = 1; isset($this->currentLine[$i]) && ']' !== $this->currentLine[$i]; ++$i) {
+            for ($i = 0; isset($this->currentLine[$i]) && ']' !== $this->currentLine[$i]; ++$i) {
             }
 
             $trimmedValue = trim($this->currentLine);

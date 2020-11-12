@@ -1699,6 +1699,22 @@ foobar: [foo,
 YAML
                 ,
             ],
+            'sequence spanning multiple lines nested in mapping with a following mapping' => [
+                [
+                    'foobar' => [
+                        'foo',
+                        'bar',
+                    ],
+                    'bar' => 'baz',
+                ],
+                <<<YAML
+foobar: [
+    foo,
+    bar,
+]
+bar: baz
+YAML
+            ],
             'nested sequence nested in mapping starting on the same line' => [
                 [
                     'foo' => [

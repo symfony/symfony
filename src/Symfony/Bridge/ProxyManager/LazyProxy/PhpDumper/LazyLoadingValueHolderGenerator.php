@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
+use Laminas\Code\Generator\ClassGenerator;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator as BaseGenerator;
 use Symfony\Component\DependencyInjection\Definition;
-use Zend\Code\Generator\ClassGenerator;
 
 /**
  * @internal
@@ -35,31 +35,9 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
         parent::generate($originalClass, $classGenerator);
 
         foreach ($classGenerator->getMethods() as $method) {
-            $body = preg_replace(
-                '/(\$this->initializer[0-9a-f]++) && \1->__invoke\(\$this->(valueHolder[0-9a-f]++), (.*?), \1\);/',
-                '$1 && ($1->__invoke(\$$2, $3, $1) || 1) && $this->$2 = \$$2;',
-                $method->getBody()
-            );
-            $body = str_replace('(new \ReflectionClass(get_class()))', '$reflection', $body);
-            $body = str_replace('$reflection = $reflection ?: ', '$reflection = $reflection ?? ', $body);
-            $body = str_replace('$reflection ?? $reflection = ', '$reflection ?? ', $body);
+            $body = $method->getBody();
 
-            if ($originalClass->isInterface()) {
-                $body = str_replace('get_parent_class($this)', var_export($originalClass->name, true), $body);
-                $body = preg_replace_callback('/\n\n\$realInstanceReflection = [^{]++\{([^}]++)\}\n\n.*/s', function ($m) {
-                    $r = '';
-                    foreach (explode("\n", $m[1]) as $line) {
-                        $r .= "\n".substr($line, 4);
-                        if (0 === strpos($line, '    return ')) {
-                            break;
-                        }
-                    }
-
-                    return $r;
-                }, $body);
-            }
-
-            if ($this->fluentSafe) {
+            if ($this->fluentSafe && '__destruct' !== $method->getName()) {
                 $indent = $method->getIndentation();
                 $method->setIndentation('');
                 $code = $method->generate();

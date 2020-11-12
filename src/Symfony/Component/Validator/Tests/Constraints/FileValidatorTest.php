@@ -455,6 +455,73 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
+    public function testValidExtension()
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
+            ->getMock();
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->willReturn($this->path);
+        $file
+            ->expects($this->once())
+            ->method('getExtension')
+            ->willReturn('jpg');
+
+        $constraint = new File([
+            'extensions' => ['png', 'jpg'],
+        ]);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideExtensionConstraints
+     */
+    public function testInvalidExtension(File $constraint)
+    {
+        $file = $this
+            ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
+            ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
+            ->getMock();
+        $file
+            ->expects($this->once())
+            ->method('getPathname')
+            ->willReturn($this->path);
+        $file
+            ->expects($this->once())
+            ->method('getExtension')
+            ->willReturn('pdf');
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ extension }}', '"pdf"')
+            ->setParameter('{{ extensions }}', '"png", "jpg"')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
+            ->setCode(File::INVALID_EXTENSION_ERROR)
+            ->assertRaised();
+    }
+
+    public function provideExtensionConstraints(): iterable
+    {
+        yield 'Doctrine style' => [new File([
+            'extensions' => ['png', 'jpg'],
+            'extensionsMessage' => 'myMessage',
+        ])];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            yield 'named arguments' => [
+                eval('return new \Symfony\Component\Validator\Constraints\File(extensions: ["png", "jpg"], extensionsMessage: "myMessage");'),
+            ];
+        }
+    }
+
     /**
      * @dataProvider uploadedFileErrorProvider
      */

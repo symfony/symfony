@@ -204,6 +204,30 @@ class FileValidator extends ConstraintValidator
                 ->setCode(File::INVALID_MIME_TYPE_ERROR)
                 ->addViolation();
         }
+
+        if ($constraint->extensions) {
+            if ($value instanceof FileObject) {
+                $fileExtension = $value->getExtension();
+            } else {
+                $fileExtension = (new FileObject($value))->getExtension();
+            }
+
+            $extensions = (array) $constraint->extensions;
+
+            foreach ($extensions as $extension) {
+                if ($extension === $fileExtension) {
+                    return;
+                }
+            }
+
+            $this->context->buildViolation($constraint->extensionsMessage)
+                ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setParameter('{{ extension }}', $this->formatValue($fileExtension))
+                ->setParameter('{{ extensions }}', $this->formatValues($extensions))
+                ->setParameter('{{ name }}', $this->formatValue($basename))
+                ->setCode(File::INVALID_EXTENSION_ERROR)
+                ->addViolation();
+        }
     }
 
     private static function moreDecimalsThan(string $double, int $numberOfDecimals): bool

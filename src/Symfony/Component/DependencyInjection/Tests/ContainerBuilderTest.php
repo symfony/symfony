@@ -1397,6 +1397,9 @@ class ContainerBuilderTest extends TestCase
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
         $container->compile();
 
+        $pA = $container->get('pA');
+        $this->assertEquals(new \stdClass(), $pA);
+
         $logger = $container->get('monolog.logger');
         $this->assertEquals(new \stdClass(), $logger->handler);
 

@@ -11,87 +11,26 @@
 
 namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
+use Laminas\Code\Generator\ClassGenerator;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator as BaseGenerator;
 use Symfony\Component\DependencyInjection\Definition;
-use Zend\Code\Generator\ClassGenerator;
 
 /**
  * @internal
  */
 class LazyLoadingValueHolderGenerator extends BaseGenerator
 {
-    private $fluentSafe = false;
-
-    public function setFluentSafe(bool $fluentSafe)
-    {
-        $this->fluentSafe = $fluentSafe;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator): void
+    public function generate(\ReflectionClass $originalClass, ClassGenerator $classGenerator, array $proxyOptions = []): void
     {
-        parent::generate($originalClass, $classGenerator);
+        parent::generate($originalClass, $classGenerator, $proxyOptions);
 
         foreach ($classGenerator->getMethods() as $method) {
-            $body = preg_replace(
-                '/(\$this->initializer[0-9a-f]++) && \1->__invoke\(\$this->(valueHolder[0-9a-f]++), (.*?), \1\);/',
-                '$1 && ($1->__invoke(\$$2, $3, $1) || 1) && $this->$2 = \$$2;',
-                $method->getBody()
-            );
-            $body = str_replace('(new \ReflectionClass(get_class()))', '$reflection', $body);
-            $body = str_replace('$reflection = $reflection ?: ', '$reflection = $reflection ?? ', $body);
-            $body = str_replace('$reflection ?? $reflection = ', '$reflection ?? ', $body);
-
-            if ($originalClass->isInterface()) {
-                $body = str_replace('get_parent_class($this)', var_export($originalClass->name, true), $body);
-                $body = preg_replace_callback('/\n\n\$realInstanceReflection = [^{]++\{([^}]++)\}\n\n.*/s', function ($m) {
-                    $r = '';
-                    foreach (explode("\n", $m[1]) as $line) {
-                        $r .= "\n".substr($line, 4);
-                        if (0 === strpos($line, '    return ')) {
-                            break;
-                        }
-                    }
-
-                    return $r;
-                }, $body);
-            }
-
-            if ($this->fluentSafe) {
-                $indent = $method->getIndentation();
-                $method->setIndentation('');
-                $code = $method->generate();
-                if (null !== $docBlock = $method->getDocBlock()) {
-                    $code = substr($code, \strlen($docBlock->generate()));
-                }
-                $refAmp = (strpos($code, '&') ?: \PHP_INT_MAX) <= strpos($code, '(') ? '&' : '';
-                $body = preg_replace(
-                    '/\nreturn (\$this->valueHolder[0-9a-f]++)(->[^;]++);$/',
-                    "\nif ($1 === \$returnValue = {$refAmp}$1$2) {\n    \$returnValue = \$this;\n}\n\nreturn \$returnValue;",
-                    $body
-                );
-                $method->setIndentation($indent);
-            }
-
             if (0 === strpos($originalClass->getFilename(), __FILE__)) {
-                $body = str_replace(var_export($originalClass->name, true), '__CLASS__', $body);
+                $method->setBody(str_replace(var_export($originalClass->name, true), '__CLASS__', $method->getBody()));
             }
-
-            $method->setBody($body);
-        }
-
-        if ($classGenerator->hasMethod('__destruct')) {
-            $destructor = $classGenerator->getMethod('__destruct');
-            $body = $destructor->getBody();
-            $newBody = preg_replace('/^(\$this->initializer[a-zA-Z0-9]++) && .*;\n\nreturn (\$this->valueHolder)/', '$1 || $2', $body);
-
-            if ($body === $newBody) {
-                throw new \UnexpectedValueException(sprintf('Unexpected lazy-proxy format generated for method "%s::__destruct()".', $originalClass->name));
-            }
-
-            $destructor->setBody($newBody);
         }
 
         if (0 === strpos($originalClass->getFilename(), __FILE__)) {

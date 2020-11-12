@@ -48,7 +48,11 @@ class RuntimeInstantiator implements InstantiatorInterface
                 $proxy->setProxyInitializer(null);
 
                 return true;
-            }
+            },
+            [
+                'fluentSafe' => $definition->hasTag('proxy'),
+                'skipDestructor' => true,
+            ]
         );
     }
 }

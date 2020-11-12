@@ -9,6 +9,21 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCa
 $public = 'public' === $visibility;
 $container = new ContainerBuilder();
 
+// multiple path detection
+
+$container->register('pA', 'stdClass')->setPublic(true)
+    ->addArgument(new Reference('pB'))
+    ->addArgument(new Reference('pC'));
+
+$container->register('pB', 'stdClass')->setPublic($public)
+    ->setProperty('d', new Reference('pD'));
+$container->register('pC', 'stdClass')->setPublic($public)
+    ->setLazy(true)
+    ->setProperty('d', new Reference('pD'));
+
+$container->register('pD', 'stdClass')->setPublic($public)
+    ->addArgument(new Reference('pA'));
+
 // monolog-like + handler that require monolog
 
 $container->register('monolog.logger', 'stdClass')->setPublic(true)

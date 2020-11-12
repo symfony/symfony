@@ -37,6 +37,7 @@
         "symfony/config": "^4.2|^5.0",
         "symfony/dependency-injection": "^3.4|^4.1|^5.0",
         "symfony/filesystem": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0"
     },
     "conflict": {

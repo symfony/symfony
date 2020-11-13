@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-05T12:42:14Z
+
+For reference, disabling autoconfig for decorating services has been proposed by @stof in https://github.com/symfony/symfony/issues/30391#issuecomment-467858531
+
+The drawback was also described:
+> If you have a memoizing decorator, it might make perfect sense to tag the decorator service as resettable (to clear its memoization), because that's a behavior that belongs to it.
+
+As pointed out, all tags that describe behavior that belongs to the service itself should be preserved.
+`container.service_subscriber` is one of them, but we could add `kernel.reset`, `kernel.event_subscriber` and others I suppose.
+
+Now, I don't know how to make this generic...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-13T09:08:36Z
+
+I have reworked the patch to account for some more tags.

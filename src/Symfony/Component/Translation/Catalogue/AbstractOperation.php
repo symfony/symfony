@@ -141,8 +141,9 @@ abstract class AbstractOperation implements OperationInterface
         foreach ($this->getDomains() as $domain) {
             if (!isset($this->messages[$domain])) {
                 $this->processDomain($domain);
-                $this->processVariablesMetadata($domain);
             }
+
+            $this->processVariablesMetadata($domain);
         }
 
         return $this->result;
@@ -173,7 +174,7 @@ abstract class AbstractOperation implements OperationInterface
 
                 if ($variablesNote) {
                     // Update old variables note (if any)
-                    if (isset($metadata['notes'])) {
+                    if (isset($sourceMetadata['notes'])) {
                         foreach ($sourceMetadata['notes'] as $index => $note) {
                             if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
                                 $sourceMetadata['notes'][$index] = $variablesNote;

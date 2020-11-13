@@ -95,7 +95,7 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
                     foreach ($metadata['notes'] as $index => $note) {
                         if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
                             // Keep the higher variables count
-                            if (count($extractedMessage[2]) > substr_count($note['content'], ',')) {
+                            if (\count($extractedMessage[2]) > substr_count($note['content'], ',')) {
                                 $metadata['notes'][$index] = $variablesNote;
                             }
 

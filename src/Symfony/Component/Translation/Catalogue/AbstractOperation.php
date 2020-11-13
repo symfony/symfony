@@ -186,7 +186,6 @@ abstract class AbstractOperation implements OperationInterface
                         $sourceMetadata['notes'][] = $variablesNote;
                     }
 
-
                     $this->result->setMetadata($id, $sourceMetadata, $sourceDomain);
                 }
             }

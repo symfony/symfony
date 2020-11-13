@@ -16,7 +16,6 @@ CHANGELOG
 -----
 
  * Added the "extra_fields" option, an array of custom fields to pull from the LDAP server
- * Added caseSensitive option for attribute keys in the Entry class.
 
 4.3.0
 -----

@@ -24,6 +24,7 @@ class Entry
     public function __construct(string $dn, array $attributes = [])
     {
         $this->dn = $dn;
+        $this->attributes = [];
         $this->lowerMap = [];
 
         foreach ($attributes as $key => $attribute) {

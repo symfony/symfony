@@ -13,11 +13,14 @@ namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\IsFalse;
+use Symfony\Component\Validator\Constraints\IsNull;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -26,6 +29,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
@@ -2134,5 +2138,67 @@ class RecursiveValidatorTest extends TestCase
         $violations = $this->validator->validate([], new Optional());
 
         $this->assertCount(0, $violations);
+    }
+
+    public function testValidatedConstraintsHashesDoNotCollide()
+    {
+        $metadata = new ClassMetadata(Entity::class);
+        $metadata->addPropertyConstraint('initialized', new NotNull(['groups' => 'should_pass']));
+        $metadata->addPropertyConstraint('initialized', new IsNull(['groups' => 'should_fail']));
+
+        $this->metadataFactory->addMetadata($metadata);
+
+        $entity = new Entity();
+        $entity->data = new \stdClass();
+
+        $this->assertCount(2, $this->validator->validate($entity, new TestConstraintHashesDoNotCollide()));
+    }
+
+    public function testValidatedConstraintsHashesDoNotCollideWithSameConstraintValidatingDifferentProperties()
+    {
+        $value = new \stdClass();
+
+        $entity = new Entity();
+        $entity->firstName = $value;
+        $entity->setLastName($value);
+
+        $validator = $this->validator->startContext($entity);
+
+        $constraint = new IsNull();
+        $validator->atPath('firstName')
+            ->validate($entity->firstName, $constraint);
+        $validator->atPath('lastName')
+            ->validate($entity->getLastName(), $constraint);
+
+        $this->assertCount(2, $validator->getViolations());
+    }
+}
+
+final class TestConstraintHashesDoNotCollide extends Constraint
+{
+}
+
+final class TestConstraintHashesDoNotCollideValidator extends ConstraintValidator
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value, Constraint $constraint)
+    {
+        if (!$value instanceof Entity) {
+            throw new \LogicException();
+        }
+
+        $this->context->getValidator()
+            ->inContext($this->context)
+            ->atPath('data')
+            ->validate($value, new NotNull())
+            ->validate($value, new NotNull())
+            ->validate($value, new IsFalse());
+
+        $this->context->getValidator()
+            ->inContext($this->context)
+            ->validate($value, null, new GroupSequence(['should_pass']))
+            ->validate($value, null, new GroupSequence(['should_fail']));
     }
 }

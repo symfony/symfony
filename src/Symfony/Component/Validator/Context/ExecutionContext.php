@@ -129,6 +129,7 @@ class ExecutionContext implements ExecutionContextInterface
      * @var array
      */
     private $initializedObjects;
+    private $cachedObjectsRefs;
 
     /**
      * Creates a new execution context.
@@ -153,6 +154,7 @@ class ExecutionContext implements ExecutionContextInterface
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
         $this->violations = new ConstraintViolationList();
+        $this->cachedObjectsRefs = new \SplObjectStorage();
     }
 
     /**
@@ -357,5 +359,21 @@ class ExecutionContext implements ExecutionContextInterface
     public function isObjectInitialized($cacheKey): bool
     {
         return isset($this->initializedObjects[$cacheKey]);
+    }
+
+    /**
+     * @internal
+     *
+     * @param object $object
+     *
+     * @return string
+     */
+    public function generateCacheKey($object)
+    {
+        if (!isset($this->cachedObjectsRefs[$object])) {
+            $this->cachedObjectsRefs[$object] = spl_object_hash($object);
+        }
+
+        return $this->cachedObjectsRefs[$object];
     }
 }

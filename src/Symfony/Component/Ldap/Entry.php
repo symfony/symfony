@@ -54,7 +54,7 @@ class Entry
     {
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
-        if (!$attributeKey) {
+        if (null === $attributeKey) {
             return false;
         }
 
@@ -76,11 +76,11 @@ class Entry
     {
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
 
-        if (!$attributeKey) {
+        if (null === $attributeKey) {
             return null;
         }
 
-        return isset($this->attributes[$attributeKey]) ? $this->attributes[$attributeKey] : null;
+        return $this->attributes[$attributeKey] ?? null;
     }
 
     /**
@@ -119,12 +119,12 @@ class Entry
      *
      * @return string|null
      */
-    private function getAttributeKey(string $name, $caseSensitive = true)
+    private function getAttributeKey(string $name, bool $caseSensitive = true): ?string
     {
         if ($caseSensitive) {
             return $name;
         }
 
-        return isset($this->lowerMap[strtolower($name)]) ? $this->lowerMap[strtolower($name)] : null;
+        return $this->lowerMap[strtolower($name)] ?? null;
     }
 }

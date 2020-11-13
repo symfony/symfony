@@ -493,6 +493,14 @@ class FrameworkExtension extends Extension
 
         $container->registerForAutoconfiguration(RouteLoaderInterface::class)
             ->addTag('routing.route_loader');
+
+        $container->setParameter('container.behavior_describing_tags', [
+            'container.service_locator',
+            'container.service_subscriber',
+            'kernel.event_subscriber',
+            'kernel.locale_aware',
+            'kernel.reset',
+        ]);
     }
 
     /**

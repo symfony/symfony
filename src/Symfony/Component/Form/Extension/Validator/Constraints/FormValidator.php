@@ -25,7 +25,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class FormValidator extends ConstraintValidator
 {
     private $resolvedGroups;
-    private $fieldFormConstraints;
 
     /**
      * {@inheritdoc}
@@ -68,7 +67,6 @@ class FormValidator extends ConstraintValidator
 
             if ($hasChildren && $form->isRoot()) {
                 $this->resolvedGroups = new \SplObjectStorage();
-                $this->fieldFormConstraints = [];
             }
 
             if ($groups instanceof GroupSequence) {
@@ -93,7 +91,6 @@ class FormValidator extends ConstraintValidator
                             $this->resolvedGroups[$field] = (array) $group;
                             $fieldFormConstraint = new Form();
                             $fieldFormConstraint->groups = $group;
-                            $this->fieldFormConstraints[] = $fieldFormConstraint;
                             $this->context->setNode($this->context->getValue(), $field, $this->context->getMetadata(), $this->context->getPropertyPath());
                             $validator->atPath(sprintf('children[%s]', $field->getName()))->validate($field, $fieldFormConstraint, $group);
                         }
@@ -139,10 +136,8 @@ class FormValidator extends ConstraintValidator
                 foreach ($form->all() as $field) {
                     if ($field->isSubmitted()) {
                         $this->resolvedGroups[$field] = $groups;
-                        $fieldFormConstraint = new Form();
-                        $this->fieldFormConstraints[] = $fieldFormConstraint;
                         $this->context->setNode($this->context->getValue(), $field, $this->context->getMetadata(), $this->context->getPropertyPath());
-                        $validator->atPath(sprintf('children[%s]', $field->getName()))->validate($field, $fieldFormConstraint);
+                        $validator->atPath(sprintf('children[%s]', $field->getName()))->validate($field, $formConstraint);
                     }
                 }
             }
@@ -150,7 +145,6 @@ class FormValidator extends ConstraintValidator
             if ($hasChildren && $form->isRoot()) {
                 // destroy storage to avoid memory leaks
                 $this->resolvedGroups = new \SplObjectStorage();
-                $this->fieldFormConstraints = [];
             }
         } elseif (!$form->isSynchronized()) {
             $childrenSynchronized = true;
@@ -159,11 +153,8 @@ class FormValidator extends ConstraintValidator
             foreach ($form as $child) {
                 if (!$child->isSynchronized()) {
                     $childrenSynchronized = false;
-
-                    $fieldFormConstraint = new Form();
-                    $this->fieldFormConstraints[] = $fieldFormConstraint;
                     $this->context->setNode($this->context->getValue(), $child, $this->context->getMetadata(), $this->context->getPropertyPath());
-                    $validator->atPath(sprintf('children[%s]', $child->getName()))->validate($child, $fieldFormConstraint);
+                    $validator->atPath(sprintf('children[%s]', $child->getName()))->validate($child, $formConstraint);
                 }
             }
 

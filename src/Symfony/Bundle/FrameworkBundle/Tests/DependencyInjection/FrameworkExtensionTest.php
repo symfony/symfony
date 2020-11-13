@@ -1622,6 +1622,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('my_response_factory', (string) $argument);
     }
 
+    public function testRegisterParameterCollectingBehaviorDescribingTags()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
+        $this->assertEquals([
+            'container.service_locator',
+            'container.service_subscriber',
+            'kernel.event_subscriber',
+            'kernel.locale_aware',
+            'kernel.reset',
+        ], $container->getParameter('container.behavior_describing_tags'));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

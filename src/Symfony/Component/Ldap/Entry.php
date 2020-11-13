@@ -116,8 +116,6 @@ class Entry
      *
      * @param string $name          The attribute name
      * @param bool   $caseSensitive Whether the attribute name is case-sensitive
-     *
-     * @return string|null
      */
     private function getAttributeKey(string $name, bool $caseSensitive = true): ?string
     {

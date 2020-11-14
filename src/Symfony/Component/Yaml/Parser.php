@@ -1181,27 +1181,6 @@ class Parser
         }
 
         return $value;
-
-        for ($i = 1; isset($yaml[$i]) && $quotation !== $yaml[$i]; ++$i) {
-        }
-
-        // quoted single line string
-        if (isset($yaml[$i]) && $quotation === $yaml[$i]) {
-            return $yaml;
-        }
-
-        $lines = [$yaml];
-
-        while ($this->moveToNextLine()) {
-            for ($i = 1; isset($this->currentLine[$i]) && $quotation !== $this->currentLine[$i]; ++$i) {
-            }
-
-            $lines[] = trim($this->currentLine);
-
-            if (isset($this->currentLine[$i]) && $quotation === $this->currentLine[$i]) {
-                break;
-            }
-        }
     }
 
     private function lexInlineMapping(string $yaml): string

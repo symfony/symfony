@@ -35,7 +35,7 @@
         </service>
 
         <service id="notifier.transport_factory.firebase" class="Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory" parent="notifier.transport_factory.abstract">
-            <tag name="texter.transport_factory" />
+            <tag name="chatter.transport_factory" />
         </service>
 
         <service id="notifier.transport_factory.freemobile" class="Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory" parent="notifier.transport_factory.abstract">

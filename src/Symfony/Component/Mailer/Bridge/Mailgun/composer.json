@@ -22,6 +22,9 @@
     "require-dev": {
         "symfony/http-client": "^4.3|^5.0"
     },
+    "suggest": {
+        "symfony/http-client": "To enable the \"mailgun+api\" and \"mailgun+https\" transports."
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailgun\\": "" },
         "exclude-from-classmap": [

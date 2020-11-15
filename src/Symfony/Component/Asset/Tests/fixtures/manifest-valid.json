@@ -1,4 +1,5 @@
 {
   "main.js": "main.123abc.js",
-  "css/styles.css": "css/styles.555def.css"
+  "css/styles.css": "css/styles.555def.css",
+  "/css/slash.css": "css/slash.856sh.css"
 }

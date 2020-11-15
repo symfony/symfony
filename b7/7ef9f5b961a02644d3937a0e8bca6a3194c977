@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-27T20:26:37Z
+
+> I wonder if it wouldn't make sens to apply this PR to all transports for consistency?
+
+I think so (let's make sure we are all good on the first one, we have time for 5.3.)
+
+---------------------------------------------------------------------------
+
+by jacekwilczynski at 2020-10-28T10:03:25Z
+
+@jderusse , @chalasr , thanks for the review, I'm really happy to see it so fast :D Forgive me if the question is banal but I couldn't find info in the guidelines: should I push another commit with the fixes or amend the previous one?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-10-28T10:05:38Z
+
+@jacekwilczynski You can amend. If you don't, we will squash your commits when merging the PR
+
+---------------------------------------------------------------------------
+
+by jacekwilczynski at 2020-11-03T14:16:47Z
+
+@chalasr , anything I should still change in this PR?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-03T16:34:36Z
+
+> What I was wondering: Do we really need two ways to construct a `AmazonSqsTransport`? If not, can we change the constructor to this?
+
+Hmm a `Serializer` is required to build a `Receiver` and a `Sender`.. I'm not sure to get what you mean :thinking:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-03T16:55:43Z
+
+> Hmm a `Serializer` is required to build a `Receiver` and a `Sender`..
+
+Is it? Right now, the constructor is able to build a `Receiver` and a `Sender` even if I provide a connection only.
+
+And if you want to change the serializer implementation, you could still do that with the signature I proposed by constructing `Receiver` and `Sender` yourself.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-04T02:33:23Z
+
+> And if you want to change the serializer implementation, you could still do that with the signature I proposed by constructing Receiver and Sender yourself.
+
+I mean, today, all bridges lazy build the sender/receiver (I don't know why. As already pointed in this PR, this looks like a micro-optimization).
+Anyway, removing the serializer (which is currently injected by the TransportFactory regarding the semantic configuration) would break the initial behavior.
+When people provides a custom implementation of Serializer, The factory would have to create a Transport with both a Sender AND a Receiver (which will not be lazy built anymore).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-04T06:49:31Z
+
+Let's keep it that way, thanks for the explanation!

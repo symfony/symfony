@@ -28,9 +28,10 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy = $this->createStrategy('manifest-valid.json');
 
         $this->assertSame('css/styles.555def.css', $strategy->getVersion('css/styles.css'));
+        $this->assertSame('css/styles.555def.css', $strategy->getVersion('/css/styles.css'));
     }
 
-    public function testGetVersionWithoutSlash()
+    public function testGetVersionWithSlash()
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 

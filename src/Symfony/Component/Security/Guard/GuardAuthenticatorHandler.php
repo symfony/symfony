@@ -52,7 +52,7 @@ class GuardAuthenticatorHandler
     /**
      * Authenticates the given token in the system.
      */
-    public function authenticateWithToken(TokenInterface $token, Request $request/*, string $providerKey */)
+    public function authenticateWithToken(TokenInterface $token, Request $request)
     {
         $providerKey = \func_num_args() > 2 ? func_get_arg(2) : null;
 

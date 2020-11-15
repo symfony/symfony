@@ -63,6 +63,16 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
             }
         }
 
-        return isset($this->manifestData[$path]) ? $this->manifestData[$path] : null;
+        return $this->manifestData[$path] ?? $this->getPossiblePath($path);
+    }
+
+    private function getPossiblePath(string $path): ?string
+    {
+        return $this->manifestData[$this->generatePossiblePath($path)] ?? null;
+    }
+
+    private function generatePossiblePath(string $path): string
+    {
+        return 0 === strpos($path, '/') ? ltrim($path, '/') : '/'.$path;
     }
 }

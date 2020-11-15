@@ -15,7 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Laurent Masforné <l.masforne@gmail.com>
@@ -24,16 +23,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class IsinValidator extends ConstraintValidator
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -87,6 +76,6 @@ class IsinValidator extends ConstraintValidator
         }
         $number = implode('', $characters);
 
-        return 0 === $this->validator->validate($number, new Luhn())->count();
+        return 0 === $this->context->getValidator()->validate($number, new Luhn())->count();
     }
 }

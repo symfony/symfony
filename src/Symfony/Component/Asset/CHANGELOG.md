@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * prepend or trim "/" from asset name if not found in `JsonManifestVersionStrategy`
+
 5.1.0
 -----
 

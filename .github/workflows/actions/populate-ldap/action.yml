@@ -1,9 +1,0 @@
-name: 'LDAP Populate'
-description: 'Create a pre-populated LDAP server with symfony test data'
-branding:
-  icon: 'database'
-  color: 'blue'
-
-runs:
-  using: 'docker'
-  image: 'Dockerfile'

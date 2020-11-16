@@ -96,9 +96,8 @@ class LdapManagerTest extends LdapTestCase
         $em->add($entry);
         try {
             $em->add($entry);
-        } catch (LdapException $e) {
+        } finally {
             $em->remove($entry);
-            throw $e;
         }
     }
 
@@ -215,12 +214,12 @@ class LdapManagerTest extends LdapTestCase
         $newEntry = $result[0];
         $originalCN = $entry->getAttribute('cn')[0];
 
-        $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
-        $this->assertContains('Kevin', $newEntry->getAttribute('cn'));
-
-        $entryManager->rename($newEntry, 'cn='.$originalCN);
-
-        $this->executeSearchQuery(1);
+        try {
+            $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
+            $this->assertContains('Kevin', $newEntry->getAttribute('cn'));
+        } finally {
+            $entryManager->rename($newEntry, 'cn='.$originalCN);
+        }
     }
 
     public function testLdapAddRemoveAttributeValues()

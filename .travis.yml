@@ -9,8 +9,6 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
-        - ldap-utils
-        - slapd
         - zookeeperd
         - libzookeeper-mt-dev
 
@@ -163,13 +161,6 @@ before_install:
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
       done
-
-    - |
-      # Load fixtures
-      if [[ ! $skip ]]; then
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif &&
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
-      fi
 
 install:
     - |

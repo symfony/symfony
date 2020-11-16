@@ -22,6 +22,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
 
 /**
  * @requires extension ldap
+ * @group integration
  */
 class AdapterTest extends LdapTestCase
 {
@@ -116,7 +117,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPagination()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig()));
+        $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
         $entries = $this->setupTestUsers($ldap);
 
@@ -147,7 +148,7 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($fully_paged_query->getResources()), 1);
             $this->assertEquals(\count($paged_query->getResources()), 5);
 
-            if (\PHP_MAJOR_VERSION > 7 || (\PHP_MAJOR_VERSION == 7 && \PHP_MINOR_VERSION >= 2)) {
+            if (\PHP_VERSION_ID >= 70200) {
                 // This last query is to ensure that we haven't botched the state of our connection
                 // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
                 // bits to work around an implementation flaw, so we simply can't guarantee this to work there.
@@ -199,7 +200,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPaginationLimits()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig()));
+        $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
         $entries = $this->setupTestUsers($ldap);

@@ -1,0 +1,209 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-07T19:55:36Z
+
+Thank you for starting this PR! Adding LDAP integration tests to the already complex CI set-up of Symfony is a really brave task :)
+
+Let's start with a big disclaimer: I've never used LDAP before, so my knowledge about it is very weak.
+
+Can you maybe share why a custom docker image was used (instead of semi-official ones like [`bitnami/openldap`](https://hub.docker.com/r/bitnami/openldap/))?
+I think it would be good to explore how we can remove this "dependency" on a custom image, in order to reduce maintenance work (and depending on images maintained by a single author is a bit more "risky" than depending on an image maintained by a community or company).
+
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-11-07T21:09:22Z
+
+Well, honestly I'm not into LDAP too. I've just used it for authentication. But I've made a PR which led to a bug that would have been avoided if I had been more accurate with tests. So... this is my way to ask forgiveness..
+
+You're absolutely right: introducing a dependency on a custom image would absolutely be risky. I needed to do it because I needed to push some initial data to the LDAP server, namely, those in [the test env](https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif). And it is precisely what I do in my custom [Dockerfile](https://github.com/lucasaba/symfony-ldap-test-server/blob/main/docker/Dockerfile#L5): I create a folder where I store the data and copy it there. Then, with [the env](https://github.com/lucasaba/symfony/blob/add-ldap-tests/.github/workflows/tests.yml#L50), I tell the image to load it.
+
+I think, the best aproach would be to use the standard image and then, add a step in the action, that pushes the data to the server. In order to do that I should use some command line program like `ldapadd`. And thats where I'm stuck...
+
+Another way would be to create a custom action, which would lead to tha same problem as having a custom docker image.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-07T21:53:54Z
+
+If we really need a custom image (which I'd like to avoid), we should move its maintenance this this repository or at least a repository within the Symfony organization.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-07T22:08:52Z
+
+> If we really need a custom image (which I'd like to avoid), we should move its maintenance this this repository or at least a repository within the Symfony organization.
+
+we even don't need a docker image. Github Action can run Dockerfile directly (https://docs.github.com/en/free-pro-team@latest/actions/creating-actions/creating-a-docker-container-action)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-07T22:17:41Z
+
+We can do this without a custom image I think. The following docker compose config (docker compose isn't needed here, it's just more readable than a docker run command imho) sets up the openldap image with our fixture data (as far as I can see):
+
+```yaml
+version: '3.0'
+
+services:
+    ldap:
+        image: osixia/openldap:1.4.0
+        ports:
+            - 3389:389
+        volumes:
+            - ./src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif:/container/service/slapd/assets/config/bootstrap/ldif/50-bootstrap.ldif
+        command: --copy-service --loglevel debug
+        environment:
+            LDAP_DOMAIN: symfony.com
+            LDAP_BASE_DN: dc=symfony,dc=com
+            LDAP_ADMIN_PASSWORD: 'symfony'
+```
+
+Please note that I can't make the tests pass with this config, so something isn't quite right. But it at least is a start to get custom data in the openldap image without using a custom image.
+
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-11-07T23:51:29Z
+
+@wouterj I've tryed your suggestion. seemd promising! I've mounted a volume with the GHA:
+```yaml
+openldap:
+    image: osixia/openldap:1.4.0
+    options: -v ${{ github.workspace }}/src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif:/ldif-data
+    ports:
+        - 3389:389
+    env:
+        LDAP_DOMAIN: "symfony.com"
+        LDAP_ADMIN_PASSWORD: symfony
+        LDAP_BASE_DN: "dc=symfony,dc=com"
+        LDAP_SEED_INTERNAL_LDIF_PATH: "/ldif-data"
+```
+But in the `Checkout` phase, GHA [tryes to clean-up the workspace](https://github.com/symfony/symfony/runs/1368882113?check_suite_focus=true#step:3:1) and, beeing the volume tied to the image, breaks the pipeline.
+
+I'll try some alternatives and read the article pointed from @jderusse
+
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-11-08T10:31:44Z
+
+> we even don't need a docker image. Github Action can run Dockerfile directly (https://docs.github.com/en/free-pro-team@latest/actions/creating-actions/creating-a-docker-container-action)
+
+At a first impression, that would move the problem. In the sense that, instead of maintaing a docker image, there should be a GHA to maintain.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-08T10:40:43Z
+
+Hmm, according to https://github.com/actions/checkout/issues/211#issuecomment-611986243 the solution would be to run this command before the checkout action:
+
+    sudo chown -R $USER:$USER /home/runner/work/symfony/symfony/src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
+
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-11-08T15:16:03Z
+
+> we even don't need a docker image. Github Action can run Dockerfile directly (https://docs.github.com/en/free-pro-team@latest/actions/creating-actions/creating-a-docker-container-action)
+
+My bad @jderusse ! Indeed, we can [use a local action](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#example-using-action-in-the-same-repository-as-the-workflow) and not depenend on an external one.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-16T12:52:39Z
+
+I squashed your commits @lucasaba rebased, and puh a commit that fix the CI.
+Please, `pull --rebase` before pushing another commit
+
+PR is ready for review @derrabus @wouterj
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-11-16T13:06:25Z
+
+Rebase went wrong? It seems that an unrelated commit landed in this PR https://github.com/symfony/symfony/pull/39030/commits/3510b67b2a5f1ce57e645eb4de742291207d0b73
+
+---------------------------------------------------------------------------
+
+by lucasaba at 2020-11-16T13:15:10Z
+
+Thanks @jderusse ! I didn't think about using actions in that way! Thank you very much!
+The erros on Travis and appveyour seems unrelated.
+
+@chalasr seems ok now. I had some error too. Maybe some cache on github....
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-16T13:26:34Z
+
+@chalasr is right, that does not look right. The content of that commit looks okay, but message and author are from a different PR.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-16T13:55:53Z
+
+> Rebase went wrong? It seems that an unrelated commit landed in this PR [3510b67](https://github.com/symfony/symfony/commit/3510b67b2a5f1ce57e645eb4de742291207d0b73)
+
+Yeah, the commit was there in the original PR (https://github.com/lucasaba/symfony/commit/9de67714ccde40ecab88193aca381369ded57357)  I can reword it or squash it if you want @derrabus
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-16T14:03:14Z
+
+Right now, the commit message is misleading and I'm the author of that commit. I think, squashing it into the second commit and removing me as author would be good. 😃
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-16T14:48:39Z
+
+> derstand anything about what's happening here, but it seems to make the LDAP
+
+For the record. This PR update the CI to:
+- starts an openldap server as a service (like redis/memcache/...)
+- load fixtures
+- deletes the user created by the bitnami/openldap (I didn't found a way to start with basic root setup, BUT WITHOUT demo users generated by LDAP_USERS env variable)
+- remove LDAP calls from travis
+
+Then it fixes tests:
+- restore states of database after successful/failed tests (otherwise, you can't run tests twice)
+- fix SSL bug in connection to LDAP
+- fix wrong exception expected
+
+> unrelated, but I'm a bit scared by amount of integration tests that are skipped on our CI
+
+So do I.. Shall we run tests with option -vv to see the reason of skipped tests?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-16T15:06:03Z
+
+> So do I.. Shall we run tests with option -vv to see the reason of skipped tests?
+
+Yes, that would be good. Integration tests are often skipped if an external system is not available. If we have a CI run dedicated to integration tests, skipped tests are likely an accident.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-16T15:27:01Z
+
+> > So do I.. Shall we run tests with option -vv to see the reason of skipped tests?
+>
+> Yes, that would be good. Integration tests are often skipped if an external system is not available. If we have a CI run dedicated to integration tests, skipped tests are likely an accident.
+
+Done. We have ~200 skipped tests for the following reasons:
+- Testing expiration slows down the test suite
+- Not a pruneable cache pool.
+- Memcached cannot clear by prefix
+- REDIS_SENTINEL_HOSTS env var is not defined.
+- Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard
+
+I'm checking for the REDIS_SENTINEL test.
+Other skipped tests sounds legit to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-16T15:29:46Z
+
+All right, none of them is related to LDAP, so this PR should be good.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-16T15:30:06Z
+
+(fwiw, let's move the conversation of the skipped tests to another PR/issue, so we can merge this asap)

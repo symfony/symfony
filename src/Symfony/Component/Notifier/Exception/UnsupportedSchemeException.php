@@ -42,6 +42,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,
             'package' => 'symfony/nexmo-notifier',
         ],
+        'iqsms' => [
+            'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
+            'package' => 'symfony/iqsms-notifier',
+        ],
         'rocketchat' => [
             'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
             'package' => 'symfony/rocket-chat-notifier',

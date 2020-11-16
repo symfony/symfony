@@ -15,7 +15,6 @@ use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\UpdateOperation;
 use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
@@ -23,6 +22,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
 
 /**
  * @requires extension ldap
+ * @group integration
  */
 class LdapManagerTest extends LdapTestCase
 {
@@ -82,7 +82,7 @@ class LdapManagerTest extends LdapTestCase
      */
     public function testLdapAddDouble()
     {
-        $this->expectException(AlreadyExistsException::class);
+        $this->expectException(LdapException::class);
         $this->executeSearchQuery(1);
 
         $entry = new Entry('cn=Elsa Amrouche,dc=symfony,dc=com', [
@@ -94,7 +94,11 @@ class LdapManagerTest extends LdapTestCase
 
         $em = $this->adapter->getEntryManager();
         $em->add($entry);
-        $em->add($entry);
+        try {
+            $em->add($entry);
+        } finally {
+            $em->remove($entry);
+        }
     }
 
     /**
@@ -210,11 +214,12 @@ class LdapManagerTest extends LdapTestCase
         $newEntry = $result[0];
         $originalCN = $entry->getAttribute('cn')[0];
 
-        $this->assertStringContainsString($originalCN, $newEntry->getAttribute('cn'));
-
-        $entryManager->rename($newEntry, 'cn='.$originalCN);
-
-        $this->executeSearchQuery(1);
+        try {
+            $this->assertContains($originalCN, $newEntry->getAttribute('cn'));
+            $this->assertContains('Kevin', $newEntry->getAttribute('cn'));
+        } finally {
+            $entryManager->rename($newEntry, 'cn='.$originalCN);
+        }
     }
 
     public function testLdapAddRemoveAttributeValues()
@@ -372,7 +377,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
 
         $entry = $result[0];
-        $this->assertNotContains('ou=Ldap', $entry->getDn());
+        $this->assertStringNotContainsString('ou=Ldap', $entry->getDn());
 
         $entryManager = $this->adapter->getEntryManager();
         $entryManager->move($entry, 'ou=Ldap,ou=Components,dc=symfony,dc=com');
@@ -380,5 +385,8 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $movedEntry = $result[0];
         $this->assertStringContainsString('ou=Ldap', $movedEntry->getDn());
+
+        // Move back entry
+        $entryManager->move($movedEntry, 'dc=symfony,dc=com');
     }
 }

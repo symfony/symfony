@@ -95,6 +95,14 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     }
 
     /**
+     * @internal
+     */
+    public function __wakeup(): void
+    {
+        $this->globBrace = \defined('GLOB_BRACE') ? \GLOB_BRACE : 0;
+    }
+
+    /**
      * @return \Traversable
      */
     public function getIterator()

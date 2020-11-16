@@ -15,6 +15,17 @@ jobs:
                 php: ['7.1', '7.4']
 
         services:
+            ldap:
+                image: bitnami/openldap
+                ports:
+                    - 3389:3389
+                env:
+                    LDAP_ADMIN_USERNAME: admin
+                    LDAP_ADMIN_PASSWORD: symfony
+                    LDAP_ROOT: dc=symfony,dc=com
+                    LDAP_PORT_NUMBER: 3389
+                    LDAP_USERS: a
+                    LDAP_PASSWORDS: a
             redis:
                 image: redis:6.0.0
                 ports:
@@ -49,9 +60,15 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     coverage: "none"
-                    extensions: "memcached,redis,xsl"
+                    extensions: "memcached,redis,xsl,ldap"
                     ini-values: "memory_limit=-1"
                     php-version: "${{ matrix.php }}"
+
+            -   name: Load fixtures
+                uses: docker://bitnami/openldap
+                with:
+                  entrypoint: /bin/bash
+                  args: -c "(ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
             -   name: Configure composer
                 run: |
@@ -80,13 +97,15 @@ jobs:
                     echo "::endgroup::"
 
             -   name: Run tests
-                run: ./phpunit --group integration
+                run: ./phpunit --group integration -v
                 env:
                     REDIS_HOST: localhost
                     REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
                     MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
                     MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
                     MEMCACHED_HOST: localhost
+                    LDAP_HOST: localhost
+                    LDAP_PORT: 3389
 
             -   name: Run HTTP push tests
                 if: matrix.php == '7.4'

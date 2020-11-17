@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-5.3.0
------
-
- * Inject `twig` service on `AppVariable` by calling `setTwig`
-
 5.2.0
 -----
 

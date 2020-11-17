@@ -239,6 +239,7 @@ class ResponseCacheStrategyTest extends TestCase
     }
 
     /**
+     * @group time-sensitive
      * @dataProvider cacheControlMergingProvider
      */
     public function testCacheControlMerging(array $expects, array $master, array $surrogates)

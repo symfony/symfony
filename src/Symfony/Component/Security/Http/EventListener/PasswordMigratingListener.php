@@ -13,7 +13,9 @@ namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
@@ -53,7 +55,19 @@ class PasswordMigratingListener implements EventSubscriberInterface
             return;
         }
 
-        $badge->getPasswordUpgrader()->upgradePassword($user, $passwordEncoder->encodePassword($plaintextPassword, $user->getSalt()));
+        $passwordUpgrader = $badge->getPasswordUpgrader();
+        if (null === $passwordUpgrader) {
+            /** @var UserBadge $userBadge */
+            $userBadge = $passport->getBadge(UserBadge::class);
+            $userLoader = $userBadge->getUserLoader();
+            if (\is_array($userLoader) && $userLoader[0] instanceof PasswordUpgraderInterface) {
+                $passwordUpgrader = $userLoader[0];
+            } else {
+                return;
+            }
+        }
+
+        $passwordUpgrader->upgradePassword($user, $passwordEncoder->encodePassword($plaintextPassword, $user->getSalt()));
     }
 
     public static function getSubscribedEvents(): array

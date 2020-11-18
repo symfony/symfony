@@ -15,6 +15,7 @@ CHANGELOG
  * Added `LoginThrottlingListener`.
  * Added `LoginLinkAuthenticator`.
  * Moved methods `supports()` and `authenticate()` from `AbstractListener` to `FirewallListenerInterface`.
+ * [BC break] `PasswordUpgradeBadge::getPasswordUpgrader()` changed its return type to return null or a `PasswordUpgraderInterface` implementation.
 
 5.1.0
 -----

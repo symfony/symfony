@@ -11,9 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
-use Symfony\Bridge\Doctrine\Types\UlidBinaryType;
 use Symfony\Bridge\Doctrine\Types\UlidType;
-use Symfony\Bridge\Doctrine\Types\UuidBinaryType;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,14 +36,6 @@ final class RegisterUidTypePass implements CompilerPassInterface
 
         if (!isset($typeDefinition['ulid'])) {
             $typeDefinition['ulid'] = ['class' => UlidType::class];
-        }
-
-        if (!isset($typeDefinition['uuid_binary'])) {
-            $typeDefinition['uuid_binary'] = ['class' => UuidBinaryType::class];
-        }
-
-        if (!isset($typeDefinition['ulid_binary'])) {
-            $typeDefinition['ulid_binary'] = ['class' => UlidBinaryType::class];
         }
 
         $container->setParameter('doctrine.dbal.connection_factory.types', $typeDefinition);

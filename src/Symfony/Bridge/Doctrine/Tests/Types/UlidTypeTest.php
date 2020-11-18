@@ -38,6 +38,9 @@ final class UlidTypeTest extends TestCase
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform
+            ->method('hasNativeGuidType')
+            ->willReturn(true);
+        $this->platform
             ->method('getGuidTypeDeclarationSQL')
             ->willReturn('DUMMYVARCHAR()');
 

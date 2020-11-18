@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Mime;
 
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\LogicException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -65,6 +66,21 @@ class TemplatedEmail extends Email
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    public function ensureValidity()
+    {
+        if (null === $this->textTemplate && null === $this->htmlTemplate && !$this->getAttachments()) {
+            throw new LogicException('A message must have a text or an HTML part or attachments.');
+        }
+
+        if (!$this->getHeaders()->has('To') && !$this->getHeaders()->has('Cc') && !$this->getHeaders()->has('Bcc')) {
+            throw new LogicException('An email must have a "To", "Cc", or "Bcc" header.');
+        }
+
+        if (!$this->getHeaders()->has('From') && !$this->getHeaders()->has('Sender')) {
+            throw new LogicException('An email must have a "From" or a "Sender" header.');
+        }
     }
 
     /**

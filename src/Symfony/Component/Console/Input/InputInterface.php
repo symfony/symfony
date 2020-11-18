@@ -90,6 +90,27 @@ interface InputInterface
     public function getArgument(string $name);
 
     /**
+     * Returns the argument value for a given argument name as a string.
+     *
+     * @throws InvalidArgumentException When argument given doesn't exist
+     */
+    public function getArgumentString(string $name): string;
+
+    /**
+     * Returns the argument value for a given argument name as an integer.
+     *
+     * @throws InvalidArgumentException When argument given doesn't exist
+     */
+    public function getArgumentInt(string $name): int;
+
+    /**
+     * Returns the argument value for a given argument name as a boolean.
+     *
+     * @throws InvalidArgumentException When argument given doesn't exist
+     */
+    public function getArgumentBoolean(string $name): bool;
+
+    /**
      * Sets an argument value by name.
      *
      * @param string|string[]|null $value The argument value

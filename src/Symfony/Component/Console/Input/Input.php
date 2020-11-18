@@ -198,4 +198,19 @@ abstract class Input implements InputInterface, StreamableInputInterface
     {
         return $this->stream;
     }
+
+    public function getArgumentString(string $name): string
+    {
+        return (string) $this->getArgument($name);
+    }
+
+    public function getArgumentInt(string $name): int
+    {
+        return (int) $this->getArgument($name);
+    }
+
+    public function getArgumentBoolean(string $name): bool
+    {
+        return (bool) $this->getArgument($name);
+    }
 }

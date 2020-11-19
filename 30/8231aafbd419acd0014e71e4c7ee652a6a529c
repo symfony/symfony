@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-08-11T10:19:58Z
+
+@xabbuh Is it something you're still willing to work on?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-15T17:15:09Z
+
+Many thanks to @RevZer0, @simonberger and @Matth--. I have added the tests you added in #37876, #39013, and #39064 here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-15T18:46:18Z
+
+This is ready to be reviewed.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-11-17T16:42:18Z
+
+There is (now) another small issue with escaped backslashes in quotes treated as the escape for the quote.
+
+```
+'escaped backslash in mapping' => [
+                [['"']],
+                <<<YAML
+[
+    ["\\"]
+]
+YAML
+            ]
+```
+
+I got a segmentation error writing the yam like this: `[["\\"]]`. l didn't look further in. Should be related to the problem but maybe a boundary check isn't robust enough.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-17T16:46:32Z
+
+Did you mean `[["\\\\"]]`? `[["\\"]]` isn't valid YAML and runs into a parsing error for me locally.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-11-17T17:00:27Z
+
+Depends how it is declared. In HEREDOC `[["\\"]]`in quotes `'[["\\\\"]]'`.
+There is also for me a parser error when using new lines, but there shouldn't.
+
+`Malformed inline YAML string: ""\"] ]]]" at line 3 (near "]")`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-17T18:08:36Z
+
+@simonberger I don't see a difference here (see also https://3v4l.org/iOVjl). Could you please send a PR with a test case that you have in mind to my branch if you still think that something isn't working as expected?
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-11-17T23:09:01Z
+
+@xabbuh I am sorry. This was indeed my wrong test.

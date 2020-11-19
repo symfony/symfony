@@ -25,7 +25,14 @@ abstract class AbstractUidType extends Type
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getGuidTypeDeclarationSQL($column);
+        if ($platform->hasNativeGuidType()) {
+            return $platform->getGuidTypeDeclarationSQL($column);
+        }
+
+        return $platform->getBinaryTypeDeclarationSQL([
+            'length' => '16',
+            'fixed' => true,
+        ]);
     }
 
     /**
@@ -57,8 +64,10 @@ abstract class AbstractUidType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
+        $toString = $platform->hasNativeGuidType() ? 'toRfc4122' : 'toBinary';
+
         if ($value instanceof AbstractUid) {
-            return $value->toRfc4122();
+            return $value->$toString();
         }
 
         if (null === $value || '' === $value) {
@@ -70,7 +79,7 @@ abstract class AbstractUidType extends Type
         }
 
         try {
-            return $this->getUidClass()::fromString($value)->toRfc4122();
+            return $this->getUidClass()::fromString($value)->$toString();
         } catch (\InvalidArgumentException $e) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }

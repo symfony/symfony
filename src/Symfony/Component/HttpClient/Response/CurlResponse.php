@@ -283,10 +283,7 @@ final class CurlResponse implements ResponseInterface
                     curl_multi_remove_handle($multi->handle, $ch);
                     $waitFor[1] = (string) ((int) $waitFor[1] - 1); // decrement the retry counter
                     curl_setopt($ch, \CURLOPT_PRIVATE, $waitFor);
-
-                    if ('1' === $waitFor[1]) {
-                        curl_setopt($ch, \CURLOPT_HTTP_VERSION, \CURL_HTTP_VERSION_1_1);
-                    }
+                    curl_setopt($ch, \CURLOPT_FORBID_REUSE, true);
 
                     if (0 === curl_multi_add_handle($multi->handle, $ch)) {
                         continue;

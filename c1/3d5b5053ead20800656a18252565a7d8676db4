@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-19T00:20:36Z
+
+Is it possible to change your mind on this? Storing a UUID as string on MySQL seems to be inferior to storing it in `BINARY(16)`. That's not only about storage, but also about index size.
+
+MySQL ships with functions like `UUID_TO_BIN()` and `BIN_TO_UUID()`, dedicated to the binary storage of UUIDs. `BINARY(16)` is MySQL's poor man's version of a native UUID type. https://dev.mysql.com/doc/refman/8.0/en/miscellaneous-functions.html#function_uuid-to-bin
+
+And you know, if the project is already running on MySQL, "use Postgres" is not really a viable option.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-19T00:27:59Z
+
+Instead of defaulting to a varchar, we could default to binary when a DB storage doesn't have a native GUID type.
+But I don't think providing a choice to users for this is really needed. Eg if MySQL has functions to represent `BINARY(16)` as uuids, then we should definitely use `BINARY(16)` when the type is declared as `uuid` or `ulid`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-19T00:44:36Z
+
+@derrabus updated to my last proposal.

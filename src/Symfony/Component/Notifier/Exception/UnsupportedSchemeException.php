@@ -148,6 +148,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Smsc\SmscTransportFactory::class,
             'package' => 'symfony/smsc-notifier',
         ],
+        'sns' => [
+            'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
+            'package' => 'symfony/amazon-sns-notifier',
+        ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',

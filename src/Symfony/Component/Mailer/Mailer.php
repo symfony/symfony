@@ -45,9 +45,9 @@ final class Mailer implements MailerInterface
         }
 
         if (null !== $this->dispatcher) {
-            $clonedMessage = clone $message;
-            $clonedEnvelope = null !== $envelope ? clone $envelope : Envelope::create($clonedMessage);
-            $event = new MessageEvent($clonedMessage, $clonedEnvelope, (string) $this->transport, true);
+            $message = clone $message;
+            $clonedEnvelope = null !== $envelope ? clone $envelope : Envelope::create($message);
+            $event = new MessageEvent($message, $clonedEnvelope, (string) $this->transport, true);
             $this->dispatcher->dispatch($event);
         }
 

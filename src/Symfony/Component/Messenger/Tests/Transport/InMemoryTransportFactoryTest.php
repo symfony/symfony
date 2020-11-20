@@ -49,6 +49,35 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
     }
 
+    public function testCreateTransportWithoutSerializer()
+    {
+        /** @var SerializerInterface $serializer */
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer
+            ->expects($this->never())
+            ->method('encode')
+        ;
+        $transport = $this->factory->createTransport('in-memory://?serialize=false', [], $serializer);
+        $message = Envelope::wrap(new DummyMessage('Hello.'));
+        $transport->send($message);
+
+        $this->assertSame([$message], $transport->get());
+    }
+
+    public function testCreateTransportWithSerializer()
+    {
+        /** @var SerializerInterface $serializer */
+        $serializer = $this->createMock(SerializerInterface::class);
+        $message = Envelope::wrap(new DummyMessage('Hello.'));
+        $serializer
+            ->expects($this->once())
+            ->method('encode')
+            ->with($this->equalTo($message))
+        ;
+        $transport = $this->factory->createTransport('in-memory://?serialize=true', [], $serializer);
+        $transport->send($message);
+    }
+
     public function testResetCreatedTransports()
     {
         $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
@@ -63,6 +92,8 @@ class InMemoryTransportFactoryTest extends TestCase
     {
         return [
             'Supported' => ['in-memory://foo'],
+            'Serialize enabled' => ['in-memory://?serialize=true'],
+            'Serialize disabled' => ['in-memory://?serialize=false'],
             'Unsupported' => ['amqp://bar', false],
         ];
     }

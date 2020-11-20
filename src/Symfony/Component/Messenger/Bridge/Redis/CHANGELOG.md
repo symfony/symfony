@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Implement `MessageCountAwareInterface`
+
 5.2.0
 -----
 

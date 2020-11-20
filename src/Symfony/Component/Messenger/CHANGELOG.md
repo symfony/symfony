@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+* `RedisTransport` implement `MessageCountAwareInterface`
 
 5.2.0
 -----

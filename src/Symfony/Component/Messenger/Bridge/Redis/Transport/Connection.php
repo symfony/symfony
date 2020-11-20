@@ -474,6 +474,19 @@ class Connection
         $this->autoSetup = false;
     }
 
+    public function getMessageCount(): int
+    {
+        if ($this->autoSetup) {
+            $this->setup();
+        }
+
+        try {
+            return $this->connection->xLen($this->stream);
+        } catch (\RedisException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
+
     private function getCurrentTimeInMilliseconds(): int
     {
         return (int) (microtime(true) * 1000);

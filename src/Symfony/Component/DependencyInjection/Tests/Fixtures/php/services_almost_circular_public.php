@@ -33,6 +33,9 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'connection4' => 'getConnection4Service',
             'dispatcher' => 'getDispatcherService',
             'dispatcher2' => 'getDispatcher2Service',
+            'doctrine.entity_listener_resolver' => 'getDoctrine_EntityListenerResolverService',
+            'doctrine.entity_manager' => 'getDoctrine_EntityManagerService',
+            'doctrine.listener' => 'getDoctrine_ListenerService',
             'foo' => 'getFooService',
             'foo2' => 'getFoo2Service',
             'foo4' => 'getFoo4Service',
@@ -48,11 +51,15 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'mailer.transport' => 'getMailer_TransportService',
             'mailer.transport_factory' => 'getMailer_TransportFactoryService',
             'mailer.transport_factory.amazon' => 'getMailer_TransportFactory_AmazonService',
+            'mailer_inline.transport_factory' => 'getMailerInline_TransportFactoryService',
+            'mailer_inline.transport_factory.amazon' => 'getMailerInline_TransportFactory_AmazonService',
             'manager' => 'getManagerService',
             'manager2' => 'getManager2Service',
             'manager3' => 'getManager3Service',
             'monolog.logger' => 'getMonolog_LoggerService',
             'monolog.logger_2' => 'getMonolog_Logger2Service',
+            'monolog_inline.logger' => 'getMonologInline_LoggerService',
+            'monolog_inline.logger_2' => 'getMonologInline_Logger2Service',
             'pA' => 'getPAService',
             'pB' => 'getPBService',
             'pC' => 'getPCService',
@@ -83,12 +90,14 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
             'bar6' => true,
             'config' => true,
             'config2' => true,
+            'doctrine.config' => true,
             'level2' => true,
             'level3' => true,
             'level4' => true,
             'level5' => true,
             'level6' => true,
             'logger2' => true,
+            'mailer_inline.mailer' => true,
             'manager4' => true,
             'multiuse1' => true,
             'subscriber2' => true,
@@ -258,6 +267,42 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $instance->subscriber2 = new \stdClass(($this->services['manager2'] ?? $this->getManager2Service()));
 
         return $instance;
+    }
+
+    /**
+     * Gets the public 'doctrine.entity_listener_resolver' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getDoctrine_EntityListenerResolverService()
+    {
+        return $this->services['doctrine.entity_listener_resolver'] = new \stdClass(new RewindableGenerator(function () {
+            yield 0 => ($this->services['doctrine.listener'] ?? $this->getDoctrine_ListenerService());
+        }, 1));
+    }
+
+    /**
+     * Gets the public 'doctrine.entity_manager' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getDoctrine_EntityManagerService()
+    {
+        $a = new \stdClass();
+        $a->resolver = ($this->services['doctrine.entity_listener_resolver'] ?? $this->getDoctrine_EntityListenerResolverService());
+        $a->flag = 'ok';
+
+        return $this->services['doctrine.entity_manager'] = \FactoryChecker::create($a);
+    }
+
+    /**
+     * Gets the public 'doctrine.listener' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getDoctrine_ListenerService()
+    {
+        return $this->services['doctrine.listener'] = new \stdClass(($this->services['doctrine.entity_manager'] ?? $this->getDoctrine_EntityManagerService()));
     }
 
     /**
@@ -449,13 +494,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailer_TransportService()
     {
-        $a = ($this->services['mailer.transport_factory'] ?? $this->getMailer_TransportFactoryService());
-
-        if (isset($this->services['mailer.transport'])) {
-            return $this->services['mailer.transport'];
-        }
-
-        return $this->services['mailer.transport'] = $a->create();
+        return $this->services['mailer.transport'] = ($this->services['mailer.transport_factory'] ?? $this->getMailer_TransportFactoryService())->create();
     }
 
     /**
@@ -467,7 +506,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         return $this->services['mailer.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () {
             yield 0 => ($this->services['mailer.transport_factory.amazon'] ?? $this->getMailer_TransportFactory_AmazonService());
-        }, 1));
+            yield 1 => ($this->services['mailer_inline.transport_factory.amazon'] ?? $this->getMailerInline_TransportFactory_AmazonService());
+        }, 2));
     }
 
     /**
@@ -477,13 +517,29 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getMailer_TransportFactory_AmazonService()
     {
-        $a = ($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service());
+        return $this->services['mailer.transport_factory.amazon'] = new \stdClass(($this->services['monolog.logger_2'] ?? $this->getMonolog_Logger2Service()));
+    }
 
-        if (isset($this->services['mailer.transport_factory.amazon'])) {
-            return $this->services['mailer.transport_factory.amazon'];
-        }
+    /**
+     * Gets the public 'mailer_inline.transport_factory' shared service.
+     *
+     * @return \FactoryCircular
+     */
+    protected function getMailerInline_TransportFactoryService()
+    {
+        return $this->services['mailer_inline.transport_factory'] = new \FactoryCircular(new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
+    }
 
-        return $this->services['mailer.transport_factory.amazon'] = new \stdClass($a);
+    /**
+     * Gets the public 'mailer_inline.transport_factory.amazon' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMailerInline_TransportFactory_AmazonService()
+    {
+        return $this->services['mailer_inline.transport_factory.amazon'] = new \stdClass(($this->services['monolog_inline.logger_2'] ?? $this->getMonologInline_Logger2Service()));
     }
 
     /**
@@ -558,6 +614,34 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->services['monolog.logger_2'] = $instance = new \stdClass();
 
         $instance->handler = ($this->services['mailer.transport'] ?? $this->getMailer_TransportService());
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'monolog_inline.logger' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMonologInline_LoggerService()
+    {
+        $this->services['monolog_inline.logger'] = $instance = new \stdClass();
+
+        $instance->handler = ($this->privates['mailer_inline.mailer'] ?? $this->getMailerInline_MailerService());
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'monolog_inline.logger_2' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMonologInline_Logger2Service()
+    {
+        $this->services['monolog_inline.logger_2'] = $instance = new \stdClass();
+
+        $instance->handler = ($this->privates['mailer_inline.mailer'] ?? $this->getMailerInline_MailerService());
 
         return $instance;
     }
@@ -689,6 +773,16 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $a->call($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the private 'mailer_inline.mailer' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getMailerInline_MailerService()
+    {
+        return $this->privates['mailer_inline.mailer'] = new \stdClass(($this->services['mailer_inline.transport_factory'] ?? $this->getMailerInline_TransportFactoryService())->create());
     }
 
     /**

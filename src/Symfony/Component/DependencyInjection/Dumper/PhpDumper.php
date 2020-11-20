@@ -420,7 +420,7 @@ EOF;
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if (!($definition = $node->getValue()) instanceof Definition || $sourceId === $id || ($edge->isLazy() && ($this->proxyDumper ?? $this->getProxyDumper())->isProxyCandidate($definition)) || $edge->isWeak()) {
+            if ($sourceId === $id || !$node->getValue() instanceof Definition || $edge->isLazy() || $edge->isWeak()) {
                 continue;
             }
 

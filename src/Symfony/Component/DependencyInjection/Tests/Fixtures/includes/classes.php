@@ -128,6 +128,18 @@ class FactoryCircular
     }
 }
 
+class FactoryChecker
+{
+    public static function create($config)
+    {
+        if (!isset($config->flag)) {
+            throw new \LogicException('The injected config must contain a "flag" property.');
+        }
+
+        return new stdClass();
+    }
+}
+
 class FoobarCircular
 {
     public function __construct(FooCircular $foo)

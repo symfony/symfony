@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2020-11-14T11:28:20Z
+
+Can you please update the component's CHANGELOG? This is for 5.3.
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-11-16T08:58:41Z
+
+> Can you please update the component's CHANGELOG? This is for 5.3.
+
+So I need to create CHANGELOG-5.3.md ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-11-16T11:00:48Z
+
+@tyx Nope, you need to add a new `5.3.0` section at the top of the https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Messenger/CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by tyx at 2020-11-16T13:29:00Z
+
+Ok done !

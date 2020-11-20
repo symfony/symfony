@@ -399,4 +399,21 @@ class ConnectionTest extends TestCase
         $connection->reject($message['id']);
         $redis->del('messenger-lazy');
     }
+
+    public function testGetMessageCount()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/message-count?delete_after_ack=true', [], $redis);
+        $redis->del('message-count');
+
+        $connection->add('first', []);
+        $this->assertEquals(1, $messageCountStart = $connection->getMessageCount());
+        $connection->add('second', []);
+        $this->assertEquals($messageCountStart + 1, $connection->getMessageCount());
+
+        $this->assertNotEmpty($message = $connection->get());
+        $connection->ack($message['id']);
+        $this->assertEquals($messageCountStart, $connection->getMessageCount());
+        $redis->del('message-count');
+    }
 }

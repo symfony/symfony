@@ -7,6 +7,22 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.0-RC2 (2020-11-21)
+
+ * bug #39113 [DoctrineBridge] drop binary variants of UID types (nicolas-grekas)
+ * feature #39111 [Security] Update password upgrader listener to work with the new UserBadge (wouterj)
+ * bug #39083 [Dotenv] Check if method inheritEnvironmentVariables exists (Chi-teck)
+ * bug #39094 [Ldap] Fix undefined variable $con (derrabus)
+ * bug #39091 [Config] Recheck glob brace support after GlobResource was serialized (wouterj)
+ * bug #39092 Fix critical extension when reseting paged control (jderusse)
+ * bug #38614 [HttpFoundation] Fix for virtualhosts based on URL path (mvorisek)
+ * bug #39072 [FrameworkBundle] [Notifier] fix firebase transport factory DI tag type (xabbuh)
+ * bug #39070 [Validator] Remove IsinValidator's validator dependency (derrabus)
+ * bug #38387 [Validator] prevent hash collisions caused by reused object hashes (fancyweb, xabbuh)
+ * bug #38999 [DependencyInjection] autoconfigure behavior describing tags on decorators (xabbuh)
+ * bug #39058 [DependencyInjection] Fix circular detection with multiple paths (jderusse)
+ * bug #39059 [Filesystem] fix cleaning up tmp files when dumpFile() fails (nicolas-grekas)
+
 * 5.2.0-RC1 (2020-11-10)
 
  * bug #39004 [Messenger] Fix JSON deserialization of ErrorDetailsStamp and normalization of FlattenException::$statusText (Jean85)

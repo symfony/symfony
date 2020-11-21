@@ -1662,6 +1662,16 @@ EOF;
 YAML
                 ,
             ],
+            'mapping with unquoted strings and values' => [
+                ['foo' => 'bar', 'bar' => 'baz'],
+                <<<YAML
+{
+    foo: bar,
+    bar: baz
+}
+YAML
+                ,
+            ],
             'sequence' => [
                 ['foo', 'bar'],
                 <<<YAML
@@ -1671,6 +1681,53 @@ YAML
 ]
 YAML
                 ,
+            ],
+            'sequence with unquoted items' => [
+                ['foo', 'bar'],
+                <<<YAML
+[
+    foo,
+    bar
+]
+YAML
+                ,
+            ],
+            'nested mapping terminating at end of line' => [
+                [
+                    'foo' => [
+                        'bar' => 'foobar',
+                    ],
+                ],
+                <<<YAML
+{ foo: { bar: foobar }
+}
+YAML
+                ,
+            ],
+            'nested sequence terminating at end of line' => [
+                [
+                    'foo',
+                    [
+                        'bar',
+                        'baz',
+                    ],
+                ],
+                <<<YAML
+[ foo, [bar, baz]
+]
+YAML
+            ],
+            'nested sequence spanning multiple lines' => [
+                [
+                    ['entry1', []],
+                    ['entry2'],
+                ],
+                <<<YAML
+[
+    ['entry1', {}],
+    ['entry2']
+]
+YAML
             ],
             'sequence nested in mapping' => [
                 ['foo' => ['bar', 'foobar'], 'bar' => ['baz']],
@@ -1697,6 +1754,22 @@ foobar: [foo,
 ]
 YAML
                 ,
+            ],
+            'sequence spanning multiple lines nested in mapping with a following mapping' => [
+                [
+                    'foobar' => [
+                        'foo',
+                        'bar',
+                    ],
+                    'bar' => 'baz',
+                ],
+                <<<YAML
+foobar: [
+    foo,
+    bar,
+]
+bar: baz
+YAML
             ],
             'nested sequence nested in mapping starting on the same line' => [
                 [
@@ -1825,6 +1898,110 @@ foo: 'bar
 baz'
 YAML
             ],
+            'mixed mapping with inline notation having separated lines' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {
+    key: "value",
+    a: "b"
+}
+param: "some"
+YAML
+            ],
+            'mixed mapping with inline notation on one line' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {key: "value", a: "b"}
+param: "some"
+YAML
+            ],
+            'mixed mapping with compact inline notation on one line' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {key: "value",
+a: "b"}
+param: "some"
+YAML
+            ],
+            'nested collections containing strings with bracket chars' => [
+                [
+                    [']'],
+                    ['}'],
+                    ['ba[r'],
+                    ['[ba]r'],
+                    ['bar]'],
+                    ['foo' => 'bar{'],
+                    ['foo' => 'b{ar}'],
+                    ['foo' => 'bar}'],
+                ],
+                <<<YAML
+[
+    [
+        "]"
+    ],
+    [
+        "}"
+    ],
+    [
+        "ba[r"
+    ],
+    [
+        '[ba]r'
+    ],
+    [
+        "bar]"
+    ],
+    {
+        foo: "bar{"
+    },
+    {
+        foo: "b{ar}"
+    },
+    {
+        foo: 'bar}'
+    }
+]
+YAML
+            ],
+            'escaped characters in quoted strings' => [
+                [
+                    ['te"st'],
+                    ['test'],
+                    ["te'st"],
+                    ['te"st]'],
+                    ['te"st'],
+                    ['test'],
+                    ["te'st"],
+                    ['te"st]'],
+                ],
+                <<<YAML
+[
+    ["te\"st"],["test"],['te''st'],["te\"st]"],
+    ["te\"st"],
+    ["test"],
+    ['te''st'],
+    ["te\"st]"]
+]
+YAML
+            ],
         ];
     }
 
@@ -1844,6 +2021,13 @@ YAML;
     public function testTaggedInlineMapping()
     {
         $this->assertEquals(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testInvalidInlineSequenceContainingStringWithEscapedQuotationCharacter()
+    {
+        $this->expectException(ParseException::class);
+
+        $this->parser->parse('["\\"]');
     }
 
     /**

@@ -99,17 +99,12 @@ jobs:
 
             -   name: Install system dependencies
                 run: |
-                    echo "::group::add apt sources"
-                    sudo wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
-                    echo "deb http://packages.couchbase.com/ubuntu bionic bionic/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
-                    echo "::endgroup::"
-
                     echo "::group::apt-get update"
                     sudo apt-get update
                     echo "::endgroup::"
 
                     echo "::group::install tools & libraries"
-                    sudo apt-get install libcouchbase-dev librdkafka-dev
+                    sudo apt-get install librdkafka-dev
                     echo "::endgroup::"
 
             -   name: Configure Couchbase
@@ -127,6 +122,11 @@ jobs:
                     ini-values: "memory_limit=-1"
                     php-version: "${{ matrix.php }}"
                     tools: pecl
+
+            -   name: Display versions
+                run: |
+                    php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+                    php -i
 
             -   name: Load fixtures
                 uses: docker://bitnami/openldap

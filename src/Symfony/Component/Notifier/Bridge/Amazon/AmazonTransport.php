@@ -27,7 +27,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class AmazonTransport extends AbstractTransport
 {
-
     /** @var SnsClient */
     private $snsClient;
 
@@ -40,6 +39,7 @@ final class AmazonTransport extends AbstractTransport
     public function __toString(): string
     {
         $configuration = $this->snsClient->getConfiguration();
+
         return sprintf('sns://%s?region=%s', $this->getEndpoint(), $configuration->get('region'));
     }
 
@@ -56,10 +56,10 @@ final class AmazonTransport extends AbstractTransport
 
         $response = $this->snsClient->publish([
             'Message' => $message->getSubject(),
-            'PhoneNumber' => $message->getPhone()
+            'PhoneNumber' => $message->getPhone(),
         ]);
 
-        $message = new SentMessage($message, (string)$this);
+        $message = new SentMessage($message, (string) $this);
         $message->setMessageId($response->getMessageId());
 
         return $message;

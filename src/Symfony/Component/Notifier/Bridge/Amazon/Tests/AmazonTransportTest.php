@@ -19,7 +19,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 
 class AmazonTransportTest extends TestCase
 {
-
     public function testSupportsMessageInterface()
     {
         $transport = new AmazonTransport($this->createMock(SnsClient::class));

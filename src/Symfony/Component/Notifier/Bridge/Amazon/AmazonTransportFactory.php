@@ -31,12 +31,13 @@ final class AmazonTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
 
-        if ($scheme === self::DSN_SCHEME) {
+        if (self::DSN_SCHEME === $scheme) {
             $options = [
                 'region' => $dsn->getOption('region') ?: 'eu-west-1',
                 'accessKeyId' => $dsn->getUser(),
                 'accessKeySecret' => $dsn->getPassword(),
             ];
+
             return new AmazonTransport(new SnsClient(Configuration::create($options)));
         }
 

@@ -26,7 +26,7 @@ class AmazonTransportFactoryTest extends TestCase
         $transport = $factory->create(Dsn::fromString($dsn));
         $transport->setHost('sns.host');
 
-        $this->assertSame('sns://sns.host?region=eu-west-3', (string)$transport);
+        $this->assertSame('sns://sns.host?region=eu-west-3', (string) $transport);
     }
 
     public function testDefaultRegionIsCorrectlySet(): void
@@ -37,7 +37,7 @@ class AmazonTransportFactoryTest extends TestCase
         $transport = $factory->create(Dsn::fromString($dsn));
         $transport->setHost('sns.host');
 
-        $this->assertSame('sns://sns.host?region=eu-west-1', (string)$transport);
+        $this->assertSame('sns://sns.host?region=eu-west-1', (string) $transport);
     }
 
     public function testSupportsSnsScheme(): void

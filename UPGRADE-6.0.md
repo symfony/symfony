@@ -226,6 +226,11 @@ Validator
       ->addDefaultDoctrineAnnotationReader();
   ```
 
+Serializer
+----------
+
+ * Removed the denormalization of scalar values without normalizer, add the `BuiltinTypeDenormalizer` to the `Serializer`
+
 Yaml
 ----
 

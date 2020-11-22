@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\BuiltinTypeDenormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
@@ -193,6 +194,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
 
         // Check for a denormalizer first, e.g. the data is wrapped
         if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
+            trigger_deprecation('symfony/serializer', '5.2', 'Denormalizing scalar values without registering the "%s" is deprecated.', BuiltinTypeDenormalizer::class);
+
             if (!('is_'.$type)($data)) {
                 throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)));
             }

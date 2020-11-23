@@ -61,4 +61,23 @@ class SodiumVaultTest extends TestCase
 
         $this->assertSame([], $vault->list());
     }
+
+    public function testKeysFallback()
+    {
+        $vault = new SodiumVault($this->secretsDir);
+        $this->assertTrue($vault->generateKeys());
+
+        $vault->seal('foo', 'bar');
+        $this->assertSame('bar', $vault->reveal('foo'));
+
+        $vault = new SodiumVault($this->secretsDir, str_repeat('X', \SODIUM_CRYPTO_BOX_KEYPAIRBYTES));
+        $this->assertSame('bar', $vault->reveal('foo'));
+
+        unlink($this->secretsDir.'/test.decrypt.private.php');
+
+        $vault = new SodiumVault($this->secretsDir, str_repeat('X', \SODIUM_CRYPTO_BOX_KEYPAIRBYTES));
+
+        $this->assertNull($vault->reveal('foo'));
+        $this->assertStringContainsString('cannot be revealed as the wrong decryption key was provided', $vault->getLastMessage());
+    }
 }

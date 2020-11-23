@@ -120,6 +120,14 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
         }
 
         if (false === $value = sodium_crypto_box_seal_open(include $file, $this->decryptionKey)) {
+            if (null === $this->encryptionKey) {
+                $this->decryptionKey = null;
+
+                if (null !== $value = $this->reveal($name)) {
+                    return $value;
+                }
+            }
+
             $this->lastMessage = sprintf('Secret "%s" cannot be revealed as the wrong decryption key was provided for "%s".', $name, $this->getPrettyPath(\dirname($this->pathPrefix).\DIRECTORY_SEPARATOR));
 
             return null;

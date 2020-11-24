@@ -451,7 +451,10 @@ class SymfonyStyle extends OutputStyle
     {
         // We need to know if the two last chars are PHP_EOL
         // Preserve the last 4 chars inserted (PHP_EOL on windows is two chars) in the history buffer
-        $this->bufferedOutput->write(substr($message, -4), $newLine, $type);
+        $messages = array_map(function ($value) {
+            return substr($value, -4);
+        }, array_merge([$this->bufferedOutput->fetch()], (array) $message));
+        $this->bufferedOutput->write($messages, $newLine, $type);
     }
 
     private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array

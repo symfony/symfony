@@ -37,13 +37,14 @@ final class Dotenv
     private $values;
     private $envKey;
     private $debugKey;
+    private $runtimeEnvKey;
     private $prodEnvs = ['prod'];
     private $usePutenv = false;
 
     /**
      * @param string $envKey
      */
-    public function __construct($envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
+    public function __construct($envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG', string $runtimeEnvKey = 'APP_RUNTIME_ENV')
     {
         if (\in_array($envKey = (string) $envKey, ['1', ''], true)) {
             trigger_deprecation('symfony/dotenv', '5.1', 'Passing a boolean to the constructor of "%s" is deprecated, use "Dotenv::usePutenv()".', __CLASS__);
@@ -53,6 +54,7 @@ final class Dotenv
 
         $this->envKey = $envKey;
         $this->debugKey = $debugKey;
+        $this->runtimeEnvKey = $runtimeEnvKey;
     }
 
     /**
@@ -147,11 +149,12 @@ final class Dotenv
      */
     public function bootEnv(string $path, string $defaultEnv = 'dev', array $testEnvs = ['test']): void
     {
-        $p = $path.'.local.php';
-        $env = is_file($p) ? include $p : null;
         $k = $this->envKey;
+        $envName = $_SERVER[$k] ?? $_ENV[$k] ?? null;
+        $runtimeEnvName = $_SERVER[$this->runtimeEnvKey] ?? $_ENV[$this->runtimeEnvKey] ?? $envName;
+        $env = $runtimeEnvName === $envName && is_file($p = $path.'.local.php') ? include $p : null;
 
-        if (\is_array($env) && (!isset($env[$k]) || ($_SERVER[$k] ?? $_ENV[$k] ?? $env[$k]) === $env[$k])) {
+        if (\is_array($env) && (!isset($env[$k], $envName) || $envName === $env[$k])) {
             $this->populate($env);
         } else {
             $this->loadEnv($path, $k, $defaultEnv, $testEnvs);

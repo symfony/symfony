@@ -493,7 +493,16 @@ class DotenvTest extends TestCase
         $this->assertSame('1', $_SERVER['TEST_APP_DEBUG']);
 
         unset($_SERVER['FOO'], $_ENV['FOO']);
+        // keep .env.local.php around
+        file_put_contents($path, 'FOO=BUZ');
+
+        $_SERVER['TEST_APP_RUNTIME_ENV'] = 'test';
+        (new Dotenv('TEST_APP_ENV', 'TEST_APP_DEBUG', 'TEST_APP_RUNTIME_ENV'))->bootEnv($path);
+        $this->assertSame('BUZ', $_SERVER['FOO']);
+
+        unset($_SERVER['FOO'], $_ENV['FOO']);
         unlink($path.'.local.php');
+        unlink($path);
         rmdir($tmpdir);
     }
 }

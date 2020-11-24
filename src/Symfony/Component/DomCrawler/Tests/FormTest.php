@@ -571,6 +571,9 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost/foo/bar');
         $this->assertEquals('http://localhost/foo/bar', $form->getUri(), '->getUri() returns path if no action defined');
+
+        $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost/foo/bar?login_attempt=1');
+        $this->assertEquals('http://localhost/foo/bar?login_attempt=1', $form->getUri(), '->getUri() returns path if no action defined');
     }
 
     public function testGetUriWithActionOverride()

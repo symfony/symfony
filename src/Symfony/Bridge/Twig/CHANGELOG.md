@@ -2,10 +2,11 @@ CHANGELOG
 =========
 
 5.3
------
+---
 
 * Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
 * Add a new `fragment_uri()` helper to generate the URI of a fragment
+* Add support of Bootstrap 5 for form theming
 
 5.3.0
 -----

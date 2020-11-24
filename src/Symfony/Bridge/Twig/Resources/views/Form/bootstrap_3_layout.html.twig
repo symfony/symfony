@@ -54,6 +54,11 @@
     {%- endif -%}
 {%- endblock radio_widget %}
 
+{% block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed %}
+
 {# Labels #}
 
 {% block form_label -%}

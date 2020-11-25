@@ -39,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Mailer\Command\MailerSendEmailCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -132,6 +133,12 @@ return static function (ContainerConfigurator $container) {
                 tagged_locator('event_dispatcher.dispatcher'),
             ])
             ->tag('console.command', ['command' => 'debug:event-dispatcher'])
+
+        ->set('console.command.mailer_send_email', MailerSendEmailCommand::class)
+            ->args([
+                service('mailer.mailer'),
+            ])
+            ->tag('console.command', ['command' => 'mailer:send-email'])
 
         ->set('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)
             ->args([

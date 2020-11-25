@@ -87,6 +87,7 @@ use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
+use Symfony\Component\Mailer\Command\MailerSendEmailCommand;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -386,6 +387,10 @@ class FrameworkExtension extends Extension
 
         if ($this->mailerConfigEnabled = $this->isConfigEnabled($container, $config['mailer'])) {
             $this->registerMailerConfiguration($config['mailer'], $container, $loader);
+        }
+
+        if (false === $this->mailerConfigEnabled || false === class_exists(MailerSendEmailCommand::class)) {
+            $container->removeDefinition('console.command.mailer_send_email');
         }
 
         if ($this->notifierConfigEnabled = $this->isConfigEnabled($container, $config['notifier'])) {

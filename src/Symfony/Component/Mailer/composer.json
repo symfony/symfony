@@ -33,7 +33,8 @@
         "symfony/mailchimp-mailer": "^4.4|^5.0",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/postmark-mailer": "^4.4|^5.0",
-        "symfony/sendgrid-mailer": "^4.4|^5.0"
+        "symfony/sendgrid-mailer": "^4.4|^5.0",
+        "symfony/console": "^4.4|^5.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4"

@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added the `mailer` monolog channel and set it on all transport definitions
+ * added `console mailer:send-email` command to check if your mailer configuration or supplier is (still) operational
+
 
 5.2.0
 -----

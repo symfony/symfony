@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-24T13:12:42Z
+
+> The bug exists on lower branches, isn't it?
+> Can we mark the new class as internal to make this target 4.4?
+
+Thanks, I picked the wrong base branch when creating the PR
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-11-24T18:23:20Z
+
+I'm not sure we need to fix this "issue". In the original issue report, the reproducer in #39156 is a code that writes a string 26 millions of times. How is that realistic?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-24T18:29:19Z
+
+@javiereguiluz the original laravel issue was abotu a long-running command outputting lots of different things. The minimal reproducer is not meant to be a realistic case, but a minimal case.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-11-24T18:52:18Z
+
+The original Laravel issue report says that this problem occurs _"After running it for a long time"_. How long is "long" considered here? Hours? Days? Weeks? I wouldn't try to fix this because for now it looks like a "non issue". (In PHP you must restart long-running processes from time to time to avoid these "memory leaks" or other issues, right?)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-24T19:43:24Z
+
+The script leaks. The fix is not that complexe...
+I don't understand why we shouldn't fix it...
+
+> In PHP you must restart long-running processes from time to time to avoid these "memory leaks" or other issues, right?)
+
+NOooo!!!! Why people believe that having a memory leak is the normal behavior?
+
+I hope I won't offend you @javiereguiluz , but I'm really tired of people saying PHP sucks and have a bad memory management.
+Running a PHP script for days is perfectly fine!
+
+---------------------------------------------------------------------------
+
+by z5864703 at 2020-11-25T01:55:15Z
+
+> The original Laravel issue report says that this problem occurs _"After running it for a long time"_. How long is "long" considered here? Hours? Days? Weeks? I wouldn't try to fix this because for now it looks like a "non issue". (In PHP you must restart long-running processes from time to time to avoid these "memory leaks" or other issues, right?)
+
+If this is not the problem, our script can run forever without memory leaks.
+
+This has nothing to do with the length of time the problem occurred. If the business needs it, the trigger point can be reached in a day. If this function is not used, it will never be triggered. What is the significance of this function? Knowing that there is a problem that can be solved, but through a method that is not a solution?

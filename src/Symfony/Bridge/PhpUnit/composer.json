@@ -20,6 +20,9 @@
         "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
         "php": ">=5.5.9"
     },
+    "require-dev": {
+        "symfony/error-handler": "^4.4|^5.0"
+    },
     "suggest": {
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },

@@ -1,3 +1,4 @@
 vendor/
 composer.lock
 phpunit.xml
+Tests/DeprecationErrorHandler/fake_vendor/symfony/error-handler/DebugClassLoader.php

@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-11-19T18:52:08Z
+
+As there is no change in the composer.json of the doctrine bridge, you have no guarantee that doctrine/persistence 2 is actually used when using the subtree packages.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-19T18:55:40Z
+
+Making Persistence 2.0 a requirement would basically render our codebase incompatible with ORM 2.6, correct?
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-19T18:56:57Z
+
+ORM 2.6 is EOL AFAICT
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-11-19T18:57:23Z
+
+I think it would, but I don't think it's a big deal, for reasons pointed out by @stof
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-19T19:01:06Z
+
+Yeah, I think we're good. It's just that the Bridge's composer.json says `"doctrine/orm": "^2.6.3"` and I thought we should've at least talked about that hidden version bump. 😃
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-19T19:01:09Z
+
+@alcaeus is the ODM 1.3.x still maintained (and supported by a version of the bundle compatible with Symfony 5) ? Because that would also drop support for the ODM 1.3.x
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-19T19:02:16Z
+
+> It's just that the Bridge's composer.json says `"doctrine/orm": "^2.6.3"` and I thought we should've at least talked about that hidden version bump.
+
+We could update that one to `^2.7.3` to avoid confusion
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-11-19T19:06:21Z
+
+Should I bump the ORM constraint globally as well?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-19T19:09:05Z
+
+@greg0ire Yes, please. The ORM version referenced there can be considered antique by now. 😅
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2020-11-19T20:12:13Z
+
+> @alcaeus is the ODM 1.3.x still maintained (and supported by a version of the bundle compatible with Symfony 5) ? Because that would also drop support for the ODM 1.3.x
+
+It's no longer supported, so we can start the process of dropping support for it.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2020-11-20T08:23:30Z
+
+@fabpot you're right, done!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-11-20T10:45:33Z
+
+Build failure looks unrelated but interesting https://travis-ci.com/github/symfony/symfony/jobs/444188596#L2509
+//cc @xabbuh @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-20T10:47:07Z
+
+fix welcome :)

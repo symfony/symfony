@@ -1,0 +1,165 @@
+---------------------------------------------------------------------------
+
+by thewalkingcoder at 2020-11-20T07:26:53Z
+
+@xabbuh thanks for your pull request, as expected i try with context #39107 same issue for me.
+
+![image](https://user-images.githubusercontent.com/10476280/99771547-9d60d100-2b09-11eb-807f-e2aedd3f759b.png)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-20T08:16:18Z
+
+Thank you for the feedback. Could you create a small example application that allows me to reproduce and debug the issue?
+
+---------------------------------------------------------------------------
+
+by thewalkingcoder at 2020-11-20T08:18:31Z
+
+@xabbuh ok i try to create that today.
+
+---------------------------------------------------------------------------
+
+by thewalkingcoder at 2020-11-20T10:45:33Z
+
+@xabbuh
+you can try here ;-)
+https://github.com/thewalkingcoder/uploadfile
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-20T13:04:12Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-21T10:46:31Z
+
+@thewalkingcoder Thanks, based on your example I was able to find a few issue with my initial solution. Can you try the updated patch again?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-21T12:58:08Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by thewalkingcoder at 2020-11-21T13:03:49Z
+
+@xabbuh thanks for your works.
+
+Your commit resolve the duplicated message and so resolve #39107
+![image](https://user-images.githubusercontent.com/10476280/99877720-789b5500-2c00-11eb-86ac-588d050bbe2d.png)
+
+ but if  i remove
+```
+uploadIniSizeErrorMessage
+```
+```php
+    /**
+     * @var array<UploadedFile>
+
+     * @Assert\NotBlank(message="Veuillez sélectionner un fichier.")
+     * @Assert\All({
+     *     @Assert\File(
+     *         maxSize = "500k",
+     *         maxSizeMessage = "Custom message max size.",
+     *         uploadFormSizeErrorMessage = "Custom message max size form",
+     *     )
+     * })
+     */
+    public $files;
+```
+error message is
+
+![image](https://user-images.githubusercontent.com/10476280/99877816-198a1000-2c01-11eb-8b3b-43d919c4ef58.png)
+
+normally is
+
+`
+Custom message max size.
+`
+
+other issue ? or side effect with the PR ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-21T13:47:40Z
+
+If I understand you correctly, that's expected. The file couldn't be uploaded as the maximum file limit configured for PHP is reached and thus the `FileValidator` will not perform any additional checks.
+
+---------------------------------------------------------------------------
+
+by thewalkingcoder at 2020-11-21T14:47:52Z
+
+@xabbuh i say just i don't understand the behaviour
+
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert maxSize |  500ko |
+| Assert  maxSizeMessage |  Custom Max file 500ko |
+| Assert  uploadIniSizeErrorMessage | Custom message Max file php ini |
+| file.pdf |  6mo |
+| **result** | **Custom message Max file php ini** |
+
+for me this PR resolve duplicated error Message.
+
+but if i remove Assert uploadIniSizeErrorMessage
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert maxSize |  500ko |
+| Assert  maxSizeMessage |  Custom Max file 500ko size |
+| file.pdf |  6mo |
+| **result** | the file is too large. Allowed maximum size is 0.5Mo |
+
+default message maxSize is applied instead MaxSizeMessage
+
+For me, the expected behaviour is
+
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert maxSize |  500ko |
+| file.pdf |  6mo |
+| **result** | the file is too large. Allowed maximum size is 0.5Mo  (default message Assert MaxSize) |
+| **behaviour** | ok actually |
+
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert maxSize |  500ko |
+| Assert  maxSizeMessage |  Custom Max file 500ko size |
+| file.pdf |  6mo |
+| **result** | Custom Max file 500ko size (custom message with maxSizeMessage) |
+| **behaviour** | not the same actually |
+
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert maxSize |  500ko |
+| Assert  maxSizeMessage |  Custom Max file 500ko size |
+| Assert  uploadIniSizeErrorMessage | Custom message Max file php ini |
+| file.pdf |  6mo |
+| **result** | Custom Max file 500ko size (custom message with maxSizeMessage)  |
+| **behaviour** | not the same actually |
+
+| config | value |
+|-------|--------|
+| php.ini |  2mo |
+| Assert  uploadIniSizeErrorMessage | Custom message Max file php ini |
+| Assert maxSize |  4mo |
+| file.pdf |  6mo |
+| **result** | Custom message Max file php ini (custom message with uploadIniSizeErrorMessage) |
+| **behaviour** | ok actually |
+
+I'm not sure is a side effect with this PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2020-11-22T14:10:53Z
+
+Well, if the file exceeds the limit configured with `upload_max_filesize` the `uploadIniSizeErrorMessage` is used. If you do not configure it explicitly, its default value `The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.` will be used. The message configured with `maxSizeMessage` is only taken into account if the file size is below the limit configured with `upload_max_filesize`, but exceeds the `maxSize` value of the `File` constraint. So the results that you observe look expected to me.

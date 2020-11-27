@@ -323,6 +323,8 @@
                     processSingleFetch(req[0], req[1]);
                 });
 
+                window.Sfjs_globalFetchStack.length = 0;
+
                 /* Rewrite the global fetch stack push method */
                 window.Sfjs_globalFetchStack.push = function (args) {
                     processSingleFetch(args[0], args[1]);
@@ -386,6 +388,8 @@
                 window.Sfjs_globalXHRStack.forEach(function (req) {
                     processSingleXHR(req[0], req[1], req[2]);
                 });
+
+                window.Sfjs_globalXHRStack.length = 0;
 
                 /* Rewrite the global xhr stack push method */
                 window.Sfjs_globalXHRStack.push = function (args) {

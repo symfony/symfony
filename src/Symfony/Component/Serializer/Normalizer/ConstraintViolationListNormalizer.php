@@ -41,6 +41,8 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
 
     /**
      * {@inheritdoc}
+     *
+     * @return array
      */
     public function normalize($object, string $format = null, array $context = [])
     {

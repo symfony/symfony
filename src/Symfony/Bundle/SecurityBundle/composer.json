@@ -25,7 +25,7 @@
         "symfony/polyfill-php80": "^1.15",
         "symfony/security-core": "^5.2",
         "symfony/security-csrf": "^4.4|^5.0",
-        "symfony/security-guard": "^5.1",
+        "symfony/security-guard": "^5.2",
         "symfony/security-http": "^5.2"
     },
     "require-dev": {

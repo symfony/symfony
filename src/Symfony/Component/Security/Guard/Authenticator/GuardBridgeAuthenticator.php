@@ -29,6 +29,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCre
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * This authenticator is used to bridge Guard authenticators with
@@ -38,7 +39,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
  *
  * @internal
  */
-class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface
+class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
     private $guard;
     private $userProvider;
@@ -47,6 +48,11 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface
     {
         $this->guard = $guard;
         $this->userProvider = $userProvider;
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null)
+    {
+        return $this->guard->start($request, $authException);
     }
 
     public function supports(Request $request): ?bool

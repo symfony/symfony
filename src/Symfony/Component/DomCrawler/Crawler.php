@@ -34,7 +34,7 @@ class Crawler implements \Countable, \IteratorAggregate
     private $namespaces = [];
 
     /**
-     * @var \ArrayIterator A map of cached namespaces
+     * @var \ArrayObject A map of cached namespaces
      */
     private $cachedNamespaces;
 
@@ -73,7 +73,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
         $this->html5Parser = class_exists(HTML5::class) ? new HTML5(['disable_html_ns' => true]) : null;
-        $this->cachedNamespaces = new \ArrayIterator();
+        $this->cachedNamespaces = new \ArrayObject();
 
         $this->add($node);
     }
@@ -105,7 +105,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         $this->nodes = [];
         $this->document = null;
-        $this->cachedNamespaces = new \ArrayIterator();
+        $this->cachedNamespaces = new \ArrayObject();
     }
 
     /**
@@ -1198,17 +1198,14 @@ class Crawler implements \Countable, \IteratorAggregate
             return $this->namespaces[$prefix];
         }
 
-        if ($this->cachedNamespaces->offsetExists($prefix)) {
-            return $this->cachedNamespaces->offsetGet($prefix);
+        if (isset($this->cachedNamespaces[$prefix])) {
+            return $this->cachedNamespaces[$prefix];
         }
 
         // ask for one namespace, otherwise we'd get a collection with an item for each node
         $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
 
-        $namespace = ($node = $namespaces->item(0)) ? $node->nodeValue : null;
-        $this->cachedNamespaces->offsetSet($prefix, $namespace);
-
-        return $namespace;
+        return $this->cachedNamespaces[$prefix] = ($node = $namespaces->item(0)) ? $node->nodeValue : null;
     }
 
     private function findNamespacePrefixes(string $xpath): array

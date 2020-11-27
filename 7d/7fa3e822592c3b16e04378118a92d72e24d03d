@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by eerison at 2020-11-21T21:31:44Z
+
+Nothing about this PR?
+
+---------------------------------------------------------------------------
+
+by eerison at 2020-11-21T21:48:01Z
+
+@jderusse Why are you putting branch 4.4 as target? it's happen when I'm trying to use symfony 5.2 😕
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-21T22:03:44Z
+
+@eerison We always fix bugs on the lowest branch that they occur on.

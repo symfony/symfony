@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface, EntryPointFactoryInterface
+class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
     public function __construct()
     {
@@ -94,12 +94,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
     protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
     {
-        return $this->registerEntryPoint($container, $id, $config);
-    }
-
-    public function registerEntryPoint(ContainerBuilder $container, string $firewallName, array $config): string
-    {
-        $entryPointId = 'security.authentication.form_entry_point.'.$firewallName;
+        $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
             ->setDefinition($entryPointId, new ChildDefinition('security.authentication.form_entry_point'))
             ->addArgument(new Reference('security.http_utils'))
@@ -118,12 +113,16 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
         $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
-        $container
+        $authenticator = $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(4, $options);
+
+        if ($options['use_forward'] ?? false) {
+            $authenticator->addMethodCall('setHttpKernel', [new Reference('http_kernel')]);
+        }
 
         return $authenticatorId;
     }

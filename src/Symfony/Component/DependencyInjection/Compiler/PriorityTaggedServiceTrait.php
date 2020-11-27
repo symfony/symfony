@@ -46,7 +46,7 @@ trait PriorityTaggedServiceTrait
             $indexAttribute = $tagName->getIndexAttribute();
             $defaultIndexMethod = $tagName->getDefaultIndexMethod();
             $needsIndexes = $tagName->needsIndexes();
-            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod();
+            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod() ?? 'getDefaultPriority';
             $tagName = $tagName->getTag();
         }
 
@@ -69,15 +69,15 @@ trait PriorityTaggedServiceTrait
                 }
                 $priority = $priority ?? $defaultPriority ?? $defaultPriority = 0;
 
-                if (null === $indexAttribute && !$needsIndexes) {
+                if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
                     $services[] = [$priority, ++$i, null, $serviceId, null];
                     continue 2;
                 }
 
                 if (null !== $indexAttribute && isset($attribute[$indexAttribute])) {
                     $index = $attribute[$indexAttribute];
-                } elseif (null === $defaultIndex && $defaultIndexMethod && $class) {
-                    $defaultIndex = PriorityTaggedServiceUtil::getDefaultIndex($container, $serviceId, $class, $defaultIndexMethod, $tagName, $indexAttribute);
+                } elseif (null === $defaultIndex && $defaultPriorityMethod && $class) {
+                    $defaultIndex = PriorityTaggedServiceUtil::getDefaultIndex($container, $serviceId, $class, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute);
                 }
                 $index = $index ?? $defaultIndex ?? $defaultIndex = $serviceId;
 
@@ -116,24 +116,31 @@ class PriorityTaggedServiceUtil
     /**
      * Gets the index defined by the default index method.
      */
-    public static function getDefaultIndex(ContainerBuilder $container, string $serviceId, string $class, string $defaultIndexMethod, string $tagName, string $indexAttribute): ?string
+    public static function getDefaultIndex(ContainerBuilder $container, string $serviceId, string $class, string $defaultIndexMethod, string $tagName, ?string $indexAttribute): ?string
     {
         if (!($r = $container->getReflectionClass($class)) || !$r->hasMethod($defaultIndexMethod)) {
             return null;
         }
 
+        if (null !== $indexAttribute) {
+            $service = $class !== $serviceId ? sprintf('service "%s"', $serviceId) : 'on the corresponding service';
+            $message = [sprintf('Either method "%s::%s()" should ', $class, $defaultIndexMethod), sprintf(' or tag "%s" on %s is missing attribute "%s".', $tagName, $service, $indexAttribute)];
+        } else {
+            $message = [sprintf('Method "%s::%s()" should ', $class, $defaultIndexMethod), '.'];
+        }
+
         if (!($rm = $r->getMethod($defaultIndexMethod))->isStatic()) {
-            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be static or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
+            throw new InvalidArgumentException(implode('be static', $message));
         }
 
         if (!$rm->isPublic()) {
-            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should be public or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
+            throw new InvalidArgumentException(implode('be public', $message));
         }
 
         $defaultIndex = $rm->invoke(null);
 
         if (!\is_string($defaultIndex)) {
-            throw new InvalidArgumentException(sprintf('Either method "%s::%s()" should return a string (got "%s") or tag "%s" on service "%s" is missing attribute "%s".', $class, $defaultIndexMethod, \gettype($defaultIndex), $tagName, $serviceId, $indexAttribute));
+            throw new InvalidArgumentException(implode(sprintf('return a string (got "%s")', \gettype($defaultIndex)), $message));
         }
 
         return $defaultIndex;

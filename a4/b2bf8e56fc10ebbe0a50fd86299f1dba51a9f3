@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-08T18:57:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by karlshea at 2020-11-13T23:13:47Z
+
+@jderusse Thanks!
+
+The reason for this PR is for the Drupal LDAP module, and the issue is here: https://www.drupal.org/project/ldap/issues/3126807
+
+That module is using 4.4. Are you saying that this PR could only appear in 5.x? Or that I should target 5.x and it could be backported?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-13T23:28:12Z
+
+> Are you saying that this PR could only appear in 5.x?
+
+Yes. 4.4 is closed for features, so you would need to target 5.x.
+
+---------------------------------------------------------------------------
+
+by karlshea at 2020-11-13T23:28:54Z
+
+Just to be clear so I can update the Drupal issue, there is no possibility of this appearing in 4.x?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-14T00:01:45Z
+
+> Just to be clear so I can update the Drupal issue, there is no possibility of this appearing in 4.x?
+
+There is no 4.x anymore. We're only bugfixing 4.4 and feature development has shifted to 5.x. I cannot make a final decision here, but to me this change does not look like a bugfix. Is it a big problem to support 5.x as well?
+
+---------------------------------------------------------------------------
+
+by karlshea at 2020-11-14T00:03:59Z
+
+> There is no 4.x anymore. We're only bugfixing 4.4 and feature development has shifted to 5.x. I cannot make a final decision here, but to me this change does not look like a bugfix. Is it a big problem to support 5.x as well?
+
+I don't think Drupal 8/Drupal 9 support Symfony 5.x, so that module is stuck with 4.4. They're already using a fork that only contains the Ldap components though, so I'm not sure what direction the maintainer will eventually go.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-14T00:10:36Z
+
+> I don't think Drupal 8/Drupal 9 support Symfony 5.x, so that module is stuck with 4.4.
+
+The LDAP component is pretty much self-contained. You should be able to upgrade `symfony/ldap` to 5.2 while pinning all other components to 4.4.
+
+---------------------------------------------------------------------------
+
+by karlshea at 2020-11-14T00:12:11Z
+
+Good to know! I'll follow up in the Drupal issue and see what they want to do.
+
+Current test failure seems unrelated to Ldap.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-16T19:04:50Z
+
+@karlshea I've force-pushed to your branch in order to resolve conflicts with 5.x and to test your changes with our new LDAP integration test suite.

@@ -84,4 +84,18 @@ class SwitchUserTokenTest extends TestCase
 
         $this->assertNull($unserializedToken->getOriginatedFromUri());
     }
+
+    public function testUnserializeOldToken()
+    {
+        /** @var SwitchUserToken $token */
+        $token = unserialize(file_get_contents(__DIR__.'/Fixtures/switch-user-token-4.4.txt'));
+
+        self::assertInstanceOf(SwitchUserToken::class, $token);
+        self::assertInstanceOf(UsernamePasswordToken::class, $token->getOriginalToken());
+        self::assertSame('john', $token->getUsername());
+        self::assertSame(['foo' => 'bar'], $token->getCredentials());
+        self::assertSame('main', $token->getFirewallName());
+        self::assertEquals(['ROLE_USER'], $token->getRoleNames());
+        self::assertNull($token->getOriginatedFromUri());
+    }
 }

@@ -113,12 +113,6 @@ class Entry
         unset($this->lowerMap[strtolower($name)]);
     }
 
-    /**
-     * Get the attribute key.
-     *
-     * @param string $name          The attribute name
-     * @param bool   $caseSensitive Whether the attribute name is case-sensitive
-     */
     private function getAttributeKey(string $name, bool $caseSensitive = true): ?string
     {
         if ($caseSensitive) {

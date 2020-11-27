@@ -1570,6 +1570,54 @@ EOT;
         $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
     }
 
+    /**
+     * @dataProvider escapedQuotationCharactersInQuotedStrings
+     */
+    public function testParseQuotedStringContainingEscapedQuotationCharacters(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function escapedQuotationCharactersInQuotedStrings()
+    {
+        return [
+            'single quoted string' => [
+                <<<YAML
+entries:
+ - message: 'No emails received before timeout - Address: ''test@testemail.company.com''
+       Keyword: ''Your Order confirmation'' ttl: 50'
+   outcome: failed
+YAML
+                ,
+                [
+                    'entries' => [
+                        [
+                            'message' => 'No emails received before timeout - Address: \'test@testemail.company.com\' Keyword: \'Your Order confirmation\' ttl: 50',
+                            'outcome' => 'failed',
+                        ],
+                    ],
+                ],
+            ],
+            'double quoted string' => [
+                <<<YAML
+entries:
+ - message: "No emails received before timeout - Address: \"test@testemail.company.com\"
+       Keyword: \"Your Order confirmation\" ttl: 50"
+   outcome: failed
+YAML
+                ,
+                [
+                    'entries' => [
+                        [
+                            'message' => 'No emails received before timeout - Address: "test@testemail.company.com" Keyword: "Your Order confirmation" ttl: 50',
+                            'outcome' => 'failed',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function testParseMultiLineString()
     {
         $this->assertEquals("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));

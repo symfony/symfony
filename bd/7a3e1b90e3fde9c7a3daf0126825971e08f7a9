@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-16T19:25:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-11-18T19:30:13Z
+
+Is the ticket (still) auto-closed by this PR? If so can I write it differently? Otherwise I just remove it.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-18T19:32:08Z
+
+@simonberger don't put `fix` just before the issue number
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-19T12:40:12Z
+
+this PR looks good to me.
+
+the last potential improvement is the one I suggested in https://github.com/symfony/symfony/issues/39067#issuecomment-730279448 to make *all* subcrawlers share their namespace cache with the main crawler (instead of copying the parent cache at instantiation time), which helps when the subcrawlers are the one making the discovery.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2020-11-19T12:46:21Z
+
+Yeah I tested to use an ArrayIterator instead of an array which seems to solve that shared namespace issue.
+I'll push a solution like this tomorrow.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-11-27T07:05:03Z
+
+Rebase on 5.x (we don't introduce new features in 4.4, and caching is a new feature). I've also made some cosmetic changes.

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-24T21:52:35Z
+
+I've completely changed the implementation of this PR to simply the implementation suggested by @weaverryan. If you want entry point to be configured by default, you should now implement `AuthenticationEntryPointInterface` on the authenticator. This already used to be a requirement with Guard and also the core authenticators were almost all supporting this already. If only one entry point is found, it's registered automatically. If you need another class to be the entry point, you would need to configure `entry_point` explicitly.
+
+I'll add some tests for the new compiler pass tomorrow evening.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-11-27T06:01:57Z
+
+@wouterj Can you have a look at the failing tests and apply fabbot's patch which seems relevant?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-11-27T09:50:47Z
+
+> @wouterj Can you have a look at the failing tests and apply fabbot's patch which seems relevant?
+
+Fixed. The remaining failing test seems to be due to outdated dependencies for some reason. If I apply the patches in this PR to `FormLoginAuthenticator` and `GuardBridgeAuthenticator` in the `vendor/` of SecurityBundle, the tests pass. However, I do require `^5.2` in the `composer.json`. So I think (hope) these will be fixed automatically after this PR is merged.

@@ -29,6 +29,20 @@ class TranslationFilesTest extends TestCase
         $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
+    /**
+     * @dataProvider provideTranslationFiles
+     */
+    public function testTranslationFileIsValidWithoutEntityLoader($filePath)
+    {
+        $document = new \DOMDocument();
+        $document->loadXML(file_get_contents($filePath));
+        libxml_disable_entity_loader(true);
+
+        $errors = XliffUtils::validateSchema($document);
+
+        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+    }
+
     public function provideTranslationFiles()
     {
         return array_map(

@@ -45,6 +45,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * {@inheritdoc}
      *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -75,6 +77,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
+     *
+     * @return \DateTimeInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {

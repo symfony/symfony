@@ -22,7 +22,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\AnonymousPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -217,10 +216,6 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         if ($authenticator instanceof InteractiveAuthenticatorInterface && $authenticator->isInteractive()) {
             $loginEvent = new InteractiveLoginEvent($request, $authenticatedToken);
             $this->eventDispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
-        }
-
-        if ($passport instanceof AnonymousPassport) {
-            return $response;
         }
 
         $this->eventDispatcher->dispatch($loginSuccessEvent = new LoginSuccessEvent($authenticator, $passport, $authenticatedToken, $request, $response, $this->firewallName));

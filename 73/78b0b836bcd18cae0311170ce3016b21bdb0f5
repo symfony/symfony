@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-20T15:47:46Z
+
+Paging @fabpot: Was there a particular reason why `BinaryFileResponse` was omitted in #34771?

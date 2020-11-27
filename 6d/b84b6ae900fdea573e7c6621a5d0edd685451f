@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-11-12T18:20:19Z
+
+could we suffer from issues on PHP 8 due to other libraries changing such global state too ? Or is PHP 8 turning that into a no-op ?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-12T18:26:15Z
+
+@stof I don't think so, we will suffer from the same issue.
+
+a solution could be to implement a method by our self that check the status of the entity loader and use this instead of checking the version.
+note: `libxml_disable_entity_loader` is used in 5 components
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-12T18:42:46Z
+
+> could we suffer from issues on PHP 8 due to other libraries changing such global state too ?
+
+Yes, this change only buys us some time. The main problem is that php 8 triggers a seprecation without offering us an alternative.
+
+> Or is PHP 8 turning that into a no-op ?
+
+As far as I understood it, the functionality is the same.
+
+@jderusse The PR title tells quite the opposite of what this PR is doing. 😉
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-12T19:03:57Z
+
+> Yes, this change only buys us some time. The main problem is that php 8 triggers a seprecation without offering us an alternative.
+
+Then this should be reported to PHP *before* the release of PHP 8. Deprecating an API without an alternative is not OK.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-12T19:09:27Z
+
+> > Yes, this change only buys us some time. The main problem is that php 8 triggers a seprecation without offering us an alternative.
+>
+> Then this should be reported to PHP _before_ the release of PHP 8. Deprecating an API without an alternative is not OK.
+
+This is deprecated, because nobody should call it in PHP >= 8.
+BUT if somebody call it, you have to revert the call, and you can't do it without triggering a deprecation.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-12T19:13:40Z
+
+> This is deprecated, because nobody should call it in PHP >= 8.
+> BUT if somebody call it, you have to revert the call, and you can't do it without triggering a deprecation.
+
+That's precisely the issue. As it is deprecated without being a no-op, it still affects the global state for everyone. And so shared libraries (which cannot know what else is running in the project) cannot assume the global state and so are forced to keep calling the deprecated API. And that makes the deprecation warning an issue.
+In practice, Symfony on PHP 8 is still not reliably working even after this PR, because it assumes that no other code is using the deprecated API.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-12T20:03:50Z
+
+Bug opened https://bugs.php.net/bug.php?id=80357
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-12T20:42:04Z
+
+> Bug opened https://bugs.php.net/bug.php?id=80357
+
+Thank you. 😃
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-12T21:07:25Z
+
+I changed the patch to
+
+1. let previous code about `libxml_disable_entity_loader(true)`
+
+Disabling entity loaded is not needed sin libXml 2.9 (this is the reason on the deprecation in PHP 8 by the way).
+We don't have to disable it on our side (whether or not it's previously disabled, it won't changed our code).
+
+2. Silent deprecation triggered by `libxml_disable_entity_loader(false)`
+
+`FALSE` is default value, and Symfony need it (cf #39040). Given we can't do it without triggering a deprecation we shoud silent it, as suggested in  https://bugs.php.net/bug.php?id=80357
+
+3. Stop calling `libxml_disable_entity_loader(false)` after PHP 9
+
+Because the method is deprecated in 8.0 and we are still calling it with `@` sign, we should prevent calling it afterward.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-12T21:07:32Z
+
+So, it's silencing now according to the feedback we've received? Well okay, let's silence the error then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-12T23:19:22Z
+
+Our deprecation error handler still triggers during tests if the deprecation is silenced. :-(
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-11-19T22:52:12Z
+
+I don't know if PHP 8 will fix the issue, I the meantime, I suggest this patch that check if the entity loader is disabled by trying to validate a wellknown document
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-11-27T06:34:30Z
+
+PHP won't fix the issue as PHP 8 is now released. Let's merge this one then.

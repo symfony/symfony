@@ -119,7 +119,7 @@ final class AmpClientState extends ClientState
     private function getClient(array $options): array
     {
         $options = [
-            'bindto' => $options['bindto'] ?: '0',
+            'bindto' => $options['bindto'] ?: '0:0',
             'verify_peer' => $options['verify_peer'],
             'capath' => $options['capath'],
             'cafile' => $options['cafile'],

@@ -1395,11 +1395,17 @@ class ContainerBuilderTest extends TestCase
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
         $container->compile();
 
+        $entityManager = $container->get('doctrine.entity_manager');
+        $this->assertEquals(new \stdClass(), $entityManager);
+
         $pA = $container->get('pA');
         $this->assertEquals(new \stdClass(), $pA);
 
         $logger = $container->get('monolog.logger');
         $this->assertEquals(new \stdClass(), $logger->handler);
+
+        $logger_inline = $container->get('monolog_inline.logger');
+        $this->assertEquals(new \stdClass(), $logger_inline->handler);
 
         $foo = $container->get('foo');
         $this->assertSame($foo, $foo->bar->foobar->foo);

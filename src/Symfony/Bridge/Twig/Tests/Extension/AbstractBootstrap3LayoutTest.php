@@ -2393,7 +2393,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
 '/textarea
     [@name="name"]
-    [@pattern="foo"]
+    [not(@pattern)]
     [@class="my&class form-control"]
     [.="foo&bar"]
 '

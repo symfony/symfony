@@ -624,19 +624,48 @@ $imports
 EOF
         ;
 
-        if (\LIBXML_VERSION < 20900) {
+        if ($this->shouldEnableEntityLoader()) {
             $disableEntities = libxml_disable_entity_loader(false);
             $valid = @$dom->schemaValidateSource($source);
             libxml_disable_entity_loader($disableEntities);
         } else {
             $valid = @$dom->schemaValidateSource($source);
         }
-
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
 
         return $valid;
+    }
+
+    private function shouldEnableEntityLoader(): bool
+    {
+        // Version prior to 8.0 can be enabled without deprecation
+        if (\PHP_VERSION_ID < 80000) {
+            return true;
+        }
+
+        static $dom, $schema;
+        if (null === $dom) {
+            $dom = new \DOMDocument();
+            $dom->loadXML('<?xml version="1.0"?><test/>');
+
+            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
+            register_shutdown_function(static function () use ($tmpfile) {
+                @unlink($tmpfile);
+            });
+            $schema = '<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:include schemaLocation="file:///'.str_replace('\\', '/', $tmpfile).'" />
+</xsd:schema>';
+            file_put_contents($tmpfile, '<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="test" type="testType" />
+  <xsd:complexType name="testType"/>
+</xsd:schema>');
+        }
+
+        return !@$dom->schemaValidateSource($schema);
     }
 
     private function validateAlias(\DOMElement $alias, string $file)

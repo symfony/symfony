@@ -758,54 +758,54 @@ class Parser
                 return Inline::parse($this->lexInlineSequence($cursor), $flags, $this->refs);
             }
 
-            $quotation = '' !== $value && ('"' === $value[0] || "'" === $value[0]) ? $value[0] : null;
+            switch ($value[0] ?? '') {
+                case '"':
+                case "'":
+                    $cursor = \strlen($this->currentLine) - \strlen($value);
+                    $parsedValue = Inline::parse($this->lexInlineQuotedString($cursor), $flags, $this->refs);
 
-            // do not take following lines into account when the current line is a quoted single line value
-            if (null !== $quotation && self::preg_match('/^'.$quotation.'.*'.$quotation.'(\s*#.*)?$/', $value)) {
-                return Inline::parse($value, $flags, $this->refs);
+                    if (isset($this->currentLine[$cursor]) && preg_replace('/\s*#.*$/A', '', substr($this->currentLine, $cursor))) {
+                        throw new ParseException(sprintf('Unexpected characters near "%s".', substr($this->currentLine, $cursor)));
+                    }
+
+                    return $parsedValue;
+                default:
+                    $lines = [];
+
+                    while ($this->moveToNextLine()) {
+                        // unquoted strings end before the first unindented line
+                        if (0 === $this->getCurrentLineIndentation()) {
+                            $this->moveToPreviousLine();
+
+                            break;
+                        }
+
+                        $lines[] = trim($this->currentLine);
+                    }
+
+                    for ($i = 0, $linesCount = \count($lines), $previousLineBlank = false; $i < $linesCount; ++$i) {
+                        if ('' === $lines[$i]) {
+                            $value .= "\n";
+                            $previousLineBlank = true;
+                        } elseif ($previousLineBlank) {
+                            $value .= $lines[$i];
+                            $previousLineBlank = false;
+                        } else {
+                            $value .= ' '.$lines[$i];
+                            $previousLineBlank = false;
+                        }
+                    }
+
+                    Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
+
+                    $parsedValue = Inline::parse($value, $flags, $this->refs);
+
+                    if ('mapping' === $context && \is_string($parsedValue) && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {
+                        throw new ParseException('A colon cannot be used in an unquoted mapping value.', $this->getRealCurrentLineNb() + 1, $value, $this->filename);
+                    }
+
+                    return $parsedValue;
             }
-
-            $lines = [];
-
-            while ($this->moveToNextLine()) {
-                // unquoted strings end before the first unindented line
-                if (null === $quotation && 0 === $this->getCurrentLineIndentation()) {
-                    $this->moveToPreviousLine();
-
-                    break;
-                }
-
-                $lines[] = trim($this->currentLine);
-
-                // quoted string values end with a line that is terminated with the quotation character
-                $escapedLine = str_replace(['\\\\', '\\"'], '', $this->currentLine);
-                if ('' !== $escapedLine && $escapedLine[-1] === $quotation) {
-                    break;
-                }
-            }
-
-            for ($i = 0, $linesCount = \count($lines), $previousLineBlank = false; $i < $linesCount; ++$i) {
-                if ('' === $lines[$i]) {
-                    $value .= "\n";
-                    $previousLineBlank = true;
-                } elseif ($previousLineBlank) {
-                    $value .= $lines[$i];
-                    $previousLineBlank = false;
-                } else {
-                    $value .= ' '.$lines[$i];
-                    $previousLineBlank = false;
-                }
-            }
-
-            Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
-
-            $parsedValue = Inline::parse($value, $flags, $this->refs);
-
-            if ('mapping' === $context && \is_string($parsedValue) && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {
-                throw new ParseException('A colon cannot be used in an unquoted mapping value.', $this->getRealCurrentLineNb() + 1, $value, $this->filename);
-            }
-
-            return $parsedValue;
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);
@@ -1162,8 +1162,13 @@ class Parser
 
         $previousLineWasNewline = true;
         $previousLineWasTerminatedWithBackslash = false;
+        $lineNumber = 0;
 
         do {
+            if (++$lineNumber > 1) {
+                $cursor += strspn($this->currentLine, ' ', $cursor);
+            }
+
             if ($this->isCurrentLineBlank()) {
                 $value .= "\n";
             } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {

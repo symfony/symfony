@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
+use Symfony\Component\Form\FileUploadError;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -124,6 +126,23 @@ class ViolationMapper implements ViolationMapperInterface
 
         // Only add the error if the form is synchronized
         if ($this->acceptsErrors($scope)) {
+            if ($violation->getConstraint() instanceof File && (string) \UPLOAD_ERR_INI_SIZE === $violation->getCode()) {
+                $errorsTarget = $scope;
+
+                while (null !== $errorsTarget->getParent() && $errorsTarget->getConfig()->getErrorBubbling()) {
+                    $errorsTarget = $errorsTarget->getParent();
+                }
+
+                $errors = $errorsTarget->getErrors();
+                $errorsTarget->clearErrors();
+
+                foreach ($errors as $error) {
+                    if (!$error instanceof FileUploadError) {
+                        $errorsTarget->addError($error);
+                    }
+                }
+            }
+
             $scope->addError(new FormError(
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),

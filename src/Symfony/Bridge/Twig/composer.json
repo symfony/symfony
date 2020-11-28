@@ -26,7 +26,7 @@
         "symfony/asset": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
-        "symfony/form": "^5.1",
+        "symfony/form": "^5.1.9",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",

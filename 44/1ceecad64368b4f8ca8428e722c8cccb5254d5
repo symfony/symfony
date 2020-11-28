@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-27T14:04:05Z
+
+This needs to be fixed on the 5.1 branch.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-27T14:06:13Z
+
+… and on 4.4 for the `Symfony\Bundle\FrameworkBundle\Client` class.

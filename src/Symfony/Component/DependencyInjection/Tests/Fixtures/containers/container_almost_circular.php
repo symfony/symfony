@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -8,6 +9,20 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCa
 
 $public = 'public' === $visibility;
 $container = new ContainerBuilder();
+
+// factory with lazy injection
+
+$container->register('doctrine.config', 'stdClass')->setPublic(false)
+    ->setProperty('resolver', new Reference('doctrine.entity_listener_resolver'))
+    ->setProperty('flag', 'ok');
+
+$container->register('doctrine.entity_manager', 'stdClass')->setPublic(true)
+    ->setFactory([FactoryChecker::class, 'create'])
+    ->addArgument(new Reference('doctrine.config'));
+$container->register('doctrine.entity_listener_resolver', 'stdClass')->setPublic($public)
+    ->addArgument(new IteratorArgument([new Reference('doctrine.listener')]));
+$container->register('doctrine.listener', 'stdClass')->setPublic($public)
+    ->addArgument(new Reference('doctrine.entity_manager'));
 
 // multiple path detection
 
@@ -41,6 +56,27 @@ $container->register('mailer.transport_factory.amazon', 'stdClass')->setPublic($
 
 $container->register('monolog.logger_2', 'stdClass')->setPublic($public)
     ->setProperty('handler', new Reference('mailer.transport'));
+
+// monolog-like + handler that require monolog with inlined factory
+
+$container->register('monolog_inline.logger', 'stdClass')->setPublic(true)
+    ->setProperty('handler', new Reference('mailer_inline.mailer'));
+
+$container->register('mailer_inline.mailer', 'stdClass')->setPublic(false)
+    ->addArgument(
+        (new Definition('stdClass'))
+            ->setFactory([new Reference('mailer_inline.transport_factory'), 'create'])
+    );
+
+$container->register('mailer_inline.transport_factory', FactoryCircular::class)->setPublic($public)
+    ->addArgument(new TaggedIteratorArgument('mailer_inline.transport'));
+
+$container->register('mailer_inline.transport_factory.amazon', 'stdClass')->setPublic($public)
+    ->addArgument(new Reference('monolog_inline.logger_2'))
+    ->addTag('mailer.transport');
+
+$container->register('monolog_inline.logger_2', 'stdClass')->setPublic($public)
+    ->setProperty('handler', new Reference('mailer_inline.mailer'));
 
 // same visibility for deps
 

@@ -25,10 +25,10 @@ class TrimmedBufferOutput extends Output
     private $buffer = '';
 
     public function __construct(
+        int $maxLength,
         ?int $verbosity = self::VERBOSITY_NORMAL,
         bool $decorated = false,
-        OutputFormatterInterface $formatter = null,
-        int $maxLength
+        OutputFormatterInterface $formatter = null
     ) {
         if ($maxLength <= 0) {
             throw new InvalidArgumentException(sprintf('"%s()" expects a strictly positive maxLength. Got %d.', __METHOD__, $maxLength));

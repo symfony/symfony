@@ -31,7 +31,11 @@ final class UuidTypeTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        Type::addType('uuid', UuidType::class);
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', UuidType::class);
+        } else {
+            Type::addType('uuid', UuidType::class);
+        }
     }
 
     protected function setUp(): void

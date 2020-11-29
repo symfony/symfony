@@ -13,7 +13,9 @@ namespace Symfony\Component\Notifier\Bridge\Amazon;
 
 use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
@@ -45,19 +47,26 @@ final class AmazonTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage;
+        return $message instanceof SmsMessage || $message instanceof ChatMessage;
     }
 
     protected function doSend(MessageInterface $message): SentMessage
     {
-        if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+        if (!$message instanceof SmsMessage && !$message instanceof ChatMessage) {
+            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" and "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, ChatMessage::class, get_debug_type($message)));
         }
 
-        $response = $this->snsClient->publish([
-            'Message' => $message->getSubject(),
-            'PhoneNumber' => $message->getPhone(),
-        ]);
+        if ($message instanceof ChatMessage) {
+            if (!$message->getOptions() instanceof AmazonSnsOptions) {
+                throw new LogicException(sprintf('The "%s" transport only supports "%s" as "%s" for "%s".', __CLASS__, AmazonSnsOptions::class, MessageOptionsInterface::class, ChatMessage::class));
+            }
+            //dd($this->snsClient->getConfiguration());
+            $options = $message->getOptions()->toArray();
+        }
+        $options['Message'] = $message->getSubject();
+        $options[($message instanceof ChatMessage) ? 'TopicArn' : 'PhoneNumber'] = $message->getRecipientId();
+
+        $response = $this->snsClient->publish($options);
 
         $message = new SentMessage($message, (string) $this);
         $message->setMessageId($response->getMessageId());

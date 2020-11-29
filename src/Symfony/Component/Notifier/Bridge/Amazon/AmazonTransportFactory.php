@@ -33,12 +33,16 @@ final class AmazonTransportFactory extends AbstractTransportFactory
 
         if (self::DSN_SCHEME === $scheme) {
             $options = [
-                'region' => $dsn->getOption('region') ?: 'eu-west-1',
-                'accessKeyId' => $dsn->getUser(),
-                'accessKeySecret' => $dsn->getPassword(),
+                Configuration::OPTION_PROFILE => $dsn->getHost(),
+                Configuration::OPTION_REGION => $dsn->getOption('region'),
             ];
 
-            return new AmazonTransport(new SnsClient(Configuration::create($options)));
+            if (null !== $dsn->getUser() && null !== $dsn->getPassword()) {
+                $options[Configuration::OPTION_ACCESS_KEY_ID] = $dsn->getUser();
+                $options[Configuration::OPTION_SECRET_ACCESS_KEY] = $dsn->getPassword();
+            }
+
+            return new AmazonTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
         }
 
         throw new UnsupportedSchemeException($dsn, self::DSN_SCHEME, $this->getSupportedSchemes());

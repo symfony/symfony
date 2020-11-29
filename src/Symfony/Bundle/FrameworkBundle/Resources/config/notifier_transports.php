@@ -180,6 +180,7 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.amazon', AmazonTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
+            ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.null', NullTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')

@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\Notifier\Bridge\Amazon\Tests;
 
+use AsyncAws\Sns\Result\PublishResponse;
 use AsyncAws\Sns\SnsClient;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Notifier\Bridge\Amazon\AmazonSnsOptions;
 use Symfony\Component\Notifier\Bridge\Amazon\AmazonTransport;
+use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
 class AmazonTransportTest extends TestCase
@@ -24,6 +29,67 @@ class AmazonTransportTest extends TestCase
         $transport = new AmazonTransport($this->createMock(SnsClient::class));
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
+        $this->assertTrue($transport->supports(new ChatMessage('arn:topic')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+    }
+
+    public function testSendMessageWithUnsupportedMessageThrows()
+    {
+        $transport = new AmazonTransport($this->createMock(SnsClient::class));
+
+        $this->expectException(LogicException::class);
+        $transport->send($this->createMock(MessageInterface::class));
+    }
+
+    public function testChatMessageWithInvalidOptionsThrows()
+    {
+        $transport = new AmazonTransport($this->createMock(SnsClient::class));
+
+        $this->expectException(LogicException::class);
+        $transport->send(new ChatMessage('topic', $this->createMock(MessageOptionsInterface::class)));
+    }
+
+    public function testSmsMessageOptions()
+    {
+        $response = $this->createMock(PublishResponse::class);
+        $response
+            ->expects($this->once())
+            ->method('getMessageId')
+            ->willReturn('messageId');
+
+        $snsMock = $this->getMockBuilder(SnsClient::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
+
+        $snsMock
+            ->expects($this->once())
+            ->method('publish')
+            ->with($this->equalTo(['PhoneNumber' => '0600000000', 'Message' => 'test']))
+            ->willReturn($response);
+
+        $transport = new AmazonTransport($snsMock);
+        $transport->send(new SmsMessage('0600000000', 'test'));
+    }
+
+    public function testChatMessageOptions()
+    {
+        $response = $this->createMock(PublishResponse::class);
+        $response
+            ->expects($this->once())
+            ->method('getMessageId')
+            ->willReturn('messageId');
+
+        $snsMock = $this->getMockBuilder(SnsClient::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
+
+        $snsMock
+            ->expects($this->once())
+            ->method('publish')
+            ->with($this->equalTo(['TopicArn' => 'my-topic', 'random' => 'value', 'Message' => 'Subject']))
+            ->willReturn($response);
+
+        $transport = new AmazonTransport($snsMock);
+        $transport->send(new ChatMessage('Subject', new AmazonSnsOptions('my-topic', ['random' => 'value'])));
     }
 }

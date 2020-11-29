@@ -21,34 +21,33 @@ class AmazonTransportFactoryTest extends TestCase
     public function testCreateWithDsn(): void
     {
         $factory = new AmazonTransportFactory();
+        $transport = $factory->create(Dsn::fromString('sns://auth@default?region=eu-west-3'));
 
-        $dsn = 'sns://auth@default?region=eu-west-3';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('sns.host');
+        $this->assertSame('sns://localhost?region=eu-west-3', (string) $transport);
+    }
 
-        $this->assertSame('sns://sns.host?region=eu-west-3', (string) $transport);
+    public function testCreateWithoutCredentialDsn(): void
+    {
+        $factory = new AmazonTransportFactory();
+        $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3'));
+
+        $this->assertSame('sns://localhost?region=eu-west-3', (string) $transport);
     }
 
     public function testDefaultRegionIsCorrectlySet(): void
     {
         $factory = new AmazonTransportFactory();
+        $transport = $factory->create(Dsn::fromString('sns://default'));
 
-        $dsn = 'sns://auth@default';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('sns.host');
-
-        $this->assertSame('sns://sns.host?region=eu-west-1', (string) $transport);
+        $this->assertSame('sns://localhost?region=us-east-1', (string) $transport);
     }
 
     public function testSupportsSnsScheme(): void
     {
         $factory = new AmazonTransportFactory();
 
-        $dsn = 'sns://auth@default';
-        $unsupportedDsn = 'notsns://auth@default';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($unsupportedDsn)));
+        $this->assertTrue($factory->supports(Dsn::fromString('sns://default')));
+        $this->assertFalse($factory->supports(Dsn::fromString('not-sns://default')));
     }
 
     public function testNonFreeMobileSchemeThrows(): void
@@ -57,7 +56,7 @@ class AmazonTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $unsupportedDsn = 'notsns://auth@default';
+        $unsupportedDsn = 'not-sns://localhost';
         $factory->create(Dsn::fromString($unsupportedDsn));
     }
 }

@@ -13,7 +13,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Symfony Twilio Notifier Bridge Test Suite">
+        <testsuite name="Symfony Amazon SNS Notifier Bridge Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>

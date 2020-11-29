@@ -50,7 +50,7 @@ The <info>%command.name%</info> command sends a signal to stop any <info>messeng
 
 Each worker command will finish the message they are currently processing
 and then exit. Worker commands are *not* automatically restarted: that
-should be handled by something like supervisord.
+should be handled by a process control system.
 EOF
             )
         ;

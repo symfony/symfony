@@ -60,7 +60,6 @@ final class AmazonTransport extends AbstractTransport
             if (!$message->getOptions() instanceof AmazonSnsOptions) {
                 throw new LogicException(sprintf('The "%s" transport only supports "%s" as "%s" for "%s".', __CLASS__, AmazonSnsOptions::class, MessageOptionsInterface::class, ChatMessage::class));
             }
-            //dd($this->snsClient->getConfiguration());
             $options = $message->getOptions()->toArray();
         }
         $options['Message'] = $message->getSubject();

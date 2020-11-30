@@ -33,7 +33,7 @@ class TraceableVoter implements VoterInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function vote(TokenInterface $token, $subject, array $attributes): int
+    public function vote(TokenInterface $token, $subject, array $attributes)
     {
         $result = $this->voter->vote($token, $subject, $attributes);
 

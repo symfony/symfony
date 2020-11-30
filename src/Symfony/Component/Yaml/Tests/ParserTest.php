@@ -2683,7 +2683,7 @@ YAML;
             $this->parser->parse($yaml)
         );
 
-        $yaml = "\nfoo:\n    bar: {}\n";
+        $yaml = "\nfoo:\n    bar: {} \n";
         $this->assertSame(
             [
                 'foo' => [

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by rxu at 2020-11-30T13:34:51Z
+
+This has fixed https://github.com/symfony/symfony/issues/39227 for me, thanks.

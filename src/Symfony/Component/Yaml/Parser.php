@@ -749,11 +749,11 @@ class Parser
 
         try {
             if ('' !== $value && '{' === $value[0]) {
-                $cursor = \strlen($this->currentLine) - \strlen($value);
+                $cursor = \strlen(rtrim($this->currentLine)) - \strlen(rtrim($value));
 
                 return Inline::parse($this->lexInlineMapping($cursor), $flags, $this->refs);
             } elseif ('' !== $value && '[' === $value[0]) {
-                $cursor = \strlen($this->currentLine) - \strlen($value);
+                $cursor = \strlen(rtrim($this->currentLine)) - \strlen(rtrim($value));
 
                 return Inline::parse($this->lexInlineSequence($cursor), $flags, $this->refs);
             }

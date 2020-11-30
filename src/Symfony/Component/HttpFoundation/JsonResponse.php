@@ -129,8 +129,6 @@ class JsonResponse extends Response
      * @param string $json
      *
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
     public function setJson($json)
     {

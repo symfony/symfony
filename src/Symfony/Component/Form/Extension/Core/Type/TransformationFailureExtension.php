@@ -30,7 +30,7 @@ class TransformationFailureExtension extends AbstractTypeExtension
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!isset($options['constraints'])) {
+        if (empty($options['constraints'])) {
             $builder->addEventSubscriber(new TransformationFailureListener($this->translator));
         }
     }

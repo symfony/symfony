@@ -83,10 +83,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
             if (false === \is_int($result)) {
-                @trigger_error(
-                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
-                    \E_USER_DEPRECATED
-                );
+                trigger_deprecation('symfony/security-core', '5.3', 'Returning a value of type "%s" in "%s::vote()" is deprecated, return an int instead.', get_debug_type($result), get_debug_type($voter));
             }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
@@ -126,10 +123,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
             if (false === \is_int($result)) {
-                @trigger_error(
-                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
-                    \E_USER_DEPRECATED
-                );
+                trigger_deprecation('symfony/security-core', '5.3', 'Returning a value of type "%s" in "%s::vote()" is deprecated, return an int instead.', get_debug_type($result), get_debug_type($voter));
             }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
@@ -167,10 +161,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             foreach ($attributes as $attribute) {
                 $result = $voter->vote($token, $object, [$attribute]);
                 if (false === \is_int($result)) {
-                    @trigger_error(
-                        sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
-                        \E_USER_DEPRECATED
-                    );
+                    trigger_deprecation('symfony/security-core', '5.3', 'Returning a value of type "%s" in "%s::vote()" is deprecated, return an int instead.', get_debug_type($result), get_debug_type($voter));
                 }
 
                 if (VoterInterface::ACCESS_DENIED === $result) {
@@ -203,10 +194,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
             if (false === \is_int($result)) {
-                @trigger_error(
-                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
-                    \E_USER_DEPRECATED
-                );
+                trigger_deprecation('symfony/security-core', '5.3', 'Returning a value of type "%s" in "%s::vote()" is deprecated, return an int instead.', get_debug_type($result), get_debug_type($voter));
             }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {

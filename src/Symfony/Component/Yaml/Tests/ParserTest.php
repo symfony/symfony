@@ -2671,6 +2671,29 @@ YAML;
         );
     }
 
+    public function testMultipleWhitespaceAtEndOfLine()
+    {
+        $yaml = "\nfoo:\n    arguments: [ '@bar' ]  \n";
+        $this->assertSame(
+            [
+                'foo' => [
+                    'arguments' => ['@bar'],
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+
+        $yaml = "\nfoo:\n    bar: {}\n";
+        $this->assertSame(
+            [
+                'foo' => [
+                    'bar' => [],
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+    }
+
     /**
      * This is a regression test for a bug where a YAML block with a nested multiline string using | was parsed without
      * a trailing \n when a shorter YAML document was parsed before.

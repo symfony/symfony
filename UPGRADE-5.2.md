@@ -174,3 +174,5 @@ Security
    `AbstractRememberMeServices::$firewallName`, the old property will be removed
    in 6.0.
 
+ * Deprecation error in `TraceableVoter` in `voter()` method. Cast when original voter return value different than expected.
+

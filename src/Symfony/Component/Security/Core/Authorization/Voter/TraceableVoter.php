@@ -37,6 +37,13 @@ class TraceableVoter implements VoterInterface
     {
         $result = $this->voter->vote($token, $subject, $attributes);
 
+        if (false === \in_array($result, [self::ACCESS_DENIED, self::ACCESS_GRANTED, self::ACCESS_ABSTAIN])) {
+            @trigger_error(
+                sprintf( 'Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.',get_class($this->voter), \gettype($result) ),
+                \E_USER_DEPRECATED
+            );
+        }
+
         $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
 
         return $result;

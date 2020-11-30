@@ -16,6 +16,7 @@ CHANGELOG
  * Added `LoginLinkAuthenticator`.
  * Moved methods `supports()` and `authenticate()` from `AbstractListener` to `FirewallListenerInterface`.
  * [BC break] `PasswordUpgradeBadge::getPasswordUpgrader()` changed its return type to return null or a `PasswordUpgraderInterface` implementation.
+ * Deprecation error in `TraceableVoter` in `voter()` method. Cast when original voter return value different than expected.
 
 5.1.0
 -----

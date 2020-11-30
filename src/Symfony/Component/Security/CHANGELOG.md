@@ -3,7 +3,7 @@ CHANGELOG
 5.3.0
 -----
 
- * Deprecation error in `TraceableVoter` in `voter()` method. Cast when original voter return value different than expected.
+ * Deprecation error in `AccessDecisionManager`. Cast when voter return value different than integer.
 
 5.2.0
 -----

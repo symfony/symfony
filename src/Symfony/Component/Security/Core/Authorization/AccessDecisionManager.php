@@ -82,6 +82,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $deny = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
+            if (false === \is_int($result)) {
+                @trigger_error(
+                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
+                    \E_USER_DEPRECATED
+                );
+            }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
                 return true;
@@ -119,6 +125,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $deny = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
+            if (false === \is_int($result)) {
+                @trigger_error(
+                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
+                    \E_USER_DEPRECATED
+                );
+            }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
                 ++$grant;
@@ -154,6 +166,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         foreach ($this->voters as $voter) {
             foreach ($attributes as $attribute) {
                 $result = $voter->vote($token, $object, [$attribute]);
+                if (false === \is_int($result)) {
+                    @trigger_error(
+                        sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
+                        \E_USER_DEPRECATED
+                    );
+                }
 
                 if (VoterInterface::ACCESS_DENIED === $result) {
                     return false;
@@ -184,6 +202,12 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
+            if (false === \is_int($result)) {
+                @trigger_error(
+                    sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($voter), \gettype($result)),
+                    \E_USER_DEPRECATED
+                );
+            }
 
             if (VoterInterface::ACCESS_GRANTED === $result) {
                 return true;

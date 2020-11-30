@@ -33,6 +33,20 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
     abstract protected function getLoginUrl(Request $request): string;
 
     /**
+     * {@inheritdoc}
+     *
+     * Override to change the request conditions that have to be
+     * matched in order to handle the login form submit.
+     *
+     * This default implementation handles all POST requests to the
+     * login path (@see getLoginUrl()).
+     */
+    public function supports(Request $request): bool
+    {
+        return $request->isMethod('POST') && $this->getLoginUrl($request) === $request->getPathInfo();
+    }
+
+    /**
      * Override to change what happens after a bad username/password is submitted.
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response

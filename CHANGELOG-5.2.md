@@ -7,6 +7,30 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.0 (2020-11-30)
+
+ * feature #39213 [Security] [DX] Automatically add PasswordUpgradeBadge + default support() impl in AbstractFormLoginAuthenticator (wouterj)
+ * bug #39166 [Messenger] Fix mssql compatibility for doctrine transport. (bill moll)
+ * bug #39210 [DoctrineBridge] Fix form EntityType with filter on UID (jderusse)
+ * bug #39211 [HttpClient] fix binding to network interfaces (nicolas-grekas)
+ * bug #39129 [DependencyInjection] Fix circular in DI with lazy + byContruct loop (jderusse)
+ * feature #39153 [Security] Automatically register custom authenticator as entry_point (if supported) (wouterj)
+ * bug #39068 [DependencyInjection][Translator] Silent deprecation triggered by libxml_disable_entity_loader (jderusse)
+ * bug #39119 [Form] prevent duplicated error message for file upload limits (xabbuh)
+ * bug #39099 [Form] ignore the pattern attribute for textareas (xabbuh)
+ * feature #39118 [DoctrineBridge] Require doctrine/persistence 2 (greg0ire)
+ * feature #39128 [HttpFoundation] Deprecate BinaryFileResponse::create() (derrabus)
+ * bug #39154 [Yaml] fix lexing strings containing escaped quotation characters (xabbuh)
+ * bug #39187 [Security] Support for SwitchUserToken instances serialized with 4.4/5.1 (derrabus)
+ * bug #39180 [Serializer] Fix denormalizing scalar with UnwrappingDenormalizer (camilledejoye)
+ * bug #38597 [PhpUnitBridge] Fix qualification of deprecations triggered by the debug class loader (fancyweb)
+ * bug #39160 [Console] Use a partial buffer in SymfonyStyle (jderusse)
+ * bug #39168 [Console] Fix console closing tag (jderusse)
+ * bug #39155 [VarDumper] fix casting resources turned into objects on PHP 8 (nicolas-grekas)
+ * bug #39131 [Cache] Fix CI because of Couchbase version (jderusse)
+ * bug #39115 [HttpClient] don't fallback to HTTP/1.1 when HTTP/2 streams break (nicolas-grekas)
+ * bug #33763 [Yaml] fix lexing nested sequences/mappings (xabbuh)
+
 * 5.2.0-RC2 (2020-11-21)
 
  * bug #39113 [DoctrineBridge] drop binary variants of UID types (nicolas-grekas)

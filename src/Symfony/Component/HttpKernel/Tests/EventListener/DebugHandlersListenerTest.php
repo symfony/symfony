@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -35,8 +34,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListenerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testConfigure()
     {
         $logger = $this->createMock(LoggerInterface::class);
@@ -238,15 +235,5 @@ class DebugHandlersListenerTest extends TestCase
             set_exception_handler($prevHander);
             throw $e;
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyConstructor()
-    {
-        $this->expectDeprecation('Since symfony/http-kernel 5.4: Passing a $fileLinkFormat is deprecated.');
-
-        new DebugHandlersListener(null, null, \E_ALL, \E_ALL, true, 'filelinkformat', true, $this->createMock(LoggerInterface::class));
     }
 }

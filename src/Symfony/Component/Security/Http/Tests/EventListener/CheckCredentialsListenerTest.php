@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -111,6 +112,54 @@ class CheckCredentialsListenerTest extends TestCase
 
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('wouter', function () { return $this->user; })));
         $this->listener->checkPassport($event);
+    }
+
+    public function testAddsPasswordUpgradeBadge()
+    {
+        $encoder = $this->createMock(PasswordEncoderInterface::class);
+        $encoder->expects($this->any())->method('isPasswordValid')->with('encoded-password', 'ThePa$$word')->willReturn(true);
+
+        $this->encoderFactory->expects($this->any())->method('getEncoder')->with($this->identicalTo($this->user))->willReturn($encoder);
+
+        $passport = new Passport(new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('ThePa$$word'));
+        $this->listener->checkPassport($this->createEvent($passport));
+
+        $this->assertTrue($passport->hasBadge(PasswordUpgradeBadge::class));
+        $this->assertEquals('ThePa$$word', $passport->getBadge(PasswordUpgradeBadge::class)->getAndErasePlaintextPassword());
+    }
+
+    public function testAddsNoPasswordUpgradeBadgeIfItAlreadyExists()
+    {
+        $encoder = $this->createMock(PasswordEncoderInterface::class);
+        $encoder->expects($this->any())->method('isPasswordValid')->with('encoded-password', 'ThePa$$word')->willReturn(true);
+
+        $this->encoderFactory->expects($this->any())->method('getEncoder')->with($this->identicalTo($this->user))->willReturn($encoder);
+
+        $passport = $this->getMockBuilder(Passport::class)
+            ->setMethods(['addBadge'])
+            ->setConstructorArgs([new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('ThePa$$word'), [new PasswordUpgradeBadge('ThePa$$word')]])
+            ->getMock();
+
+        $passport->expects($this->never())->method('addBadge')->with($this->isInstanceOf(PasswordUpgradeBadge::class));
+
+        $this->listener->checkPassport($this->createEvent($passport));
+    }
+
+    public function testAddsNoPasswordUpgradeBadgeIfPasswordIsInvalid()
+    {
+        $encoder = $this->createMock(PasswordEncoderInterface::class);
+        $encoder->expects($this->any())->method('isPasswordValid')->with('encoded-password', 'ThePa$$word')->willReturn(false);
+
+        $this->encoderFactory->expects($this->any())->method('getEncoder')->with($this->identicalTo($this->user))->willReturn($encoder);
+
+        $passport = $this->getMockBuilder(Passport::class)
+            ->setMethods(['addBadge'])
+            ->setConstructorArgs([new UserBadge('wouter', function () { return $this->user; }), new PasswordCredentials('ThePa$$word'), [new PasswordUpgradeBadge('ThePa$$word')]])
+            ->getMock();
+
+        $passport->expects($this->never())->method('addBadge')->with($this->isInstanceOf(PasswordUpgradeBadge::class));
+
+        $this->listener->checkPassport($this->createEvent($passport));
     }
 
     private function createEvent($passport)

@@ -39,7 +39,7 @@ class TraceableVoter implements VoterInterface
 
         if (false === \in_array($result, [self::ACCESS_DENIED, self::ACCESS_GRANTED, self::ACCESS_ABSTAIN])) {
             @trigger_error(
-                sprintf( 'Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.',get_class($this->voter), \gettype($result) ),
+                sprintf('Return value of "%s::vote()" should always be of the type int since Symfony 5.0, %s returned.', \get_class($this->voter), \gettype($result)),
                 \E_USER_DEPRECATED
             );
         }

@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+5.3.0
+-----
+
+ * Deprecation error in `TraceableVoter` in `voter()` method. Cast when original voter return value different than expected.
 
 5.2.0
 -----

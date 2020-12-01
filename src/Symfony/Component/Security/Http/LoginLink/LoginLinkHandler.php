@@ -55,7 +55,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $user->getUsername(),
+            'user' => $this->encryptUsername($user->getUsername()),
             'expires' => $expires,
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
@@ -71,7 +71,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $username = $request->get('user');
+        $username = $this->decryptUsername($request->get('user'));
 
         try {
             $user = $this->userProvider->loadUserByUsername($username);
@@ -118,5 +118,33 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         return base64_encode(hash_hmac('sha256', implode(':', $signatureFields), $this->secret));
+    }
+
+    private function encryptUsername(string $username): string
+    {
+        $nonce = random_bytes(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        $cipher = sodium_crypto_secretbox($username, $nonce, $this->getSodiumKey($this->secret));
+
+        return base64_encode($cipher).'.'.base64_encode($nonce);
+    }
+
+    private function decryptUsername(string $username): string
+    {
+        list($cipher, $nonce) = explode('.', $username);
+
+        return  sodium_crypto_secretbox_open(base64_decode($cipher, true), base64_decode($nonce, true), $this->getSodiumKey($this->secret));
+    }
+
+    private function getSodiumKey(string $secret): string
+    {
+        $secretLength = mb_strlen($secret);
+        if ($secretLength > SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
+            return mb_substr($secret, 0, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+        }
+        if ($secretLength < SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
+            return sodium_pad($secret, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+        }
+
+        return $secret;
     }
 }

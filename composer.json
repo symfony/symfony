@@ -65,6 +65,7 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/dotenv": "self.version",
+        "symfony/encryption": "self.version",
         "symfony/error-handler": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/expression-language": "self.version",

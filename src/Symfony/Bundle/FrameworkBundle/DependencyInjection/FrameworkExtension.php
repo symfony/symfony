@@ -420,6 +420,7 @@ class FrameworkExtension extends Extension
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
+        $this->registerEncryptionConfiguration($config['encryption'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
@@ -634,6 +635,15 @@ class FrameworkExtension extends Extension
                       ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
                   );
         }
+    }
+
+    private function registerEncryptionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        $loader->load('encryption.php');
     }
 
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

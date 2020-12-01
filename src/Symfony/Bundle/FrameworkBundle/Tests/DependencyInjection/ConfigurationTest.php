@@ -18,6 +18,7 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Encryption\EncryptionInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -575,6 +576,9 @@ class ConfigurationTest extends TestCase
                 'default_uuid_version' => 6,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
+            ],
+            'encryption' => [
+                'enabled' => !class_exists(FullStack::class) && interface_exists(EncryptionInterface::class),
             ],
         ];
     }

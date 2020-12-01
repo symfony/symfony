@@ -761,10 +761,10 @@ class Parser
             switch ($value[0] ?? '') {
                 case '"':
                 case "'":
-                    $cursor = \strlen($this->currentLine) - \strlen($value);
+                    $cursor = \strlen(rtrim($this->currentLine)) - \strlen(rtrim($value));
                     $parsedValue = Inline::parse($this->lexInlineQuotedString($cursor), $flags, $this->refs);
 
-                    if (isset($this->currentLine[$cursor]) && preg_replace('/\s*#.*$/A', '', substr($this->currentLine, $cursor))) {
+                    if (isset($this->currentLine[$cursor]) && preg_replace('/\s*(#.*)?$/A', '', substr($this->currentLine, $cursor))) {
                         throw new ParseException(sprintf('Unexpected characters near "%s".', substr($this->currentLine, $cursor)));
                     }
 

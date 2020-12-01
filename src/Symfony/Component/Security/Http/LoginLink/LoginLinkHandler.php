@@ -130,9 +130,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     private function decryptUsername(string $username): string
     {
-        list($cipher, $nonce) = explode('.', $username);
+        [$cipher, $nonce] = explode('.', $username);
 
-        return  sodium_crypto_secretbox_open(base64_decode($cipher, true), base64_decode($nonce, true), $this->getSodiumKey($this->secret));
+        return sodium_crypto_secretbox_open(base64_decode($cipher, true), base64_decode($nonce, true), $this->getSodiumKey($this->secret));
     }
 
     private function getSodiumKey(string $secret): string

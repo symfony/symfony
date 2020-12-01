@@ -137,9 +137,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     private function getSodiumKey(string $secret): string
     {
-        $secretLength = mb_strlen($secret);
+        $secretLength = strlen($secret);
         if ($secretLength > SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            return mb_substr($secret, 0, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+            return substr($secret, 0, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
         if ($secretLength < SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
             return sodium_pad($secret, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);

@@ -474,12 +474,19 @@ class TextDescriptor extends Descriptor
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = \array_key_exists('event', $options) ? $options['event'] : null;
+        $dispatcherServiceName = $options['dispatcher_service_name'] ?? null;
+
+        $title = 'Registered Listeners';
+
+        if (null !== $dispatcherServiceName) {
+            $title .= sprintf(' of Event Dispatcher "%s"', $dispatcherServiceName);
+        }
 
         if (null !== $event) {
-            $title = sprintf('Registered Listeners for "%s" Event', $event);
+            $title .= sprintf(' for "%s" Event', $event);
             $registeredListeners = $eventDispatcher->getListeners($event);
         } else {
-            $title = 'Registered Listeners Grouped by Event';
+            $title .= ' Grouped by Event';
             // Try to see if "events" exists
             $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
         }

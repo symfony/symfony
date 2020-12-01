@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-30T13:22:04Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-30T17:30:56Z
+
+An empty string might not be valid input, but we must not trigger a notice in that case, imho.
+
+Thank you very much for the PR. Can you provide a test for this change, please?
+
+---------------------------------------------------------------------------
+
+by moldman at 2020-11-30T20:27:23Z
+
+@derrabus Thank you for reviewing. I added tests, but now `fabbot.io` fails, not sure if I need to apply the proposed changes as soon as this code was not part of my changes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-30T20:28:23Z
+
+You can safely ignore fabbot here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-30T22:17:28Z
+
+I'd personally prefer adding the empty string to the `$uninflected` property.
+Does this issue exist in the inflector component on 4.4 btw?
+
+---------------------------------------------------------------------------
+
+by moldman at 2020-12-01T07:52:17Z
+
+@nicolas-grekas I also like the solution with `$uninflected` property, but I think it may not be obvious why empty string is together with reversed words.
+
+Tested now with 4.4, seems that issue exists:
+```
+\Symfony\Component\Inflector\Inflector::singularize('');
+```
+```
+Notice: Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+PHP Notice:  Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+...
+Notice: Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+PHP Notice:  Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+```
+
+And PropertyAccesor have same behavior:
+```
+class Check
+{
+    public $_;
+}
+$check = new Check();
+$pr = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessorBuilder()
+    ->getPropertyAccessor();
+
+$pr->setValue($check, '_', 'test');
+
+```
+```
+Notice: Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+PHP Notice:  Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+...
+Notice: Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+PHP Notice:  Uninitialized string offset: 0 in src/Symfony/Component/Inflector/Inflector.php on line 363
+```
+
+---------------------------------------------------------------------------
+
+by moldman at 2020-12-01T13:08:33Z
+
+@nicolas-grekas Should i open another PR with fix for 4.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-01T14:49:22Z
+
+> it may not be obvious why empty string is together with reversed words.
+
+I think the test cases are enough to remind about this.
+
+> Should i open another PR with fix for 4.4?
+
+yes please!
+
+---------------------------------------------------------------------------
+
+by moldman at 2020-12-01T15:40:46Z
+
+@nicolas-grekas added to `$uninflected`
+
+ For 4.4: https://github.com/symfony/symfony/pull/39270

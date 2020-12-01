@@ -306,4 +306,16 @@ class EnglishInflectorTest extends TestCase
     {
         $this->assertSame(\is_array($plural) ? $plural : [$plural], (new EnglishInflector())->pluralize($singular));
     }
+
+    public function testPluralizeEmptyString()
+    {
+        $plural = (new EnglishInflector())->pluralize('');
+        $this->assertSame([''], $plural);
+    }
+
+    public function testSingularizeEmptyString()
+    {
+        $singular = (new EnglishInflector())->singularize('');
+        $this->assertSame([''], $singular);
+    }
 }

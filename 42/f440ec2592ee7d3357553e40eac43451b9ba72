@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-01T09:52:11Z
+
+Can you add this case to `PasswordMigratingListenerTest`? We should make sure this does not break again.
+
+---------------------------------------------------------------------------
+
+by romaricdrigon at 2020-12-01T11:10:42Z
+
+Sure, I just added a test case. I struggled a bit with PHPUnit stubbing (usually I'm using anonymous classes), please tell me if that looks good to you and consistent with the rest of the codebase.

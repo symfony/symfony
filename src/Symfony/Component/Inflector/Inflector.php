@@ -310,6 +310,7 @@ final class Inflector
      * A list of words which should not be inflected, reversed.
      */
     private static $uninflected = [
+        '',
         'atad',
         'reed',
         'kcabdeef',

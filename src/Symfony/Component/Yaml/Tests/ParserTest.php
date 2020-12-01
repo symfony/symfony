@@ -2671,7 +2671,7 @@ YAML;
         );
     }
 
-    public function testMultipleWhitespaceAtEndOfLine()
+    public function testWhitespaceAtEndOfLine()
     {
         $yaml = "\nfoo:\n    arguments: [ '@bar' ]  \n";
         $this->assertSame(
@@ -2691,6 +2691,14 @@ YAML;
                 ],
             ],
             $this->parser->parse($yaml)
+        );
+
+        $this->assertSame(
+            [
+                'foo' => 'bar',
+                'foobar' => 'baz',
+            ],
+            $this->parser->parse("foo: 'bar' \nfoobar: baz")
         );
     }
 

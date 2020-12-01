@@ -56,7 +56,12 @@ class PasswordMigratingListener implements EventSubscriberInterface
         }
 
         $passwordUpgrader = $badge->getPasswordUpgrader();
+
         if (null === $passwordUpgrader) {
+            if (!$passport->hasBadge(UserBadge::class)) {
+                return;
+            }
+
             /** @var UserBadge $userBadge */
             $userBadge = $passport->getBadge(UserBadge::class);
             $userLoader = $userBadge->getUserLoader();

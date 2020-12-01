@@ -810,9 +810,7 @@ class FrameworkExtension extends Extension
             // Create Workflow
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
-            if (isset($markingStoreDefinition)) {
-                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
-            }
+            $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 

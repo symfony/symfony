@@ -226,7 +226,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
-        $this->assertNull($container->getDefinition('workflow.article')->getArgument('index_4'), 'Workflows has eventsToDispatch=null');
+
+        $args = $container->getDefinition('workflow.article')->getArguments();
+        $this->assertArrayHasKey('index_0', $args);
+        $this->assertArrayHasKey('index_1', $args);
+        $this->assertArrayHasKey('index_3', $args);
+        $this->assertArrayHasKey('index_4', $args);
+        $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 

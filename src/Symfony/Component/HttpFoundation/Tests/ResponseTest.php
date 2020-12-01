@@ -211,6 +211,29 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isNotModified($request));
     }
 
+    public function testIsNotModifiedEtagWithResponseSetter()
+    {
+        $etag = 'random_etag';
+        $weakEtag = 'weak_etag';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('\\"%s\\", W/\\"%s\\"', $etag, $weakEtag));
+
+        $response = new Response();
+
+        $response->setEtag($etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->setEtag($weakEtag);
+        $this->assertFalse($response->isNotModified($request));
+
+        $response->setEtag($weakEtag, true);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->setEtag();
+        $this->assertFalse($response->isNotModified($request));
+    }
+
     public function testIsNotModifiedLastModifiedAndEtag()
     {
         $before = 'Sun, 25 Aug 2013 18:32:31 GMT';

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgrade
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
 
@@ -65,6 +66,20 @@ class PasswordMigratingListenerTest extends TestCase
 
         // no user
         yield [$this->createEvent($this->createMock(PassportInterface::class))];
+    }
+
+    public function testUnsupportedPassport()
+    {
+        // A custom Passport, without an UserBadge
+        $passport = $this->createMock(UserPassportInterface::class);
+        $passport->method('getUser')->willReturn($this->user);
+        $passport->method('hasBadge')->withConsecutive([PasswordUpgradeBadge::class], [UserBadge::class])->willReturnOnConsecutiveCalls(true, false);
+        $passport->expects($this->once())->method('getBadge')->with(PasswordUpgradeBadge::class)->willReturn(new PasswordUpgradeBadge('pa$$word'));
+        // We should never "getBadge" for "UserBadge::class"
+
+        $event = $this->createEvent($passport);
+
+        $this->listener->onLoginSuccess($event);
     }
 
     public function testUpgradeWithUpgrader()

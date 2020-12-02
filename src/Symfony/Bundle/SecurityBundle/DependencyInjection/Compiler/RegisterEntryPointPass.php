@@ -50,7 +50,7 @@ class RegisterEntryPointPass implements CompilerPassInterface
             }
 
             if (!$entryPoints) {
-                return;
+                continue;
             }
 
             $config = $container->getDefinition('security.firewall.map.config.'.$firewallName);

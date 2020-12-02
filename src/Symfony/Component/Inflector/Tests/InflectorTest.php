@@ -323,4 +323,16 @@ class InflectorTest extends TestCase
 
         $this->assertEquals($expectedPlural, $plural);
     }
+
+    public function testPluralizeEmptyString()
+    {
+        $plural = Inflector::pluralize('');
+        $this->assertSame('', $plural);
+    }
+
+    public function testSingularizeEmptyString()
+    {
+        $singular = Inflector::singularize('');
+        $this->assertSame('', $singular);
+    }
 }

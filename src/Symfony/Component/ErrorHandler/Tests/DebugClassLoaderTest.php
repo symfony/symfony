@@ -392,6 +392,7 @@ class DebugClassLoaderTest extends TestCase
         ], \PHP_VERSION_ID >= 80000 ? [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::this()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::mixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableMixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
         ] : [
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::this()" will return "object" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',

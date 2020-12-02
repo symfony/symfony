@@ -43,7 +43,6 @@ class ReturnType extends ReturnTypeParent implements ReturnTypeInterface, Fixtur
     public function arrayWithLessThanSignNormalization() { }
     public function this() { }
     public function mixed() { }
-    public function nullableMixed() { }
     public function static() { }
     public function outsideMethod() { }
 }

@@ -200,13 +200,6 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     }
 
     /**
-     * @return mixed|null
-     */
-    public function nullableMixed()
-    {
-    }
-
-    /**
      * @return static
      */
     public function static()

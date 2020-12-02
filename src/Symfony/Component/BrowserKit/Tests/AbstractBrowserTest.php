@@ -63,12 +63,34 @@ class AbstractBrowserTest extends TestCase
     public function testJsonRequest()
     {
         $client = $this->getBrowser();
-        $client->jsonRequest('GET', 'http://example.com/', ['param' => 1], [], true);
+        $client->jsonRequest('POST', 'http://example.com/', ['param' => 1], [], true);
         $this->assertSame('application/json', $client->getRequest()->getServer()['CONTENT_TYPE']);
         $this->assertSame('application/json', $client->getRequest()->getServer()['HTTP_ACCEPT']);
         $this->assertFalse($client->getServerParameter('CONTENT_TYPE', false));
         $this->assertFalse($client->getServerParameter('HTTP_ACCEPT', false));
         $this->assertSame('{"param":1}', $client->getRequest()->getContent());
+    }
+
+    public function testJsonRequestPredefinedServerVariables()
+    {
+        $client = $this->getBrowser(['HTTP_ACCEPT' => 'application/xml', 'CONTENT_TYPE' => 'application/xml']);
+        $client->jsonRequest('POST', 'http://example.com/', ['param' => 1], [], true);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['CONTENT_TYPE']);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['HTTP_ACCEPT']);
+        $this->assertSame('application/xml', $client->getServerParameter('HTTP_ACCEPT'));
+        $this->assertSame('application/xml', $client->getServerParameter('CONTENT_TYPE'));
+    }
+
+    public function testJsonRequestGet()
+    {
+        $client = $this->getBrowser();
+        $client->jsonRequest('GET', 'http://example.com/', ['param' => 1], [], true);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['CONTENT_TYPE']);
+        $this->assertSame('application/json', $client->getRequest()->getServer()['HTTP_ACCEPT']);
+        $this->assertFalse($client->getServerParameter('CONTENT_TYPE', false));
+        $this->assertFalse($client->getServerParameter('HTTP_ACCEPT', false));
+        $this->assertNull($client->getRequest()->getContent());
+        $this->assertSame(['param' => '1'], $client->getRequest()->getParameters());
     }
 
     public function testGetRequestWithIpAsHttpHost()

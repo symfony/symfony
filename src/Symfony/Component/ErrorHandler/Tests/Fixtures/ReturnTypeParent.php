@@ -202,7 +202,8 @@ abstract class ReturnTypeParent extends ReturnTypeGrandParent implements ReturnT
     /**
      * @return mixed
      *
-     * Will be removed in Symfony 6.x, see https://github.com/symfony/symfony/pull/39282 discussion.
+     * @deprecated annotated with mixed|null originally, but that is not valid php type,
+     *             see https://github.com/symfony/symfony/pull/39282 discussion.
      */
     public function nullableMixed()
     {

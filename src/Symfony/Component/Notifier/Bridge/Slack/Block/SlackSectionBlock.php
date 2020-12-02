@@ -19,6 +19,7 @@ final class SlackSectionBlock extends AbstractSlackBlock
     public function __construct()
     {
         $this->options['type'] = 'section';
+        $this->options['fields'] = [];
     }
 
     /**

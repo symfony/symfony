@@ -85,13 +85,14 @@ class PassConfig
             new ReplaceAliasByActualDefinitionPass(),
             new RemoveAbstractDefinitionsPass(),
             new RemoveUnusedDefinitionsPass(),
+            new AnalyzeServiceReferencesPass(),
+            new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
             new AnalyzeServiceReferencesPass(),
             new DefinitionErrorExceptionPass(),
         ]];
 
         $this->afterRemovingPasses = [[
-            new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
             new ResolveNoPreloadPass(),
             new AliasDeprecatedPublicServicesPass(),

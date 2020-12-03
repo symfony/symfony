@@ -9,3 +9,4 @@
 - Arguments: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+- Usages: none

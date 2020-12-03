@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+ * Added "Usages" to container:debug output
+
 5.2.0
 -----
 

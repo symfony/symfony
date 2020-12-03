@@ -16,6 +16,7 @@ Definitions
 - Autoconfigured: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+- Usages: none
 
 ### definition_without_class
 
@@ -27,6 +28,7 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Usages: none
 
 ### service_container
 
@@ -39,6 +41,7 @@ Definitions
 - Abstract: no
 - Autowired: no
 - Autoconfigured: no
+- Usages: none
 
 
 Aliases

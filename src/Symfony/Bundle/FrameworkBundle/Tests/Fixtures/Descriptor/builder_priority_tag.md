@@ -22,6 +22,7 @@ Definitions
     - Attr1: val1
     - Attr2: val2
     - Priority: 0
+- Usages: none
 
 ### definition_1
 
@@ -43,6 +44,7 @@ Definitions
 - Tag: `tag1`
     - Attr2: val2
 - Tag: `tag2`
+- Usages: none
 
 ### definition_2
 
@@ -59,3 +61,4 @@ Definitions
     - Attr1: val1
     - Attr2: val2
     - Priority: -20
+- Usages: none

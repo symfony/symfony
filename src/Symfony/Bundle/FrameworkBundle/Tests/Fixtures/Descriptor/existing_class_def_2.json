@@ -8,5 +8,6 @@
     "autowire": false,
     "autoconfigure": false,
     "file": null,
-    "tags": []
+    "tags": [],
+    "usages": []
 }

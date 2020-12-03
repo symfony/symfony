@@ -33,7 +33,8 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ]
+            ],
+            "usages": []
         }
     },
     "aliases": {

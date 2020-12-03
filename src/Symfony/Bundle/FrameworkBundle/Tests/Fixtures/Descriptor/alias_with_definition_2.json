@@ -36,6 +36,9 @@
                 "name": "tag2",
                 "parameters": []
             }
+        ],
+        "usages": [
+          ".alias_2"
         ]
     }
 ]

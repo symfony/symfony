@@ -15,4 +15,7 @@
     </tag>
     <tag name="tag2"/>
   </tags>
+  <usages>
+    <usage>.alias_2</usage>
+  </usages>
 </definition>

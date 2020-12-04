@@ -66,7 +66,7 @@ class SymmetricEncryption
         try {
             return sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
         } catch (\SodiumException $exception) {
-            throw new DecryptionException(sprintf('Failed to decrypt key with algorithm "%s"', $algorithm), 0, $exception);
+            throw new DecryptionException(sprintf('Failed to decrypt key with algorithm "%s".', $algorithm), 0, $exception);
         }
     }
 

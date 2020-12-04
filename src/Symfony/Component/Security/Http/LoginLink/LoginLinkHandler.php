@@ -71,7 +71,11 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $username = $this->decryptUsername($request->get('user'));
+        try {
+            $username = $this->decryptUsername($request->get('user'));
+        } catch (\InvalidArgumentException $exception) {
+            throw new InvalidLoginLinkException('Username not found.', 0, $exception);
+        }
 
         try {
             $user = $this->userProvider->loadUserByUsername($username);
@@ -130,9 +134,27 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     private function decryptUsername(string $username): string
     {
+        /*
+         * ErrorException "Notice: Undefined offset: 1" is prevented in case $username does not contain "."
+         */
+        if (strpos($username, '.') === false) {
+            throw new \InvalidArgumentException('Username is malformed.');
+        }
+
         [$cipher, $nonce] = explode('.', $username);
 
-        return sodium_crypto_secretbox_open(base64_decode($cipher, true), base64_decode($nonce, true), $this->getSodiumKey($this->secret));
+        $ciphertext = base64_decode($cipher, true);
+        $nonce = base64_decode($nonce, true);
+        $key = $this->getSodiumKey($this->secret);
+
+        /*
+         * A \SodiumException "nonce size should be SODIUM_CRYPTO_SECRETBOX_NONCEBYTES bytes" can occur if $nounce is not of the correct length
+         */
+        try {
+            return sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
+        } catch (\SodiumException $exception) {
+            throw new \InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        }
     }
 
     private function getSodiumKey(string $secret): string

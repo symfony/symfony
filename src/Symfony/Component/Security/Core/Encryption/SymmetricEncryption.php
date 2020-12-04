@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Encryption;
 
+use Symfony\Component\Security\Core\Exception\DecryptionException;
+use Symfony\Component\Security\Core\Exception\MalformedCipherException;
+use Symfony\Component\Security\Core\Exception\UnsupportedAlgorithmException;
+
 class SymmetricEncryption
 {
     /**
@@ -36,29 +40,24 @@ class SymmetricEncryption
         // Make sure the message has two periods
         $parts = explode('.', $message);
         if (false === $parts || 3 !== \count($parts)) {
-            // TODO throw specific exception
-            throw new \InvalidArgumentException('Message is malformed.');
+            throw new MalformedCipherException();
         }
 
         [$cipher, $algorithm, $nonce] = $parts;
 
-        if ('sodium_secretbox' !== base64_decode($algorithm)) {
-            // TODO throw specific exception
-            throw new \InvalidArgumentException('Unknown algorithm.');
+        $algorithm = base64_decode($algorithm);
+        if ('sodium_secretbox' !== $algorithm) {
+            throw new UnsupportedAlgorithmException($algorithm);
         }
 
         $ciphertext = base64_decode($cipher, true);
         $nonce = base64_decode($nonce, true);
         $key = $this->getSodiumKey($this->secret);
 
-        /*
-         * A \SodiumException "nonce size should be SODIUM_CRYPTO_SECRETBOX_NONCEBYTES bytes" can occur if $nonce is not of the correct length
-         */
         try {
             return sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
         } catch (\SodiumException $exception) {
-            // TODO throw more specific exception
-            throw new \InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DecryptionException(sprintf('Failed to decrypt key with algorithm "%s"', $algorithm), 0, $exception);
         }
     }
 

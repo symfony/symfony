@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encryption\SymmetricEncryption;
+use Symfony\Component\Security\Core\Exception\MalformedCipherException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -77,11 +78,10 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $usernameMessage = $request->get('user');
         try {
             $username = $this->encryption->decrypt($usernameMessage);
-        } catch (\InvalidArgumentException $exception) {
-            // TODO catch exception about malformed string
+        } catch (MalformedCipherException $exception) {
+            // Keep compatibility with older versions of the code
             $username = $usernameMessage;
         } catch (\Exception $exception) {
-            // TODO All other exception
             throw new InvalidLoginLinkException('Username not found.', 0, $exception);
         }
 

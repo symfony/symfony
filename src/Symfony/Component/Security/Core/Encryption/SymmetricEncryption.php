@@ -15,6 +15,15 @@ use Symfony\Component\Security\Core\Exception\DecryptionException;
 use Symfony\Component\Security\Core\Exception\MalformedCipherException;
 use Symfony\Component\Security\Core\Exception\UnsupportedAlgorithmException;
 
+/**
+ * Symmetric encryption uses the same key to encrypt and decrypt a message. The
+ * keys should be kept safe and should not be exposed to the public. The key length
+ * should be 32 bytes, but other sizes are accepted.
+ *
+ * Symmetric encryption is in theory weaker than asymmetric encryption.
+ *
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ */
 class SymmetricEncryption
 {
     /**
@@ -27,10 +36,10 @@ class SymmetricEncryption
         $this->secret = $secret;
     }
 
-    public function encrypt(string $text): string
+    public function encrypt(string $message): string
     {
         $nonce = random_bytes(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
-        $cipher = sodium_crypto_secretbox($text, $nonce, $this->getSodiumKey($this->secret));
+        $cipher = sodium_crypto_secretbox($message, $nonce, $this->getSodiumKey($this->secret));
 
         return sprintf('%s.%s.%s', base64_encode($cipher), base64_encode('sodium_secretbox'), base64_encode($nonce));
     }

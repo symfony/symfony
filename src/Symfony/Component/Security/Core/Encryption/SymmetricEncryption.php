@@ -28,7 +28,7 @@ class SymmetricEncryption
         $nonce = random_bytes(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $cipher = sodium_crypto_secretbox($text, $nonce, $this->getSodiumKey($this->secret));
 
-        return base64_encode($cipher).'.sodium_secretbox.'.base64_encode($nonce);
+        return sprintf('%s.%s.%s', base64_encode($cipher), base64_encode('sodium_secretbox'), base64_encode($nonce));
     }
 
     public function decrypt(string $message): string
@@ -42,7 +42,7 @@ class SymmetricEncryption
 
         [$cipher, $algorithm, $nonce] = $parts;
 
-        if ('sodium_secretbox' !== $algorithm) {
+        if ('sodium_secretbox' !== base64_decode($algorithm)) {
             // TODO throw specific exception
             throw new \InvalidArgumentException('Unknown algorithm.');
         }

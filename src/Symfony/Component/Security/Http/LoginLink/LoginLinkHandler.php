@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\LoginLink;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Encryption\SymmetricEncryption;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -33,8 +34,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     private $secret;
     private $options;
     private $expiredStorage;
+    private $encryption;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage)
+    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage, SymmetricEncryption $encryption)
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
@@ -47,6 +49,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'max_uses' => null,
         ], $options);
         $this->expiredStorage = $expiredStorage;
+        $this->encryption = $encryption;
     }
 
     public function createLoginLink(UserInterface $user): LoginLinkDetails
@@ -55,7 +58,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $this->encryptUsername($user->getUsername()),
+            'user' => $this->encryption->encrypt($user->getUsername()),
             'expires' => $expires,
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
@@ -71,9 +74,14 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
+        $usernameMessage = $request->get('user');
         try {
-            $username = $this->decryptUsername($request->get('user'));
+            $username = $this->encryption->decrypt($usernameMessage);
         } catch (\InvalidArgumentException $exception) {
+            // TODO catch exception about malformed string
+            $username = $usernameMessage;
+        } catch (\Exception $exception) {
+            // TODO All other exception
             throw new InvalidLoginLinkException('Username not found.', 0, $exception);
         }
 
@@ -122,51 +130,5 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         return base64_encode(hash_hmac('sha256', implode(':', $signatureFields), $this->secret));
-    }
-
-    private function encryptUsername(string $username): string
-    {
-        $nonce = random_bytes(\SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
-        $cipher = sodium_crypto_secretbox($username, $nonce, $this->getSodiumKey($this->secret));
-
-        return base64_encode($cipher).'.'.base64_encode($nonce);
-    }
-
-    private function decryptUsername(string $username): string
-    {
-        /*
-         * ErrorException "Notice: Undefined offset: 1" is prevented in case $username does not contain "."
-         */
-        if (strpos($username, '.') === false) {
-            throw new \InvalidArgumentException('Username is malformed.');
-        }
-
-        [$cipher, $nonce] = explode('.', $username);
-
-        $ciphertext = base64_decode($cipher, true);
-        $nonce = base64_decode($nonce, true);
-        $key = $this->getSodiumKey($this->secret);
-
-        /*
-         * A \SodiumException "nonce size should be SODIUM_CRYPTO_SECRETBOX_NONCEBYTES bytes" can occur if $nounce is not of the correct length
-         */
-        try {
-            return sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
-        } catch (\SodiumException $exception) {
-            throw new \InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
-        }
-    }
-
-    private function getSodiumKey(string $secret): string
-    {
-        $secretLength = strlen($secret);
-        if ($secretLength > SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            return substr($secret, 0, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-        }
-        if ($secretLength < SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            return sodium_pad($secret, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-        }
-
-        return $secret;
     }
 }

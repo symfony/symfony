@@ -50,7 +50,6 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
-use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -97,7 +96,6 @@ return static function (ContainerConfigurator $container) {
                 service('security.token_storage'),
             ])
             ->tag('controller.argument_value_resolver', ['priority' => 40])
-
 
         ->set('security.encryption.symmetric', SymmetricEncryption::class)
             ->abstract()

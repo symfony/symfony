@@ -79,6 +79,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         try {
             $username = $this->encryption->decrypt($usernameMessage);
         } catch (MalformedCipherException $exception) {
+            trigger_deprecation('symfony/security-http', '5.3', 'Login link without encryption for the "user" query parameter is deprecated.', __METHOD__);
             // Keep compatibility with older versions of the code
             $username = $usernameMessage;
         } catch (\Exception $exception) {

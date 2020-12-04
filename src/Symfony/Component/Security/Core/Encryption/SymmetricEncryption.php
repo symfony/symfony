@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Encryption;
 
-
 class SymmetricEncryption
 {
     /**
@@ -36,14 +35,14 @@ class SymmetricEncryption
     {
         // Make sure the message has two periods
         $parts = explode('.', $message);
-        if ($parts === false || count($parts) !== 3) {
+        if (false === $parts || 3 !== \count($parts)) {
             // TODO throw specific exception
             throw new \InvalidArgumentException('Message is malformed.');
         }
 
         [$cipher, $algorithm, $nonce] = $parts;
 
-        if ($algorithm !== 'sodium_secretbox') {
+        if ('sodium_secretbox' !== $algorithm) {
             // TODO throw specific exception
             throw new \InvalidArgumentException('Unknown algorithm.');
         }
@@ -65,11 +64,11 @@ class SymmetricEncryption
 
     private function getSodiumKey(string $secret): string
     {
-        $secretLength = strlen($secret);
-        if ($secretLength > SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
+        $secretLength = \strlen($secret);
+        if ($secretLength > \SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
             return substr($secret, 0, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
-        if ($secretLength < SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
+        if ($secretLength < \SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
             return sodium_pad($secret, \SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
 

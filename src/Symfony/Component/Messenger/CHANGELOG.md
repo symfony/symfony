@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+ * Add the options `group` and `class-filter` to `FailedMessagesShowCommand`
 
 5.3
 ---

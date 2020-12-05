@@ -14,7 +14,6 @@
 
     <testsuites>
         <testsuite name="Symfony Security Component Test Suite">
-            <directory>./Tests/</directory>
             <directory>./*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -23,8 +22,6 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Resources</directory>
-                <directory>./Tests</directory>
                 <directory>./vendor</directory>
                 <directory>./*/Resources</directory>
                 <directory>./*/Tests</directory>

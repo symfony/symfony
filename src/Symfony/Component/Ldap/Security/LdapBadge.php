@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in Symfony 5.1
+ * @experimental in 5.1
  */
 class LdapBadge implements BadgeInterface
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  *
  * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 abstract class FirebaseOptions implements MessageOptionsInterface
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @experimental in 5.1
+ * @experimental in 5.2
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

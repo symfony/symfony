@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class UnsupportedSchemeException extends LogicException
 {

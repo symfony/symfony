@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Security;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in Symfony 5.2
+ * @experimental in 5.2
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {

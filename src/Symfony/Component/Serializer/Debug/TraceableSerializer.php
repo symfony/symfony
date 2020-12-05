@@ -17,11 +17,11 @@ use Symfony\Contracts\Service\ResetInterface;
 final class TraceableSerializer implements SerializerInterface, ResetInterface
 {
     /**
-     * @var array|Serialization[]
+     * @var Serialization[]
      */
     private $serializations = [];
     /**
-     * @var array|Deserialization[]
+     * @var Deserialization[]
      */
     private $deserializations = [];
 

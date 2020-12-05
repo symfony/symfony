@@ -14,9 +14,6 @@ namespace Symfony\Component\Serializer\Debug\Normalizer;
 use Symfony\Component\Serializer\Debug\Deserialization;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-/**
- * Class Denormalization.
- */
 final class Denormalization extends Deserialization
 {
     /**

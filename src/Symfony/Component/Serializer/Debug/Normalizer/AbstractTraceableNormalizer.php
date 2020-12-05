@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Debug\Normalizer;
 
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, DenormalizerAwareInterface, NormalizerAwareInterface
+abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, DenormalizerAwareInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     /**
      * @var DenormalizerInterface|NormalizerInterface
@@ -93,6 +94,13 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
         if ($this->delegate instanceof NormalizerAwareInterface) {
             $this->delegate->setNormalizer($normalizer);
         }
+    }
+
+    public function hasCacheableSupportsMethod(): bool{
+        if ($this->delegate instanceof CacheableSupportsMethodInterface) {
+            return $this->delegate->hasCacheableSupportsMethod();
+        }
+        return false;
     }
 
     public function getNormalizations(): array

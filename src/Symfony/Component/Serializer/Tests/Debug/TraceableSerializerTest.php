@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -32,7 +31,7 @@ final class TraceableSerializerTest extends TestCase
      */
     private $delegateMock;
     /**
-     * @var stdClass
+     * @var \stdClass
      */
     private $something;
     /**
@@ -44,7 +43,7 @@ final class TraceableSerializerTest extends TestCase
     {
         $this->delegateMock = $this->createMock(SerializerInterface::class);
         $this->traceableSerializer = new TraceableSerializer($this->delegateMock);
-        $this->something = new stdClass();
+        $this->something = new \stdClass();
         $this->emptyContext = [];
     }
 
@@ -91,7 +90,7 @@ final class TraceableSerializerTest extends TestCase
             $this->something,
             $this->traceableSerializer->deserialize(
                 self::SERIALIZED_OBJECT,
-                stdClass::class,
+                \stdClass::class,
                 self::JSON,
                 $this->emptyContext
             )
@@ -145,7 +144,7 @@ final class TraceableSerializerTest extends TestCase
         $this->delegateMock
             ->expects(self::once())
             ->method('deserialize')
-            ->with(self::SERIALIZED_OBJECT, stdClass::class, self::JSON, $this->emptyContext)
+            ->with(self::SERIALIZED_OBJECT, \stdClass::class, self::JSON, $this->emptyContext)
             ->willReturn($this->something);
     }
 
@@ -153,7 +152,7 @@ final class TraceableSerializerTest extends TestCase
     {
         $this->traceableSerializer->deserialize(
             self::SERIALIZED_OBJECT,
-            stdClass::class,
+            \stdClass::class,
             self::JSON,
             $this->emptyContext
         );

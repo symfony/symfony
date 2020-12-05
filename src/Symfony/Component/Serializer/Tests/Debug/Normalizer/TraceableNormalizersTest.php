@@ -12,10 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Debug\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableDenormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableHybridNormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -51,6 +51,10 @@ final class TraceableNormalizersTest extends TestCase
         self::assertInstanceOf(DenormalizerInterface::class, $this->traceableDenormalizer);
         self::assertInstanceOf(NormalizerInterface::class, $this->traceableHybridNormalizer);
         self::assertInstanceOf(DenormalizerInterface::class, $this->traceableHybridNormalizer);
+
+        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->traceableNormalizer);
+        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->traceableDenormalizer);
+        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->traceableHybridNormalizer);
     }
 
     /**
@@ -58,7 +62,7 @@ final class TraceableNormalizersTest extends TestCase
      */
     public function testSupportsNormalizationDelegation(bool $supports, $normalizer, $tracer): void
     {
-        $something = new stdClass();
+        $something = new \stdClass();
         $format = 'json';
         $normalizer->expects(self::once())->method('supportsNormalization')->with($something, $format)->willReturn(
             $supports
@@ -71,7 +75,7 @@ final class TraceableNormalizersTest extends TestCase
      */
     public function testNormalizationDelegation($_, $normalizer, $tracer): void
     {
-        $something = new stdClass();
+        $something = new \stdClass();
         $format = 'json';
         $context = [];
         $somethingSerialized = '<some-serialized-thing>';
@@ -128,7 +132,7 @@ final class TraceableNormalizersTest extends TestCase
     public function testSupportsDenormalizationDelegation(bool $supports, $denormalizer, $tracer): void
     {
         $something = '<some-serialized-thing>';
-        $type = stdClass::class;
+        $type = \stdClass::class;
         $format = 'json';
 
         $denormalizer->expects(self::once())
@@ -147,8 +151,8 @@ final class TraceableNormalizersTest extends TestCase
      */
     public function testDenormalizationDelegation($_, $denormalizer, $tracer): void
     {
-        $something = new stdClass();
-        $type = stdClass::class;
+        $something = new \stdClass();
+        $type = \stdClass::class;
         $format = 'json';
         $context = [];
         $somethingSerialized = '<some-serialized-thing>';
@@ -212,6 +216,26 @@ final class TraceableNormalizersTest extends TestCase
         self::assertSame($this->normalizerDelegate, $delegate->normalizer);
         self::assertSame($this->denormalizerDelegate, $delegate->denormalizer);
         self::assertSame($serializer, $delegate->serializer);
+    }
+
+    /**
+     * @dataProvider provideYesNo
+     */
+    public function testCacheableSupport(bool $isCachable):void
+    {
+        $tracer = new TraceableHybridNormalizer(new TestCacheableNormalizer($isCachable));
+        self::assertSame($isCachable, $tracer->hasCacheableSupportsMethod());
+    }
+
+    public function testCacheableSupportOnNonCacheableDelegates():void
+    {
+        self::assertFalse($this->traceableNormalizer->hasCacheableSupportsMethod());
+    }
+
+    public function provideYesNo():iterable
+    {
+        yield 'yes' => [true];
+        yield 'no' => [false];
     }
 
     protected function setUp(): void

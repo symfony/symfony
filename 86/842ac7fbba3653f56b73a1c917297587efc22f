@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-12-05T08:42:43Z
+
+Hi @wouterj, that is a good point.
+
+@weaverryan and I picked `kernel.event_dispatcher` for the consistency with other tags. My other ideas were `event.dispatcher` or `event_dispatcher`, but those seem a bit short and out of place.
+
+`kernel.dispatcher` won't do due to the message bus also dispatching.
+
+I'm a bit out of ideas on this one.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T09:20:37Z
+
+Would it make sense to enable auto-configuration for the new tag?
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-12-05T09:22:58Z
+
+> Would it make sense to enable auto-configuration for the new tag?
+
+It is. See https://github.com/symfony/symfony/pull/39276/files#diff-e4f52d5033296421d02e360c8355aa1931bdfb0c12579f4815ea02b724322c0cR483
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T09:25:27Z
+
+Oh right, sorry. 🙈
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-12-05T09:25:32Z
+
+> I'm a bit out of ideas on this one.
+
+I'm also a bit of out of ideas. Maybe `event_dispatcher.dispatcher`? (to match the `<component name>.<subject>` convention)
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2020-12-05T09:36:49Z
+
+> Maybe `event_dispatcher.dispatcher`? (to match the `<component name>.<subject>` convention)
+
+That sound good to me. I'll make the change.

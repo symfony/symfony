@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+* Deprecated voters that do not return a valid decision when calling the `vote` method.
+
 5.2.0
 -----
 

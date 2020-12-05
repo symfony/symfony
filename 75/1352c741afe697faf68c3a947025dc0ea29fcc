@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T11:15:14Z
+
+The tests failed because three fixtures in SecurityBundle use the container as resource type. That does not really make sense. I'm going to backport that fix.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T12:11:36Z
+
+> I'm going to backport that fix
+
+#39324

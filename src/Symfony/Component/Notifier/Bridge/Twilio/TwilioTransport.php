@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 final class TwilioTransport extends AbstractTransport
 {

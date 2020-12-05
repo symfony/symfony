@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Emanuele Panzeri <thepanz@gmail.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 final class MattermostTransportFactory extends AbstractTransportFactory
 {

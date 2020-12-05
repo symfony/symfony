@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Notifier;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {

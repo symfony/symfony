@@ -23,7 +23,7 @@ class SodiumEncryptionTest extends TestCase
         $sodium = new SodiumEncryption('s3cr3t');
         $cipher = $sodium->encrypt('');
         $this->assertNotEmpty('input', $cipher);
-        $this->assertTrue(strlen($cipher) > 10);
+        $this->assertTrue(\strlen($cipher) > 10);
         $this->assertNotEquals('input', $sodium->encrypt('input'));
 
         $cipher = $sodium->encrypt($input = 'random_string');

@@ -98,12 +98,12 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('controller.argument_value_resolver', ['priority' => 40])
 
-        ->set('security.encryption.sodium', SodiumEncryption::class)
+        ->set('security.encryption.sodium_symmetric', SodiumEncryption::class)
             ->abstract()
             ->args([
                 '%kernel.secret%',
             ])
-        ->alias(SymmetricEncryptionInterface::class, 'security.encryption.sodium')
+        ->alias(SymmetricEncryptionInterface::class, 'security.encryption.sodium_symmetric')
 
         // Authentication related services
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)

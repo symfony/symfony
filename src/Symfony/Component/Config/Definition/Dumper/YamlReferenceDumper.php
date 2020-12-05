@@ -129,7 +129,7 @@ class YamlReferenceDumper
 
         // example
         if ($example && !\is_array($example)) {
-            $comments[] = 'Example: '.$example;
+            $comments[] = 'Example: '.Inline::dump($example);
         }
 
         $default = '' != (string) $default ? ' '.$default : '';
@@ -165,7 +165,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray($example, $depth + 1);
+            $this->writeArray(array_map([Inline::class, 'dump'], $example), $depth + 1);
         }
 
         if ($children) {

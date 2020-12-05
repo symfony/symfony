@@ -27,18 +27,69 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
-    private const QUERY_FRAGMENT_DECODED = [
-        // RFC 3986 explicitly allows those in the query/fragment to reference other URIs unencoded
-        '%2F' => '/',
-        '%3F' => '?',
-        // reserved chars that have no special meaning for HTTP URIs in a query or fragment
-        // this excludes esp. "&", "=" and also "+" because PHP would treat it as a space (form-encoded)
+    // Character classes as defined in RFC 3986 2.2 and 3
+    // @see https://tools.ietf.org/html/rfc3986#page-22 ff
+
+    /**
+     * these chars are only sub-delimiters that have no predefined meaning and can therefore be used literally
+     * so URI producing applications can use these chars to delimit subcomponents in a path segment without being
+     * encoded for better readability
+     *
+     * @see https://tools.ietf.org/html/rfc3986#page-11 2
+     */
+    protected const SUB_DELIMITERS = [
+        '%21' => '!',
+        '%24' => '$',
+        '%26' => '&',
+        '%27' => '\'', // TODO: we may want an option to include this as original implementation claims usage in HTML, although this is wrong and htmlspecialchars et. al should be used here
+        '%28' => '(',
+        '%29' => ')',
+        '%2A' => '*',
+        '%2B' => '+',
+        '%2C' => ',',
+        '%3B' => ';',
+        '%3D' => '=',
+    ];
+
+    /**
+     * URL path segment separator
+     *
+     * @see https://tools.ietf.org/html/rfc3986#page-22 3.3
+     */
+    protected const PATH_SEPARATOR = ['%2F' => '/'];
+
+    /**
+     * URL path allowed characters
+     *
+     * the following chars are general delimiters in the URI specification but have only special meaning in the
+     * authority component so they can safely be used in the path in unencoded form
+     *
+     * @see https://tools.ietf.org/html/rfc3986#page-22 3.3
+     */
+    protected const PATH_QUERY_FRAGMENT_DECODED = [
         '%40' => '@',
         '%3A' => ':',
-        '%21' => '!',
-        '%3B' => ';',
-        '%2C' => ',',
-        '%2A' => '*',
+    ];
+
+    /**
+     * URL query and fragment allowed characters
+     *
+     * @see https://tools.ietf.org/html/rfc3986#page-22 3.4 and 3.5
+     */
+    protected const QUERY_FRAGMENT_DECODED = [
+        // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
+        // so they can safely be used in the path in unencoded form
+        '%2F' => '/',
+        '%3F' => '?',
+    ];
+
+    /**
+     * URL query and fragment special characters used as space respectively form urlencoded key value pairs
+     */
+    protected const QUERY_FRAGMENT_SPECIAL = [
+        '%24' => '+',
+        '%26' => '&',
+        '%3D' => '=',
     ];
 
     protected $routes;
@@ -52,34 +103,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $logger;
 
     private $defaultLocale;
-
-    /**
-     * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
-     *
-     * PHP's rawurlencode() encodes all chars except "a-zA-Z0-9-._~" according to RFC 3986. But we want to allow some chars
-     * to be used in their literal form (reasons below). Other chars inside the path must of course be encoded, e.g.
-     * "?" and "#" (would be interpreted wrongly as query and fragment identifier),
-     * "'" and """ (are used as delimiters in HTML).
-     */
-    protected $decodedChars = [
-        // the slash can be used to designate a hierarchical structure and we want allow using it with this meaning
-        // some webservers don't allow the slash in encoded form in the path for security reasons anyway
-        // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
-        '%2F' => '/',
-        // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
-        // so they can safely be used in the path in unencoded form
-        '%40' => '@',
-        '%3A' => ':',
-        // these chars are only sub-delimiters that have no predefined meaning and can therefore be used literally
-        // so URI producing applications can use these chars to delimit subcomponents in a path segment without being encoded for better readability
-        '%3B' => ';',
-        '%2C' => ',',
-        '%3D' => '=',
-        '%2B' => '+',
-        '%21' => '!',
-        '%2A' => '*',
-        '%7C' => '|',
-    ];
 
     public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, string $defaultLocale = null)
     {
@@ -200,12 +223,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
-                    $url = $token[1].$mergedParams[$varName].$url;
+                    $url = $token[1] . self::encodeVariable($mergedParams[$varName]) . $url;
                     $optional = false;
                 }
             } else {
                 // static text
-                $url = $token[1].$url;
+                $url = self::encodePath($token[1]) . $url;
                 $optional = false;
             }
         }
@@ -213,9 +236,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         if ('' === $url) {
             $url = '/';
         }
-
-        // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
-        $url = strtr(rawurlencode($url), $this->decodedChars);
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
@@ -303,11 +323,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if ($extra && $query = http_build_query($extra, '', '&', \PHP_QUERY_RFC3986)) {
-            $url .= '?'.strtr($query, self::QUERY_FRAGMENT_DECODED);
+            $url .= '?' . strtr($query, self::decodeQueryFragmentChars());
         }
 
         if ('' !== $fragment) {
-            $url .= '#'.strtr(rawurlencode($fragment), self::QUERY_FRAGMENT_DECODED);
+            $url .= '#' . strtr(rawurlencode($fragment), self::decodeQueryFragmentChars());
         }
 
         return $url;
@@ -362,5 +382,30 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         return '' === $path || '/' === $path[0]
             || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
             ? "./$path" : $path;
+    }
+
+    private static function encodePath(string $path): string
+    {
+        return strtr(rawurlencode($path), self::decodePathChars());
+    }
+
+    private static function encodeVariable(string $var): string
+    {
+        return strtr(rawurlencode($var), self::decodeVariableChars());
+    }
+
+    private static function decodePathChars(): array
+    {
+        return self::PATH_SEPARATOR + self::PATH_QUERY_FRAGMENT_DECODED + self::SUB_DELIMITERS;
+    }
+
+    private static function decodeVariableChars(): array
+    {
+        return self::PATH_QUERY_FRAGMENT_DECODED + self::SUB_DELIMITERS;
+    }
+
+    private static function decodeQueryFragmentChars(): array
+    {
+        return array_diff(self::PATH_QUERY_FRAGMENT_DECODED + self::QUERY_FRAGMENT_DECODED + self::SUB_DELIMITERS, self::QUERY_FRAGMENT_SPECIAL);
     }
 }

@@ -443,9 +443,9 @@ class UrlGeneratorTest extends TestCase
 
     public function testUrlEncoding()
     {
-        $expectedPath = '/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-            .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-            .'?query=@:%5B%5D/%28%29*%27%22%20%2B,;-._~%26%24%3C%3E%7C%7B%7D%25%5C%5E%60!?foo%3Dbar%23id';
+        $expectedPath = '/app.php/@:%5B%5D/()*\'%22%20+,;-._~&$%3C%3E%7C%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
+            .'/@:%5B%5D%2F()*\'%22%20+,;-._~&$%3C%3E%7C%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
+            .'?query=@:%5B%5D/()*\'%22%20%2B,;-._~%26$%3C%3E%7C%7B%7D%25%5C%5E%60!?foo%3Dbar%23id';
 
         // This tests the encoding of reserved characters that are used for delimiting of URI components (defined in RFC 3986)
         // and other special ASCII chars. These chars are tested as static text path, variable path and query param.
@@ -465,6 +465,12 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/dir/%2E/dir/%2E', $this->getGenerator($routes)->generate('test'));
         $routes = $this->getRoutes('test', new Route('/a./.a/a../..a/...'));
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
+    }
+
+    public function testEncodingOfSlashInPath()
+    {
+        $routes = $this->getRoutes('test', new Route('/dir/{path}/dir2', [], ['path' => '.+']));
+        $this->assertSame('/app.php/dir/foo%2Fbar/dir2', $this->getGenerator($routes)->generate('test', ['path' => 'foo/bar']));
     }
 
     public function testAdjacentVariables()
@@ -863,10 +869,10 @@ class UrlGeneratorTest extends TestCase
 
     public function provideLookAroundRequirementsInPath()
     {
-        yield ['/app.php/a/b/b%28ar/c/d/e', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)'];
-        yield ['/app.php/a/b/bar/c/d/e', '/{foo}/bar/{baz}', '.+(?!$)'];
-        yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<=/bar/).+'];
-        yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+'];
+        yield ['/app.php/a%2Fb/b(ar/c%2Fd%2Fe', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)'];
+        yield ['/app.php/a%2Fb/bar/c%2Fd%2Fe', '/{foo}/bar/{baz}', '.+(?!$)'];
+        yield ['/app.php/bar/a%2Fb/bam/c%2Fd%2Fe', '/bar/{foo}/bam/{baz}', '(?<=/bar/).+'];
+        yield ['/app.php/bar/a%2Fb/bam/c%2Fd%2Fe', '/bar/{foo}/bam/{baz}', '(?<!^).+'];
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, string $defaultLocale = null)

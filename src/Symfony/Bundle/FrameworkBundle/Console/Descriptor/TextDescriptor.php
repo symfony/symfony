@@ -477,13 +477,14 @@ class TextDescriptor extends Descriptor
 
         if (null !== $event) {
             $title = sprintf('Registered Listeners for "%s" Event', $event);
+            $registeredListeners = $eventDispatcher->getListeners($event);
         } else {
             $title = 'Registered Listeners Grouped by Event';
+            // Try to see if "events" exists
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
         }
 
         $options['output']->title($title);
-
-        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
             $this->renderEventListenerTable($eventDispatcher, $event, $registeredListeners, $options['output']);
         } else {

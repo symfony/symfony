@@ -46,7 +46,7 @@ class EventDispatcherDebugCommand extends Command
     {
         $this
             ->setDefinition([
-                new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
+                new InputArgument('event', InputArgument::OPTIONAL, 'An event name or a part of the event name'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
@@ -75,13 +75,21 @@ EOF
 
         $options = [];
         if ($event = $input->getArgument('event')) {
-            if (!$this->dispatcher->hasListeners($event)) {
-                $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+            if ($this->dispatcher->hasListeners($event)) {
+                $options = ['event' => $event];
+            } else {
+                // if there is no direct match, try find partial matches
+                $events = $this->searchForEvent($this->dispatcher, $event);
+                if (0 === \count($events)) {
+                    $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
-                return 0;
+                    return 0;
+                } elseif (1 === \count($events)) {
+                    $options = ['event' => $events[array_key_first($events)]];
+                } else {
+                    $options = ['events' => $events];
+                }
             }
-
-            $options = ['event' => $event];
         }
 
         $helper = new DescriptorHelper();
@@ -91,5 +99,18 @@ EOF
         $helper->describe($io, $this->dispatcher, $options);
 
         return 0;
+    }
+
+    private function searchForEvent(EventDispatcherInterface $dispatcher, $needle): array
+    {
+        $output = [];
+        $allEvents = array_keys($dispatcher->getListeners());
+        foreach ($allEvents as $event) {
+            if (str_contains($event, $needle)) {
+                $output[] = $event;
+            }
+        }
+
+        return $output;
     }
 }

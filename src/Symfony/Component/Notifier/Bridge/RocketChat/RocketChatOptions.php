@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @see https://rocket.chat/docs/administrator-guides/integrations/
  */

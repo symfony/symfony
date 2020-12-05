@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Authenticator\AbstractPreAuthenticatedAuthen
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class PreAuthenticatedUserBadge implements BadgeInterface
 {

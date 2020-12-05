@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class MessageEvent extends Event
 {

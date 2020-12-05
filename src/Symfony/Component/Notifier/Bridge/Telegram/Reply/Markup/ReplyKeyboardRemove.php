@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup;
  *
  * @see https://core.telegram.org/bots/api#replykeyboardremove
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class ReplyKeyboardRemove extends AbstractTelegramReplyMarkup
 {

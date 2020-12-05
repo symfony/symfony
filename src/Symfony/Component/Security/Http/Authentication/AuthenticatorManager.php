@@ -39,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Ryan Weaver <ryan@symfonycasts.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {

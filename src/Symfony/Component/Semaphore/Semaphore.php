@@ -23,7 +23,7 @@ use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 /**
  * Semaphore is the default implementation of the SemaphoreInterface.
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>

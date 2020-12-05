@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class TwilioTransportFactory extends AbstractTransportFactory
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class PasswordUpgradeBadge implements BadgeInterface
 {

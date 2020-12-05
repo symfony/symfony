@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class SinchTransportFactory extends AbstractTransportFactory
 {

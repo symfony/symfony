@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class LinkedInOptions implements MessageOptionsInterface
 {

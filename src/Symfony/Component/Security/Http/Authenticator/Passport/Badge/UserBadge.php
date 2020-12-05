@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class UserBadge implements BadgeInterface
 {

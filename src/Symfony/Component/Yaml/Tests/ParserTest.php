@@ -1617,6 +1617,11 @@ YAML
         ];
     }
 
+    public function testBackslashInSingleQuotedString()
+    {
+        $this->assertSame(['foo' => 'bar\\'], $this->parser->parse("foo: 'bar\'"));
+    }
+
     public function testParseMultiLineString()
     {
         $this->assertEquals("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));

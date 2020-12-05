@@ -831,6 +831,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 // replace multiple new lines with a single newline
                 $rawChunk .= preg_replace(['/\n{2,}/S'], "\n", $token[1]);
             } elseif (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT])) {
+                if (!\in_array($rawChunk[\strlen($rawChunk) - 1], [' ', "\n", "\r", "\t"], true)) {
+                    $rawChunk .= ' ';
+                }
                 $ignoreSpace = true;
             } else {
                 $rawChunk .= $token[1];
@@ -838,6 +841,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 // The PHP-open tag already has a new-line
                 if (\T_OPEN_TAG === $token[0]) {
                     $ignoreSpace = true;
+                } else {
+                    $ignoreSpace = false;
                 }
             }
         }

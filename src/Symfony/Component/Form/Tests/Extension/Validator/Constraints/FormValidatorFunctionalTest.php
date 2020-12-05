@@ -17,6 +17,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,6 +28,7 @@ use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
@@ -286,6 +288,39 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[field2].data', $violations[1]->getPropertyPath());
     }
 
+    public function testCascadeValidationToChildFormsWithTwoValidConstraints()
+    {
+        $form = $this->formFactory->create(ReviewType::class);
+
+        $form->submit([
+            'rating' => 1,
+            'title' => 'Sample Title',
+        ]);
+
+        $violations = $this->validator->validate($form);
+
+        $this->assertCount(1, $violations);
+        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
+        $this->assertSame('children[author].data.email', $violations[0]->getPropertyPath());
+    }
+
+    public function testCascadeValidationToChildFormsWithTwoValidConstraints2()
+    {
+        $form = $this->formFactory->create(ReviewType::class);
+
+        $form->submit([
+            'title' => 'Sample Title',
+        ]);
+
+        $violations = $this->validator->validate($form);
+
+        $this->assertCount(2, $violations);
+        $this->assertSame('This value should not be blank.', $violations[0]->getMessage());
+        $this->assertSame('data.rating', $violations[0]->getPropertyPath());
+        $this->assertSame('This value should not be blank.', $violations[1]->getMessage());
+        $this->assertSame('children[author].data.email', $violations[1]->getPropertyPath());
+    }
+
     public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence()
     {
         $form = $this->formFactory->create(FormType::class, null, [
@@ -442,5 +477,64 @@ class FooType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('data_class', Foo::class);
+    }
+}
+
+class Review
+{
+    public $rating;
+    public $title;
+    public $author;
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('title', new NotBlank());
+        $metadata->addPropertyConstraint('rating', new NotBlank());
+    }
+}
+
+class ReviewType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('rating', IntegerType::class, [
+                'constraints' => [new Valid()],
+            ])
+            ->add('title')
+            ->add('author', CustomerType::class, [
+                'constraints' => [new Valid()],
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('data_class', Review::class);
+    }
+}
+
+class Customer
+{
+    public $email;
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('email', new NotBlank());
+    }
+}
+
+class CustomerType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('email')
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('data_class', Customer::class);
     }
 }

@@ -498,6 +498,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(8, $definition->getArgument(2));
     }
 
+    public function testPhpErrorsWithLogLevels()
+    {
+        $container = $this->createContainerFromFile('php_errors_log_levels');
+
+        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertSame([
+            \E_NOTICE => \Psr\Log\LogLevel::ERROR,
+            \E_WARNING => \Psr\Log\LogLevel::ERROR,
+        ], $definition->getArgument(2));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

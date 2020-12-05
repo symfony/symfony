@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class ChannelPolicy implements ChannelPolicyInterface
 {

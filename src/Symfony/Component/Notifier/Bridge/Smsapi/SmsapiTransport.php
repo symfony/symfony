@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Marcin Szepczynski <szepczynski@gmail.com>
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class SmsapiTransport extends AbstractTransport
 {

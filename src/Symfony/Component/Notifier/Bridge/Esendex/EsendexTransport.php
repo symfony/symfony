@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class EsendexTransport extends AbstractTransport
 {

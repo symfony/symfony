@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#sharecontent
  */

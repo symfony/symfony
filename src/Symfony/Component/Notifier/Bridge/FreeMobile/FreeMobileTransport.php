@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class FreeMobileTransport extends AbstractTransport
 {

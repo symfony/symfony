@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class SinchTransport extends AbstractTransport
 {

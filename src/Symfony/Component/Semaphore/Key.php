@@ -16,7 +16,7 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 /**
  * Key is a container for the state of the semaphores in stores.
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>

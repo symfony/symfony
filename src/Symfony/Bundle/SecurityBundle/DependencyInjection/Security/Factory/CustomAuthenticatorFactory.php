@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface
 {

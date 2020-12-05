@@ -18,7 +18,7 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *
  * @internal
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class SlidingWindow implements LimiterStateInterface
 {

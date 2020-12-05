@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @internal
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class GoogleChatTransport extends AbstractTransport
 {

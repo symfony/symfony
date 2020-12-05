@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerInterface
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class AuthenticatorManagerListener extends AbstractListener
 {

@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * @author Wouter de Jong <wouter@driveamber.com>
  *
  * @final
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class CheckCredentialsListener implements EventSubscriberInterface
 {

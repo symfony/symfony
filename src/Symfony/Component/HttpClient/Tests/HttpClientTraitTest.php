@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -118,6 +119,20 @@ class HttpClientTraitTest extends TestCase
             [self::RFC3986_BASE, '?0',            'http://a/b/c/d;p?0'],
             [self::RFC3986_BASE, '#0',            'http://a/b/c/d;p?q#0'],
         ];
+    }
+
+    public function testResolveUrlWithoutScheme()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8080". Did you forget to add "http(s)://"?');
+        self::resolveUrl(self::parseUrl('localhost:8080'), null);
+    }
+
+    public function testResolveBaseUrlWitoutScheme()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid URL: scheme is missing in "//localhost:8081". Did you forget to add "http(s)://"?');
+        self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
     }
 
     /**

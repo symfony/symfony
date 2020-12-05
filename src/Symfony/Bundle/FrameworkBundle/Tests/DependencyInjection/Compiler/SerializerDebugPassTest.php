@@ -49,7 +49,7 @@ class SerializerDebugPassTest extends TestCase
         ];
 
         foreach ($debugDefinitions as $originalName => $decoratorName) {
-            self::assertTrue($container->hasDefinition($decoratorName), 'Container should have definition: '. $decoratorName);
+            self::assertTrue($container->hasDefinition($decoratorName), 'Container should have definition: '.$decoratorName);
             $definition = $container->getDefinition($decoratorName);
             self::assertTrue($definition->hasTag('debug.normalizer'));
             $decoratedService = $definition->getDecoratedService();

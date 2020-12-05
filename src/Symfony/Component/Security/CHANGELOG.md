@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Changed the signature of `TokenStorageInterface::setToken()` to `setToken(?TokenInterface $token)`
+ * Deprecated calling `TokenStorage::setToken()` or `UsageTrackingTokenStorage::setToken()` without arguments
+
 5.2.0
 -----
 

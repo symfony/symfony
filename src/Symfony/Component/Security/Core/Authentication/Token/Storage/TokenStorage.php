@@ -45,6 +45,10 @@ class TokenStorage implements TokenStorageInterface, ResetInterface
      */
     public function setToken(TokenInterface $token = null)
     {
+        if (1 > \func_num_args()) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Calling "%s()" without any arguments is deprecated. Please explicitly pass null if you want to unset the token.', __METHOD__);
+        }
+
         if ($token) {
             // ensure any initializer is called
             $this->getToken();

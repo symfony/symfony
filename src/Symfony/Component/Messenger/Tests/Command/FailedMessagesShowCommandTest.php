@@ -469,7 +469,7 @@ EOF;
         $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
     }
 
-    public function testListMessagesReturnsGroupByClassName()
+    public function testListMessagesReturnsCountByClassName()
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $envelope = new Envelope(new \stdClass(), [
@@ -487,7 +487,7 @@ EOF;
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(['--group' => 1]);
+        $tester->execute(['--stats' => 1]);
         $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
     }
 

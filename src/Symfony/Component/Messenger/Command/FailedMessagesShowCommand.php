@@ -42,7 +42,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
-                new InputOption('group', null, InputOption::VALUE_NONE, 'Group by message class'),
+                new InputOption('stats', null, InputOption::VALUE_NONE, 'Display the message count by class'),
                 new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setDescription(self::$defaultDescription)
@@ -83,8 +83,8 @@ EOF
             throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $failureTransportName));
         }
 
-        if ($input->getOption('group')) {
-            $this->listMessagesPerClass($failureTransportName, $io);
+        if ($input->getOption('stats')) {
+            $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
         } elseif (null === $id = $input->getArgument('id')) {
             $this->listMessages($failureTransportName, $io, $input->getOption('max'));
         } else {
@@ -102,6 +102,12 @@ EOF
 
         $rows = [];
         foreach ($envelopes as $envelope) {
+            $currentClassName = \get_class($envelope->getMessage());
+
+            if ($classFilter && $classFilter !== $currentClassName) {
+                continue;
+            }
+
             /** @var RedeliveryStamp|null $lastRedeliveryStamp */
             $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
             /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
@@ -116,18 +122,12 @@ EOF
                 $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
             }
 
-            $currentClassName = str_replace('\\', '', \get_class($envelope->getMessage()));
-
-            if (!$classFilter || $classFilter === $currentClassName) {
-                $rows[] = [
-                    $this->getMessageId($envelope),
-                    $currentClassName,
-                    null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format(
-                        'Y-m-d H:i:s'
-                    ),
-                    $errorMessage,
-                ];
-            }
+            $rows[] = [
+                $this->getMessageId($envelope),
+                $currentClassName,
+                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                $errorMessage,
+            ];
         }
 
         if (0 === \count($rows)) {
@@ -145,20 +145,20 @@ EOF
         $io->comment(sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
     }
 
-    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io)
+    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max)
     {
         /** @var ListableReceiverInterface $receiver */
-        $this->getReceiver($failedTransportName);
-        $envelopes = $receiver->all();
+        $receiver = $this->getReceiver($failedTransportName);
+        $envelopes = $receiver->all($max);
 
         $countPerClass = [];
 
         foreach ($envelopes as $envelope) {
             if (!isset($countPerClass[\get_class($envelope->getMessage())])) {
-                $countPerClass[\get_class($envelope->getMessage())] = 0;
+                $countPerClass[$c = \get_class($envelope->getMessage())] = [$c, 0];
             }
 
-            $countPerClass[\get_class($envelope->getMessage())]++;
+            ++$countPerClass[\get_class($envelope->getMessage())][1];
         }
 
         if (0 === \count($countPerClass)) {
@@ -166,13 +166,6 @@ EOF
 
             return;
         }
-
-        array_walk(
-            $countPerClass,
-            function (&$count, $class) {
-                $count = [$class, $count];
-            }
-        );
 
         $io->table(['Class', 'Count'], $countPerClass);
     }

@@ -11,17 +11,9 @@
 
 namespace Symfony\Component\Serializer\Tests\Debug\Normalizer;
 
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/**
- * Class Test
- * @package Debug\Normalizer
- */
 final class TestCacheableNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     /**

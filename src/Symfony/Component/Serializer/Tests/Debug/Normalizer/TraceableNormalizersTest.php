@@ -221,18 +221,18 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideYesNo
      */
-    public function testCacheableSupport(bool $isCachable):void
+    public function testCacheableSupport(bool $isCachable): void
     {
         $tracer = new TraceableHybridNormalizer(new TestCacheableNormalizer($isCachable));
         self::assertSame($isCachable, $tracer->hasCacheableSupportsMethod());
     }
 
-    public function testCacheableSupportOnNonCacheableDelegates():void
+    public function testCacheableSupportOnNonCacheableDelegates(): void
     {
         self::assertFalse($this->traceableNormalizer->hasCacheableSupportsMethod());
     }
 
-    public function provideYesNo():iterable
+    public function provideYesNo(): iterable
     {
         yield 'yes' => [true];
         yield 'no' => [false];

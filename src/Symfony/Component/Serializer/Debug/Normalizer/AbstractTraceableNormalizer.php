@@ -96,7 +96,8 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
         }
     }
 
-    public function hasCacheableSupportsMethod(): bool{
+    public function hasCacheableSupportsMethod(): bool
+    {
         if ($this->delegate instanceof CacheableSupportsMethodInterface) {
             return $this->delegate->hasCacheableSupportsMethod();
         }

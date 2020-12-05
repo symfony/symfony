@@ -33,7 +33,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * these chars are only sub-delimiters that have no predefined meaning and can therefore be used literally
      * so URI producing applications can use these chars to delimit subcomponents in a path segment without being
-     * encoded for better readability
+     * encoded for better readability.
      *
      * @see https://tools.ietf.org/html/rfc3986#page-11 2
      */
@@ -52,14 +52,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     ];
 
     /**
-     * URL path segment separator
+     * URL path segment separator.
      *
      * @see https://tools.ietf.org/html/rfc3986#page-22 3.3
      */
     protected const PATH_SEPARATOR = ['%2F' => '/'];
 
     /**
-     * URL path allowed characters
+     * URL path allowed characters.
      *
      * the following chars are general delimiters in the URI specification but have only special meaning in the
      * authority component so they can safely be used in the path in unencoded form
@@ -72,7 +72,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     ];
 
     /**
-     * URL query and fragment allowed characters
+     * URL query and fragment allowed characters.
      *
      * @see https://tools.ietf.org/html/rfc3986#page-22 3.4 and 3.5
      */
@@ -84,7 +84,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     ];
 
     /**
-     * URL query and fragment special characters used as space respectively form urlencoded key value pairs
+     * URL query and fragment special characters used as space respectively form urlencoded key value pairs.
      */
     protected const QUERY_FRAGMENT_SPECIAL = [
         '%24' => '+',
@@ -223,12 +223,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         return '';
                     }
 
-                    $url = $token[1] . self::encodeVariable($mergedParams[$varName]) . $url;
+                    $url = $token[1].self::encodeVariable($mergedParams[$varName]).$url;
                     $optional = false;
                 }
             } else {
                 // static text
-                $url = self::encodePath($token[1]) . $url;
+                $url = self::encodePath($token[1]).$url;
                 $optional = false;
             }
         }
@@ -323,11 +323,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if ($extra && $query = http_build_query($extra, '', '&', \PHP_QUERY_RFC3986)) {
-            $url .= '?' . strtr($query, self::decodeQueryFragmentChars());
+            $url .= '?'.strtr($query, self::decodeQueryFragmentChars());
         }
 
         if ('' !== $fragment) {
-            $url .= '#' . strtr(rawurlencode($fragment), self::decodeQueryFragmentChars());
+            $url .= '#'.strtr(rawurlencode($fragment), self::decodeQueryFragmentChars());
         }
 
         return $url;

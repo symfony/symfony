@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableDenormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableHybridNormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableNormalizer;
-use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

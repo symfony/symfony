@@ -28,7 +28,7 @@ return static function (ContainerConfigurator $container) {
         ->set('data_collector.serializer', SerializerDataCollector::class)
         ->args([
             service('debug.serializer'),
-            tagged_iterator('debug.normalizer')
+            tagged_iterator('debug.normalizer'),
         ])
         ->tag('data_collector', [
             'template' => '@WebProfiler/Collector/serializer.html.twig',

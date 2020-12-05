@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Debug\Normalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-final class TraceableHybridNormalizer extends AbstractTraceableNormalizer implements NormalizerInterface,
-                                                                                     DenormalizerInterface
+final class TraceableHybridNormalizer extends AbstractTraceableNormalizer implements NormalizerInterface, DenormalizerInterface
 {
 }

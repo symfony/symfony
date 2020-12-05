@@ -18,8 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class TestSerializerNormalizerDenormalizerAware implements SerializerAwareInterface, DenormalizerAwareInterface,
-                                                                 NormalizerAwareInterface, NormalizerInterface
+final class TestSerializerNormalizerDenormalizerAware implements SerializerAwareInterface, DenormalizerAwareInterface, NormalizerAwareInterface, NormalizerInterface
 {
     public $denormalizer;
     public $serializer;

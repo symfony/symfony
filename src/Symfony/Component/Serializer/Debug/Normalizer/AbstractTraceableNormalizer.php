@@ -18,8 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, DenormalizerAwareInterface,
-                                                      NormalizerAwareInterface
+abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, DenormalizerAwareInterface, NormalizerAwareInterface
 {
     /**
      * @var DenormalizerInterface|NormalizerInterface

@@ -46,9 +46,7 @@ class SerializerDebugPass implements CompilerPassInterface
         $normalizerClass = $normalizerDef->getClass();
 
         if (!$normalizerRef = $container->getReflectionClass($normalizerClass)) {
-            throw new InvalidArgumentException(
-                sprintf('Class "%s" used for service "%s" cannot be found.', $normalizerClass, $id)
-            );
+            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $normalizerClass, $id));
         }
 
         $isNormalizer = $normalizerRef->implementsInterface(NormalizerInterface::class);
@@ -66,9 +64,7 @@ class SerializerDebugPass implements CompilerPassInterface
         } elseif ($isDenormalizer) {
             $decoratorClass = TraceableDenormalizer::class;
         } else {
-            throw new RuntimeException(
-                sprintf('Normalizer with id %s neither implements NormalizerInterface nor DenormalizerInterface!', $id)
-            );
+            throw new RuntimeException(sprintf('Normalizer with id %s neither implements NormalizerInterface nor DenormalizerInterface!', $id));
         }
 
         $decoratorDef = (new Definition($decoratorClass))

@@ -50,7 +50,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @param bool|string $ignoreErrors Whether errors should be ignored; pass "not_found" to ignore only when the loaded resource is not found
      */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null, $exclude = null)
+    public function import($resource, string $type = null, $ignoreErrors = false, string $sourceResource = null, $exclude = null)
     {
         $args = \func_get_args();
 
@@ -87,7 +87,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      */
-    public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
+    public function registerClasses(Definition $prototype, string $namespace, string $resource, $exclude = null)
     {
         if ('\\' !== substr($namespace, -1)) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": "%s".', $namespace));
@@ -134,10 +134,8 @@ abstract class FileLoader extends BaseFileLoader
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
-     *
-     * @param string $id
      */
-    protected function setDefinition($id, Definition $definition)
+    protected function setDefinition(string $id, Definition $definition)
     {
         $this->container->removeBindings($id);
 

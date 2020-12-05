@@ -39,6 +39,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
                 new InputOption('transport', null, InputOption::VALUE_OPTIONAL, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
+                new InputOption('stats', null, InputOption::VALUE_NONE, 'Display the message count by class'),
+                new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows message that are pending in the failure transport.
@@ -77,8 +79,10 @@ EOF
             throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $failureTransportName));
         }
 
-        if (null === $id = $input->getArgument('id')) {
-            $this->listMessages($failureTransportName, $io, $input->getOption('max'));
+        if ($input->getOption('stats')) {
+            $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
+        } elseif (null === $id = $input->getArgument('id')) {
+            $this->listMessages($failureTransportName, $io, $input->getOption('max'), $input->getOption('class-filter'));
         } else {
             $this->showMessage($failureTransportName, $id, $io);
         }
@@ -86,14 +90,25 @@ EOF
         return 0;
     }
 
-    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max)
+    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, ?string $classFilter)
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $rows = [];
+
+        if ($classFilter) {
+            $io->comment(sprintf('Displaying only \'%s\' messages', $classFilter));
+        }
+
         foreach ($envelopes as $envelope) {
+            $currentClassName = \get_class($envelope->getMessage());
+
+            if ($classFilter && $classFilter !== $currentClassName) {
+                continue;
+            }
+
             /** @var RedeliveryStamp|null $lastRedeliveryStamp */
             $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
             /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
@@ -106,13 +121,15 @@ EOF
 
             $rows[] = [
                 $this->getMessageId($envelope),
-                \get_class($envelope->getMessage()),
+                $currentClassName,
                 null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
                 $errorMessage,
             ];
         }
 
-        if (0 === \count($rows)) {
+        $rowsCount = \count($rows);
+
+        if (0 === $rowsCount) {
             $io->success('No failed messages were found.');
 
             return;
@@ -120,11 +137,40 @@ EOF
 
         $io->table(['Id', 'Class', 'Failed at', 'Error'], $rows);
 
-        if (\count($rows) === $max) {
+        if ($rowsCount === $max) {
             $io->comment(sprintf('Showing first %d messages.', $max));
+        } elseif ($classFilter) {
+            $io->comment(sprintf('Showing %d message(s).', $rowsCount));
         }
 
         $io->comment(sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
+    }
+
+    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max)
+    {
+        /** @var ListableReceiverInterface $receiver */
+        $receiver = $this->getReceiver($failedTransportName);
+        $envelopes = $receiver->all($max);
+
+        $countPerClass = [];
+
+        foreach ($envelopes as $envelope) {
+            $c = \get_class($envelope->getMessage());
+
+            if (!isset($countPerClass[$c])) {
+                $countPerClass[$c] = [$c, 0];
+            }
+
+            ++$countPerClass[$c][1];
+        }
+
+        if (0 === \count($countPerClass)) {
+            $io->success('No failed messages were found.');
+
+            return;
+        }
+
+        $io->table(['Class', 'Count'], $countPerClass);
     }
 
     private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io)

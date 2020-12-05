@@ -384,13 +384,9 @@ class Configuration implements ConfigurationInterface
                                         ->defaultValue([])
                                         ->prototype('scalar')->end()
                                     ->end()
-                                    ->variableNode('events_to_dispatch')
-                                        ->defaultValue(null)
+                                    ->arrayNode('events_to_dispatch')
                                         ->validate()
                                             ->ifTrue(function ($v) {
-                                                if (null === $v) {
-                                                    return false;
-                                                }
                                                 if (!\is_array($v)) {
                                                     return true;
                                                 }

@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-05T08:56:07Z
+
+That's a BC break, isn't it?
+This cannot go on 5.3 if yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-05T09:00:01Z
+
+Can't the classes also be updated to use `Traversable`?
+Also, I don't understand the original issue: what is this fixing? What's wrong with accepting arrays?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-05T09:01:04Z
+
+Last comment: can't we fix this right away in 5.1?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T09:10:20Z
+
+> That's a BC break, isn't it?
+
+The PR as it is right now is not a BC break, as far as I can tell. We can change the parameter type declaration on the interface from `iterable` to `Traversable` and existing implementations with a `iterable` type declaration will continue to work.
+
+> Can't the classes also be updated to use `Traversable`?
+
+That's technically a BC break because they wouldn't accept arrays anymore. So if there is existing code that calls those classes with an array (for what reason ever), those calls would fail.
+
+> Also, I don't understand the original issue: what is this fixing? What's wrong with accepting arrays?
+
+`DataMapperInterface` is a contract for userland code. A data mapper is usually called by the form component and not by other userland code. The component however will always call that method with a `Traversable` instance. The `iterable` type declaration somewhat forces you to handle arrays as well which is a case that never happens.
+
+The issue gives a good example: The sample code from the documentation would break if you passed an array.
+
+> Last comment: can't we fix this right away in 5.1?
+
+I think we need that deprecation layer which would be a show-stopper for 5.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-05T09:35:10Z
+
+> > Can't the classes also be updated to use Traversable?
+>
+> That's technically a BC break because they wouldn't accept arrays anymore. So if there is existing code that calls those classes with an array (for what reason ever), those calls would fail.
+
+How are we going to change their type hint then, since we'd like to do it, isn't it?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T09:36:45Z
+
+> How are we going to change their type hint then, since we'd like to do it, isn't it?
+
+Trigger a deprecation on 5.3 if we get an array and change the type declaration on 6.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-05T09:46:39Z
+
+> Trigger a deprecation on 5.3 if we get an array and change the type declaration on 6.0.
+
+Hm, and type widening will mean we won't break classes that extend/override these methods.
+What bothers me is that ppl won't be able to fix their own type hints in their child classes.
+But I guess there is no way around.
+
+Shouldn't we improve the deprecation message to tell about the type change? At least something that will ensure we won't forget how to clean the deprecation when preparing 6.0? Eg "method foo() will only accept Traversable, array give."
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T10:21:49Z
+
+> What bothers me is that ppl won't be able to fix their own type hints in their child classes.
+
+My understanding is that userland code is supposed to implement `DataMapperInterface` directly instead of extending Symfony's classes. Since we *can* change the interface already, developers can upgrade their type declarations right away.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2020-12-05T12:58:47Z
+
+> What bothers me is that ppl won't be able to fix their own type hints in their child classes.
+
+We cannot forbid users to widen parameter types in subclasses/implementations, they can keep `iterable` if the want to.

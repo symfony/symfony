@@ -42,7 +42,7 @@ class CoverageListenerTrait
             return;
         }
 
-        $annotations = $test->getAnnotations();
+        $annotations = Test::parseTestMethodAnnotations(\get_class($test), $test->getName(false));
 
         $ignoredAnnotations = ['covers', 'coversDefaultClass', 'coversNothing'];
 

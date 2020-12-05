@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-11-07T07:39:40Z
+
+Looks like a new feature to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-11-27T06:43:36Z
+
+@lyrixx Do you have time to finish this PR and rebase it on 5.x? Thank you
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-11-27T09:07:20Z
+
+Oups, yes. I'll do that ASAP
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-11-30T19:30:59Z
+
+The PR should be ready
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-05T16:27:09Z
+
+I added true support for XML (can't wait to remove this :p) + added tests
+It should be OK now
+
+BTW, Fabbot seems wrong:
+```
+in src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/Fixtures/yml/php_errors_log_levels.yml
+Non-string keys are not supported. Quote your evaluable mapping keys instead at line 4 (near "!php/const \E_NOTICE: !php/const Psr\Log\LogLevel::ERROR").
+```

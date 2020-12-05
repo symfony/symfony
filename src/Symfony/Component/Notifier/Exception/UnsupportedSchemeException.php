@@ -100,6 +100,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
         ],
+        'mercure' => [
+            'class' => Bridge\Mercure\MercureTransportFactory::class,
+            'package' => 'symfony/mercure-notifier',
+        ],
     ];
 
     /**

@@ -51,7 +51,7 @@ class SerializerDataCollector extends DataCollector
 
     public function getName(): string
     {
-        return 'serializer.data_collector';
+        return 'serializer';
     }
 
     public function reset(): void

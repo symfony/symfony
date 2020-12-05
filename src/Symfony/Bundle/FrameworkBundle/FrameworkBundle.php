@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTra
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerDebugPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SessionPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
@@ -166,6 +167,7 @@ class FrameworkBundle extends Bundle
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
+            $container->addCompilerPass(new SerializerDebugPass());
         }
     }
 

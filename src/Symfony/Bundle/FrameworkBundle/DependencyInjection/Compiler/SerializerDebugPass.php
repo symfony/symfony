@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableDenormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableHybridNormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableNormalizer;
+use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -30,6 +31,10 @@ class SerializerDebugPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        if (!$container->hasDefinition('serializer')) {
+            return;
+        }
+
         foreach ($container->findTaggedServiceIds('serializer.normalizer') as $id => $tags) {
             $this->decorateNormalizer($id, $container);
         }
@@ -64,7 +69,7 @@ class SerializerDebugPass implements CompilerPassInterface
         } elseif ($isDenormalizer) {
             $decoratorClass = TraceableDenormalizer::class;
         } else {
-            throw new RuntimeException(sprintf('Normalizer with id %s neither implements NormalizerInterface nor DenormalizerInterface!', $id));
+            throw new RuntimeException(sprintf('Normalizer with id "%s" neither implements NormalizerInterface nor DenormalizerInterface!', $id));
         }
 
         $decoratorDef = (new Definition($decoratorClass))

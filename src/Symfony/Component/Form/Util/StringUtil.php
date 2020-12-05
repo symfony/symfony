@@ -33,7 +33,7 @@ class StringUtil
      */
     public static function trim($string)
     {
-        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $string)) {
+        if (null !== $result = @preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$/u', '', $string)) {
             return $result;
         }
 

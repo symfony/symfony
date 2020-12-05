@@ -504,7 +504,9 @@ class TextDescriptor extends Descriptor
         }
 
         try {
-            if (\is_array($controller)) {
+            if (null === $controller) {
+                return $anchorText;
+            } elseif (\is_array($controller)) {
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
             } elseif ($controller instanceof \Closure) {
                 $r = new \ReflectionFunction($controller);

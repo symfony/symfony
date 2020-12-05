@@ -358,7 +358,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Register Firewall-specific event dispatcher
         $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
-        $container->register($firewallEventDispatcherId, EventDispatcher::class);
+        $container->register($firewallEventDispatcherId, EventDispatcher::class)
+            ->addTag('event_dispatcher.dispatcher');
 
         // Register listeners
         $listeners = [];

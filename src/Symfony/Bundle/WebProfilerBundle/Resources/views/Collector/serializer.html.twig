@@ -1,0 +1,184 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('@WebProfiler/Icon/serializer.svg') }}
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            Serializer
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+{% endblock %}
+
+{% block menu %}
+    {% set disable = collector.serializations | length == 0 and collector.deserializations | length == 0 %}
+    <span class="label {{ disable ? 'disabled' }}">
+        <span class="icon">{{ include('data_collector/exchange-alt-solid.svg') }}</span>
+        <strong>Serializer</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Serializer</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.serializations | length }}</span>
+            <span class="label">Serializations</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.deserializations | length }}</span>
+            <span class="label">Deserializations</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.normalizations | length }}</span>
+            <span class="label">Normalizations</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.denormalizations | length }}</span>
+            <span class="label">Denormalizations</span>
+        </div>
+    </div>
+
+    <div class="sf-tabs">
+        <div class="tab {{ collector.serializations|length == 0 ? 'disabled' }}">
+            <h3 class="tab-title">Serializations <span class="badge">{{ collector.serializations | length }}</span></h3>
+
+            <div class="tab-content">
+                <h4>Serializations</h4>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Format</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Context</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for serialization in collector.serializations %}
+                        <tr>
+                            <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                            <td class="nowrap">{{ serialization.format }}</td>
+                            <td>{{ profiler_dump(serialization.data, maxDepth=2) }}</td>
+                            <td>{{ serialization.result }}</td>
+                            <td>{{ profiler_dump(serialization.context, maxDepth=2) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab {{ collector.deserializations|length == 0 ? 'disabled' }}">
+            <h3 class="tab-title">Deserializations <span class="badge">{{ collector.deserializations | length }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <h4>Deserializations</h4>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Format</th>
+                        <th>Type</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Context</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for deserialization in collector.deserializations %}
+                        <tr>
+                            <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                            <td class="nowrap">{{ deserialization.format }}</td>
+                            <td class="nowrap">{{ deserialization.type }}</td>
+                            <td>{{ deserialization.data }}</td>
+                            <td>{{ profiler_dump(deserialization.result, maxDepth=2) }}</td>
+                            <td>{{ profiler_dump(deserialization.context, maxDepth=2) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab {{ collector.normalizations|length == 0 ? 'disabled' }}">
+            <h3 class="tab-title">Normalizations <span class="badge">{{ collector.normalizations | length }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <h4>Normalizations</h4>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Format</th>
+                        <th>Normalizer</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Context</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for normalization in collector.normalizations %}
+                        <tr>
+                            <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                            <td class="nowrap">{{ normalization.format }}</td>
+                            <td>{{ profiler_dump(normalization.normalizer, maxDepth=2) }}</td>
+                            <td>{{ profiler_dump(normalization.data, maxDepth=2) }}</td>
+                            <td>{{ normalization.result }}</td>
+                            <td>{{ profiler_dump(normalization.context, maxDepth=2) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab {{ collector.denormalizations|length == 0 ? 'disabled' }}">
+            <h3 class="tab-title">Denormalizations <span class="badge">{{ collector.denormalizations | length }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <h4>Denormalizations</h4>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Format</th>
+                        <th>Denormalizer</th>
+                        <th>Type</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Context</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for denormalization in collector.denormalizations %}
+                        <tr>
+                            <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                            <td class="nowrap">{{ denormalization.format }}</td>
+                            <td class="nowrap">{{ denormalization.denormalizer }}</td>
+                            <td class="nowrap">{{ denormalization.type }}</td>
+                            <td>{{ denormalization.data }}</td>
+                            <td>{{ profiler_dump(denormalization.result, maxDepth=2) }}</td>
+                            <td>{{ profiler_dump(denormalization.context, maxDepth=2) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <small>
+            The icon is taken from <a href="https://fontawesome.com/icons/exchange-alt?style=solid">fontawesome</a> and
+            is under <a href="https://fontawesome.com/license/free">Creative Commons Attribution 4.0 International
+                license</a>.
+        </small>
+    </footer>
+{% endblock %}

@@ -14,10 +14,6 @@ namespace Symfony\Component\Serializer\Debug;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-/**
- * Class TraceableSerializer
- * @package App\Serializer
- */
 final class TraceableSerializer implements SerializerInterface, ResetInterface
 {
     /**

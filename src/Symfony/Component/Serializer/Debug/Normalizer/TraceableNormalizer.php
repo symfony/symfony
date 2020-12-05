@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer\Debug;
+namespace Symfony\Component\Serializer\Debug\Normalizer;
 
-class Serialization extends SerializerAction
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+final class TraceableNormalizer extends AbstractTraceableNormalizer implements NormalizerInterface
 {
 }

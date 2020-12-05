@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 final class FirebaseTransport extends AbstractTransport
 {

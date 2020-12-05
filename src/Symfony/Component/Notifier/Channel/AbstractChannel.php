@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.2
  */
 abstract class AbstractChannel implements ChannelInterface
 {

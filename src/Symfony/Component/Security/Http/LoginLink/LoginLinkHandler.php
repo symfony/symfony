@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\LoginLink;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encryption\SymmetricEncryption;
+use Symfony\Component\Security\Core\Encryption\SymmetricEncryptionInterface;
 use Symfony\Component\Security\Core\Exception\MalformedCipherException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -37,7 +37,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     private $expiredStorage;
     private $encryption;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage, SymmetricEncryption $encryption)
+    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage, SymmetricEncryptionInterface $encryption)
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;

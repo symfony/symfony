@@ -14,6 +14,6 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DecryptionException extends \Exception implements EncryptionExceptionInterface
+class EncryptionException extends \Exception implements EncryptionExceptionInterface
 {
 }

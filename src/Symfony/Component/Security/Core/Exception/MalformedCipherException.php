@@ -18,6 +18,6 @@ class MalformedCipherException extends \Exception implements EncryptionException
 {
     public function __construct(\Throwable $previous = null)
     {
-        parent::__construct('The message you provided does not look like a valid cipher text.', 0, $previous);
+        parent::__construct('The message you provided is not a valid cipher text.', 0, $previous);
     }
 }

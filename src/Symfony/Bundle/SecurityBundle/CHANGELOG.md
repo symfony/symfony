@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Add the `debug:firewall` command.
  * Deprecate `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Deprecate the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

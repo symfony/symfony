@@ -164,6 +164,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
+        if (class_exists(Application::class)) {
+            $loader->load('debug_console.php');
+            $debugCommand = $container->getDefinition('security.command.debug_firewall');
+            $debugCommand->replaceArgument(4, $this->authenticatorManagerEnabled);
+        }
+
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
@@ -298,7 +304,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
         }
-        $mapDef->replaceArgument(0, ServiceLocatorTagPass::register($container, $contextRefs));
+
+        $container->setAlias('security.firewall.context_locator', (string) ServiceLocatorTagPass::register($container, $contextRefs));
+
+        $mapDef->replaceArgument(0, new Reference('security.firewall.context_locator'));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
 
         if (!$this->authenticatorManagerEnabled) {
@@ -503,6 +512,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->addTag('kernel.event_subscriber', ['dispatcher' => $firewallEventDispatcherId]);
 
             $listeners[] = new Reference('security.firewall.authenticator.'.$id);
+
+            // Add authenticators to the debug:firewall command
+            $debugCommand = $container->getDefinition('security.command.debug_firewall');
+            $debugCommand->replaceArgument(3, array_merge($debugCommand->getArgument(3), [$id => $authenticators]));
         }
 
         $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);

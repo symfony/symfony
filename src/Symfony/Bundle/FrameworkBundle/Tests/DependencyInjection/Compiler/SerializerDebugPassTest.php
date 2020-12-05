@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerDebugPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestHybridNormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -26,6 +27,7 @@ class SerializerDebugPassTest extends TestCase
     {
         $serializerDebugPass = new SerializerDebugPass();
         $container = new ContainerBuilder();
+        $container->register('serializer', SerializerInterface::class);
 
         $container->register('Test\normalizer', TestNormalizer::class)
             ->addTag(self::NORMALIZER_TAG);
@@ -47,7 +49,7 @@ class SerializerDebugPassTest extends TestCase
         ];
 
         foreach ($debugDefinitions as $originalName => $decoratorName) {
-            self::assertTrue($container->hasDefinition($decoratorName));
+            self::assertTrue($container->hasDefinition($decoratorName), 'Container should have definition: '. $decoratorName);
             $definition = $container->getDefinition($decoratorName);
             self::assertTrue($definition->hasTag('debug.normalizer'));
             $decoratedService = $definition->getDecoratedService();

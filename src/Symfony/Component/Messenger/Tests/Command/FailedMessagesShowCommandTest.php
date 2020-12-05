@@ -68,14 +68,14 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['id' => 15]);
 
         $this->assertStringContainsString(sprintf(<<<EOF
-------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async                
+------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Code    123
+  Error Class   Exception
+  Transport     async
 EOF
             ,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
@@ -110,13 +110,13 @@ EOF
         $tester->execute(['id' => 15]);
 
         $this->assertStringContainsString(sprintf(<<<EOF
-------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
+------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Code    123
+  Error Class   Exception
   Transport     async
 EOF
             ,
@@ -149,14 +149,14 @@ EOF
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
         $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async                
+ ------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Code    123
+  Error Class   Exception
+  Transport     async
 EOF
             ,
             $redeliveryStamp2->getRedeliveredAt()->format('Y-m-d H:i:s')),
@@ -191,13 +191,13 @@ EOF
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
         $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
+ ------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Code    123
+  Error Class   Exception
   Transport     async
 EOF
             ,
@@ -226,14 +226,14 @@ EOF
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
         $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code                         
-  Error Class   (unknown)            
-  Transport     async                
+ ------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Code
+  Error Class   (unknown)
+  Transport     async
 EOF
             ,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
@@ -441,6 +441,54 @@ EOF;
         $tester = new CommandTester($command);
         $tester->execute(['--max' => 1]);
         $this->assertStringContainsString('Showing first 1 messages.', $tester->getDisplay(true));
+    }
+
+    public function testListMessagesReturnsFilteredByClassMessage()
+    {
+        $sentToFailureStamp = new SentToFailureTransportStamp('async');
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            $sentToFailureStamp,
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('all')->with()->willReturn([$envelope]);
+
+        $command = new FailedMessagesShowCommand(
+            'failure_receiver',
+            $receiver
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
+        $tester->execute(['--class-filter' => 'stdClass']);
+        $this->assertStringContainsString('Things are bad!', $tester->getDisplay(true));
+        $tester->execute(['--class-filter' => 'namespace\otherClass']);
+        $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
+    }
+
+    public function testListMessagesReturnsGroupByClassName()
+    {
+        $sentToFailureStamp = new SentToFailureTransportStamp('async');
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            $sentToFailureStamp,
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->method('all')->with()->willReturn([$envelope, $envelope]);
+
+        $command = new FailedMessagesShowCommand(
+            'failure_receiver',
+            $receiver
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--group' => 1]);
+        $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
     }
 
     /**

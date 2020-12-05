@@ -30,6 +30,7 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
 
     /**
      * AbstractTraceableNormalizer constructor.
+     *
      * @param DenormalizerInterface|NormalizerInterface $delegate
      */
     public function __construct($delegate)
@@ -95,17 +96,11 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
         }
     }
 
-    /**
-     * @return array
-     */
     public function getNormalizations(): array
     {
         return $this->normalizations;
     }
 
-    /**
-     * @return array
-     */
     public function getDenormalizations(): array
     {
         return $this->denormalizations;

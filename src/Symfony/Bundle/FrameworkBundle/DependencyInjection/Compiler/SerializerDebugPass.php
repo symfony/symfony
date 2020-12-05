@@ -67,7 +67,7 @@ class SerializerDebugPass implements CompilerPassInterface
             $decoratorClass = TraceableDenormalizer::class;
         } else {
             throw new RuntimeException(
-                sprintf("Normalizer with id %s neither implements NormalizerInterface nor DenormalizerInterface!", $id)
+                sprintf('Normalizer with id %s neither implements NormalizerInterface nor DenormalizerInterface!', $id)
             );
         }
 

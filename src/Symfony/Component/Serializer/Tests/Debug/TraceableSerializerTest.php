@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Class TraceableSerializerTest
+ * Class TraceableSerializerTest.
  */
 final class TraceableSerializerTest extends TestCase
 {
@@ -66,7 +66,6 @@ final class TraceableSerializerTest extends TestCase
 
     public function testTracerAddsSerializationToSerializationsStack(): void
     {
-
         $this->assertSerializeToBeCalled();
 
         $this->callSerialize();
@@ -118,7 +117,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertSame($this->something, $deserializations[0]->result);
     }
 
-    public function testResetClearsSerializationsAndDeserializationsStacks():void
+    public function testResetClearsSerializationsAndDeserializationsStacks(): void
     {
         $this->assertSerializeToBeCalled();
         $this->assertDeserializeToBeCalled();

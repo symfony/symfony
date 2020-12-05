@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Debug\Deserialization;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Class Denormalization
+ * Class Denormalization.
  */
 final class Denormalization extends Deserialization
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Debug\Serialization;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Class Normalization
+ * Class Normalization.
  */
 final class Normalization extends Serialization
 {

@@ -49,6 +49,12 @@ Form
  * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
  * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been removed, use `\NumberFormatter::ROUND_*` instead.
  * Removed `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
+ * Changed `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Changed `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Changed `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
 
 FrameworkBundle
 ---------------

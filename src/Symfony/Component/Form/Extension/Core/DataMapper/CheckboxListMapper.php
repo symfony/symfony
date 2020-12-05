@@ -30,6 +30,10 @@ class CheckboxListMapper implements DataMapperInterface
      */
     public function mapDataToForms($choices, iterable $checkboxes)
     {
+        if (\is_array($checkboxes)) {
+            trigger_deprecation('symfony/form', '5.3', 'Passing an array as the second argument of the "%s()" method is deprecated, pass "\Traversable" instead.', __METHOD__);
+        }
+
         if (null === $choices) {
             $choices = [];
         }
@@ -49,6 +53,10 @@ class CheckboxListMapper implements DataMapperInterface
      */
     public function mapFormsToData(iterable $checkboxes, &$choices)
     {
+        if (\is_array($checkboxes)) {
+            trigger_deprecation('symfony/form', '5.3', 'Passing an array as the first argument of the "%s()" method is deprecated, pass "\Traversable" instead.', __METHOD__);
+        }
+
         if (!\is_array($choices)) {
             throw new UnexpectedTypeException($choices, 'array');
         }

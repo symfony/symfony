@@ -1178,7 +1178,9 @@ class Parser
             for (; \strlen($this->currentLine) > $cursor; ++$cursor) {
                 switch ($this->currentLine[$cursor]) {
                     case '\\':
-                        if (isset($this->currentLine[++$cursor])) {
+                        if ("'" === $quotation) {
+                            $value .= '\\';
+                        } elseif (isset($this->currentLine[++$cursor])) {
                             $value .= '\\'.$this->currentLine[$cursor];
                         }
 

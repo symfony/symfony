@@ -40,11 +40,11 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
 
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $result = $this->delegate->denormalize($data, $type, $format, $context);
+        $denormalization = new Denormalization($this->delegate, $data, $type, $format, $context);
+        $denormalization->result = $this->delegate->denormalize($data, $type, $format, $context);
+        $this->denormalizations[] = $denormalization;
 
-        $this->denormalizations[] = new Denormalization($this->delegate, $data, $type, $format, $context);
-
-        return $result;
+        return $denormalization->result;
     }
 
     public function supportsDenormalization($data, string $type, string $format = null): bool
@@ -54,11 +54,11 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
 
     public function normalize($object, string $format = null, array $context = [])
     {
-        $result = $this->delegate->normalize($object, $format, $context);
+        $normalization = new Normalization($this->delegate, $object, $format, $context);
+        $normalization->result = $this->delegate->normalize($object, $format, $context);
+        $this->normalizations[] = $normalization;
 
-        $this->normalizations[] = new Normalization($this->delegate, $object, $format, $context);
-
-        return $result;
+        return $normalization->result;
     }
 
     public function supportsNormalization($data, string $format = null): bool

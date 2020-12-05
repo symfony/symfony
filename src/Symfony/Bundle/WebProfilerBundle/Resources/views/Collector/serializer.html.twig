@@ -17,7 +17,7 @@
 {% block menu %}
     {% set disable = collector.serializations | length == 0 and collector.deserializations | length == 0 %}
     <span class="label {{ disable ? 'disabled' }}">
-        <span class="icon">{{ include('data_collector/exchange-alt-solid.svg') }}</span>
+        <span class="icon">{{ include('@WebProfiler/Icon/serializer.svg') }}</span>
         <strong>Serializer</strong>
     </span>
 {% endblock %}

@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Security\Http\LoginLink;
 
+use ParagonIE\Halite\Symmetric\Crypto;
+use ParagonIE\Halite\Symmetric\EncryptionKey;
+use ParagonIE\HiddenString\HiddenString;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encryption\SymmetricEncryptionInterface;
-use Symfony\Component\Security\Core\Exception\MalformedCipherException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -35,9 +36,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     private $secret;
     private $options;
     private $expiredStorage;
-    private $encryption;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage, SymmetricEncryptionInterface $encryption)
+    public function __construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, PropertyAccessorInterface $propertyAccessor, array $signatureProperties, string $secret, array $options, ?ExpiredLoginLinkStorage $expiredStorage)
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
@@ -50,7 +50,6 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'max_uses' => null,
         ], $options);
         $this->expiredStorage = $expiredStorage;
-        $this->encryption = $encryption;
     }
 
     public function createLoginLink(UserInterface $user): LoginLinkDetails
@@ -59,7 +58,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $this->encryption->encrypt($user->getUsername()),
+            'user' => $this->encrypt($user->getUsername()),
             'expires' => $expires,
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
@@ -76,15 +75,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     public function consumeLoginLink(Request $request): UserInterface
     {
         $usernameMessage = $request->get('user');
-        try {
-            $username = $this->encryption->decrypt($usernameMessage);
-        } catch (MalformedCipherException $exception) {
-            trigger_deprecation('symfony/security-http', '5.3', 'Login link without encryption for the "user" query parameter is deprecated.', __METHOD__);
-            // Keep compatibility with older versions of the code
-            $username = $usernameMessage;
-        } catch (\Exception $exception) {
-            throw new InvalidLoginLinkException('Username not found.', 0, $exception);
-        }
+        $username = $this->decrypt($usernameMessage);
 
         try {
             $user = $this->userProvider->loadUserByUsername($username);
@@ -131,5 +122,22 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         return base64_encode(hash_hmac('sha256', implode(':', $signatureFields), $this->secret));
+    }
+
+    private function encrypt(string $message): string
+    {
+        // TODO check if paragonie/halite is installed
+        $key = new EncryptionKey(new HiddenString($this->secret));
+        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+
+        return $cipherText;
+    }
+
+    private function decrypt(string $message): string
+    {
+        $key = new EncryptionKey(new HiddenString($this->secret));
+        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+
+        return $cipherText;
     }
 }

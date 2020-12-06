@@ -36,8 +36,6 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Encryption\SodiumEncryption;
-use Symfony\Component\Security\Core\Encryption\SymmetricEncryptionInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Security;
@@ -97,13 +95,6 @@ return static function (ContainerConfigurator $container) {
                 service('security.token_storage'),
             ])
             ->tag('controller.argument_value_resolver', ['priority' => 40])
-
-        ->set('security.encryption.sodium_symmetric', SodiumEncryption::class)
-            ->abstract()
-            ->args([
-                '%kernel.secret%',
-            ])
-        ->alias(SymmetricEncryptionInterface::class, 'security.encryption.sodium_symmetric')
 
         // Authentication related services
         ->set('security.authentication.trust_resolver', AuthenticationTrustResolver::class)

@@ -38,7 +38,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('signature properties'),
                 '%kernel.secret%',
                 abstract_arg('options'),
-                abstract_arg('expired login link storage')
+                abstract_arg('expired login link storage'),
             ])
 
         ->set('security.authenticator.expired_login_link_storage', ExpiredLoginLinkStorage::class)

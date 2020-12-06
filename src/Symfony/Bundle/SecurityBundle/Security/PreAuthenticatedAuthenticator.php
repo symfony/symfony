@@ -38,7 +38,7 @@ class PreAuthenticatedAuthenticator implements AuthenticatorInterface
 
     public function authenticate(Request $request): PassportInterface
     {
-        throw new \LogicException(sprintf('"%s" does not support %s::authenticate() calls', static::class, AuthenticatorInterface::class));
+        throw new \LogicException(sprintf('"%s" does not support "%s::authenticate()" calls.', static::class, AuthenticatorInterface::class));
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface

@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Security\Http\Tests\LoginLink;
 
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Symmetric\Crypto;
+use ParagonIE\Halite\Symmetric\EncryptionKey;
+use ParagonIE\HiddenString\HiddenString;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encryption\SodiumEncryption;
-use Symfony\Component\Security\Core\Encryption\SymmetricEncryptionInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -37,8 +39,6 @@ class LoginLinkHandlerTest extends TestCase
     private $propertyAccessor;
     /** @var MockObject|ExpiredLoginLinkStorage */
     private $expiredLinkStorage;
-    /** @var SymmetricEncryptionInterface */
-    private $encryption;
 
     protected function setUp(): void
     {
@@ -46,7 +46,19 @@ class LoginLinkHandlerTest extends TestCase
         $this->userProvider = $this->createMock(UserProviderInterface::class);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->expiredLinkStorage = $this->createMock(ExpiredLoginLinkStorage::class);
-        $this->encryption = new SodiumEncryption('secret');
+    }
+
+    private function encrypt(string $message): string
+    {
+
+       $key = KeyFactory::deriveEncryptionKey(
+            new HiddenString('s3cret'),
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+            KeyFactory::MODERATE
+        );
+        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+
+        return $cipherText;
     }
 
     /**
@@ -96,7 +108,7 @@ class LoginLinkHandlerTest extends TestCase
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
-        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', urlencode($this->encryption->encrypt('weaverryan')), $signature, $expires));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -142,7 +154,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->expectException(ExpiredLoginLinkException::class);
         $expires = time() - 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
-        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', urlencode($this->encryption->encrypt('weaverryan')), $signature, $expires));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -157,7 +169,7 @@ class LoginLinkHandlerTest extends TestCase
     public function testConsumeLoginLinkWithUserNotFound()
     {
         $this->expectException(InvalidLoginLinkException::class);
-        $request = Request::create(sprintf('/login/verify?user=%s&hash=thehash&expires=10000', urlencode($this->encryption->encrypt('weaverryan'))));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=thehash&expires=10000', $this->encrypt('weaverryan')));
 
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')
@@ -171,7 +183,7 @@ class LoginLinkHandlerTest extends TestCase
     public function testConsumeLoginLinkWithDifferentSignature()
     {
         $this->expectException(InvalidLoginLinkException::class);
-        $request = Request::create(sprintf('/login/verify?user=%s&hash=fake_hash&expires=%d', urlencode($this->encryption->encrypt('weaverryan')), time() + 500));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=fake_hash&expires=%d', $this->encrypt('weaverryan'), time() + 500));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -188,7 +200,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->expectException(ExpiredLoginLinkException::class);
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
-        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', urlencode($this->encryption->encrypt('weaverryan')), $signature, $expires));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -223,7 +235,7 @@ class LoginLinkHandlerTest extends TestCase
             'route_name' => 'app_check_login_link_route',
         ], $options);
 
-        return new LoginLinkHandler($this->router, $this->userProvider, $this->propertyAccessor, $extraProperties, 's3cret', $options, $this->expiredLinkStorage, $this->encryption);
+        return new LoginLinkHandler($this->router, $this->userProvider, $this->propertyAccessor, $extraProperties, 's3cret', $options, $this->expiredLinkStorage);
     }
 }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\LoginLink;
 
+use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\HiddenString\HiddenString;
@@ -127,17 +128,28 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     private function encrypt(string $message): string
     {
         // TODO check if paragonie/halite is installed
-        $key = new EncryptionKey(new HiddenString($this->secret));
-        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+        $cipherText = Crypto::encrypt(new HiddenString($message), $this->createKey());
 
         return $cipherText;
     }
 
     private function decrypt(string $message): string
     {
-        $key = new EncryptionKey(new HiddenString($this->secret));
-        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+        // TODO make sure we support old strings
+        $cipherText = Crypto::decrypt($message, $this->createKey());
 
         return $cipherText;
+    }
+
+    private function createKey(): EncryptionKey
+    {
+        // TODO make sure we dont use a static salt.
+        $salt = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f";
+        $key = KeyFactory::deriveEncryptionKey(
+            new HiddenString($this->secret),
+            $salt,
+            KeyFactory::MODERATE
+        );
+        return $key;
     }
 }

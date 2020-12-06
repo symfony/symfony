@@ -22,24 +22,27 @@ class AmazonTransportFactoryTest extends TestCase
     {
         $factory = new AmazonTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://auth@default?region=eu-west-3'));
+        $transport->setHost('example.com');
 
-        $this->assertSame('sns://localhost?region=eu-west-3', (string) $transport);
+        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
     }
 
     public function testCreateWithoutCredentialDsn(): void
     {
         $factory = new AmazonTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3'));
+        $transport->setHost('example.com');
 
-        $this->assertSame('sns://localhost?region=eu-west-3', (string) $transport);
+        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
     }
 
     public function testDefaultRegionIsCorrectlySet(): void
     {
         $factory = new AmazonTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default'));
+        $transport->setHost('example.com');
 
-        $this->assertSame('sns://localhost?region=us-east-1', (string) $transport);
+        $this->assertSame('sns://example.com?region=us-east-1', (string) $transport);
     }
 
     public function testSupportsSnsScheme(): void
@@ -56,7 +59,7 @@ class AmazonTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $unsupportedDsn = 'not-sns://localhost';
+        $unsupportedDsn = 'not-sns://example.com';
         $factory->create(Dsn::fromString($unsupportedDsn));
     }
 }

@@ -330,6 +330,62 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>O Código de Identificação de Empresa (BIC) não está associado ao IBAN {{ iban }}.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Este valor deve ser um JSON válido.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Esta coleção deve conter só elementos únicos.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Este valor deve ser estritamente positivo.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Este valor deve ser superior ou igual a zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Este valor deve ser estritamente negativo.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Este valor deve ser inferior ou igual a zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Este valor não é um fuso horário válido.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Esta senha foi divulgada durante uma fuga de dados, não deve ser usada de novamente. Por favor usar uma senha outra.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Este valor deve situar-se entre {{ min }} e {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Este valor não é um nome de host válido.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>O número de elementos desta coleção deve ser um múltiplo de {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Este valor deve satisfazer pelo menos uma das seguintes restrições :</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Cada elemento desta coleção deve satisfazer o seu próprio conjunto de restrições.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Este valor não é um Número Internacional de Identificação de Segurança (ISIN) válido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

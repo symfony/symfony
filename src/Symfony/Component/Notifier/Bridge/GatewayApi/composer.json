@@ -29,7 +29,4 @@
         ]
     },
     "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.2"
-    }
 }

@@ -18,9 +18,9 @@ use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class CacheClearCommandTest extends TestCase
 {
@@ -41,40 +41,44 @@ class CacheClearCommandTest extends TestCase
         $this->fs->remove($this->kernel->getProjectDir());
     }
 
-    /** @dataProvider getKernel */
-    public function testCacheIsFreshAfterCacheClearedWithWarmup(KernelInterface $kernel)
+    public function testCacheIsFreshAfterCacheClearedWithWarmup()
     {
+        $this->fs->mkdir($this->kernel->getProjectDir());
+
         $input = new ArrayInput(['cache:clear']);
-        $application = new Application($kernel);
+        $application = new Application($this->kernel);
         $application->setCatchExceptions(false);
 
         $application->doRun($input, new NullOutput());
 
         // Ensure that all *.meta files are fresh
         $finder = new Finder();
-        $metaFiles = $finder->files()->in($kernel->getCacheDir())->name('*.php.meta');
+        $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
         // check that cache is warmed up
         $this->assertNotEmpty($metaFiles);
         $configCacheFactory = new ConfigCacheFactory(true);
 
         foreach ($metaFiles as $file) {
-            $configCacheFactory->cache(substr($file, 0, -5), function () use ($file) {
-                $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
-            });
+            $configCacheFactory->cache(
+                substr($file, 0, -5),
+                function () use ($file) {
+                    $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
+                }
+            );
         }
 
         // check that app kernel file present in meta file of container's cache
-        $containerClass = $kernel->getContainer()->getParameter('kernel.container_class');
+        $containerClass = $this->kernel->getContainer()->getParameter('kernel.container_class');
         $containerRef = new \ReflectionClass($containerClass);
         $containerFile = \dirname($containerRef->getFileName(), 2).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
-        $kernelRef = new \ReflectionObject($kernel);
-        $kernelFile = $kernelRef->getFileName();
+        $this->kernelRef = new \ReflectionObject($this->kernel);
+        $this->kernelFile = $this->kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
         $meta = unserialize(file_get_contents($containerMetaFile));
         $found = false;
         foreach ($meta as $resource) {
-            if ((string) $resource === $kernelFile) {
+            if ((string) $resource === $this->kernelFile) {
                 $found = true;
                 break;
             }
@@ -82,24 +86,51 @@ class CacheClearCommandTest extends TestCase
         $this->assertTrue($found, 'Kernel file should present as resource');
 
         $containerRef = new \ReflectionClass(require $containerFile);
-        $containerFile = str_replace('tes_'.\DIRECTORY_SEPARATOR, 'test'.\DIRECTORY_SEPARATOR, $containerRef->getFileName());
-        $this->assertMatchesRegularExpression(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
+        $containerFile = str_replace(
+            'tes_'.\DIRECTORY_SEPARATOR,
+            'test'.\DIRECTORY_SEPARATOR,
+            $containerRef->getFileName()
+        );
+        $this->assertMatchesRegularExpression(
+            sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass),
+            file_get_contents($containerFile),
+            'kernel.container_class is properly set on the dumped container'
+        );
     }
 
-    public function getKernel()
+    public function testCacheIsWarmedWhenCalledTwice()
     {
-        yield [new TestAppKernel('test', true)];
-        yield [new NoBuildDirKernel('test', true)];
+        $input = new ArrayInput(['cache:clear']);
+        $application = new Application(clone $this->kernel);
+        $application->setCatchExceptions(false);
+        $application->doRun($input, new NullOutput());
+
+        $_SERVER['REQUEST_TIME'] = time() + 1;
+        $application = new Application(clone $this->kernel);
+        $application->setCatchExceptions(false);
+        $application->doRun($input, new NullOutput());
+
+        $this->assertTrue(is_file($this->kernel->getCacheDir().'/annotations.php'));
     }
-}
 
-class NoBuildDirKernel extends TestAppKernel
-{
-    protected function getKernelParameters()
+    public function testCacheIsWarmedWithOldContainer()
     {
-        $parameters = parent::getKernelParameters();
-        unset($parameters['kernel.build_dir']);
+        $kernel = clone $this->kernel;
 
-        return $parameters;
+        // Hack to get a dumped working container,
+        // BUT without "kernel.build_dir" parameter (like an old dumped container)
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        \Closure::bind(function (Container $class) {
+            unset($class->loadedDynamicParameters['kernel.build_dir']);
+            unset($class->parameters['kernel.build_dir']);
+        }, null, \get_class($container))($container);
+
+        $input = new ArrayInput(['cache:clear']);
+        $application = new Application($kernel);
+        $application->setCatchExceptions(false);
+        $application->doRun($input, new NullOutput());
+
+        $this->expectNotToPerformAssertions();
     }
 }

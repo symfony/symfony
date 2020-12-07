@@ -24,7 +24,7 @@
         "symfony/event-dispatcher": "^5.1",
         "symfony/error-handler": "^4.4.1|^5.0.1",
         "symfony/http-foundation": "^5.2.1",
-        "symfony/http-kernel": "^5.2",
+        "symfony/http-kernel": "^5.2.1",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.15",
         "symfony/filesystem": "^4.4|^5.0",

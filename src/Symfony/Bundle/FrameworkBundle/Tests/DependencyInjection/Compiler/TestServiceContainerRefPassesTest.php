@@ -36,6 +36,12 @@ class TestServiceContainerRefPassesTest extends TestCase
             ->setPublic(true)
             ->addArgument(new Reference('Test\private_used_shared_service'))
             ->addArgument(new Reference('Test\private_used_non_shared_service'))
+            ->addArgument(new Reference('Test\soon_private_service'))
+        ;
+
+        $container->register('Test\soon_private_service')
+            ->setPublic(true)
+            ->addTag('container.private', ['package' => 'foo/bar', 'version' => '1.42'])
         ;
 
         $container->register('Test\private_used_shared_service');
@@ -48,6 +54,7 @@ class TestServiceContainerRefPassesTest extends TestCase
         $expected = [
             'Test\private_used_shared_service' => new ServiceClosureArgument(new Reference('Test\private_used_shared_service')),
             'Test\private_used_non_shared_service' => new ServiceClosureArgument(new Reference('Test\private_used_non_shared_service')),
+            'Test\soon_private_service' => new ServiceClosureArgument(new Reference('.container.private.Test\soon_private_service')),
             'Psr\Container\ContainerInterface' => new ServiceClosureArgument(new Reference('service_container')),
             'Symfony\Component\DependencyInjection\ContainerInterface' => new ServiceClosureArgument(new Reference('service_container')),
         ];

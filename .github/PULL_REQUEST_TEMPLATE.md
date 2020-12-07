@@ -9,7 +9,7 @@
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->
 <!--
 Replace this notice by a short README for your feature/bugfix. This will help people
-understand your PR and can be used as a start for the documentation.
+to understand your PR and can be used as a start for the documentation.
 
 Additionally (see https://symfony.com/releases):
  - Always add tests and ensure they pass.

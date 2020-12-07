@@ -276,14 +276,6 @@ class JsonResponseTest extends TestCase
         new JsonResponse(null, 200, [], true);
     }
 
-    public function testfromJsonStringConstructorWithNullAsDataThrowsAnUnexpectedValueException()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "null" given.');
-
-        JsonResponse::fromJsonString(null);
-    }
-
     public function testConstructorWithObjectWithToStringMethod()
     {
         $class = new class() {

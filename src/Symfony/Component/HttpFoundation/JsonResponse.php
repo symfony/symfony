@@ -43,6 +43,10 @@ class JsonResponse extends Response
     {
         parent::__construct('', $status, $headers);
 
+        if ($json && !\is_string($data) && !is_numeric($data) && !\is_callable([$data, '__toString'])) {
+            throw new \TypeError(sprintf('"%s": If $json is set to true, argument $data must be a string or object implementing __toString(), "%s" given.', __METHOD__, get_debug_type($data)));
+        }
+
         if (null === $data) {
             $data = new \ArrayObject();
         }
@@ -81,13 +85,13 @@ class JsonResponse extends Response
      *     return JsonResponse::fromJsonString('{"key": "value"}')
      *         ->setSharedMaxAge(300);
      *
-     * @param string|null $data    The JSON response string
-     * @param int         $status  The response status code
-     * @param array       $headers An array of response headers
+     * @param string $data    The JSON response string
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
      *
      * @return static
      */
-    public static function fromJsonString(string $data = null, int $status = 200, array $headers = [])
+    public static function fromJsonString(string $data, int $status = 200, array $headers = [])
     {
         return new static($data, $status, $headers, true);
     }

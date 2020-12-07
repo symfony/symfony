@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>A conta está trancada.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Várias tentativas de login falhadas, por favor tente mais tarde.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ligação de login inválida ou expirada.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

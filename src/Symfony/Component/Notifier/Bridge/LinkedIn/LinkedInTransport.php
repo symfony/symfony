@@ -97,17 +97,17 @@ final class LinkedInTransport extends AbstractTransport
     {
         return [
             'specificContent' => [
-                    'com.linkedin.ugc.ShareContent' => [
-                            'shareCommentary' => [
-                                    'attributes' => [],
-                                    'text' => $message->getSubject(),
-                                ],
-                            'shareMediaCategory' => 'NONE',
-                        ],
+                'com.linkedin.ugc.ShareContent' => [
+                    'shareCommentary' => [
+                        'attributes' => [],
+                        'text' => $message->getSubject(),
                     ],
-            'visibility' => [
-                    'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+                    'shareMediaCategory' => 'NONE',
                 ],
+            ],
+            'visibility' => [
+                'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+            ],
             'lifecycleState' => 'PUBLISHED',
             'author' => sprintf('urn:li:person:%s', $this->accountId),
         ];

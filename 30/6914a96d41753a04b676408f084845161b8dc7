@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-01T15:45:16Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-01T15:57:41Z
+
+By passing `true` as fourth argument, you're telling `JsonResponse` that the data you pass is already encoded JSON which is by definition a string. We can think about throwing an exception that is more helpful, but apart from that, there's nothing to fix: The call is broken and the error you're receiving is correct.
+
+---------------------------------------------------------------------------
+
+by sidz at 2020-12-01T16:17:27Z
+
+@derrabus I'm okay to throw an InvalidArgument exception but IMO this part of code shouldn't throw TypeError exception. WDYT?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-01T16:59:03Z
+
+> this part of code shouldn't throw TypeError exception
+
+Why not? We're expecting a string in that context and got `null`. This justifies a `TypeError` imho.
+
+What I do understand is that the message of the `TypeError` is confusing because you did not actually call the method that the error you got complains about.
+
+---------------------------------------------------------------------------
+
+by sidz at 2020-12-01T19:05:58Z
+
+@derrabus found that there was a different kind of exception https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/HttpFoundation/Response.php#L403-L412 which was removed with type-hints.
+
+So I've added almost the same exception and message
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-01T20:21:28Z
+
+Right, we used that exception back in the PHP 5 days where we did not have `TypeError`. I don't have a super-strong opinion on this topic, but I would still prefer `TypeError`, tbh.
+
+---------------------------------------------------------------------------
+
+by sidz at 2020-12-02T19:38:36Z
+
+BTW I have a strong feeling that the first argument of `fromJsonString` method shouldn't be optional and it should expect to get a string only:
+```
+public static function fromJsonString(string $data, int $status = 200, array $headers = [])
+```
+Because it doesn't make a lot of sense to allow pass `NULL` that which will cause an exception in on 100% cases.
+
+p.s. But I suppose it will be a BC break and shouldn't be in this PR. WDYT @derrabus ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-02T21:34:55Z
+
+You are right about `fromJsonString()`. This is broken. Let me check when this broke. This might change everything. 🙈
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-02T21:49:10Z
+
+Okay, so `fromJsonString()` without arguments or with `null` kind of has always been broken. I've checked on 3.4 and 4.4 and got the error that you encountered as well. Thus, removing the default value there shouldn't be a breaking change, imho.
+
+But this also tells me that we should apply your change to the 4.4 branch. Can you rebase?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-06T23:00:10Z
+
+I think we need to add this to the `require` section of the composer.json file of HttpFoundation in order to make the tests pass:
+
+```
+"symfony/polyfill-php80": "^1.15"
+```
+
+Apart from that, the PR looks good to me.

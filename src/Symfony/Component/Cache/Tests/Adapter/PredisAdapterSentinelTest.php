@@ -17,12 +17,12 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 /**
  * @group integration
  */
-class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
+class PredisAdapterSentinelTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists(\RedisSentinel::class)) {
-            self::markTestSkipped('The RedisSentinel class is required.');
+        if (!class_exists(\Predis\Client::class)) {
+            self::markTestSkipped('The Predis\Client class is required.');
         }
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             self::markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -31,7 +31,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
             self::markTestSkipped('REDIS_SENTINEL_SERVICE env var is not defined.');
         }
 
-        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service]);
+        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['redis_sentinel' => $service, 'class' => \Predis\Client::class]);
     }
 
     public function testInvalidDSNHasBothClusterAndSentinel()

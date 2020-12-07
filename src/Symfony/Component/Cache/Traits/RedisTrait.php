@@ -159,13 +159,17 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s".', $dsn));
         }
 
-        if (isset($params['redis_sentinel']) && !class_exists(\Predis\Client::class)) {
-            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package: "%s".', $dsn));
-        }
-
         $params += $query + $options + self::$defaultConnectionOptions;
 
-        if (null === $params['class'] && !isset($params['redis_sentinel']) && \extension_loaded('redis')) {
+        if (isset($params['redis_sentinel']) && (!class_exists(\Predis\Client::class) || !class_exists(\RedisSentinel::class))) {
+            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package or the "redis" extension with minimum version v5.2.0: "%s".', $dsn));
+        }
+
+        if ($params['redis_cluster'] && isset($params['redis_sentinel'])) {
+            throw new InvalidArgumentException(sprintf('Cannot use both "redis_cluster" and "redis_sentinel" at the same time: "%s".', $dsn));
+        }
+
+        if (null === $params['class'] && \extension_loaded('redis')) {
             $class = $params['redis_cluster'] ? \RedisCluster::class : (1 < \count($hosts) ? \RedisArray::class : \Redis::class);
         } else {
             $class = null === $params['class'] ? \Predis\Client::class : $params['class'];
@@ -176,8 +180,22 @@ trait RedisTrait
             $redis = new $class();
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts) {
+                $address = $hosts[0]['host'] ?? $hosts[0]['path'];
+                $port = $hosts[0]['port'] ?? null;
+
+                if (isset($params['redis_sentinel'])) {
+                    $sentinel = new \RedisSentinel($address, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    $master = $sentinel->getMasterAddrByName($params['redis_sentinel']);
+                    if (false === $master) {
+                        throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $params['redis_sentinel'], $address, $port));
+                    }
+
+                    $address = $master[0];
+                    $port = $master[1];
+                }
+
                 try {
-                    @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    @$redis->{$connect}($address, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     $isConnected = $redis->isConnected();
@@ -254,9 +272,6 @@ trait RedisTrait
         } elseif (is_a($class, \Predis\ClientInterface::class, true)) {
             if ($params['redis_cluster']) {
                 $params['cluster'] = 'redis';
-                if (isset($params['redis_sentinel'])) {
-                    throw new InvalidArgumentException(sprintf('Cannot use both "redis_cluster" and "redis_sentinel" at the same time: "%s".', $dsn));
-                }
             } elseif (isset($params['redis_sentinel'])) {
                 $params['replication'] = 'sentinel';
                 $params['service'] = $params['redis_sentinel'];

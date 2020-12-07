@@ -267,6 +267,44 @@ class JsonResponseTest extends TestCase
 
         $this->assertEquals('/**/ಠ_ಠ["foo"].bar[0]({"foo":"bar"});', $response->getContent());
     }
+
+    public function testConstructorWithNullAsDataThrowsAnUnexpectedValueException()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "null" given.');
+
+        new JsonResponse(null, 200, [], true);
+    }
+
+    public function testfromJsonStringConstructorWithNullAsDataThrowsAnUnexpectedValueException()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "null" given.');
+
+        JsonResponse::fromJsonString(null);
+    }
+
+    public function testConstructorWithObjectWithToStringMethod()
+    {
+        $class = new class() {
+            public function __toString()
+            {
+                return '{}';
+            }
+        };
+
+        $response = new JsonResponse($class, 200, [], true);
+
+        $this->assertSame('{}', $response->getContent());
+    }
+
+    public function testConstructorWithObjectWithoutToStringMethodThrowsAnException()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "stdClass" given.');
+
+        new JsonResponse(new \stdClass(), 200, [], true);
+    }
 }
 
 if (interface_exists('JsonSerializable', false)) {

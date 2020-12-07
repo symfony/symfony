@@ -7,6 +7,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
@@ -31,9 +32,9 @@ final class LinkedInTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows(): void
     {
-        $this->expectException(LogicException::class);
-
         $transport = $this->getTransport();
+
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }

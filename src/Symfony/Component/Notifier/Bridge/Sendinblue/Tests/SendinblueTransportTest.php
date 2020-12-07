@@ -14,8 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -42,7 +42,8 @@ final class SendinblueTransportTest extends TestCase
     {
         $transport = $this->initTransport();
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnsupportedMessageTypeException::class);
+
         $transport->send($this->createMock(MessageInterface::class));
     }
 

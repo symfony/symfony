@@ -17,6 +17,7 @@ use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
@@ -44,9 +45,9 @@ class GoogleChatTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows(): void
     {
-        $this->expectException(LogicException::class);
-
         $transport = new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }

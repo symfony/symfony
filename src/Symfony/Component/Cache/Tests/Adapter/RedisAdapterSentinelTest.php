@@ -21,8 +21,8 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists('Predis\Client')) {
-            self::markTestSkipped('The Predis\Client class is required.');
+        if (!class_exists(\RedisSentinel::class)) {
+            self::markTestSkipped('The RedisSentinel class is required.');
         }
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             self::markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');

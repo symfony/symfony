@@ -38,13 +38,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslationDebugCommand extends Command
 {
-    const EXIT_CODE_GENERAL_ERROR = 64;
-    const EXIT_CODE_MISSING = 65;
-    const EXIT_CODE_UNUSED = 66;
-    const EXIT_CODE_FALLBACK = 68;
-    const MESSAGE_MISSING = 0;
-    const MESSAGE_UNUSED = 1;
-    const MESSAGE_EQUALS_FALLBACK = 2;
+    public const EXIT_CODE_GENERAL_ERROR = 64;
+    public const EXIT_CODE_MISSING = 65;
+    public const EXIT_CODE_UNUSED = 66;
+    public const EXIT_CODE_FALLBACK = 68;
+    public const MESSAGE_MISSING = 0;
+    public const MESSAGE_UNUSED = 1;
+    public const MESSAGE_EQUALS_FALLBACK = 2;
 
     protected static $defaultName = 'debug:translation';
 

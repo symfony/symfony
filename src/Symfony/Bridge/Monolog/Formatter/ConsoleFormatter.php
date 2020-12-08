@@ -27,8 +27,8 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class ConsoleFormatter implements FormatterInterface
 {
-    const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
-    const SIMPLE_DATE = 'H:i:s';
+    public const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
+    public const SIMPLE_DATE = 'H:i:s';
 
     private static $levelColorMap = [
         Logger::DEBUG => 'fg=white',

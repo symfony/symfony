@@ -37,7 +37,7 @@ use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 
 class EntityTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
+    public const TESTED_TYPE = 'Symfony\Bridge\Doctrine\Form\Type\EntityType';
 
     private const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
     private const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';

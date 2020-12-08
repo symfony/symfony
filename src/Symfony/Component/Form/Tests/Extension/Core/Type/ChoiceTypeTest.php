@@ -22,7 +22,7 @@ class ChoiceTypeTest extends BaseTypeTest
 {
     use ExpectDeprecationTrait;
 
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = [
         'Bernhard' => 'a',

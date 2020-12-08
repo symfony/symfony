@@ -191,5 +191,5 @@ YAML;
 
 class Foo
 {
-    const TEST = 'foo';
+    public const TEST = 'foo';
 }

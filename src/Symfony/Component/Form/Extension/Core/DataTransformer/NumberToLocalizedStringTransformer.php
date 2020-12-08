@@ -26,37 +26,37 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_CEILING instead.
      */
-    const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
+    public const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_FLOOR instead.
      */
-    const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
+    public const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_UP instead.
      */
-    const ROUND_UP = \NumberFormatter::ROUND_UP;
+    public const ROUND_UP = \NumberFormatter::ROUND_UP;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_DOWN instead.
      */
-    const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
+    public const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFEVEN instead.
      */
-    const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
+    public const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFUP instead.
      */
-    const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
+    public const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
     /**
      * @deprecated since Symfony 5.1, use \NumberFormatter::ROUND_HALFDOWN instead.
      */
-    const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
+    public const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
 
     protected $grouping;
 

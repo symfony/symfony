@@ -29,7 +29,7 @@ class Email extends Constraint
     public const VALIDATION_MODE_STRICT = 'strict';
     public const VALIDATION_MODE_LOOSE = 'loose';
 
-    const INVALID_FORMAT_ERROR = 'bd79c0ab-ddba-46cc-a703-a7a4b08de310';
+    public const INVALID_FORMAT_ERROR = 'bd79c0ab-ddba-46cc-a703-a7a4b08de310';
 
     protected static $errorNames = [
         self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',

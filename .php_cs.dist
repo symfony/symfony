@@ -16,6 +16,7 @@ return PhpCsFixer\Config::create()
         'native_constant_invocation' => true,
         'combine_nested_dirname' => true,
         'list_syntax' => ['syntax' => 'short'],
+        'visibility_required' => ['property', 'method', 'const'],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

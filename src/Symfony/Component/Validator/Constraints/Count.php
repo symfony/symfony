@@ -23,9 +23,9 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Count extends Constraint
 {
-    const TOO_FEW_ERROR = 'bef8e338-6ae5-4caf-b8e2-50e7b0579e69';
-    const TOO_MANY_ERROR = '756b1212-697c-468d-a9ad-50dd783bb169';
-    const NOT_DIVISIBLE_BY_ERROR = DivisibleBy::NOT_DIVISIBLE_BY;
+    public const TOO_FEW_ERROR = 'bef8e338-6ae5-4caf-b8e2-50e7b0579e69';
+    public const TOO_MANY_ERROR = '756b1212-697c-468d-a9ad-50dd783bb169';
+    public const NOT_DIVISIBLE_BY_ERROR = DivisibleBy::NOT_DIVISIBLE_BY;
 
     protected static $errorNames = [
         self::TOO_FEW_ERROR => 'TOO_FEW_ERROR',

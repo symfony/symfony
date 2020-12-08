@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
  */
 class JsonEncode implements EncoderInterface
 {
-    const OPTIONS = 'json_encode_options';
+    public const OPTIONS = 'json_encode_options';
 
     private $defaultContext = [
         self::OPTIONS => 0,

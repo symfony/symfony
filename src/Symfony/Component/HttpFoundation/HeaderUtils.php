@@ -228,7 +228,7 @@ class HeaderUtils
             if (false === $i = strpos($k, '[')) {
                 $q[] = bin2hex($k).$v;
             } else {
-                $q[] = substr_replace($k, bin2hex(substr($k, 0, $i)), 0, $i).$v;
+                $q[] = bin2hex(substr($k, 0, $i)).rawurlencode(substr($k, $i)).$v;
             }
         }
 

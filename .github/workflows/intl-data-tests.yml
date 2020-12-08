@@ -1,0 +1,47 @@
+name: Intl data tests
+
+on:
+    push:
+        paths:
+          - 'src/Symfony/Component/Intl/Resources/data/**'
+    pull_request:
+        paths:
+          - 'src/Symfony/Component/Intl/Resources/data/**'
+
+jobs:
+
+    tests:
+        name: Tests (intl-data)
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Define the ICU version
+                run: |
+                    SYMFONY_ICU_VERSION=$(php -r 'require "src/Symfony/Component/Intl/Intl.php"; echo Symfony\Component\Intl\Intl::getIcuStubVersion();')
+                    echo "SYMFONY_ICU_VERSION=$SYMFONY_ICU_VERSION" >> $GITHUB_ENV
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    coverage: "none"
+                    extensions: "zip,intl-${{env.SYMFONY_ICU_VERSION}}"
+                    ini-values: "memory_limit=-1"
+                    php-version: "7.4"
+
+            -   name: Install dependencies
+                run: |
+                    echo "::group::composer update"
+                    composer update --no-progress --no-suggest --ansi
+                    echo "::endgroup::"
+                    echo "::group::install phpunit"
+                    ./phpunit install
+                    echo "::endgroup::"
+
+            -   name: Report the ICU version
+                run: icu-config --version && php -i | grep 'ICU version'
+
+            -   name: Run intl-data tests
+                run: ./phpunit --group intl-data -v

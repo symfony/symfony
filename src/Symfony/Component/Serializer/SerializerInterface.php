@@ -32,7 +32,7 @@ interface SerializerInterface
      *
      * @param mixed $data
      *
-     * @return object|array
+     * @return mixed
      */
     public function deserialize($data, string $type, string $format, array $context = []);
 }

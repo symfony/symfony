@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by derickr at 2020-11-28T11:08:06Z
+
+On Fri, 27 Nov 2020, Nicolas Grekas wrote:
+
+> @derickr FYI we have this check here because xdebug changes the
+> behavior of PHP in a way that prevents us from doing a lazy evaluation
+> here: native PHP allows one to set the $message property of throwables
+> to a stringable. We use this below. It would be great if debug could
+> preserve this behavior, if possible.
+
+Xdebug shouldn't be changing behaviour, can you file a bug report at
+https://bugs.xdebug.org ?
+
+cheers,
+Derick
+
+--
+PHP 7.4 Release Manager
+Host of PHP Internals News: https://phpinternals.news
+Like Xdebug? Consider supporting me: https://xdebug.org/support
+https://derickrethans.nl | https://xdebug.org | https://dram.io
+twitter: @derickr and @xdebug
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-07T18:31:53Z
+
+I submitted an issue at https://bugs.xdebug.org/view.php?id=1907

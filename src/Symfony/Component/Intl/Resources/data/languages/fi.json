@@ -100,7 +100,7 @@
         "chp": "chipewyan",
         "chr": "cherokee",
         "chy": "cheyenne",
-        "ckb": "sorani",
+        "ckb": "soranî",
         "co": "korsika",
         "cop": "kopti",
         "cps": "capiznon",
@@ -613,8 +613,6 @@
         "pt_BR": "brasilianportugali",
         "pt_PT": "euroopanportugali",
         "ro_MD": "moldova",
-        "sw_CD": "kingwana",
-        "zh_Hans": "yksinkertaistettu kiina",
-        "zh_Hant": "perinteinen kiina"
+        "sw_CD": "kingwana"
     }
 }

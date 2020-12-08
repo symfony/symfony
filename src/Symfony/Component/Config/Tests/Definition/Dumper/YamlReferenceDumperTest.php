@@ -42,7 +42,7 @@ array:
     # this is a long
     # multi-line info text
     # which should be indented
-    child3:               ~ # Example: example setting
+    child3:               ~ # Example: 'example setting'
 EOL
             ],
             'Regular nested' => ['array.child2', <<<EOL
@@ -112,7 +112,7 @@ acme_root:
         # this is a long
         # multi-line info text
         # which should be indented
-        child3:               ~ # Example: example setting
+        child3:               ~ # Example: 'example setting'
     scalar_prototyped:    []
     parameters:
 

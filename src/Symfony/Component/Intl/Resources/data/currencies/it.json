@@ -441,7 +441,7 @@
             "nuovo siclo israeliano"
         ],
         "INR": [
-            "₹",
+            "INR",
             "rupia indiana"
         ],
         "IQD": [
@@ -583,7 +583,11 @@
         ],
         "MKD": [
             "MKD",
-            "denar macedone"
+            "dinaro macedone"
+        ],
+        "MKN": [
+            "MKN",
+            "dinaro macedone (1992–1993)"
         ],
         "MLF": [
             "MLF",
@@ -958,7 +962,7 @@
             "bolívar venezuelano"
         ],
         "VND": [
-            "₫",
+            "VND",
             "dong vietnamita"
         ],
         "VUV": [
@@ -1031,7 +1035,7 @@
         ],
         "ZMW": [
             "ZMW",
-            "kwacha dello Zambia"
+            "kwacha zambiano"
         ],
         "ZRN": [
             "ZRN",

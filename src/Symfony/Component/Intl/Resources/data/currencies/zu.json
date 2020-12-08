@@ -120,6 +120,10 @@
             "CLP",
             "i-Chilean Peso"
         ],
+        "CNH": [
+            "CNH",
+            "i-CNH"
+        ],
         "CNY": [
             "CN¥",
             "i-Chinese Yuan"

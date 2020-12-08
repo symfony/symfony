@@ -25,10 +25,10 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class FileValidator extends ConstraintValidator
 {
-    const KB_BYTES = 1000;
-    const MB_BYTES = 1000000;
-    const KIB_BYTES = 1024;
-    const MIB_BYTES = 1048576;
+    public const KB_BYTES = 1000;
+    public const MB_BYTES = 1000000;
+    public const KIB_BYTES = 1024;
+    public const MIB_BYTES = 1048576;
 
     private static $suffices = [
         1 => 'bytes',

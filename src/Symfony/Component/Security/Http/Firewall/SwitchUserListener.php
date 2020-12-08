@@ -39,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener extends AbstractListener
 {
-    const EXIT_VALUE = '_exit';
+    public const EXIT_VALUE = '_exit';
 
     private $tokenStorage;
     private $provider;

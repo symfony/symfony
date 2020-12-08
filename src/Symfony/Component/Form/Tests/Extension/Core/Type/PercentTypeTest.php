@@ -20,7 +20,7 @@ class PercentTypeTest extends TypeTestCase
 {
     use ExpectDeprecationTrait;
 
-    const TESTED_TYPE = PercentType::class;
+    public const TESTED_TYPE = PercentType::class;
 
     private $defaultLocale;
 

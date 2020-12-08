@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Type extends Constraint
 {
-    const INVALID_TYPE_ERROR = 'ba785a8c-82cb-4283-967c-3cf342181b40';
+    public const INVALID_TYPE_ERROR = 'ba785a8c-82cb-4283-967c-3cf342181b40';
 
     protected static $errorNames = [
         self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',

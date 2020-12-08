@@ -24,11 +24,11 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const INSTANCE = 'instance';
-    const STATUS = 'status';
-    const TITLE = 'title';
-    const TYPE = 'type';
-    const PAYLOAD_FIELDS = 'payload_fields';
+    public const INSTANCE = 'instance';
+    public const STATUS = 'status';
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const PAYLOAD_FIELDS = 'payload_fields';
 
     private $defaultContext;
     private $nameConverter;

@@ -31,9 +31,9 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
-    const PROPERTY = 0;
-    const ACCESSOR = 1;
-    const MUTATOR = 2;
+    public const PROPERTY = 0;
+    public const ACCESSOR = 1;
+    public const MUTATOR = 2;
 
     /**
      * @var DocBlock[]

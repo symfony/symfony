@@ -22,12 +22,12 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Isin extends Constraint
 {
-    const VALIDATION_LENGTH = 12;
-    const VALIDATION_PATTERN = '/[A-Z]{2}[A-Z0-9]{9}[0-9]{1}/';
+    public const VALIDATION_LENGTH = 12;
+    public const VALIDATION_PATTERN = '/[A-Z]{2}[A-Z0-9]{9}[0-9]{1}/';
 
-    const INVALID_LENGTH_ERROR = '88738dfc-9ed5-ba1e-aebe-402a2a9bf58e';
-    const INVALID_PATTERN_ERROR = '3d08ce0-ded9-a93d-9216-17ac21265b65e';
-    const INVALID_CHECKSUM_ERROR = '32089b-0ee1-93ba-399e-aa232e62f2d29d';
+    public const INVALID_LENGTH_ERROR = '88738dfc-9ed5-ba1e-aebe-402a2a9bf58e';
+    public const INVALID_PATTERN_ERROR = '3d08ce0-ded9-a93d-9216-17ac21265b65e';
+    public const INVALID_CHECKSUM_ERROR = '32089b-0ee1-93ba-399e-aa232e62f2d29d';
 
     protected static $errorNames = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',

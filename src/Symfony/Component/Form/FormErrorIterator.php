@@ -33,7 +33,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * The prefix used for indenting nested error messages.
      */
-    const INDENTATION = '    ';
+    public const INDENTATION = '    ';
 
     private $form;
     private $errors;

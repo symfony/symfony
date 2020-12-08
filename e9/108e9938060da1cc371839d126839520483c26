@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-05T13:49:46Z
+
+Hey!
+
+I like what you have done here.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-05T15:40:00Z
+
+I think this could even be considered as a bugfix.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2020-12-08T06:28:43Z
+
+Should I rebase on 4.4?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-08T06:40:50Z
+
+@fbourigault I don't think so, it looks like a new feature to me. We (or perhaps this is just me really) try to be much more conservative in merging non bugs in older branches. And reading the description/code, it does not looks like a bug to me.

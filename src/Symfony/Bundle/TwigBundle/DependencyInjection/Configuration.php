@@ -88,7 +88,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('globals')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
-                    ->example(['foo' => '"@bar"', 'pi' => 3.14])
+                    ->example(['foo' => '@bar', 'pi' => 3.14])
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()

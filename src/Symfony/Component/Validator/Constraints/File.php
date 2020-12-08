@@ -26,11 +26,11 @@ class File extends Constraint
 {
     // Check the Image constraint for clashes if adding new constants here
 
-    const NOT_FOUND_ERROR = 'd2a3fb6e-7ddc-4210-8fbf-2ab345ce1998';
-    const NOT_READABLE_ERROR = 'c20c92a4-5bfa-4202-9477-28e800e0f6ff';
-    const EMPTY_ERROR = '5d743385-9775-4aa5-8ff5-495fb1e60137';
-    const TOO_LARGE_ERROR = 'df8637af-d466-48c6-a59d-e7126250a654';
-    const INVALID_MIME_TYPE_ERROR = '744f00bc-4389-4c74-92de-9a43cde55534';
+    public const NOT_FOUND_ERROR = 'd2a3fb6e-7ddc-4210-8fbf-2ab345ce1998';
+    public const NOT_READABLE_ERROR = 'c20c92a4-5bfa-4202-9477-28e800e0f6ff';
+    public const EMPTY_ERROR = '5d743385-9775-4aa5-8ff5-495fb1e60137';
+    public const TOO_LARGE_ERROR = 'df8637af-d466-48c6-a59d-e7126250a654';
+    public const INVALID_MIME_TYPE_ERROR = '744f00bc-4389-4c74-92de-9a43cde55534';
 
     protected static $errorNames = [
         self::NOT_FOUND_ERROR => 'NOT_FOUND_ERROR',

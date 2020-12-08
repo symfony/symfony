@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 
 class DateIntervalTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = DateIntervalType::class;
+    public const TESTED_TYPE = DateIntervalType::class;
 
     public function testSubmitDateInterval()
     {

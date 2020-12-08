@@ -21,14 +21,14 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
  */
 interface QueryInterface
 {
-    const DEREF_NEVER = 0x00;
-    const DEREF_SEARCHING = 0x01;
-    const DEREF_FINDING = 0x02;
-    const DEREF_ALWAYS = 0x03;
+    public const DEREF_NEVER = 0x00;
+    public const DEREF_SEARCHING = 0x01;
+    public const DEREF_FINDING = 0x02;
+    public const DEREF_ALWAYS = 0x03;
 
-    const SCOPE_BASE = 'base';
-    const SCOPE_ONE = 'one';
-    const SCOPE_SUB = 'sub';
+    public const SCOPE_BASE = 'base';
+    public const SCOPE_ONE = 'one';
+    public const SCOPE_SUB = 'sub';
 
     /**
      * Executes a query and returns the list of Ldap entries.

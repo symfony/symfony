@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Hostname extends Constraint
 {
-    const INVALID_HOSTNAME_ERROR = '7057ffdb-0af4-4f7e-bd5e-e9acfa6d7a2d';
+    public const INVALID_HOSTNAME_ERROR = '7057ffdb-0af4-4f7e-bd5e-e9acfa6d7a2d';
 
     protected static $errorNames = [
         self::INVALID_HOSTNAME_ERROR => 'INVALID_HOSTNAME_ERROR',

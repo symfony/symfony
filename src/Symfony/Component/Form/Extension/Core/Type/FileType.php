@@ -24,8 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileType extends AbstractType
 {
-    const KIB_BYTES = 1024;
-    const MIB_BYTES = 1048576;
+    public const KIB_BYTES = 1024;
+    public const MIB_BYTES = 1048576;
 
     private static $suffixes = [
         1 => 'bytes',

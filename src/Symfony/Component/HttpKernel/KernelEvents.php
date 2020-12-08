@@ -27,7 +27,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\RequestEvent")
      */
-    const REQUEST = 'kernel.request';
+    public const REQUEST = 'kernel.request';
 
     /**
      * The EXCEPTION event occurs when an uncaught exception appears.
@@ -37,7 +37,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\ExceptionEvent")
      */
-    const EXCEPTION = 'kernel.exception';
+    public const EXCEPTION = 'kernel.exception';
 
     /**
      * The CONTROLLER event occurs once a controller was found for
@@ -48,7 +48,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\ControllerEvent")
      */
-    const CONTROLLER = 'kernel.controller';
+    public const CONTROLLER = 'kernel.controller';
 
     /**
      * The CONTROLLER_ARGUMENTS event occurs once controller arguments have been resolved.
@@ -58,7 +58,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent")
      */
-    const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
+    public const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
 
     /**
      * The VIEW event occurs when the return value of a controller
@@ -69,7 +69,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\ViewEvent")
      */
-    const VIEW = 'kernel.view';
+    public const VIEW = 'kernel.view';
 
     /**
      * The RESPONSE event occurs once a response was created for
@@ -80,7 +80,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\ResponseEvent")
      */
-    const RESPONSE = 'kernel.response';
+    public const RESPONSE = 'kernel.response';
 
     /**
      * The FINISH_REQUEST event occurs when a response was generated for a request.
@@ -90,7 +90,7 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\FinishRequestEvent")
      */
-    const FINISH_REQUEST = 'kernel.finish_request';
+    public const FINISH_REQUEST = 'kernel.finish_request';
 
     /**
      * The TERMINATE event occurs once a response was sent.
@@ -99,5 +99,5 @@ final class KernelEvents
      *
      * @Event("Symfony\Component\HttpKernel\Event\TerminateEvent")
      */
-    const TERMINATE = 'kernel.terminate';
+    public const TERMINATE = 'kernel.terminate';
 }

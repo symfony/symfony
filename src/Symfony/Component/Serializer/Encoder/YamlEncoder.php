@@ -23,7 +23,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {
-    const FORMAT = 'yaml';
+    public const FORMAT = 'yaml';
     private const ALTERNATIVE_FORMAT = 'yml';
 
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';

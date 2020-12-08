@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT_KEY = 'datetime_format';
-    const TIMEZONE_KEY = 'datetime_timezone';
+    public const FORMAT_KEY = 'datetime_format';
+    public const TIMEZONE_KEY = 'datetime_timezone';
 
     private $defaultContext = [
         self::FORMAT_KEY => \DateTime::RFC3339,

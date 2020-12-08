@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
-    const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
+    public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
 
     private $tokenStorage;
     private $accessDecisionManager;

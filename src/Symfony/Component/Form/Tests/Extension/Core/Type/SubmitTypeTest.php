@@ -16,7 +16,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
  */
 class SubmitTypeTest extends ButtonTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\SubmitType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\SubmitType';
 
     public function testCreateSubmitButtonInstances()
     {

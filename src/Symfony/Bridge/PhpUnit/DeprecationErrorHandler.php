@@ -25,9 +25,9 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  */
 class DeprecationErrorHandler
 {
-    const MODE_DISABLED = 'disabled';
-    const MODE_WEAK = 'max[total]=999999&verbose=0';
-    const MODE_STRICT = 'max[total]=0';
+    public const MODE_DISABLED = 'disabled';
+    public const MODE_WEAK = 'max[total]=999999&verbose=0';
+    public const MODE_STRICT = 'max[total]=0';
 
     private $mode;
     private $configuration;

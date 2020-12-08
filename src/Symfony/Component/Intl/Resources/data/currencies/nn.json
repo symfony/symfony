@@ -186,7 +186,7 @@
         ],
         "BYN": [
             "BYN",
-            "kviterussiske rublar"
+            "nye kviterussiske rublar"
         ],
         "BYR": [
             "BYR",
@@ -223,6 +223,10 @@
         "CLP": [
             "CLP",
             "chilenske pesos"
+        ],
+        "CNH": [
+            "CNH",
+            "kinesiske yuan (offshore)"
         ],
         "CNY": [
             "CNY",
@@ -446,7 +450,7 @@
         ],
         "ILS": [
             "ILS",
-            "israelske nye sheklar"
+            "nye israelske sheklar"
         ],
         "INR": [
             "INR",
@@ -626,7 +630,7 @@
         ],
         "MUR": [
             "MUR",
-            "mauritanske rupiar"
+            "mauritiske rupiar"
         ],
         "MVR": [
             "MVR",
@@ -862,7 +866,7 @@
         ],
         "SZL": [
             "SZL",
-            "swazilandske lilangeni"
+            "eswatinisk lilangeni"
         ],
         "THB": [
             "THB",

@@ -148,7 +148,19 @@
         "zh": "Sinuwaa"
     },
     "LocalizedNames": {
-        "es_419": "Español (Amerik Latin)",
+        "de_AT": "Almaa bu Ótiriis",
+        "de_CH": "Almaa bu Kawe bu Swis",
+        "en_AU": "Àngale bu Óstraali",
+        "en_CA": "Àngale bu Kanadaa",
+        "en_GB": "Àngale bu Grànd Brëtaañ",
+        "en_US": "Àngale bu Amerik",
+        "es_419": "Español bu Amerik Latin",
+        "es_ES": "Español bu Tugël",
+        "es_MX": "Español bu Meksik",
+        "fr_CA": "Frañse bu Kanadaa",
+        "fr_CH": "Frañse bu Swis",
+        "pt_BR": "Purtugees bu Bresil",
+        "pt_PT": "Portugees bu Tugël",
         "zh_Hans": "Sinuwaa buñ woyofal",
         "zh_Hant": "Sinuwaa bu cosaan"
     }

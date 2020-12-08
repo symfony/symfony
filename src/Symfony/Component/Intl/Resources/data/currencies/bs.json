@@ -82,11 +82,15 @@
         ],
         "BAD": [
             "BAD",
-            "Bosansko-Hercegovački dinar"
+            "Bosanskohercegovački dinar"
         ],
         "BAM": [
             "KM",
             "Bosanskohercegovačka konvertibilna marka"
+        ],
+        "BAN": [
+            "BAN",
+            "Bosanskohercegovački novi dinar"
         ],
         "BBD": [
             "BBD",
@@ -111,6 +115,10 @@
         "BGL": [
             "BGL",
             "Bugarski tvrdi lev"
+        ],
+        "BGM": [
+            "BGM",
+            "Bugarski socijalistički lev"
         ],
         "BGN": [
             "BGN",
@@ -232,6 +240,10 @@
             "CHW",
             "WIR franak"
         ],
+        "CLE": [
+            "CLE",
+            "Čileanski eskudo"
+        ],
         "CLF": [
             "CLF",
             "Čileanski unidades de fomento"
@@ -244,6 +256,10 @@
             "CNH",
             "Kineski juan (izvanteritorijalni)"
         ],
+        "CNX": [
+            "CNX",
+            "Dolar kineske narodne banke"
+        ],
         "CNY": [
             "CNY",
             "Kineski juan"
@@ -251,6 +267,10 @@
         "COP": [
             "COP",
             "Kolumbijski pezos"
+        ],
+        "COU": [
+            "COU",
+            "Kolumbijski Unidade real de valor"
         ],
         "CRC": [
             "CRC",
@@ -607,6 +627,14 @@
         "MAF": [
             "MAF",
             "Marokanski franak"
+        ],
+        "MCF": [
+            "MCF",
+            "Monegaskaški franak"
+        ],
+        "MDC": [
+            "MDC",
+            "Moldavski kupon"
         ],
         "MDL": [
             "MDL",
@@ -1075,6 +1103,10 @@
         "YUN": [
             "YUN",
             "Jugoslovenski konvertibilni dinar"
+        ],
+        "YUR": [
+            "YUR",
+            "Jugoslovenski reformirani dinar"
         ],
         "ZAL": [
             "ZAL",

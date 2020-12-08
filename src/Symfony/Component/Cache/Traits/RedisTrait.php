@@ -162,7 +162,7 @@ trait RedisTrait
         $params += $query + $options + self::$defaultConnectionOptions;
 
         if (isset($params['redis_sentinel']) && (!class_exists(\Predis\Client::class) || !class_exists(\RedisSentinel::class))) {
-            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package or the "redis" extension with minimum version v5.2.0: "%s".', $dsn));
+            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package or the "redis" extension v5.2 or higher: "%s".', $dsn));
         }
 
         if ($params['redis_cluster'] && isset($params['redis_sentinel'])) {
@@ -180,22 +180,19 @@ trait RedisTrait
             $redis = new $class();
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts) {
-                $address = $hosts[0]['host'] ?? $hosts[0]['path'];
+                $host = $hosts[0]['host'] ?? $hosts[0]['path'];
                 $port = $hosts[0]['port'] ?? null;
 
                 if (isset($params['redis_sentinel'])) {
-                    $sentinel = new \RedisSentinel($address, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
-                    $master = $sentinel->getMasterAddrByName($params['redis_sentinel']);
-                    if (false === $master) {
-                        throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $params['redis_sentinel'], $address, $port));
-                    }
+                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
 
-                    $address = $master[0];
-                    $port = $master[1];
+                    if (!([$host, $port] = $sentinel->getMasterAddrByName($params['redis_sentinel']))) {
+                        throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $params['redis_sentinel'], $host, $port));
+                    }
                 }
 
                 try {
-                    @$redis->{$connect}($address, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     $isConnected = $redis->isConnected();

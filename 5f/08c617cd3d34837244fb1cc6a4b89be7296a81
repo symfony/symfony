@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-03T10:15:59Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-03T11:05:50Z
+
+Thank you very much for working on this issue. Because the 5.2 branch is affected by this bug, please base your PR on the 5.2 branch.
+
+---------------------------------------------------------------------------
+
+by wickex at 2020-12-04T10:00:19Z
+
+Here's the pull request that introduced these changes: https://github.com/symfony/symfony/pull/37993.
+
+The UNLINK command is a pending pull request to Predis (see https://github.com/predis/predis/pull/666) and not yet available, but might be in the future if/when it's approved. There's a check to see if that class exists or it will fall back to the DELETE-command, so there currently aren't any negative side effects in keeping it as far as I can see.
+
+These changes will also need to be applied to the following two files:
+- src/Symfony/Component/HttpFoundation/Session/Storage/Handler/RedisSessionHandler.php
+- src/Symfony/Component/Messenger/Bridge/Redis/Transport/Connection.php
+
+I'll implement those corrections soon.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-07T16:57:30Z
+
+Which version of phpredis are you using?
+On my machine, using v5.3.2, I do get an exception.

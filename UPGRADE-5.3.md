@@ -12,3 +12,8 @@ Form
  * Deprecated passing an array as the first argument of the `CheckboxListMapper::mapFormsToData()` method, pass `\Traversable` instead.
  * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead.
  * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
+
+Security
+--------
+
+ * Deprecated voters that do not return a valid decision when calling the `vote` method.

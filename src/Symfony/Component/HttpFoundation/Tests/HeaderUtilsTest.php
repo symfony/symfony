@@ -151,6 +151,7 @@ class HeaderUtilsTest extends TestCase
             ['a[b]=c', 'a%5Bb%5D=c'],
             ['a[b][c.d]=c', 'a%5Bb%5D%5Bc.d%5D=c'],
             ['a%5Bb%5D=c'],
+            ['f[%2525][%26][%3D][p.c]=d', 'f%5B%2525%5D%5B%26%5D%5B%3D%5D%5Bp.c%5D=d'],
         ];
     }
 

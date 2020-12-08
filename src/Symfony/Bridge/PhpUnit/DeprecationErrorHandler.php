@@ -27,11 +27,11 @@ class DeprecationErrorHandler
     /**
      * @deprecated since Symfony 4.3, use max[self]=0 instead
      */
-    public const MODE_WEAK_VENDORS = 'weak_vendors';
+    const MODE_WEAK_VENDORS = 'weak_vendors';
 
-    public const MODE_DISABLED = 'disabled';
-    public const MODE_WEAK = 'max[total]=999999&verbose=0';
-    public const MODE_STRICT = 'max[total]=0';
+    const MODE_DISABLED = 'disabled';
+    const MODE_WEAK = 'max[total]=999999&verbose=0';
+    const MODE_STRICT = 'max[total]=0';
 
     private $mode;
     private $configuration;

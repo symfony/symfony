@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Daniel Stancu <birkof@birkof.ro>
  *
- * @internal
- *
  * @see https://api.slack.com/messaging/webhooks
  *
  * @experimental in 5.1

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+
 5.2.0
 -----
 

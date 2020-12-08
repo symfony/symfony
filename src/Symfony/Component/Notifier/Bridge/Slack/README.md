@@ -1,7 +1,22 @@
 Slack Notifier
 ==============
 
-Provides Slack integration for Symfony Notifier.
+Provides [Slack](https://slack.com) integration for Symfony Notifier.
+
+DSN example
+-----------
+
+```
+SLACK_DSN=slack://default/ID
+```
+
+where:
+- `ID` is your webhook id (e.g. `/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`)
+
+in this case:
+```
+SLACK_DSN=slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX
+```
 
 Resources
 ---------

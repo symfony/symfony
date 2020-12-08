@@ -1,7 +1,19 @@
 Twilio Notifier
 ===============
 
-Provides Twilio integration for Symfony Notifier.
+Provides [Twilio](https://www.twilio.com) integration for Symfony Notifier.
+
+DSN example
+-----------
+
+```
+TWILIO_DSN=twilio://SID:TOKEN@default?from=FROM
+```
+
+where:
+- `SID` is your Twillio ID
+- `TOKEN` is your Twilio token
+- `FROM` is your sender
 
 Resources
 ---------

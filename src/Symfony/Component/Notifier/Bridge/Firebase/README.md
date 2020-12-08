@@ -1,13 +1,12 @@
 Firebase Notifier
 =================
 
-Provides Firebase integration for Symfony Notifier.
+Provides [Firebase](https://firebase.google.com) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-// .env file
 FIREBASE_DSN=firebase://USERNAME:PASSWORD@default
 ```
 

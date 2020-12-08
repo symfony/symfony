@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,6 +29,15 @@ final class SlackTransportFactoryTest extends TestCase
         $transport = $factory->create(Dsn::fromString(sprintf('slack://testUser@%s/?channel=%s', $host, $channel)));
 
         $this->assertSame(sprintf('slack://%s?channel=%s', $host, $channel), (string) $transport);
+    }
+
+    public function testCreateWithDeprecatedDsn(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
+
+        $factory = new SlackTransportFactory();
+        $factory->create(Dsn::fromString('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }
 
     public function testCreateWithNoTokenThrowsMalformed(): void

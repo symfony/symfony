@@ -248,6 +248,10 @@
             "CLP",
             "Peso na Sile"
         ],
+        "CNH": [
+            "CNH",
+            "Yuan na Síne (seachairgeadra)"
+        ],
         "CNY": [
             "CN¥",
             "Yuan na Síne"
@@ -370,7 +374,7 @@
         ],
         "FRF": [
             "FRF",
-            "FRF"
+            "Franc na Fraince"
         ],
         "GBP": [
             "£",
@@ -578,7 +582,7 @@
         ],
         "LUC": [
             "LUC",
-            "LUC"
+            "Franc Inmhalartach Lucsamburgach"
         ],
         "LUF": [
             "LUF",
@@ -590,7 +594,7 @@
         ],
         "LVR": [
             "LVR",
-            "LVR"
+            "Rúbal na Laitvia"
         ],
         "LYD": [
             "LYD",
@@ -682,7 +686,7 @@
         ],
         "MXV": [
             "MXV",
-            "MXV"
+            "Aonad Infheistíochta Meicsiceach"
         ],
         "MYR": [
             "MYR",
@@ -1066,7 +1070,7 @@
         ],
         "YUN": [
             "YUN",
-            "YUN"
+            "Dinar Inmhalartaithe Iúgslavach (1990–1992)"
         ],
         "YUR": [
             "YUR",

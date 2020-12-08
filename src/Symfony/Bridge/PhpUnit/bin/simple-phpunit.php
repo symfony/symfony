@@ -147,6 +147,10 @@ foreach ($defaultEnvs as $envName => $envValue) {
     }
 }
 
+if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
+    putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
+}
+
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
     || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
     || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer`) : `which composer 2> /dev/null`))

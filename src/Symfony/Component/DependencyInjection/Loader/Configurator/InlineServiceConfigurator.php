@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class InlineServiceConfigurator extends AbstractConfigurator
 {
-    const FACTORY = 'inline';
+    public const FACTORY = 'inline';
 
     use Traits\ArgumentTrait;
     use Traits\AutowireTrait;

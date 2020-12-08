@@ -24,7 +24,7 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
  */
 class Inline
 {
-    const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+)"|\'([^\']*+(?:\'\'[^\']*+)*+)\')';
+    public const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+)"|\'([^\']*+(?:\'\'[^\']*+)*+)\')';
 
     public static $parsedLineNumber = -1;
     public static $parsedFilename;

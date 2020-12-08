@@ -23,10 +23,10 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 class CurrencyDataProvider
 {
-    const INDEX_SYMBOL = 0;
-    const INDEX_NAME = 1;
-    const INDEX_FRACTION_DIGITS = 0;
-    const INDEX_ROUNDING_INCREMENT = 1;
+    public const INDEX_SYMBOL = 0;
+    public const INDEX_NAME = 1;
+    public const INDEX_FRACTION_DIGITS = 0;
+    public const INDEX_ROUNDING_INCREMENT = 1;
 
     private $path;
     private $reader;

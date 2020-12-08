@@ -21,7 +21,7 @@ abstract class BaseTypeTest extends TypeTestCase
 {
     use VersionAwareTest;
 
-    const TESTED_TYPE = '';
+    public const TESTED_TYPE = '';
 
     public function testPassDisabledAsOption()
     {

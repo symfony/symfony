@@ -41,11 +41,11 @@ class UuidValidator extends ConstraintValidator
     // M = any allowed version {1..5}
     // N = any allowed variant {8, 9, a, b}
 
-    const STRICT_LENGTH = 36;
-    const STRICT_FIRST_HYPHEN_POSITION = 8;
-    const STRICT_LAST_HYPHEN_POSITION = 23;
-    const STRICT_VERSION_POSITION = 14;
-    const STRICT_VARIANT_POSITION = 19;
+    public const STRICT_LENGTH = 36;
+    public const STRICT_FIRST_HYPHEN_POSITION = 8;
+    public const STRICT_LAST_HYPHEN_POSITION = 23;
+    public const STRICT_VERSION_POSITION = 14;
+    public const STRICT_VARIANT_POSITION = 19;
 
     // The loose pattern validates similar yet non-compliant UUIDs.
     // Hyphens are completely optional. If present, they should only appear
@@ -59,8 +59,8 @@ class UuidValidator extends ConstraintValidator
 
     // Neither the version nor the variant is validated by this pattern.
 
-    const LOOSE_MAX_LENGTH = 39;
-    const LOOSE_FIRST_HYPHEN_POSITION = 4;
+    public const LOOSE_MAX_LENGTH = 39;
+    public const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
     /**
      * {@inheritdoc}

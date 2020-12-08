@@ -27,12 +27,12 @@ class EmailValidator extends ConstraintValidator
     /**
      * @internal
      */
-    const PATTERN_HTML5 = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
+    public const PATTERN_HTML5 = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
 
     /**
      * @internal
      */
-    const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
+    public const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
 
     private static $emailPatterns = [
         Email::VALIDATION_MODE_LOOSE => self::PATTERN_LOOSE,

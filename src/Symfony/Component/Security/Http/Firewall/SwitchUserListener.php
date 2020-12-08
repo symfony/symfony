@@ -43,7 +43,7 @@ class SwitchUserListener extends AbstractListener implements ListenerInterface
 {
     use LegacyListenerTrait;
 
-    const EXIT_VALUE = '_exit';
+    public const EXIT_VALUE = '_exit';
 
     private $tokenStorage;
     private $provider;

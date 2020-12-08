@@ -35,7 +35,7 @@ use Symfony\Component\Console\Terminal;
  */
 class SymfonyStyle extends OutputStyle
 {
-    const MAX_LINE_LENGTH = 120;
+    public const MAX_LINE_LENGTH = 120;
 
     private $input;
     private $questionHelper;

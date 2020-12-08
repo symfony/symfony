@@ -22,9 +22,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  */
 class AccessDecisionManager implements AccessDecisionManagerInterface
 {
-    const STRATEGY_AFFIRMATIVE = 'affirmative';
-    const STRATEGY_CONSENSUS = 'consensus';
-    const STRATEGY_UNANIMOUS = 'unanimous';
+    public const STRATEGY_AFFIRMATIVE = 'affirmative';
+    public const STRATEGY_CONSENSUS = 'consensus';
+    public const STRATEGY_UNANIMOUS = 'unanimous';
 
     private $voters;
     private $strategy;

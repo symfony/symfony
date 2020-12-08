@@ -19,7 +19,7 @@ final class AuthenticationEvents
      *
      * @Event("Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent")
      */
-    const AUTHENTICATION_SUCCESS = 'security.authentication.success';
+    public const AUTHENTICATION_SUCCESS = 'security.authentication.success';
 
     /**
      * The AUTHENTICATION_FAILURE event occurs after a user cannot be
@@ -27,5 +27,5 @@ final class AuthenticationEvents
      *
      * @Event("Symfony\Component\Security\Core\Event\AuthenticationFailureEvent")
      */
-    const AUTHENTICATION_FAILURE = 'security.authentication.failure';
+    public const AUTHENTICATION_FAILURE = 'security.authentication.failure';
 }

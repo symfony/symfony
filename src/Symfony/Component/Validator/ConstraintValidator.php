@@ -24,12 +24,12 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Whether to format {@link \DateTime} objects, either with the {@link \IntlDateFormatter}
      * (if it is available) or as RFC-3339 dates ("Y-m-d H:i:s").
      */
-    const PRETTY_DATE = 1;
+    public const PRETTY_DATE = 1;
 
     /**
      * Whether to cast objects with a "__toString()" method to strings.
      */
-    const OBJECT_TO_STRING = 2;
+    public const OBJECT_TO_STRING = 2;
 
     /**
      * @var ExecutionContextInterface

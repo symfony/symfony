@@ -20,16 +20,16 @@ namespace Symfony\Component\PropertyInfo;
  */
 class Type
 {
-    const BUILTIN_TYPE_INT = 'int';
-    const BUILTIN_TYPE_FLOAT = 'float';
-    const BUILTIN_TYPE_STRING = 'string';
-    const BUILTIN_TYPE_BOOL = 'bool';
-    const BUILTIN_TYPE_RESOURCE = 'resource';
-    const BUILTIN_TYPE_OBJECT = 'object';
-    const BUILTIN_TYPE_ARRAY = 'array';
-    const BUILTIN_TYPE_NULL = 'null';
-    const BUILTIN_TYPE_CALLABLE = 'callable';
-    const BUILTIN_TYPE_ITERABLE = 'iterable';
+    public const BUILTIN_TYPE_INT = 'int';
+    public const BUILTIN_TYPE_FLOAT = 'float';
+    public const BUILTIN_TYPE_STRING = 'string';
+    public const BUILTIN_TYPE_BOOL = 'bool';
+    public const BUILTIN_TYPE_RESOURCE = 'resource';
+    public const BUILTIN_TYPE_OBJECT = 'object';
+    public const BUILTIN_TYPE_ARRAY = 'array';
+    public const BUILTIN_TYPE_NULL = 'null';
+    public const BUILTIN_TYPE_CALLABLE = 'callable';
+    public const BUILTIN_TYPE_ITERABLE = 'iterable';
 
     /**
      * List of PHP builtin types.

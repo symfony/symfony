@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UrlValidator extends ConstraintValidator
 {
-    const PATTERN = '~^
+    public const PATTERN = '~^
             (%s)://                                 # protocol
             (((?:[\_\.\pL\pN-]|%%[0-9A-Fa-f]{2})+:)?((?:[\_\.\pL\pN-]|%%[0-9A-Fa-f]{2})+)@)?  # basic auth
             (

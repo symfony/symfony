@@ -25,69 +25,69 @@ class Url extends Constraint
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_ANY = 'ANY';
+    public const CHECK_DNS_TYPE_ANY = 'ANY';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_NONE = false;
+    public const CHECK_DNS_TYPE_NONE = false;
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_A = 'A';
+    public const CHECK_DNS_TYPE_A = 'A';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_A6 = 'A6';
+    public const CHECK_DNS_TYPE_A6 = 'A6';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_AAAA = 'AAAA';
+    public const CHECK_DNS_TYPE_AAAA = 'AAAA';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_CNAME = 'CNAME';
+    public const CHECK_DNS_TYPE_CNAME = 'CNAME';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_MX = 'MX';
+    public const CHECK_DNS_TYPE_MX = 'MX';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
+    public const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_NS = 'NS';
+    public const CHECK_DNS_TYPE_NS = 'NS';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_PTR = 'PTR';
+    public const CHECK_DNS_TYPE_PTR = 'PTR';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_SOA = 'SOA';
+    public const CHECK_DNS_TYPE_SOA = 'SOA';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_SRV = 'SRV';
+    public const CHECK_DNS_TYPE_SRV = 'SRV';
 
     /**
      * @deprecated since Symfony 4.1
      */
-    const CHECK_DNS_TYPE_TXT = 'TXT';
+    public const CHECK_DNS_TYPE_TXT = 'TXT';
 
-    const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
+    public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
     protected static $errorNames = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',

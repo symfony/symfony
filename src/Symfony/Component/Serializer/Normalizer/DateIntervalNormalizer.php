@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT_KEY = 'dateinterval_format';
+    public const FORMAT_KEY = 'dateinterval_format';
 
     private $defaultContext = [
         self::FORMAT_KEY => '%rP%yY%mM%dDT%hH%iM%sS',

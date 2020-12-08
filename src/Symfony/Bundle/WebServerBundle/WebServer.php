@@ -24,8 +24,8 @@ use Symfony\Component\Process\Process;
  */
 class WebServer
 {
-    const STARTED = 0;
-    const STOPPED = 1;
+    public const STARTED = 0;
+    public const STOPPED = 1;
 
     private $pidFileDirectory;
 

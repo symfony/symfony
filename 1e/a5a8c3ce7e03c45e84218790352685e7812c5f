@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-30T21:56:49Z
+
+Can you please rebase onto 4.4 and push again, so the CI is triggered on the right branch?
+
+---------------------------------------------------------------------------
+
+by kick-the-bucket at 2020-12-02T14:20:49Z
+
+@derrabus It's already based on the newest 4.4, I can't push it, because it's up to date
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-02T14:26:42Z
+
+May I do the rebase for you?
+
+---------------------------------------------------------------------------
+
+by kick-the-bucket at 2020-12-02T14:32:50Z
+
+@derrabus please try
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-02T15:37:25Z
+
+Done. The Travis failure looks unrelated. We're having some troubles there at the moment.

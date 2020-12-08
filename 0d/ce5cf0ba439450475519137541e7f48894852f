@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by awoimbee at 2020-10-18T21:22:11Z
+
+Bump
+All the feedback has been answered, everything seems good to merge.
+It's not an issue if I need to rebase to make the tests pass (it's obviously not my PR that broke them).
+
+---------------------------------------------------------------------------
+
+by awoimbee at 2020-10-19T15:41:42Z
+
+@nicolas-grekas
+I just checked all the profiler pages, the dump, ...
+I only found that the toggle button on the exception page is now a bit lower (centered instead of top left)
+To me this isn't an issue, if you agree then this is 100% OK to merge.
+Here are screenshots: https://www.meerodrop.com/fr/drop/9a407d4e-c42e-42a5-9c4b-ee6d86598ceb
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-22T17:03:23Z
+
+Thank you @awoimbee for your work.
+
+Could you finish this PR so it is included in the next release?
+
+---------------------------------------------------------------------------
+
+by awoimbee at 2020-10-23T10:44:28Z
+
+Hope it's good now!
+If there is a small thing that bothers you before merging, feel free to commit to this PR.
+It should be faster that requesting changes and re-reviewing later at this point

@@ -1617,7 +1617,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
-        $definition = $container->getDefinition('http_client');
+        $definition = $container->getDefinition('http_client.mock_client');
 
         $this->assertSame(MockHttpClient::class, $definition->getClass());
         $this->assertCount(1, $definition->getArguments());
@@ -1625,6 +1625,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
+        $this->assertSame('http_client', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
     }
 

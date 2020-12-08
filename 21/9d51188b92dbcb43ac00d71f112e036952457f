@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by thiagomp at 2020-10-18T17:51:11Z
+
+I tried to make sense of Appveyor details but couldn't determine why it failed.
+Would anyone be kind enough to let me know the issue so I can fix it?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-19T18:47:59Z
+
+Im happy with this PR after @stloyd's change.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-10-19T20:23:20Z
+
+@nicolas-grekas  That's for 5.x :)
+
+---------------------------------------------------------------------------
+
+by thiagomp at 2020-10-20T02:09:43Z
+
+Thanks @stloyd for your suggestion! I've committed the changes you've suggested.
+
+---------------------------------------------------------------------------
+
+by thiagomp at 2020-10-24T23:07:53Z
+
+Please, let me know if this is failing because of my changes. From what I saw, I don't think it was.

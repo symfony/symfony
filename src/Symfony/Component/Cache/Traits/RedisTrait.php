@@ -159,11 +159,11 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s".', $dsn));
         }
 
+        $params += $query + $options + self::$defaultConnectionOptions;
+
         if (isset($params['redis_sentinel']) && !class_exists(\Predis\Client::class)) {
             throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package: "%s".', $dsn));
         }
-
-        $params += $query + $options + self::$defaultConnectionOptions;
 
         if (null === $params['class'] && !isset($params['redis_sentinel']) && \extension_loaded('redis')) {
             $class = $params['redis_cluster'] ? \RedisCluster::class : (1 < \count($hosts) ? \RedisArray::class : \Redis::class);

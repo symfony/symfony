@@ -135,8 +135,6 @@ class JsonResponse extends Response
      * Sets a raw string containing a JSON document to be sent.
      *
      * @return $this
-     *
-     * @throws \InvalidArgumentException
      */
     public function setJson(string $json)
     {

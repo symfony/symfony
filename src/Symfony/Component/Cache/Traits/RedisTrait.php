@@ -408,15 +408,15 @@ trait RedisTrait
 
             if ($unlink) {
                 try {
-                    $this->redis->unlink($ids);
-
-                    return true;
+                    $unlink = false !== $this->redis->unlink($ids);
                 } catch (\Throwable $e) {
                     $unlink = false;
                 }
             }
 
-            $this->redis->del($ids);
+            if (!$unlink) {
+                $this->redis->del($ids);
+            }
         }
 
         return true;

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-05T16:00:49Z
+
+Not sure about this one. IIUC, the change is only for YAML, but we have other formats as well where you should not add the quotes, right?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-05T16:06:51Z
+
+Hm. Yes. I'll try to fix this problem by updating the Yaml dumper instead.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-05T18:57:19Z
+
+I've updated the PR, it fixes the same problem but is only updating the dumper instead of the configuration.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-08T07:10:49Z
+
+@Nyholm Can you have a look at the tests?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-08T09:22:33Z
+
+Sure. PR is rebased and tests are updated

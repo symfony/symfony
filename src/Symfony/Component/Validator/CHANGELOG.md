@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * added the `extensions` option to the `File` constraint
+
 5.2.0
 -----
 

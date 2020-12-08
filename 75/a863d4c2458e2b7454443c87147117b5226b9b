@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-07T22:21:17Z
+
+Thank you @jakzal for working on this.
+
+What is the plan for converting json to php? #23545
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-08T06:37:54Z
+
+#39370 has been merged now, would you like to rebase this one?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2020-12-08T09:52:12Z
+
+@jderusse I think it's time to get back to that idea :)

@@ -53,12 +53,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             }
         }
 
-        try {
-            $content = $request->getContent();
-        } catch (\LogicException $e) {
-            // the user already got the request content as a resource
-            $content = false;
-        }
+        $content = $request->getContent();
 
         $sessionMetadata = [];
         $sessionAttributes = [];

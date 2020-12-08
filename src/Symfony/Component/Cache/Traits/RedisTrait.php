@@ -186,7 +186,7 @@ trait RedisTrait
                 if (isset($params['redis_sentinel'])) {
                     $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
 
-                    if (!([$host, $port] = $sentinel->getMasterAddrByName($params['redis_sentinel']))) {
+                    if (![$host, $port] = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
                         throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $params['redis_sentinel'], $host, $port));
                     }
                 }

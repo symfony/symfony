@@ -63,6 +63,14 @@ class HttpBrowserTest extends AbstractBrowserTest
             ['POST', 'http://example.com/', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
             ['POST', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
         ];
+        yield 'GET JSON' => [
+            ['GET', 'http://example.com/jsonrpc', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
+            ['GET', 'http://example.com/jsonrpc', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
+        yield 'HEAD JSON' => [
+            ['HEAD', 'http://example.com/jsonrpc', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
+            ['HEAD', 'http://example.com/jsonrpc', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
     }
 
     public function testMultiPartRequestWithSingleFile()

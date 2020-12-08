@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-11-06T16:13:58Z
+
+@derrabus What about the solution of @nicolas-grekas? It sounds simpler to me :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2020-11-06T17:23:28Z
+
+> the alternative is to make this class @internal since 5.3 and do what we want in v6...
+
+I'm for this alternative :+1:, this class looks really `@internal`.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-11-06T21:46:40Z
+
+> > the alternative is to make this class @internal since 5.3 and do what we want in v6...
+>
+> I'm for this alternative 👍, this class looks really `@internal`.
+
+I agree. In that case, we wouldn't need a deprecation layer at all, I guess.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-11-17T08:46:55Z
+
+@lyrixx caution, it seems that you pushed a commit under my name :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-11-30T19:38:13Z
+
+I updated the PR to mark the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+
+Should I put something in `UPGRADE-6.0.md` ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-08T10:29:47Z
+
+Hello,
+
+What is missing for this PR?
+
+Note: I keep rebasing this PR because of a conflit on `UPGRADE-5.3.md`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-08T11:47:38Z
+
+Maybe add a changelog entry in the component?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-08T13:10:21Z
+
+I added a note in the CHANGELOG of HttpKernel Component

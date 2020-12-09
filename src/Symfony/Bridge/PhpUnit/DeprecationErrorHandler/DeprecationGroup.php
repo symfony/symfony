@@ -55,11 +55,7 @@ final class DeprecationGroup
      */
     private function deprecationNotice($message)
     {
-        if (!isset($this->deprecationNotices[$message])) {
-            $this->deprecationNotices[$message] = new DeprecationNotice();
-        }
-
-        return $this->deprecationNotices[$message];
+        return $this->deprecationNotices[$message] ?? $this->deprecationNotices[$message] = new DeprecationNotice();
     }
 
     public function count()

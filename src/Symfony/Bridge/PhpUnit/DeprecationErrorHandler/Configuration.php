@@ -278,7 +278,7 @@ class Configuration
         }
 
         return new self(
-            isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
+            $normalizedConfiguration['max'] ?? [],
             '',
             $verboseOutput,
             filter_var($normalizedConfiguration['generateBaseline'], \FILTER_VALIDATE_BOOLEAN),

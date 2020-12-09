@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
  *
- * @internal
- *
  * @experimental in 5.2
  */
 final class DiscordTransport extends AbstractTransport

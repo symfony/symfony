@@ -28,6 +28,10 @@ final class RegisterUidTypePass implements CompilerPassInterface
             return;
         }
 
+        if (!$container->hasParameter('doctrine.dbal.connection_factory.types')) {
+            return;
+        }
+
         $typeDefinition = $container->getParameter('doctrine.dbal.connection_factory.types');
 
         if (!isset($typeDefinition['uuid'])) {

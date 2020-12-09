@@ -41,7 +41,7 @@ class Deprecation
 
     /**
      * @var string[] Absolute paths to source or tests of the project, cache
-     *               directories exlcuded because it is based on autoloading
+     *               directories excluded because it is based on autoloading
      *               rules and cache systems typically do not use those
      */
     private static $internalPaths = [];
@@ -56,10 +56,10 @@ class Deprecation
     {
         $this->trace = $trace;
 
-        if ('trigger_error' === ($trace[1]['function'] ?? null)
-            && (DebugClassLoader::class === ($class = $trace[2]['class'] ?? null) || LegacyDebugClassLoader::class === $class)
-            && 'checkClass' === ($trace[2]['function'] ?? null)
-            && null !== ($extraFile = $trace[2]['args'][1] ?? null)
+        if ('trigger_error' === (isset($trace[1]['function']) ? $trace[1]['function'] : null)
+            && (DebugClassLoader::class === ($class = (isset($trace[2]['class']) ? $trace[2]['class'] : null)) || LegacyDebugClassLoader::class === $class)
+            && 'checkClass' === (isset($trace[2]['function']) ? $trace[2]['function'] : null)
+            && null !== ($extraFile = (isset($trace[2]['args'][1]) ? $trace[2]['args'][1] : null))
             && '' !== $extraFile
             && false !== $extraFile = realpath($extraFile)
         ) {

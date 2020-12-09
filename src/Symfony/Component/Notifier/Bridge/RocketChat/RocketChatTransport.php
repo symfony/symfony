@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
  *
- * @internal
- *
  * @experimental in 5.1
  */
 final class RocketChatTransport extends AbstractTransport

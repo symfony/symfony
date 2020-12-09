@@ -32,7 +32,7 @@ final class InfobipTransportTest extends TestCase
         $transport = $this->getTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
     public function testSendNonSmsMessageThrowsException(): void

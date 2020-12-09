@@ -38,6 +38,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFact
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
+use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
@@ -91,6 +92,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MobytTransportFactory::class => false,
             NexmoTransportFactory::class => false,
             OctopushTransportFactory::class => false,
+            OneSignalTransportFactory::class => false,
             OvhCloudTransportFactory::class => false,
             RocketChatTransportFactory::class => false,
             SendinblueTransportFactory::class => false,
@@ -150,6 +152,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['mobyt', 'symfony/mobyt-notifier'];
         yield ['nexmo', 'symfony/nexmo-notifier'];
         yield ['octopush', 'symfony/octopush-notifier'];
+        yield ['onesignal', 'symfony/one-signal-notifier'];
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
         yield ['rocketchat', 'symfony/rocket-chat-notifier'];
         yield ['sendinblue', 'symfony/sendinblue-notifier'];

@@ -35,7 +35,7 @@ final class SendinblueTransportTest extends TestCase
         $transport = $this->initTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
     public function testSendNonSmsMessageThrowsException(): void

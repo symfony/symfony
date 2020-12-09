@@ -2072,8 +2072,8 @@ class FrameworkExtension extends Extension
         }
 
         if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
-            $container->getDefinition($httpClientId)
-                ->setClass(MockHttpClient::class)
+            $container->register($httpClientId.'.mock_client', MockHttpClient::class)
+                ->setDecoratedService($httpClientId, null, -10) // lower priority than TraceableHttpClient
                 ->setArguments([new Reference($responseFactoryId)]);
         }
     }

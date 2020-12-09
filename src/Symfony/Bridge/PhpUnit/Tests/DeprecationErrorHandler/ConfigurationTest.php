@@ -184,7 +184,7 @@ class ConfigurationTest extends TestCase
         return [
             ['disabled', false],
             ['disabled=1', false],
-            ['disabled=0', true]
+            ['disabled=0', true],
         ];
     }
 
@@ -251,7 +251,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineGenerationEmptyFile()
     {
         $filename = $this->createFile();
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -277,7 +277,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineGenerationNoFile()
     {
         $filename = $this->createFile();
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -299,7 +299,6 @@ class ConfigurationTest extends TestCase
             ],
         ];
         $this->assertEquals(json_encode($expected_baseline, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES), file_get_contents($filename));
-
     }
 
     public function testExistingBaseline()
@@ -319,7 +318,7 @@ class ConfigurationTest extends TestCase
         ];
         file_put_contents($filename, json_encode($baseline));
 
-        $configuration = Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
         $this->assertFalse($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 1', $trace, '')));
@@ -344,7 +343,7 @@ class ConfigurationTest extends TestCase
             ],
         ];
         file_put_contents($filename, json_encode($baseline));
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $this->assertTrue($configuration->isGeneratingBaseline());
         $trace = debug_backtrace();
         $this->assertTrue($configuration->isBaselineDeprecation(new Deprecation('Test message 2', $trace, '')));
@@ -379,7 +378,7 @@ class ConfigurationTest extends TestCase
         unlink($filename);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The baselineFile "%s" does not exist.', $filename));
-        Configuration::fromUrlEncodedString('baselineFile=' . urlencode($filename));
+        Configuration::fromUrlEncodedString('baselineFile='.urlencode($filename));
     }
 
     public function testBaselineFileWriteError()
@@ -388,7 +387,7 @@ class ConfigurationTest extends TestCase
         chmod($filename, 0444);
         $this->expectError();
         $this->expectErrorMessageMatches('/[Ff]ailed to open stream: Permission denied/');
-        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile=' . urlencode($filename));
+        $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
         $configuration->writeBaseline();
     }
 
@@ -406,10 +405,11 @@ class ConfigurationTest extends TestCase
         }
     }
 
-    private function createFile() {
+    private function createFile()
+    {
         $filename = tempnam(sys_get_temp_dir(), 'sf-');
         $this->files[] = $filename;
+
         return $filename;
     }
-
 }

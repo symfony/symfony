@@ -39,7 +39,7 @@ class TextPart extends AbstractPart
     /**
      * @param resource|string $body
      */
-    public function __construct($body, ?string $charset = 'utf-8', $subtype = 'plain', string $encoding = null)
+    public function __construct($body, ?string $charset = 'utf-8', string $subtype = 'plain', string $encoding = null)
     {
         parent::__construct();
 

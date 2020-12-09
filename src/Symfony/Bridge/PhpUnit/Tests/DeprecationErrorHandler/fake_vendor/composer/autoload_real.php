@@ -26,7 +26,7 @@ class ComposerLoaderFake
     public function findFile($class)
     {
         foreach ($this->getPrefixesPsr4() as $prefix => $baseDirs) {
-            if (strpos($class, $prefix) !== 0) {
+            if (0 !== strpos($class, $prefix)) {
                 continue;
             }
 

@@ -16,4 +16,3 @@ final class AppService
         $service2->deprecatedApi();
     }
 }
-

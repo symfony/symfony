@@ -13,7 +13,6 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\TraversableContains;
 
@@ -228,7 +227,7 @@ trait PolyfillAssertTrait
     public static function assertFinite($actual, $message = '')
     {
         static::assertInternalType('float', $actual, $message);
-        static::assertTrue(is_finite($actual), $message ? $message : "Failed asserting that $actual is finite.");
+        static::assertTrue(is_finite($actual), $message ?: "Failed asserting that $actual is finite.");
     }
 
     /**
@@ -239,7 +238,7 @@ trait PolyfillAssertTrait
     public static function assertInfinite($actual, $message = '')
     {
         static::assertInternalType('float', $actual, $message);
-        static::assertTrue(is_infinite($actual), $message ? $message : "Failed asserting that $actual is infinite.");
+        static::assertTrue(is_infinite($actual), $message ?: "Failed asserting that $actual is infinite.");
     }
 
     /**
@@ -250,7 +249,7 @@ trait PolyfillAssertTrait
     public static function assertNan($actual, $message = '')
     {
         static::assertInternalType('float', $actual, $message);
-        static::assertTrue(is_nan($actual), $message ? $message : "Failed asserting that $actual is nan.");
+        static::assertTrue(is_nan($actual), $message ?: "Failed asserting that $actual is nan.");
     }
 
     /**
@@ -262,7 +261,7 @@ trait PolyfillAssertTrait
     public static function assertIsReadable($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertTrue(is_readable($filename), $message ? $message : "Failed asserting that $filename is readable.");
+        static::assertTrue(is_readable($filename), $message ?: "Failed asserting that $filename is readable.");
     }
 
     /**
@@ -274,7 +273,7 @@ trait PolyfillAssertTrait
     public static function assertNotIsReadable($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertFalse(is_readable($filename), $message ? $message : "Failed asserting that $filename is not readable.");
+        static::assertFalse(is_readable($filename), $message ?: "Failed asserting that $filename is not readable.");
     }
 
     /**
@@ -297,7 +296,7 @@ trait PolyfillAssertTrait
     public static function assertIsWritable($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertTrue(is_writable($filename), $message ? $message : "Failed asserting that $filename is writable.");
+        static::assertTrue(is_writable($filename), $message ?: "Failed asserting that $filename is writable.");
     }
 
     /**
@@ -309,7 +308,7 @@ trait PolyfillAssertTrait
     public static function assertNotIsWritable($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertFalse(is_writable($filename), $message ? $message : "Failed asserting that $filename is not writable.");
+        static::assertFalse(is_writable($filename), $message ?: "Failed asserting that $filename is not writable.");
     }
 
     /**
@@ -332,7 +331,7 @@ trait PolyfillAssertTrait
     public static function assertDirectoryExists($directory, $message = '')
     {
         static::assertInternalType('string', $directory, $message);
-        static::assertTrue(is_dir($directory), $message ? $message : "Failed asserting that $directory exists.");
+        static::assertTrue(is_dir($directory), $message ?: "Failed asserting that $directory exists.");
     }
 
     /**
@@ -344,7 +343,7 @@ trait PolyfillAssertTrait
     public static function assertDirectoryNotExists($directory, $message = '')
     {
         static::assertInternalType('string', $directory, $message);
-        static::assertFalse(is_dir($directory), $message ? $message : "Failed asserting that $directory does not exist.");
+        static::assertFalse(is_dir($directory), $message ?: "Failed asserting that $directory does not exist.");
     }
 
     /**
@@ -437,7 +436,7 @@ trait PolyfillAssertTrait
     public static function assertFileExists($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertTrue(file_exists($filename), $message ? $message : "Failed asserting that $filename exists.");
+        static::assertTrue(file_exists($filename), $message ?: "Failed asserting that $filename exists.");
     }
 
     /**
@@ -449,7 +448,7 @@ trait PolyfillAssertTrait
     public static function assertFileNotExists($filename, $message = '')
     {
         static::assertInternalType('string', $filename, $message);
-        static::assertFalse(file_exists($filename), $message ? $message : "Failed asserting that $filename does not exist.");
+        static::assertFalse(file_exists($filename), $message ?: "Failed asserting that $filename does not exist.");
     }
 
     /**

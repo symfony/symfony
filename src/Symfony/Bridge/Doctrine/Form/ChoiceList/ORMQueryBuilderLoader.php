@@ -12,8 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.
@@ -96,7 +98,11 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                 $doctrineType = Type::getType($type);
                 $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
                 foreach ($values as &$value) {
-                    $value = $doctrineType->convertToDatabaseValue($value, $platform);
+                    try {
+                        $value = $doctrineType->convertToDatabaseValue($value, $platform);
+                    } catch (ConversionException $e) {
+                        throw new TransformationFailedException(sprintf('Failed to transform "%s" into "%s".', $value, $type), 0, $e);
+                    }
                 }
                 unset($value);
             }

@@ -2,7 +2,10 @@
     "name": "symfony/rocket-chat-notifier",
     "type": "symfony-bridge",
     "description": "Symfony RocketChat Notifier Bridge",
-    "keywords": ["rocketchat", "notifier"],
+    "keywords": [
+        "rocketchat",
+        "notifier"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +24,9 @@
         "symfony/notifier": "^5.0,<5.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\RocketChat\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\RocketChat\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

@@ -2,7 +2,11 @@
     "name": "symfony/twilio-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Twilio Notifier Bridge",
-    "keywords": ["sms", "twilio", "notifier"],
+    "keywords": [
+        "sms",
+        "twilio",
+        "notifier"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +25,9 @@
         "symfony/notifier": "^5.0,<5.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Twilio\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Twilio\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

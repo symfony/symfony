@@ -2,7 +2,11 @@
     "name": "symfony/ovh-cloud-notifier",
     "type": "symfony-bridge",
     "description": "Symfony OvhCloud Notifier Bridge",
-    "keywords": ["sms", "OvhCloud", "notifier"],
+    "keywords": [
+        "sms",
+        "ovhcloud",
+        "notifier"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +25,9 @@
         "symfony/notifier": "^5.0,<5.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\OvhCloud\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\OvhCloud\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

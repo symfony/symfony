@@ -2,7 +2,11 @@
     "name": "symfony/sinch-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Sinch Notifier Bridge",
-    "keywords": ["sms", "sinch", "notifier"],
+    "keywords": [
+        "sms",
+        "sinch",
+        "notifier"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -22,7 +26,9 @@
         "symfony/notifier": "^5.0,<5.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sinch\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Sinch\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

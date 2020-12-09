@@ -2,7 +2,11 @@
     "name": "symfony/nexmo-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Nexmo Notifier Bridge",
-    "keywords": ["sms", "nexmo", "notifier"],
+    "keywords": [
+        "sms",
+        "nexmo",
+        "notifier"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,7 +25,9 @@
         "symfony/notifier": "^5.0,<5.2"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Nexmo\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Nexmo\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

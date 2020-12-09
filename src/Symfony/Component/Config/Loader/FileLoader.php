@@ -71,7 +71,7 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, string $type = null, bool $ignoreErrors = false, string $sourceResource = null, $exclude = null)
     {
-        if (\is_string($resource) && \strlen($resource) !== $i = strcspn($resource, '*?{[')) {
+        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && false === strpos($resource, "\n")) {
             $excluded = [];
             foreach ((array) $exclude as $pattern) {
                 foreach ($this->glob($pattern, true, $_, false, true) as $path => $info) {

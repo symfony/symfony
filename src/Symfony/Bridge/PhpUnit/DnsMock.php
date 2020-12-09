@@ -18,18 +18,18 @@ class DnsMock
 {
     private static $hosts = [];
     private static $dnsTypes = [
-        'A' => DNS_A,
-        'MX' => DNS_MX,
-        'NS' => DNS_NS,
-        'SOA' => DNS_SOA,
-        'PTR' => DNS_PTR,
-        'CNAME' => DNS_CNAME,
-        'AAAA' => DNS_AAAA,
-        'A6' => DNS_A6,
-        'SRV' => DNS_SRV,
-        'NAPTR' => DNS_NAPTR,
-        'TXT' => DNS_TXT,
-        'HINFO' => DNS_HINFO,
+        'A' => \DNS_A,
+        'MX' => \DNS_MX,
+        'NS' => \DNS_NS,
+        'SOA' => \DNS_SOA,
+        'PTR' => \DNS_PTR,
+        'CNAME' => \DNS_CNAME,
+        'AAAA' => \DNS_AAAA,
+        'A6' => \DNS_A6,
+        'SRV' => \DNS_SRV,
+        'NAPTR' => \DNS_NAPTR,
+        'TXT' => \DNS_TXT,
+        'HINFO' => \DNS_HINFO,
     ];
 
     /**
@@ -137,7 +137,7 @@ class DnsMock
         return $ips;
     }
 
-    public static function dns_get_record($hostname, $type = DNS_ANY, &$authns = null, &$addtl = null, $raw = false)
+    public static function dns_get_record($hostname, $type = \DNS_ANY, &$authns = null, &$addtl = null, $raw = false)
     {
         if (!self::$hosts) {
             return \dns_get_record($hostname, $type, $authns, $addtl, $raw);
@@ -146,8 +146,8 @@ class DnsMock
         $records = false;
 
         if (isset(self::$hosts[$hostname])) {
-            if (DNS_ANY === $type) {
-                $type = DNS_ALL;
+            if (\DNS_ANY === $type) {
+                $type = \DNS_ALL;
             }
             $records = [];
 

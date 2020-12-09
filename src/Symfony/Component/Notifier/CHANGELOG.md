@@ -12,6 +12,7 @@ CHANGELOG
  * [BC BREAK] Remove `Dsn::fromString()` method
  * [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
  * Added `DSN::getRequiredOption` method which throws a new `MissingRequiredOptionException`.
+ * Add `push` channel to notifier
 
 5.2.0
 -----

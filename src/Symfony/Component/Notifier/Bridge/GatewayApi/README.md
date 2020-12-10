@@ -1,7 +1,7 @@
 GatewayAPI Notifier
 ===================
 
-Provides GatewayAPI integration for Symfony Notifier.
+Provides [GatewayAPI](https://gatewayapi.com) integration for Symfony Notifier.
 
 DSN example
 -----------

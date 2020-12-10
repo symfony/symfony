@@ -21,7 +21,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn(): void
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $dsn = 'freemobile://login:pass@default?phone=0611223344';
         $transport = $factory->create(Dsn::fromString($dsn));
@@ -32,7 +32,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
 
     public function testCreateWithNoPhoneThrowsMalformed(): void
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
@@ -42,7 +42,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
 
     public function testSupportsFreeMobileScheme(): void
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $dsn = 'freemobile://login:pass@default?phone=0611223344';
         $dsnUnsupported = 'foobarmobile://login:pass@default?phone=0611223344';
@@ -53,7 +53,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
 
     public function testNonFreeMobileSchemeThrows(): void
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
 
@@ -61,7 +61,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnUnsupported));
     }
 
-    private function initFactory(): FreeMobileTransportFactory
+    private function createFactory(): FreeMobileTransportFactory
     {
         return new FreeMobileTransportFactory();
     }

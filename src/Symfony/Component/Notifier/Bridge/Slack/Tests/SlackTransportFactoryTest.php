@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class SlackTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new SlackTransportFactory();
 
@@ -29,7 +29,7 @@ final class SlackTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('slack://%s/%s', $host, $path), (string) $transport);
     }
 
-    public function testSupportsSlackScheme(): void
+    public function testSupportsSlackScheme()
     {
         $factory = new SlackTransportFactory();
 
@@ -37,7 +37,7 @@ final class SlackTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
     }
 
-    public function testNonSlackSchemeThrows(): void
+    public function testNonSlackSchemeThrows()
     {
         $factory = new SlackTransportFactory();
 

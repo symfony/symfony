@@ -4,7 +4,7 @@ CHANGELOG
 5.3.0
 -----
 
-* Added caseSensitive option for attribute keys in the Entry class.
+ * Added caseSensitive option for attribute keys in the Entry class.
 
 5.1.0
 -----

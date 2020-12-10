@@ -4,7 +4,7 @@ CHANGELOG
 5.3.0
 -----
 
-* added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
+ * added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
 
 5.2.0
 -----

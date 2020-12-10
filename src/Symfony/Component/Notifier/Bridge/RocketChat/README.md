@@ -1,13 +1,12 @@
 RocketChat Notifier
 ===================
 
-Provides RocketChat integration for Symfony Notifier.
+Provides [RocketChat](https://rocket.chat) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-// .env file
 ROCKETCHAT_DSN=rocketchat://ACCESS_TOKEN@default?channel=CHANNEL
 ```
 

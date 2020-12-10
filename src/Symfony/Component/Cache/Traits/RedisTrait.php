@@ -177,7 +177,7 @@ trait RedisTrait
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts) {
                 try {
-                    @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    @$redis->{$connect}($hosts[0]['host'] ?? $hosts[0]['path'], $hosts[0]['port'] ?? null, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout']);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     $isConnected = $redis->isConnected();
@@ -189,7 +189,6 @@ trait RedisTrait
 
                     if ((null !== $auth && !$redis->auth($auth))
                         || ($params['dbindex'] && !$redis->select($params['dbindex']))
-                        || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
                     ) {
                         $e = preg_replace('/^ERR /', '', $redis->getLastError());
                         throw new InvalidArgumentException(sprintf('Redis connection "%s" failed: ', $dsn).$e.'.');

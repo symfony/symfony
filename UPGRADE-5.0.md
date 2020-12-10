@@ -360,7 +360,7 @@ Monolog
 MonologBridge
 --------------
 
-* The `RouteProcessor` class is final.
+ * The `RouteProcessor` class is final.
 
 Process
 -------
@@ -529,7 +529,7 @@ Serializer
 Serializer
 ----------
 
-* Removed the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant. Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead.
+ * Removed the `XmlEncoder::TYPE_CASE_ATTRIBUTES` constant. Use `XmlEncoder::TYPE_CAST_ATTRIBUTES` instead.
 
 Stopwatch
 ---------

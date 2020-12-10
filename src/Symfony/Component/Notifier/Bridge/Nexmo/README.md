@@ -1,7 +1,19 @@
 Nexmo Notifier
 ==============
 
-Provides Nexmo integration for Symfony Notifier.
+Provides [Nexmo](https://nexmo.com) integration for Symfony Notifier.
+
+DSN example
+-----------
+
+```
+NEXMO_DSN=nexmo://KEY:SECRET@default?from=FROM
+```
+
+where:
+- `KEY` is your Nexmo key
+- `SECRET` is your Nexmo secret
+- `FROM` is your sender
 
 Resources
 ---------

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon\Tests;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use AsyncAws\Sns\Result\PublishResponse;
 use AsyncAws\Sns\SnsClient;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Amazon\AmazonSnsOptions;
-use Symfony\Component\Notifier\Bridge\Amazon\AmazonTransport;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsOptions;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -26,7 +26,7 @@ class AmazonTransportTest extends TestCase
 {
     public function testSupportsMessageInterface()
     {
-        $transport = new AmazonTransport($this->createMock(SnsClient::class));
+        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
         $this->assertTrue($transport->supports(new ChatMessage('arn:topic')));
@@ -35,7 +35,7 @@ class AmazonTransportTest extends TestCase
 
     public function testSendMessageWithUnsupportedMessageThrows()
     {
-        $transport = new AmazonTransport($this->createMock(SnsClient::class));
+        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
 
         $this->expectException(LogicException::class);
         $transport->send($this->createMock(MessageInterface::class));
@@ -43,7 +43,7 @@ class AmazonTransportTest extends TestCase
 
     public function testChatMessageWithInvalidOptionsThrows()
     {
-        $transport = new AmazonTransport($this->createMock(SnsClient::class));
+        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
 
         $this->expectException(LogicException::class);
         $transport->send(new ChatMessage('topic', $this->createMock(MessageOptionsInterface::class)));
@@ -67,7 +67,7 @@ class AmazonTransportTest extends TestCase
             ->with($this->equalTo(['PhoneNumber' => '0600000000', 'Message' => 'test']))
             ->willReturn($response);
 
-        $transport = new AmazonTransport($snsMock);
+        $transport = new AmazonSnsTransport($snsMock);
         $transport->send(new SmsMessage('0600000000', 'test'));
     }
 
@@ -89,7 +89,7 @@ class AmazonTransportTest extends TestCase
             ->with($this->equalTo(['TopicArn' => 'my-topic', 'random' => 'value', 'Message' => 'Subject']))
             ->willReturn($response);
 
-        $transport = new AmazonTransport($snsMock);
+        $transport = new AmazonSnsTransport($snsMock);
         $transport->send(new ChatMessage('Subject', new AmazonSnsOptions('my-topic', ['random' => 'value'])));
     }
 }

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon\Tests;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Amazon\AmazonTransportFactory;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -20,7 +20,7 @@ class AmazonTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://auth@default?region=eu-west-3&profile=myProfile'));
         $transport->setHost('example.com');
 
@@ -29,7 +29,7 @@ class AmazonTransportFactoryTest extends TestCase
 
     public function testCreateWithoutCredentialDsn()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3&profile=myProfile'));
         $transport->setHost('example.com');
 
@@ -38,43 +38,34 @@ class AmazonTransportFactoryTest extends TestCase
 
     public function testDefaultRegionIsCorrectlySet()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default'));
         $transport->setHost('example.com');
 
-        $this->assertSame('sns://example.com?region=us-east-1&profile=default', (string) $transport);
-    }
-
-    public function testDsnWithProfileOption()
-    {
-        $factory = new AmazonTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://default?profile=myProfile'));
-        $transport->setHost('example.com');
-
-        $this->assertSame('sns://example.com?region=us-east-1&profile=myProfile', (string) $transport);
+        $this->assertSame('sns://example.com?region=us-east-1', (string) $transport);
     }
 
     public function testDsnWithRegionOption()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3'));
         $transport->setHost('example.com');
 
-        $this->assertSame('sns://example.com?region=eu-west-3&profile=default', (string) $transport);
+        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
     }
 
     public function testDefaultProfileIsCorrectlySet()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
         $transport = $factory->create(Dsn::fromString('sns://default'));
         $transport->setHost('example.com');
 
-        $this->assertSame('sns://example.com?region=us-east-1&profile=default', (string) $transport);
+        $this->assertSame('sns://example.com?region=us-east-1', (string) $transport);
     }
 
     public function testSupportsSnsScheme()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
 
         $this->assertTrue($factory->supports(Dsn::fromString('sns://default')));
         $this->assertFalse($factory->supports(Dsn::fromString('not-sns://default')));
@@ -82,7 +73,7 @@ class AmazonTransportFactoryTest extends TestCase
 
     public function testNonFreeMobileSchemeThrows()
     {
-        $factory = new AmazonTransportFactory();
+        $factory = new AmazonSnsTransportFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
 

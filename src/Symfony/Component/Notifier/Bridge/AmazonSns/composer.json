@@ -1,8 +1,8 @@
 {
-    "name": "symfony/amazon-notifier",
+    "name": "symfony/amazon-sns-notifier",
     "type": "symfony-bridge",
     "description": "Provides Amazon SNS integration for Symfony Notifier.",
-    "keywords": ["sms", "amazon", "sns", "notifier"],
+    "keywords": ["amazon", "sns", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -23,7 +23,7 @@
         "async-aws/core": "^1.7"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Amazon\\": "" },
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\AmazonSns\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\LogicException;
@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @experimental in 5.3
  */
-final class AmazonTransport extends AbstractTransport
+final class AmazonSnsTransport extends AbstractTransport
 {
     /** @var SnsClient */
     private $snsClient;
@@ -42,12 +42,12 @@ final class AmazonTransport extends AbstractTransport
     {
         $configuration = $this->snsClient->getConfiguration();
 
-        return sprintf('sns://%s?region=%s&profile=%s', $this->getEndpoint(), $configuration->get('region'), $configuration->get('profile'));
+        return sprintf('sns://%s?region=%s', $this->getEndpoint(), $configuration->get('region'));
     }
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage || $message instanceof ChatMessage;
+        return $message instanceof SmsMessage || ($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions);
     }
 
     protected function doSend(MessageInterface $message): SentMessage

@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
-use AsyncAws\Core\Configuration;
 use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
@@ -23,7 +22,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  *
  * @experimental in 5.3
  */
-final class AmazonTransportFactory extends AbstractTransportFactory
+final class AmazonSnsTransportFactory extends AbstractTransportFactory
 {
     private const DSN_SCHEME = 'sns';
 
@@ -33,16 +32,15 @@ final class AmazonTransportFactory extends AbstractTransportFactory
 
         if (self::DSN_SCHEME === $scheme) {
             $options = [
-                Configuration::OPTION_PROFILE => $dsn->getOption('profile', 'default'),
-                Configuration::OPTION_REGION => $dsn->getOption('region', Configuration::DEFAULT_REGION),
-            ];
+                    'region' => $dsn->getOption('region') ?: 'eu-west-1',
+                    'profile' => $dsn->getOption('profile'),
+                    'accessKeyId' => $dsn->getUser(),
+                    'accessKeySecret' => $dsn->getPassword(),
+                ] + (
+                'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://' . $dsn->getHost() . ($dsn->getPort() ? ':' . $dsn->getPort() : '')]
+                );
 
-            if (null !== $dsn->getUser() && null !== $dsn->getPassword()) {
-                $options[Configuration::OPTION_ACCESS_KEY_ID] = $dsn->getUser();
-                $options[Configuration::OPTION_SECRET_ACCESS_KEY] = $dsn->getPassword();
-            }
-
-            return new AmazonTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
+            return new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
         }
 
         throw new UnsupportedSchemeException($dsn, self::DSN_SCHEME, $this->getSupportedSchemes());

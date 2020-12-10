@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\Input\PublishInput;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;

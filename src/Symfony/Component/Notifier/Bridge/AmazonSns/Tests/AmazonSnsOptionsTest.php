@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Amazon\Tests;
+namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Amazon\AmazonSnsOptions;
+use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsOptions;
 
 class AmazonSnsOptionsTest extends TestCase
 {

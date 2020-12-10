@@ -10,7 +10,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class GatewayApiTransportFactoryTest extends TestCase
 {
-    public function testSupportsGatewayApiScheme(): void
+    public function testSupportsGatewayApiScheme()
     {
         $factory = $this->initFactory();
 
@@ -19,7 +19,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
         $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
     }
 
-    public function testUnSupportedGatewayShouldThrowsUnsupportedSchemeException(): void
+    public function testUnSupportedGatewayShouldThrowsUnsupportedSchemeException()
     {
         $factory = $this->initFactory();
         $this->expectException(UnsupportedSchemeException::class);
@@ -27,7 +27,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsn));
     }
 
-    public function testCreateWithNoTokenThrowsIncompleteDsnException(): void
+    public function testCreateWithNoTokenThrowsIncompleteDsnException()
     {
         $factory = $this->initFactory();
         $this->expectException(IncompleteDsnException::class);
@@ -35,7 +35,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsn));
     }
 
-    public function testCreateWithNoFromShouldThrowsIncompleteDsnException(): void
+    public function testCreateWithNoFromShouldThrowsIncompleteDsnException()
     {
         $factory = $this->initFactory();
         $this->expectException(IncompleteDsnException::class);

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-10-22T15:22:56Z
+
+As explained here: https://github.com/symfony/symfony/pull/36851#issuecomment-703284784
+
+I don't know how to avoid the deprecation in the tests (that's why they are failing).
+That's the last thing before being RTM.
+
+Could you help me @fabpot @xabbuh @nicolas-grekas ? Thanks.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-11-21T10:49:05Z
+
+@fabpot @xabbuh @nicolas-grekas This PR is ready to merge except the deprecation in the tests.
+But I don't know how to get rid of it... Could you give me some help ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2020-12-06T23:14:00Z
+
+I rebased, it should be RTM

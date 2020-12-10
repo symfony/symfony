@@ -15,7 +15,6 @@ where:
  - `TOKEN` the secure token of the webhook (returned for Incoming Webhooks)
  - `ID` the id of the webhook
 
-
 Resources
 ---------
 

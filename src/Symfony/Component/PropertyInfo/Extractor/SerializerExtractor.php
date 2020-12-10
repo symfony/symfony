@@ -47,7 +47,7 @@ class SerializerExtractor implements PropertyListExtractorInterface
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            $ignored = method_exists($serializerClassMetadata, 'isIgnored') && $serializerAttributeMetadata->isIgnored();
+            $ignored = method_exists($serializerAttributeMetadata, 'isIgnored') && $serializerAttributeMetadata->isIgnored();
             if (!$ignored && (null === $context['serializer_groups'] || array_intersect($context['serializer_groups'], $serializerAttributeMetadata->getGroups()))) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }

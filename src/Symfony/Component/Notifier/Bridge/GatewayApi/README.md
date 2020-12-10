@@ -7,7 +7,6 @@ DSN example
 -----------
 
 ```
-// .env file
 GATEWAYAPI_DSN=gatewayapi://TOKEN@default?from=FROM
 ```
 

@@ -33,8 +33,8 @@ final class AmazonTransportFactory extends AbstractTransportFactory
 
         if (self::DSN_SCHEME === $scheme) {
             $options = [
-                Configuration::OPTION_PROFILE => $dsn->getHost(),
-                Configuration::OPTION_REGION => $dsn->getOption('region'),
+                Configuration::OPTION_PROFILE => $dsn->getOption('profile', 'default'),
+                Configuration::OPTION_REGION => $dsn->getOption('region', Configuration::DEFAULT_REGION),
             ];
 
             if (null !== $dsn->getUser() && null !== $dsn->getPassword()) {

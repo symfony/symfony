@@ -42,7 +42,7 @@ final class AmazonTransport extends AbstractTransport
     {
         $configuration = $this->snsClient->getConfiguration();
 
-        return sprintf('sns://%s?region=%s', $this->getEndpoint(), $configuration->get('region'));
+        return sprintf('sns://%s?region=%s&profile=%s', $this->getEndpoint(), $configuration->get('region'), $configuration->get('profile'));
     }
 
     public function supports(MessageInterface $message): bool

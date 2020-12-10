@@ -4,8 +4,8 @@ CHANGELOG
 5.1.0
 -----
 
-* Added an `UninitializedPropertyException`
-* Linking to PropertyInfo extractor to remove a lot of duplicate code
+ * Added an `UninitializedPropertyException`
+ * Linking to PropertyInfo extractor to remove a lot of duplicate code
 
 4.4.0
 -----

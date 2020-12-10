@@ -4,7 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
-* Add support for extracting accessor and mutator via PHP Reflection
+ * Add support for extracting accessor and mutator via PHP Reflection
 
 4.3.0
 -----

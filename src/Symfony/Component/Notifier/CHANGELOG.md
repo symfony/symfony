@@ -5,10 +5,10 @@ CHANGELOG
 -----
 
  * Added the Mattermost notifier bridge
-* [BC BREAK] The `ChatMessage::fromNotification()` method's `$recipient` and `$transport`
-  arguments were removed.
-* [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
-  methods' `$transport` argument was removed.
+ * [BC BREAK] The `ChatMessage::fromNotification()` method's `$recipient` and `$transport`
+   arguments were removed.
+ * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
+   methods' `$transport` argument was removed.
 
 5.0.0
 -----

@@ -8,7 +8,7 @@ DSN example
 
 ```
 // .env file
-AMAZON_DSN=sns://ACCESS_ID:ACCESS_KEY@default?region=eu-west-3
+AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION&profile=PROFILE'
 ```
 
 Chatter usage

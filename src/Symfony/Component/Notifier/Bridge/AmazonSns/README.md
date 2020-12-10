@@ -1,18 +1,18 @@
 Amazon Notifier
-=============
+===============
 
-Provides Amazon SNS integration for Symfony Notifier.
+Provides [Amazon SNS](https://aws.amazon.com/de/sns/) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
 // .env file
-AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION&profile=PROFILE'
+AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION'
 ```
 
 Chatter usage
------------
+-------------
 ```php
 function sendMessage(ChatterInterface $chatter)
 {
@@ -23,7 +23,7 @@ function sendMessage(ChatterInterface $chatter)
 ```
 
 Texter usage
------------
+------------
 ```php
 function sendMessage(TexterInterface $texter)
 {

@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-09T13:31:03Z
+
+Travis failure looks unrelated
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-10T08:06:11Z
+
+Travis failure looks unrelated and is only in 7.4 job:
+```
+There were 7 errors:
+1) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportFactoryTest::testCreateWithDsn
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransportFactory.php:33
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:66
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:24
+2) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportFactoryTest::testCreateWithNoFromThrowsMalformed
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransportFactory.php:33
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:66
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:35
+3) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportFactoryTest::testSupportsNexmoScheme
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransportFactory.php:33
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:66
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:45
+4) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportFactoryTest::testNonNexmoSchemeThrows
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransportFactory.php:33
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:66
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportFactoryTest.php:56
+5) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportTest::testToStringContainsProperties
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransport.php:48
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/NexmoTransport.php:41
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:49
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:25
+6) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportTest::testSupportsMessageInterface
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransport.php:48
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/NexmoTransport.php:41
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:49
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:32
+7) Symfony\Component\Notifier\Bridge\Nexmo\Tests\NexmoTransportTest::testSendNonSmsMessageThrowsException
+Error: Class 'Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy' not found
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/vendor/symfony/notifier/Transport/AbstractTransport.php:48
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/NexmoTransport.php:41
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:49
+/home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Nexmo/Tests/NexmoTransportTest.php:40
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-10T10:46:52Z
+
+That mean the class `Symfony\Component\EventDispatcher\Event` exists but not `Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy`.
+
+I believe your should add a conflict rule in composer.json (siilar to Messenger component)
+```
+    "conflict": {
+        "symfony/event-dispatcher": "<4.4",
+    }
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-10T11:03:21Z
+
+No, this is a bug in Notifier 5.0.0 that is used here (because we're testing with lowest deps here). We should bump `symfony/notifier` to `^5.1` in the nexmo bridge (and possibly in others too).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-10T11:46:23Z
+
+> We should bump symfony/notifier to ^5.1 in the nexmo bridge (and possibly in others too).
+
+Done

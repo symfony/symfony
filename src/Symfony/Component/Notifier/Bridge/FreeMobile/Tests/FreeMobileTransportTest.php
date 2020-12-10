@@ -56,8 +56,6 @@ final class FreeMobileTransportTest extends TestCase
 
     private function initTransport(): FreeMobileTransport
     {
-        return (new FreeMobileTransport(
-            'login', 'pass', '0611223344', $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        return (new FreeMobileTransport('login', 'pass', '0611223344', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

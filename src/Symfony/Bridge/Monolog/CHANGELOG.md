@@ -4,9 +4,9 @@ CHANGELOG
 4.4.0
 -----
 
-* The `RouteProcessor` class has been made final
-* Added `ElasticsearchLogstashHandler`
-* Added the `ServerLogCommand`. Backport from the deprecated WebServerBundle
+ * The `RouteProcessor` class has been made final
+ * Added `ElasticsearchLogstashHandler`
+ * Added the `ServerLogCommand`. Backport from the deprecated WebServerBundle
 
 4.3.0
 -----

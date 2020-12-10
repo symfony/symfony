@@ -250,9 +250,9 @@ DependencyInjection
 DoctrineBridge
 --------------
 
-* The `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
-  `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema` have been removed. Use
-  `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
+ * The `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
+   `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema` have been removed. Use
+   `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
 
 EventDispatcher
 ---------------
@@ -287,9 +287,9 @@ Finder
 Form
 ----
 
-* The values of the `FormEvents::*` constants have been updated to match the
-  constant names. You should only update your application if you relied on the
-  constant values instead of their names.
+ * The values of the `FormEvents::*` constants have been updated to match the
+   constant names. You should only update your application if you relied on the
+   constant values instead of their names.
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
 
@@ -817,8 +817,8 @@ Translation
 TwigBundle
 ----------
 
-* The `ContainerAwareRuntimeLoader` class has been removed. Use the
-  Twig `Twig_ContainerRuntimeLoader` class instead.
+ * The `ContainerAwareRuntimeLoader` class has been removed. Use the
+   Twig `Twig_ContainerRuntimeLoader` class instead.
 
  * Removed `DebugCommand` in favor of `Symfony\Bridge\Twig\Command\DebugCommand`.
 
@@ -869,7 +869,6 @@ TwigBridge
 
  * Removed `LintCommand::set/getTwigEnvironment`. Pass an instance of
    `Twig\Environment` as first argument of the constructor instead.
-
 
 Validator
 ---------

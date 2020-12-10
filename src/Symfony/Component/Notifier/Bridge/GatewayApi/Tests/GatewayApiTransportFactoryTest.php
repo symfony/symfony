@@ -12,7 +12,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
 {
     public function testSupportsGatewayApiScheme()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $dsn = 'gatewayapi://token@default?from=Symfony';
 
@@ -21,7 +21,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
 
     public function testUnSupportedGatewayShouldThrowsUnsupportedSchemeException()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
         $this->expectException(UnsupportedSchemeException::class);
         $dsn = 'wrongGateway://token@default?from=Symfony';
         $factory->create(Dsn::fromString($dsn));
@@ -29,7 +29,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
 
     public function testCreateWithNoTokenThrowsIncompleteDsnException()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
         $this->expectException(IncompleteDsnException::class);
         $dsn = 'gatewayapi://default?from=Symfony';
         $factory->create(Dsn::fromString($dsn));
@@ -37,13 +37,13 @@ final class GatewayApiTransportFactoryTest extends TestCase
 
     public function testCreateWithNoFromShouldThrowsIncompleteDsnException()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
         $this->expectException(IncompleteDsnException::class);
         $dsn = 'gatewayapi://token@default';
         $factory->create(Dsn::fromString($dsn));
     }
 
-    private function initFactory(): GatewayApiTransportFactory
+    private function createFactory(): GatewayApiTransportFactory
     {
         return new GatewayApiTransportFactory();
     }

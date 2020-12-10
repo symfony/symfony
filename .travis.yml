@@ -233,7 +233,7 @@ install:
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
-      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*') ]] && export LEGACY=,legacy
+      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi

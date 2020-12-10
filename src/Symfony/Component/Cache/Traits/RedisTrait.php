@@ -214,7 +214,6 @@ trait RedisTrait
             }
             $params['lazy_connect'] = $params['lazy'] ?? true;
             $params['connect_timeout'] = $params['timeout'];
-            $params['read_timeout'] = $params['read_timeout'];
 
             try {
                 $redis = new $class($hosts, $params);

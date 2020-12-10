@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by mpiot at 2020-12-09T16:55:32Z
+
+@OskarStark yes you're right, both are required: token and the chanel id, to use the webhook.
+Thanks a lot :)

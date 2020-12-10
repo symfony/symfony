@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-08T17:49:14Z
+
+done @fabpot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-12-10T09:55:53Z
+
+Do we want to link to these third party services? I'm not sure it adds much tbh. In the docs, we're extremely careful about linking people to third party websites, as they might be monetized, go down, etc. Not sure what the policy in the READMEs is about this.
+
+Thanks for all changes @OskarStark! That much have been quite a boring task.. but more consistency is always better :)

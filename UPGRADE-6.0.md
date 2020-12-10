@@ -196,7 +196,7 @@ Validator
 
  * Removed the `NumberConstraintTrait` trait.
 
-* `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore.
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore.
 
   Before:
 
@@ -211,7 +211,7 @@ Validator
       ->setDoctrineAnnotationReader($reader);
   ```
 
-* `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore.
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore.
 
   Before:
 

@@ -4,46 +4,46 @@ CHANGELOG
 4.4.0
 -----
 
-* Added `Form::getName()` method.
-* Added `Crawler::matches()` method.
-* Added `Crawler::closest()` method.
-* Added `Crawler::outerHtml()` method.
-* Added an argument to the `Crawler::text()` method to opt-in normalizing whitespaces.
+ * Added `Form::getName()` method.
+ * Added `Crawler::matches()` method.
+ * Added `Crawler::closest()` method.
+ * Added `Crawler::outerHtml()` method.
+ * Added an argument to the `Crawler::text()` method to opt-in normalizing whitespaces.
 
 4.3.0
 -----
 
-* Added PHPUnit constraints: `CrawlerSelectorAttributeValueSame`, `CrawlerSelectorExists`, `CrawlerSelectorTextContains`
-  and `CrawlerSelectorTextSame`
-* Added return of element name (`_name`) in `extract()` method.
-* Added ability to return a default value in `text()` and `html()` instead of throwing an exception when node is empty.
-* When available, the [html5-php library](https://github.com/Masterminds/html5-php) is used to
-  parse HTML added to a Crawler for better support of HTML5 tags.
+ * Added PHPUnit constraints: `CrawlerSelectorAttributeValueSame`, `CrawlerSelectorExists`, `CrawlerSelectorTextContains`
+   and `CrawlerSelectorTextSame`
+ * Added return of element name (`_name`) in `extract()` method.
+ * Added ability to return a default value in `text()` and `html()` instead of throwing an exception when node is empty.
+ * When available, the [html5-php library](https://github.com/Masterminds/html5-php) is used to
+   parse HTML added to a Crawler for better support of HTML5 tags.
 
 4.2.0
 -----
 
-* The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
-  `Image` classes is now optional.
-* The `Crawler::children()` method will have a new `$selector` argument in version 5.0,
-  not defining it is deprecated.
+ * The `$currentUri` constructor argument of the `AbstractUriElement`, `Link` and
+   `Image` classes is now optional.
+ * The `Crawler::children()` method will have a new `$selector` argument in version 5.0,
+   not defining it is deprecated.
 
 3.1.0
 -----
 
-* All the URI parsing logic have been abstracted in the `AbstractUriElement` class.
-  The `Link` class is now a child of `AbstractUriElement`.
-* Added an `Image` class to crawl images and parse their `src` attribute,
-  and `selectImage`, `image`, `images` methods in the `Crawler` (the image version of the equivalent `link` methods).
+ * All the URI parsing logic have been abstracted in the `AbstractUriElement` class.
+   The `Link` class is now a child of `AbstractUriElement`.
+ * Added an `Image` class to crawl images and parse their `src` attribute,
+   and `selectImage`, `image`, `images` methods in the `Crawler` (the image version of the equivalent `link` methods).
 
 2.5.0
 -----
 
-* [BC BREAK] The default value for checkbox and radio inputs without a value attribute have changed
-  from '1' to 'on' to match the HTML specification.
-* [BC BREAK] The typehints on the `Link`, `Form` and `FormField` classes have been changed from
-  `\DOMNode` to `DOMElement`. Using any other type of `DOMNode` was triggering fatal errors in previous
-  versions. Code extending these classes will need to update the typehints when overwriting these methods.
+ * [BC BREAK] The default value for checkbox and radio inputs without a value attribute have changed
+   from '1' to 'on' to match the HTML specification.
+ * [BC BREAK] The typehints on the `Link`, `Form` and `FormField` classes have been changed from
+   `\DOMNode` to `DOMElement`. Using any other type of `DOMNode` was triggering fatal errors in previous
+   versions. Code extending these classes will need to update the typehints when overwriting these methods.
 
 2.4.0
 -----

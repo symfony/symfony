@@ -10,9 +10,9 @@ CHANGELOG
 4.3.0
 -----
 
-* added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
-* added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
-  `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
+ * added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
+ * added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
+   `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
 
 4.0.0
 -----

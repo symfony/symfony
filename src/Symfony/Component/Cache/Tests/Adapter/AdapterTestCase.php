@@ -272,6 +272,30 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($cache->hasItem('foobar'));
         $this->assertTrue($cache->hasItem('barfoo'));
     }
+
+    public function testWeirdDataMatchingMetadataWrappedValues()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $item = $cache->getItem('foobar');
+
+        // it should be an array containing only one element
+        // with key having a strlen of 10.
+        $weirdDataMatchingMedatataWrappedValue = [
+            1234567890 => [
+                1,
+            ],
+        ];
+
+        $cache->save($item->set($weirdDataMatchingMedatataWrappedValue));
+
+        $this->assertTrue($cache->hasItem('foobar'));
+    }
 }
 
 class NotUnserializable

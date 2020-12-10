@@ -34,7 +34,7 @@ final class FreeMobileTransportTest extends TestCase
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
         $this->assertTrue($transport->supports(new SmsMessage('+33611223344', 'Hello!')));
         $this->assertFalse($transport->supports(new SmsMessage('0699887766', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
 
         $transport = $this->getTransport('+33611223344');
 
@@ -43,6 +43,15 @@ final class FreeMobileTransportTest extends TestCase
     }
 
     public function testSendNonSmsMessageThrowsException(): void
+    {
+        $transport = $this->getTransport('0611223344');
+
+        $this->expectException(LogicException::class);
+
+        $transport->send($this->createMock(MessageInterface::class));
+    }
+
+    public function testSendSmsMessageButInvalidPhoneThrowsException(): void
     {
         $transport = $this->getTransport('0611223344');
 

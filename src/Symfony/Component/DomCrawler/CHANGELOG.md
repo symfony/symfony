@@ -4,14 +4,14 @@ CHANGELOG
 5.1.0
 -----
 
-* Added an internal cache layer on top of the CssSelectorConverter
-* Added `UriResolver` to resolve an URI according to a base URI
+ * Added an internal cache layer on top of the CssSelectorConverter
+ * Added `UriResolver` to resolve an URI according to a base URI
 
 5.0.0
 -----
 
-* Added argument `$selector` to `Crawler::children()`
-* Added argument `$default` to `Crawler::text()` and `html()`
+ * Added argument `$selector` to `Crawler::children()`
+ * Added argument `$default` to `Crawler::text()` and `html()`
 
 4.4.0
 -----

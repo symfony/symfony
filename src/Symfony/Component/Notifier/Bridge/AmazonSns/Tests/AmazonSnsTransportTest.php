@@ -22,14 +22,15 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
-class AmazonTransportTest extends TestCase
+class AmazonSnsTransportTest extends TestCase
 {
     public function testSupportsMessageInterface()
     {
         $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertTrue($transport->supports(new ChatMessage('arn:topic')));
+        $this->assertTrue($transport->supports(new ChatMessage('arn:topic', new AmazonSnsOptions())));
+        $this->assertFalse($transport->supports(new ChatMessage('arn:topic')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
@@ -86,10 +87,15 @@ class AmazonTransportTest extends TestCase
         $snsMock
             ->expects($this->once())
             ->method('publish')
-            ->with($this->equalTo(['TopicArn' => 'my-topic', 'random' => 'value', 'Message' => 'Subject']))
+            ->with($this->equalTo(['TopicArn' => 'my-topic', 'Subject' => 'subject', 'Message' => 'Hello World !']))
             ->willReturn($response);
 
+        $options = new AmazonSnsOptions();
+        $options
+            ->recipient('my-topic')
+            ->subject('subject');
+
         $transport = new AmazonSnsTransport($snsMock);
-        $transport->send(new ChatMessage('Subject', new AmazonSnsOptions('my-topic', ['random' => 'value'])));
+        $transport->send(new ChatMessage('Hello World !', $options));
     }
 }

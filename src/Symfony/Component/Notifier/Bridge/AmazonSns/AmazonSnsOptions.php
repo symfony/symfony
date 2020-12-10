@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\Input\PublishInput;
+use AsyncAws\Sns\ValueObject\MessageAttributeValue;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
@@ -19,31 +20,108 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  *
  * @experimental in 5.3
  */
-class AmazonSnsOptions implements MessageOptionsInterface
+final class AmazonSnsOptions implements MessageOptionsInterface
 {
-    /** @var string */
-    private $topic;
+    private $options = [];
 
-    /**
-     * @var array
-     *
-     * @see PublishInput
-     */
-    private $options;
-
-    public function __construct(string $topic, array $options = [])
+    public function __construct(array $options = [])
     {
-        $this->topic = $topic;
         $this->options = $options;
     }
 
     public function toArray(): array
     {
-        return $this->options;
+        $options = $this->options;
+        unset($options['recipient_id']);
+
+        return $options;
     }
 
     public function getRecipientId(): ?string
     {
-        return $this->topic;
+        return $this->options['recipient_id'] ?? null;
     }
+
+    /**
+     * @param string $topic The Topic ARN for SNS message
+     *
+     * @return $this
+     */
+    public function recipient(string $topic): self
+    {
+        $this->options['recipient_id'] = $topic;
+
+        return $this;
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return $this
+     *
+     * @see PublishInput::$Subject
+     */
+    public function subject(string $subject): self
+    {
+        $this->options['Subject'] = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param string $messageStructure
+     *
+     * @return $this
+     *
+     * @see PublishInput::$MessageStructure
+     */
+    public function messageStructure(string $messageStructure): self
+    {
+        $this->options['MessageStructure'] = $messageStructure;
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, MessageAttributeValue> $messageAttributes
+     *
+     * @return $this
+     *
+     * @see PublishInput::$MessageAttributes
+     */
+    public function messageAttributes(array $messageAttributes): self
+    {
+        $this->options['MessageAttributes'] = $messageAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @param string $messageDeduplicationId
+     *
+     * @return $this
+     *
+     * @see PublishInput::$MessageDeduplicationId
+     */
+    public function messageDeduplicationId(string $messageDeduplicationId): self
+    {
+        $this->options['MessageDeduplicationId'] = $messageDeduplicationId;
+
+        return $this;
+    }
+
+    /**
+     * @param string $messageGroupId
+     *
+     * @return $this
+     *
+     * @see PublishInput::$MessageGroupId
+     */
+    public function messageGroupId(string $messageGroupId): self
+    {
+        $this->options['MessageGroupId'] = $messageGroupId;
+
+        return $this;
+    }
+
 }

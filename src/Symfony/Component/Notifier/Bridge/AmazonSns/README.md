@@ -13,10 +13,13 @@ AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION'
 
 Chatter usage
 -------------
+
 ```php
 function sendMessage(ChatterInterface $chatter)
 {
-    $options = new AmazonSnsOptions('arn:topic');
+    $options = new AmazonSnsOptions();
+    $options->recipient('arn:topic');
+
     $message = new ChatMessage('Hello', $options);
     $chatter->send($message);
 }
@@ -24,6 +27,7 @@ function sendMessage(ChatterInterface $chatter)
 
 Texter usage
 ------------
+
 ```php
 function sendMessage(TexterInterface $texter)
 {

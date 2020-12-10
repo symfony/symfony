@@ -18,13 +18,17 @@ class AmazonSnsOptionsTest extends TestCase
 {
     public function testGetRecipientId()
     {
-        $options = new AmazonSnsOptions('my-topic');
+        $options = new AmazonSnsOptions();
+        $options->recipient('my-topic');
         $this->assertSame('my-topic', $options->getRecipientId());
     }
 
     public function testToArray()
     {
-        $options = new AmazonSnsOptions('my-topic', ['random' => 'value']);
-        $this->assertEquals(['random' => 'value'], $options->toArray());
+        $options = new AmazonSnsOptions();
+        $options
+            ->recipient('my-topic')
+            ->subject('value');
+        $this->assertEquals(['Subject' => 'value'], $options->toArray());
     }
 }

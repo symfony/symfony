@@ -184,7 +184,7 @@ trait RedisTrait
                 $port = $hosts[0]['port'] ?? null;
 
                 if (isset($params['redis_sentinel'])) {
-                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    $sentinel = new \RedisSentinel($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout']);
 
                     if (![$host, $port] = $sentinel->getMasterAddrByName($params['redis_sentinel'])) {
                         throw new InvalidArgumentException(sprintf('Failed to retrieve master information from master name "%s" and address "%s:%d".', $params['redis_sentinel'], $host, $port));
@@ -192,7 +192,7 @@ trait RedisTrait
                 }
 
                 try {
-                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval']);
+                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout']);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     $isConnected = $redis->isConnected();

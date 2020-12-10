@@ -20,7 +20,6 @@ CHANGELOG
  * Changed `EmailChannel` to only support recipients which implement the `EmailRecipientInterface`.
  * Changed `SmsChannel` to only support recipients which implement the `SmsRecipientInterface`.
 
-
 5.1.0
 -----
 

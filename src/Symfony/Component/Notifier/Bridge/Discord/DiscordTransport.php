@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
  *
- * @internal
- *
  * @experimental in 5.3
  */
 final class DiscordTransport extends AbstractTransport
@@ -34,7 +32,7 @@ final class DiscordTransport extends AbstractTransport
     private $token;
     private $webhookId;
 
-    public function __construct(string $token, string $webhookId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->webhookId = $webhookId;

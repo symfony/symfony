@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twilio;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -32,6 +33,11 @@ final class TwilioTransportFactory extends AbstractTransportFactory
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
         $from = $dsn->getOption('from');
+
+        if (!$from) {
+            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
+        }
+
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

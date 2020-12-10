@@ -31,7 +31,7 @@ final class DiscordTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('discord://%s?webhook_id=%s', $host, $webhookId), (string) $transport);
     }
 
-    public function testCreateWithNoWebhookIdThrowsMalformed(): void
+    public function testCreateWithNoWebhookIdThrowsMalformed()
     {
         $factory = new DiscordTransportFactory();
 

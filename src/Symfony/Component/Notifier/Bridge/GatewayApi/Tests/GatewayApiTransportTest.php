@@ -44,10 +44,6 @@ final class GatewayApiTransportTest extends TestCase
 
     private function getTransport(MockHttpClient $client = null): GatewayApiTransport
     {
-        if (null == $client) {
-            $this->createMock(ResponseInterface::class);
-        }
-
         return (new GatewayApiTransport(
             'authtoken',
             'Symfony',

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-11-30T10:59:59Z
+
+As discussed on Slack, this should be fixed in `AsyncResponse` instead.

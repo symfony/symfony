@@ -9,43 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
+namespace Symfony\Component\Notifier\Bridge\Zulip\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Sinch\SinchTransport;
+use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
-use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class SinchTransportTest extends TestCase
+final class ZulipTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
         $transport = $this->createTransport();
 
-        $this->assertSame('sinch://host.test?from=sender', (string) $transport);
+        $this->assertSame('zulip://test.host?channel=testChannel', (string) $transport);
     }
 
-    public function testSupportsMessageInterface()
+    public function testSupportsChatMessage()
     {
         $transport = $this->createTransport();
 
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
+        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function testSendNonChatMessageThrows()
     {
         $transport = $this->createTransport();
 
         $this->expectException(LogicException::class);
-
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    private function createTransport(): SinchTransport
+    private function createTransport(): ZulipTransport
     {
-        return (new SinchTransport('accountSid', 'authToken', 'sender', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 }

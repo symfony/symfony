@@ -25,33 +25,31 @@ final class DiscordTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
-        $webhookId = 'testChannel';
+        $transport = $this->createTransport();
 
-        $transport = new DiscordTransport('testToken', $webhookId, $this->createMock(HttpClientInterface::class));
-        $transport->setHost('testHost');
-
-        $this->assertSame(sprintf('discord://%s?webhook_id=%s', 'testHost', $webhookId), (string) $transport);
+        $this->assertSame('discord://host.test?webhook_id=testWebhookId', (string) $transport);
     }
 
     public function testSupportsChatMessage()
     {
-        $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows()
+    public function testSendNonChatMessageThrowsLogicException()
     {
+        $transport = $this->createTransport();
+
         $this->expectException(LogicException::class);
-        $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
         $transport->send($this->createMock(MessageInterface::class));
     }
 
     public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
     {
-        $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = $this->createTransport();
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
@@ -61,9 +59,6 @@ final class DiscordTransportTest extends TestCase
 
     public function testSendWithErrorResponseThrows()
     {
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
-
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -76,8 +71,16 @@ final class DiscordTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new DiscordTransport('testToken', 'testChannel', $client);
+        $transport = $this->createTransport($client);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
 
         $transport->send(new ChatMessage('testMessage'));
+    }
+
+    private function createTransport(?HttpClientInterface $client = null): DiscordTransport
+    {
+        return (new DiscordTransport('testToken', 'testWebhookId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

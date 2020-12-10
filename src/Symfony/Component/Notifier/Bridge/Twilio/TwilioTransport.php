@@ -76,9 +76,9 @@ final class TwilioTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['sid']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['sid']);
 
-        return $message;
+        return $sentMessage;
     }
 }

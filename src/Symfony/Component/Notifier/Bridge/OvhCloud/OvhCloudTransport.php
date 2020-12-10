@@ -94,10 +94,10 @@ final class OvhCloudTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['ids'][0]);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['ids'][0]);
 
-        return $message;
+        return $sentMessage;
     }
 
     /**

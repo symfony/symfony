@@ -22,34 +22,30 @@ final class InfobipTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
-        $transport = $this->getTransport();
+        $transport = $this->createTransport();
 
         $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
     }
 
     public function testSupportsMessageInterface()
     {
-        $transport = $this->getTransport();
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException()
+    public function testSendNonSmsMessageThrowsLogicException()
     {
-        $transport = $this->getTransport();
+        $transport = $this->createTransport();
 
         $this->expectException(LogicException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    private function getTransport(): InfobipTransport
+    private function createTransport(): InfobipTransport
     {
-        return (new InfobipTransport(
-            'authtoken',
-            '0611223344',
-            $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        return (new InfobipTransport('authtoken', '0611223344', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

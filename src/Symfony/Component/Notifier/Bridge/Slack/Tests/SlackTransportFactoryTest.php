@@ -22,44 +22,55 @@ final class SlackTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new SlackTransportFactory();
+        $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('slack://testUser@testHost/?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test/?channel=testChannel'));
 
-        $this->assertSame('slack://testHost?channel=testChannel', (string) $transport);
+        $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
     }
 
     public function testCreateWithDeprecatedDsn()
     {
+        $factory = $this->createFactory();
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
 
-        $factory = new SlackTransportFactory();
         $factory->create(Dsn::fromString('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }
 
-    public function testCreateWithNoTokenThrowsMalformed()
+    public function testCreateWithNoTokenThrowsInclompleteDsnException()
     {
-        $factory = new SlackTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('slack://%s/?channel=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('slack://host.test?channel=testChannel'));
     }
 
-    public function testSupportsScheme()
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = new SlackTransportFactory();
+        $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('slack://host/?channel=testChannel')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('slack://host?channel=testChannel')));
     }
 
-    public function testNonSlackSchemeThrows()
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
-        $factory = new SlackTransportFactory();
+        $factory = $this->createFactory();
+
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?channel=testChannel')));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
+    {
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
+        $factory->create(Dsn::fromString('somethingElse://host?channel=testChannel'));
+    }
 
-        $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
+    private function createFactory(): SlackTransportFactory
+    {
+        return new SlackTransportFactory();
     }
 }

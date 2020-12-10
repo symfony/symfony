@@ -88,9 +88,9 @@ final class FirebaseTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['results'][0]['message_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['results'][0]['message_id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

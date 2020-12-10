@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Zulip;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -24,27 +25,30 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 class ZulipTransportFactory extends AbstractTransportFactory
 {
     /**
-     * {@inheritdoc}
+     * @return ZulipTransport
      */
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('zulip' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'zulip', $this->getSupportedSchemes());
+        }
+
         $email = $this->getUser($dsn);
         $token = $this->getPassword($dsn);
         $channel = $dsn->getOption('channel');
+
+        if (!$channel) {
+            throw new IncompleteDsnException('Missing channel.', $dsn->getOriginalDsn());
+        }
+
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('zulip' === $scheme) {
-            return (new ZulipTransport($email, $token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'zulip', $this->getSupportedSchemes());
+        return (new ZulipTransport($email, $token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSupportedSchemes(): array
     {
         return ['zulip'];

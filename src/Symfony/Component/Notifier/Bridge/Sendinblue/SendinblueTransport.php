@@ -75,9 +75,9 @@ final class SendinblueTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['messageId']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['messageId']);
 
-        return $message;
+        return $sentMessage;
     }
 }

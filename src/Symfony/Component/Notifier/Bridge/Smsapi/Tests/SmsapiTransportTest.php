@@ -9,22 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
+namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Sinch\SinchTransport;
+use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class SinchTransportTest extends TestCase
+final class SmsapiTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
         $transport = $this->createTransport();
 
-        $this->assertSame('sinch://host.test?from=sender', (string) $transport);
+        $this->assertSame('smsapi://test.host?from=testFrom', (string) $transport);
     }
 
     public function testSupportsMessageInterface()
@@ -35,17 +35,16 @@ final class SinchTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function testSendNonChatMessageThrows()
     {
         $transport = $this->createTransport();
 
         $this->expectException(LogicException::class);
-
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    private function createTransport(): SinchTransport
+    private function createTransport(): SmsapiTransport
     {
-        return (new SinchTransport('accountSid', 'authToken', 'sender', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new SmsapiTransport('testToken', 'testFrom', $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 }

@@ -25,22 +25,22 @@ final class SendinblueTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
-        $transport = $this->initTransport();
+        $transport = $this->createTransport();
 
         $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
     }
 
     public function testSupportsMessageInterface()
     {
-        $transport = $this->initTransport();
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException()
+    public function testSendNonSmsMessageThrowsLogicException()
     {
-        $transport = $this->initTransport();
+        $transport = $this->createTransport();
 
         $this->expectException(LogicException::class);
         $transport->send($this->createMock(MessageInterface::class));
@@ -60,17 +60,15 @@ final class SendinblueTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->initTransport($client);
+        $transport = $this->createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send the SMS: bad request');
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    private function initTransport(?HttpClientInterface $client = null): SendinblueTransport
+    private function createTransport(?HttpClientInterface $client = null): SendinblueTransport
     {
-        return (new SendinblueTransport(
-            'api-key', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        return (new SendinblueTransport('api-key', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

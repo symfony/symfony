@@ -11,7 +11,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GatewayApiTransportTest extends TestCase
 {
-    public function testSend(): void
+    public function testSend()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -28,14 +28,14 @@ final class GatewayApiTransportTest extends TestCase
         $this->assertNotNull($sentMessage);
     }
 
-    public function testSupportsSmsMessage(): void
+    public function testSupportsSmsMessage()
     {
         $transport = $this->getTransport();
         $message = new SmsMessage('3333333333', 'Test Messgage');
         $this->assertTrue($transport->supports($message));
     }
 
-    public function testNotSupportsChatMessage(): void
+    public function testNotSupportsChatMessage()
     {
         $transport = $this->getTransport();
         $message = new ChatMessage('3333333333');

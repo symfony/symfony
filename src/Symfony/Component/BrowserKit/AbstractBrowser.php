@@ -173,7 +173,7 @@ abstract class AbstractBrowser
             case 'PUT':
             case 'DELETE':
             case 'PATCH':
-                $content = json_encode($parameters, \defined('JSON_THROW_ON_ERROR') ? \JSON_THROW_ON_ERROR : 0);
+                $content = json_encode($parameters);
                 $query = [];
                 break;
             default:

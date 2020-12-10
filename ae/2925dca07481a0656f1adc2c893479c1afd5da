@@ -1,0 +1,259 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-03T12:08:42Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-03T12:34:12Z
+
+It seems that `PropertyInfo` Tests is not the appropriate place to write this test because of the dependency on `Serializer` component annotation. But `Serializer` component doesn't use `SerializerExtractor`, it uses `AbstractNormalizer` which contains duplicated logic of handling ignored properties which is correct there. That's why `Serializer` tests are green despite the fact that mistake is obvious and this annotation doesn't work for those who use `PropertyInfoExtractor` directly. For example, it is `ObjectModelDescriber` of `nelmio/api-doc-bundle:4.0.1` since https://github.com/nelmio/NelmioApiDocBundle/pull/1665
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-05T16:06:52Z
+
+I have rebased on top of 5.2 and have changed target branch to 5.2, because in 5.1 this error is actually not reproducible, because you have to use `@Groups()` annotation with `@Ignore()` annotation for the same property to reach this error, and it doesn't make sense. This error is easily reproducible only after changes in https://github.com/symfony/symfony/pull/37040 which landed only in 5.2.
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-05T20:03:22Z
+
+Anyway, I have rebased on top of 5.1 and have changed target branch to 5.1.
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-07T22:12:10Z
+
+FYI Failing tests are not related to the current fix, PhpDocExtractorTest fails with Symfony 4.1 under PHP 7.3, and it wasn't affected in the current PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-08T06:35:58Z
+
+@javer Can you have a look at the failing test and try to fix it?
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-08T10:10:26Z
+
+@fabpot These tests cannot be fixed in 5.1 branch, because they also fail on 4.1 branch because of BC break introduced in one of the dependency of `symfony/property-info`: https://github.com/phpDocumentor/TypeResolver/releases/tag/0.5.0.
+
+```sh
+$ git checkout 4.1
+$ composer update
+$ ./phpunit src/Symfony/Component/PropertyInfo/
+#!/usr/bin/env php
+PHPUnit 6.5.14 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Component/PropertyInfo/
+.................................F...........................F.  63 / 165 ( 38%)
+........................F...................................... 126 / 165 ( 76%)
+.......................................                         165 / 165 (100%)
+
+Time: 242 ms, Memory: 6.00MB
+
+There were 3 failures:
+
+1) Symfony\Component\PropertyInfo\Tests\PhpDocExtractor\PhpDocExtractorTest::testExtract with data set #21 ('i', array(Symfony\Component\PropertyInfo\Type Object (...), Symfony\Component\PropertyInfo\Type Object (...)), null, null)
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+ Array (
+     0 => Symfony\Component\PropertyInfo\Type Object (
+-        'builtinType' => 'string'
+-        'nullable' => true
+-        'class' => null
++        'builtinType' => 'object'
++        'nullable' => false
++        'class' => 'string'
+@@ @@
+-        'nullable' => true
++        'nullable' => false
+
+src/Symfony/Component/PropertyInfo/Tests/Extractor/PhpDocExtractorTest.php:38
+
+2) Symfony\Component\PropertyInfo\Tests\PhpDocExtractor\PhpDocExtractorTest::testExtractTypesWithCustomPrefixes with data set #21 ('i', array(Symfony\Component\PropertyInfo\Type Object (...), Symfony\Component\PropertyInfo\Type Object (...)), null, null)
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+ Array (
+     0 => Symfony\Component\PropertyInfo\Type Object (
+-        'builtinType' => 'string'
+-        'nullable' => true
+-        'class' => null
++        'builtinType' => 'object'
++        'nullable' => false
++        'class' => 'string'
+@@ @@
+-        'nullable' => true
++        'nullable' => false
+
+src/Symfony/Component/PropertyInfo/Tests/Extractor/PhpDocExtractorTest.php:55
+
+3) Symfony\Component\PropertyInfo\Tests\PhpDocExtractor\PhpDocExtractorTest::testExtractTypesWithNoPrefixes with data set #21 ('i', array(Symfony\Component\PropertyInfo\Type Object (...), Symfony\Component\PropertyInfo\Type Object (...)), null, null)
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+ Array (
+     0 => Symfony\Component\PropertyInfo\Type Object (
+-        'builtinType' => 'string'
+-        'nullable' => true
+-        'class' => null
++        'builtinType' => 'object'
++        'nullable' => false
++        'class' => 'string'
+@@ @@
+-        'nullable' => true
++        'nullable' => false
+
+src/Symfony/Component/PropertyInfo/Tests/Extractor/PhpDocExtractorTest.php:65
+
+FAILURES!
+Tests: 165, Assertions: 246, Failures: 3.
+```
+
+After applying the following patch:
+```diff
+diff --git a/composer.json b/composer.json
+index f861cbca31..4302251895 100644
+--- a/composer.json
++++ b/composer.json
+@@ -102,7 +102,7 @@
+     },
+     "conflict": {
+         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+-        "phpdocumentor/type-resolver": "<0.3.0",
++        "phpdocumentor/type-resolver": "<0.3.0||>=0.5.0",
+         "phpunit/phpunit": "<5.4.3"
+     },
+     "provide": {
+diff --git a/src/Symfony/Component/PropertyInfo/composer.json b/src/Symfony/Component/PropertyInfo/composer.json
+index 88f177d004..bcf0693f5a 100644
+--- a/src/Symfony/Component/PropertyInfo/composer.json
++++ b/src/Symfony/Component/PropertyInfo/composer.json
+@@ -35,7 +35,7 @@
+     },
+     "conflict": {
+         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+-        "phpdocumentor/type-resolver": "<0.3.0",
++        "phpdocumentor/type-resolver": "<0.3.0||>=0.5.0",
+         "symfony/dependency-injection": "<3.4"
+     },
+     "suggest": {
+```
+
+tests do not fail:
+```sh
+$ composer update
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Package operations: 0 installs, 2 updates, 0 removals
+  - Downgrading phpdocumentor/reflection-common (dev-master cf8df60 => 1.0.1):  Checking out 21bdeb5f65
+  - Downgrading phpdocumentor/type-resolver (1.x-dev 6a467b8 => 0.4.0):  Checking out 9c97770899
+Package doctrine/doctrine-cache-bundle is abandoned, you should avoid using it. No replacement was suggested.
+Package doctrine/reflection is abandoned, you should avoid using it. Use roave/better-reflection instead.
+Writing lock file
+Generating autoload files
+composer/package-versions-deprecated: Generating version class...
+composer/package-versions-deprecated: ...done generating version class
+25 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+$ ./phpunit src/Symfony/Component/PropertyInfo/
+#!/usr/bin/env php
+PHPUnit 6.5.14 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Component/PropertyInfo/
+...............................................................  63 / 165 ( 38%)
+............................................................... 126 / 165 ( 76%)
+.......................................                         165 / 165 (100%)
+
+Time: 232 ms, Memory: 6.00MB
+
+OK (165 tests, 248 assertions)
+```
+
+If we update `phpdocumentor/type-resolver` to the next version - it starts failing again:
+```sh
+$ composer update
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Package operations: 0 installs, 1 update, 0 removals
+  - Updating phpdocumentor/type-resolver (0.4.0 => 0.5.0):  Checking out 7159da1ff4
+Package doctrine/doctrine-cache-bundle is abandoned, you should avoid using it. No replacement was suggested.
+Package doctrine/reflection is abandoned, you should avoid using it. Use roave/better-reflection instead.
+Writing lock file
+Generating autoload files
+composer/package-versions-deprecated: Generating version class...
+composer/package-versions-deprecated: ...done generating version class
+25 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+MacBook-Pro-Vadim-Work:symfony javer$ ./phpunit src/Symfony/Component/PropertyInfo/
+#!/usr/bin/env php
+PHPUnit 6.5.14 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Component/PropertyInfo/
+.................................F...........................F.  63 / 165 ( 38%)
+........................F...................................... 126 / 165 ( 76%)
+.......................................                         165 / 165 (100%)
+
+Time: 163 ms, Memory: 6.00MB
+...
+FAILURES!
+Tests: 165, Assertions: 246, Failures: 3.
+```
+
+I don't know why tests for EOL version of Symfony 4.1 are started during build for 5.1 branch and how we can fix them in this case, could you please help? I have a patch which should be applied on top of 4.1 branch, but not the current 5.1 branch. Should I create PR to 4.1? Is it expected behavior for EOL versions of Symfony?
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-08T22:06:10Z
+
+@nicolas-grekas Could you please explain as the author of the https://github.com/symfony/symfony/pull/33653 feature why it's required in 5.1 build that the affected component tests in 4.1 should be green if they are red in the branch 4.1 itself? Version 4.1 is not supported anymore, it means that we cannot fix issue related to external dependency BC break (see https://github.com/symfony/symfony/pull/33588), therefore it's impossible to merge any fixes to PropertyInfo component in Symfony 5.1 and 5.2, because mentioned above fix landed in 4.3, so only for Symfony 5.3 "checkout previous major and test with patched components" will checkout 4.3 and PropertyInfo tests will be green.
+
+And how can I help you to merge this tiny fix? What's my next steps?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-10T18:04:56Z
+
+@javer good question, looks like an issue with the CI.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-12-10T18:39:14Z
+
+the tests are meant to be run with the version before it, which should be installing Symfony 4.4, not 4.1. So https://github.com/symfony/symfony/blob/f66b853f4accdddcb62a0f9a25d8cf26eb4f9ca8/.travis.yml#L202-L210 looks buggy.
+
+---------------------------------------------------------------------------
+
+by javer at 2020-12-10T19:16:02Z
+
+I have fixed calculation of the previous version, and all tests are finally passed.
+
+Now exactly the previous version is taken, i.e 4.4 for 5.0, 5.0 for 5.1, 5.1 for 5.2 and so on. If always should be the previous LTS version, i.e. 4.4 for 5.0...5.4 - please tell me, I will fix.

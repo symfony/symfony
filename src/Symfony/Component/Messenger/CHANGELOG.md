@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+* Added capability for modifying transport layer while dispatching message
 
 5.2.0
 -----

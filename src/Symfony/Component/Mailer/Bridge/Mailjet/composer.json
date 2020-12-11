@@ -16,16 +16,14 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/mailer": "^4.4|^5.0"
     },
     "require-dev": {
         "symfony/http-client": "^4.4|^5.0"
     },
     "autoload": {
-        "psr-4": {
-            "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\": ""
-        },
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

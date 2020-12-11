@@ -21,9 +21,7 @@
         "symfony/notifier": "^5.2"
     },
     "autoload": {
-        "psr-4": {
-            "Symfony\\Component\\Notifier\\Bridge\\Smsapi\\": ""
-        },
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Smsapi\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

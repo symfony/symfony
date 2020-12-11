@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-12-11T09:08:38Z
+
+Supporting PHP 8 is done in patch releases (that's why Symfony 4.4 supports it). So this should be done in the lowest maintained branch containing each bridge.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-11T09:14:28Z
+
+Ok, than this branch seems to be correct, as they all were introduced as experimental bridges in `5.2`. Thanks for the feedback @stof 👍

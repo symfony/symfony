@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-08T06:50:26Z
+
+Can you check the failed tests?
+By the way, that's a new feature :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-08T07:19:29Z
+
+> Can you check the failed tests?
+
+Yes will do 👍
+
+> By the way, that's a new feature :)
+
+I thought that, thanks!
+
+Any preference for the signature and shall we use `UnsupportedMessageException` or is `...MessageType...` fine, because its a new term in notifier scope.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-08T11:55:23Z
+
+Tests fixed, the lat one is unrelated ❗
+
+_fabbot.io_ failure seems unrelated, and if you want can be fixed in a separate PR:
+```diff
+diff -ru src/Symfony/Component/Notifier/Bridge/RocketChat/RocketChatTransport.php src/Symfony/Component/Notifier/Bridge/RocketChat/RocketChatTransport.php
+--- src/Symfony/Component/Notifier/Bridge/RocketChat/RocketChatTransport.php	2020-12-08 11:06:07.893047631 +0000
++++ src/Symfony/Component/Notifier/Bridge/RocketChat/RocketChatTransport.php	2020-12-08 11:06:09.624988949 +0000
+@@ -77,12 +77,12 @@
+         );
+
+         if (200 !== $response->getStatusCode()) {
+-            throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $response->getContent(false)), $response);
++            throw new TransportException(sprintf('Unable to post the RocketChat message: "%s".', $response->getContent(false)), $response);
+         }
+
+         $result = $response->toArray(false);
+         if (!$result['success']) {
+-            throw new TransportException(sprintf('Unable to post the RocketChat message: %s.', $result['error']), $response);
++            throw new TransportException(sprintf('Unable to post the RocketChat message: "%s".', $result['error']), $response);
+         }
+     }
+ }
+diff -ru src/Symfony/Component/Notifier/Bridge/Telegram/TelegramTransport.php src/Symfony/Component/Notifier/Bridge/Telegram/TelegramTransport.php
+--- src/Symfony/Component/Notifier/Bridge/Telegram/TelegramTransport.php	2020-12-08 11:06:08.584024219 +0000
++++ src/Symfony/Component/Notifier/Bridge/Telegram/TelegramTransport.php	2020-12-08 11:06:09.624988949 +0000
+@@ -78,7 +78,7 @@
+         if (200 !== $response->getStatusCode()) {
+             $result = $response->toArray(false);
+
+-            throw new TransportException('Unable to post the Telegram message: '.$result['description'].sprintf(' (code %s).', $result['error_code']), $response);
++            throw new TransportException('Unable to post the Telegram message: '.$result['description'].sprintf(' (code "%s").', $result['error_code']), $response);
+         }
+     }
+ }
+```

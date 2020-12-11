@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-12-11T13:51:23Z
+
+For my information, why this change? For consistency? Can it be enforced with fabbot? Appear in https://symfony.com/doc/current/contributing/code/standards.html?
+
+Note that I'm only asking this because I blindly added `void` return types in https://github.com/symfony/symfony/pull/39399 tests as I wasn't aware of any particular CS rule regarding this :)

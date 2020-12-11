@@ -1447,7 +1447,7 @@ abstract class FrameworkExtensionTest extends TestCase
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports): void
+    public function testMailer(string $configFile, array $expectedTransports)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -1463,14 +1463,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('messenger.default_bus', ContainerInterface::NULL_ON_INVALID_REFERENCE), $container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
-    public function testMailerWithDisabledMessageBus(): void
+    public function testMailerWithDisabledMessageBus()
     {
         $container = $this->createContainerFromFile('mailer_with_disabled_message_bus');
 
         $this->assertNull($container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
-    public function testMailerWithSpecificMessageBus(): void
+    public function testMailerWithSpecificMessageBus()
     {
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
 

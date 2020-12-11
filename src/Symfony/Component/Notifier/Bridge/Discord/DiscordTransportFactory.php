@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -34,12 +33,7 @@ final class DiscordTransportFactory extends AbstractTransportFactory
         }
 
         $token = $this->getUser($dsn);
-        $webhookId = $dsn->getOption('webhook_id');
-
-        if (!$webhookId) {
-            throw new IncompleteDsnException('Missing webhook_id.', $dsn->getOriginalDsn());
-        }
-
+        $webhookId = $dsn->getRequiredOption('webhook_id');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

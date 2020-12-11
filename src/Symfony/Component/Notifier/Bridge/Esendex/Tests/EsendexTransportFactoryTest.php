@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -46,20 +47,20 @@ final class EsendexTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString('esendex://email:@host?accountreference=testAccountreference&from=FROM'));
     }
 
-    public function testCreateWithMissingOptionAccountreferenceThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionAccountreferenceThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('esendex://email:password@host?from=FROM'));
     }
 
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionFromThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('esendex://email:password@host?accountreference=ACCOUNTREFERENCE'));
     }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -35,12 +34,7 @@ final class MobytTransportFactory extends AbstractTransportFactory
 
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
-        $from = $dsn->getOption('from');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
-
+        $from = $dsn->getRequiredOption('from');
         $typeQuality = $dsn->getOption('type_quality', MobytOptions::MESSAGE_TYPE_QUALITY_LOW);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();

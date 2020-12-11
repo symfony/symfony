@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,11 +28,11 @@ final class InfobipTransportFactoryTest extends TestCase
         $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoFromThrowsIncompleteDsnException()
+    public function testCreateWithNoFromThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
         $factory->create(Dsn::fromString('infobip://authtoken@default'));
     }
 

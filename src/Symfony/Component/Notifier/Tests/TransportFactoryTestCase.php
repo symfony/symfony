@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
@@ -48,6 +49,14 @@ abstract class TransportFactoryTestCase extends TestCase
      * @return iterable<array{0: string, 1: string|null}>
      */
     public function incompleteDsnProvider(): iterable
+    {
+        return [];
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: string|null}>
+     */
+    public function missingRequiredOptionProvider(): iterable
     {
         return [];
     }
@@ -100,6 +109,23 @@ abstract class TransportFactoryTestCase extends TestCase
         $dsn = Dsn::fromString($dsn);
 
         $this->expectException(IncompleteDsnException::class);
+        if (null !== $message) {
+            $this->expectExceptionMessage($message);
+        }
+
+        $factory->create($dsn);
+    }
+
+    /**
+     * @dataProvider missingRequiredOptionProvider
+     */
+    public function testMissingRequiredOptionException(string $dsn, string $message = null): void
+    {
+        $factory = $this->createFactory();
+
+        $dsn = Dsn::fromString($dsn);
+
+        $this->expectException(MissingRequiredOptionException::class);
         if (null !== $message) {
             $this->expectExceptionMessage($message);
         }

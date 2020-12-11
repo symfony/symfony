@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Zulip\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,11 +29,11 @@ final class ZulipTransportFactoryTest extends TestCase
         $this->assertSame('zulip://host.test?channel=testChannel', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionChannelThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('zulip://email:token@host'));
     }

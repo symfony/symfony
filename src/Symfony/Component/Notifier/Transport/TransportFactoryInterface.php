@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Transport;
 
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
 /**
@@ -22,6 +23,7 @@ interface TransportFactoryInterface
     /**
      * @throws UnsupportedSchemeException
      * @throws IncompleteDsnException
+     * @throws MissingRequiredOptionException
      */
     public function create(Dsn $dsn): TransportInterface;
 

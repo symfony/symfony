@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 final class DsnTest extends TestCase
@@ -119,5 +120,55 @@ final class DsnTest extends TestCase
         $this->assertSame('some value', $dsn->getOption('with_value'));
         $this->assertSame('default', $dsn->getOption('nullable', 'default'));
         $this->assertSame('default', $dsn->getOption('not_existent_property', 'default'));
+    }
+
+    public function testGetRequiredOptionGetsOptionIfSet()
+    {
+        $options = ['with_value' => 'some value'];
+        $dsn = new Dsn('scheme', 'localhost', 'u$er', 'pa$s', '8000', $options, '/channel');
+
+        $this->assertSame('some value', $dsn->getRequiredOption('with_value'));
+    }
+
+    public function testGetRequiredOptionGetsOptionIfValueIsZero()
+    {
+        $options = ['timeout' => 0];
+        $dsn = new Dsn('scheme', 'localhost', 'u$er', 'pa$s', '8000', $options, '/channel');
+
+        $this->assertSame(0, $dsn->getRequiredOption('timeout'));
+    }
+
+    /**
+     * @dataProvider getRequiredOptionThrowsMissingRequiredOptionExceptionProvider
+     */
+    public function testGetRequiredOptionThrowsMissingRequiredOptionException(string $expectedExceptionMessage, array $options, string $option)
+    {
+        $dsn = new Dsn('scheme', 'localhost', 'u$er', 'pa$s', '8000', $options, '/channel');
+
+        $this->expectException(MissingRequiredOptionException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $dsn->getRequiredOption($option);
+    }
+
+    public function getRequiredOptionThrowsMissingRequiredOptionExceptionProvider(): iterable
+    {
+        yield [
+            'The option "foo_bar" is required but missing.',
+            ['with_value' => 'some value'],
+            'foo_bar',
+        ];
+
+        yield [
+            'The option "with_empty_string" is required but missing.',
+            ['with_empty_string' => ''],
+            'with_empty_string',
+        ];
+
+        yield [
+            'The option "with_null" is required but missing.',
+            ['with_null' => null],
+            'with_null',
+        ];
     }
 }

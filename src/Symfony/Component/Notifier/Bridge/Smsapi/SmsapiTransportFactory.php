@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsapi;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -36,12 +35,7 @@ final class SmsapiTransportFactory extends AbstractTransportFactory
         }
 
         $authToken = $this->getUser($dsn);
-        $from = $dsn->getOption('from');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
-
+        $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

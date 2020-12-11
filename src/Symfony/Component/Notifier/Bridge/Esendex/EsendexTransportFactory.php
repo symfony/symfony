@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Esendex;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -32,18 +31,8 @@ final class EsendexTransportFactory extends AbstractTransportFactory
 
         $email = $this->getUser($dsn);
         $password = $this->getPassword($dsn);
-        $accountReference = $dsn->getOption('accountreference');
-
-        if (!$accountReference) {
-            throw new IncompleteDsnException('Missing accountreference.', $dsn->getOriginalDsn());
-        }
-
-        $from = $dsn->getOption('from');
-
-        if (!$from) {
-            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
-        }
-
+        $accountReference = $dsn->getRequiredOption('accountreference');
+        $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

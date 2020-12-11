@@ -44,7 +44,7 @@ final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing option: token' => ['rocketchat://host.test?channel=testChannel'];
+        yield 'missing token' => ['rocketchat://host.test?channel=testChannel'];
     }
 
     public function unsupportedSchemeProvider(): iterable

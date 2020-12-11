@@ -39,7 +39,7 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: consumer_key' => ['ovhcloud://key:secret@default?service_name=serviceName'];
         yield 'missing option: service_name' => ['ovhcloud://key:secret@default?consumer_key=consumerKey'];

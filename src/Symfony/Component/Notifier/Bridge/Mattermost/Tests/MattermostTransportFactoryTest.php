@@ -59,7 +59,11 @@ final class MattermostTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing option: token' => ['mattermost://host.test?channel=testChannel'];
+        yield 'missing token' => ['mattermost://host.test?channel=testChannel'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
         yield 'missing option: channel' => ['mattermost://token@host'];
     }
 

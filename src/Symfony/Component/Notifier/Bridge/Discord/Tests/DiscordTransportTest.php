@@ -49,6 +49,16 @@ final class DiscordTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
+    public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
+    {
+        $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
+
+        $transport->send(new ChatMessage(str_repeat('d', 2001)));
+    }
+
     public function testSendWithErrorResponseThrows()
     {
         $this->expectException(TransportException::class);

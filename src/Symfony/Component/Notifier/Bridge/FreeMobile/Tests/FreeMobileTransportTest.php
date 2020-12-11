@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -46,7 +46,7 @@ final class FreeMobileTransportTest extends TestCase
     {
         $transport = $this->getTransport('0611223344');
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }
@@ -55,7 +55,7 @@ final class FreeMobileTransportTest extends TestCase
     {
         $transport = $this->getTransport('0611223344');
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send(new SmsMessage('0699887766', 'Hello!'));
     }

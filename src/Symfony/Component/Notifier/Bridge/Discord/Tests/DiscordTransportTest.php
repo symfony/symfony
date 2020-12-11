@@ -14,8 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -43,8 +43,9 @@ final class DiscordTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows()
     {
-        $this->expectException(LogicException::class);
         $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }

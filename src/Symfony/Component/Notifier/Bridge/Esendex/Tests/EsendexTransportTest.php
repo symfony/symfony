@@ -14,8 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -43,7 +43,8 @@ final class EsendexTransportTest extends TestCase
     {
         $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnsupportedMessageTypeException::class);
+
         $transport->send($this->createMock(MessageInterface::class));
     }
 

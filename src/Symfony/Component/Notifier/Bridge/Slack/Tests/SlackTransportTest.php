@@ -17,6 +17,7 @@ use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
@@ -47,9 +48,9 @@ final class SlackTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows(): void
     {
-        $this->expectException(LogicException::class);
-
         $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(UnsupportedMessageTypeException::class);
 
         $transport->send($this->createMock(MessageInterface::class));
     }

@@ -99,4 +99,11 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailAddressContains($email, 'To', 'thomas@symfony.com');
         $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
     }
+
+    public function testSendingQueuedMessage()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config_messenger.yml', 'debug' => true]);
+        $client->request('GET', '/send_templated_email');
+        $this->assertResponseIsSuccessful();
+    }
 }

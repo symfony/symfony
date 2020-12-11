@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
@@ -35,6 +36,18 @@ class EmailController
             ->html('<p>Foo</p>')
             ->attach(file_get_contents(__FILE__), 'foobar.php')
         );
+
+        return new Response();
+    }
+
+    public function sendTemplatedEmail(MailerInterface $mailer)
+    {
+        $mail = (new TemplatedEmail())
+            ->to('fabien@symfony.com')->from('fabien@symfony.com')->subject('Foo')
+            ->addReplyTo('me@symfony.com')
+            ->htmlTemplate('mail.html.twig');
+
+        $mailer->send($mail);
 
         return new Response();
     }

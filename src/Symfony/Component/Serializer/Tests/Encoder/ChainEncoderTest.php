@@ -67,9 +67,9 @@ class ChainEncoderTest extends TestCase
     public function testEncode()
     {
         $this->encoder1->expects($this->never())->method('encode');
-        $this->encoder2->expects($this->once())->method('encode');
+        $this->encoder2->expects($this->once())->method('encode')->willReturn('foo:123');
 
-        $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2);
+        $this->assertSame('foo:123', $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2));
     }
 
     public function testEncodeUnsupportedFormat()

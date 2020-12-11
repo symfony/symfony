@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class RocketChatTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new RocketChatTransportFactory();
 
@@ -32,7 +32,7 @@ final class RocketChatTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('rocketchat://%s?channel=%s', $host, $channel), (string) $transport);
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function testCreateWithNoTokenThrowsMalformed()
     {
         $factory = new RocketChatTransportFactory();
 

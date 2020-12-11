@@ -20,14 +20,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class RocketChatTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $transport = $this->createTransport();
 
         $this->assertSame('rocketchat://testHost?channel=testChannel', (string) $transport);
     }
 
-    public function testSupportsChatMessage(): void
+    public function testSupportsChatMessage()
     {
         $transport = $this->createTransport();
 
@@ -35,7 +35,7 @@ final class RocketChatTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows(): void
+    public function testSendNonChatMessageThrows()
     {
         $transport = $this->createTransport();
 

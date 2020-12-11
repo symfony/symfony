@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class TwilioTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = $this->createFactory();
 
@@ -30,7 +30,7 @@ final class TwilioTransportFactoryTest extends TestCase
         $this->assertSame('twilio://host.test?from=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoFromThrowsMalformed(): void
+    public function testCreateWithNoFromThrowsMalformed()
     {
         $factory = $this->createFactory();
 
@@ -40,7 +40,7 @@ final class TwilioTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsTwilioScheme(): void
+    public function testSupportsTwilioScheme()
     {
         $factory = $this->createFactory();
 
@@ -51,7 +51,7 @@ final class TwilioTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
     }
 
-    public function testNonTwilioSchemeThrows(): void
+    public function testNonTwilioSchemeThrows()
     {
         $factory = $this->createFactory();
 

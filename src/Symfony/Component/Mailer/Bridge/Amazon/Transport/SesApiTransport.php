@@ -33,7 +33,7 @@ class SesApiTransport extends AbstractApiTransport
     private $region;
 
     /**
-     * @param string $region Amazon SES region (currently one of us-east-1, us-west-2, or eu-west-1)
+     * @param string|null $region Amazon SES region (currently one of us-east-1, us-west-2, or eu-west-1)
      */
     public function __construct(string $accessKey, string $secretKey, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {

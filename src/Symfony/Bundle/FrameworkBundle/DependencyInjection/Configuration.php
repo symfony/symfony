@@ -1816,7 +1816,7 @@ class Configuration implements ConfigurationInterface
                         ->ifTrue(function ($v) { return \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']); })
                         ->then(function (array $v) {
                             $newV = [
-                                'enabled' => $v['enabled'],
+                                'enabled' => $v['enabled'] ?? true,
                             ];
                             unset($v['enabled']);
 

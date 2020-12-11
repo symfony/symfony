@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
+use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\MessageInterface;
 
@@ -22,6 +25,9 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 interface TransportInterface
 {
     /**
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws RuntimeException
      * @throws TransportExceptionInterface
      */
     public function send(MessageInterface $message): void;

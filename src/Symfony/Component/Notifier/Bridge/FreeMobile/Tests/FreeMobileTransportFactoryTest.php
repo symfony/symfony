@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FreeMobileTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = $this->createFactory();
 
@@ -30,7 +30,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoPhoneThrowsMalformed(): void
+    public function testCreateWithNoPhoneThrowsMalformed()
     {
         $factory = $this->createFactory();
 
@@ -40,7 +40,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsFreeMobileScheme(): void
+    public function testSupportsFreeMobileScheme()
     {
         $factory = $this->createFactory();
 
@@ -51,7 +51,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
     }
 
-    public function testNonFreeMobileSchemeThrows(): void
+    public function testNonFreeMobileSchemeThrows()
     {
         $factory = $this->createFactory();
 

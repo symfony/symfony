@@ -20,14 +20,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class TwilioTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $transport = $this->createTransport();
 
         $this->assertSame('twilio://host.test?from=sender', (string) $transport);
     }
 
-    public function testSupportsMessageInterface(): void
+    public function testSupportsMessageInterface()
     {
         $transport = $this->createTransport();
 
@@ -35,7 +35,7 @@ final class TwilioTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function testSendNonSmsMessageThrowsException()
     {
         $transport = $this->createTransport();
 

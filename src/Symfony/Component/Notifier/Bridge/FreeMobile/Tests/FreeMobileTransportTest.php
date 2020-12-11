@@ -20,14 +20,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class FreeMobileTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $transport = $this->initTransport();
 
         $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
     }
 
-    public function testSupportsMessageInterface(): void
+    public function testSupportsMessageInterface()
     {
         $transport = $this->initTransport();
 
@@ -36,7 +36,7 @@ final class FreeMobileTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function testSendNonSmsMessageThrowsException()
     {
         $transport = $this->initTransport();
 
@@ -45,7 +45,7 @@ final class FreeMobileTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendSmsMessageButInvalidPhoneThrowsException(): void
+    public function testSendSmsMessageButInvalidPhoneThrowsException()
     {
         $transport = $this->initTransport();
 

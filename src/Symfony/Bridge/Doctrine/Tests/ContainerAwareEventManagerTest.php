@@ -156,7 +156,7 @@ class MyListener
     public $calledByInvokeCount = 0;
     public $calledByEventNameCount = 0;
 
-    public function __invoke(): void
+    public function __invoke()
     {
         ++$this->calledByInvokeCount;
     }

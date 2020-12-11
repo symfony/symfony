@@ -1194,11 +1194,11 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     private function discoverNamespace(\DOMXPath $domxpath, string $prefix): ?string
     {
-        if (isset($this->namespaces[$prefix])) {
+        if (\array_key_exists($prefix, $this->namespaces)) {
             return $this->namespaces[$prefix];
         }
 
-        if (isset($this->cachedNamespaces[$prefix])) {
+        if ($this->cachedNamespaces->offsetExists($prefix)) {
             return $this->cachedNamespaces[$prefix];
         }
 

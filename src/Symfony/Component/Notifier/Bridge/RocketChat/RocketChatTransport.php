@@ -52,7 +52,7 @@ final class RocketChatTransport extends AbstractTransport
     }
 
     /**
-     * @see https://rocket.chat/docs/administrator-guides/integrations/
+     * @see https://rocket.chat/docs/administrator-guides/integrations
      */
     protected function doSend(MessageInterface $message): SentMessage
     {

@@ -11,31 +11,6 @@ DSN example
 AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION'
 ```
 
-Chatter usage
--------------
-
-```php
-function sendMessage(ChatterInterface $chatter)
-{
-    $options = new AmazonSnsOptions();
-    $options->recipient('arn:topic');
-
-    $message = new ChatMessage('Hello', $options);
-    $chatter->send($message);
-}
-```
-
-Texter usage
-------------
-
-```php
-function sendMessage(TexterInterface $texter)
-{
-    $message = new SmsMessage('+33600000000', 'Hello');
-    $texter->send($message);
-}
-```
-
 Resources
 ---------
 

@@ -37,7 +37,7 @@ final class AmazonSnsTransportFactory extends AbstractTransportFactory
                     'accessKeyId' => $dsn->getUser(),
                     'accessKeySecret' => $dsn->getPassword(),
                 ] + (
-                'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://' . $dsn->getHost() . ($dsn->getPort() ? ':' . $dsn->getPort() : '')]
+                'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
                 );
 
             return new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);

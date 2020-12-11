@@ -146,7 +146,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'sns' => [
             'class' => Bridge\AmazonSns\AmazonSnsTransportFactory::class,
-            'package' => 'symfony/amazon-notifier',
+            'package' => 'symfony/amazon-sns-notifier',
         ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,

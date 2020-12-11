@@ -12,7 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\Input\PublishInput;
-use AsyncAws\Sns\ValueObject\MessageAttributeValue;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
@@ -55,10 +54,6 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $subject
-     *
-     * @return $this
-     *
      * @see PublishInput::$Subject
      */
     public function subject(string $subject): self
@@ -69,10 +64,6 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $messageStructure
-     *
-     * @return $this
-     *
      * @see PublishInput::$MessageStructure
      */
     public function messageStructure(string $messageStructure): self
@@ -83,10 +74,6 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param array<string, MessageAttributeValue> $messageAttributes
-     *
-     * @return $this
-     *
      * @see PublishInput::$MessageAttributes
      */
     public function messageAttributes(array $messageAttributes): self
@@ -97,10 +84,6 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $messageDeduplicationId
-     *
-     * @return $this
-     *
      * @see PublishInput::$MessageDeduplicationId
      */
     public function messageDeduplicationId(string $messageDeduplicationId): self
@@ -111,10 +94,6 @@ final class AmazonSnsOptions implements MessageOptionsInterface
     }
 
     /**
-     * @param string $messageGroupId
-     *
-     * @return $this
-     *
      * @see PublishInput::$MessageGroupId
      */
     public function messageGroupId(string $messageGroupId): self
@@ -123,5 +102,4 @@ final class AmazonSnsOptions implements MessageOptionsInterface
 
         return $this;
     }
-
 }

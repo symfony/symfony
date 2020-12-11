@@ -23,16 +23,17 @@ final class SendgridTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface
     {
+        $scheme = $dsn->getScheme();
         $key = $this->getUser($dsn);
 
-        if ('sendgrid+api' === $dsn->getScheme()) {
+        if ('sendgrid+api' === $scheme) {
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
             return (new SendgridApiTransport($key, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 
-        if ('sendgrid+smtp' === $dsn->getScheme() || 'sendgrid+smtps' === $dsn->getScheme() || 'sendgrid' === $dsn->getScheme()) {
+        if ('sendgrid+smtp' === $scheme || 'sendgrid+smtps' === $scheme || 'sendgrid' === $scheme) {
             return new SendgridSmtpTransport($key, $this->dispatcher, $this->logger);
         }
 

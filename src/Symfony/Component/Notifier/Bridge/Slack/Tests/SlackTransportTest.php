@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SlackTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $host = 'testHost';
         $channel = 'test Channel'; // invalid channel name to test url encoding of the channel
@@ -37,7 +37,7 @@ final class SlackTransportTest extends TestCase
         $this->assertSame(sprintf('slack://%s?channel=%s', $host, urlencode($channel)), (string) $transport);
     }
 
-    public function testSupportsChatMessage(): void
+    public function testSupportsChatMessage()
     {
         $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
@@ -45,7 +45,7 @@ final class SlackTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows(): void
+    public function testSendNonChatMessageThrows()
     {
         $this->expectException(LogicException::class);
 
@@ -54,7 +54,7 @@ final class SlackTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithEmptyArrayResponseThrows(): void
+    public function testSendWithEmptyArrayResponseThrows()
     {
         $this->expectException(TransportException::class);
 
@@ -75,7 +75,7 @@ final class SlackTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testErrorCode/');
@@ -98,7 +98,7 @@ final class SlackTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithOptions(): void
+    public function testSendWithOptions()
     {
         $token = 'testToken';
         $channel = 'testChannel';
@@ -127,7 +127,7 @@ final class SlackTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithNotification(): void
+    public function testSendWithNotification()
     {
         $token = 'testToken';
         $channel = 'testChannel';
@@ -164,7 +164,7 @@ final class SlackTransportTest extends TestCase
         $transport->send($chatMessage);
     }
 
-    public function testSendWithInvalidOptions(): void
+    public function testSendWithInvalidOptions()
     {
         $this->expectException(LogicException::class);
 
@@ -177,7 +177,7 @@ final class SlackTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
-    public function testSendWith200ResponseButNotOk(): void
+    public function testSendWith200ResponseButNotOk()
     {
         $token = 'testToken';
         $channel = 'testChannel';

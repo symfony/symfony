@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TelegramTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $channel = 'testChannel';
 
@@ -34,7 +34,7 @@ final class TelegramTransportTest extends TestCase
         $this->assertSame(sprintf('telegram://%s?channel=%s', 'testHost', $channel), (string) $transport);
     }
 
-    public function testSupportsChatMessage(): void
+    public function testSupportsChatMessage()
     {
         $transport = new TelegramTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
@@ -42,7 +42,7 @@ final class TelegramTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows(): void
+    public function testSendNonChatMessageThrows()
     {
         $this->expectException(LogicException::class);
         $transport = new TelegramTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
@@ -50,7 +50,7 @@ final class TelegramTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
@@ -72,7 +72,7 @@ final class TelegramTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithOptions(): void
+    public function testSendWithOptions()
     {
         $channel = 'testChannel';
 
@@ -129,7 +129,7 @@ JSON;
         $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    public function testSendWithChannelOverride(): void
+    public function testSendWithChannelOverride()
     {
         $channelOverride = 'channelOverride';
 

@@ -36,24 +36,21 @@ final class NexmoTransportFactoryTest extends TestCase
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'nexmo://apiKey:apiSecret@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('nexmo://apiKey:apiSecret@default'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsn = 'nexmo://apiKey:apiSecret@default?from=0611223344';
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
+        $this->assertTrue($factory->supports(Dsn::fromString('nexmo://apiKey:apiSecret@default?from=0611223344')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsnUnsupported = 'nexmoo://apiKey:apiSecret@default?from=0611223344';
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertFalse($factory->supports(Dsn::fromString('nexmoo://apiKey:apiSecret@default?from=0611223344')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -62,8 +59,7 @@ final class NexmoTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'nexmoo://apiKey:apiSecret@default?from=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        $factory->create(Dsn::fromString('somethingElse://apiKey:apiSecret@default?from=0611223344'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
@@ -73,7 +69,7 @@ final class NexmoTransportFactoryTest extends TestCase
         $this->expectException(UnsupportedSchemeException::class);
 
         // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('nexmoo://apiKey:apiSecret@default'));
+        $factory->create(Dsn::fromString('somethingElse://apiKey:apiSecret@default'));
     }
 
     private function createFactory(): NexmoTransportFactory

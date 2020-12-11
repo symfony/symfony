@@ -36,8 +36,7 @@ final class OvhCloudTransportFactoryTest extends TestCase
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'ovhcloud://applicationKey:applicationSecret@default?service_name=serviceName';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?service_name=serviceName'));
     }
 
     public function testCreateWithMissingOptionServiceNameThrowsIncompleteDsnException()
@@ -46,24 +45,21 @@ final class OvhCloudTransportFactoryTest extends TestCase
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'ovhcloud://applicationKey:applicationSecret@default?consumeer_key=consumerKey';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?consumeer_key=consumerKey'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsn = 'ovhcloud://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName';
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
+        $this->assertTrue($factory->supports(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsnUnsupported = 'ovhclouddddd://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName';
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -72,8 +68,7 @@ final class OvhCloudTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'ovhclouddddd://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        $factory->create(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
@@ -83,7 +78,7 @@ final class OvhCloudTransportFactoryTest extends TestCase
         $this->expectException(UnsupportedSchemeException::class);
 
         // unsupported scheme and missing "service_name" option
-        $factory->create(Dsn::fromString('ovhclouddddd://applicationKey:applicationSecret@default?consumer_key=consumerKey'));
+        $factory->create(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey'));
     }
 
     private function createFactory(): OvhCloudTransportFactory

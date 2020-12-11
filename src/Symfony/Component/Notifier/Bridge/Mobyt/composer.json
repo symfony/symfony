@@ -17,7 +17,7 @@
     ],
     "require": {
         "ext-json": "*",
-        "php": "^7.2.5",
+        "php": ">=7.2.5",
         "symfony/http-client": "^4.3|^5.0",
         "symfony/notifier": "^5.2"
     },

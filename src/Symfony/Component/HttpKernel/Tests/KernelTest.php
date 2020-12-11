@@ -663,7 +663,7 @@ EOF
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
     }
 
-    public function testAnonymousKernelGeneratesValidContainerClass(): void
+    public function testAnonymousKernelGeneratesValidContainerClass()
     {
         $kernel = new class('test', true) extends Kernel {
             public function registerBundles(): iterable

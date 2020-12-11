@@ -396,7 +396,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @requires PHP 7.4
      */
-    public function testTypedProperties(): void
+    public function testTypedProperties()
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableBoolProp'));

@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class EsendexTransportTest extends TestCase
 {
-    public function testToString(): void
+    public function testToString()
     {
         $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
         $transport->setHost('testHost');
@@ -31,7 +31,7 @@ final class EsendexTransportTest extends TestCase
         $this->assertSame(sprintf('esendex://%s', 'testHost'), (string) $transport);
     }
 
-    public function testSupportsSmsMessage(): void
+    public function testSupportsSmsMessage()
     {
         $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
 
@@ -39,7 +39,7 @@ final class EsendexTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrows(): void
+    public function testSendNonSmsMessageThrows()
     {
         $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
 
@@ -48,7 +48,7 @@ final class EsendexTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -66,7 +66,7 @@ final class EsendexTransportTest extends TestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithErrorResponseContainingDetailsThrows(): void
+    public function testSendWithErrorResponseContainingDetailsThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class SendinblueTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = $this->initFactory();
 
@@ -29,7 +29,7 @@ final class SendinblueTransportFactoryTest extends TestCase
         $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoPhoneThrowsMalformed(): void
+    public function testCreateWithNoPhoneThrowsMalformed()
     {
         $factory = $this->initFactory();
 
@@ -39,7 +39,7 @@ final class SendinblueTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsSendinblueScheme(): void
+    public function testSupportsSendinblueScheme()
     {
         $factory = $this->initFactory();
 

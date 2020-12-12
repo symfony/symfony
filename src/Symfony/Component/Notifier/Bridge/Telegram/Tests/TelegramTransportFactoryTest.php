@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class TelegramTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new TelegramTransportFactory();
 
@@ -31,7 +31,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('telegram://%s?channel=%s', $host, $channel), (string) $transport);
     }
 
-    public function testCreateWithNoPasswordThrowsMalformed(): void
+    public function testCreateWithNoPasswordThrowsMalformed()
     {
         $factory = new TelegramTransportFactory();
 
@@ -39,7 +39,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'simpleToken', 'testHost', 'testChannel')));
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function testCreateWithNoTokenThrowsMalformed()
     {
         $factory = new TelegramTransportFactory();
 
@@ -47,7 +47,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString(sprintf('telegram://%s/?channel=%s', 'testHost', 'testChannel')));
     }
 
-    public function testSupportsTelegramScheme(): void
+    public function testSupportsTelegramScheme()
     {
         $factory = new TelegramTransportFactory();
 
@@ -55,7 +55,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
     }
 
-    public function testNonTelegramSchemeThrows(): void
+    public function testNonTelegramSchemeThrows()
     {
         $factory = new TelegramTransportFactory();
 

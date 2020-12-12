@@ -23,14 +23,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SendinblueTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $transport = $this->initTransport();
 
         $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
     }
 
-    public function testSupportsMessageInterface(): void
+    public function testSupportsMessageInterface()
     {
         $transport = $this->initTransport();
 
@@ -38,7 +38,7 @@ final class SendinblueTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function testSendNonSmsMessageThrowsException()
     {
         $transport = $this->initTransport();
 
@@ -47,7 +47,7 @@ final class SendinblueTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

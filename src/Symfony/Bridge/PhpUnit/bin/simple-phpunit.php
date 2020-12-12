@@ -243,8 +243,9 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $q = '\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 80000 ? '"' : '';
+    $extraComposerFlags = getenv('SYMFONY_PHPUNIT_COMPOSER_FLAGS') ?: '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
-    $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
+    $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress $extraComposerFlags$q", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($exit) {
         exit($exit);

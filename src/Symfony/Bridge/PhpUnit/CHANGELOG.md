@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.2.0
+-----
+
+ * added `SYMFONY_PHPUNIT_COMPOSER_FLAGS` env variable to allow passing extra options to `composer install`
+
 5.1.0
 -----
 

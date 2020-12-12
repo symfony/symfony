@@ -920,6 +920,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     public function __wakeup()
     {
+        if (\is_object($this->environment) || \is_object($this->debug)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
         if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
             @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), \E_USER_DEPRECATED);
             $this->unserialize($this->serialized);

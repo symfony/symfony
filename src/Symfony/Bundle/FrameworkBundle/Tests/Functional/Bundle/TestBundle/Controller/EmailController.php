@@ -45,7 +45,9 @@ class EmailController
         $mail = (new TemplatedEmail())
             ->to('fabien@symfony.com')->from('fabien@symfony.com')->subject('Foo')
             ->addReplyTo('me@symfony.com')
-            ->htmlTemplate('mail.html.twig');
+            ->htmlTemplate('mail.html.twig')
+            ->context(['foo' => 'bar'])
+        ;
 
         $mailer->send($mail);
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-09T20:26:01Z
+
+I'd really love to do that, but the bridge is also used by projects outside of the Symfony org. Those projects would be locked in on 5.2 then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-09T21:14:48Z
+
+Yes, but we never promised anything past our LTS versions. Having the bridge out of sync is a pain. We need to make our lives simpler from time to time, this is now :)

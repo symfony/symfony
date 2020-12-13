@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * added the `mailer` monolog channel and set it on all transport definitions
+
 5.2.0
 -----
 

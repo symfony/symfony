@@ -21,14 +21,14 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  */
 class Deprecation
 {
-    const PATH_TYPE_VENDOR = 'path_type_vendor';
-    const PATH_TYPE_SELF = 'path_type_internal';
-    const PATH_TYPE_UNDETERMINED = 'path_type_undetermined';
+    public const PATH_TYPE_VENDOR = 'path_type_vendor';
+    public const PATH_TYPE_SELF = 'path_type_internal';
+    public const PATH_TYPE_UNDETERMINED = 'path_type_undetermined';
 
-    const TYPE_SELF = 'type_self';
-    const TYPE_DIRECT = 'type_direct';
-    const TYPE_INDIRECT = 'type_indirect';
-    const TYPE_UNDETERMINED = 'type_undetermined';
+    public const TYPE_SELF = 'type_self';
+    public const TYPE_DIRECT = 'type_direct';
+    public const TYPE_INDIRECT = 'type_indirect';
+    public const TYPE_UNDETERMINED = 'type_undetermined';
 
     private $trace = [];
     private $message;
@@ -61,10 +61,10 @@ class Deprecation
 
         $this->trace = $trace;
 
-        if ('trigger_error' === (isset($trace[1]['function']) ? $trace[1]['function'] : null)
-            && (DebugClassLoader::class === ($class = (isset($trace[2]['class']) ? $trace[2]['class'] : null)) || LegacyDebugClassLoader::class === $class)
-            && 'checkClass' === (isset($trace[2]['function']) ? $trace[2]['function'] : null)
-            && null !== ($extraFile = (isset($trace[2]['args'][1]) ? $trace[2]['args'][1] : null))
+        if ('trigger_error' === ($trace[1]['function'] ?? null)
+            && (DebugClassLoader::class === ($class = $trace[2]['class'] ?? null) || LegacyDebugClassLoader::class === $class)
+            && 'checkClass' === ($trace[2]['function'] ?? null)
+            && null !== ($extraFile = $trace[2]['args'][1] ?? null)
             && '' !== $extraFile
             && false !== $extraFile = realpath($extraFile)
         ) {
@@ -118,7 +118,7 @@ class Deprecation
         }
         $class = $line['class'];
 
-        return 'ReflectionMethod' === $class || 0 === strpos($class, 'PHPUnit_') || 0 === strpos($class, 'PHPUnit\\');
+        return 'ReflectionMethod' === $class || 0 === strpos($class, 'PHPUnit\\');
     }
 
     /**
@@ -290,7 +290,7 @@ class Deprecation
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);
-                    $v = \dirname(\dirname($r->getFileName()));
+                    $v = \dirname($r->getFileName(), 2);
                     if (file_exists($v.'/composer/installed.json')) {
                         self::$vendors[] = $v;
                         $loader = require $v.'/autoload.php';

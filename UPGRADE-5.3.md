@@ -18,6 +18,11 @@ HttpKernel
 
  * Marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
 
+PhpunitBridge
+-------------
+
+ * Deprecated the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
+
 Security
 --------
 

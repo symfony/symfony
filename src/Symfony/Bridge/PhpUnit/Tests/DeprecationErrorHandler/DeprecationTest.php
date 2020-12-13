@@ -14,13 +14,10 @@ namespace Symfony\Bridge\PhpUnit\Tests\DeprecationErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
-use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV5;
-use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
+use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV7;
 
 class DeprecationTest extends TestCase
 {
-    use SetUpTearDownTrait;
-
     private static $vendorDir;
     private static $prefixDirsPsr4;
 
@@ -164,7 +161,7 @@ class DeprecationTest extends TestCase
                     'triggering_file' => 'dummy_vendor_path',
                     'files_stack' => [],
                 ]),
-                SymfonyTestsListenerForV5::class,
+                SymfonyTestsListenerForV7::class,
                 '',
             ],
         ];
@@ -208,7 +205,7 @@ class DeprecationTest extends TestCase
                         $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php',
                     ],
                 ]),
-                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV5::class, 'method' => 'mymethod']],
+                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV7::class, 'method' => 'mymethod']],
             ],
             'serialized_stack_files_from_various_packages' => [
                 Deprecation::TYPE_INDIRECT,
@@ -221,7 +218,7 @@ class DeprecationTest extends TestCase
                         $vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php',
                     ],
                 ]),
-                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV5::class, 'method' => 'mymethod']],
+                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV7::class, 'method' => 'mymethod']],
             ],
         ];
     }
@@ -261,7 +258,7 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
-    private static function doSetupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
@@ -281,7 +278,7 @@ class DeprecationTest extends TestCase
         }
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         foreach (self::$prefixDirsPsr4 as [$prop, $loader, $prefixDirsPsr4]) {
             $prop->setValue($loader, $prefixDirsPsr4);

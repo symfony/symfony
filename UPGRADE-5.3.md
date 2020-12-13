@@ -1,6 +1,11 @@
 UPGRADE FROM 5.2 to 5.3
 =======================
 
+Asset
+-----
+
+ * Deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
+
 Form
 ----
 

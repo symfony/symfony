@@ -30,6 +30,15 @@ $container->loadFromExtension('framework', [
             'remote_manifest' => [
                 'json_manifest_path' => 'https://cdn.example.com/manifest.json',
             ],
+            'var_manifest' => [
+                'json_manifest_path' => '%var_json_manifest_path%',
+            ],
+            'env_manifest' => [
+                'json_manifest_path' => '%env(env_manifest)%',
+            ],
         ],
     ],
 ]);
+
+$container->setParameter('var_json_manifest_path', 'https://cdn.example.com/manifest.json');
+$container->setParameter('env(env_manifest)', 'https://cdn.example.com/manifest.json');

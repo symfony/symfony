@@ -1,6 +1,11 @@
 UPGRADE FROM 5.x to 6.0
 =======================
 
+Asset
+-----
+
+ * Removed `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
+
 Config
 ------
 

@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CacheClearCommandTest extends TestCase
 {
@@ -40,17 +41,18 @@ class CacheClearCommandTest extends TestCase
         $this->fs->remove($this->kernel->getProjectDir());
     }
 
-    public function testCacheIsFreshAfterCacheClearedWithWarmup()
+    /** @dataProvider getKernel */
+    public function testCacheIsFreshAfterCacheClearedWithWarmup(KernelInterface $kernel)
     {
         $input = new ArrayInput(['cache:clear']);
-        $application = new Application($this->kernel);
+        $application = new Application($kernel);
         $application->setCatchExceptions(false);
 
         $application->doRun($input, new NullOutput());
 
         // Ensure that all *.meta files are fresh
         $finder = new Finder();
-        $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
+        $metaFiles = $finder->files()->in($kernel->getCacheDir())->name('*.php.meta');
         // check that cache is warmed up
         $this->assertNotEmpty($metaFiles);
         $configCacheFactory = new ConfigCacheFactory(true);
@@ -62,11 +64,11 @@ class CacheClearCommandTest extends TestCase
         }
 
         // check that app kernel file present in meta file of container's cache
-        $containerClass = $this->kernel->getContainer()->getParameter('kernel.container_class');
+        $containerClass = $kernel->getContainer()->getParameter('kernel.container_class');
         $containerRef = new \ReflectionClass($containerClass);
         $containerFile = \dirname($containerRef->getFileName(), 2).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
-        $kernelRef = new \ReflectionObject($this->kernel);
+        $kernelRef = new \ReflectionObject($kernel);
         $kernelFile = $kernelRef->getFileName();
         /** @var ResourceInterface[] $meta */
         $meta = unserialize(file_get_contents($containerMetaFile));
@@ -82,5 +84,22 @@ class CacheClearCommandTest extends TestCase
         $containerRef = new \ReflectionClass(require $containerFile);
         $containerFile = str_replace('tes_'.\DIRECTORY_SEPARATOR, 'test'.\DIRECTORY_SEPARATOR, $containerRef->getFileName());
         $this->assertMatchesRegularExpression(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
+    }
+
+    public function getKernel()
+    {
+        yield [new TestAppKernel('test', true)];
+        yield [new NoBuildDirKernel('test', true)];
+    }
+}
+
+class NoBuildDirKernel extends TestAppKernel
+{
+    protected function getKernelParameters()
+    {
+        $parameters = parent::getKernelParameters();
+        unset($parameters['kernel.build_dir']);
+
+        return $parameters;
     }
 }

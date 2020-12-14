@@ -31,18 +31,6 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     }
 
     /**
-     * @dataProvider formatProvider
-     */
-    public function testFormat($pattern, $timestamp, $expected)
-    {
-        if (\PHP_VERSION_ID < 70105 && $timestamp instanceof \DateTimeImmutable) {
-            $this->markTestSkipped('PHP >= 7.1.5 required for DateTimeImmutable.');
-        }
-
-        parent::testFormat($pattern, $timestamp, $expected);
-    }
-
-    /**
      * @dataProvider formatTimezoneProvider
      */
     public function testFormatTimezone($pattern, $timezone, $expected)

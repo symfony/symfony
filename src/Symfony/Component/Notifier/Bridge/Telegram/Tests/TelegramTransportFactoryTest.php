@@ -47,7 +47,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString(sprintf('telegram://%s/?channel=%s', 'testHost', 'testChannel')));
     }
 
-    public function testSupportsTelegramScheme()
+    public function testSupportsScheme()
     {
         $factory = new TelegramTransportFactory();
 

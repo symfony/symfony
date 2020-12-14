@@ -328,7 +328,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        if (\PHP_VERSION_ID < 70123 || (70200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 70211)) {
+        if (\PHP_VERSION_ID < 70211) {
             // workaround https://bugs.php.net/76480
             $timeout = min($timeout, 0.01);
         }

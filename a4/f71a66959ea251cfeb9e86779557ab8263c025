@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-13T23:36:03Z
+
+On PHP 7.1, you can simply define `function setUp(): void` even if the upstream method does not have that return type. I agree with the proposed change, but we should deprecate the trait and remove it in Symfony 6.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-14T08:24:32Z
+
+Deprecating added

@@ -34,6 +34,7 @@ return static function (ContainerConfigurator $container) {
                 service('http_client')->ignoreOnInvalid(),
                 service('logger')->ignoreOnInvalid(),
             ])
+            ->tag('monolog.logger', ['channel' => 'mailer'])
 
         ->set('mailer.transport_factory.amazon', SesTransportFactory::class)
             ->parent('mailer.transport_factory.abstract')

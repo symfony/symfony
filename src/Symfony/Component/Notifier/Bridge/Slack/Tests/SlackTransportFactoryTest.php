@@ -11,67 +11,42 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class SlackTransportFactoryTest extends TestCase
+final class SlackTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('slack://host.test/testPath'));
-
-        $this->assertSame('slack://host.test/testPath', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionIdThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('slack://host'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('slack://host/path')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://host/path'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "id" option
-        $factory->create(Dsn::fromString('somethingElse://host'));
-    }
-
-    private function createFactory(): SlackTransportFactory
+    /**
+     * @return SlackTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new SlackTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'slack://host.test/id',
+            'slack://host.test/id',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'slack://host.test/id'];
+        yield [false, 'somethingElse://host.test/id'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing path' => ['slack://host.test'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://host.test/id'];
+        yield ['somethingElse://host.test']; // missing "id"
     }
 }

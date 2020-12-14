@@ -11,41 +11,37 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class TwilioTransportTest extends TestCase
+final class TwilioTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return TwilioTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('twilio://host.test?from=sender', (string) $transport);
+        return new TwilioTransport('accountSid', 'authToken', 'from', $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsMessageInterface()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['twilio://api.twilio.com?from=from', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    private function createTransport(): TwilioTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new TwilioTransport('accountSid', 'authToken', 'sender', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

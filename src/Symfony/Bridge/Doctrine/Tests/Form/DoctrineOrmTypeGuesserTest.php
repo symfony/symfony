@@ -35,12 +35,20 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     {
         $return = [];
 
-        // DateTime field
+        // DateImmutable field
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
         $classMetadata->fieldMappings['field'] = true;
         $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn(Types::DATE_IMMUTABLE);
 
         $return[] = [$classMetadata, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+
+
+        // DateTimeImmutable field
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $classMetadata->fieldMappings['field'] = true;
+        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn(Types::DATETIME_IMMUTABLE);
+
+        $return[] = [$classMetadata, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
 
         return $return;
     }

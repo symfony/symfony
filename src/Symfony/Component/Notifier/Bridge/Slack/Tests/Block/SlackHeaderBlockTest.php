@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests\Block;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\LengthException;
 
 final class SlackHeaderBlockTest extends TestCase
 {
@@ -34,7 +34,7 @@ final class SlackHeaderBlockTest extends TestCase
 
     public function testThrowsWhenTextExceedsCharacterLimit(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the text is 150 characters.');
 
         new SlackHeaderBlock(str_repeat('h', 151));
@@ -42,7 +42,7 @@ final class SlackHeaderBlockTest extends TestCase
 
     public function testThrowsWhenBlockIdExceedsCharacterLimit(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the block id is 255 characters.');
 
         $header = new SlackHeaderBlock('header');

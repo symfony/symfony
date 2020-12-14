@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-12-11T17:31:56Z
+
+this should not become a hard requirement, as only one of the transports of the bridge need it
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-11T18:20:21Z
+
+I agree that making it a hard requirement is bad for one who only uses one of the other transports, maybe checking for the existence of the class first and a clear exception message is a better approach.
+
+@jderusse if this is merged we should definitely add an issue about that and set the 6.0 milestone.
+
+Anyway it worked like this before but is not really clear and that's a big feeling I have when working with bridges of mailer and/or notifier. My main goal is to make those bridges more "stable" from a usage perspective, they do not feel very "Symfony".
+
+I am ok with closing this PR 👌🏻
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-11T18:24:59Z
+
+adding a check on the extension in `SesTransportFactory` sounds good to me.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T07:07:06Z
+
+> adding a check on the extension in SesTransportFactory sounds good to me.
+
+Done @jderusse
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T11:27:39Z
+
+> (once fabbot is happy :) )
+
+😄  done 👍

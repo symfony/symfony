@@ -26,7 +26,7 @@ class Ulid extends AbstractUid
     public function __construct(string $ulid = null)
     {
         if (null === $ulid) {
-            $this->uid = self::generate();
+            $this->uid = static::generate();
 
             return;
         }
@@ -124,10 +124,25 @@ class Ulid extends AbstractUid
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
-    private static function generate(): string
+    public static function generate(\DateTimeInterface $time = null): string
     {
-        $time = microtime(false);
-        $time = substr($time, 11).substr($time, 2, 3);
+        if (null === $time) {
+            return self::doGenerate();
+        }
+
+        if (0 > $time = substr($time->format('Uu'), 0, -3)) {
+            throw new \InvalidArgumentException('The timestamp must be positive.');
+        }
+
+        return self::doGenerate($time);
+    }
+
+    private static function doGenerate(string $mtime = null): string
+    {
+        if (null === $time = $mtime) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        }
 
         if ($time !== self::$time) {
             $r = unpack('nr1/nr2/nr3/nr4/nr', random_bytes(10));
@@ -139,9 +154,13 @@ class Ulid extends AbstractUid
             self::$rand = array_values($r);
             self::$time = $time;
         } elseif ([0xFFFFF, 0xFFFFF, 0xFFFFF, 0xFFFFF] === self::$rand) {
-            usleep(100);
+            if (null === $mtime) {
+                usleep(100);
+            } else {
+                self::$rand = [0, 0, 0, 0];
+            }
 
-            return self::generate();
+            return self::doGenerate($mtime);
         } else {
             for ($i = 3; $i >= 0 && 0xFFFFF === self::$rand[$i]; --$i) {
                 self::$rand[$i] = 0;

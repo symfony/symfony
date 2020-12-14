@@ -160,6 +160,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -447,6 +449,14 @@ class FrameworkExtension extends Extension
             }
 
             $loader->load('web_link.php');
+        }
+
+        if ($this->isConfigEnabled($container, $config['uid'])) {
+            if (!class_exists(UuidFactory::class)) {
+                throw new LogicException('Uid support cannot be enabled as the Uid component is not installed. Try running "composer require symfony/uid".');
+            }
+
+            $this->registerUidConfiguration($config['uid'], $container, $loader);
         }
 
         $this->addAnnotatedClassesToCompile([
@@ -2320,6 +2330,27 @@ class FrameworkExtension extends Extension
         $limiter->replaceArgument(0, $limiterConfig);
 
         $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
+    }
+
+    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        $loader->load('uid.php');
+
+        $container->getDefinition('uuid.factory')
+            ->setArguments([
+                $config['default_uuid_version'],
+                $config['time_based_uuid_version'],
+                $config['name_based_uuid_version'],
+                UuidV4::class,
+                $config['time_based_uuid_node'] ?? null,
+                $config['name_based_uuid_namespace'] ?? null,
+            ])
+        ;
+
+        if (isset($config['name_based_uuid_namespace'])) {
+            $container->getDefinition('name_based_uuid.factory')
+                ->setArguments([$config['name_based_uuid_namespace']]);
+        }
     }
 
     private function resolveTrustedHeaders(array $headers): int

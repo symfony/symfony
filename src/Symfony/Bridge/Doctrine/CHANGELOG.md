@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate `DoctrineTestHelper` and `TestRepositoryFactory`
  * [BC BREAK] Remove `UuidV*Generator` classes
+ * Add `UuidGenerator`
 
 5.2.0
 -----

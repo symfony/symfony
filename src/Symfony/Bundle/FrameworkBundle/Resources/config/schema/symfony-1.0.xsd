@@ -35,6 +35,7 @@
             <xsd:element name="mailer" type="mailer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="http-cache" type="http_cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="rate-limiter" type="rate_limiter" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="uid" type="uid" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -692,4 +693,35 @@
         <xsd:attribute name="interval" type="xsd:string" />
         <xsd:attribute name="amount" type="xsd:int" />
     </xsd:complexType>
+
+    <xsd:complexType name="uid">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="default_uuid_version" type="default_uuid_version" />
+        <xsd:attribute name="name_based_uuid_version" type="name_based_uuid_version" />
+        <xsd:attribute name="time_based_uuid_version" type="time_based_uuid_version" />
+        <xsd:attribute name="name_based_uuid_namespace" type="xsd:string" />
+        <xsd:attribute name="time_based_uuid_node" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="default_uuid_version">
+        <xsd:restriction base="xsd:int">
+            <xsd:enumeration value="6" />
+            <xsd:enumeration value="4" />
+            <xsd:enumeration value="1" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="name_based_uuid_version">
+        <xsd:restriction base="xsd:int">
+            <xsd:enumeration value="5" />
+            <xsd:enumeration value="3" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="time_based_uuid_version">
+        <xsd:restriction base="xsd:int">
+            <xsd:enumeration value="6" />
+            <xsd:enumeration value="1" />
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

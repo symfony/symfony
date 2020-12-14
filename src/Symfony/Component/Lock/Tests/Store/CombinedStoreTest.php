@@ -351,4 +351,29 @@ class CombinedStoreTest extends AbstractStoreTest
 
         $this->store->delete($key);
     }
+
+    public function testExistsDontStopOnFailure()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+
+        $this->strategy
+            ->expects($this->any())
+            ->method('canBeMet')
+            ->willReturn(true);
+        $this->strategy
+            ->expects($this->any())
+            ->method('isMet')
+            ->willReturn(false);
+        $this->store1
+            ->expects($this->once())
+            ->method('exists')
+            ->willThrowException(new \Exception());
+        $this->store2
+            ->expects($this->once())
+            ->method('exists')
+            ->with($key)
+            ->willReturn(false);
+
+        $this->assertFalse($this->store->exists($key));
+    }
 }

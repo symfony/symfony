@@ -129,6 +129,7 @@ PhpUnitBridge
 -------------
 
  * Removed support for `@expectedDeprecation` annotations, use the `ExpectDeprecationTrait::expectDeprecation()` method instead.
+ * Removed the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
 
 PropertyAccess
 --------------

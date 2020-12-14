@@ -158,9 +158,14 @@ class CombinedStore implements PersistingStoreInterface, LoggerAwareInterface
         $storesCount = \count($this->stores);
 
         foreach ($this->stores as $store) {
-            if ($store->exists($key)) {
-                ++$successCount;
-            } else {
+            try {
+                if ($store->exists($key)) {
+                    ++$successCount;
+                } else {
+                    ++$failureCount;
+                }
+            } catch (\Exception $e) {
+                $this->logger->debug('One store failed to check the "{resource}" lock.', ['resource' => $key, 'store' => $store, 'exception' => $e]);
                 ++$failureCount;
             }
 

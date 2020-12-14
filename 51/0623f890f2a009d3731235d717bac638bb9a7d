@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-10T07:49:20Z
+
+Could we even run the tests with 5.5?
+(and remove the corresponding logic from .travis.yml)
+Just: please make this a single job on GHA :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-10T09:35:26Z
+
+> Could we even run the tests with 5.5?
+
+I tried last night and failed miserably. 🙈
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-14T13:23:25Z
+
+@nicolas-grekas Can we merge this PR as is? The tests are widely incompatible with php 5.5 and this small linter (that only activates on changes to the bridge) would have been enough to detect the compatibility issues we've had recently.

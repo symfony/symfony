@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-11T13:04:37Z
+
+`"symfony/notifier": "~5.1.0"` to make Travis happy.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-11T13:12:17Z
+
+> "symfony/notifier": "~5.1.0" to make Travis happy.
+
+Done, thanks 👍
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-11T18:21:25Z
+
+Could you please merge this PR #39454 with #39455?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-11T18:23:46Z
+
+Just for my curiosity, why? ☺️
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-11T18:28:44Z
+
+when the PRs contain the same thing, it's easier to review:
+- when something has changed, it's easier to check if it has been applied in all components
+- can review everything once (no need to open PR individually one by one)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T07:01:35Z
+
+Done @jderusse 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T11:52:51Z
+
+This one is ready to merge from my side 👍

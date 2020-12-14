@@ -40,7 +40,7 @@ final class TwilioTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsTwilioScheme()
+    public function testSupportsScheme()
     {
         $factory = $this->createFactory();
 

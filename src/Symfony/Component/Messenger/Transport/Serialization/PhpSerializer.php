@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
@@ -20,6 +21,13 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class PhpSerializer implements SerializerInterface
 {
+    private bool $createClassNotFound = false;
+
+    public function enableClassNotFoundCreation(bool $enable = true): void
+    {
+        $this->createClassNotFound = $enable;
+    }
+
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
@@ -50,14 +58,19 @@ class PhpSerializer implements SerializerInterface
         ];
     }
 
-    private function safelyUnserialize(string $contents)
+    private function safelyUnserialize(string $contents): Envelope
     {
         if ('' === $contents) {
             throw new MessageDecodingFailedException('Could not decode an empty message using PHP serialization.');
         }
 
         $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
-        $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
+
+        if ($this->createClassNotFound) {
+            $prevUnserializeHandler = ini_set('unserialize_callback_func', null);
+        } else {
+            $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
+        }
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
             if (__FILE__ === $file) {
                 throw $signalingException;
@@ -67,13 +80,22 @@ class PhpSerializer implements SerializerInterface
         });
 
         try {
-            $meta = unserialize($contents);
+            /** @var Envelope */
+            $envelope = unserialize($contents);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
-        return $meta;
+        if (!$envelope instanceof Envelope) {
+            throw $signalingException;
+        }
+
+        if ($envelope->getMessage() instanceof \__PHP_Incomplete_Class) {
+            $envelope = $envelope->with(new MessageDecodingFailedStamp());
+        }
+
+        return $envelope;
     }
 
     /**

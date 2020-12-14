@@ -30,35 +30,46 @@ final class TwilioTransportFactoryTest extends TestCase
         $this->assertSame('twilio://host.test?from=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoFromThrowsMalformed()
+    public function testCreateWithNoFromThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'twilio://accountSid:authToken@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('twilio://accountSid:authToken@default'));
     }
 
-    public function testSupportsScheme()
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsn = 'twilio://accountSid:authToken@default?from=0611223344';
-        $dsnUnsupported = 'twilioooo://accountSid:authToken@default?from=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertTrue($factory->supports(Dsn::fromString('twilio://accountSid:authToken@default?from=0611223344')));
     }
 
-    public function testNonTwilioSchemeThrows()
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
+    {
+        $factory = $this->createFactory();
+
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344')));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
     {
         $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'twilioooo://accountSid:authToken@default?from=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344'));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(UnsupportedSchemeException::class);
+
+        // unsupported scheme and missing "from" option
+        $factory->create(Dsn::fromString('somethingElse://token@host'));
     }
 
     private function createFactory(): TwilioTransportFactory

@@ -30,6 +30,11 @@ final class TwilioTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('twilio' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'twilio', $this->getSupportedSchemes());
+        }
+
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
         $from = $dsn->getOption('from');
@@ -41,11 +46,7 @@ final class TwilioTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('twilio' === $scheme) {
-            return (new TwilioTransport($accountSid, $authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'twilio', $this->getSupportedSchemes());
+        return (new TwilioTransport($accountSid, $authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

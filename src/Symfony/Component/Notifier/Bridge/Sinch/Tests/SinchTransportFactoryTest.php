@@ -36,24 +36,21 @@ final class SinchTransportFactoryTest extends TestCase
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'sinch://accountSid:authToken@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('sinch://accountSid:authToken@default'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsn = 'sinch://accountSid:authToken@default?from=0611223344';
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
+        $this->assertTrue($factory->supports(Dsn::fromString('sinch://accountSid:authToken@default?from=0611223344')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $dsnUnsupported = 'sinnnnch://accountSid:authToken@default?from=0611223344';
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -62,8 +59,7 @@ final class SinchTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'sinnnnch://accountSid:authToken@default?from=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
@@ -73,7 +69,7 @@ final class SinchTransportFactoryTest extends TestCase
         $this->expectException(UnsupportedSchemeException::class);
 
         // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('sinnnnch://accountSid:authToken@default'));
+        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default'));
     }
 
     private function createFactory(): SinchTransportFactory

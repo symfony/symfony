@@ -22,12 +22,9 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  */
 abstract class FirebaseOptions implements MessageOptionsInterface
 {
-    /** @var string the recipient */
     private $to;
 
     /**
-     * @var array
-     *
      * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html#notification-payload-support
      */
     protected $options;

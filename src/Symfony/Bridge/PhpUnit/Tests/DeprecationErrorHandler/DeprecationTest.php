@@ -15,12 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerForV5;
-use Symfony\Bridge\PhpUnit\SetUpTearDownTrait;
 
 class DeprecationTest extends TestCase
 {
-    use SetUpTearDownTrait;
-
     private static $vendorDir;
     private static $prefixDirsPsr4;
 
@@ -261,7 +258,7 @@ class DeprecationTest extends TestCase
         rmdir($dir);
     }
 
-    private static function doSetupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
@@ -281,7 +278,7 @@ class DeprecationTest extends TestCase
         }
     }
 
-    private static function doTearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         foreach (self::$prefixDirsPsr4 as [$prop, $loader, $prefixDirsPsr4]) {
             $prop->setValue($loader, $prefixDirsPsr4);

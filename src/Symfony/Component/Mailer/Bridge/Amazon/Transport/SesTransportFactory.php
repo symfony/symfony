@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
+use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -31,6 +32,10 @@ final class SesTransportFactory extends AbstractTransportFactory
         $port = $dsn->getPort();
 
         if ('ses+api' === $scheme) {
+            if (!\extension_loaded('simplexml')) {
+                throw new LogicException(sprintf('Cannot use "%s". Make sure you have "ext-simplexml" installed and enabled.', SesApiTransport::class));
+            }
+
             return (new SesApiTransport($user, $password, $region, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
         }
 

@@ -48,7 +48,7 @@ final class SlackTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString(sprintf('slack://%s/?channel=%s', 'testHost', 'testChannel')));
     }
 
-    public function testSupportsSlackScheme()
+    public function testSupportsScheme()
     {
         $factory = new SlackTransportFactory();
 

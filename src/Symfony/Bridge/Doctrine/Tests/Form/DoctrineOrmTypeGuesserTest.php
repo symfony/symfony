@@ -11,16 +11,40 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
 class DoctrineOrmTypeGuesserTest extends TestCase
 {
+    /**
+     * @dataProvider requiredType
+     */
+    public function testTypeGuesser($classMetadata, $expected)
+    {
+        $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessType('TestEntity', 'field'));
+    }
+
+    public function requiredType()
+    {
+        $return = [];
+
+        // DateTime field
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $classMetadata->fieldMappings['field'] = true;
+        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn(Types::DATE_IMMUTABLE);
+
+        $return[] = [$classMetadata, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+
+        return $return;
+    }
+
     /**
      * @dataProvider requiredProvider
      */

@@ -40,7 +40,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsFreeMobileScheme()
+    public function testSupportsScheme()
     {
         $factory = $this->createFactory();
 

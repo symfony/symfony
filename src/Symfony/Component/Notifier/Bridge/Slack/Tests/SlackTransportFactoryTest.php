@@ -29,7 +29,7 @@ final class SlackTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('slack://%s/%s', $host, $path), (string) $transport);
     }
 
-    public function testSupportsSlackScheme()
+    public function testSupportsScheme()
     {
         $factory = new SlackTransportFactory();
 

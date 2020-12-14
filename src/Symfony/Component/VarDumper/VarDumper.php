@@ -77,7 +77,7 @@ class VarDumper
                 $dumper = new ServerDumper($host, $dumper, self::getDefaultContextProviders());
                 break;
             default:
-                $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliDumper() : new HtmlDumper();
+                $dumper = \in_array(\PHP_SAPI, ['cli', 'cli-server', 'phpdbg'], true) ? new CliDumper() : new HtmlDumper();
         }
 
         if (!$dumper instanceof ServerDumper) {

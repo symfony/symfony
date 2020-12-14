@@ -26,16 +26,17 @@ final class RocketChatTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('rocketchat' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'rocketchat', $this->getSupportedSchemes());
+        }
+
         $accessToken = $this->getUser($dsn);
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('rocketchat' === $scheme) {
-            return (new RocketChatTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'rocketchat', $this->getSupportedSchemes());
+        return (new RocketChatTransport($accessToken, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

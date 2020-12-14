@@ -29,9 +29,9 @@ final class TelegramTransportTest extends TestCase
         $channel = 'testChannel';
 
         $transport = new TelegramTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
-        $transport->setHost('testHost');
+        $transport->setHost('host.test');
 
-        $this->assertSame(sprintf('telegram://%s?channel=%s', 'testHost', $channel), (string) $transport);
+        $this->assertSame(sprintf('telegram://%s?channel=%s', 'host.test', $channel), (string) $transport);
     }
 
     public function testSupportsChatMessage()

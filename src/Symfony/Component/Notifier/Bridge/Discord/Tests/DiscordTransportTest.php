@@ -56,7 +56,7 @@ final class DiscordTransportTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
 
-        $transport->send(new ChatMessage(str_repeat('d', 2001)));
+        $transport->send(new ChatMessage(str_repeat('囍', 2001)));
     }
 
     public function testSendWithErrorResponseThrows()

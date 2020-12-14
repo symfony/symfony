@@ -24,30 +24,28 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
  */
 final class AmazonSnsTransportFactory extends AbstractTransportFactory
 {
-    private const DSN_SCHEME = 'sns';
-
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
 
-        if (self::DSN_SCHEME === $scheme) {
-            $options = [
-                    'region' => $dsn->getOption('region') ?: 'eu-west-1',
-                    'profile' => $dsn->getOption('profile'),
-                    'accessKeyId' => $dsn->getUser(),
-                    'accessKeySecret' => $dsn->getPassword(),
-                ] + (
-                'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
-                );
-
-            return new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
+        if ('sns' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'sns', $this->getSupportedSchemes());
         }
 
-        throw new UnsupportedSchemeException($dsn, self::DSN_SCHEME, $this->getSupportedSchemes());
+        $options = [
+                'region' => $dsn->getOption('region') ?: 'eu-west-1',
+                'profile' => $dsn->getOption('profile'),
+                'accessKeyId' => $dsn->getUser(),
+                'accessKeySecret' => $dsn->getPassword(),
+            ] + (
+            'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
+            );
+
+        return new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
     }
 
     protected function getSupportedSchemes(): array
     {
-        return [self::DSN_SCHEME];
+        return ['sns'];
     }
 }

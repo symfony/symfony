@@ -26,31 +26,27 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     /**
      * @dataProvider requiredType
      */
-    public function testTypeGuesser($classMetadata, $expected)
+    public function testTypeGuesser(string $type, $expected)
     {
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $classMetadata->fieldMappings['field'] = true;
+        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn($type);
+
         $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessType('TestEntity', 'field'));
     }
 
     public function requiredType()
     {
-        $return = [];
+        yield [Types::DATE_IMMUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+        yield [Types::DATE_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', [], Guess::HIGH_CONFIDENCE)];
 
-        // DateImmutable field
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-        $classMetadata->fieldMappings['field'] = true;
-        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn(Types::DATE_IMMUTABLE);
+        yield [Types::TIME_IMMUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+        yield [Types::TIME_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', [], Guess::HIGH_CONFIDENCE)];
 
-        $return[] = [$classMetadata, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
-
-
-        // DateTimeImmutable field
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-        $classMetadata->fieldMappings['field'] = true;
-        $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn(Types::DATETIME_IMMUTABLE);
-
-        $return[] = [$classMetadata, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
-
-        return $return;
+        yield [Types::DATETIME_IMMUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+        yield [Types::DATETIMETZ_IMMUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE)];
+        yield [Types::DATETIME_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', [], Guess::HIGH_CONFIDENCE)];
+        yield [Types::DATETIMETZ_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', [], Guess::HIGH_CONFIDENCE)];
     }
 
     /**

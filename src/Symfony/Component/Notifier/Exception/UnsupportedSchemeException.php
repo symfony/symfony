@@ -36,7 +36,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'googlechat' => [
             'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
-            'package' => 'symfony/googlechat-notifier',
+            'package' => 'symfony/google-chat-notifier',
         ],
         'nexmo' => [
             'class' => Bridge\Nexmo\NexmoTransportFactory::class,

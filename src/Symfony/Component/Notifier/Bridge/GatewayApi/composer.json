@@ -25,9 +25,7 @@
         "symfony/notifier": "^5.3"
     },
     "autoload": {
-        "psr-4": {
-            "Symfony\\Component\\Notifier\\Bridge\\GatewayApi\\": ""
-        },
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\GatewayApi\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

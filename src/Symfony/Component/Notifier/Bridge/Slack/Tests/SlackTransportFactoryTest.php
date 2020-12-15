@@ -23,11 +23,9 @@ final class SlackTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $host = 'testHost';
-        $path = 'testPath';
-        $transport = $factory->create(Dsn::fromString(sprintf('slack://%s/%s', $host, $path)));
+        $transport = $factory->create(Dsn::fromString('slack://host.test/testPath'));
 
-        $this->assertSame(sprintf('slack://%s/%s', $host, $path), (string) $transport);
+        $this->assertSame('slack://host.test/testPath', (string) $transport);
     }
 
     public function testCreateWithMissingOptionIdThrowsIncompleteDsnException()

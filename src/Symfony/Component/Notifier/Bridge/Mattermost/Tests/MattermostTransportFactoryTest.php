@@ -26,13 +26,9 @@ final class MattermostTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $accessToken = 'testAccessToken';
-        $host = 'testHost';
-        $channel = 'testChannel';
+        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@host.test?channel=testChannel'));
 
-        $transport = $factory->create(Dsn::fromString(sprintf('mattermost://%s@%s/?channel=%s', $accessToken, $host, $channel)));
-
-        $this->assertSame(sprintf('mattermost://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame('mattermost://host.test?channel=testChannel', (string) $transport);
     }
 
     public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
@@ -49,21 +45,21 @@ final class MattermostTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('mattermost://%s/?channel=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('mattermost://host.test?channel=testChannel'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('mattermost://token@host/?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('mattermost://token@host?channel=testChannel')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host/?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -72,7 +68,7 @@ final class MattermostTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $factory->create(Dsn::fromString('somethingElse://token@host/?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()

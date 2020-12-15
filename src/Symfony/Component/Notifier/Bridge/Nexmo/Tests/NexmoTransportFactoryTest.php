@@ -23,9 +23,7 @@ final class NexmoTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'nexmo://apiKey:apiSecret@default?from=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('nexmo://apiKey:apiSecret@host.test?from=0611223344'));
 
         $this->assertSame('nexmo://host.test?from=0611223344', (string) $transport);
     }

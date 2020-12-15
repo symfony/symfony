@@ -20,9 +20,10 @@ final class GatewayApiTransportFactoryTest extends TestCase
     public function testUnSupportedGatewayShouldThrowsUnsupportedSchemeException()
     {
         $factory = $this->createFactory();
+
         $this->expectException(UnsupportedSchemeException::class);
-        $dsn = 'wrongGateway://token@default?from=Symfony';
-        $factory->create(Dsn::fromString($dsn));
+
+        $factory->create(Dsn::fromString( 'somethingElse://token@default?from=Symfony'));
     }
 
     public function testCreateWithNoTokenThrowsIncompleteDsnException()

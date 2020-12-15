@@ -899,7 +899,7 @@ class FrameworkExtension extends Extension
         $debug = $container->getParameter('kernel.debug');
 
         if ($debug) {
-            $container->setParameter('debug.container.dump', '%kernel.cache_dir%/%kernel.container_class%.xml');
+            $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 
         if ($debug && class_exists(Stopwatch::class)) {

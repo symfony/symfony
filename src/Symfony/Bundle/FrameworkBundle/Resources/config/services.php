@@ -109,7 +109,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_iterator('kernel.cache_warmer'),
                 param('kernel.debug'),
-                sprintf('%s/%sDeprecations.log', param('kernel.cache_dir'), param('kernel.container_class')),
+                sprintf('%s/%sDeprecations.log', param('kernel.build_dir'), param('kernel.container_class')),
             ])
             ->tag('container.no_preload')
 

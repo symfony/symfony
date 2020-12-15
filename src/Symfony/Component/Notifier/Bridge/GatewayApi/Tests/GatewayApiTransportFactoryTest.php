@@ -14,9 +14,7 @@ final class GatewayApiTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'gatewayapi://token@default?from=Symfony';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
+        $this->assertTrue($factory->supports(Dsn::fromString('gatewayapi://token@host.test?from=Symfony')));
     }
 
     public function testUnSupportedGatewayShouldThrowsUnsupportedSchemeException()

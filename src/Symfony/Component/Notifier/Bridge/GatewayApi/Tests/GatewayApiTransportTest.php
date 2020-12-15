@@ -44,10 +44,6 @@ final class GatewayApiTransportTest extends TestCase
 
     private function getTransport(MockHttpClient $client = null): GatewayApiTransport
     {
-        return (new GatewayApiTransport(
-            'authtoken',
-            'Symfony',
-            $client
-        ))->setHost('host.test');
+        return (new GatewayApiTransport('authtoken', 'Symfony', $client))->setHost('host.test');
     }
 }

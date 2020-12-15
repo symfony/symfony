@@ -77,10 +77,12 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('manifest path'),
+                service('http_client'),
             ])
 
         ->set('assets.remote_json_manifest_version_strategy', RemoteJsonManifestVersionStrategy::class)
             ->abstract()
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "assets.json_manifest_version_strategy" instead.')
             ->args([
                 abstract_arg('manifest url'),
                 service('http_client'),

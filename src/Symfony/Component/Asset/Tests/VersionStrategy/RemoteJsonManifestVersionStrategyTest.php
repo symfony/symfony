@@ -17,6 +17,9 @@ use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
+/**
+ * @group legacy
+ */
 class RemoteJsonManifestVersionStrategyTest extends TestCase
 {
     public function testGetVersion()

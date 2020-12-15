@@ -13,47 +13,83 @@ namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
-    public function testGetVersion()
+    /**
+     * @dataProvider ProvideValidStrategies
+     */
+    public function testGetVersion(JsonManifestVersionStrategy $strategy)
     {
-        $strategy = $this->createStrategy('manifest-valid.json');
-
         $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
-    public function testApplyVersion()
+    /**
+     * @dataProvider ProvideValidStrategies
+     */
+    public function testApplyVersion(JsonManifestVersionStrategy $strategy)
     {
-        $strategy = $this->createStrategy('manifest-valid.json');
-
         $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
-    public function testApplyVersionWhenKeyDoesNotExistInManifest()
+    /**
+     * @dataProvider ProvideValidStrategies
+     */
+    public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
     {
-        $strategy = $this->createStrategy('manifest-valid.json');
-
         $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
-    public function testMissingManifestFileThrowsException()
+    /**
+     * @dataProvider ProvideMissingStrategies
+     */
+    public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException('RuntimeException');
-        $strategy = $this->createStrategy('non-existent-file.json');
         $strategy->getVersion('main.js');
     }
 
-    public function testManifestFileWithBadJSONThrowsException()
+    /**
+     * @dataProvider ProvideInvalidStrategies
+     */
+    public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException('RuntimeException');
         $this->expectExceptionMessage('Error parsing JSON');
-        $strategy = $this->createStrategy('manifest-invalid.json');
         $strategy->getVersion('main.js');
     }
 
-    private function createStrategy($manifestFilename)
+    public function provideValidStrategies()
     {
-        return new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestFilename);
+        yield from $this->provideStrategies('manifest-valid.json');
+    }
+
+    public function provideInvalidStrategies()
+    {
+        yield from $this->provideStrategies('manifest-invalid.json');
+    }
+
+    public function provideMissingStrategies()
+    {
+        yield from $this->provideStrategies('non-existent-file.json');
+    }
+
+    public function provideStrategies(string $manifestPath)
+    {
+        $httpClient = new MockHttpClient(function ($method, $url, $options) {
+            $filename = __DIR__.'/../fixtures/'.basename($url);
+
+            if (file_exists($filename)) {
+                return new MockResponse(file_get_contents($filename), ['http_headers' => ['content-type' => 'application/json']]);
+            }
+
+            return new MockResponse('{}', ['http_code' => 404]);
+        });
+
+        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
+
+        yield [new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestPath)];
     }
 }

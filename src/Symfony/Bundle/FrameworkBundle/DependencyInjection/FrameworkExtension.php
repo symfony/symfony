@@ -1129,12 +1129,7 @@ class FrameworkExtension extends Extension
         }
 
         if (null !== $jsonManifestPath) {
-            $definitionName = 'assets.json_manifest_version_strategy';
-            if (0 === strpos(parse_url($jsonManifestPath, \PHP_URL_SCHEME), 'http')) {
-                $definitionName = 'assets.remote_json_manifest_version_strategy';
-            }
-
-            $def = new ChildDefinition($definitionName);
+            $def = new ChildDefinition('assets.json_manifest_version_strategy');
             $def->replaceArgument(0, $jsonManifestPath);
             $container->setDefinition('assets._version_'.$name, $def);
 

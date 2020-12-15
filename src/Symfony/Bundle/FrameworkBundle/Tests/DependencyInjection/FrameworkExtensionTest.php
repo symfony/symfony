@@ -597,7 +597,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount(7, $packages);
+        $this->assertCount(9, $packages);
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
@@ -621,8 +621,18 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition($packages['remote_manifest']);
         $versionStrategy = $container->getDefinition($package->getArgument(1));
-        $this->assertSame('assets.remote_json_manifest_version_strategy', $versionStrategy->getParent());
+        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
+
+        $package = $container->getDefinition($packages['var_manifest']);
+        $versionStrategy = $container->getDefinition($package->getArgument(1));
+        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
+        $this->assertSame('https://cdn.example.com/manifest.json', $versionStrategy->getArgument(0));
+
+        $package = $container->getDefinition($packages['env_manifest']);
+        $versionStrategy = $container->getDefinition($package->getArgument(1));
+        $this->assertSame('assets.json_manifest_version_strategy', $versionStrategy->getParent());
+        $this->assertStringMatchesFormat('env_%s', $versionStrategy->getArgument(0));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()

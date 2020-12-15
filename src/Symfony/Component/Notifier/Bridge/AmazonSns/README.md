@@ -7,7 +7,6 @@ DSN example
 -----------
 
 ```
-// .env file
 AMAZON_DSN='sns://ACCESS_ID:ACCESS_KEY@default?region=REGION'
 ```
 

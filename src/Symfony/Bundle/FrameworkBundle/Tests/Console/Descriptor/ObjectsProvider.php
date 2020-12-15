@@ -92,10 +92,12 @@ class ObjectsProvider
     {
         $builderWithDeprecations = new ContainerBuilder();
         $builderWithDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithDeprecations->setParameter('kernel.build_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
         $builderWithDeprecations->setParameter('kernel.container_class', 'KernelContainerWith');
 
         $builderWithoutDeprecations = new ContainerBuilder();
         $builderWithoutDeprecations->setParameter('kernel.cache_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
+        $builderWithoutDeprecations->setParameter('kernel.build_dir', __DIR__.'/../../Fixtures/Descriptor/cache');
         $builderWithoutDeprecations->setParameter('kernel.container_class', 'KernelContainerWithout');
 
         return [

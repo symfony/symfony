@@ -609,7 +609,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'kernel.runtime_environment' => '%env(default:kernel.environment:APP_RUNTIME_ENV)%',
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
-            'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
+            'kernel.cache_dir' => realpath($cacheDir = ($this->getCacheDir() === $this->getBuildDir() ? ($this->warmupDir ?: $this->getCacheDir()) : $this->getCacheDir())) ?: $cacheDir,
             'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata,

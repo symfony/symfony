@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Uid;
+namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\NilUuid;

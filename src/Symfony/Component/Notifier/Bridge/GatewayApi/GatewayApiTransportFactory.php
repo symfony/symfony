@@ -30,6 +30,11 @@ final class GatewayApiTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('gatewayapi' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'gatewayapi', $this->getSupportedSchemes());
+        }
+
         $authToken = $dsn->getUser();
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $from = $dsn->getOption('from');

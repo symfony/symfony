@@ -21,6 +21,17 @@ jobs:
                     - 5432:5432
                 env:
                     POSTGRES_PASSWORD: 'password'
+            ldap:
+                image: bitnami/openldap
+                ports:
+                    - 3389:3389
+                env:
+                    LDAP_ADMIN_USERNAME: admin
+                    LDAP_ADMIN_PASSWORD: symfony
+                    LDAP_ROOT: dc=symfony,dc=com
+                    LDAP_PORT_NUMBER: 3389
+                    LDAP_USERS: a
+                    LDAP_PASSWORDS: a
             redis:
                 image: redis:6.0.0
                 ports:
@@ -35,9 +46,16 @@ jobs:
                     - 7004:7004
                     - 7005:7005
                     - 7006:7006
-                    - 7007:7007
                 env:
-                    STANDALONE: true
+                    STANDALONE: 1
+            redis-sentinel:
+                image: bitnami/redis-sentinel:6.0
+                ports:
+                    - 26379:26379
+                env:
+                    REDIS_MASTER_HOST: redis
+                    REDIS_MASTER_SET: redis_sentinel
+                    REDIS_SENTINEL_QUORUM: 1
             memcached:
                 image: memcached:1.6.5
                 ports:
@@ -81,17 +99,12 @@ jobs:
 
             -   name: Install system dependencies
                 run: |
-                    echo "::group::add apt sources"
-                    sudo wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
-                    echo "deb http://packages.couchbase.com/ubuntu bionic bionic/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
-                    echo "::endgroup::"
-
                     echo "::group::apt-get update"
                     sudo apt-get update
                     echo "::endgroup::"
 
                     echo "::group::install tools & libraries"
-                    sudo apt-get install libcouchbase-dev librdkafka-dev
+                    sudo apt-get install librdkafka-dev
                     echo "::endgroup::"
 
             -   name: Configure Couchbase
@@ -105,16 +118,27 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     coverage: "none"
-                    extensions: "json,couchbase,memcached,mongodb,redis,rdkafka,xsl"
+                    extensions: "json,couchbase,memcached,mongodb,redis,rdkafka,xsl,ldap"
                     ini-values: "memory_limit=-1"
                     php-version: "${{ matrix.php }}"
                     tools: pecl
+
+            -   name: Display versions
+                run: |
+                    php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+                    php -i
+
+            -   name: Load fixtures
+                uses: docker://bitnami/openldap
+                with:
+                  entrypoint: /bin/bash
+                  args: -c "(ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
             -   name: Configure composer
                 run: |
                     COMPOSER_HOME="$(composer config home)"
                     ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-                    echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*').x-dev" >> $GITHUB_ENV
+                    echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory
                 id: composer-cache
@@ -138,15 +162,19 @@ jobs:
                     echo "::endgroup::"
 
             -   name: Run tests
-                run: ./phpunit --group integration
+                run: ./phpunit --group integration -v
                 env:
                     REDIS_HOST: localhost
                     REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
+                    REDIS_SENTINEL_HOSTS: 'localhost:26379'
+                    REDIS_SENTINEL_SERVICE: redis_sentinel
                     MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
                     MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
                     MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
                     MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
                     MEMCACHED_HOST: localhost
+                    LDAP_HOST: localhost
+                    LDAP_PORT: 3389
                     MONGODB_HOST: localhost
                     KAFKA_BROKER: localhost:9092
                     POSTGRES_HOST: localhost

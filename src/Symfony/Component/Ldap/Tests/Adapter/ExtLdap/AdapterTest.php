@@ -22,15 +22,10 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
 
 /**
  * @requires extension ldap
+ * @group integration
  */
 class AdapterTest extends LdapTestCase
 {
-    const PAGINATION_REQUIRED_CONFIG = [
-        'options' => [
-            'protocol_version' => 3,
-        ],
-    ];
-
     public function testLdapEscape()
     {
         $ldap = new Adapter();
@@ -122,7 +117,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPagination()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig(), static::PAGINATION_REQUIRED_CONFIG));
+        $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
         $entries = $this->setupTestUsers($ldap);
 
@@ -153,19 +148,17 @@ class AdapterTest extends LdapTestCase
             $this->assertEquals(\count($fully_paged_query->getResources()), 1);
             $this->assertEquals(\count($paged_query->getResources()), 5);
 
-            if (\PHP_MAJOR_VERSION > 7 || (\PHP_MAJOR_VERSION == 7 && \PHP_MINOR_VERSION >= 2)) {
-                // This last query is to ensure that we haven't botched the state of our connection
-                // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
-                // bits to work around an implementation flaw, so we simply can't guarantee this to work there.
-                $final_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
-                    'scope' => Query::SCOPE_ONE,
-                ]);
+            // This last query is to ensure that we haven't botched the state of our connection
+            // by not resetting pagination properly. extldap <= PHP 7.1 do not implement the necessary
+            // bits to work around an implementation flaw, so we simply can't guarantee this to work there.
+            $final_query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectClass=applicationProcess)(cn=user*))', [
+                'scope' => Query::SCOPE_ONE,
+            ]);
 
-                $final_results = $final_query->execute();
+            $final_results = $final_query->execute();
 
-                $this->assertEquals($final_results->count(), 25);
-                $this->assertEquals(\count($final_query->getResources()), 1);
-            }
+            $this->assertEquals($final_results->count(), 25);
+            $this->assertEquals(\count($final_query->getResources()), 1);
         } catch (LdapException $exc) {
             $this->markTestSkipped('Test LDAP server does not support pagination');
         }
@@ -205,7 +198,7 @@ class AdapterTest extends LdapTestCase
 
     public function testLdapPaginationLimits()
     {
-        $ldap = new Adapter(array_merge($this->getLdapConfig(), static::PAGINATION_REQUIRED_CONFIG));
+        $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
         $entries = $this->setupTestUsers($ldap);

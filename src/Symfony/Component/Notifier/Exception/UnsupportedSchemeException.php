@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 /**
  * @author Konstantin Myakshin <molodchick@gmail.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  */
 class UnsupportedSchemeException extends LogicException
 {
@@ -58,7 +58,7 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Firebase\FirebaseTransportFactory::class,
             'package' => 'symfony/firebase-notifier',
         ],
-        'free-mobile' => [
+        'freemobile' => [
             'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
             'package' => 'symfony/free-mobile-notifier',
         ],

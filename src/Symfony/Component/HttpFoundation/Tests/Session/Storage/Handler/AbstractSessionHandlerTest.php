@@ -23,7 +23,7 @@ class AbstractSessionHandlerTest extends TestCase
             1 => ['file', '/dev/null', 'w'],
             2 => ['file', '/dev/null', 'w'],
         ];
-        if (!self::$server = @proc_open('exec php -S localhost:8053', $spec, $pipes, __DIR__.'/Fixtures')) {
+        if (!self::$server = @proc_open('exec '.\PHP_BINARY.' -S localhost:8053', $spec, $pipes, __DIR__.'/Fixtures')) {
             self::markTestSkipped('PHP server unable to start.');
         }
         sleep(1);

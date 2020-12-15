@@ -391,6 +391,10 @@ trait HttpClientTrait
             throw new InvalidArgumentException(sprintf('Invalid "base_uri" option: host or scheme is missing in "%s".', implode('', $base)));
         }
 
+        if (null === $url['scheme'] && (null === $base || null === $base['scheme'])) {
+            throw new InvalidArgumentException(sprintf('Invalid URL: scheme is missing in "%s". Did you forget to add "http(s)://"?', implode('', $base ?? $url)));
+        }
+
         if (null === $base && '' === $url['scheme'].$url['authority']) {
             throw new InvalidArgumentException(sprintf('Invalid URL: no "base_uri" option was provided and host or scheme is missing in "%s".', implode('', $url)));
         }

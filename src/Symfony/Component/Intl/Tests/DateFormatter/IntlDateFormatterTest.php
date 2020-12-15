@@ -14,6 +14,9 @@ namespace Symfony\Component\Intl\Tests\DateFormatter;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+/**
+ * @group legacy
+ */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     public function testConstructor()

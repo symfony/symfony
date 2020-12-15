@@ -72,7 +72,9 @@ class StringUtilTest extends TestCase
             ['000D'],
             ['0085'],
             // zero width space
-//            ['200B'],
+            ['200B'],
+            // soft hyphen
+            ['00AD'],
         ];
     }
 

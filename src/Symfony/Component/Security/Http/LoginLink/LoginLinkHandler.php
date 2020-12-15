@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {

@@ -107,7 +107,7 @@ class MarkdownDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -287,15 +287,24 @@ class MarkdownDescriptor extends Descriptor
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = \array_key_exists('event', $options) ? $options['event'] : null;
+        $dispatcherServiceName = $options['dispatcher_service_name'] ?? null;
 
         $title = 'Registered listeners';
+
+        if (null !== $dispatcherServiceName) {
+            $title .= sprintf(' of event dispatcher "%s"', $dispatcherServiceName);
+        }
+
         if (null !== $event) {
             $title .= sprintf(' for event `%s` ordered by descending priority', $event);
+            $registeredListeners = $eventDispatcher->getListeners($event);
+        } else {
+            // Try to see if "events" exists
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
         }
 
         $this->write(sprintf('# %s', $title)."\n");
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
             foreach ($registeredListeners as $order => $listener) {
                 $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");

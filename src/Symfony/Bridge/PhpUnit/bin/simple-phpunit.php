@@ -15,8 +15,8 @@
 error_reporting(-1);
 
 global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$argv = $_SERVER['argv'] ?? [];
+$argc = $_SERVER['argc'] ?? 0;
 $getEnvVar = function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
@@ -98,19 +98,9 @@ if (\PHP_VERSION_ID >= 80000) {
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.4');
 } elseif (\PHP_VERSION_ID >= 70200) {
     // PHPUnit 8 requires PHP 7.2+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.3');
-} elseif (\PHP_VERSION_ID >= 70100) {
-    // PHPUnit 7 requires PHP 7.1+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5');
-} elseif (\PHP_VERSION_ID >= 70000) {
-    // PHPUnit 6 requires PHP 7.0+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '6.5');
-} elseif (\PHP_VERSION_ID >= 50600) {
-    // PHPUnit 4 does not support PHP 7
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '5.7');
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5');
 } else {
-    // PHPUnit 5.1 requires PHP 5.6+
-    $PHPUNIT_VERSION = '4.8';
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5');
 }
 
 $MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);
@@ -151,6 +141,10 @@ foreach ($defaultEnvs as $envName => $envValue) {
         putenv("$envName=$envValue");
         $_SERVER[$envName] = $_ENV[$envName] = $envValue;
     }
+}
+
+if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
+    putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 }
 
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
@@ -238,7 +232,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
-    $q = '\\' === \DIRECTORY_SEPARATOR ? '"' : '';
+    $q = '\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 80000 ? '"' : '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
     $exit = proc_close(proc_open("$q$COMPOSER install --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
@@ -251,12 +245,12 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
         $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
     }
-    $alteredCode = preg_replace('/abstract class (?:TestCase|PHPUnit_Framework_TestCase)[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
+    $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
     file_put_contents($alteredFile, $alteredCode);
 
     // Mutate Assert code
     $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');
-    $alteredCode = preg_replace('/abstract class (?:Assert|PHPUnit_Framework_Assert)[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
+    $alteredCode = preg_replace('/abstract class Assert[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillAssertTrait;", $alteredCode, 1);
     file_put_contents($alteredFile, $alteredCode);
 
     file_put_contents('phpunit', <<<'EOPHP'
@@ -348,7 +342,7 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
 }
 
 if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = [];
 
     foreach ($components as $component) {

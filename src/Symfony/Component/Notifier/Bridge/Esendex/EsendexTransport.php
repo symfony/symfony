@@ -13,8 +13,8 @@ namespace Symfony\Component\Notifier\Bridge\Esendex;
 
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class EsendexTransport extends AbstractTransport
 {
@@ -55,7 +55,7 @@ final class EsendexTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $messageData = [

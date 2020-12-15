@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class FirewallMapTest extends TestCase
 {
-    const ATTRIBUTE_FIREWALL_CONTEXT = '_firewall_context';
+    private const ATTRIBUTE_FIREWALL_CONTEXT = '_firewall_context';
 
     public function testGetListenersWithEmptyMap()
     {

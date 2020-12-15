@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Exception;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  */
 class IncompleteDsnException extends InvalidArgumentException
 {
@@ -24,7 +24,7 @@ class IncompleteDsnException extends InvalidArgumentException
     {
         $this->dsn = $dsn;
         if ($dsn) {
-            $message = sprintf('Invalid "%s" notifier DSN: ', $dsn).$message;
+            $message = sprintf('Invalid "%s" notifier DSN: %s', $dsn, $message);
         }
 
         parent::__construct($message, 0, $previous);

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class UrlTypeTest extends TextTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
 
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {

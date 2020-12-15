@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Filen kunne ikke blive uploadet.</target>
+                <target>Filen kunne ikke uploades.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -324,7 +324,7 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Denne værdi skal være et flertal af {{ compared_value }}.</target>
+                <target>Denne værdi skal være et multiplikation af {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -365,6 +365,26 @@
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Værdien skal være mellem {{ min }} og {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Værdien er ikke et gyldigt værtsnavn.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Antallet af elementer i denne samling skal være en multiplikation af {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Værdien skal overholde mindst én af følgende krav::</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Hvert element i denne samling skal overholde dens egne krav.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Værdien er ikke et gyldig International Securities Identification Number (ISIN).</target>
             </trans-unit>
         </body>
     </file>

@@ -17,7 +17,6 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -53,6 +52,7 @@ class ValidatorBuilder
      * @var Reader|null
      */
     private $annotationReader;
+    private $enableAnnotationMapping = false;
 
     /**
      * @var MetadataFactoryInterface|null
@@ -212,23 +212,28 @@ class ValidatorBuilder
     /**
      * Enables annotation based constraint mapping.
      *
+     * @param bool $skipDoctrineAnnotations
+     *
      * @return $this
      */
-    public function enableAnnotationMapping(Reader $annotationReader = null)
+    public function enableAnnotationMapping(/* bool $skipDoctrineAnnotations = true */)
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
-        if (null === $annotationReader) {
-            if (!class_exists(AnnotationReader::class) || !class_exists(ArrayCache::class)) {
-                throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.');
-            }
-
-            $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
+        $skipDoctrineAnnotations = 1 > \func_num_args() ? false : func_get_arg(0);
+        if (false === $skipDoctrineAnnotations || null === $skipDoctrineAnnotations) {
+            trigger_deprecation('symfony/validator', '5.2', 'Not passing true as first argument to "%s" is deprecated. Pass true and call "addDefaultDoctrineAnnotationReader()" if you want to enable annotation mapping with Doctrine Annotations.', __METHOD__);
+            $this->addDefaultDoctrineAnnotationReader();
+        } elseif ($skipDoctrineAnnotations instanceof Reader) {
+            trigger_deprecation('symfony/validator', '5.2', 'Passing an instance of "%s" as first argument to "%s" is deprecated. Pass true instead and call setDoctrineAnnotationReader() if you want to enable annotation mapping with Doctrine Annotations.', get_debug_type($skipDoctrineAnnotations), __METHOD__);
+            $this->setDoctrineAnnotationReader($skipDoctrineAnnotations);
+        } elseif (true !== $skipDoctrineAnnotations) {
+            throw new \TypeError(sprintf('"%s": Argument 1 is expected to be a boolean, "%s" given.', __METHOD__, get_debug_type($skipDoctrineAnnotations)));
         }
 
-        $this->annotationReader = $annotationReader;
+        $this->enableAnnotationMapping = true;
 
         return $this;
     }
@@ -240,7 +245,28 @@ class ValidatorBuilder
      */
     public function disableAnnotationMapping()
     {
+        $this->enableAnnotationMapping = false;
         $this->annotationReader = null;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDoctrineAnnotationReader(?Reader $reader): self
+    {
+        $this->annotationReader = $reader;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addDefaultDoctrineAnnotationReader(): self
+    {
+        $this->annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
 
         return $this;
     }
@@ -252,7 +278,7 @@ class ValidatorBuilder
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory)
     {
-        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || null !== $this->annotationReader) {
+        if (\count($this->xmlMappings) > 0 || \count($this->yamlMappings) > 0 || \count($this->methodMappings) > 0 || $this->enableAnnotationMapping) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -346,7 +372,7 @@ class ValidatorBuilder
             $loaders[] = new StaticMethodLoader($methodName);
         }
 
-        if ($this->annotationReader) {
+        if ($this->enableAnnotationMapping) {
             $loaders[] = new AnnotationLoader($this->annotationReader);
         }
 

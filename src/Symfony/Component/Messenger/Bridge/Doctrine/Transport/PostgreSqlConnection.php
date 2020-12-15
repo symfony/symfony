@@ -64,7 +64,7 @@ final class PostgreSqlConnection extends Connection
         if (!$this->listening) {
             // This is secure because the table name must be a valid identifier:
             // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-            $this->driverConnection->exec(sprintf('LISTEN "%s"', $this->configuration['table_name']));
+            $this->executeStatement(sprintf('LISTEN "%s"', $this->configuration['table_name']));
             $this->listening = true;
         }
 
@@ -87,7 +87,7 @@ final class PostgreSqlConnection extends Connection
     {
         parent::setup();
 
-        $this->driverConnection->exec(implode("\n", $this->getTriggerSql()));
+        $this->executeStatement(implode("\n", $this->getTriggerSql()));
     }
 
     /**
@@ -134,7 +134,7 @@ SQL
             return;
         }
 
-        $this->driverConnection->exec(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
+        $this->executeStatement(sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
         $this->listening = false;
     }
 }

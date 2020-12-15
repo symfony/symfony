@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\LogicException;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Expression extends Constraint
 {
-    const EXPRESSION_FAILED_ERROR = '6b3befbc-2f01-4ddf-be21-b57898905284';
+    public const EXPRESSION_FAILED_ERROR = '6b3befbc-2f01-4ddf-be21-b57898905284';
 
     protected static $errorNames = [
         self::EXPRESSION_FAILED_ERROR => 'EXPRESSION_FAILED_ERROR',

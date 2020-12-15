@@ -94,6 +94,14 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         return ['prefix', 'pattern', 'recursive', 'hash', 'forExclusion', 'excludedPrefixes'];
     }
 
+    /**
+     * @internal
+     */
+    public function __wakeup(): void
+    {
+        $this->globBrace = \defined('GLOB_BRACE') ? \GLOB_BRACE : 0;
+    }
+
     public function getIterator(): \Traversable
     {
         if (!file_exists($this->prefix) || (!$this->recursive && '' === $this->pattern)) {

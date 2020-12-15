@@ -17,9 +17,11 @@
     ],
     "require": {
         "php": ">=7.2.5",
+        "async-aws/core": "^1.5",
         "async-aws/sqs": "^1.0",
         "symfony/messenger": "^4.3|^5.0",
-        "symfony/service-contracts": "^1.1|^2"
+        "symfony/service-contracts": "^1.1|^2",
+        "psr/log": "^1.0"
     },
     "require-dev": {
         "symfony/http-client-contracts": "^1.0|^2.0",

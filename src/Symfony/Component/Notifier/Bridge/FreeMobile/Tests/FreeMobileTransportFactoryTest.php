@@ -19,9 +19,9 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class FreeMobileTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $dsn = 'freemobile://login:pass@default?phone=0611223344';
         $transport = $factory->create(Dsn::fromString($dsn));
@@ -30,38 +30,49 @@ final class FreeMobileTransportFactoryTest extends TestCase
         $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoPhoneThrowsMalformed(): void
+    public function testCreateWithNoPhoneThrowsIncompleteDsnException()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
-        $dsnIncomplete = 'freemobile://login:pass@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('freemobile://login:pass@default'));
     }
 
-    public function testSupportsFreeMobileScheme(): void
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'freemobile://login:pass@default?phone=0611223344';
-        $dsnUnsupported = 'foobarmobile://login:pass@default?phone=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertTrue($factory->supports(Dsn::fromString('freemobile://login:pass@default?phone=0611223344')));
     }
 
-    public function testNonFreeMobileSchemeThrows(): void
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
-        $factory = $this->initFactory();
+        $factory = $this->createFactory();
+
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://login:pass@default?phone=0611223344')));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
+    {
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'foobarmobile://login:pass@default?phone=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        $factory->create(Dsn::fromString('somethingElse://login:pass@default?phone=0611223344'));
     }
 
-    private function initFactory(): FreeMobileTransportFactory
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(UnsupportedSchemeException::class);
+
+        // unsupported scheme and missing "phone" option
+        $factory->create(Dsn::fromString('somethingElse://login:pass@default'));
+    }
+
+    private function createFactory(): FreeMobileTransportFactory
     {
         return new FreeMobileTransportFactory();
     }

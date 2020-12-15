@@ -14,8 +14,10 @@ namespace Symfony\Component\Console\Tests\Style;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -114,5 +116,19 @@ class SymfonyStyleTest extends TestCase
         $style = new SymfonyStyle($this->getMockBuilder(InputInterface::class)->getMock(), $output);
 
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
+    }
+
+    public function testMemoryConsumption()
+    {
+        $io = new SymfonyStyle(new ArrayInput([]), new NullOutput());
+        $str = 'teststr';
+        $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
+        $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
+        $start = memory_get_usage();
+        for ($i = 0; $i < 100; ++$i) {
+            $io->writeln($str, SymfonyStyle::VERBOSITY_QUIET);
+        }
+
+        $this->assertSame(0, memory_get_usage() - $start);
     }
 }

@@ -19,9 +19,9 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class TelegramTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
-        $factory = new TelegramTransportFactory();
+        $factory = $this->createFactory();
 
         $host = 'testHost';
         $channel = 'testChannel';
@@ -31,35 +31,47 @@ final class TelegramTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('telegram://%s?channel=%s', $host, $channel), (string) $transport);
     }
 
-    public function testCreateWithNoPasswordThrowsMalformed(): void
+    public function testCreateWithNoPasswordThrowsIncompleteDsnException()
     {
-        $factory = new TelegramTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
         $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'simpleToken', 'testHost', 'testChannel')));
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function testCreateWithNoTokenThrowsIncompleteDsnException()
     {
-        $factory = new TelegramTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
         $factory->create(Dsn::fromString(sprintf('telegram://%s/?channel=%s', 'testHost', 'testChannel')));
     }
 
-    public function testSupportsTelegramScheme(): void
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = new TelegramTransportFactory();
+        $factory = $this->createFactory();
 
         $this->assertTrue($factory->supports(Dsn::fromString('telegram://host/?channel=testChannel')));
+    }
+
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
+    {
+        $factory = $this->createFactory();
+
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
     }
 
-    public function testNonTelegramSchemeThrows(): void
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
     {
-        $factory = new TelegramTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
+
         $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
+    }
+
+    private function createFactory(): TelegramTransportFactory
+    {
+        return new TelegramTransportFactory();
     }
 }

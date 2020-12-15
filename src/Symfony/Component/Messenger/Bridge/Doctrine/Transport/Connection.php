@@ -16,6 +16,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Comparator;
@@ -159,9 +160,23 @@ class Connection implements ResetInterface
                 ->orderBy('available_at', 'ASC')
                 ->setMaxResults(1);
 
+            // Append pessimistic write lock to FROM clause if db platform supports it
+            $sql = $query->getSQL();
+            if (($fromPart = $query->getQueryPart('from')) &&
+                ($table = $fromPart[0]['table'] ?? null) &&
+                ($alias = $fromPart[0]['alias'] ?? null)
+            ) {
+                $fromClause = sprintf('%s %s', $table, $alias);
+                $sql = str_replace(
+                    sprintf('FROM %s WHERE', $fromClause),
+                    sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
+                    $sql
+                );
+            }
+
             // use SELECT ... FOR UPDATE to lock table
             $stmt = $this->executeQuery(
-                $query->getSQL().' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
+                $sql.' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
                 $query->getParameters(),
                 $query->getParameterTypes()
             );
@@ -341,7 +356,7 @@ class Connection implements ResetInterface
         return $stmt;
     }
 
-    private function executeStatement(string $sql, array $parameters = [], array $types = [])
+    protected function executeStatement(string $sql, array $parameters = [], array $types = [])
     {
         try {
             if (method_exists($this->driverConnection, 'executeStatement')) {

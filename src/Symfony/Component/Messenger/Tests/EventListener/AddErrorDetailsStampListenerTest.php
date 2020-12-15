@@ -17,7 +17,7 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $envelope = new Envelope(new \stdClass());
         $exception = new \Exception('It failed!');
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
-        $expectedStamp = new ErrorDetailsStamp($exception);
+        $expectedStamp = ErrorDetailsStamp::create($exception);
 
         $listener->onMessageFailed($event);
 
@@ -29,12 +29,12 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $listener = new AddErrorDetailsStampListener();
 
         $envelope = new Envelope(new \stdClass(), [
-            new ErrorDetailsStamp(new \InvalidArgumentException('First error!')),
+            ErrorDetailsStamp::create(new \InvalidArgumentException('First error!')),
         ]);
 
         $exception = new \Exception('Second error!');
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
-        $expectedStamp = new ErrorDetailsStamp($exception);
+        $expectedStamp = ErrorDetailsStamp::create($exception);
 
         $listener->onMessageFailed($event);
 

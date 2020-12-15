@@ -194,4 +194,17 @@ class GlobResourceTest extends TestCase
 
         $this->assertSame([], array_keys(iterator_to_array($resource)));
     }
+
+    public function testSerializeUnserialize()
+    {
+        $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
+        $resource = new GlobResource($dir, '/Resource', true);
+
+        $newResource = unserialize(serialize($resource));
+
+        $p = new \ReflectionProperty($resource, 'globBrace');
+        $p->setAccessible(true);
+
+        $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
+    }
 }

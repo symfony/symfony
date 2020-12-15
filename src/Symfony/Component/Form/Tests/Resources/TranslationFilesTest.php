@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests\Resources;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\Xml\Loader;
+use Symfony\Component\Translation\Util\XliffUtils;
 
 class TranslationFilesTest extends TestCase
 {
@@ -21,13 +21,27 @@ class TranslationFilesTest extends TestCase
      */
     public function testTranslationFileIsValid($filePath)
     {
-        $loader = class_exists(Loader::class)
-            ? [new Loader(), 'loadFile']
-            : ['PHPUnit\Util\XML', 'loadfile'];
+        $document = new \DOMDocument();
+        $document->loadXML(file_get_contents($filePath));
 
-        $loader($filePath, false, false, true);
+        $errors = XliffUtils::validateSchema($document);
 
-        $this->addToAssertionCount(1);
+        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
+    }
+
+    /**
+     * @dataProvider provideTranslationFiles
+     * @group Legacy
+     */
+    public function testTranslationFileIsValidWithoutEntityLoader($filePath)
+    {
+        $document = new \DOMDocument();
+        $document->loadXML(file_get_contents($filePath));
+        libxml_disable_entity_loader(true);
+
+        $errors = XliffUtils::validateSchema($document);
+
+        $this->assertCount(0, $errors, sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
     public function provideTranslationFiles()

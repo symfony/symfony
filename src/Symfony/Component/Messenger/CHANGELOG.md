@@ -1,25 +1,30 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+
 5.2.0
 -----
 
-* The `RedeliveryStamp` will no longer be populated with error data. This information is now stored in the `ErrorDetailsStamp` instead.
-* Added `FlattenExceptionNormalizer` to give more information about the exception on Messenger background processes. The `FlattenExceptionNormalizer` has a higher priority than `ProblemNormalizer` and it is only used when the Messenger serialization context is set.
-* Added factory methods `DelayStamp::delayFor(\DateInterval)` and `DelayStamp::delayUntil(\DateTimeInterface)`.
-* Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
-* Added `WorkerMessageRetriedEvent`
-* Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
+ * The `RedeliveryStamp` will no longer be populated with error data. This information is now stored in the `ErrorDetailsStamp` instead.
+ * Added `FlattenExceptionNormalizer` to give more information about the exception on Messenger background processes. The `FlattenExceptionNormalizer` has a higher priority than `ProblemNormalizer` and it is only used when the Messenger serialization context is set.
+ * Added factory methods `DelayStamp::delayFor(\DateInterval)` and `DelayStamp::delayUntil(\DateTimeInterface)`.
+ * Removed the exception when dispatching a message with a `DispatchAfterCurrentBusStamp` and not in a context of another dispatch call
+ * Added `WorkerMessageRetriedEvent`
+ * Added `WorkerMessageReceivedEvent::setEnvelope()` and made event mutable
 
 5.1.0
 -----
 
-* Moved AmqpExt transport to package `symfony/amqp-messenger`. All classes in `Symfony\Component\Messenger\Transport\AmqpExt` have been moved to `Symfony\Component\Messenger\Bridge\Amqp\Transport`
-* Moved Doctrine transport to package `symfony/doctrine-messenger`. All classes in `Symfony\Component\Messenger\Transport\Doctrine` have been moved to `Symfony\Component\Messenger\Bridge\Doctrine\Transport`
-* Moved RedisExt transport to package `symfony/redis-messenger`. All classes in `Symfony\Component\Messenger\Transport\RedisExt` have been moved to `Symfony\Component\Messenger\Bridge\Redis\Transport`
-* Added support for passing a `\Throwable` argument to `RetryStrategyInterface` methods. This allows to define strategies based on the reason of the handling failure.
-* Added `StopWorkerOnFailureLimitListener` to stop the worker after a specified amount of failed messages is reached.
-* Added `RecoverableExceptionInterface` interface to force retry.
+ * Moved AmqpExt transport to package `symfony/amqp-messenger`. All classes in `Symfony\Component\Messenger\Transport\AmqpExt` have been moved to `Symfony\Component\Messenger\Bridge\Amqp\Transport`
+ * Moved Doctrine transport to package `symfony/doctrine-messenger`. All classes in `Symfony\Component\Messenger\Transport\Doctrine` have been moved to `Symfony\Component\Messenger\Bridge\Doctrine\Transport`
+ * Moved RedisExt transport to package `symfony/redis-messenger`. All classes in `Symfony\Component\Messenger\Transport\RedisExt` have been moved to `Symfony\Component\Messenger\Bridge\Redis\Transport`
+ * Added support for passing a `\Throwable` argument to `RetryStrategyInterface` methods. This allows to define strategies based on the reason of the handling failure.
+ * Added `StopWorkerOnFailureLimitListener` to stop the worker after a specified amount of failed messages is reached.
+ * Added `RecoverableExceptionInterface` interface to force retry.
 
 5.0.0
 -----

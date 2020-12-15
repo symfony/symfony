@@ -2,14 +2,14 @@
     <thead class="trace-head">
         <tr>
             <th class="sf-toggle" data-toggle-selector="#trace-text-<?= $index; ?>" data-toggle-initial="<?= 1 === $index ? 'display' : ''; ?>">
-                <h3 class="trace-class">
+                <div class="trace-class">
                     <?php if ($numExceptions > 1) { ?>
                         <span class="text-muted">[<?= $numExceptions - $index + 1; ?>/<?= $numExceptions; ?>]</span>
                     <?php } ?>
                     <?= ($parts = explode('\\', $exception['class'])) ? end($parts) : ''; ?>
                     <span class="icon icon-close"><?= $this->include('assets/images/icon-minus-square-o.svg'); ?></span>
                     <span class="icon icon-open"><?= $this->include('assets/images/icon-plus-square-o.svg'); ?></span>
-                </h3>
+                </div>
             </th>
         </tr>
     </thead>

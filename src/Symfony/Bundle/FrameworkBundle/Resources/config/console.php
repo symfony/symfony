@@ -129,7 +129,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('console.command.event_dispatcher_debug', EventDispatcherDebugCommand::class)
             ->args([
-                service('event_dispatcher'),
+                tagged_locator('event_dispatcher.dispatcher'),
             ])
             ->tag('console.command', ['command' => 'debug:event-dispatcher'])
 

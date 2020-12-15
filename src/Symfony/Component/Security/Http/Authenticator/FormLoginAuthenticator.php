@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Authenticator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -40,7 +41,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -49,6 +50,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     private $successHandler;
     private $failureHandler;
     private $options;
+    private $httpKernel;
 
     public function __construct(HttpUtils $httpUtils, UserProviderInterface $userProvider, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options)
     {
@@ -145,5 +147,25 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
 
         return $credentials;
+    }
+
+    public function setHttpKernel(HttpKernelInterface $httpKernel): void
+    {
+        $this->httpKernel = $httpKernel;
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        if (!$this->options['use_forward']) {
+            return parent::start($request, $authException);
+        }
+
+        $subRequest = $this->httpUtils->createRequest($request, $this->options['login_path']);
+        $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        if (200 === $response->getStatusCode()) {
+            $response->setStatusCode(401);
+        }
+
+        return $response;
     }
 }

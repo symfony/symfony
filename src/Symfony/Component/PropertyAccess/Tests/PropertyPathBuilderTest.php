@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPathBuilder;
  */
 class PropertyPathBuilderTest extends TestCase
 {
-    const PREFIX = 'old1[old2].old3[old4][old5].old6';
+    private const PREFIX = 'old1[old2].old3[old4][old5].old6';
 
     /**
      * @var PropertyPathBuilder

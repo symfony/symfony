@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class Passport implements UserPassportInterface
 {

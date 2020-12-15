@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
- * Annotation loader.
+ * Loader for Doctrine annotations and PHP 8 attributes.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexander M. Turek <me@derrabus.de>

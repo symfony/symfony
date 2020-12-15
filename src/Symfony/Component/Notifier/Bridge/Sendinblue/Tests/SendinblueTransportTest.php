@@ -14,8 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -23,30 +23,31 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SendinblueTransportTest extends TestCase
 {
-    public function testToStringContainsProperties(): void
+    public function testToStringContainsProperties()
     {
         $transport = $this->initTransport();
 
         $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
     }
 
-    public function testSupportsMessageInterface(): void
+    public function testSupportsMessageInterface()
     {
         $transport = $this->initTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class), 'Hello!'));
+        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException(): void
+    public function testSendNonSmsMessageThrowsException()
     {
         $transport = $this->initTransport();
 
-        $this->expectException(LogicException::class);
+        $this->expectException(UnsupportedMessageTypeException::class);
+
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))

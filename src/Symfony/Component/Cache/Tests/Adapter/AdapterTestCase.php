@@ -118,9 +118,9 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $metadata = $item->getMetadata();
         $this->assertArrayHasKey(CacheItem::METADATA_CTIME, $metadata);
-        $this->assertEqualsWithDelta(1000, $metadata[CacheItem::METADATA_CTIME], 6);
+        $this->assertEqualsWithDelta(999, $metadata[CacheItem::METADATA_CTIME], 10);
         $this->assertArrayHasKey(CacheItem::METADATA_EXPIRY, $metadata);
-        $this->assertEqualsWithDelta(9.5 + time(), $metadata[CacheItem::METADATA_EXPIRY], 0.6);
+        $this->assertEqualsWithDelta(9 + time(), $metadata[CacheItem::METADATA_EXPIRY], 1);
     }
 
     public function testDefaultLifeTime()
@@ -271,6 +271,30 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->clear('foo');
         $this->assertFalse($cache->hasItem('foobar'));
         $this->assertTrue($cache->hasItem('barfoo'));
+    }
+
+    public function testWeirdDataMatchingMetadataWrappedValues()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $item = $cache->getItem('foobar');
+
+        // it should be an array containing only one element
+        // with key having a strlen of 10.
+        $weirdDataMatchingMedatataWrappedValue = [
+            1234567890 => [
+                1,
+            ],
+        ];
+
+        $cache->save($item->set($weirdDataMatchingMedatataWrappedValue));
+
+        $this->assertTrue($cache->hasItem('foobar'));
     }
 }
 

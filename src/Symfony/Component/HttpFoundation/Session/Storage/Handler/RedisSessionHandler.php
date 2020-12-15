@@ -93,15 +93,15 @@ class RedisSessionHandler extends AbstractSessionHandler
 
         if ($unlink) {
             try {
-                $this->redis->unlink($this->prefix.$sessionId);
-
-                return true;
+                $unlink = false !== $this->redis->unlink($this->prefix.$sessionId);
             } catch (\Throwable $e) {
                 $unlink = false;
             }
         }
 
-        $this->redis->del($this->prefix.$sessionId);
+        if (!$unlink) {
+            $this->redis->del($this->prefix.$sessionId);
+        }
 
         return true;
     }

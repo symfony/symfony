@@ -485,17 +485,15 @@ class Connection
 
         if ($unlink) {
             try {
-                $this->connection->unlink($this->stream);
-                $this->connection->unlink($this->queue);
-
-                return;
+                $unlink = false !== $this->connection->unlink($this->stream, $this->queue);
             } catch (\Throwable $e) {
                 $unlink = false;
             }
         }
 
-        $this->connection->del($this->stream);
-        $this->connection->del($this->queue);
+        if (!$unlink) {
+            $this->connection->del($this->stream, $this->queue);
+        }
     }
 }
 class_alias(Connection::class, \Symfony\Component\Messenger\Transport\RedisExt\Connection::class);

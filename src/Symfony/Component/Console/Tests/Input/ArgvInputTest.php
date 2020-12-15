@@ -247,6 +247,16 @@ class ArgvInputTest extends TestCase
                 new InputDefinition([new InputOption('foo', 'f', InputOption::VALUE_NONE)]),
                 'The "-Щ" option does not exist.',
             ],
+            [
+                ['cli.php', 'acme:foo', 'bar'],
+                new InputDefinition([new InputArgument('command', InputArgument::REQUIRED)]),
+                'No arguments expected for "acme:foo" command, got "bar"',
+            ],
+            [
+                ['cli.php', 'acme:foo', 'bar'],
+                new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]),
+                'Too many arguments, expected arguments "name".',
+            ],
         ];
     }
 

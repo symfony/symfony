@@ -74,7 +74,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('notifier.transport_factory.firebase', FirebaseTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
-            ->tag('texter.transport_factory')
+            ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.freemobile', FreeMobileTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')

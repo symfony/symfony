@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthenticatorInterface
 {

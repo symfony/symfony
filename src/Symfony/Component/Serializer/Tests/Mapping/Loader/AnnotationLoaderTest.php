@@ -114,5 +114,6 @@ abstract class AnnotationLoaderTest extends TestCase
     }
 
     abstract protected function createLoader(): AnnotationLoader;
+
     abstract protected function getNamespace(): string;
 }

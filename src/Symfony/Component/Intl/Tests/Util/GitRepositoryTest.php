@@ -23,7 +23,7 @@ class GitRepositoryTest extends TestCase
 {
     private $targetDir;
 
-    const REPO_URL = 'https://github.com/symfony/intl.git';
+    private const REPO_URL = 'https://github.com/symfony/intl.git';
 
     /**
      * @before

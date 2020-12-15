@@ -189,7 +189,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        if (isset(self::SCALAR_TYPES[$type])) {
+        $normalizer = $this->getDenormalizer($data, $type, $format, $context);
+
+        // Check for a denormalizer first, e.g. the data is wrapped
+        if (!$normalizer && isset(self::SCALAR_TYPES[$type])) {
             if (!('is_'.$type)($data)) {
                 throw new NotNormalizableValueException(sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data)));
             }
@@ -201,7 +204,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        if ($normalizer = $this->getDenormalizer($data, $type, $format, $context)) {
+        if ($normalizer) {
             return $normalizer->denormalize($data, $type, $format, $context);
         }
 

@@ -21,9 +21,9 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
-    const MESSAGE_TOKEN = 300;
-    const METHOD_ARGUMENTS_TOKEN = 1000;
-    const DOMAIN_TOKEN = 1001;
+    public const MESSAGE_TOKEN = 300;
+    public const METHOD_ARGUMENTS_TOKEN = 1000;
+    public const DOMAIN_TOKEN = 1001;
 
     /**
      * Prefix for new found message.

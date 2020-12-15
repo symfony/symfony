@@ -15,6 +15,7 @@ use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -45,6 +46,7 @@ class Connection
         'queue_name' => 'messages',
         'account' => null,
         'sslmode' => null,
+        'debug' => null,
     ];
 
     private $configuration;
@@ -57,10 +59,11 @@ class Connection
     /** @var string|null */
     private $queueUrl;
 
-    public function __construct(array $configuration, SqsClient $client = null)
+    public function __construct(array $configuration, SqsClient $client = null, string $queueUrl = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->client = $client ?? new SqsClient([]);
+        $this->queueUrl = $queueUrl;
     }
 
     public function __destruct()
@@ -84,8 +87,9 @@ class Connection
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
+     * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
-    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null): self
+    public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null, LoggerInterface $logger = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given Amazon SQS DSN "%s" is invalid.', $dsn));
@@ -123,6 +127,9 @@ class Connection
             'accessKeyId' => urldecode($parsedUrl['user'] ?? '') ?: $options['access_key'] ?? self::DEFAULT_OPTIONS['access_key'],
             'accessKeySecret' => urldecode($parsedUrl['pass'] ?? '') ?: $options['secret_key'] ?? self::DEFAULT_OPTIONS['secret_key'],
         ];
+        if (isset($options['debug'])) {
+            $clientConfiguration['debug'] = $options['debug'];
+        }
         unset($query['region']);
 
         if ('default' !== ($parsedUrl['host'] ?? 'default')) {
@@ -140,7 +147,18 @@ class Connection
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
 
-        return new self($configuration, new SqsClient($clientConfiguration, null, $client));
+        // When the DNS looks like a QueueUrl, we can directly inject it in the connection
+        // https://sqs.REGION.amazonaws.com/ACCOUNT/QUEUE
+        $queueUrl = null;
+        if (
+            'https' === $parsedUrl['scheme']
+            && ($parsedUrl['host'] ?? 'default') === "sqs.{$clientConfiguration['region']}.amazonaws.com"
+            && ($parsedUrl['path'] ?? '/') === "/{$configuration['account']}/{$configuration['queue_name']}"
+        ) {
+            $queueUrl = 'https://'.$parsedUrl['host'].$parsedUrl['path'];
+        }
+
+        return new self($configuration, new SqsClient($clientConfiguration, null, $client, $logger), $queueUrl);
     }
 
     public function get(): ?array

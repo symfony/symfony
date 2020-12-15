@@ -118,6 +118,7 @@
         "luo": "Luo",
         "luy": "Luyia",
         "lv": "Latvia",
+        "mai": "Maithili",
         "mas": "Masai",
         "mer": "Meru",
         "mfe": "Morisyen",
@@ -128,6 +129,7 @@
         "mk": "Makedonia",
         "ml": "Malayalam",
         "mn": "Mongolia",
+        "mni": "Manipuri",
         "mr": "Marathi",
         "ms": "Melayu",
         "mt": "Malta",
@@ -150,6 +152,7 @@
         "or": "Odia",
         "os": "Ossetia",
         "pa": "Punjab",
+        "pcm": "Nigeria Pidgin",
         "pl": "Polandia",
         "prg": "Prusia",
         "ps": "Pashto",
@@ -165,6 +168,7 @@
         "sa": "Sanskerta",
         "sah": "Sakha",
         "saq": "Samburu",
+        "sat": "Santali",
         "sbp": "Sangu",
         "sd": "Sindhi",
         "se": "Sami Sisih Lor",
@@ -223,6 +227,7 @@
         "es_ES": "Spanyol (Eropah)",
         "es_MX": "Spanyol (Meksiko)",
         "nl_BE": "Flemis",
+        "zh_Hans": "Tyonghwa (Ringkes)",
         "zh_Hant": "Tyonghwa (Tradisional)"
     }
 }

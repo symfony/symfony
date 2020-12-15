@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "ext-xml": "*",
         "doctrine/event-manager": "~1.0",
-        "doctrine/persistence": "^1.3|^2",
+        "doctrine/persistence": "^2",
         "twig/twig": "^2.10|^3.0",
         "psr/cache": "~1.0",
         "psr/container": "^1.0",
@@ -116,7 +116,7 @@
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.10|^3.0",
-        "doctrine/orm": "~2.4,>=2.4.5",
+        "doctrine/orm": "^2.7.3",
         "doctrine/doctrine-bundle": "^2.0",
         "guzzlehttp/promises": "^1.3.1",
         "masterminds/html5": "^2.6",
@@ -138,6 +138,7 @@
         "twig/markdown-extra": "^2.12"
     },
     "conflict": {
+        "async-aws/core": "<1.5",
         "doctrine/dbal": "<2.10",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",
@@ -175,6 +176,6 @@
     ],
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "5.2"
+        "branch-version": "5.x"
     }
 }

@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class DateTime extends Constraint
 {
-    const INVALID_FORMAT_ERROR = '1a9da513-2640-4f84-9b6a-4d99dcddc628';
-    const INVALID_DATE_ERROR = 'd52afa47-620d-4d99-9f08-f4d85b36e33c';
-    const INVALID_TIME_ERROR = '5e797c9d-74f7-4098-baa3-94390c447b27';
+    public const INVALID_FORMAT_ERROR = '1a9da513-2640-4f84-9b6a-4d99dcddc628';
+    public const INVALID_DATE_ERROR = 'd52afa47-620d-4d99-9f08-f4d85b36e33c';
+    public const INVALID_TIME_ERROR = '5e797c9d-74f7-4098-baa3-94390c447b27';
 
     protected static $errorNames = [
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',

@@ -39,95 +39,97 @@ use Symfony\Component\Intl\Locale\Locale;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */
 abstract class NumberFormatter
 {
     /* Format style constants */
-    const PATTERN_DECIMAL = 0;
-    const DECIMAL = 1;
-    const CURRENCY = 2;
-    const PERCENT = 3;
-    const SCIENTIFIC = 4;
-    const SPELLOUT = 5;
-    const ORDINAL = 6;
-    const DURATION = 7;
-    const PATTERN_RULEBASED = 9;
-    const IGNORE = 0;
-    const DEFAULT_STYLE = 1;
+    public const PATTERN_DECIMAL = 0;
+    public const DECIMAL = 1;
+    public const CURRENCY = 2;
+    public const PERCENT = 3;
+    public const SCIENTIFIC = 4;
+    public const SPELLOUT = 5;
+    public const ORDINAL = 6;
+    public const DURATION = 7;
+    public const PATTERN_RULEBASED = 9;
+    public const IGNORE = 0;
+    public const DEFAULT_STYLE = 1;
 
     /* Format type constants */
-    const TYPE_DEFAULT = 0;
-    const TYPE_INT32 = 1;
-    const TYPE_INT64 = 2;
-    const TYPE_DOUBLE = 3;
-    const TYPE_CURRENCY = 4;
+    public const TYPE_DEFAULT = 0;
+    public const TYPE_INT32 = 1;
+    public const TYPE_INT64 = 2;
+    public const TYPE_DOUBLE = 3;
+    public const TYPE_CURRENCY = 4;
 
     /* Numeric attribute constants */
-    const PARSE_INT_ONLY = 0;
-    const GROUPING_USED = 1;
-    const DECIMAL_ALWAYS_SHOWN = 2;
-    const MAX_INTEGER_DIGITS = 3;
-    const MIN_INTEGER_DIGITS = 4;
-    const INTEGER_DIGITS = 5;
-    const MAX_FRACTION_DIGITS = 6;
-    const MIN_FRACTION_DIGITS = 7;
-    const FRACTION_DIGITS = 8;
-    const MULTIPLIER = 9;
-    const GROUPING_SIZE = 10;
-    const ROUNDING_MODE = 11;
-    const ROUNDING_INCREMENT = 12;
-    const FORMAT_WIDTH = 13;
-    const PADDING_POSITION = 14;
-    const SECONDARY_GROUPING_SIZE = 15;
-    const SIGNIFICANT_DIGITS_USED = 16;
-    const MIN_SIGNIFICANT_DIGITS = 17;
-    const MAX_SIGNIFICANT_DIGITS = 18;
-    const LENIENT_PARSE = 19;
+    public const PARSE_INT_ONLY = 0;
+    public const GROUPING_USED = 1;
+    public const DECIMAL_ALWAYS_SHOWN = 2;
+    public const MAX_INTEGER_DIGITS = 3;
+    public const MIN_INTEGER_DIGITS = 4;
+    public const INTEGER_DIGITS = 5;
+    public const MAX_FRACTION_DIGITS = 6;
+    public const MIN_FRACTION_DIGITS = 7;
+    public const FRACTION_DIGITS = 8;
+    public const MULTIPLIER = 9;
+    public const GROUPING_SIZE = 10;
+    public const ROUNDING_MODE = 11;
+    public const ROUNDING_INCREMENT = 12;
+    public const FORMAT_WIDTH = 13;
+    public const PADDING_POSITION = 14;
+    public const SECONDARY_GROUPING_SIZE = 15;
+    public const SIGNIFICANT_DIGITS_USED = 16;
+    public const MIN_SIGNIFICANT_DIGITS = 17;
+    public const MAX_SIGNIFICANT_DIGITS = 18;
+    public const LENIENT_PARSE = 19;
 
     /* Text attribute constants */
-    const POSITIVE_PREFIX = 0;
-    const POSITIVE_SUFFIX = 1;
-    const NEGATIVE_PREFIX = 2;
-    const NEGATIVE_SUFFIX = 3;
-    const PADDING_CHARACTER = 4;
-    const CURRENCY_CODE = 5;
-    const DEFAULT_RULESET = 6;
-    const PUBLIC_RULESETS = 7;
+    public const POSITIVE_PREFIX = 0;
+    public const POSITIVE_SUFFIX = 1;
+    public const NEGATIVE_PREFIX = 2;
+    public const NEGATIVE_SUFFIX = 3;
+    public const PADDING_CHARACTER = 4;
+    public const CURRENCY_CODE = 5;
+    public const DEFAULT_RULESET = 6;
+    public const PUBLIC_RULESETS = 7;
 
     /* Format symbol constants */
-    const DECIMAL_SEPARATOR_SYMBOL = 0;
-    const GROUPING_SEPARATOR_SYMBOL = 1;
-    const PATTERN_SEPARATOR_SYMBOL = 2;
-    const PERCENT_SYMBOL = 3;
-    const ZERO_DIGIT_SYMBOL = 4;
-    const DIGIT_SYMBOL = 5;
-    const MINUS_SIGN_SYMBOL = 6;
-    const PLUS_SIGN_SYMBOL = 7;
-    const CURRENCY_SYMBOL = 8;
-    const INTL_CURRENCY_SYMBOL = 9;
-    const MONETARY_SEPARATOR_SYMBOL = 10;
-    const EXPONENTIAL_SYMBOL = 11;
-    const PERMILL_SYMBOL = 12;
-    const PAD_ESCAPE_SYMBOL = 13;
-    const INFINITY_SYMBOL = 14;
-    const NAN_SYMBOL = 15;
-    const SIGNIFICANT_DIGIT_SYMBOL = 16;
-    const MONETARY_GROUPING_SEPARATOR_SYMBOL = 17;
+    public const DECIMAL_SEPARATOR_SYMBOL = 0;
+    public const GROUPING_SEPARATOR_SYMBOL = 1;
+    public const PATTERN_SEPARATOR_SYMBOL = 2;
+    public const PERCENT_SYMBOL = 3;
+    public const ZERO_DIGIT_SYMBOL = 4;
+    public const DIGIT_SYMBOL = 5;
+    public const MINUS_SIGN_SYMBOL = 6;
+    public const PLUS_SIGN_SYMBOL = 7;
+    public const CURRENCY_SYMBOL = 8;
+    public const INTL_CURRENCY_SYMBOL = 9;
+    public const MONETARY_SEPARATOR_SYMBOL = 10;
+    public const EXPONENTIAL_SYMBOL = 11;
+    public const PERMILL_SYMBOL = 12;
+    public const PAD_ESCAPE_SYMBOL = 13;
+    public const INFINITY_SYMBOL = 14;
+    public const NAN_SYMBOL = 15;
+    public const SIGNIFICANT_DIGIT_SYMBOL = 16;
+    public const MONETARY_GROUPING_SEPARATOR_SYMBOL = 17;
 
     /* Rounding mode values used by NumberFormatter::setAttribute() with NumberFormatter::ROUNDING_MODE attribute */
-    const ROUND_CEILING = 0;
-    const ROUND_FLOOR = 1;
-    const ROUND_DOWN = 2;
-    const ROUND_UP = 3;
-    const ROUND_HALFEVEN = 4;
-    const ROUND_HALFDOWN = 5;
-    const ROUND_HALFUP = 6;
+    public const ROUND_CEILING = 0;
+    public const ROUND_FLOOR = 1;
+    public const ROUND_DOWN = 2;
+    public const ROUND_UP = 3;
+    public const ROUND_HALFEVEN = 4;
+    public const ROUND_HALFDOWN = 5;
+    public const ROUND_HALFUP = 6;
 
     /* Pad position values used by NumberFormatter::setAttribute() with NumberFormatter::PADDING_POSITION attribute */
-    const PAD_BEFORE_PREFIX = 0;
-    const PAD_AFTER_PREFIX = 1;
-    const PAD_BEFORE_SUFFIX = 2;
-    const PAD_AFTER_SUFFIX = 3;
+    public const PAD_BEFORE_PREFIX = 0;
+    public const PAD_AFTER_PREFIX = 1;
+    public const PAD_BEFORE_SUFFIX = 2;
+    public const PAD_AFTER_SUFFIX = 3;
 
     /**
      * The error code from the last operation.

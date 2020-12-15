@@ -12,9 +12,14 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 
 use Doctrine\DBAL\Abstraction\Result as AbstractionResult;
+use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Result as DriverResult;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\SQLServer2012Platform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -118,7 +123,7 @@ class ConnectionTest extends TestCase
 
     private function getDBALConnectionMock()
     {
-        $driverConnection = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $driverConnection = $this->createMock(DBALConnection::class);
         $platform = $this->createMock(AbstractPlatform::class);
         $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
         $configuration = $this->createMock(\Doctrine\DBAL\Configuration::class);
@@ -347,6 +352,55 @@ class ConnectionTest extends TestCase
         $this->assertEquals(2, $doctrineEnvelopes[1]['id']);
         $this->assertEquals('{"message":"Hi again"}', $doctrineEnvelopes[1]['body']);
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
+    }
+
+    /**
+     * @dataProvider providePlatformSql
+     */
+    public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
+    {
+        $driverConnection = $this->createMock(DBALConnection::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('createQueryBuilder')->willReturnCallback(function () use ($driverConnection) {
+            return new QueryBuilder($driverConnection);
+        });
+
+        if (interface_exists(DriverResult::class)) {
+            $result = $this->createMock(DriverResult::class);
+            $result->method('fetchAssociative')->willReturn(false);
+
+            if (class_exists(Result::class)) {
+                $result = new Result($result, $driverConnection);
+            }
+        } else {
+            $result = $this->createMock(ResultStatement::class);
+            $result->method('fetch')->willReturn(false);
+        }
+
+        $driverConnection->expects($this->once())->method('beginTransaction');
+        $driverConnection
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with($expectedSql)
+            ->willReturn($result)
+        ;
+        $driverConnection->expects($this->once())->method('commit');
+
+        $connection = new Connection([], $driverConnection);
+        $connection->get();
+    }
+
+    public function providePlatformSql(): iterable
+    {
+        yield 'MySQL' => [
+            new MySQL57Platform(),
+            'SELECT m.* FROM messenger_messages m WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC LIMIT 1 FOR UPDATE',
+        ];
+
+        yield 'SQL Server' => [
+            new SQLServer2012Platform(),
+            'SELECT m.* FROM messenger_messages m WITH (UPDLOCK, ROWLOCK) WHERE (m.delivered_at is null OR m.delivered_at < ?) AND (m.available_at <= ?) AND (m.queue_name = ?) ORDER BY available_at ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY  ',
+        ];
     }
 
     public function testConfigureSchema()

@@ -23,6 +23,7 @@ class TextareaType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['pattern'] = null;
+        unset($view->vars['attr']['pattern']);
     }
 
     /**

@@ -135,7 +135,7 @@ class JsonDescriptor extends Descriptor
 
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
-        $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, \array_key_exists('event', $options) ? $options['event'] : null), $options);
+        $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, $options), $options);
     }
 
     protected function describeCallable($callable, array $options = [])
@@ -157,7 +157,7 @@ class JsonDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -274,18 +274,19 @@ class JsonDescriptor extends Descriptor
         ];
     }
 
-    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, string $event = null): array
+    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, array $options): array
     {
         $data = [];
+        $event = \array_key_exists('event', $options) ? $options['event'] : null;
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
-            foreach ($registeredListeners as $listener) {
+            foreach ($eventDispatcher->getListeners($event) as $listener) {
                 $l = $this->getCallableData($listener);
                 $l['priority'] = $eventDispatcher->getListenerPriority($event, $listener);
                 $data[] = $l;
             }
         } else {
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {

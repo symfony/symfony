@@ -89,7 +89,8 @@ class PropertyInfoLoaderTest extends TestCase
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
 
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addLoader($propertyInfoLoader)
             ->getValidator()
         ;
@@ -220,7 +221,8 @@ class PropertyInfoLoaderTest extends TestCase
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
         $validator = Validation::createValidatorBuilder()
-            ->enableAnnotationMapping()
+            ->enableAnnotationMapping(true)
+            ->addDefaultDoctrineAnnotationReader()
             ->addLoader($propertyInfoLoader)
             ->getValidator()
         ;

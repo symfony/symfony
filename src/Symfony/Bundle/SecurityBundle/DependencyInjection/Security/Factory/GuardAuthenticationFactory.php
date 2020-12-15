@@ -27,7 +27,7 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
  *
  * @internal
  */
-class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface, EntryPointFactoryInterface
+class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {
     public function getPosition()
     {
@@ -102,6 +102,10 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         $userProvider = new Reference($userProviderId);
         $authenticatorIds = [];
 
+        if (isset($config['entry_point'])) {
+            throw new InvalidConfigurationException('The "security.firewall.'.$firewallName.'.guard.entry_point" option has no effect in the new authenticator system, configure "security.firewall.'.$firewallName.'.entry_point" instead.');
+        }
+
         $guardAuthenticatorIds = $config['authenticators'];
         foreach ($guardAuthenticatorIds as $i => $guardAuthenticatorId) {
             $container->setDefinition($authenticatorIds[] = 'security.authenticator.guard.'.$firewallName.'.'.$i, new Definition(GuardBridgeAuthenticator::class))
@@ -112,15 +116,6 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         }
 
         return $authenticatorIds;
-    }
-
-    public function registerEntryPoint(ContainerBuilder $container, string $firewallName, array $config): ?string
-    {
-        try {
-            return $this->determineEntryPoint(null, $config);
-        } catch (\LogicException $e) {
-            throw new InvalidConfigurationException(sprintf('Because you have multiple guard authenticators, you need to set the "entry_point" key to one of your authenticators (%s).', implode(', ', $config['authenticators'])));
-        }
     }
 
     private function determineEntryPoint(?string $defaultEntryPointId, array $config): string

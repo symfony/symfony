@@ -79,8 +79,8 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
-        $realBuildDir = $kernel->getContainer()->getParameter('kernel.build_dir');
         $realCacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
+        $realBuildDir = $kernel->getContainer()->hasParameter('kernel.build_dir') ? $kernel->getContainer()->getParameter('kernel.build_dir') : $realCacheDir;
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
@@ -91,13 +91,20 @@ EOF
         }
 
         $useBuildDir = $realBuildDir !== $realCacheDir;
+        $oldBuildDir = substr($realBuildDir, 0, -1).('~' === substr($realBuildDir, -1) ? '+' : '~');
         if ($useBuildDir) {
-            $oldBuildDir = substr($realBuildDir, 0, -1).('~' === substr($realBuildDir, -1) ? '+' : '~');
             $fs->remove($oldBuildDir);
 
             if (!is_writable($realBuildDir)) {
                 throw new RuntimeException(sprintf('Unable to write in the "%s" directory.', $realBuildDir));
             }
+
+            if ($this->isNfs($realCacheDir)) {
+                $fs->remove($realCacheDir);
+            } else {
+                $fs->rename($realCacheDir, $oldCacheDir);
+            }
+            $fs->mkdir($realCacheDir);
         }
 
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
@@ -114,7 +121,7 @@ EOF
 
         // the warmup cache dir name must have the same length as the real one
         // to avoid the many problems in serialized resources files
-        $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
+        $warmupDir = substr($realBuildDir, 0, -1).('_' === substr($realBuildDir, -1) ? '-' : '_');
 
         if ($output->isVerbose() && $fs->exists($warmupDir)) {
             $io->comment('Clearing outdated warmup directory...');
@@ -153,34 +160,14 @@ EOF
                 touch($warmupDir.'/'.$containerDir.'.legacy');
             }
 
-            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
-                foreach ($mounts as $mount) {
-                    $mount = \array_slice(explode(' ', $mount), 1, -3);
-                    if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {
-                        continue;
-                    }
-                    $mount = implode(' ', $mount).'/';
-
-                    if (0 === strpos($realCacheDir, $mount)) {
-                        $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
-                        $oldCacheDir = false;
-                        break;
-                    }
-                }
-            }
-
-            if ($oldCacheDir) {
-                $fs->rename($realCacheDir, $oldCacheDir);
+            if ($this->isNfs($realBuildDir)) {
+                $io->note('For better performances, you should move the cache and log directories to a non-shared folder of the VM.');
+                $fs->remove($realBuildDir);
             } else {
-                $fs->remove($realCacheDir);
-            }
-            $fs->rename($warmupDir, $realCacheDir);
-
-            if ($useBuildDir) {
                 $fs->rename($realBuildDir, $oldBuildDir);
-                // Copy the content of the warmed cache in the build dir
-                $fs->mirror($realCacheDir, $realBuildDir);
             }
+
+            $fs->rename($warmupDir, $realBuildDir);
 
             if ($output->isVerbose()) {
                 $io->comment('Removing old build and cache directory...');
@@ -212,6 +199,31 @@ EOF
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         return 0;
+    }
+
+    private function isNfs(string $dir): bool
+    {
+        static $mounts = null;
+
+        if (null === $mounts) {
+            $mounts = [];
+            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
+                foreach ($mounts as $mount) {
+                    $mount = \array_slice(explode(' ', $mount), 1, -3);
+                    if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {
+                        continue;
+                    }
+                    $mounts[] = implode(' ', $mount).'/';
+                }
+            }
+        }
+        foreach ($mounts as $mount) {
+            if (0 === strpos($dir, $mount)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function warmup(string $warmupDir, string $realBuildDir, bool $enableOptionalWarmers = true)

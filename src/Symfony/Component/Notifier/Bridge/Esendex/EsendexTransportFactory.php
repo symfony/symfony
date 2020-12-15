@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class EsendexTransportFactory extends AbstractTransportFactory
 {

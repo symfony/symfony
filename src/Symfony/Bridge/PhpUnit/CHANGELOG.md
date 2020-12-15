@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * bumped the minimum PHP version to 7.1.3
+ * bumped the minimum PHPUnit version to 7.5
+ * deprecated the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
+
 5.1.0
 -----
 

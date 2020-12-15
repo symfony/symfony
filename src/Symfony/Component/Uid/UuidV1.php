@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * A v1 UUID contains a 60-bit timestamp and 62 extra unique bits.
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

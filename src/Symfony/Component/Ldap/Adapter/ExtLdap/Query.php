@@ -22,7 +22,7 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
 class Query extends AbstractQuery
 {
     // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
-    const PAGINATION_OID = '1.2.840.113556.1.4.319';
+    public const PAGINATION_OID = '1.2.840.113556.1.4.319';
 
     /** @var Connection */
     protected $connection;
@@ -100,7 +100,7 @@ class Query extends AbstractQuery
             $cookie = '';
             do {
                 if ($pageControl) {
-                    $this->controlPagedResult($con, $pageSize, $cookie);
+                    $this->controlPagedResult($con, $pageSize, true, $cookie);
                 }
                 $sizeLimit = $itemsLeft;
                 if ($pageSize > 0 && $sizeLimit >= $pageSize) {
@@ -174,7 +174,7 @@ class Query extends AbstractQuery
     private function resetPagination()
     {
         $con = $this->connection->getResource();
-        $this->controlPagedResultResponse($con, 0, '');
+        $this->controlPagedResult($con, 0, false, '');
         $this->serverctrls = [];
 
         // This is a workaround for a bit of a bug in the above invocation
@@ -204,15 +204,15 @@ class Query extends AbstractQuery
      *
      * @param resource $con
      */
-    private function controlPagedResult($con, int $pageSize, string $cookie): bool
+    private function controlPagedResult($con, int $pageSize, bool $critical, string $cookie): bool
     {
         if (\PHP_VERSION_ID < 70300) {
-            return ldap_control_paged_result($con, $pageSize, true, $cookie);
+            return ldap_control_paged_result($con, $pageSize, $critical, $cookie);
         }
         $this->serverctrls = [
             [
                 'oid' => \LDAP_CONTROL_PAGEDRESULTS,
-                'isCritical' => true,
+                'isCritical' => $critical,
                 'value' => [
                     'size' => $pageSize,
                     'cookie' => $cookie,

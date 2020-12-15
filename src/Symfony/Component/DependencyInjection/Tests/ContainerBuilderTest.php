@@ -1337,6 +1337,47 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
     }
 
+    public function testGetThrownServiceNotFoundExceptionWithCorrectServiceId()
+    {
+        $this->expectException(ServiceNotFoundException::class);
+        $this->expectExceptionMessage('The service "child_service" has a dependency on a non-existent service "non_existent_service".');
+
+        $container = new ContainerBuilder();
+        $container->register('child_service', \stdClass::class)
+            ->setPublic(false)
+            ->addArgument([
+                'non_existent' => new Reference('non_existent_service'),
+            ])
+        ;
+        $container->register('parent_service', \stdClass::class)
+            ->setPublic(true)
+            ->addArgument([
+                'child_service' => new Reference('child_service'),
+            ])
+        ;
+
+        $container->compile();
+    }
+
+    public function testUnusedServiceRemovedByPassAndServiceNotFoundExceptionWasNotThrown()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service', \stdClass::class)
+            ->setPublic(false)
+            ->addArgument([
+                'non_existent_service' => new Reference('non_existent_service'),
+            ])
+        ;
+
+        try {
+            $container->compile();
+        } catch (ServiceNotFoundException $e) {
+            $this->fail('Should not be thrown');
+        }
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testServiceLocator()
     {
         $container = new ContainerBuilder();
@@ -1393,6 +1434,19 @@ class ContainerBuilderTest extends TestCase
     public function testAlmostCircular($visibility)
     {
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
+        $container->compile();
+
+        $entityManager = $container->get('doctrine.entity_manager');
+        $this->assertEquals(new \stdClass(), $entityManager);
+
+        $pA = $container->get('pA');
+        $this->assertEquals(new \stdClass(), $pA);
+
+        $logger = $container->get('monolog.logger');
+        $this->assertEquals(new \stdClass(), $logger->handler);
+
+        $logger_inline = $container->get('monolog_inline.logger');
+        $this->assertEquals(new \stdClass(), $logger_inline->handler);
 
         $foo = $container->get('foo');
         $this->assertSame($foo, $foo->bar->foobar->foo);

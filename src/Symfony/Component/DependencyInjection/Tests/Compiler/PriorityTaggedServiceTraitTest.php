@@ -15,8 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedForInvalidDefaultMethodClass;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
@@ -131,6 +134,55 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
+
+    public function testTheIndexedTagsByDefaultIndexMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service1', FooTagClass::class)->addTag('my_custom_tag');
+
+        $definition = $container->register('service2', BarTagClass::class);
+        $definition->addTag('my_custom_tag', ['priority' => 100]);
+        $definition->addTag('my_custom_tag', []);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
+        $expected = [
+            'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
+            'service1' => new TypedReference('service1', FooTagClass::class),
+        ];
+        $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
+    }
+
+    /**
+     * @dataProvider provideInvalidDefaultMethods
+     */
+    public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $container = new ContainerBuilder();
+
+        $container->register('service1', FooTaggedForInvalidDefaultMethodClass::class)->addTag('my_custom_tag');
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $tag = new TaggedIteratorArgument('my_custom_tag', $indexAttribute, $defaultIndexMethod);
+        $priorityTaggedServiceTraitImplementation->test($tag, $container);
+    }
+
+    public function provideInvalidDefaultMethods(): iterable
+    {
+        yield ['getMethodShouldBeStatic', null, sprintf('Method "%s::getMethodShouldBeStatic()" should be static.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBeStatic', 'foo', sprintf('Either method "%s::getMethodShouldBeStatic()" should be static or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', null, sprintf('Method "%s::getMethodShouldBePublicInsteadProtected()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadProtected', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadProtected()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', null, sprintf('Method "%s::getMethodShouldBePublicInsteadPrivate()" should be public.', FooTaggedForInvalidDefaultMethodClass::class)];
+        yield ['getMethodShouldBePublicInsteadPrivate', 'foo', sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
 }
 

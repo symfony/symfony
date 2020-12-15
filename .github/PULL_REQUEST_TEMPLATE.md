@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 5.x for features / 4.4 or 5.1 for bug fixes <!-- see below -->
+| Branch?       | 5.x for features / 4.4, 5.1 or 5.2 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->

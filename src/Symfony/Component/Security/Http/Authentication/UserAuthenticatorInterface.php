@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 interface UserAuthenticatorInterface
 {

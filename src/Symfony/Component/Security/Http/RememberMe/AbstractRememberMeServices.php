@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  */
 abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
 {
-    const COOKIE_DELIMITER = ':';
+    public const COOKIE_DELIMITER = ':';
 
     protected $logger;
     protected $options = [

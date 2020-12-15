@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup;
 /**
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 abstract class AbstractTelegramReplyMarkup
 {

@@ -25,22 +25,22 @@ interface ItemInterface extends CacheItemInterface
     /**
      * References the Unix timestamp stating when the item will expire.
      */
-    const METADATA_EXPIRY = 'expiry';
+    public const METADATA_EXPIRY = 'expiry';
 
     /**
      * References the time the item took to be created, in milliseconds.
      */
-    const METADATA_CTIME = 'ctime';
+    public const METADATA_CTIME = 'ctime';
 
     /**
      * References the list of tags that were assigned to the item, as string[].
      */
-    const METADATA_TAGS = 'tags';
+    public const METADATA_TAGS = 'tags';
 
     /**
      * Reserved characters that cannot be used in a key or tag.
      */
-    const RESERVED_CHARACTERS = '{}()/\@:';
+    public const RESERVED_CHARACTERS = '{}()/\@:';
 
     /**
      * Adds a tag to a cache item.

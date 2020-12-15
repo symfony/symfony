@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormInterface;
 
 class DateTimeTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
     protected function setUp(): void
     {

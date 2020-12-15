@@ -226,7 +226,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
         $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
-        $this->assertNull($container->getDefinition('workflow.article')->getArgument('index_4'), 'Workflows has eventsToDispatch=null');
+
+        $args = $container->getDefinition('workflow.article')->getArguments();
+        $this->assertArrayHasKey('index_0', $args);
+        $this->assertArrayHasKey('index_1', $args);
+        $this->assertArrayHasKey('index_3', $args);
+        $this->assertArrayHasKey('index_4', $args);
+        $this->assertNull($args['index_4'], 'Workflows has eventsToDispatch=null');
 
         $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
@@ -490,6 +496,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $definition = $container->getDefinition('debug.debug_handlers_listener');
         $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
         $this->assertSame(8, $definition->getArgument(2));
+    }
+
+    public function testPhpErrorsWithLogLevels()
+    {
+        $container = $this->createContainerFromFile('php_errors_log_levels');
+
+        $definition = $container->getDefinition('debug.debug_handlers_listener');
+        $this->assertEquals(new Reference('monolog.logger.php', ContainerInterface::NULL_ON_INVALID_REFERENCE), $definition->getArgument(1));
+        $this->assertSame([
+            \E_NOTICE => \Psr\Log\LogLevel::ERROR,
+            \E_WARNING => \Psr\Log\LogLevel::ERROR,
+        ], $definition->getArgument(2));
     }
 
     public function testRouter()
@@ -870,7 +888,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
 
-        $this->assertCount($annotations ? 7 : 6, $calls);
+        $this->assertCount($annotations ? 8 : 6, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
@@ -882,6 +900,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $i = 3;
         if ($annotations) {
             $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+            $this->assertSame('setDoctrineAnnotationReader', $calls[++$i][0]);
         }
         $this->assertSame('addMethodMapping', $calls[++$i][0]);
         $this->assertSame(['loadValidatorMetadata'], $calls[$i][1]);
@@ -923,13 +942,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
+        $this->assertCount(8, $calls);
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
-        $this->assertEquals([new Reference('annotation_reader')], $calls[4][1]);
-        $this->assertSame('addMethodMapping', $calls[5][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[5][1]);
-        $this->assertSame('setMappingCache', $calls[6][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[6][1]);
+        $this->assertSame('setDoctrineAnnotationReader', $calls[5][0]);
+        $this->assertEquals([new Reference('annotation_reader')], $calls[5][1]);
+        $this->assertSame('addMethodMapping', $calls[6][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
+        $this->assertSame('setMappingCache', $calls[7][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
         // no cache this time
     }
 
@@ -944,14 +964,15 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(8, $calls);
+        $this->assertCount(9, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
-        $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(['loadValidatorMetadata'], $calls[6][1]);
-        $this->assertSame('setMappingCache', $calls[7][0]);
-        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[7][1]);
+        $this->assertSame('setDoctrineAnnotationReader', $calls[6][0]);
+        $this->assertSame('addMethodMapping', $calls[7][0]);
+        $this->assertSame(['loadValidatorMetadata'], $calls[7][1]);
+        $this->assertSame('setMappingCache', $calls[8][0]);
+        $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[8][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(3, $xmlMappings);
@@ -1004,11 +1025,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
 
-        $this->assertCount($annotations ? 6 : 5, $calls);
+        $this->assertCount($annotations ? 7 : 5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $i = 3;
         if ($annotations) {
             $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+            $this->assertSame('setDoctrineAnnotationReader', $calls[++$i][0]);
         }
         $this->assertSame('setMappingCache', $calls[++$i][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.adapter')], $calls[$i][1]);
@@ -1232,7 +1254,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $projectDir = $container->getParameter('kernel.project_dir');
         $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
         $expectedLoaders = [
-            new Definition(AnnotationLoader::class, [new Reference('annotation_reader')]),
+            new Definition(AnnotationLoader::class, [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]),
             new Definition(XmlFileLoader::class, [$configDir.'/serialization.xml']),
             new Definition(YamlFileLoader::class, [$configDir.'/serialization.yml']),
             new Definition(YamlFileLoader::class, [$projectDir.'/config/serializer/foo.yml']),
@@ -1568,7 +1590,7 @@ abstract class FrameworkExtensionTest extends TestCase
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports): void
+    public function testMailer(string $configFile, array $expectedTransports)
     {
         $container = $this->createContainerFromFile($configFile);
 
@@ -1589,14 +1611,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(3, $h->getMethodCalls());
     }
 
-    public function testMailerWithDisabledMessageBus(): void
+    public function testMailerWithDisabledMessageBus()
     {
         $container = $this->createContainerFromFile('mailer_with_disabled_message_bus');
 
         $this->assertNull($container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
-    public function testMailerWithSpecificMessageBus(): void
+    public function testMailerWithSpecificMessageBus()
     {
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
 
@@ -1607,7 +1629,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
-        $definition = $container->getDefinition('http_client');
+        $definition = $container->getDefinition('http_client.mock_client');
 
         $this->assertSame(MockHttpClient::class, $definition->getClass());
         $this->assertCount(1, $definition->getArguments());
@@ -1615,7 +1637,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $argument = $definition->getArgument(0);
 
         $this->assertInstanceOf(Reference::class, $argument);
+        $this->assertSame('http_client', current($definition->getDecoratedService()));
         $this->assertSame('my_response_factory', (string) $argument);
+    }
+
+    public function testRegisterParameterCollectingBehaviorDescribingTags()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
+        $this->assertEquals([
+            'container.service_locator',
+            'container.service_subscriber',
+            'kernel.event_subscriber',
+            'kernel.locale_aware',
+            'kernel.reset',
+        ], $container->getParameter('container.behavior_describing_tags'));
     }
 
     protected function createContainer(array $data = [])

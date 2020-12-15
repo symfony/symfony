@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * A v4 UUID contains a 122-bit random number.
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

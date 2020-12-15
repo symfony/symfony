@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormError;
 
 class WeekTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\WeekType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\WeekType';
 
     public function testSubmitArray()
     {

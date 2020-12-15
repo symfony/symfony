@@ -31,7 +31,7 @@ class CommandForV9 extends BaseCommand
      */
     protected function createRunner(): BaseRunner
     {
-        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : [];
+        $this->arguments['listeners'] ?? $this->arguments['listeners'] = [];
 
         $registeredLocally = false;
 

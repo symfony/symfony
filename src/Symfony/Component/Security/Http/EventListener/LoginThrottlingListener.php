@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {

@@ -226,10 +226,37 @@ class KernelTest extends TestCase
         $kernel->handle($request, $type, $catch);
     }
 
-    public function testStripComments()
+    /**
+     * @dataProvider getStripCommentsCodes
+     */
+    public function testStripComments(string $source, string $expected)
     {
-        $source = <<<'EOF'
+        $output = Kernel::stripComments($source);
+
+        // Heredocs are preserved, making the output mixing Unix and Windows line
+        // endings, switching to "\n" everywhere on Windows to avoid failure.
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $expected = str_replace("\r\n", "\n", $expected);
+            $output = str_replace("\r\n", "\n", $output);
+        }
+
+        $this->assertEquals($expected, $output);
+    }
+
+    public function getStripCommentsCodes(): array
+    {
+        return [
+            ['<?php echo foo();', '<?php echo foo();'],
+            ['<?php echo/**/foo();', '<?php echo foo();'],
+            ['<?php echo/** bar */foo();', '<?php echo foo();'],
+            ['<?php /**/echo foo();', '<?php echo foo();'],
+            ['<?php echo \foo();', '<?php echo \foo();'],
+            ['<?php echo/**/\foo();', '<?php echo \foo();'],
+            ['<?php echo/** bar */\foo();', '<?php echo \foo();'],
+            ['<?php /**/echo \foo();', '<?php echo \foo();'],
+            [<<<'EOF'
 <?php
+include_once \dirname(__DIR__).'/foo.php';
 
 $string = 'string should not be   modified';
 
@@ -267,9 +294,10 @@ class TestClass
         // inline comment
     }
 }
-EOF;
-        $expected = <<<'EOF'
+EOF
+, <<<'EOF'
 <?php
+include_once \dirname(__DIR__).'/foo.php';
 $string = 'string should not be   modified';
 $string = 'string should not be
 
@@ -294,18 +322,9 @@ class TestClass
     {
         }
 }
-EOF;
-
-        $output = Kernel::stripComments($source);
-
-        // Heredocs are preserved, making the output mixing Unix and Windows line
-        // endings, switching to "\n" everywhere on Windows to avoid failure.
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $expected = str_replace("\r\n", "\n", $expected);
-            $output = str_replace("\r\n", "\n", $output);
-        }
-
-        $this->assertEquals($expected, $output);
+EOF
+            ],
+        ];
     }
 
     public function testSerialize()
@@ -567,7 +586,7 @@ EOF;
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
     }
 
-    public function testAnonymousKernelGeneratesValidContainerClass(): void
+    public function testAnonymousKernelGeneratesValidContainerClass()
     {
         $kernel = new class('test', true) extends Kernel {
             public function registerBundles(): iterable

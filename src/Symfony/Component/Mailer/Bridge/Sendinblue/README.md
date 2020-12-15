@@ -3,7 +3,6 @@ Sendinblue Bridge
 
 Provides Sendinblue integration for Symfony Mailer.
 
-
 Configuration example:
 
 ```env

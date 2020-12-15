@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @experimental in 5.1
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

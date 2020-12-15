@@ -35,8 +35,8 @@ use Twig\Environment;
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
-    const DISABLED = 1;
-    const ENABLED = 2;
+    public const DISABLED = 1;
+    public const ENABLED = 2;
 
     protected $twig;
     protected $urlGenerator;

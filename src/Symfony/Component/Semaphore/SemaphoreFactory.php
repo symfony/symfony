@@ -18,7 +18,7 @@ use Psr\Log\NullLogger;
 /**
  * Factory provides method to create semaphores.
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>

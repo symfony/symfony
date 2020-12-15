@@ -20,12 +20,14 @@ $ composer require symfony/rate-limiter
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
-$limiter = new RateLimiterFactory([
+$factory = new RateLimiterFactory([
     'id' => 'login',
     'policy' => 'token_bucket',
     'limit' => 10,
     'rate' => ['interval' => '15 minutes'],
 ], new InMemoryStorage());
+
+$limiter = $factory->create();
 
 // blocks until 1 token is free to use for this process
 $limiter->reserve(1)->wait();

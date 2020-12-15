@@ -25,21 +25,21 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class CardScheme extends Constraint
 {
-    const AMEX = 'AMEX';
-    const CHINA_UNIONPAY = 'CHINA_UNIONPAY';
-    const DINERS = 'DINERS';
-    const DISCOVER = 'DISCOVER';
-    const INSTAPAYMENT = 'INSTAPAYMENT';
-    const JCB = 'JCB';
-    const LASER = 'LASER';
-    const MAESTRO = 'MAESTRO';
-    const MASTERCARD = 'MASTERCARD';
-    const MIR = 'MIR';
-    const UATP = 'UATP';
-    const VISA = 'VISA';
+    public const AMEX = 'AMEX';
+    public const CHINA_UNIONPAY = 'CHINA_UNIONPAY';
+    public const DINERS = 'DINERS';
+    public const DISCOVER = 'DISCOVER';
+    public const INSTAPAYMENT = 'INSTAPAYMENT';
+    public const JCB = 'JCB';
+    public const LASER = 'LASER';
+    public const MAESTRO = 'MAESTRO';
+    public const MASTERCARD = 'MASTERCARD';
+    public const MIR = 'MIR';
+    public const UATP = 'UATP';
+    public const VISA = 'VISA';
 
-    const NOT_NUMERIC_ERROR = 'a2ad9231-e827-485f-8a1e-ef4d9a6d5c2e';
-    const INVALID_FORMAT_ERROR = 'a8faedbf-1c2f-4695-8d22-55783be8efed';
+    public const NOT_NUMERIC_ERROR = 'a2ad9231-e827-485f-8a1e-ef4d9a6d5c2e';
+    public const INVALID_FORMAT_ERROR = 'a8faedbf-1c2f-4695-8d22-55783be8efed';
 
     protected static $errorNames = [
         self::NOT_NUMERIC_ERROR => 'NOT_NUMERIC_ERROR',

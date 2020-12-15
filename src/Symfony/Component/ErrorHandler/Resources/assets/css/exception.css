@@ -124,7 +124,7 @@ tr.status-error td, tr.status-warning td { border-bottom: 1px solid var(--base-2
 .status-warning .colored { color: #A46A1F; }
 .status-error .colored  { color: var(--color-error); }
 
-.sf-toggle { cursor: pointer; }
+.sf-toggle { cursor: pointer; position: relative; }
 .sf-toggle-content { -moz-transition: display .25s ease; -webkit-transition: display .25s ease; transition: display .25s ease; }
 .sf-toggle-content.sf-toggle-hidden { display: none; }
 .sf-toggle-content.sf-toggle-visible { display: block; }

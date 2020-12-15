@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class EnvVarProcessorTest extends TestCase
 {
-    const TEST_CONST = 'test';
+    public const TEST_CONST = 'test';
 
     /**
      * @dataProvider validStrings

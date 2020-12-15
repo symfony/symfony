@@ -21,13 +21,13 @@ use Twig\Loader\ArrayLoader;
 
 class BodyRendererTest extends TestCase
 {
-    public function testRenderTextOnly(): void
+    public function testRenderTextOnly()
     {
         $email = $this->prepareEmail('Text', null);
         $this->assertEquals('Text', $email->getBody()->bodyToString());
     }
 
-    public function testRenderHtmlOnly(): void
+    public function testRenderHtmlOnly()
     {
         $html = '<head>head</head><b>HTML</b><style type="text/css">css</style>';
         $email = $this->prepareEmail(null, $html);
@@ -37,7 +37,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderHtmlOnlyWithTextSet(): void
+    public function testRenderHtmlOnlyWithTextSet()
     {
         $email = $this->prepareEmail(null, '<b>HTML</b>');
         $email->text('Text');
@@ -47,7 +47,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderTextAndHtml(): void
+    public function testRenderTextAndHtml()
     {
         $email = $this->prepareEmail('Text', '<b>HTML</b>');
         $body = $email->getBody();
@@ -56,7 +56,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderWithContextReservedEmailEntry(): void
+    public function testRenderWithContextReservedEmailEntry()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->prepareEmail('Text', '', ['email' => 'reserved!']);

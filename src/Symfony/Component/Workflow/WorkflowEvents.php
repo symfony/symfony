@@ -28,44 +28,44 @@ final class WorkflowEvents
     /**
      * @Event("Symfony\Component\Workflow\Event\GuardEvent")
      */
-    const GUARD = 'workflow.guard';
+    public const GUARD = 'workflow.guard';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\LeaveEvent")
      */
-    const LEAVE = 'workflow.leave';
+    public const LEAVE = 'workflow.leave';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\TransitionEvent")
      */
-    const TRANSITION = 'workflow.transition';
+    public const TRANSITION = 'workflow.transition';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\EnterEvent")
      */
-    const ENTER = 'workflow.enter';
+    public const ENTER = 'workflow.enter';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\EnteredEvent")
      */
-    const ENTERED = 'workflow.entered';
+    public const ENTERED = 'workflow.entered';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\CompletedEvent")
      */
-    const COMPLETED = 'workflow.completed';
+    public const COMPLETED = 'workflow.completed';
 
     /**
      * @Event("Symfony\Component\Workflow\Event\AnnounceEvent")
      */
-    const ANNOUNCE = 'workflow.announce';
+    public const ANNOUNCE = 'workflow.announce';
 
     /**
      * Event aliases.
      *
      * These aliases can be consumed by RegisterListenersPass.
      */
-    const ALIASES = [
+    public const ALIASES = [
         GuardEvent::class => self::GUARD,
         LeaveEvent::class => self::LEAVE,
         TransitionEvent::class => self::TRANSITION,

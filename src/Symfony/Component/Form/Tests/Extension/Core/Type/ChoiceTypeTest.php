@@ -22,7 +22,7 @@ class ChoiceTypeTest extends BaseTypeTest
 {
     use ExpectDeprecationTrait;
 
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
 
     private $choices = [
         'Bernhard' => 'a',
@@ -1782,14 +1782,26 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices' => [$obj1, $obj2, $obj3, $obj4],
             'choice_label' => 'label',
             'choice_value' => 'value',
+            'choice_attr' => [
+                ['attr1' => 'value1'],
+                ['attr2' => 'value2'],
+                ['attr3' => 'value3'],
+                ['attr4' => 'value4'],
+            ],
+            'choice_translation_parameters' => [
+                ['%placeholder1%' => 'value1'],
+                ['%placeholder2%' => 'value2'],
+                ['%placeholder3%' => 'value3'],
+                ['%placeholder4%' => 'value4'],
+            ],
         ])
             ->createView();
 
         $this->assertEquals([
-            new ChoiceView($obj1, 'a', 'A'),
-            new ChoiceView($obj2, 'b', 'B'),
-            new ChoiceView($obj3, 'c', 'C'),
-            new ChoiceView($obj4, 'd', 'D'),
+            new ChoiceView($obj1, 'a', 'A', ['attr1' => 'value1'], ['%placeholder1%' => 'value1']),
+            new ChoiceView($obj2, 'b', 'B', ['attr2' => 'value2'], ['%placeholder2%' => 'value2']),
+            new ChoiceView($obj3, 'c', 'C', ['attr3' => 'value3'], ['%placeholder3%' => 'value3']),
+            new ChoiceView($obj4, 'd', 'D', ['attr4' => 'value4'], ['%placeholder4%' => 'value4']),
         ], $view->vars['choices']);
     }
 

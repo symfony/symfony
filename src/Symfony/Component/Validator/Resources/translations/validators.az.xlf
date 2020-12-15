@@ -366,6 +366,26 @@
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>Bu dəyər {{ min }} və {{ max }} arasında olmaldır.</target>
             </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Bu dəyər doğru bir host adı deyil.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Bu kolleksiyadakı elementlerin sayı {{ compared_value }} tam bölünəni olmalıdır.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Bu dəyər aşağıdakı məcburiyyətlərdən birini qarşılamalıdır:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Bu kolleksiyadakı hər element öz məcburiyyətlərini qarşılamalıdır.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Bu dəyər doğru bir Qiymətli Kağızın Beynəlxalq İdentifikasiya Kodu (ISIN) deyil.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

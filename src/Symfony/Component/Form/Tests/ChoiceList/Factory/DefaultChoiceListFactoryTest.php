@@ -77,6 +77,11 @@ class DefaultChoiceListFactoryTest extends TestCase
         return $object->attr;
     }
 
+    public function getLabelTranslationParameters($object)
+    {
+        return $object->labelTranslationParameters;
+    }
+
     public function getGroup($object)
     {
         return $this->obj1 === $object || $this->obj2 === $object ? 'Group 1' : 'Group 2';
@@ -96,10 +101,10 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->obj1 = (object) ['label' => 'A', 'index' => 'w', 'value' => 'a', 'preferred' => false, 'group' => 'Group 1', 'attr' => []];
-        $this->obj2 = (object) ['label' => 'B', 'index' => 'x', 'value' => 'b', 'preferred' => true, 'group' => 'Group 1', 'attr' => ['attr1' => 'value1']];
-        $this->obj3 = (object) ['label' => 'C', 'index' => 'y', 'value' => 1, 'preferred' => true, 'group' => 'Group 2', 'attr' => ['attr2' => 'value2']];
-        $this->obj4 = (object) ['label' => 'D', 'index' => 'z', 'value' => 2, 'preferred' => false, 'group' => 'Group 2', 'attr' => []];
+        $this->obj1 = (object) ['label' => 'A', 'index' => 'w', 'value' => 'a', 'preferred' => false, 'group' => 'Group 1', 'attr' => [], 'labelTranslationParameters' => []];
+        $this->obj2 = (object) ['label' => 'B', 'index' => 'x', 'value' => 'b', 'preferred' => true, 'group' => 'Group 1', 'attr' => ['attr1' => 'value1'], 'labelTranslationParameters' => []];
+        $this->obj3 = (object) ['label' => 'C', 'index' => 'y', 'value' => 1, 'preferred' => true, 'group' => 'Group 2', 'attr' => ['attr2' => 'value2'], 'labelTranslationParameters' => []];
+        $this->obj4 = (object) ['label' => 'D', 'index' => 'z', 'value' => 2, 'preferred' => false, 'group' => 'Group 2', 'attr' => [], 'labelTranslationParameters' => ['%placeholder1%' => 'value1']];
         $this->list = new ArrayChoiceList(['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4]);
         $this->factory = new DefaultChoiceListFactory();
     }
@@ -753,6 +758,110 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    public function testCreateViewFlatLabelTranslationParametersAsArray()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            [
+                'D' => ['%placeholder1%' => 'value1'],
+            ]
+        );
+
+        $this->assertFlatViewWithlabelTranslationParameters($view);
+    }
+
+    public function testCreateViewFlatlabelTranslationParametersEmpty()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            []
+        );
+
+        $this->assertFlatView($view);
+    }
+
+    public function testCreateViewFlatlabelTranslationParametersAsCallable()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            [$this, 'getlabelTranslationParameters']
+        );
+
+        $this->assertFlatViewWithlabelTranslationParameters($view);
+    }
+
+    public function testCreateViewFlatlabelTranslationParametersAsClosure()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            function ($object) {
+                return $object->labelTranslationParameters;
+            }
+        );
+
+        $this->assertFlatViewWithlabelTranslationParameters($view);
+    }
+
+    public function testCreateViewFlatlabelTranslationParametersClosureReceivesKey()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            function ($object, $key) {
+                switch ($key) {
+                    case 'D': return ['%placeholder1%' => 'value1'];
+                    default: return [];
+                }
+            }
+        );
+
+        $this->assertFlatViewWithlabelTranslationParameters($view);
+    }
+
+    public function testCreateViewFlatlabelTranslationParametersClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            function ($object, $key, $value) {
+                switch ($value) {
+                    case '3': return ['%placeholder1%' => 'value1'];
+                    default: return [];
+                }
+            }
+        );
+
+        $this->assertFlatViewWithlabelTranslationParameters($view);
+    }
+
     private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
     {
         $this->assertSame(['a', 'b', 'c', 'd'], $list->getValues());
@@ -891,6 +1000,21 @@ class DefaultChoiceListFactoryTest extends TestCase
                         ['attr2' => 'value2']
                     ),
                 ]
+        ), $view);
+    }
+
+    private function assertFlatViewWithlabelTranslationParameters($view)
+    {
+        $this->assertEquals(new ChoiceListView(
+            [
+                0 => new ChoiceView($this->obj1, '0', 'A'),
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+                3 => new ChoiceView($this->obj4, '3', 'D', [], ['%placeholder1%' => 'value1']),
+            ], [
+                1 => new ChoiceView($this->obj2, '1', 'B'),
+                2 => new ChoiceView($this->obj3, '2', 'C'),
+            ]
         ), $view);
     }
 

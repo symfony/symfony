@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\DeadlockException;
+use Doctrine\DBAL\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
@@ -77,7 +78,14 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
         $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        $connection->method('get')->willThrowException(new DeadlockException('Deadlock', $driverException));
+        if (!class_exists(Version::class)) {
+            // This is doctrine/dbal 3.x
+            $deadlockException = new DeadlockException($driverException, null);
+        } else {
+            $deadlockException = new DeadlockException('Deadlock', $driverException);
+        }
+
+        $connection->method('get')->willThrowException($deadlockException);
         $receiver = new DoctrineReceiver($connection, $serializer);
         $this->assertSame([], $receiver->get());
         $this->assertSame([], $receiver->get());

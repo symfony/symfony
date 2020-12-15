@@ -15,7 +15,7 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 trait ResetLimiterTrait
 {

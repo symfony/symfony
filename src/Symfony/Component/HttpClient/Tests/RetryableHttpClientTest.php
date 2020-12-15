@@ -68,6 +68,31 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
+    public function testRetryWithBodyKeepContent()
+    {
+        $client = new RetryableHttpClient(
+            new MockHttpClient([
+                new MockResponse('my bad', ['http_code' => 400]),
+            ]),
+            new class([400], 0) extends GenericRetryStrategy {
+                public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+                {
+                    if (null === $responseContent) {
+                        return null;
+                    }
+
+                    return 'my bad' !== $responseContent;
+                }
+            },
+            1
+        );
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame('my bad', $response->getContent(false));
+    }
+
     public function testRetryWithBodyInvalid()
     {
         $client = new RetryableHttpClient(

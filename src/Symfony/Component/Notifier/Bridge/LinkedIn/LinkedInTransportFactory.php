@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class LinkedInTransportFactory extends AbstractTransportFactory
 {

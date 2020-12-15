@@ -65,6 +65,7 @@ return static function (ContainerConfigurator $container) {
         ->set('event_dispatcher', EventDispatcher::class)
             ->public()
             ->tag('container.hot_path')
+            ->tag('event_dispatcher.dispatcher')
         ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
 
@@ -109,7 +110,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_iterator('kernel.cache_warmer'),
                 param('kernel.debug'),
-                sprintf('%s/%sDeprecations.log', param('kernel.cache_dir'), param('kernel.container_class')),
+                sprintf('%s/%sDeprecations.log', param('kernel.build_dir'), param('kernel.container_class')),
             ])
             ->tag('container.no_preload')
 

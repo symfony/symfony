@@ -21,8 +21,8 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\TrimmedBufferOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -35,7 +35,7 @@ use Symfony\Component\Console\Terminal;
  */
 class SymfonyStyle extends OutputStyle
 {
-    const MAX_LINE_LENGTH = 120;
+    public const MAX_LINE_LENGTH = 120;
 
     private $input;
     private $questionHelper;
@@ -46,7 +46,7 @@ class SymfonyStyle extends OutputStyle
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
-        $this->bufferedOutput = new BufferedOutput($output->getVerbosity(), false, clone $output->getFormatter());
+        $this->bufferedOutput = new TrimmedBufferOutput(\DIRECTORY_SEPARATOR === '\\' ? 4 : 2, $output->getVerbosity(), false, clone $output->getFormatter());
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
@@ -454,9 +454,8 @@ class SymfonyStyle extends OutputStyle
 
     private function writeBuffer(string $message, bool $newLine, int $type): void
     {
-        // We need to know if the two last chars are PHP_EOL
-        // Preserve the last 4 chars inserted (PHP_EOL on windows is two chars) in the history buffer
-        $this->bufferedOutput->write(substr($message, -4), $newLine, $type);
+        // We need to know if the last chars are PHP_EOL
+        $this->bufferedOutput->write($message, $newLine, $type);
     }
 
     private function createBlock(iterable $messages, string $type = null, string $style = null, string $prefix = ' ', bool $padding = false, bool $escape = false): array

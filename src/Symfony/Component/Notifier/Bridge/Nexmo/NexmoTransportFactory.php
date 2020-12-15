@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Nexmo;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -19,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  */
 final class NexmoTransportFactory extends AbstractTransportFactory
 {
@@ -29,17 +30,23 @@ final class NexmoTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('nexmo' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'nexmo', $this->getSupportedSchemes());
+        }
+
         $apiKey = $this->getUser($dsn);
         $apiSecret = $this->getPassword($dsn);
         $from = $dsn->getOption('from');
+
+        if (!$from) {
+            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
+        }
+
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('nexmo' === $scheme) {
-            return (new NexmoTransport($apiKey, $apiSecret, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'nexmo', $this->getSupportedSchemes());
+        return (new NexmoTransport($apiKey, $apiSecret, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

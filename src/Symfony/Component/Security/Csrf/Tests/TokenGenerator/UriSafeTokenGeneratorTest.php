@@ -19,7 +19,7 @@ use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
  */
 class UriSafeTokenGeneratorTest extends TestCase
 {
-    const ENTROPY = 1000;
+    private const ENTROPY = 1000;
 
     /**
      * A non alpha-numeric byte string.

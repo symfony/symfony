@@ -18,7 +18,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class TableCellStyle
 {
-    const DEFAULT_ALIGN = 'left';
+    public const DEFAULT_ALIGN = 'left';
 
     private $options = [
         'fg' => 'default',

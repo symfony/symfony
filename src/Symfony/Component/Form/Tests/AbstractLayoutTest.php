@@ -2045,7 +2045,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/textarea
     [@name="name"]
-    [@pattern="foo"]
+    [not(@pattern)]
     [.="foo&bar"]
 '
         );

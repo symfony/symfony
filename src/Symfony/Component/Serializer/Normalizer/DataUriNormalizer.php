@@ -47,6 +47,8 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -88,6 +90,8 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      *
      * @throws InvalidArgumentException
      * @throws NotNormalizableValueException
+     *
+     * @return \SplFileInfo
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {

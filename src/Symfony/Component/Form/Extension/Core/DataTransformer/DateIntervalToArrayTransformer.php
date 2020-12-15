@@ -22,13 +22,13 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class DateIntervalToArrayTransformer implements DataTransformerInterface
 {
-    const YEARS = 'years';
-    const MONTHS = 'months';
-    const DAYS = 'days';
-    const HOURS = 'hours';
-    const MINUTES = 'minutes';
-    const SECONDS = 'seconds';
-    const INVERT = 'invert';
+    public const YEARS = 'years';
+    public const MONTHS = 'months';
+    public const DAYS = 'days';
+    public const HOURS = 'hours';
+    public const MINUTES = 'minutes';
+    public const SECONDS = 'seconds';
+    public const INVERT = 'invert';
 
     private static $availableFields = [
         self::YEARS => 'y',

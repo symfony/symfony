@@ -8,6 +8,8 @@ CHANGELOG
  * Added `SortFirewallListenersPass` to make the execution order of firewall listeners configurable by
    leveraging `Symfony\Component\Security\Http\Firewall\FirewallListenerInterface`
  * Added ability to use comma separated ip address list for `security.access_control`
+ * [BC break] Removed `EntryPointFactoryInterface`, authenticators must now implement `AuthenticationEntryPointInterface` if
+   they require autoregistration of a Security entry point.
 
 5.1.0
 -----

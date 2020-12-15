@@ -20,10 +20,10 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy;
 
 class PropertyMetadataTest extends TestCase
 {
-    const CLASSNAME = Entity::class;
-    const CLASSNAME_74 = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74';
-    const CLASSNAME_74_PROXY = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy';
-    const PARENTCLASS = EntityParent::class;
+    private const CLASSNAME = Entity::class;
+    private const CLASSNAME_74 = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74';
+    private const CLASSNAME_74_PROXY = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy';
+    private const PARENTCLASS = EntityParent::class;
 
     public function testInvalidPropertyName()
     {

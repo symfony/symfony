@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\CI\GithubActionReporter;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Yaml\Command\LintCommand;
@@ -61,6 +62,57 @@ bar';
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
         $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
+    }
+
+    public function testLintIncorrectFileWithGithubFormat()
+    {
+        if (!class_exists(GithubActionReporter::class)) {
+            $this->expectException(\InvalidArgumentException::class);
+            $this->expectExceptionMessage('The "github" format is only available since "symfony/console" >= 5.3.');
+        }
+
+        $incorrectContent = <<<YAML
+foo:
+bar
+YAML;
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile($incorrectContent);
+
+        $tester->execute(['filename' => $filename, '--format' => 'github'], ['decorated' => false]);
+
+        if (!class_exists(GithubActionReporter::class)) {
+            return;
+        }
+
+        self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+        self::assertStringMatchesFormat('%A::error file=%s, line=2, col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
+    }
+
+    public function testLintAutodetectsGithubActionEnvironment()
+    {
+        if (!class_exists(GithubActionReporter::class)) {
+            $this->markTestSkipped('The "github" format is only available since "symfony/console" >= 5.3.');
+        }
+
+        $prev = getenv('GITHUB_ACTIONS');
+        putenv('GITHUB_ACTIONS');
+
+        try {
+            putenv('GITHUB_ACTIONS=1');
+
+            $incorrectContent = <<<YAML
+foo:
+bar
+YAML;
+            $tester = $this->createCommandTester();
+            $filename = $this->createFile($incorrectContent);
+
+            $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+            self::assertStringMatchesFormat('%A::error file=%s, line=2, col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
+        } finally {
+            putenv('GITHUB_ACTIONS'.($prev ? "=$prev" : ''));
+        }
     }
 
     public function testConstantAsKey()
@@ -139,5 +191,5 @@ YAML;
 
 class Foo
 {
-    const TEST = 'foo';
+    public const TEST = 'foo';
 }

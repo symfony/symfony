@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Check for maximum number of buttons in Slack action block
+ * Add HeaderBlock
+
 5.2.0
 -----
 

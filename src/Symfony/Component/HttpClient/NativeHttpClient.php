@@ -67,8 +67,16 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     {
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
-        if ($options['bindto'] && file_exists($options['bindto'])) {
-            throw new TransportException(__CLASS__.' cannot bind to local Unix sockets, use e.g. CurlHttpClient instead.');
+        if ($options['bindto']) {
+            if (file_exists($options['bindto'])) {
+                throw new TransportException(__CLASS__.' cannot bind to local Unix sockets, use e.g. CurlHttpClient instead.');
+            }
+            if (0 === strpos($options['bindto'], 'if!')) {
+                throw new TransportException(__CLASS__.' cannot bind to network interfaces, use e.g. CurlHttpClient instead.');
+            }
+            if (0 === strpos($options['bindto'], 'host!')) {
+                $options['bindto'] = substr($options['bindto'], 5);
+            }
         }
 
         $options['body'] = self::getBodyAsString($options['body']);

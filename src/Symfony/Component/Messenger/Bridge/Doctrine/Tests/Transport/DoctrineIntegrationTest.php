@@ -62,7 +62,7 @@ class DoctrineIntegrationTest extends TestCase
             ->select('m.available_at')
             ->from('messenger_messages', 'm')
             ->where('m.body = :body')
-            ->setParameter(':body', '{"message": "Hi i am delayed"}')
+            ->setParameter('body', '{"message": "Hi i am delayed"}')
             ->execute();
 
         $available_at = new \DateTime($stmt instanceof Result || $stmt instanceof DriverResult ? $stmt->fetchOne() : $stmt->fetchColumn());

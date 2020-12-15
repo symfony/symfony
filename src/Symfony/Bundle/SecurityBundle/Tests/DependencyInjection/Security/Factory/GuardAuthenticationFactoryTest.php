@@ -178,9 +178,6 @@ class GuardAuthenticationFactoryTest extends TestCase
         $authenticators = $factory->createAuthenticator($container, $firewallName, $config, $userProviderId);
         $this->assertEquals('security.authenticator.guard.my_firewall.0', $authenticators[0]);
 
-        $entryPointId = $factory->registerEntryPoint($container, $firewallName, $config, null);
-        $this->assertEquals('authenticator123', $entryPointId);
-
         $authenticatorDefinition = $container->getDefinition('security.authenticator.guard.my_firewall.0');
         $this->assertEquals(GuardBridgeAuthenticator::class, $authenticatorDefinition->getClass());
         $this->assertEquals('authenticator123', (string) $authenticatorDefinition->getArgument(0));

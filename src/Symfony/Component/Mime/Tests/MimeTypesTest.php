@@ -73,4 +73,18 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $this->assertContains('text/baz', $mt->getMimeTypes('foo'));
         $this->assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
     }
+
+    /**
+     * PHP 8 detects .csv files as "application/csv" while PHP 7 returns "text/plain".
+     *
+     * @requires PHP 8
+     */
+    public function testCsvExtension()
+    {
+        $mt = new MimeTypes();
+
+        $mime = $mt->guessMimeType(__DIR__.'/Fixtures/mimetypes/abc.csv');
+        $this->assertSame('application/csv', $mime);
+        $this->assertSame(['csv'], $mt->getExtensions($mime));
+    }
 }

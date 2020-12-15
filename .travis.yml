@@ -9,8 +9,6 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
-        - ldap-utils
-        - slapd
         - zookeeperd
         - libzookeeper-mt-dev
 
@@ -28,12 +26,9 @@ matrix:
           env: deps=high
         - php: 7.4
           env: deps=low
-        - php: nightly
+        - php: 8.0
           services: [memcached]
     fast_finish: true
-    allow_failures:
-        - php: nightly
-          services: [memcached]
 
 cache:
     directories:
@@ -55,17 +50,11 @@ before_install:
       # General configuration
       set -e
       stty cols 120
-      mkdir /tmp/slapd
-      if [ ! -e /tmp/slapd-modules ]; then
-          [ -d /usr/lib/openldap ] && ln -s /usr/lib/openldap /tmp/slapd-modules || ln -s /usr/lib/ldap /tmp/slapd-modules
-      fi
-      slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
       cp .github/composer-config.json "$(composer config home)/config.json"
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
-      find ~/.phpenv -name xdebug.ini -delete
 
       nanoseconds () {
           local cmd="date"
@@ -140,10 +129,11 @@ before_install:
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          if [[ $PHP != nightly ]]; then
+          if [[ $PHP != 8.* ]]; then
               echo extension = memcached.so >> $INI
           fi
       done
+      find ~/.phpenv -name xdebug.ini -delete
 
     - |
       # Install extra PHP extensions
@@ -156,7 +146,7 @@ before_install:
           if ! php --ri sodium > /dev/null; then
               tfold ext.libsodium tpecl libsodium sodium.so $INI
           fi
-          if [[ $PHP = nightly ]]; then
+          if [[ $PHP = 8.* ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
           else
               tfold ext.mongodb tpecl mongodb-1.6.16 mongodb.so $INI
@@ -168,13 +158,6 @@ before_install:
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
       done
-
-    - |
-      # Load fixtures
-      if [[ ! $skip ]]; then
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif &&
-          ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
-      fi
 
 install:
     - |
@@ -199,7 +182,7 @@ install:
       git config --global user.email ""
       git config --global user.name "Symfony"
 
-      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.]*')
+      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*')
 
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
@@ -234,7 +217,7 @@ install:
 
     - |
       # Set composer's platform to php 7.4 if we're on php 8.
-      if [[ $PHP = nightly ]]; then
+      if [[ $PHP = 8.* ]]; then
           composer config platform.php 7.4.99
           export SYMFONY_DEPRECATIONS_HELPER=max[total]=999
       fi
@@ -250,7 +233,7 @@ install:
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
-      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*') ]] && export LEGACY=,legacy
+      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi

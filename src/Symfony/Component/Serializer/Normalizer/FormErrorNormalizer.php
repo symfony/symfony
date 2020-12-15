@@ -18,9 +18,9 @@ use Symfony\Component\Form\FormInterface;
  */
 final class FormErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const TITLE = 'title';
-    const TYPE = 'type';
-    const CODE = 'status_code';
+    public const TITLE = 'title';
+    public const TYPE = 'type';
+    public const CODE = 'status_code';
 
     /**
      * {@inheritdoc}

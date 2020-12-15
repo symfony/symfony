@@ -21,10 +21,10 @@ use Symfony\Component\Console\Exception\LogicException;
  */
 class InputOption
 {
-    const VALUE_NONE = 1;
-    const VALUE_REQUIRED = 2;
-    const VALUE_OPTIONAL = 4;
-    const VALUE_IS_ARRAY = 8;
+    public const VALUE_NONE = 1;
+    public const VALUE_REQUIRED = 2;
+    public const VALUE_OPTIONAL = 4;
+    public const VALUE_IS_ARRAY = 8;
 
     private $name;
     private $shortcut;

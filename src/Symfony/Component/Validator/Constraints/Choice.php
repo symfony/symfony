@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Choice extends Constraint
 {
-    const NO_SUCH_CHOICE_ERROR = '8e179f1b-97aa-4560-a02f-2a8b42e49df7';
-    const TOO_FEW_ERROR = '11edd7eb-5872-4b6e-9f12-89923999fd0e';
-    const TOO_MANY_ERROR = '9bd98e49-211c-433f-8630-fd1c2d0f08c3';
+    public const NO_SUCH_CHOICE_ERROR = '8e179f1b-97aa-4560-a02f-2a8b42e49df7';
+    public const TOO_FEW_ERROR = '11edd7eb-5872-4b6e-9f12-89923999fd0e';
+    public const TOO_MANY_ERROR = '9bd98e49-211c-433f-8630-fd1c2d0f08c3';
 
     protected static $errorNames = [
         self::NO_SUCH_CHOICE_ERROR => 'NO_SUCH_CHOICE_ERROR',
@@ -69,7 +69,7 @@ class Choice extends Constraint
         if (\is_array($choices) && \is_string(key($choices))) {
             $options = array_merge($choices, $options);
         } elseif (null !== $choices) {
-            $options['choices'] = $choices;
+            $options['value'] = $choices;
         }
 
         parent::__construct($options, $groups, $payload);

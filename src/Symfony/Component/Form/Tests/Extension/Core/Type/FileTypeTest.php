@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
     protected function getExtensions()
     {

@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -43,10 +44,21 @@ final class DiscordTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows()
     {
-        $this->expectException(LogicException::class);
         $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
+        $this->expectException(UnsupportedMessageTypeException::class);
+
         $transport->send($this->createMock(MessageInterface::class));
+    }
+
+    public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
+    {
+        $transport = new DiscordTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The subject length of a Discord message must not exceed 2000 characters.');
+
+        $transport->send(new ChatMessage(str_repeat('d', 2001)));
     }
 
     public function testSendWithErrorResponseThrows()

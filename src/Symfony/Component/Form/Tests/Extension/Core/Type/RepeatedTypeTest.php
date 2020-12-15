@@ -16,7 +16,7 @@ use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 
     /**
      * @var Form

@@ -20,6 +20,10 @@
         "symfony/polyfill-php80": "^1.15",
         "psr/log": "~1.0"
     },
+    "require-dev": {
+        "symfony/event-dispatcher-contracts": "^2",
+        "symfony/http-client-contracts": "^2"
+    },
     "conflict": {
         "symfony/http-kernel": "<4.4",
         "symfony/firebase-notifier": "<5.2",

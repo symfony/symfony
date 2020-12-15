@@ -22,11 +22,11 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class PassConfig
 {
-    const TYPE_AFTER_REMOVING = 'afterRemoving';
-    const TYPE_BEFORE_OPTIMIZATION = 'beforeOptimization';
-    const TYPE_BEFORE_REMOVING = 'beforeRemoving';
-    const TYPE_OPTIMIZE = 'optimization';
-    const TYPE_REMOVE = 'removing';
+    public const TYPE_AFTER_REMOVING = 'afterRemoving';
+    public const TYPE_BEFORE_OPTIMIZATION = 'beforeOptimization';
+    public const TYPE_BEFORE_REMOVING = 'beforeRemoving';
+    public const TYPE_OPTIMIZE = 'optimization';
+    public const TYPE_REMOVE = 'removing';
 
     private $mergePass;
     private $afterRemovingPasses = [];
@@ -79,13 +79,14 @@ class PassConfig
             new ReplaceAliasByActualDefinitionPass(),
             new RemoveAbstractDefinitionsPass(),
             new RemoveUnusedDefinitionsPass(),
+            new AnalyzeServiceReferencesPass(),
+            new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
             new AnalyzeServiceReferencesPass(),
             new DefinitionErrorExceptionPass(),
         ]];
 
         $this->afterRemovingPasses = [[
-            new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
             new ResolveNoPreloadPass(),
             new AliasDeprecatedPublicServicesPass(),

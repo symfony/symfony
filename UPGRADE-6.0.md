@@ -49,6 +49,12 @@ Form
  * The `Symfony\Component\Form\Extension\Validator\Util\ServerParams` class has been removed, use its parent `Symfony\Component\Form\Util\ServerParams` instead.
  * The `NumberToLocalizedStringTransformer::ROUND_*` constants have been removed, use `\NumberFormatter::ROUND_*` instead.
  * Removed `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`.
+ * Changed `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Changed `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
+ * Changed `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`.
+ * Changed `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`.
 
 FrameworkBundle
 ---------------
@@ -64,9 +70,10 @@ HttpFoundation
 --------------
 
  * Removed `Response::create()`, `JsonResponse::create()`,
-   `RedirectResponse::create()`, and `StreamedResponse::create()` methods (use
-   `__construct()` instead)
+   `RedirectResponse::create()`, `StreamedResponse::create()` and
+   `BinaryFileResponse::create()` methods (use `__construct()` instead)
  * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `InvalidArgumentException`; wrap your filter in a closure instead.
+ * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead.
 
 HttpKernel
 ----------
@@ -122,6 +129,7 @@ PhpUnitBridge
 -------------
 
  * Removed support for `@expectedDeprecation` annotations, use the `ExpectDeprecationTrait::expectDeprecation()` method instead.
+ * Removed the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
 
 PropertyAccess
 --------------
@@ -152,6 +160,7 @@ Security
    in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`,
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
+ * `AccessDecisionManager` now throw an exception when a voter does not return a valid decision.
 
 TwigBundle
 ----------
@@ -187,6 +196,36 @@ Validator
    ```
 
  * Removed the `NumberConstraintTrait` trait.
+
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore.
+
+  Before:
+
+  ```php
+  $builder->enableAnnotationMapping($reader);
+  ```
+
+  After:
+
+  ```php
+  $builder->enableAnnotationMapping(true)
+      ->setDoctrineAnnotationReader($reader);
+  ```
+
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore.
+
+  Before:
+
+  ```php
+  $builder->enableAnnotationMapping();
+  ```
+
+  After:
+
+  ```php
+  $builder->enableAnnotationMapping(true)
+      ->addDefaultDoctrineAnnotationReader();
+  ```
 
 Yaml
 ----

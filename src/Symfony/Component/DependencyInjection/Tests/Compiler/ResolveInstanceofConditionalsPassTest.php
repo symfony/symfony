@@ -12,12 +12,16 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ResolveInstanceofConditionalsPassTest extends TestCase
 {
@@ -324,5 +328,61 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $this->assertSame(['manual' => [[]]], $container->getDefinition('decorator')->getTags());
+    }
+
+    public function testDecoratorsKeepBehaviorDescribingTags()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('container.behavior_describing_tags', [
+            'container.service_subscriber',
+            'kernel.reset',
+        ]);
+
+        $container->register('decorator', DecoratorWithBehavior::class)
+            ->setAutoconfigured(true)
+            ->setDecoratedService('decorated')
+        ;
+
+        $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
+            ->addTag('config_cache.resource_checker')
+        ;
+        $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
+            ->addTag('container.service_subscriber')
+        ;
+        $container->registerForAutoconfiguration(ResetInterface::class)
+            ->addTag('kernel.reset', ['method' => 'reset'])
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertEquals([
+            'container.service_subscriber' => [0 => []],
+            'kernel.reset' => [
+                [
+                    'method' => 'reset',
+                ],
+            ],
+        ], $container->getDefinition('decorator')->getTags());
+        $this->assertFalse($container->hasParameter('container.behavior_describing_tags'));
+    }
+}
+
+class DecoratorWithBehavior implements ResetInterface, ResourceCheckerInterface, ServiceSubscriberInterface
+{
+    public function reset()
+    {
+    }
+
+    public function supports(ResourceInterface $metadata)
+    {
+    }
+
+    public function isFresh(ResourceInterface $resource, $timestamp)
+    {
+    }
+
+    public static function getSubscribedServices()
+    {
     }
 }

@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>Contul este blocat.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Prea multe încercări de autentificare eșuate, vă rugăm să încercați mai târziu.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Link de autentificare invalid sau expirat.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

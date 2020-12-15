@@ -14,7 +14,7 @@ namespace Symfony\Component\Semaphore\Exception;
 /**
  * Base ExceptionInterface for the Semaphore Component.
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

@@ -13,7 +13,7 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
     } elseif (\PHP_VERSION_ID < 70300) {
         putenv('SYMFONY_PHPUNIT_VERSION=8.5');
     } else {
-        putenv('SYMFONY_PHPUNIT_VERSION=9.4');
+        putenv('SYMFONY_PHPUNIT_VERSION=9.5');
     }
 }
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {

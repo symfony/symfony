@@ -25,9 +25,9 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  */
 class DeprecationErrorHandler
 {
-    const MODE_DISABLED = 'disabled';
-    const MODE_WEAK = 'max[total]=999999&verbose=0';
-    const MODE_STRICT = 'max[total]=0';
+    public const MODE_DISABLED = 'disabled';
+    public const MODE_WEAK = 'max[total]=999999&verbose=0';
+    public const MODE_STRICT = 'max[total]=0';
 
     private $mode;
     private $configuration;
@@ -238,13 +238,7 @@ class DeprecationErrorHandler
             return $this->configuration;
         }
         if (false === $mode = $this->mode) {
-            if (isset($_SERVER['SYMFONY_DEPRECATIONS_HELPER'])) {
-                $mode = $_SERVER['SYMFONY_DEPRECATIONS_HELPER'];
-            } elseif (isset($_ENV['SYMFONY_DEPRECATIONS_HELPER'])) {
-                $mode = $_ENV['SYMFONY_DEPRECATIONS_HELPER'];
-            } else {
-                $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
-            }
+            $mode = $_SERVER['SYMFONY_DEPRECATIONS_HELPER'] ?? $_ENV['SYMFONY_DEPRECATIONS_HELPER'] ?? getenv('SYMFONY_DEPRECATIONS_HELPER');
         }
         if ('strict' === $mode) {
             return $this->configuration = Configuration::inStrictMode();

@@ -92,13 +92,12 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('trusted_headers')
                     ->fixXmlConfig('trusted_header')
                     ->performNoDeepMerging()
-                    ->defaultValue(['x-forwarded-all', '!x-forwarded-host', '!x-forwarded-prefix'])
+                    ->defaultValue(['x-forwarded-for', 'x-forwarded-port', 'x-forwarded-proto'])
                     ->beforeNormalization()->ifString()->then(function ($v) { return $v ? array_map('trim', explode(',', $v)) : []; })->end()
                     ->enumPrototype()
                         ->values([
                             'forwarded',
                             'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port',
-                            'x-forwarded-all', '!x-forwarded-host', '!x-forwarded-prefix',
                         ])
                     ->end()
                 ->end()
@@ -1071,14 +1070,31 @@ class Configuration implements ConfigurationInterface
                     ->info('PHP errors handling configuration')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('log')
+                        ->variableNode('log')
                             ->info('Use the application logger instead of the PHP logger for logging PHP errors.')
-                            ->example('"true" to use the default configuration: log all errors. "false" to disable. An integer bit field of E_* constants.')
+                            ->example('"true" to use the default configuration: log all errors. "false" to disable. An integer bit field of E_* constants, or an array mapping E_* constants to log levels.')
                             ->defaultValue($this->debug)
                             ->treatNullLike($this->debug)
+                            ->beforeNormalization()
+                                ->ifArray()
+                                ->then(function (array $v): array {
+                                    if (!($v[0]['type'] ?? false)) {
+                                        return $v;
+                                    }
+
+                                    // Fix XML normalization
+
+                                    $ret = [];
+                                    foreach ($v as ['type' => $type, 'logLevel' => $logLevel]) {
+                                        $ret[$type] = $logLevel;
+                                    }
+
+                                    return $ret;
+                                })
+                            ->end()
                             ->validate()
-                                ->ifTrue(function ($v) { return !(\is_int($v) || \is_bool($v)); })
-                                ->thenInvalid('The "php_errors.log" parameter should be either an integer or a boolean.')
+                                ->ifTrue(function ($v) { return !(\is_int($v) || \is_bool($v) || \is_array($v)); })
+                                ->thenInvalid('The "php_errors.log" parameter should be either an integer, a boolean, or an array')
                             ->end()
                         ->end()
                         ->booleanNode('throw')
@@ -1817,7 +1833,7 @@ class Configuration implements ConfigurationInterface
                         ->ifTrue(function ($v) { return \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']); })
                         ->then(function (array $v) {
                             $newV = [
-                                'enabled' => $v['enabled'],
+                                'enabled' => $v['enabled'] ?? true,
                             ];
                             unset($v['enabled']);
 

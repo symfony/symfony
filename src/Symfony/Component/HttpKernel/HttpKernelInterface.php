@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface HttpKernelInterface
 {
-    const MASTER_REQUEST = 1;
-    const SUB_REQUEST = 2;
+    public const MASTER_REQUEST = 1;
+    public const SUB_REQUEST = 2;
 
     /**
      * Handles a Request to convert it to a Response.

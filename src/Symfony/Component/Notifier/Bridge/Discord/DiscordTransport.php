@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Discord;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
@@ -23,9 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
  *
- * @internal
- *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class DiscordTransport extends AbstractTransport
 {
@@ -34,7 +33,7 @@ final class DiscordTransport extends AbstractTransport
     private $token;
     private $webhookId;
 
-    public function __construct(string $token, string $webhookId = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $webhookId, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->token = $token;
         $this->webhookId = $webhookId;
@@ -59,7 +58,7 @@ final class DiscordTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof ChatMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
         $messageOptions = $message->getOptions();
@@ -68,7 +67,7 @@ final class DiscordTransport extends AbstractTransport
         $content = $message->getSubject();
 
         if (\strlen($content) > 2000) {
-            throw new LogicException(sprintf('The subject length of "%s" transport must be less than 2000 characters.', __CLASS__, ChatMessage::class, get_debug_type($message)));
+            throw new LogicException('The subject length of a Discord message must not exceed 2000 characters.');
         }
 
         $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);

@@ -438,6 +438,7 @@ class SecurityExtensionTest extends TestCase
     public function testAuthenticatorManagerEnabledEntryPoint(array $firewall, $entryPointId)
     {
         $container = $this->getRawContainer();
+        $container->register(AppCustomAuthenticator::class);
         $container->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
             'providers' => [
@@ -458,9 +459,9 @@ class SecurityExtensionTest extends TestCase
     public function provideEntryPointFirewalls()
     {
         // only one entry point available
-        yield [['http_basic' => true], 'security.authentication.basic_entry_point.main'];
+        yield [['http_basic' => true], 'security.authenticator.http_basic.main'];
         // explicitly configured by authenticator key
-        yield [['form_login' => true, 'http_basic' => true, 'entry_point' => 'form_login'], 'security.authentication.form_entry_point.main'];
+        yield [['form_login' => true, 'http_basic' => true, 'entry_point' => 'form_login'], 'security.authenticator.form_login.main'];
         // explicitly configured another service
         yield [['form_login' => true, 'entry_point' => EntryPointStub::class], EntryPointStub::class];
         // no entry point required
@@ -469,14 +470,7 @@ class SecurityExtensionTest extends TestCase
         // only one guard authenticator entry point available
         yield [[
             'guard' => ['authenticators' => [AppCustomAuthenticator::class]],
-        ], AppCustomAuthenticator::class];
-        // explicitly configured guard authenticator entry point
-        yield [[
-            'guard' => [
-                'authenticators' => [AppCustomAuthenticator::class, NullAuthenticator::class],
-                'entry_point' => NullAuthenticator::class,
-            ],
-        ], NullAuthenticator::class];
+        ], 'security.authenticator.guard.main.0'];
     }
 
     /**
@@ -507,12 +501,7 @@ class SecurityExtensionTest extends TestCase
         // more than one entry point available and not explicitly set
         yield [
             ['http_basic' => true, 'form_login' => true],
-            '/^Because you have multiple authenticators in firewall "main", you need to set the "entry_point" key to one of your authenticators/',
-        ];
-        // more than one guard entry point available and not explicitly set
-        yield [
-            ['guard' => ['authenticators' => [AppCustomAuthenticator::class, NullAuthenticator::class]]],
-            '/^Because you have multiple guard authenticators, you need to set the "entry_point" key to one of your authenticators/',
+            '/Because you have multiple authenticators in firewall "main", you need to set the "entry_point" key to one of your authenticators \("form_login", "http_basic"\) or a service ID implementing/',
         ];
     }
 
@@ -537,6 +526,7 @@ class SecurityExtensionTest extends TestCase
     public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators)
     {
         $container = $this->getRawContainer();
+        $container->register(TestAuthenticator::class);
         $container->loadFromExtension('security', [
             'enable_authenticator_manager' => true,
             'providers' => [

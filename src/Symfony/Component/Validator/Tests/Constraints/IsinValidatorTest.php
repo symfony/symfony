@@ -4,16 +4,14 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isin;
 use Symfony\Component\Validator\Constraints\IsinValidator;
+use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-use Symfony\Component\Validator\ValidatorBuilder;
 
 class IsinValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        $validatorBuilder = new ValidatorBuilder();
-
-        return new IsinValidator($validatorBuilder->getValidator());
+        return new IsinValidator();
     }
 
     public function testNullIsValid()
@@ -36,6 +34,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     public function testValidIsin($isin)
     {
         $this->validator->validate($isin, new Isin());
+        $this->expectViolationsAt(0, $isin, new Luhn());
         $this->assertNoViolation();
     }
 
@@ -103,6 +102,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
      */
     public function testIsinWithValidFormatButIncorrectChecksum($isin)
     {
+        $this->expectViolationsAt(0, $isin, new Luhn());
         $this->assertViolationRaised($isin, Isin::INVALID_CHECKSUM_ERROR);
     }
 

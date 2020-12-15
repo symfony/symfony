@@ -306,10 +306,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                     curl_multi_remove_handle($multi->handle, $ch);
                     $waitFor[1] = (string) ((int) $waitFor[1] - 1); // decrement the retry counter
                     curl_setopt($ch, \CURLOPT_PRIVATE, $waitFor);
-
-                    if ('1' === $waitFor[1]) {
-                        curl_setopt($ch, \CURLOPT_HTTP_VERSION, \CURL_HTTP_VERSION_1_1);
-                    }
+                    curl_setopt($ch, \CURLOPT_FORBID_REUSE, true);
 
                     if (0 === curl_multi_add_handle($multi->handle, $ch)) {
                         continue;
@@ -331,7 +328,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        if (\PHP_VERSION_ID < 70123 || (70200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 70211)) {
+        if (\PHP_VERSION_ID < 70211) {
             // workaround https://bugs.php.net/76480
             $timeout = min($timeout, 0.01);
         }

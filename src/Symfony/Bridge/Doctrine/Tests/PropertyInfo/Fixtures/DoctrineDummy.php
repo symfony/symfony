@@ -42,6 +42,11 @@ class DoctrineDummy
     public $bar;
 
     /**
+     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid")
+     */
+    protected $indexedRguid;
+
+    /**
      * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid_column")
      */
     protected $indexedBar;
@@ -50,6 +55,11 @@ class DoctrineDummy
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="foo", indexBy="foo")
      */
     protected $indexedFoo;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="baz", indexBy="baz_id")
+     */
+    protected $indexedBaz;
 
     /**
      * @Column(type="guid")
@@ -122,6 +132,11 @@ class DoctrineDummy
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="customType", indexBy="customType")
      */
     private $indexedByCustomType;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="buzField", indexBy="buzField")
+     */
+    protected $indexedBuz;
 
     /**
      * @Column(type="json", nullable=true)

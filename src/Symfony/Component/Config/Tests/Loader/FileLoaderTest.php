@@ -77,6 +77,31 @@ class FileLoaderTest extends TestCase
         $this->assertSame('[foo]', $loader->import('[foo]'));
     }
 
+    public function testImportWithGlobLikeResourceWhichContainsSlashes()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock->expects($this->once())->method('locate')->willReturn('');
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertNull($loader->import('foo/bar[foo]'));
+    }
+
+    public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
+    }
+
+    public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
+    {
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $loader = new TestFileLoader($locatorMock);
+
+        $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
+    }
+
     public function testImportWithNoGlobMatch()
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();

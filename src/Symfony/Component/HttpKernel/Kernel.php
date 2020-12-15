@@ -74,15 +74,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     private static $freshCache = [];
 
-    const VERSION = '5.2.0-DEV';
-    const VERSION_ID = 50200;
-    const MAJOR_VERSION = 5;
-    const MINOR_VERSION = 2;
-    const RELEASE_VERSION = 0;
-    const EXTRA_VERSION = 'DEV';
+    public const VERSION = '5.3.0-DEV';
+    public const VERSION_ID = 50300;
+    public const MAJOR_VERSION = 5;
+    public const MINOR_VERSION = 3;
+    public const RELEASE_VERSION = 0;
+    public const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '07/2021';
-    const END_OF_LIFE = '07/2021';
+    public const END_OF_MAINTENANCE = '05/2021';
+    public const END_OF_LIFE = '01/2022';
 
     public function __construct(string $environment, bool $debug)
     {
@@ -609,7 +609,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'kernel.runtime_environment' => '%env(default:kernel.environment:APP_RUNTIME_ENV)%',
             'kernel.debug' => $this->debug,
             'kernel.build_dir' => realpath($buildDir = $this->warmupDir ?: $this->getBuildDir()) ?: $buildDir,
-            'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
+            'kernel.cache_dir' => realpath($cacheDir = ($this->getCacheDir() === $this->getBuildDir() ? ($this->warmupDir ?: $this->getCacheDir()) : $this->getCacheDir())) ?: $cacheDir,
             'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata,
@@ -831,6 +831,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 // replace multiple new lines with a single newline
                 $rawChunk .= preg_replace(['/\n{2,}/S'], "\n", $token[1]);
             } elseif (\in_array($token[0], [\T_COMMENT, \T_DOC_COMMENT])) {
+                if (!\in_array($rawChunk[\strlen($rawChunk) - 1], [' ', "\n", "\r", "\t"], true)) {
+                    $rawChunk .= ' ';
+                }
                 $ignoreSpace = true;
             } else {
                 $rawChunk .= $token[1];
@@ -838,6 +841,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 // The PHP-open tag already has a new-line
                 if (\T_OPEN_TAG === $token[0]) {
                     $ignoreSpace = true;
+                } else {
+                    $ignoreSpace = false;
                 }
             }
         }

@@ -12,10 +12,6 @@
             "AMD",
             "Dírààmù Àmɛ́níà"
         ],
-        "AOA": [
-            "AOA",
-            "Wansa ti Orílɛ́ède Àngólà"
-        ],
         "ARS": [
             "ARS",
             "Pɛ́sò Agɛntínà"
@@ -39,10 +35,6 @@
         "BHD": [
             "BHD",
             "Dina ti Orílɛ́ède Báránì"
-        ],
-        "BIF": [
-            "BIF",
-            "Faransi ti Orílɛ́ède Bùùrúndì"
         ],
         "BMD": [
             "BMD",
@@ -70,7 +62,7 @@
         ],
         "BWP": [
             "BWP",
-            "Pula ti Orílɛ́ède Bɔ̀tìsúwánà"
+            "Pula Bɔ̀tìsúwánà"
         ],
         "BYN": [
             "BYN",
@@ -82,11 +74,7 @@
         ],
         "CAD": [
             "CA$",
-            "Dɔla ti Orílɛ́ède Kánádà"
-        ],
-        "CDF": [
-            "CDF",
-            "Faransi ti Orílɛ́ède Kóngò"
+            "Dɔ́là Kánádà"
         ],
         "CHF": [
             "CHF",
@@ -116,17 +104,9 @@
             "CUP",
             "Pɛ́sò Kúbà"
         ],
-        "CVE": [
-            "CVE",
-            "Kabofediano ti Orílɛ́ède Esuodo"
-        ],
         "CZK": [
             "CZK",
             "Koruna Shɛ́ɛ̀kì"
-        ],
-        "DJF": [
-            "DJF",
-            "Faransi ti Orílɛ́ède Dibouti"
         ],
         "DKK": [
             "DKK",
@@ -143,14 +123,6 @@
         "EGP": [
             "EGP",
             "pɔɔn ti Orílɛ́ède Egipiti"
-        ],
-        "ERN": [
-            "ERN",
-            "Nakifa ti Orílɛ́ède Eriteriani"
-        ],
-        "ETB": [
-            "ETB",
-            "Biri ti Orílɛ́ède Eutopia"
         ],
         "FJD": [
             "FJD",
@@ -175,10 +147,6 @@
         "GIP": [
             "GIP",
             "Pɔ́n-ùn Gibraltar"
-        ],
-        "GMD": [
-            "GMD",
-            "Dalasi ti Orílɛ́ède Gamibia"
         ],
         "GNS": [
             "GNS",
@@ -230,15 +198,11 @@
         ],
         "KES": [
             "KES",
-            "shiili ti Orílɛ́ède Kenya"
+            "Shiili Kenya"
         ],
         "KHR": [
             "KHR",
             "Ráyò Kàm̀bɔ́díà"
-        ],
-        "KMF": [
-            "KMF",
-            "Faransi ti Orílɛ́ède shomoriani"
         ],
         "KPW": [
             "KPW",
@@ -262,23 +226,11 @@
         ],
         "LRD": [
             "LRD",
-            "Dɔla ti Orílɛ́ède Liberia"
+            "Dɔla Liberia"
         ],
         "LSL": [
             "LSL",
             "Loti ti Orílɛ́ède Lesoto"
-        ],
-        "LYD": [
-            "LYD",
-            "Dina ti Orílɛ́ède Libiya"
-        ],
-        "MAD": [
-            "MAD",
-            "Dirami ti Orílɛ́ède Moroko"
-        ],
-        "MGA": [
-            "MGA",
-            "Faransi ti Orílɛ́ède Malagasi"
         ],
         "MKD": [
             "MKD",
@@ -292,17 +244,9 @@
             "MRU",
             "Ouguiya ti Orílɛ́ède Maritania"
         ],
-        "MUR": [
-            "MUR",
-            "Rupi ti Orílɛ́ède Maritiusi"
-        ],
         "MVR": [
             "MVR",
             "Rúfìyá Mɔ̀lìdífà"
-        ],
-        "MWK": [
-            "MWK",
-            "Kasha ti Orílɛ́ède Malawi"
         ],
         "MXN": [
             "MX$",
@@ -322,11 +266,7 @@
         ],
         "NAD": [
             "NAD",
-            "Dɔla ti Orílɛ́ède Namibia"
-        ],
-        "NGN": [
-            "₦",
-            "Náìrà ti Orílɛ̀-èdè Nàìjíríà"
+            "Dɔla Namibíà"
         ],
         "NIO": [
             "NIO",
@@ -352,10 +292,6 @@
             "₽",
             "Owó ruble ti ilɛ̀ Rɔ́shíà"
         ],
-        "RWF": [
-            "RWF",
-            "Faransi ti Orílɛ́ède Ruwanda"
-        ],
         "SAR": [
             "SAR",
             "Riya ti Orílɛ́ède Saudi"
@@ -364,13 +300,9 @@
             "SBD",
             "Dɔ́là Erékùsù Sɔ́lómɔ́nì"
         ],
-        "SCR": [
-            "SCR",
-            "Rupi ti Orílɛ́ède Sayiselesi"
-        ],
         "SDG": [
             "SDG",
-            "Dina ti Orílɛ́ède Sudani"
+            "Pɔ́n-ùn Sùdáànì"
         ],
         "SDP": [
             "SDP",
@@ -382,11 +314,11 @@
         ],
         "SHP": [
             "SHP",
-            "Pɔɔun ti Orílɛ́ède ̣Elena"
+            "Pɔ́n-un Elena"
         ],
         "SOS": [
             "SOS",
-            "Sile ti Orílɛ́ède Somali"
+            "Shílè Somali"
         ],
         "SRD": [
             "SRD",
@@ -394,7 +326,7 @@
         ],
         "SSP": [
             "SSP",
-            "Pɔ́n-ùn Gúúsù Sùdáànì"
+            "Pɔ́n-un Gúúsù Sùdáànì"
         ],
         "STD": [
             "STD",
@@ -402,7 +334,7 @@
         ],
         "STN": [
             "STN",
-            "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe"
+            "Dɔbíra Sao tome àti Pirisipi"
         ],
         "SYP": [
             "SYP",
@@ -414,7 +346,7 @@
         ],
         "TND": [
             "TND",
-            "Dina ti Orílɛ́ède Tunisia"
+            "Dínà Tunishíà"
         ],
         "TRY": [
             "TRY",
@@ -428,17 +360,13 @@
             "NT$",
             "Dɔ́là Tàìwánì Tuntun"
         ],
-        "TZS": [
-            "TZS",
-            "Sile ti Orílɛ́ède Tansania"
-        ],
         "UAH": [
             "UAH",
             "Ɔrifiníyà Yukiréníà"
         ],
         "UGX": [
             "UGX",
-            "Siile ti Orílɛ́ède Uganda"
+            "Shile Uganda"
         ],
         "USD": [
             "$",
@@ -456,33 +384,21 @@
             "VES",
             "Bɔ̀lífà Fɛnɛsuɛ́là"
         ],
-        "XAF": [
-            "FCFA",
-            "Faransi ti Orílɛ́ède BEKA"
-        ],
         "XCD": [
             "EC$",
             "Dɔ́là Ilà Oòrùn Karíbíà"
         ],
         "XOF": [
             "CFA",
-            "Faransi ti Orílɛ́ède BIKEAO"
+            "Faransì ìwɔ̀-oorùn Afíríkà"
         ],
         "YER": [
             "YER",
             "Ráyò Yɛ́mɛ̀nì"
         ],
-        "ZAR": [
-            "ZAR",
-            "Randi ti Orílɛ́ède Ariwa Afirika"
-        ],
         "ZMK": [
             "ZMK",
             "Kawasha ti Orílɛ́ède Saabia (1968–2012)"
-        ],
-        "ZMW": [
-            "ZMW",
-            "Kawasha ti Orílɛ́ède Saabia"
         ],
         "ZWD": [
             "ZWD",

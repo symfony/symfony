@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * @see https://github.com/ulid/spec
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

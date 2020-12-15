@@ -1569,6 +1569,59 @@ EOT;
         $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
     }
 
+    /**
+     * @dataProvider escapedQuotationCharactersInQuotedStrings
+     */
+    public function testParseQuotedStringContainingEscapedQuotationCharacters(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function escapedQuotationCharactersInQuotedStrings()
+    {
+        return [
+            'single quoted string' => [
+                <<<YAML
+entries:
+ - message: 'No emails received before timeout - Address: ''test@testemail.company.com''
+       Keyword: ''Your Order confirmation'' ttl: 50'
+   outcome: failed
+YAML
+                ,
+                [
+                    'entries' => [
+                        [
+                            'message' => 'No emails received before timeout - Address: \'test@testemail.company.com\' Keyword: \'Your Order confirmation\' ttl: 50',
+                            'outcome' => 'failed',
+                        ],
+                    ],
+                ],
+            ],
+            'double quoted string' => [
+                <<<YAML
+entries:
+ - message: "No emails received before timeout - Address: \"test@testemail.company.com\"
+       Keyword: \"Your Order confirmation\" ttl: 50"
+   outcome: failed
+YAML
+                ,
+                [
+                    'entries' => [
+                        [
+                            'message' => 'No emails received before timeout - Address: "test@testemail.company.com" Keyword: "Your Order confirmation" ttl: 50',
+                            'outcome' => 'failed',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public function testBackslashInSingleQuotedString()
+    {
+        $this->assertSame(['foo' => 'bar\\'], $this->parser->parse("foo: 'bar\'"));
+    }
+
     public function testParseMultiLineString()
     {
         $this->assertEquals("foo bar\nbaz", $this->parser->parse("foo\nbar\n\nbaz"));
@@ -1662,6 +1715,16 @@ EOF;
 YAML
                 ,
             ],
+            'mapping with unquoted strings and values' => [
+                ['foo' => 'bar', 'bar' => 'baz'],
+                <<<YAML
+{
+    foo: bar,
+    bar: baz
+}
+YAML
+                ,
+            ],
             'sequence' => [
                 ['foo', 'bar'],
                 <<<YAML
@@ -1671,6 +1734,53 @@ YAML
 ]
 YAML
                 ,
+            ],
+            'sequence with unquoted items' => [
+                ['foo', 'bar'],
+                <<<YAML
+[
+    foo,
+    bar
+]
+YAML
+                ,
+            ],
+            'nested mapping terminating at end of line' => [
+                [
+                    'foo' => [
+                        'bar' => 'foobar',
+                    ],
+                ],
+                <<<YAML
+{ foo: { bar: foobar }
+}
+YAML
+                ,
+            ],
+            'nested sequence terminating at end of line' => [
+                [
+                    'foo',
+                    [
+                        'bar',
+                        'baz',
+                    ],
+                ],
+                <<<YAML
+[ foo, [bar, baz]
+]
+YAML
+            ],
+            'nested sequence spanning multiple lines' => [
+                [
+                    ['entry1', []],
+                    ['entry2'],
+                ],
+                <<<YAML
+[
+    ['entry1', {}],
+    ['entry2']
+]
+YAML
             ],
             'sequence nested in mapping' => [
                 ['foo' => ['bar', 'foobar'], 'bar' => ['baz']],
@@ -1697,6 +1807,22 @@ foobar: [foo,
 ]
 YAML
                 ,
+            ],
+            'sequence spanning multiple lines nested in mapping with a following mapping' => [
+                [
+                    'foobar' => [
+                        'foo',
+                        'bar',
+                    ],
+                    'bar' => 'baz',
+                ],
+                <<<YAML
+foobar: [
+    foo,
+    bar,
+]
+bar: baz
+YAML
             ],
             'nested sequence nested in mapping starting on the same line' => [
                 [
@@ -1825,6 +1951,110 @@ foo: 'bar
 baz'
 YAML
             ],
+            'mixed mapping with inline notation having separated lines' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {
+    key: "value",
+    a: "b"
+}
+param: "some"
+YAML
+            ],
+            'mixed mapping with inline notation on one line' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {key: "value", a: "b"}
+param: "some"
+YAML
+            ],
+            'mixed mapping with compact inline notation on one line' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+map: {key: "value",
+a: "b"}
+param: "some"
+YAML
+            ],
+            'nested collections containing strings with bracket chars' => [
+                [
+                    [']'],
+                    ['}'],
+                    ['ba[r'],
+                    ['[ba]r'],
+                    ['bar]'],
+                    ['foo' => 'bar{'],
+                    ['foo' => 'b{ar}'],
+                    ['foo' => 'bar}'],
+                ],
+                <<<YAML
+[
+    [
+        "]"
+    ],
+    [
+        "}"
+    ],
+    [
+        "ba[r"
+    ],
+    [
+        '[ba]r'
+    ],
+    [
+        "bar]"
+    ],
+    {
+        foo: "bar{"
+    },
+    {
+        foo: "b{ar}"
+    },
+    {
+        foo: 'bar}'
+    }
+]
+YAML
+            ],
+            'escaped characters in quoted strings' => [
+                [
+                    ['te"st'],
+                    ['test'],
+                    ["te'st"],
+                    ['te"st]'],
+                    ['te"st'],
+                    ['test'],
+                    ["te'st"],
+                    ['te"st]'],
+                ],
+                <<<YAML
+[
+    ["te\"st"],["test"],['te''st'],["te\"st]"],
+    ["te\"st"],
+    ["test"],
+    ['te''st'],
+    ["te\"st]"]
+]
+YAML
+            ],
         ];
     }
 
@@ -1844,6 +2074,13 @@ YAML;
     public function testTaggedInlineMapping()
     {
         $this->assertEquals(new TaggedValue('foo', ['foo' => 'bar']), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testInvalidInlineSequenceContainingStringWithEscapedQuotationCharacter()
+    {
+        $this->expectException(ParseException::class);
+
+        $this->parser->parse('["\\"]');
     }
 
     /**
@@ -2438,6 +2675,37 @@ YAML;
         );
     }
 
+    public function testWhitespaceAtEndOfLine()
+    {
+        $yaml = "\nfoo:\n    arguments: [ '@bar' ]  \n";
+        $this->assertSame(
+            [
+                'foo' => [
+                    'arguments' => ['@bar'],
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+
+        $yaml = "\nfoo:\n    bar: {} \n";
+        $this->assertSame(
+            [
+                'foo' => [
+                    'bar' => [],
+                ],
+            ],
+            $this->parser->parse($yaml)
+        );
+
+        $this->assertSame(
+            [
+                'foo' => 'bar',
+                'foobar' => 'baz',
+            ],
+            $this->parser->parse("foo: 'bar' \nfoobar: baz")
+        );
+    }
+
     /**
      * This is a regression test for a bug where a YAML block with a nested multiline string using | was parsed without
      * a trailing \n when a shorter YAML document was parsed before.
@@ -2470,7 +2738,7 @@ class B
 {
     public $b = 'foo';
 
-    const FOO = 'foo';
-    const BAR = 'bar';
-    const BAZ = 'baz';
+    public const FOO = 'foo';
+    public const BAR = 'bar';
+    public const BAZ = 'baz';
 }

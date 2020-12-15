@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 final class EventAliasTest extends AbstractWebTestCase
 {
-    public function testAliasedEvents(): void
+    public function testAliasedEvents()
     {
         $client = $this->createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
         $container = $client->getContainer();

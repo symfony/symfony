@@ -89,7 +89,7 @@ class XmlDescriptor extends Descriptor
 
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
-        $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, \array_key_exists('event', $options) ? $options['event'] : null));
+        $this->writeDocument($this->getEventDispatcherListenersDocument($eventDispatcher, $options));
     }
 
     protected function describeCallable($callable, array $options = [])
@@ -109,7 +109,7 @@ class XmlDescriptor extends Descriptor
 
     protected function describeContainerDeprecations(ContainerBuilder $builder, array $options = []): void
     {
-        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.cache_dir'), $builder->getParameter('kernel.container_class'));
+        $containerDeprecationFilePath = sprintf('%s/%sDeprecations.log', $builder->getParameter('kernel.build_dir'), $builder->getParameter('kernel.container_class'));
         if (!file_exists($containerDeprecationFilePath)) {
             throw new RuntimeException('The deprecation file does not exist, please try warming the cache first.');
         }
@@ -454,15 +454,18 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    private function getEventDispatcherListenersDocument(EventDispatcherInterface $eventDispatcher, string $event = null): \DOMDocument
+    private function getEventDispatcherListenersDocument(EventDispatcherInterface $eventDispatcher, array $options): \DOMDocument
     {
+        $event = \array_key_exists('event', $options) ? $options['event'] : null;
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($eventDispatcherXML = $dom->createElement('event-dispatcher'));
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
+            $registeredListeners = $eventDispatcher->getListeners($event);
             $this->appendEventListenerDocument($eventDispatcher, $event, $eventDispatcherXML, $registeredListeners);
         } else {
+            // Try to see if "events" exists
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(function ($event) use ($eventDispatcher) { return $eventDispatcher->getListeners($event); }, $options['events'])) : $eventDispatcher->getListeners();
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {

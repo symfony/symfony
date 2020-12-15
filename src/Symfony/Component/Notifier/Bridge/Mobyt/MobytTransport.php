@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -23,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Basien Durand <bdurand-dev@outlook.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 final class MobytTransport extends AbstractTransport
 {
@@ -57,7 +58,7 @@ final class MobytTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         if ($message->getOptions() && !$message->getOptions() instanceof MobytOptions) {

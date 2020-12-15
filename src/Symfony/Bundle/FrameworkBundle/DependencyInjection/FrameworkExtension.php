@@ -161,6 +161,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -480,6 +481,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_clearer');
         $container->registerForAutoconfiguration(CacheWarmerInterface::class)
             ->addTag('kernel.cache_warmer');
+        $container->registerForAutoconfiguration(EventDispatcherInterface::class)
+            ->addTag('event_dispatcher.dispatcher');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(LocaleAwareInterface::class)
@@ -534,6 +537,14 @@ class FrameworkExtension extends Extension
 
         $container->registerForAutoconfiguration(RouteLoaderInterface::class)
             ->addTag('routing.route_loader');
+
+        $container->setParameter('container.behavior_describing_tags', [
+            'container.service_locator',
+            'container.service_subscriber',
+            'kernel.event_subscriber',
+            'kernel.locale_aware',
+            'kernel.reset',
+        ]);
     }
 
     /**
@@ -803,9 +814,7 @@ class FrameworkExtension extends Extension
             // Create Workflow
             $workflowDefinition = new ChildDefinition(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, new Reference(sprintf('%s.definition', $workflowId)));
-            if (isset($markingStoreDefinition)) {
-                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
-            }
+            $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
 
@@ -894,7 +903,7 @@ class FrameworkExtension extends Extension
         $debug = $container->getParameter('kernel.debug');
 
         if ($debug) {
-            $container->setParameter('debug.container.dump', '%kernel.cache_dir%/%kernel.container_class%.xml');
+            $container->setParameter('debug.container.dump', '%kernel.build_dir%/%kernel.container_class%.xml');
         }
 
         if ($debug && class_exists(Stopwatch::class)) {
@@ -966,11 +975,11 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $config['default_uri']);
         }
 
-        if ($this->annotationsConfigEnabled) {
+        if (\PHP_VERSION_ID >= 80000 || $this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', ['priority' => -10])
-                ->addArgument(new Reference('annotation_reader'));
+                ->addArgument(new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
             $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)
@@ -1304,11 +1313,14 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            if (!$this->annotationsConfigEnabled) {
-                throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
+            if (!$this->annotationsConfigEnabled && \PHP_VERSION_ID < 80000) {
+                throw new \LogicException('"enable_annotations" on the validator cannot be set as Doctrine Annotations support is disabled.');
             }
 
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', [new Reference('annotation_reader')]);
+            $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
+            if ($this->annotationsConfigEnabled) {
+                $validatorBuilder->addMethodCall('setDoctrineAnnotationReader', [new Reference('annotation_reader')]);
+            }
         }
 
         if (\array_key_exists('static_method', $config) && $config['static_method']) {
@@ -1565,13 +1577,13 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
-            if (!$this->annotationsConfigEnabled) {
+            if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
             }
 
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
-                [new Reference('annotation_reader')]
+                [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]
             );
             $annotationLoader->setPublic(false);
 
@@ -2061,8 +2073,8 @@ class FrameworkExtension extends Extension
         }
 
         if ($responseFactoryId = $config['mock_response_factory'] ?? null) {
-            $container->getDefinition($httpClientId)
-                ->setClass(MockHttpClient::class)
+            $container->register($httpClientId.'.mock_client', MockHttpClient::class)
+                ->setDecoratedService($httpClientId, null, -10) // lower priority than TraceableHttpClient
                 ->setArguments([new Reference($responseFactoryId)]);
         }
     }
@@ -2296,13 +2308,6 @@ class FrameworkExtension extends Extension
                 case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
                 case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
                 case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
-                case '!x-forwarded-host': $trustedHeaders &= ~Request::HEADER_X_FORWARDED_HOST; break;
-                case 'x-forwarded-all':
-                    if (!\in_array('!x-forwarded-prefix', $headers)) {
-                        throw new LogicException('When using "x-forwarded-all" in "framework.trusted_headers", "!x-forwarded-prefix" must be explicitly listed until support for X-Forwarded-Prefix is implemented.');
-                    }
-                    $trustedHeaders |= Request::HEADER_X_FORWARDED_ALL;
-                    break;
             }
         }
 

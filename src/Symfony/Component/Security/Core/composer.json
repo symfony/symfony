@@ -28,6 +28,7 @@
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/ldap": "^4.4|^5.0",
+        "symfony/translation": "^4.4|^5.0",
         "symfony/validator": "^5.2",
         "psr/log": "~1.0"
     },

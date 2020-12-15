@@ -23,8 +23,8 @@ namespace Symfony\Component\ExpressionLanguage;
  */
 class Parser
 {
-    const OPERATOR_LEFT = 1;
-    const OPERATOR_RIGHT = 2;
+    public const OPERATOR_LEFT = 1;
+    public const OPERATOR_RIGHT = 2;
 
     private $stream;
     private $unaryOperators;

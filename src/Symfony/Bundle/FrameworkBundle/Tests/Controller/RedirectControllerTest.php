@@ -302,16 +302,19 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza');
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza&f[%2525][%26][%3D][p.c]=d');
         $request->attributes = new ParameterBag(['_route_params' => ['base2' => 'zaza']]);
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?b.se=zaza&base2=zaza')->with('/test', ['b.se' => 'zaza', 'base2' => 'zaza'], UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->exactly(2))
+             ->method('generate')
+             ->willReturn('/test?b.se=zaza&base2=zaza&f[%2525][%26][%3D][p.c]=d')
+             ->with('/test', ['b.se' => 'zaza', 'base2' => 'zaza', 'f' => ['%25' => ['&' => ['=' => ['p.c' => 'd']]]]], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
-        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?b.se=zaza&base2=zaza');
+        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?b.se=zaza&base2=zaza&f[%2525][%26][%3D][p.c]=d');
 
         $request->attributes->set('_route_params', ['base2' => 'zaza', 'route' => '/test', 'ignoreAttributes' => false, 'keepRequestMethod' => false, 'keepQueryParams' => true]);
-        $this->assertRedirectUrl($controller($request), '/test?b.se=zaza&base2=zaza');
+        $this->assertRedirectUrl($controller($request), '/test?b.se=zaza&base2=zaza&f[%2525][%26][%3D][p.c]=d');
     }
 
     public function testRedirectWithQueryWithRouteParamsOveriding()

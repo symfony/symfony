@@ -43,6 +43,8 @@ HttpFoundation
 --------------
 
  * Deprecated not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()`; wrap your filter in a closure instead.
+ * Deprecated the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead.
+ * Deprecated `BinaryFileResponse::create()`, use `__construct()` instead
 
 Lock
 ----
@@ -124,6 +126,36 @@ Validator
    ```
 
  * Deprecated the `NumberConstraintTrait` trait.
+
+ * Deprecated setting a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`
+
+   Before:
+
+   ```php
+   $builder->enableAnnotationMapping($reader);
+   ```
+
+   After:
+
+   ```php
+   $builder->enableAnnotationMapping(true)
+       ->setDoctrineAnnotationReader($reader);
+   ```
+
+ * Deprecated creating a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`
+
+   Before:
+
+   ```php
+   $builder->enableAnnotationMapping();
+   ```
+
+   After:
+
+   ```php
+   $builder->enableAnnotationMapping(true)
+       ->addDefaultDoctrineAnnotationReader();
+   ```
 
 Security
 --------

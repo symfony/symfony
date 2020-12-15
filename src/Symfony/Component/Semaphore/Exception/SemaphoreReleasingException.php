@@ -16,7 +16,7 @@ use Symfony\Component\Semaphore\Key;
 /**
  * SemaphoreReleasingException is thrown when an issue happens during the release of a semaphore.
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>

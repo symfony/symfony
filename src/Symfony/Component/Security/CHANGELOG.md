@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Deprecated voters that do not return a valid decision when calling the `vote` method.
+
 5.2.0
 -----
 
@@ -15,6 +20,7 @@ CHANGELOG
  * Added `LoginThrottlingListener`.
  * Added `LoginLinkAuthenticator`.
  * Moved methods `supports()` and `authenticate()` from `AbstractListener` to `FirewallListenerInterface`.
+ * [BC break] `PasswordUpgradeBadge::getPasswordUpgrader()` changed its return type to return null or a `PasswordUpgraderInterface` implementation.
 
 5.1.0
 -----

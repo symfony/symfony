@@ -34,6 +34,7 @@ CHANGELOG
  * added support for UUIDv6 in `Uuid` constraint
  * enabled the validator to load constraints from PHP attributes
  * deprecated the `NumberConstraintTrait` trait
+ * deprecated setting or creating a Doctrine annotation reader via `ValidatorBuilder::enableAnnotationMapping()`, pass `true` as first parameter and additionally call `setDoctrineAnnotationReader()` or `addDefaultDoctrineAnnotationReader()` to set up the annotation reader
 
 5.1.0
 -----

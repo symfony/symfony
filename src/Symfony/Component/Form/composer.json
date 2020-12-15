@@ -22,6 +22,7 @@
         "symfony/intl": "^4.4|^5.0",
         "symfony/options-resolver": "^5.1",
         "symfony/polyfill-ctype": "~1.8",
+        "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.15",
         "symfony/property-access": "^5.0.8",
@@ -29,7 +30,7 @@
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "^4.4.12|^5.1.6",
+        "symfony/validator": "^4.4.17|^5.1.9",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
@@ -48,7 +49,6 @@
         "symfony/error-handler": "<4.4.5",
         "symfony/framework-bundle": "<4.4",
         "symfony/http-kernel": "<4.4",
-        "symfony/intl": "<4.4",
         "symfony/translation": "<4.4",
         "symfony/translation-contracts": "<1.1.7",
         "symfony/twig-bridge": "<4.4"

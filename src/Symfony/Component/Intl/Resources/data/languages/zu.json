@@ -70,6 +70,7 @@
         "de": "isi-German",
         "dgr": "isi-Dogrib",
         "dje": "isi-Zarma",
+        "doi": "isi-Dogri",
         "dsb": "isi-Lower Sorbian",
         "dua": "isi-Duala",
         "dv": "isi-Divehi",
@@ -95,6 +96,7 @@
         "fo": "isi-Faroese",
         "fon": "isi-Fon",
         "fr": "isi-French",
+        "frc": "isi-Cajun French",
         "fur": "isi-Friulian",
         "fy": "isi-Western Frisian",
         "ga": "isi-Irish",
@@ -194,6 +196,7 @@
         "lkt": "isi-Lakota",
         "ln": "isi-Lingala",
         "lo": "isi-Lao",
+        "lou": "isi-Louisiana Creole",
         "loz": "isi-Lozi",
         "lrc": "isi-Northern Luri",
         "lt": "isi-Lithuanian",
@@ -395,7 +398,7 @@
         "en_US": "i-American English",
         "es_419": "isi-Latin American Spanish",
         "es_ES": "isi-European Spanish",
-        "es_MX": "Isi-Mexican Spanish",
+        "es_MX": "isi-Mexican Spanish",
         "fa_AF": "isi-Dari",
         "fr_CA": "isi-Canadian French",
         "fr_CH": "isi-Swiss French",
@@ -406,6 +409,6 @@
         "ro_MD": "isi-Moldavian",
         "sw_CD": "isi-Congo Swahili",
         "zh_Hans": "isi-Chinese (esenziwe-lula)",
-        "zh_Hant": "isi-Chinese (Okosiko)"
+        "zh_Hant": "isi-Chinese (Sasendulo)"
     }
 }

@@ -18,16 +18,13 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
  *
  * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  */
 abstract class FirebaseOptions implements MessageOptionsInterface
 {
-    /** @var string the recipient */
     private $to;
 
     /**
-     * @var array
-     *
      * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html#notification-payload-support
      */
     protected $options;

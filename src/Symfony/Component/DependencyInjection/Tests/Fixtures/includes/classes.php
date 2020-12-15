@@ -111,6 +111,35 @@ class LazyContext
     }
 }
 
+class FactoryCircular
+{
+    public $services;
+
+    public function __construct($services)
+    {
+        $this->services = $services;
+    }
+
+    public function create()
+    {
+        foreach ($this->services as $service) {
+            return $service;
+        }
+    }
+}
+
+class FactoryChecker
+{
+    public static function create($config)
+    {
+        if (!isset($config->flag)) {
+            throw new \LogicException('The injected config must contain a "flag" property.');
+        }
+
+        return new stdClass();
+    }
+}
+
 class FoobarCircular
 {
     public function __construct(FooCircular $foo)

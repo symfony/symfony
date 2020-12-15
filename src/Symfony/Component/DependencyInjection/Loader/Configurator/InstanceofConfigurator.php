@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class InstanceofConfigurator extends AbstractServiceConfigurator
 {
-    const FACTORY = 'instanceof';
+    public const FACTORY = 'instanceof';
 
     use Traits\AutowireTrait;
     use Traits\BindTrait;

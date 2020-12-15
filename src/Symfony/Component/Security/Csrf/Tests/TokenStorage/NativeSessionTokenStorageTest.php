@@ -22,7 +22,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
  */
 class NativeSessionTokenStorageTest extends TestCase
 {
-    const SESSION_NAMESPACE = 'foobar';
+    private const SESSION_NAMESPACE = 'foobar';
 
     /**
      * @var NativeSessionTokenStorage

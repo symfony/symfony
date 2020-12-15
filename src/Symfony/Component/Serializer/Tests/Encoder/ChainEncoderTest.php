@@ -18,9 +18,9 @@ use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 class ChainEncoderTest extends TestCase
 {
-    const FORMAT_1 = 'format1';
-    const FORMAT_2 = 'format2';
-    const FORMAT_3 = 'format3';
+    private const FORMAT_1 = 'format1';
+    private const FORMAT_2 = 'format2';
+    private const FORMAT_3 = 'format3';
 
     private $chainEncoder;
     private $encoder1;
@@ -67,9 +67,9 @@ class ChainEncoderTest extends TestCase
     public function testEncode()
     {
         $this->encoder1->expects($this->never())->method('encode');
-        $this->encoder2->expects($this->once())->method('encode');
+        $this->encoder2->expects($this->once())->method('encode')->willReturn('foo:123');
 
-        $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2);
+        $this->assertSame('foo:123', $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2));
     }
 
     public function testEncodeUnsupportedFormat()

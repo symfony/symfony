@@ -1,13 +1,13 @@
 {
     "Names": {
-        "agq": "Ágɛ̀ɛ̀mù",
-        "bez": "Bɛ́nà",
-        "chr": "Shɛ́rókiì",
-        "cu": "Síláfííkì Ilé Ìjɔ́sìn",
+        "agq": "Èdè Ágɛ̀ɛ̀mù",
+        "bez": "Èdè Bɛ́nà",
+        "chr": "Èdè Shɛ́rókiì",
+        "cu": "Èdè Síláfííkì Ilé Ìjɔ́sìn",
         "da": "Èdè Ilɛ̀ Denmark",
         "dje": "Shárúmà",
-        "dsb": "Shobíànù Ìpìlɛ̀",
-        "ebu": "Ɛmbù",
+        "dsb": "Shóbíánù Apá Ìshàlɛ̀",
+        "ebu": "Èdè Ɛmbù",
         "en": "Èdè Gɛ̀ɛ́sì",
         "es": "Èdè Sípáníìshì",
         "id": "Èdè Indonéshíà",
@@ -19,7 +19,7 @@
         "ks": "Kashímirì",
         "ksb": "Sháńbálà",
         "ku": "Kɔdishì",
-        "kw": "Kɔ́nììshì",
+        "kw": "Èdè Kɔ́nììshì",
         "lb": "Lùshɛ́mbɔ́ɔ̀gì",
         "nb": "Nɔ́ɔ́wè Bokímàl",
         "nds": "Jámánì ìpìlɛ̀",
@@ -47,7 +47,7 @@
         "xog": "Shógà",
         "yav": "Yangbɛn",
         "zgh": "Àfɛnùkò Támásáìtì ti Mòrókò",
-        "zh": "Èdè Mandarin tí wɔ́n ń sɔ lórílɛ̀-èdè Sháínà",
+        "zh": "Edè Sháínà",
         "zu": "Èdè Shulu"
     },
     "LocalizedNames": {
@@ -63,6 +63,7 @@
         "fr_CH": "Èdè Faranshé (Súwísàlaǹdì)",
         "pt_BR": "Èdè Pɔtogí (Orilɛ̀-èdè Bràsíl)",
         "pt_PT": "Èdè Pɔtogí (orílɛ̀-èdè Yúróòpù)",
-        "zh_Hant": "Èdè Ìbílɛ̀ Sháínà"
+        "zh_Hans": "Ɛdè Sháínà Onírɔ̀rùn",
+        "zh_Hant": "Èdè Sháínà Ìbílɛ̀"
     }
 }

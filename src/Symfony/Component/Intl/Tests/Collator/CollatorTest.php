@@ -14,6 +14,9 @@ namespace Symfony\Component\Intl\Tests\Collator;
 use Symfony\Component\Intl\Collator\Collator;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+/**
+ * @group legacy
+ */
 class CollatorTest extends AbstractCollatorTest
 {
     public function testConstructorWithUnsupportedLocale()

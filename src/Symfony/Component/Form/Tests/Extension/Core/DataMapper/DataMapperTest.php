@@ -50,7 +50,7 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertSame($engine, $form->getData());
     }
@@ -68,7 +68,7 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNotSame($engine, $form->getData());
         self::assertEquals($engine, $form->getData());
@@ -84,7 +84,7 @@ class DataMapperTest extends TestCase
 
         self::assertNull($form->getPropertyPath());
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -101,7 +101,7 @@ class DataMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -117,7 +117,7 @@ class DataMapperTest extends TestCase
         $car = new TypehintedPropertiesCar();
         $car->engine = 'BMW';
 
-        $this->mapper->mapDataToForms($car, [$engineForm, $colorForm]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$engineForm, $colorForm]));
 
         self::assertSame($car->engine, $engineForm->getData());
         self::assertNull($colorForm->getData());
@@ -135,7 +135,7 @@ class DataMapperTest extends TestCase
 
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms(null, [$form]);
+        $this->mapper->mapDataToForms(null, new \ArrayIterator([$form]));
 
         self::assertSame($default, $form->getData());
     }
@@ -152,7 +152,7 @@ class DataMapperTest extends TestCase
 
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms([], [$form]);
+        $this->mapper->mapDataToForms([], new \ArrayIterator([$form]));
 
         self::assertSame($default, $form->getData());
     }
@@ -171,7 +171,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertEquals($engine, $car->engine);
         self::assertNotSame($engine, $car->engine);
@@ -190,7 +190,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($engine, $car->engine);
     }
@@ -209,7 +209,7 @@ class DataMapperTest extends TestCase
 
         $car->engine = 'Rolls-Royce';
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame('Rolls-Royce', $car->engine);
     }
@@ -229,7 +229,7 @@ class DataMapperTest extends TestCase
         $config->setMapped(false);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -248,7 +248,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new Form($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -266,7 +266,7 @@ class DataMapperTest extends TestCase
         $config->setData(null);
         $form = new Form($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -285,7 +285,7 @@ class DataMapperTest extends TestCase
         $config->setData($engine);
         $form = new NotSynchronizedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -305,7 +305,7 @@ class DataMapperTest extends TestCase
         $config->setDisabled(true);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame($initialEngine, $car->engine);
     }
@@ -320,7 +320,7 @@ class DataMapperTest extends TestCase
         $config->setData('BMW');
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
 
         self::assertSame('BMW', $car->engine);
     }
@@ -342,7 +342,7 @@ class DataMapperTest extends TestCase
         $config->setData($publishedAt);
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $article);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $article);
 
         self::assertSame($publishedAtValue, $article['publishedAt']);
     }
@@ -367,7 +367,7 @@ class DataMapperTest extends TestCase
         ]);
         $form = new Form($config);
 
-        $this->mapper->mapDataToForms($person, [$form]);
+        $this->mapper->mapDataToForms($person, new \ArrayIterator([$form]));
 
         self::assertSame($initialName, $form->getData());
     }
@@ -384,7 +384,7 @@ class DataMapperTest extends TestCase
         $config->setData('Jane Doe');
         $form = new SubmittedForm($config);
 
-        $this->mapper->mapFormsToData([$form], $person);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $person);
 
         self::assertSame('Jane Doe', $person->myName());
     }

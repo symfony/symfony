@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\EntryPointFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
@@ -40,7 +39,6 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Twig\Extension\AbstractExtension;
 
@@ -360,7 +358,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Register Firewall-specific event dispatcher
         $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
-        $container->register($firewallEventDispatcherId, EventDispatcher::class);
+        $container->register($firewallEventDispatcherId, EventDispatcher::class)
+            ->addTag('event_dispatcher.dispatcher');
 
         // Register listeners
         $listeners = [];
@@ -567,15 +566,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
                         $authenticators = $factory->createAuthenticator($container, $id, $firewall[$key], $userProvider);
                         if (\is_array($authenticators)) {
-                            foreach ($authenticators as $i => $authenticator) {
+                            foreach ($authenticators as $authenticator) {
                                 $authenticationProviders[] = $authenticator;
+                                $entryPoints[] = $authenticator;
                             }
                         } else {
                             $authenticationProviders[] = $authenticators;
-                        }
-
-                        if ($factory instanceof EntryPointFactoryInterface && ($entryPoint = $factory->registerEntryPoint($container, $id, $firewall[$key]))) {
-                            $entryPoints[$key] = $entryPoint;
+                            $entryPoints[$key] = $authenticators;
                         }
                     } else {
                         [$provider, $listenerId, $defaultEntryPoint] = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
@@ -596,16 +593,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        if ($entryPoints) {
-            // we can be sure the authenticator system is enabled
-            if (null !== $defaultEntryPoint) {
-                $defaultEntryPoint = $entryPoints[$defaultEntryPoint] ?? $defaultEntryPoint;
-            } elseif (1 === \count($entryPoints)) {
-                $defaultEntryPoint = current($entryPoints);
-            } else {
-                throw new InvalidConfigurationException(sprintf('Because you have multiple authenticators in firewall "%s", you need to set the "entry_point" key to one of your authenticators (%s) or a service ID implementing "%s". The "entry_point" determines what should happen (e.g. redirect to "/login") when an anonymous user tries to access a protected page.', $id, implode(', ', $entryPoints), AuthenticationEntryPointInterface::class));
-            }
-        }
+        // the actual entry point is configured by the RegisterEntryPointPass
+        $container->setParameter('security.'.$id.'._indexed_authenticators', $entryPoints);
 
         if (false === $hasListeners && !$this->authenticatorManagerEnabled) {
             throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));

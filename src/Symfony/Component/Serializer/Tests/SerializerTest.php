@@ -613,6 +613,13 @@ class SerializerTest extends TestCase
         $serializer->deserialize('["42"]', 'int[]', 'json');
     }
 
+    public function testDeserializeWrappedScalar()
+    {
+        $serializer = new Serializer([new UnwrappingDenormalizer()], ['json' => new JsonEncoder()]);
+
+        $this->assertSame(42, $serializer->deserialize('{"wrapper": 42}', 'int', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[wrapper]']));
+    }
+
     private function serializerWithClassDiscriminator()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));

@@ -43,6 +43,10 @@ class TwigExtractorTest extends TestCase
         $m->setAccessible(true);
         $m->invoke($extractor, $template, $catalogue);
 
+        if (0 === \count($messages)) {
+            $this->assertSame($catalogue->all(), $messages);
+        }
+
         foreach ($messages as $key => $domain) {
             $this->assertTrue($catalogue->has($key, $domain));
             $this->assertEquals('prefix'.$key, $catalogue->get($key, $domain));
@@ -70,6 +74,15 @@ class TwigExtractorTest extends TestCase
 
             // make sure this works with twig's named arguments
             ['{{ "new key" | trans(domain="domain") }}', ['new key' => 'domain']],
+
+            // concat translations
+            ['{{ ("new" ~ " key") | trans() }}', ['new key' => 'messages']],
+            ['{{ ("another " ~ "new " ~ "key") | trans() }}', ['another new key' => 'messages']],
+            ['{{ ("new" ~ " key") | trans(domain="domain") }}', ['new key' => 'domain']],
+            ['{{ ("another " ~ "new " ~ "key") | trans(domain="domain") }}', ['another new key' => 'domain']],
+            // if it has a variable or other expression, we can not extract it
+            ['{% set foo = "new" %} {{ ("new " ~ foo ~ "key") | trans() }}', []],
+            ['{{ ("foo " ~ "new"|trans ~ "key") | trans() }}', ['new' => 'messages']],
         ];
     }
 

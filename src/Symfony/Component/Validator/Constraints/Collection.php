@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class Collection extends Composite
 {
-    const MISSING_FIELD_ERROR = '2fa2158c-2a7f-484b-98aa-975522539ff8';
-    const NO_SUCH_FIELD_ERROR = '7703c766-b5d5-4cef-ace7-ae0dd82304e9';
+    public const MISSING_FIELD_ERROR = '2fa2158c-2a7f-484b-98aa-975522539ff8';
+    public const NO_SUCH_FIELD_ERROR = '7703c766-b5d5-4cef-ace7-ae0dd82304e9';
 
     protected static $errorNames = [
         self::MISSING_FIELD_ERROR => 'MISSING_FIELD_ERROR',

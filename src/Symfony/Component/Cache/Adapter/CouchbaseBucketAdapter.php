@@ -42,7 +42,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
     public function __construct(\CouchbaseBucket $bucket, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 2.6.0 is required.');
+            throw new CacheException('Couchbase >= 2.6.0 < 3.0.0 is required.');
         }
 
         $this->maxIdLength = static::MAX_KEY_LENGTH;
@@ -66,7 +66,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
         }
 
         if (!static::isSupported()) {
-            throw new CacheException('Couchbase >= 2.6.0 is required.');
+            throw new CacheException('Couchbase >= 2.6.0 < 3.0.0 is required.');
         }
 
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
@@ -125,7 +125,7 @@ class CouchbaseBucketAdapter extends AbstractAdapter
 
     public static function isSupported(): bool
     {
-        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '2.6.0', '>=');
+        return \extension_loaded('couchbase') && version_compare(phpversion('couchbase'), '2.6.0', '>=') && version_compare(phpversion('couchbase'), '3.0', '<');
     }
 
     private static function getOptions(string $options): array

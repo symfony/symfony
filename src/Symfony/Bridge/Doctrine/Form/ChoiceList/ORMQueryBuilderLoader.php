@@ -12,7 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.
@@ -74,7 +77,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
-        if (\in_array($metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
+        if (\in_array($type = $metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
             $parameterType = Connection::PARAM_INT_ARRAY;
 
             // Filter out non-integer values (e.g. ""). If we don't, some
@@ -82,13 +85,27 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             $values = array_values(array_filter($values, function ($v) {
                 return (string) $v === (string) (int) $v || ctype_digit($v);
             }));
-        } elseif (\in_array($metadata->getTypeOfField($identifier), ['uuid', 'guid'])) {
+        } elseif (\in_array($type, ['ulid', 'uuid', 'guid'])) {
             $parameterType = Connection::PARAM_STR_ARRAY;
 
             // Like above, but we just filter out empty strings.
             $values = array_values(array_filter($values, function ($v) {
                 return '' !== (string) $v;
             }));
+
+            // Convert values into right type
+            if (Type::hasType($type)) {
+                $doctrineType = Type::getType($type);
+                $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
+                foreach ($values as &$value) {
+                    try {
+                        $value = $doctrineType->convertToDatabaseValue($value, $platform);
+                    } catch (ConversionException $e) {
+                        throw new TransformationFailedException(sprintf('Failed to transform "%s" into "%s".', $value, $type), 0, $e);
+                    }
+                }
+                unset($value);
+            }
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;
         }

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ParametersConfigurator extends AbstractConfigurator
 {
-    const FACTORY = 'parameters';
+    public const FACTORY = 'parameters';
 
     private $container;
 

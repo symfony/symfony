@@ -14,7 +14,7 @@ namespace Symfony\Component\RateLimiter\Exception;
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 class ReserveNotSupportedException extends \BadMethodCallException
 {

@@ -1,7 +1,8 @@
 Free Mobile Notifier
 ====================
 
-Provides Free Mobile integration for Symfony Notifier.
+Provides [Free Mobile](https://mobile.free.fr) integration for Symfony Notifier.
+
 This provider allows you to receive an SMS notification
 on your personal mobile number.
 
@@ -9,7 +10,6 @@ DSN example
 -----------
 
 ```
-// .env file
 FREE_MOBILE_DSN=freemobile://LOGIN:PASSWORD@default?phone=PHONE
 ```
 

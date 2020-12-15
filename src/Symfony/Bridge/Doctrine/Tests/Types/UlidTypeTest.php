@@ -31,12 +31,19 @@ final class UlidTypeTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        Type::addType('ulid', UlidType::class);
+        if (Type::hasType('ulid')) {
+            Type::overrideType('ulid', UlidType::class);
+        } else {
+            Type::addType('ulid', UlidType::class);
+        }
     }
 
     protected function setUp(): void
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
+        $this->platform
+            ->method('hasNativeGuidType')
+            ->willReturn(true);
         $this->platform
             ->method('getGuidTypeDeclarationSQL')
             ->willReturn('DUMMYVARCHAR()');
@@ -68,11 +75,14 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testNotSupportedUlidStringConversionToDatabaseValue()
+    public function testUlidStringConvertsToDatabaseValue()
     {
-        $this->expectException(ConversionException::class);
+        $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
+        $ulid = Ulid::fromString(self::DUMMY_ULID);
 
-        $this->type->convertToDatabaseValue(self::DUMMY_ULID, $this->platform);
+        $expected = $ulid->toRfc4122();
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function testNotSupportedTypeConversionForDatabaseValue()

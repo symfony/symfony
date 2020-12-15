@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 5.1
+ * @experimental in 5.3
  */
 final class TelegramTransportFactory extends AbstractTransportFactory
 {
@@ -30,16 +30,17 @@ final class TelegramTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('telegram' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'telegram', $this->getSupportedSchemes());
+        }
+
         $token = $this->getToken($dsn);
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('telegram' === $scheme) {
-            return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'telegram', $this->getSupportedSchemes());
+        return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

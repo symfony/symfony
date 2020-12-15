@@ -25,6 +25,14 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     private $styles = [];
     private $styleStack;
 
+    public function __clone()
+    {
+        $this->styleStack = clone $this->styleStack;
+        foreach ($this->styles as $key => $value) {
+            $this->styles[$key] = clone $value;
+        }
+    }
+
     /**
      * Escapes "<" special char in given text.
      *

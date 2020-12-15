@@ -12,6 +12,7 @@ namespace Symfony\Component\Messenger\EventListener;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -70,7 +71,18 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
             $delay = $retryStrategy->getWaitingTime($envelope, $throwable);
 
             if (null !== $this->logger) {
-                $this->logger->error('Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
+                $logLevel = LogLevel::ERROR;
+                if ($throwable instanceof RecoverableExceptionInterface) {
+                    $logLevel = LogLevel::WARNING;
+                } elseif ($throwable instanceof HandlerFailedException) {
+                    foreach ($throwable->getNestedExceptions() as $nestedException) {
+                        if ($nestedException instanceof RecoverableExceptionInterface) {
+                            $logLevel = LogLevel::WARNING;
+                            break;
+                        }
+                    }
+                }
+                $this->logger->log($logLevel, 'Error thrown while handling message {class}. Sending for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
             }
 
             // add the delay and retry stamp info

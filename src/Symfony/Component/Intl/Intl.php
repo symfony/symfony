@@ -22,32 +22,32 @@ final class Intl
      * The number of resource bundles to buffer. Loading the same resource
      * bundle for n locales takes up n spots in the buffer.
      */
-    const BUFFER_SIZE = 10;
+    public const BUFFER_SIZE = 10;
 
     /**
      * The directory name of the currency data.
      */
-    const CURRENCY_DIR = 'currencies';
+    public const CURRENCY_DIR = 'currencies';
 
     /**
      * The directory name of the language data.
      */
-    const LANGUAGE_DIR = 'languages';
+    public const LANGUAGE_DIR = 'languages';
 
     /**
      * The directory name of the script data.
      */
-    const SCRIPT_DIR = 'scripts';
+    public const SCRIPT_DIR = 'scripts';
 
     /**
      * The directory name of the locale data.
      */
-    const LOCALE_DIR = 'locales';
+    public const LOCALE_DIR = 'locales';
 
     /**
      * The directory name of the region data.
      */
-    const REGION_DIR = 'regions';
+    public const REGION_DIR = 'regions';
 
     /**
      * The directory name of the zone data.
@@ -125,7 +125,7 @@ final class Intl
      */
     public static function getIcuStubVersion(): string
     {
-        return '67.1';
+        return '68.1';
     }
 
     /**

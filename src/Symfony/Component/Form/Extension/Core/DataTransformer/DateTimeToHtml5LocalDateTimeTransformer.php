@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {
-    const HTML5_FORMAT = 'Y-m-d\\TH:i:s';
+    public const HTML5_FORMAT = 'Y-m-d\\TH:i:s';
 
     /**
      * Transforms a \DateTime into a local date and time string.

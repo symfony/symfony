@@ -20,15 +20,15 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 interface OutputInterface
 {
-    const VERBOSITY_QUIET = 16;
-    const VERBOSITY_NORMAL = 32;
-    const VERBOSITY_VERBOSE = 64;
-    const VERBOSITY_VERY_VERBOSE = 128;
-    const VERBOSITY_DEBUG = 256;
+    public const VERBOSITY_QUIET = 16;
+    public const VERBOSITY_NORMAL = 32;
+    public const VERBOSITY_VERBOSE = 64;
+    public const VERBOSITY_VERY_VERBOSE = 128;
+    public const VERBOSITY_DEBUG = 256;
 
-    const OUTPUT_NORMAL = 1;
-    const OUTPUT_RAW = 2;
-    const OUTPUT_PLAIN = 4;
+    public const OUTPUT_NORMAL = 1;
+    public const OUTPUT_RAW = 2;
+    public const OUTPUT_PLAIN = 4;
 
     /**
      * Writes a message to the output.

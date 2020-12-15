@@ -18,6 +18,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\FileUploadError;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
@@ -25,6 +26,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper\Fixtures\Issue;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,10 +36,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ViolationMapperTest extends TestCase
 {
-    const LEVEL_0 = 0;
-    const LEVEL_1 = 1;
-    const LEVEL_1B = 2;
-    const LEVEL_2 = 3;
+    private const LEVEL_0 = 0;
+    private const LEVEL_1 = 1;
+    private const LEVEL_1B = 2;
+    private const LEVEL_2 = 3;
 
     /**
      * @var EventDispatcherInterface
@@ -83,6 +85,7 @@ class ViolationMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
         $config->setDataMapper(new DataMapper());
+        $config->setErrorBubbling($options['error_bubbling'] ?? false);
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
@@ -1758,5 +1761,94 @@ class ViolationMapperTest extends TestCase
 
         $violation = new ConstraintViolation('Message without label', null, [], null, 'data.name', null);
         $this->mapper->mapViolation($violation, $parent);
+    }
+
+    public function testFileUploadErrorIsNotRemovedIfNoFileSizeConstraintViolationWasRaised()
+    {
+        $form = $this->getForm('form');
+        $form->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
+
+        $this->assertCount(2, $form->getErrors());
+    }
+
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaised()
+    {
+        $form = $this->getForm('form');
+        $form->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $violation = new ConstraintViolation(
+            'The file is too large (3 MB). Allowed maximum size is 2 MB.',
+            'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ size }}' => '3',
+                '{{ suffix }}' => 'MB',
+            ],
+            '',
+            'data',
+            null,
+            null,
+            (string) \UPLOAD_ERR_INI_SIZE,
+            new File()
+        );
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $form);
+        $this->mapper->mapViolation($violation, $form);
+
+        $this->assertCount(2, $form->getErrors());
+    }
+
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaisedOnFieldWithErrorBubbling()
+    {
+        $parent = $this->getForm('parent');
+        $child = $this->getForm('child', 'file', null, [], false, true, [
+            'error_bubbling' => true,
+        ]);
+        $parent->add($child);
+        $child->addError(new FileUploadError(
+            'The file is too large. Allowed maximum size is 2 MB.',
+            'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ suffix }}' => 'MB',
+            ]
+        ));
+
+        $violation = new ConstraintViolation(
+            'The file is too large (3 MB). Allowed maximum size is 2 MB.',
+            'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.',
+            [
+                '{{ limit }}' => '2',
+                '{{ size }}' => '3',
+                '{{ suffix }}' => 'MB',
+            ],
+            null,
+            'data.file',
+            null,
+            null,
+            (string) \UPLOAD_ERR_INI_SIZE,
+            new File()
+        );
+        $this->mapper->mapViolation($this->getConstraintViolation('data'), $parent);
+        $this->mapper->mapViolation($this->getConstraintViolation('data.file'), $parent);
+        $this->mapper->mapViolation($violation, $parent);
+
+        $this->assertCount(3, $parent->getErrors());
+        $this->assertCount(0, $child->getErrors());
     }
 }

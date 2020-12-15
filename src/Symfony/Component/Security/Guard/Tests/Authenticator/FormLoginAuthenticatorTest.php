@@ -29,9 +29,8 @@ class FormLoginAuthenticatorTest extends TestCase
     private $requestWithSession;
     private $authenticator;
 
-    const LOGIN_URL = 'http://login';
-    const DEFAULT_SUCCESS_URL = 'http://defaultsuccess';
-    const CUSTOM_SUCCESS_URL = 'http://customsuccess';
+    private const LOGIN_URL = 'http://login';
+    private const DEFAULT_SUCCESS_URL = 'http://defaultsuccess';
 
     public function testAuthenticationFailureWithoutSession()
     {

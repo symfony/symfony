@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private $defaultTimezone;
     private $defaultLocale;

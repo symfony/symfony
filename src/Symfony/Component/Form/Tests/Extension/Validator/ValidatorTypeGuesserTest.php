@@ -41,9 +41,9 @@ use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
  */
 class ValidatorTypeGuesserTest extends TestCase
 {
-    const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';
+    public const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';
 
-    const TEST_PROPERTY = 'property';
+    public const TEST_PROPERTY = 'property';
 
     /**
      * @var ValidatorTypeGuesser

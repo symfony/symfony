@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class GoogleChatTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new GoogleChatTransportFactory();
 
@@ -29,7 +29,7 @@ final class GoogleChatTransportFactoryTest extends TestCase
         $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY', (string) $transport);
     }
 
-    public function testCreateWithThreadKeyInDsn(): void
+    public function testCreateWithThreadKeyInDsn()
     {
         $factory = new GoogleChatTransportFactory();
 
@@ -39,7 +39,7 @@ final class GoogleChatTransportFactoryTest extends TestCase
         $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg', (string) $transport);
     }
 
-    public function testCreateRequiresCredentials(): void
+    public function testCreateRequiresCredentials()
     {
         $this->expectException(IncompleteDsnException::class);
         $factory = new GoogleChatTransportFactory();
@@ -48,7 +48,7 @@ final class GoogleChatTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsn));
     }
 
-    public function testSupportsGoogleChatScheme(): void
+    public function testSupportsGoogleChatScheme()
     {
         $factory = new GoogleChatTransportFactory();
 
@@ -56,7 +56,7 @@ final class GoogleChatTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
     }
 
-    public function testNonGoogleChatSchemeThrows(): void
+    public function testNonGoogleChatSchemeThrows()
     {
         $factory = new GoogleChatTransportFactory();
 

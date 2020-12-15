@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added support for configuring PHP error level to log levels
+ * Added the `dispatcher` option to `debug:event-dispatcher`
+ * Added the `event_dispatcher.dispatcher` tag
+
 5.2.0
 -----
 

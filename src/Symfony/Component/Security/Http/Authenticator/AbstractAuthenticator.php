@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
- * @experimental in 5.2
+ * @experimental in 5.3
  */
 abstract class AbstractAuthenticator implements AuthenticatorInterface
 {

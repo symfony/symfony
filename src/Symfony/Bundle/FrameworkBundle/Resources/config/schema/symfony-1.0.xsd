@@ -313,8 +313,16 @@
     </xsd:complexType>
 
     <xsd:complexType name="php-errors">
+        <xsd:sequence>
+            <xsd:element name="log" type="logLevel" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="log" type="xsd:string" />
         <xsd:attribute name="throw" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="logLevel" mixed="true">
+        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="logLevel" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 
 class GetterMetadataTest extends TestCase
 {
-    const CLASSNAME = Entity::class;
+    private const CLASSNAME = Entity::class;
 
     public function testInvalidPropertyName()
     {

@@ -21,10 +21,10 @@ use Symfony\Component\VarDumper\Cloner\DumperInterface;
  */
 abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 {
-    const DUMP_LIGHT_ARRAY = 1;
-    const DUMP_STRING_LENGTH = 2;
-    const DUMP_COMMA_SEPARATOR = 4;
-    const DUMP_TRAILING_COMMA = 8;
+    public const DUMP_LIGHT_ARRAY = 1;
+    public const DUMP_STRING_LENGTH = 2;
+    public const DUMP_COMMA_SEPARATOR = 4;
+    public const DUMP_TRAILING_COMMA = 8;
 
     public static $defaultOutput = 'php://output';
 

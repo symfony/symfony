@@ -282,4 +282,25 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame('test', $lastInfo['foo']);
         $this->assertArrayHasKey('previous_info', $lastInfo);
     }
+
+    public function testMultipleYieldInInitializer()
+    {
+        $first = null;
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) use (&$first) {
+            if ($chunk->isFirst()) {
+                $first = $chunk;
+
+                return;
+            }
+            $context->passthru();
+            yield $first;
+            yield $context->createChunk('injectedFoo');
+            yield $chunk;
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/404', ['timeout' => 0.1]);
+
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertStringContainsString('injectedFoo', $response->getContent(false));
+    }
 }

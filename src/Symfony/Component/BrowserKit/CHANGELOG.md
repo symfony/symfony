@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added `jsonRequest` method to `AbstractBrowser`
+ * Allowed sending a body with GET requests when a content-type is defined
+
+5.2.0
+-----
+
+ * [BC BREAK] Request parameters are now casted to string in `Request::__construct()`.
+
 4.3.0
 -----
 
@@ -14,7 +25,7 @@ CHANGELOG
 4.2.0
 -----
 
- * The method `Client::submit()` will have a new `$serverParameters` argument 
+ * The method `Client::submit()` will have a new `$serverParameters` argument
    in version 5.0, not defining it is deprecated
  * Added ability to read the "samesite" attribute of cookies using `Cookie::getSameSite()`
 

@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormError;
 
 final class ColorTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = ColorType::class;
+    public const TESTED_TYPE = ColorType::class;
 
     /**
      * @dataProvider validationShouldPassProvider

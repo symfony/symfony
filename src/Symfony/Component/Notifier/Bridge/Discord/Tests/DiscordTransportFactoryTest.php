@@ -31,6 +31,15 @@ final class DiscordTransportFactoryTest extends TestCase
         $this->assertSame(sprintf('discord://%s?webhook_id=%s', $host, $webhookId), (string) $transport);
     }
 
+    public function testCreateWithNoWebhookIdThrowsMalformed()
+    {
+        $factory = new DiscordTransportFactory();
+
+        $this->expectException(IncompleteDsnException::class);
+
+        $factory->create(Dsn::fromString('discord://token@host'));
+    }
+
     public function testCreateWithNoTokenThrowsMalformed()
     {
         $factory = new DiscordTransportFactory();

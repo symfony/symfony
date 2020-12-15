@@ -1,6 +1,7 @@
 {
     "Names": {
         "Afak": "afaka",
+        "Aghb": "albanese caucasico",
         "Arab": "arabo",
         "Aran": "nastaliq",
         "Armi": "aramaico imperiale",
@@ -42,7 +43,7 @@
         "Grek": "greco",
         "Gujr": "gujarati",
         "Guru": "gurmukhi",
-        "Hanb": "hanb",
+        "Hanb": "han, bopomofo",
         "Hang": "hangul",
         "Hani": "han",
         "Hano": "hanunoo",

@@ -37,6 +37,8 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
 
     /**
      * {@inheritdoc}
+     *
+     * @return array
      */
     public function normalize($exception, string $format = null, array $context = [])
     {

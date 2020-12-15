@@ -10,8 +10,8 @@ CHANGELOG
 5.1.0
 -----
 
-* Added an `UninitializedPropertyException`
-* Linking to PropertyInfo extractor to remove a lot of duplicate code
+ * Added an `UninitializedPropertyException`
+ * Linking to PropertyInfo extractor to remove a lot of duplicate code
 
 4.4.0
 -----
@@ -22,9 +22,9 @@ CHANGELOG
 4.3.0
 -----
 
-* added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
-* added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
-  `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
+ * added a `$throwExceptionOnInvalidPropertyPath` argument to the PropertyAccessor constructor.
+ * added `enableExceptionOnInvalidPropertyPath()`, `disableExceptionOnInvalidPropertyPath()` and
+   `isExceptionOnInvalidPropertyPath()` methods to `PropertyAccessorBuilder`
 
 4.0.0
 -----

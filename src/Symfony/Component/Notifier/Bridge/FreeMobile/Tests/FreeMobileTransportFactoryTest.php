@@ -23,9 +23,7 @@ final class FreeMobileTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'freemobile://login:pass@default?phone=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('freemobile://login:pass@host.test?phone=0611223344'));
 
         $this->assertSame('freemobile://host.test?phone=0611223344', (string) $transport);
     }

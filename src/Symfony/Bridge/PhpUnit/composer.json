@@ -18,10 +18,10 @@
     "require": {
         "php": ">=7.1.3 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
         "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
-        "php": ">=7.1.3"
+        "php": ">=7.1.3",
+        "symfony/deprecation-contracts": "^2.1"
     },
     "require-dev": {
-        "symfony/deprecation-contracts": "^2.1",
         "symfony/error-handler": "^4.4|^5.0"
     },
     "suggest": {

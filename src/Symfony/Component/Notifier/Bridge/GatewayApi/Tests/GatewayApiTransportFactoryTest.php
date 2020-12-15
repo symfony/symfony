@@ -28,9 +28,10 @@ final class GatewayApiTransportFactoryTest extends TestCase
     public function testCreateWithNoTokenThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
+
         $this->expectException(IncompleteDsnException::class);
-        $dsn = 'gatewayapi://default?from=Symfony';
-        $factory->create(Dsn::fromString($dsn));
+
+        $factory->create(Dsn::fromString('gatewayapi://host.test?from=Symfony'));
     }
 
     public function testCreateWithNoFromShouldThrowsIncompleteDsnException()

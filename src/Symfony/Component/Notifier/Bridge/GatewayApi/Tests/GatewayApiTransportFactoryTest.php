@@ -36,9 +36,10 @@ final class GatewayApiTransportFactoryTest extends TestCase
     public function testCreateWithNoFromShouldThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
+
         $this->expectException(IncompleteDsnException::class);
-        $dsn = 'gatewayapi://token@default';
-        $factory->create(Dsn::fromString($dsn));
+
+        $factory->create(Dsn::fromString('gatewayapi://token@host.test'));
     }
 
     private function createFactory(): GatewayApiTransportFactory

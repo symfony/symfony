@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class FreeMobileTransport extends AbstractTransport
 {
-    protected const HOST = 'https://smsapi.free-mobile.fr/sendmsg';
+    protected const HOST = 'smsapi.free-mobile.fr/sendmsg';
 
     private $login;
     private $password;
@@ -57,7 +57,9 @@ final class FreeMobileTransport extends AbstractTransport
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given) and configured with your phone number.', __CLASS__, SmsMessage::class, \get_class($message)));
         }
 
-        $response = $this->client->request('POST', $this->getEndpoint(), [
+        $endpoint = sprintf('https://%s', $this->getEndpoint());
+
+        $response = $this->client->request('POST', $endpoint, [
             'json' => [
                 'user' => $this->login,
                 'pass' => $this->password,

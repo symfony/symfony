@@ -35,24 +35,17 @@ final class GatewayApiTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'gatewayapi', $this->getSupportedSchemes());
         }
 
-        $authToken = $dsn->getUser();
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $authToken = $this->getUser($dsn);
         $from = $dsn->getOption('from');
-        $port = $dsn->getPort();
 
         if (!$from) {
             throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
         }
 
-        if (!$authToken) {
-            throw new IncompleteDsnException('Missing auth token.', $dsn->getOriginalDsn());
-        }
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        if ('gatewayapi' === $scheme) {
-            return (new GatewayApiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'gatewayapi', $this->getSupportedSchemes());
+        return (new GatewayApiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

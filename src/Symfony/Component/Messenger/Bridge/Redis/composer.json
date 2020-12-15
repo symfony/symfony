@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/messenger": "^5.1"
     },
     "require-dev": {

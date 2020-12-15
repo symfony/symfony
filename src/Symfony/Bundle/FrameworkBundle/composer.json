@@ -21,6 +21,7 @@
         "symfony/cache": "^5.2",
         "symfony/config": "^5.0",
         "symfony/dependency-injection": "^5.2",
+        "symfony/deprecation-contracts": "^2.1",
         "symfony/event-dispatcher": "^5.1",
         "symfony/error-handler": "^4.4.1|^5.0.1",
         "symfony/http-foundation": "^5.2.1",

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-09T21:22:53Z
+
+FYI test in red because test in FWB requires fix Kernel form this same PR (that's why in changed composer.json to 5.2.1)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-11T09:45:53Z
+
+(the tests on Windows might need some love.)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-11T15:44:28Z
+
+> (the tests on Windows might need some love.)
+
+Fixed with my must favorite trick. Doing nothing... ^^
+
+In fact, previous failure were very strange: I guess appveyor had FS issue
+`Failed to remove non-empty directory: Fixtures/var`
+`Permission denied: Fixtures/var/cache`
+`Failed to create dir: var/cache/resetting`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-14T10:54:24Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by alongosz at 2020-12-14T19:15:49Z
+
+Hey Guys, just wanted to let you know that this PR resolves our [blocker in Ibexa DXP](https://github.com/ezsystems/ezplatform/pull/624) preventing us from upgrading to Symfony 5.2. Thanks :+1:

@@ -25,8 +25,7 @@ final class FirebaseTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('firebase://username:password@default'));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('firebase://username:password@host.test'));
 
         $this->assertSame('firebase://host.test', (string) $transport);
     }

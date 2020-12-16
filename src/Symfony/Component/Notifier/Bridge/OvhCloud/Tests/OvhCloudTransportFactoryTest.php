@@ -23,9 +23,7 @@ final class OvhCloudTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'ovhcloud://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@host.test?consumer_key=consumerKey&service_name=serviceName'));
 
         $this->assertSame('ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName', (string) $transport);
     }

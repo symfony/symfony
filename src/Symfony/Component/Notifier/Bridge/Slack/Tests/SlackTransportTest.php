@@ -29,7 +29,6 @@ final class SlackTransportTest extends TestCase
     public function testToStringContainsProperties()
     {
         $transport = $this->createTransport();
-        $transport->setHost('host.test');
 
         $this->assertSame('slack://host.test/testPath', (string) $transport);
     }
@@ -42,7 +41,7 @@ final class SlackTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows()
+    public function testSendNonChatMessageThrowsLogicException()
     {
         $transport = $this->createTransport();
 

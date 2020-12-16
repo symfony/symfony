@@ -26,13 +26,9 @@ final class RocketChatTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $accessToken = 'testAccessToken';
-        $host = 'testHost';
-        $channel = 'testChannel';
+        $transport = $factory->create(Dsn::fromString('rocketchat://accessToken@host.test?channel=testChannel'));
 
-        $transport = $factory->create(Dsn::fromString(sprintf('rocketchat://%s@%s/?channel=%s', $accessToken, $host, $channel)));
-
-        $this->assertSame(sprintf('rocketchat://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame('rocketchat://host.test?channel=testChannel', (string) $transport);
     }
 
     public function testCreateWithNoTokenThrowsIncompleteDsnException()
@@ -40,21 +36,21 @@ final class RocketChatTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('rocketchat://%s/?channel=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('rocketchat://host.test?channel=testChannel'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('rocketchat://token@host/?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('rocketchat://token@host?channel=testChannel')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host/?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -63,7 +59,7 @@ final class RocketChatTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $factory->create(Dsn::fromString('somethingElse://token@host/?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
     }
 
     private function createFactory(): RocketChatTransportFactory

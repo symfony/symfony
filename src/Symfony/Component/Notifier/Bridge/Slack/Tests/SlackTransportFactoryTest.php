@@ -24,14 +24,12 @@ final class SlackTransportFactoryTest extends TestCase
     {
         $factory = new SlackTransportFactory();
 
-        $host = 'testHost';
-        $channel = 'testChannel';
-        $transport = $factory->create(Dsn::fromString(sprintf('slack://testUser@%s/?channel=%s', $host, $channel)));
+        $transport = $factory->create(Dsn::fromString('slack://testUser@testHost/?channel=testChannel'));
 
-        $this->assertSame(sprintf('slack://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame('slack://testHost?channel=testChannel', (string) $transport);
     }
 
-    public function testCreateWithDeprecatedDsn(): void
+    public function testCreateWithDeprecatedDsn()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
@@ -40,7 +38,7 @@ final class SlackTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }
 
-    public function testCreateWithNoTokenThrowsMalformed(): void
+    public function testCreateWithNoTokenThrowsMalformed()
     {
         $factory = new SlackTransportFactory();
 

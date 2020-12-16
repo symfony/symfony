@@ -23,9 +23,7 @@ final class SinchTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'sinch://accountSid:authToken@default?from=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('sinch://accountSid:authToken@host.test?from=0611223344'));
 
         $this->assertSame('sinch://host.test?from=0611223344', (string) $transport);
     }

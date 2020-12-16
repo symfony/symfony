@@ -38,7 +38,7 @@ final class RocketChatTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows()
+    public function testSendNonChatMessageThrowsLogicException()
     {
         $transport = $this->createTransport();
 

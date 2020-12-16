@@ -23,9 +23,7 @@ final class TwilioTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = 'twilio://accountSid:authToken@default?from=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('twilio://accountSid:authToken@host.test?from=0611223344'));
 
         $this->assertSame('twilio://host.test?from=0611223344', (string) $transport);
     }

@@ -43,7 +43,10 @@ final class FreeMobileTransportFactory extends AbstractTransportFactory
             throw new IncompleteDsnException('Missing phone.', $dsn->getOriginalDsn());
         }
 
-        return new FreeMobileTransport($login, $password, $phone, $this->client, $this->dispatcher);
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
+        return (new FreeMobileTransport($login, $password, $phone, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

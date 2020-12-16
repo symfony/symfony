@@ -29,13 +29,12 @@ final class SlackTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
-        $host = 'testHost';
         $channel = 'test Channel'; // invalid channel name to test url encoding of the channel
 
         $transport = new SlackTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
         $transport->setHost('testHost');
 
-        $this->assertSame(sprintf('slack://%s?channel=%s', $host, urlencode($channel)), (string) $transport);
+        $this->assertSame('slack://testHost?channel=test+Channel', (string) $transport);
     }
 
     public function testSupportsChatMessage()
@@ -46,7 +45,7 @@ final class SlackTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows()
+    public function testSendNonChatMessageThrowsLogicException()
     {
         $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 

@@ -26,23 +26,20 @@ final class TelegramTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {
-        $channel = 'testChannel';
+        $transport = $this->createTransport();
 
-        $transport = new TelegramTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
-        $transport->setHost('host.test');
-
-        $this->assertSame(sprintf('telegram://%s?channel=%s', 'host.test', $channel), (string) $transport);
+        $this->assertSame('telegram://host.test?channel=testChannel', (string) $transport);
     }
 
     public function testSupportsChatMessage()
     {
-        $transport = new TelegramTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows()
+    public function testSendNonChatMessageThrowsLogicException()
     {
         $transport = new TelegramTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
@@ -68,7 +65,7 @@ final class TelegramTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new TelegramTransport('testToken', 'testChannel', $client);
+        $transport = $this->createTransport('testChannel', $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -122,12 +119,12 @@ JSON;
             return $response;
         });
 
-        $transport = new TelegramTransport('testToken', $channel, $client);
+        $transport = $this->createTransport($channel, $client);
 
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
+        $this->assertEquals('telegram://host.test?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithChannelOverride()
@@ -178,7 +175,7 @@ JSON;
             return $response;
         });
 
-        $transport = new TelegramTransport('testToken', 'defaultChannel', $client);
+        $transport = $this->createTransport('defaultChannel', $client);
 
         $messageOptions = new TelegramOptions();
         $messageOptions->chatId($channelOverride);
@@ -186,6 +183,11 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
+        $this->assertEquals('telegram://host.test?channel=defaultChannel', $sentMessage->getTransport());
+    }
+
+    private function createTransport($channel = 'testChannel', ?HttpClientInterface $client = null): TelegramTransport
+    {
+        return (new TelegramTransport('token', $channel, $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

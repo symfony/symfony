@@ -23,12 +23,9 @@ final class TelegramTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $host = 'testHost';
-        $channel = 'testChannel';
+        $transport = $factory->create(Dsn::fromString('telegram://user:password@host.test?channel=testChannel'));
 
-        $transport = $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'testUser:testPassword', $host, $channel)));
-
-        $this->assertSame(sprintf('telegram://%s?channel=%s', $host, $channel), (string) $transport);
+        $this->assertSame('telegram://host.test?channel=testChannel', (string) $transport);
     }
 
     public function testCreateWithNoPasswordThrowsIncompleteDsnException()
@@ -36,7 +33,7 @@ final class TelegramTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('telegram://%s@%s/?channel=%s', 'simpleToken', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('telegram://simpleToken@host.test?channel=testChannel'));
     }
 
     public function testCreateWithNoTokenThrowsIncompleteDsnException()
@@ -44,21 +41,21 @@ final class TelegramTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('telegram://%s/?channel=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('telegram://host.test?channel=testChannel'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('telegram://host/?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('telegram://host?channel=testChannel')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?channel=testChannel')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -67,7 +64,7 @@ final class TelegramTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $factory->create(Dsn::fromString('somethingElse://user:pwd@host/?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://user:pwd@host?channel=testChannel'));
     }
 
     private function createFactory(): TelegramTransportFactory

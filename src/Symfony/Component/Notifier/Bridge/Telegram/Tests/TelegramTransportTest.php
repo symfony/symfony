@@ -91,7 +91,7 @@ final class TelegramTransportTest extends TestCase
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
-            $this->assertEquals($expectedBody, json_decode($options['body'], true));
+            $this->assertSame($expectedBody, json_decode($options['body'], true));
 
             return $response;
         });
@@ -120,7 +120,7 @@ final class TelegramTransportTest extends TestCase
         ];
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
-            $this->assertEquals($expectedBody, json_decode($options['body'], true));
+            $this->assertSame($expectedBody, json_decode($options['body'], true));
 
             return $response;
         });

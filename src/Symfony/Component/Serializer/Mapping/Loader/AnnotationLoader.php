@@ -98,7 +98,7 @@ class AnnotationLoader implements LoaderInterface
             foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
                 if ($annotation instanceof Groups) {
                     if (!$accessorOrMutator) {
-                        throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                        throw new MappingException(sprintf('Groups on "%s::%s()" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
                     foreach ($annotation->getGroups() as $group) {
@@ -106,13 +106,13 @@ class AnnotationLoader implements LoaderInterface
                     }
                 } elseif ($annotation instanceof MaxDepth) {
                     if (!$accessorOrMutator) {
-                        throw new MappingException(sprintf('MaxDepth on "%s::%s" cannot be added. MaxDepth can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                        throw new MappingException(sprintf('MaxDepth on "%s::%s()" cannot be added. MaxDepth can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
                     $attributeMetadata->setMaxDepth($annotation->getMaxDepth());
                 } elseif ($annotation instanceof SerializedName) {
                     if (!$accessorOrMutator) {
-                        throw new MappingException(sprintf('SerializedName on "%s::%s" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                        throw new MappingException(sprintf('SerializedName on "%s::%s()" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());

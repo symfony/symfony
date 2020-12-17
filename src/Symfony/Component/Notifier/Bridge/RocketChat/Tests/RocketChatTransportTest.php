@@ -30,6 +30,13 @@ final class RocketChatTransportTest extends TestCase
         $this->assertSame('rocketchat://host.test?channel=testChannel', (string) $transport);
     }
 
+    public function testToStringContainsNoChannelBecauseItsOptional()
+    {
+        $transport = $this->createTransport(null);
+
+        $this->assertSame('rocketchat://host.test', (string) $transport);
+    }
+
     public function testSupportsChatMessage()
     {
         $transport = $this->createTransport();
@@ -46,8 +53,8 @@ final class RocketChatTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    private function createTransport(): RocketChatTransport
+    private function createTransport(?string $channel = 'testChannel'): RocketChatTransport
     {
-        return (new RocketChatTransport('testAccessToken', 'testChannel', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new RocketChatTransport('testAccessToken', $channel, $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

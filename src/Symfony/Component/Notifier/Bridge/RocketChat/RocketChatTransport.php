@@ -43,6 +43,10 @@ final class RocketChatTransport extends AbstractTransport
 
     public function __toString(): string
     {
+        if (null === $this->chatChannel) {
+            return sprintf('rocketchat://%s', $this->getEndpoint());
+        }
+
         return sprintf('rocketchat://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
     }
 

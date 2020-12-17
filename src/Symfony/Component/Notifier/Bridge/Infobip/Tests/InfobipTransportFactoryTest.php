@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class InfobipTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new InfobipTransportFactory();
 
@@ -30,7 +30,7 @@ final class InfobipTransportFactoryTest extends TestCase
         $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoFromThrowsMalformed(): void
+    public function testCreateWithNoFromThrowsMalformed()
     {
         $factory = new InfobipTransportFactory();
 
@@ -40,7 +40,7 @@ final class InfobipTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsnIncomplete));
     }
 
-    public function testSupportsInfobipScheme(): void
+    public function testSupportsInfobipScheme()
     {
         $factory = new InfobipTransportFactory();
 
@@ -51,7 +51,7 @@ final class InfobipTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
     }
 
-    public function testNonInfobipSchemeThrows(): void
+    public function testNonInfobipSchemeThrows()
     {
         $factory = new InfobipTransportFactory();
 

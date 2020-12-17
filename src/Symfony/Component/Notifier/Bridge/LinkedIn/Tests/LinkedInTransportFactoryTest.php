@@ -10,7 +10,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class LinkedInTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn(): void
+    public function testCreateWithDsn()
     {
         $factory = new LinkedInTransportFactory();
 
@@ -21,7 +21,7 @@ final class LinkedInTransportFactoryTest extends TestCase
         $this->assertSame('linkedin://testHost', (string) $transport);
     }
 
-    public function testSupportsLinkedinScheme(): void
+    public function testSupportsLinkedinScheme()
     {
         $factory = new LinkedInTransportFactory();
 
@@ -29,7 +29,7 @@ final class LinkedInTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
     }
 
-    public function testNonLinkedinSchemeThrows(): void
+    public function testNonLinkedinSchemeThrows()
     {
         $factory = new LinkedInTransportFactory();
 
@@ -39,7 +39,7 @@ final class LinkedInTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString($dsn));
     }
 
-    public function testIncompleteDsnMissingUserThrows(): void
+    public function testIncompleteDsnMissingUserThrows()
     {
         $factory = new LinkedInTransportFactory();
 

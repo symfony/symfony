@@ -16,12 +16,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TestCase
 {
-    public function testToString(): void
+    public function testToString()
     {
         $this->assertSame(sprintf('linkedin://host.test'), (string) $this->getTransport());
     }
 
-    public function testSupportsChatMessage(): void
+    public function testSupportsChatMessage()
     {
         $transport = $this->getTransport();
 
@@ -29,7 +29,7 @@ final class LinkedInTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonChatMessageThrows(): void
+    public function testSendNonChatMessageThrows()
     {
         $this->expectException(LogicException::class);
 
@@ -38,7 +38,7 @@ final class LinkedInTransportTest extends TestCase
         $transport->send($this->createMock(MessageInterface::class));
     }
 
-    public function testSendWithEmptyArrayResponseThrows(): void
+    public function testSendWithEmptyArrayResponseThrows()
     {
         $this->expectException(TransportException::class);
 
@@ -59,7 +59,7 @@ final class LinkedInTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrows(): void
+    public function testSendWithErrorResponseThrows()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('testErrorCode');
@@ -82,7 +82,7 @@ final class LinkedInTransportTest extends TestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithOptions(): void
+    public function testSendWithOptions()
     {
         $message = 'testMessage';
 
@@ -126,7 +126,7 @@ final class LinkedInTransportTest extends TestCase
         $transport->send(new ChatMessage($message));
     }
 
-    public function testSendWithNotification(): void
+    public function testSendWithNotification()
     {
         $message = 'testMessage';
 
@@ -174,7 +174,7 @@ final class LinkedInTransportTest extends TestCase
         $transport->send($chatMessage);
     }
 
-    public function testSendWithInvalidOptions(): void
+    public function testSendWithInvalidOptions()
     {
         $this->expectException(LogicException::class);
 

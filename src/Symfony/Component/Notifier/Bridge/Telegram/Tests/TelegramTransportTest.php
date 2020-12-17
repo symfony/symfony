@@ -31,6 +31,13 @@ final class TelegramTransportTest extends TestCase
         $this->assertSame('telegram://host.test?channel=testChannel', (string) $transport);
     }
 
+    public function testToStringContainsNoChannelBecauseItsOptional()
+    {
+        $transport = $this->createTransport(null);
+
+        $this->assertSame('telegram://host.test', (string) $transport);
+    }
+
     public function testSupportsChatMessage()
     {
         $transport = $this->createTransport();
@@ -186,7 +193,7 @@ JSON;
         $this->assertEquals('telegram://host.test?channel=defaultChannel', $sentMessage->getTransport());
     }
 
-    private function createTransport($channel = 'testChannel', ?HttpClientInterface $client = null): TelegramTransport
+    private function createTransport(?string $channel = 'testChannel', ?HttpClientInterface $client = null): TelegramTransport
     {
         return (new TelegramTransport('token', $channel, $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }

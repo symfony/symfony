@@ -48,6 +48,10 @@ final class TelegramTransport extends AbstractTransport
 
     public function __toString(): string
     {
+        if (null === $this->chatChannel) {
+            return sprintf('telegram://%s', $this->getEndpoint());
+        }
+
         return sprintf('telegram://%s?channel=%s', $this->getEndpoint(), $this->chatChannel);
     }
 

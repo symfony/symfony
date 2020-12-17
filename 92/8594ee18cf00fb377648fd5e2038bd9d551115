@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-14T14:18:49Z
+
+I tend to agree with @jderusse. Can you elaborate why we need a dedicated exception here?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T14:22:35Z
+
+It was proposed by @chalasr and confirmed by @nicolas-grekas and I felt it makes sense... so... 🤔
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-12-15T10:37:06Z
+
+Specific exceptions allow for more fine-grained error handling. But both are fine here, I don't really care tbh :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-12-15T11:00:03Z
+
+Specific exceptions for logic exceptions don't really make sense to me, appart from normalizing error messages across the codebase.
+Actually, I think most of the LogicException in components aren't useful when it doesn't perform any common logic to format the message, nor brings more semantics in the class name, if no native PHP exception matches . I guess we could just use native `\LengthException` here.
+
+---------------------------------------------------------------------------
+
+by stof at 2020-12-15T11:36:44Z
+
+@chalasr but invalid DSNs are not things that you should handle by catching exceptions IMO. You should instead fix your config to provide a valid DSN.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-15T11:39:23Z
+
+@stof its not about an invalid DSN in this case, its about a dynamic subject length of a message
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-16T11:16:32Z
+
+> Specific exceptions for logic exceptions don't really make sense to me, appart from normalizing error messages across the codebase.
+
+@ogizanagi please keep in mind, that new bridges will come from different people and I want to make it more and more easier to implement new ones.

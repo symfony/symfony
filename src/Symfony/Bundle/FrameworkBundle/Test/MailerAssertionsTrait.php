@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
-use Symfony\Component\Mailer\Tests\Constraint as MailerConstraint;
+use Symfony\Component\Mailer\Test\Constraint as MailerConstraint;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Mime\Test\Constraint as MimeConstraint;
 

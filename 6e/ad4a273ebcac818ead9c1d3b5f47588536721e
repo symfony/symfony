@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-14T12:49:24Z
+
+Can you please check how  Discord behaves as I wondered in my comment ?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-14T13:34:05Z
+
+> Can you please check how Discord behaves as I wondered in my comment ?
+
+Unfortunately I do not have Discord account I can test with.
+
+@connorhu @mpiot maybe you can help us out here?
+
+---------------------------------------------------------------------------
+
+by connorhu at 2020-12-17T09:09:22Z
+
+It seems ok. Should I run some tests with discord api?

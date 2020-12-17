@@ -44,4 +44,34 @@ class EntryManagerTest extends TestCase
         $entryManager = new EntryManager($connection);
         $entryManager->update($entry);
     }
+
+    /**
+     * @see https://tools.ietf.org/html/rfc4514#section-3
+     *
+     * @dataProvider moveWithRFC4514DistinguishedNameProvider
+     */
+    public function testMoveWithRFC4514DistinguishedName(string $dn, string $expectedRdn)
+    {
+        $connection = $this->createMock(Connection::class);
+
+        $entry = new Entry($dn);
+        $entryManager = new EntryManager($connection);
+
+        $method = (new \ReflectionClass(EntryManager::class))->getMethod('parseRdnFromEntry');
+        $method->setAccessible(true);
+
+        $cn = $method->invokeArgs($entryManager, [$entry, 'a']);
+
+        $this->assertSame($expectedRdn, $cn);
+    }
+
+    public function moveWithRFC4514DistinguishedNameProvider(): array
+    {
+        return [
+            ['CN=Simple,DC=example,DC=net', 'CN=Simple'],
+            ['CN=James \"Jim\" Smith\, III,DC=example,DC=net', 'CN=James \"Jim\" Smith\, III'],
+            ['UID=jsmith,DC=example,DC=net', 'UID=jsmith'],
+            ["CN=Before\0dAfter,DC=example,DC=net", "CN=Before\0dAfter"],
+        ];
+    }
 }

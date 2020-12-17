@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>De Konto ass gespaart.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Ze vill mësslonge Login-Versich, w.e.g. méi spéit nach emol probéieren.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Ongëltegen oder ofgelafene Login-Link.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

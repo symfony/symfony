@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Tests\Constraint;
+namespace Symfony\Component\Mailer\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use Symfony\Component\Mailer\Event\MessageEvent;

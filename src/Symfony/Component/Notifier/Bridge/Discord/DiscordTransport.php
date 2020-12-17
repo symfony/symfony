@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord;
 
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -67,7 +67,7 @@ final class DiscordTransport extends AbstractTransport
         $content = $message->getSubject();
 
         if (\strlen($content) > 2000) {
-            throw new LogicException('The subject length of a Discord message must not exceed 2000 characters.');
+            throw new LengthException('The subject length of a Discord message must not exceed 2000 characters.');
         }
 
         $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);

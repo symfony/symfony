@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesHttpTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Tests\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 

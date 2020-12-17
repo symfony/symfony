@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunApiTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunHttpTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunSmtpTransport;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
-use Symfony\Component\Mailer\Test\TransportFactoryTestCase;
+use Symfony\Component\Mailer\Tests\TransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 

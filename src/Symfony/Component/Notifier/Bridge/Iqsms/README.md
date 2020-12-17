@@ -1,7 +1,7 @@
 Iqsms Notifier
 ==============
 
-Provides [Iqsms[(https://iqsms.ru) integration for Symfony Notifier.
+Provides [Iqsms](https://iqsms.ru) integration for Symfony Notifier.
 
 DSN example
 -----------

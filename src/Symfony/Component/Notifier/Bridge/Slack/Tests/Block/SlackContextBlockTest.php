@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackContextBlock;
 
 final class SlackContextBlockTest extends TestCase
 {
-    public function testCanBeInstantiated(): void
+    public function testCanBeInstantiated()
     {
         $context = new SlackContextBlock();
         $context->text('context text without emoji', false, false);
@@ -47,7 +47,7 @@ final class SlackContextBlockTest extends TestCase
         ], $context->toArray());
     }
 
-    public function testThrowsWhenElementsLimitReached(): void
+    public function testThrowsWhenElementsLimitReached()
     {
         $context = new SlackContextBlock();
         for ($i = 0; $i < 10; ++$i) {

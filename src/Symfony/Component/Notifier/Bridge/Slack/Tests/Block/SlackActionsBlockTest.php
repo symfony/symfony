@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackActionsBlock;
 
 final class SlackActionsBlockTest extends TestCase
 {
-    public function testCanBeInstantiated(): void
+    public function testCanBeInstantiated()
     {
         $actions = new SlackActionsBlock();
         $actions->button('first button text', 'https://example.org')
@@ -47,7 +47,7 @@ final class SlackActionsBlockTest extends TestCase
         ], $actions->toArray());
     }
 
-    public function testThrowsWhenFieldsLimitReached(): void
+    public function testThrowsWhenFieldsLimitReached()
     {
         $section = new SlackActionsBlock();
         for ($i = 0; $i < 25; ++$i) {

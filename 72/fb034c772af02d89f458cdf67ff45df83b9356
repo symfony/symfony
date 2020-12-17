@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-17T07:25:44Z
+
+Ready to merge from my side 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-17T09:49:29Z
+
+> Now, I'm wondering why we should do this?
+> If ppl mess up with their DSN, that's their issue.
+> And if ppl have the empty string as user/pass, why prevent sending them?
+
+Let me explain it while using an example from Notifier component based on this code:
+https://github.com/symfony/symfony/blob/29d62dfa861d1de6d3fdd33cc72a6ea6d1c930df/src/Symfony/Component/Notifier/Bridge/Sendinblue/SendinblueTransportFactory.php#L27-L46
+
+We provide a `getUser` method which should throw an exception if the user is `null` (same for password):
+https://github.com/symfony/symfony/blob/29d62dfa861d1de6d3fdd33cc72a6ea6d1c930df/src/Symfony/Component/Notifier/Transport/AbstractTransportFactory.php#L47-L65
+
+And if it is null we throw an exception, but if it is an empty string this would not bubble up and and empty string in the password could lead to a bad experience.
+
+What I want to achieve with this PR is, that the user who implement this bridge can rely on the `getUser` method and get an exception if this is the case. For me its better to handle this here.

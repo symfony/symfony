@@ -107,6 +107,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
+use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
@@ -2220,6 +2221,7 @@ class FrameworkExtension extends Extension
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             GoogleChatTransportFactory::class => 'notifier.transport_factory.googlechat',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
+            IqsmsTransportFactory::class => 'notifier.transport_factory.iqsms',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',

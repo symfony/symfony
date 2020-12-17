@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
+use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -51,6 +52,7 @@ class Transport
         TelegramTransportFactory::class,
         MattermostTransportFactory::class,
         NexmoTransportFactory::class,
+        IqsmsTransportFactory::class,
         RocketChatTransportFactory::class,
         TwilioTransportFactory::class,
         InfobipTransportFactory::class,

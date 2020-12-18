@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**

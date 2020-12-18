@@ -20,9 +20,9 @@ class ExtraAttributesException extends RuntimeException
 {
     private $extraAttributes;
 
-    public function __construct(array $extraAttributes, \Throwable $previous = null)
+    public function __construct(string $class, array $extraAttributes, \Throwable $previous = null)
     {
-        $msg = sprintf('Extra attributes are not allowed ("%s" are unknown).', implode('", "', $extraAttributes));
+        $msg = sprintf('Cannot create an instance of "%s" from serialized data because extra attributes are not allowed ("%s" are unknown).', $class, implode('", "', $extraAttributes));
 
         $this->extraAttributes = $extraAttributes;
 

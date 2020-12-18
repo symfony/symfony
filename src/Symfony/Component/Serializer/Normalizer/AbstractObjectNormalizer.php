@@ -340,7 +340,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if (!empty($extraAttributes)) {
-            throw new ExtraAttributesException($extraAttributes);
+            throw new ExtraAttributesException($type, $extraAttributes);
         }
 
         return $object;

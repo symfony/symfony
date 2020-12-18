@@ -62,7 +62,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeWithExtraAttributes()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\ExtraAttributesException');
-        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
+        $this->expectExceptionMessage('Cannot create an instance of "Symfony\Component\Serializer\Tests\Normalizer\Dummy" from serialized data because extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new AbstractObjectNormalizerDummy($factory);
         $normalizer->denormalize(
@@ -76,7 +76,7 @@ class AbstractObjectNormalizerTest extends TestCase
     public function testDenormalizeWithExtraAttributesAndNoGroupsWithMetadataFactory()
     {
         $this->expectException('Symfony\Component\Serializer\Exception\ExtraAttributesException');
-        $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
+        $this->expectExceptionMessage('Cannot create an instance of "Symfony\Component\Serializer\Tests\Normalizer\Dummy" from serialized data because extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $normalizer->denormalize(
             ['fooFoo' => 'foo', 'fooBar' => 'bar', 'bar' => 'bar'],

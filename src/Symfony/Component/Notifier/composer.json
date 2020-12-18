@@ -25,17 +25,7 @@
         "symfony/http-client-contracts": "^2"
     },
     "conflict": {
-        "symfony/http-kernel": "<4.4",
-        "symfony/firebase-notifier": "<5.2",
-        "symfony/free-mobile-notifier": "<5.2",
-        "symfony/mattermost-notifier": "<5.2",
-        "symfony/nexmo-notifier": "<5.2",
-        "symfony/ovh-cloud-notifier": "<5.2",
-        "symfony/rocket-chat-notifier": "<5.2",
-        "symfony/sinch-notifier": "<5.2",
-        "symfony/slack-notifier": "<5.2",
-        "symfony/telegram-notifier": "<5.2",
-        "symfony/twilio-notifier": "<5.2"
+        "symfony/http-kernel": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\": "" },

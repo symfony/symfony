@@ -202,7 +202,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNode(): void
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -215,7 +215,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation()
     {
         $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->expectExceptionMessage('The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.');
@@ -229,7 +229,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void
+    public function testPartialEnvWhichCannotBeEmptyForScalarNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -242,7 +242,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvWithVariableNode(): void
+    public function testEnvWithVariableNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -266,7 +266,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testDiscardedEnvInConfig(): void
+    public function testDiscardedEnvInConfig()
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(BOOLISH)', '1');

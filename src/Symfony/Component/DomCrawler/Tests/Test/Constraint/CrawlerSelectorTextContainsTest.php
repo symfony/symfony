@@ -19,7 +19,7 @@ use Symfony\Component\DomCrawler\Test\Constraint\CrawlerSelectorTextContains;
 
 class CrawlerSelectorTextContainsTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new CrawlerSelectorTextContains('title', 'Foo');
         $this->assertTrue($constraint->evaluate(new Crawler('<html><head><title>Foobar'), '', true));

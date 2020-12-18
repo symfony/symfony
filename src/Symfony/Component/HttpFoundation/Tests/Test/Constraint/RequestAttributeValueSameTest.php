@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\RequestAttributeValueSame;
 
 class RequestAttributeValueSameTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $request = new Request();
         $request->attributes->set('foo', 'bar');

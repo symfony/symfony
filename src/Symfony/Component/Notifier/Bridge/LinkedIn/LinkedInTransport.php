@@ -91,7 +91,10 @@ final class LinkedInTransport extends AbstractTransport
             throw new TransportException(sprintf('Unable to post the Linkedin message : "%s".', $result['error']), $response);
         }
 
-        return new SentMessage($message, (string) $this);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($result['id']);
+
+        return $sentMessage;
     }
 
     private function bodyFromMessageWithNoOption(MessageInterface $message): array

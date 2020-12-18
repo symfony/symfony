@@ -30,6 +30,8 @@ final class DiscordTransport extends AbstractTransport
 {
     protected const HOST = 'discord.com';
 
+    private const SUBJECT_LIMIT = 2000;
+
     private $token;
     private $webhookId;
 
@@ -66,7 +68,7 @@ final class DiscordTransport extends AbstractTransport
 
         $content = $message->getSubject();
 
-        if (\strlen($content) > 2000) {
+        if (mb_strlen($content, 'UTF-8') > self::SUBJECT_LIMIT) {
             throw new LengthException('The subject length of a Discord message must not exceed 2000 characters.');
         }
 

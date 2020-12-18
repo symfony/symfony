@@ -20,12 +20,12 @@ class DsnTest extends TestCase
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $string, Dsn $dsn): void
+    public function testFromString(string $string, Dsn $dsn)
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
     }
 
-    public function testGetOption(): void
+    public function testGetOption()
     {
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('smtp', 'example.com', null, null, null, $options);
@@ -38,7 +38,7 @@ class DsnTest extends TestCase
     /**
      * @dataProvider invalidDsnProvider
      */
-    public function testInvalidDsn(string $dsn, string $exceptionMessage): void
+    public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);

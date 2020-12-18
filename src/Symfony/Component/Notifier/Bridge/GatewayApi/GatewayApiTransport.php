@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\GatewayApi;
 
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -54,7 +53,7 @@ final class GatewayApiTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new UnsupportedMessageTypeException( __CLASS__, SmsMessage::class, $message);
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $endpoint = sprintf('https://%s/rest/mtsms', $this->getEndpoint());

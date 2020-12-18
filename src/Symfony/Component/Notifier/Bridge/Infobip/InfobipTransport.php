@@ -86,4 +86,9 @@ final class InfobipTransport extends AbstractTransport
 
         return new SentMessage($message, (string) $this);
     }
+
+    protected function getEndpoint(): ?string
+    {
+        return $this->host.($this->port ? ':'.$this->port : '');
+    }
 }

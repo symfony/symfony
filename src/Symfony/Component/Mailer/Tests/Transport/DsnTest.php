@@ -52,6 +52,26 @@ class DsnTest extends TestCase
             new Dsn('smtp', 'example.com'),
         ];
 
+        yield 'simple dsn including @ sign, but no user/password/token' => [
+            'scheme://@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including : sign and @ sign, but no user/password/token' => [
+            'scheme://:@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including user, : sign and @ sign, but no password' => [
+            'scheme://user1:@localhost',
+            new Dsn('scheme', 'localhost', 'user1', null),
+        ];
+
+        yield 'simple dsn including : sign, password, and @ sign, but no user' => [
+            'scheme://:pass@localhost',
+            new Dsn('scheme', 'localhost', null, 'pass'),
+        ];
+
         yield 'simple smtp with custom port' => [
             'smtp://user1:pass2@example.com:99',
             new Dsn('smtp', 'example.com', 'user1', 'pass2', 99),

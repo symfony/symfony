@@ -79,11 +79,12 @@ final class TelegramTransport extends AbstractTransport
             $options['chat_id'] = $message->getRecipientId() ?: $this->chatChannel;
         }
 
+        $options['text'] = $message->getSubject();
+
         if (!isset($options['parse_mode'])) {
             $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
         }
 
-        $options['text'] = $message->getSubject();
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

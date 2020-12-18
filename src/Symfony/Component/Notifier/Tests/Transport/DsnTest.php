@@ -15,12 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-class DsnTest extends TestCase
+final class DsnTest extends TestCase
 {
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $string, Dsn $expectedDsn): void
+    public function testFromString(string $string, Dsn $expectedDsn)
     {
         $actualDsn = Dsn::fromString($string);
 
@@ -40,6 +40,26 @@ class DsnTest extends TestCase
         yield 'simple dsn' => [
             'scheme://localhost',
             new Dsn('scheme', 'localhost', null, null, null, [], null),
+        ];
+
+        yield 'simple dsn including @ sign, but no user/password/token' => [
+            'scheme://@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including : sign and @ sign, but no user/password/token' => [
+            'scheme://:@localhost',
+            new Dsn('scheme', 'localhost', null, null),
+        ];
+
+        yield 'simple dsn including user, : sign and @ sign, but no password' => [
+            'scheme://user1:@localhost',
+            new Dsn('scheme', 'localhost', 'user1', null),
+        ];
+
+        yield 'simple dsn including : sign, password, and @ sign, but no user' => [
+            'scheme://:pass@localhost',
+            new Dsn('scheme', 'localhost', null, 'pass'),
         ];
 
         yield 'dsn with user and pass' => [
@@ -66,7 +86,7 @@ class DsnTest extends TestCase
     /**
      * @dataProvider invalidDsnProvider
      */
-    public function testInvalidDsn(string $dsn, string $exceptionMessage): void
+    public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -91,7 +111,7 @@ class DsnTest extends TestCase
         ];
     }
 
-    public function testGetOption(): void
+    public function testGetOption()
     {
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('scheme', 'localhost', 'u$er', 'pa$s', '8000', $options, '/channel');

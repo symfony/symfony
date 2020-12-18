@@ -54,8 +54,8 @@ final class Dsn
             throw new InvalidArgumentException(sprintf('The "%s" notifier DSN must contain a host (use "default" by default).', $dsn));
         }
 
-        $user = isset($parsedDsn['user']) ? urldecode($parsedDsn['user']) : null;
-        $password = isset($parsedDsn['pass']) ? urldecode($parsedDsn['pass']) : null;
+        $user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
+        $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
         $port = $parsedDsn['port'] ?? null;
         $path = $parsedDsn['path'] ?? null;
         parse_str($parsedDsn['query'] ?? '', $query);

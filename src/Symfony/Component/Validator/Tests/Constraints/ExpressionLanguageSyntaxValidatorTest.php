@@ -23,7 +23,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         return new ExpressionLanguageSyntaxValidator(new ExpressionLanguage());
     }
 
-    public function testExpressionValid(): void
+    public function testExpressionValid()
     {
         $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -33,7 +33,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithoutNames(): void
+    public function testExpressionWithoutNames()
     {
         $this->validator->validate('1 + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -42,7 +42,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithAllowedVariableName(): void
+    public function testExpressionWithAllowedVariableName()
     {
         $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',
@@ -52,7 +52,7 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionIsNotValid(): void
+    public function testExpressionIsNotValid()
     {
         $this->validator->validate('a + 1', new ExpressionLanguageSyntax([
             'message' => 'myMessage',

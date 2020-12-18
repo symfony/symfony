@@ -89,11 +89,6 @@ final class MattermostTransport extends AbstractTransport
 
     protected function getEndpoint(): ?string
     {
-        return $this->host.($this->port ? ':'.$this->port : '');
-    }
-
-    protected function getEndpoint(): ?string
-    {
         return rtrim($this->host.($this->port ? ':'.$this->port : '').($this->path ?? ''), '/');
     }
 }

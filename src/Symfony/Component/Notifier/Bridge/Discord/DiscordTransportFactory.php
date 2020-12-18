@@ -30,6 +30,11 @@ final class DiscordTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('discord' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'discord', $this->getSupportedSchemes());
+        }
+
         $token = $this->getUser($dsn);
         $webhookId = $dsn->getOption('webhook_id');
 
@@ -40,11 +45,7 @@ final class DiscordTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('discord' === $scheme) {
-            return (new DiscordTransport($token, $webhookId, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'discord', $this->getSupportedSchemes());
+        return (new DiscordTransport($token, $webhookId, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

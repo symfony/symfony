@@ -25,23 +25,22 @@ final class EsendexTransportTest extends TestCase
 {
     public function testToString()
     {
-        $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
-        $transport->setHost('testHost');
+        $transport = $this->createTransport();
 
-        $this->assertSame(sprintf('esendex://%s', 'testHost'), (string) $transport);
+        $this->assertSame('esendex://host.test', (string) $transport);
     }
 
     public function testSupportsSmsMessage()
     {
-        $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new SmsMessage('phone', 'testSmsMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrows()
+    public function testSendNonSmsMessageThrowsLogicException()
     {
-        $transport = new EsendexTransport('testToken', 'accountReference', 'from', $this->createMock(HttpClientInterface::class));
+        $transport = $this->createTransport();
 
         $this->expectException(UnsupportedMessageTypeException::class);
 
@@ -59,10 +58,11 @@ final class EsendexTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new EsendexTransport('testToken', 'accountReference', 'from', $client);
+        $transport = $this->createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send the SMS: error 500.');
+
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
@@ -80,10 +80,16 @@ final class EsendexTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new EsendexTransport('testToken', 'accountReference', 'from', $client);
+        $transport = $this->createTransport($client);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send the SMS: error 500. Details from Esendex: accountreference_invalid: "Invalid Account Reference EX0000000".');
+
         $transport->send(new SmsMessage('phone', 'testMessage'));
+    }
+
+    private function createTransport(?HttpClientInterface $client = null): EsendexTransport
+    {
+        return (new EsendexTransport('testToken', 'testAccountReference', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

@@ -21,43 +21,55 @@ final class InfobipTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new InfobipTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'infobip://authtoken@default?from=0611223344';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('host.test');
+        $transport = $factory->create(Dsn::fromString('infobip://authtoken@host.test?from=0611223344'));
 
         $this->assertSame('infobip://host.test?from=0611223344', (string) $transport);
     }
 
-    public function testCreateWithNoFromThrowsMalformed()
+    public function testCreateWithNoFromThrowsIncompleteDsnException()
     {
-        $factory = new InfobipTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-
-        $dsnIncomplete = 'infobip://authtoken@default';
-        $factory->create(Dsn::fromString($dsnIncomplete));
+        $factory->create(Dsn::fromString('infobip://authtoken@default'));
     }
 
-    public function testSupportsInfobipScheme()
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = new InfobipTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'infobip://authtoken@default?from=0611223344';
-        $dsnUnsupported = 'unsupported://authtoken@default?from=0611223344';
-
-        $this->assertTrue($factory->supports(Dsn::fromString($dsn)));
-        $this->assertFalse($factory->supports(Dsn::fromString($dsnUnsupported)));
+        $this->assertTrue($factory->supports(Dsn::fromString('infobip://authtoken@default?from=0611223344')));
     }
 
-    public function testNonInfobipSchemeThrows()
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
-        $factory = new InfobipTransportFactory();
+        $factory = $this->createFactory();
+
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://authtoken@default?from=0611223344')));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(UnsupportedSchemeException::class);
+        $factory->create(Dsn::fromString('somethingElse://authtoken@default?from=FROM'));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
+    {
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        $dsnUnsupported = 'unsupported://authtoken@default?from=0611223344';
-        $factory->create(Dsn::fromString($dsnUnsupported));
+        // unsupported scheme and missing "from" option
+        $factory->create(Dsn::fromString('somethingElse://authtoken@default'));
+    }
+
+    private function createFactory(): InfobipTransportFactory
+    {
+        return new InfobipTransportFactory();
     }
 }

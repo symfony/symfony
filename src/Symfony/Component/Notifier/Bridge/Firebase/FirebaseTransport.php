@@ -80,17 +80,17 @@ final class FirebaseTransport extends AbstractTransport
         if (200 !== $response->getStatusCode()) {
             $errorMessage = $jsonContents ? $jsonContents['results']['error'] : $response->getContent(false);
 
-            throw new TransportException(sprintf('Unable to post the Firebase message: %s.', $errorMessage), $response);
+            throw new TransportException('Unable to post the Firebase message: '.$errorMessage, $response);
         }
         if ($jsonContents && isset($jsonContents['results']['error'])) {
-            throw new TransportException(sprintf('Unable to post the Firebase message: %s.', $jsonContents['error']), $response);
+            throw new TransportException('Unable to post the Firebase message: '.$jsonContents['error'], $response);
         }
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['results'][0]['message_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['results'][0]['message_id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

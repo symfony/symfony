@@ -40,6 +40,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
         if ($notification->getContent()) {
             $text .= "\r\n".$notification->getContent();
         }
+
         if ($exception = $notification->getExceptionAsString()) {
             $text .= "\r\n".'```'.$notification->getExceptionAsString().'```';
         }

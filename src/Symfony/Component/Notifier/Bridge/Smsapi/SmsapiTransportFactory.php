@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsapi;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -28,16 +29,22 @@ class SmsapiTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $authToken = $dsn->getUser();
-        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-        $from = $dsn->getOption('from');
-        $port = $dsn->getPort();
 
-        if ('smsapi' === $scheme) {
-            return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        if ('smsapi' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'smsapi', $this->getSupportedSchemes());
         }
 
-        throw new UnsupportedSchemeException($dsn, 'smsapi', $this->getSupportedSchemes());
+        $authToken = $this->getUser($dsn);
+        $from = $dsn->getOption('from');
+
+        if (!$from) {
+            throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
+        }
+
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
+        return (new SmsapiTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

@@ -12,39 +12,45 @@ final class LinkedInTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new LinkedInTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'linkedin://login:pass@default';
-        $transport = $factory->create(Dsn::fromString($dsn));
-        $transport->setHost('testHost');
+        $transport = $factory->create(Dsn::fromString('linkedin://accessToken:UserId@host.test'));
 
-        $this->assertSame('linkedin://testHost', (string) $transport);
+        $this->assertSame('linkedin://host.test', (string) $transport);
     }
 
-    public function testSupportsLinkedinScheme()
+    public function testCreateWithOnlyAccessTokenOrUserIdThrowsIncompleteDsnException()
     {
-        $factory = new LinkedInTransportFactory();
+        $factory = $this->createFactory();
+
+        $this->expectException(IncompleteDsnException::class);
+        $factory->create(Dsn::fromString('linkedin://AccessTokenOrUserId@default'));
+    }
+
+    public function testSupportsReturnsTrueWithSupportedScheme()
+    {
+        $factory = $this->createFactory();
 
         $this->assertTrue($factory->supports(Dsn::fromString('linkedin://host/path')));
+    }
+
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
+    {
+        $factory = $this->createFactory();
+
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
     }
 
-    public function testNonLinkedinSchemeThrows()
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
     {
-        $factory = new LinkedInTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-
-        $dsn = 'foo://login:pass@default';
-        $factory->create(Dsn::fromString($dsn));
+        $factory->create(Dsn::fromString('somethingElse://accessToken:UserId@default'));
     }
 
-    public function testIncompleteDsnMissingUserThrows()
+    private function createFactory(): LinkedInTransportFactory
     {
-        $factory = new LinkedInTransportFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://host/path'));
+        return new LinkedInTransportFactory();
     }
 }

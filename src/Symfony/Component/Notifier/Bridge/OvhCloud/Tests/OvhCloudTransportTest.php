@@ -35,7 +35,7 @@ final class OvhCloudTransportTest extends TestCase
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
     }
 
-    public function testSendNonSmsMessageThrowsException()
+    public function testSendNonSmsMessageThrowsLogicException()
     {
         $transport = $this->createTransport();
 

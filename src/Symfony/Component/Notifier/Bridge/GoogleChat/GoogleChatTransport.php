@@ -90,6 +90,7 @@ final class GoogleChatTransport extends AbstractTransport
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
+
         if ($message->getOptions() && !$message->getOptions() instanceof GoogleChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
         }
@@ -124,7 +125,7 @@ final class GoogleChatTransport extends AbstractTransport
         try {
             $result = $response->toArray(false);
         } catch (JsonException $jsonException) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: Invalid response.'), $response, $response->getStatusCode(), $jsonException);
+            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $response->getStatusCode(), $jsonException);
         }
 
         if (200 !== $response->getStatusCode()) {

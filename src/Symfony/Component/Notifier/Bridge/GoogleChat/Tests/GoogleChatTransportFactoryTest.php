@@ -21,47 +21,55 @@ final class GoogleChatTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new GoogleChatTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY';
-        $transport = $factory->create(Dsn::fromString($dsn));
+        $transport = $factory->create(Dsn::fromString('googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY'));
 
         $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY', (string) $transport);
     }
 
     public function testCreateWithThreadKeyInDsn()
     {
-        $factory = new GoogleChatTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg';
-        $transport = $factory->create(Dsn::fromString($dsn));
+        $transport = $factory->create(Dsn::fromString('googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg'));
 
         $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg', (string) $transport);
     }
 
     public function testCreateRequiresCredentials()
     {
-        $this->expectException(IncompleteDsnException::class);
-        $factory = new GoogleChatTransportFactory();
+        $factory = $this->createFactory();
 
-        $dsn = 'googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages';
-        $factory->create(Dsn::fromString($dsn));
+        $this->expectException(IncompleteDsnException::class);
+
+        $factory->create(Dsn::fromString('googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'));
     }
 
-    public function testSupportsGoogleChatScheme()
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = new GoogleChatTransportFactory();
+        $factory = $this->createFactory();
 
         $this->assertTrue($factory->supports(Dsn::fromString('googlechat://host/path')));
+    }
+
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
+    {
+        $factory = $this->createFactory();
+
         $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
     }
 
-    public function testNonGoogleChatSchemeThrows()
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
     {
-        $factory = new GoogleChatTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-
         $factory->create(Dsn::fromString('somethingElse://host/path'));
+    }
+
+    private function createFactory(): GoogleChatTransportFactory
+    {
+        return new GoogleChatTransportFactory();
     }
 }

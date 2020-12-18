@@ -64,6 +64,7 @@ final class LinkedInTransport extends AbstractTransport
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
+
         if ($message->getOptions() && !$message->getOptions() instanceof LinkedInOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, LinkedInOptions::class));
         }
@@ -88,7 +89,7 @@ final class LinkedInTransport extends AbstractTransport
         $result = $response->toArray(false);
 
         if (!$result['id']) {
-            throw new TransportException(sprintf('Unable to post the Linkedin message : "%s".', $result['error']), $response);
+            throw new TransportException(sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);

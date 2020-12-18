@@ -60,6 +60,7 @@ final class SlackTransport extends AbstractTransport
         if (!$message instanceof ChatMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
+
         if ($message->getOptions() && !$message->getOptions() instanceof SlackOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, SlackOptions::class));
         }

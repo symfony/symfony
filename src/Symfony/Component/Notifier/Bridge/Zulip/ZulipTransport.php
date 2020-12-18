@@ -94,9 +94,9 @@ class ZulipTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

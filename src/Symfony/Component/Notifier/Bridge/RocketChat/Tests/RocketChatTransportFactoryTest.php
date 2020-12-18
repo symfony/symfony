@@ -36,6 +36,7 @@ final class RocketChatTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
+
         $factory->create(Dsn::fromString('rocketchat://host.test?channel=testChannel'));
     }
 

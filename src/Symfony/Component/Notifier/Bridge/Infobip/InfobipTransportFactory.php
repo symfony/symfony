@@ -31,6 +31,11 @@ final class InfobipTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
+
+        if ('infobip' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'infobip', $this->getSupportedSchemes());
+        }
+
         $authToken = $this->getUser($dsn);
         $from = $dsn->getOption('from');
         $host = $dsn->getHost();
@@ -40,11 +45,7 @@ final class InfobipTransportFactory extends AbstractTransportFactory
             throw new IncompleteDsnException('Missing from.', $dsn->getOriginalDsn());
         }
 
-        if ('infobip' === $scheme) {
-            return (new InfobipTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'infobip', $this->getSupportedSchemes());
+        return (new InfobipTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

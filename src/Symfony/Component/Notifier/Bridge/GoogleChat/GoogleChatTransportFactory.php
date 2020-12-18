@@ -32,21 +32,18 @@ final class GoogleChatTransportFactory extends AbstractTransportFactory
     {
         $scheme = $dsn->getScheme();
 
-        if ('googlechat' === $scheme) {
-            $space = explode('/', $dsn->getPath())[1];
-            $accessKey = $this->getUser($dsn);
-            $accessToken = $this->getPassword($dsn);
-            $threadKey = $dsn->getOption('threadKey');
-            $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
-            $port = $dsn->getPort();
-
-            return (new GoogleChatTransport($space, $accessKey, $accessToken, $this->client, $this->dispatcher))
-                ->setThreadKey($threadKey)
-                ->setHost($host)
-                ->setPort($port);
+        if ('googlechat' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'googlechat', $this->getSupportedSchemes());
         }
 
-        throw new UnsupportedSchemeException($dsn, 'googlechat', $this->getSupportedSchemes());
+        $space = explode('/', $dsn->getPath())[1];
+        $accessKey = $this->getUser($dsn);
+        $accessToken = $this->getPassword($dsn);
+        $threadKey = $dsn->getOption('threadKey');
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
+        return (new GoogleChatTransport($space, $accessKey, $accessToken, $this->client, $this->dispatcher))->setThreadKey($threadKey)->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

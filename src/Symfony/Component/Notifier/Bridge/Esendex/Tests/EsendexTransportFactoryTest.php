@@ -9,58 +9,55 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
+namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-/**
- * @author Oskar Stark <oskarstark@googlemail.com>
- */
-final class MattermostTransportFactoryTest extends TestCase
+final class EsendexTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@host.test?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString('esendex://email:password@host.test?accountreference=testAccountreference&from=testFrom'));
 
-        $this->assertSame('mattermost://host.test?channel=testChannel', (string) $transport);
+        $this->assertSame('esendex://host.test', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionAccountreferenceThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
-        $factory->create(Dsn::fromString('mattermost://token@host'));
+        $factory->create(Dsn::fromString('esendex://email:password@host?from=FROM'));
     }
 
-    public function testCreateWithNoTokenThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
-        $factory->create(Dsn::fromString('mattermost://host.test?channel=testChannel'));
+        $factory->create(Dsn::fromString('esendex://email:password@host?accountreference=ACCOUNTREFERENCE'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('mattermost://token@host?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('esendex://email:password@host?accountreference=ACCOUNTREFERENCE&from=FROM')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://email:password@host?accountreference=ACCOUNTREFERENCE&from=FROM')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -68,8 +65,7 @@ final class MattermostTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://email:password@host?accountreference=REFERENCE&from=FROM'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
@@ -78,12 +74,12 @@ final class MattermostTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        // unsupported scheme and missing "channel" option
-        $factory->create(Dsn::fromString('somethingElse://token@host'));
+        // unsupported scheme and missing "from" option
+        $factory->create(Dsn::fromString('somethingElse://email:password@host?accountreference=REFERENCE'));
     }
 
-    private function createFactory(): MattermostTransportFactory
+    private function createFactory(): EsendexTransportFactory
     {
-        return new MattermostTransportFactory();
+        return new EsendexTransportFactory();
     }
 }

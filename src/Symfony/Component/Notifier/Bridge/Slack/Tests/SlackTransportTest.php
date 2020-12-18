@@ -32,9 +32,9 @@ final class SlackTransportTest extends TestCase
         $channel = 'test Channel'; // invalid channel name to test url encoding of the channel
 
         $transport = new SlackTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
-        $transport->setHost('testHost');
+        $transport->setHost('host.test');
 
-        $this->assertSame('slack://testHost?channel=test+Channel', (string) $transport);
+        $this->assertSame('slack://host.test?channel=test+Channel', (string) $transport);
     }
 
     public function testSupportsChatMessage()

@@ -77,9 +77,9 @@ final class NexmoTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['messages'][0]['message-id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['messages'][0]['message-id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

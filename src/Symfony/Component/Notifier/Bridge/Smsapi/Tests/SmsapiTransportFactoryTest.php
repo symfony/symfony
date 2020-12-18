@@ -9,35 +9,32 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
+namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-/**
- * @author Oskar Stark <oskarstark@googlemail.com>
- */
-final class MattermostTransportFactoryTest extends TestCase
+final class SmsapiTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@host.test?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString('smsapi://token@host.test?from=testFrom'));
 
-        $this->assertSame('mattermost://host.test?channel=testChannel', (string) $transport);
+        $this->assertSame('smsapi://host.test?from=testFrom', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
-        $factory->create(Dsn::fromString('mattermost://token@host'));
+        $factory->create(Dsn::fromString('smsapi://token@host'));
     }
 
     public function testCreateWithNoTokenThrowsIncompleteDsnException()
@@ -45,22 +42,21 @@ final class MattermostTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('mattermost://host.test?channel=testChannel'));
+        $factory->create(Dsn::fromString('smsapi://host.test?from=testFrom'));
     }
 
     public function testSupportsReturnsTrueWithSupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('mattermost://token@host?channel=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('smsapi://host?from=testFrom')));
     }
 
     public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
         $factory = $this->createFactory();
 
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?from=testFrom')));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
@@ -68,8 +64,7 @@ final class MattermostTransportFactoryTest extends TestCase
         $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://token@host?from=testFrom'));
     }
 
     public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
@@ -78,12 +73,12 @@ final class MattermostTransportFactoryTest extends TestCase
 
         $this->expectException(UnsupportedSchemeException::class);
 
-        // unsupported scheme and missing "channel" option
+        // unsupported scheme and missing "from" option
         $factory->create(Dsn::fromString('somethingElse://token@host'));
     }
 
-    private function createFactory(): MattermostTransportFactory
+    private function createFactory(): SmsapiTransportFactory
     {
-        return new MattermostTransportFactory();
+        return new SmsapiTransportFactory();
     }
 }

@@ -330,6 +330,62 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Banku Identifikazioko Kode hau ez dago lotuta {{ IBAN }} IBAN-rekin.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Balio honek baliozko JSON bat izan behar luke.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Bilduma honek elementu bakarrak soilik izan beharko lituzke.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Balio honek positiboa izan beharko luke.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Balio honek positiboa edo zero izan behar luke.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Balio honek negatiboa izan behar luke.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Balio honek negatiboa edo zero izan behar luke.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Balio hori ez da baliozko ordu-eremua.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Pasahitz hori ezin da erabili, beste gune eta aplikazio batzuetako segurtasun-akatsei esker lortutako pasahitz publikoen zerrendan sartuta dagoelako. Mesedez, erabili beste pasahitz bat.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Balio honek {{ min }} eta {{ max }} artean egon behar luke.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Balio hori ez da ostalari-izen onargarria.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Bilduma honetako elementu-kopuruak {{ compared_value }}-ren multiploa izan behar luke.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Balio honek, gutxienez, murrizketa hauetako bat bete behar du:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Bilduma honetako elementu bakoitzak bere murriztapen-multzoa bete behar du.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Balio hori ez da baliozko baloreen nazioarteko identifikazio-zenbaki bat (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

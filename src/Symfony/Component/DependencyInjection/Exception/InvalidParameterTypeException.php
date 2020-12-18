@@ -25,6 +25,6 @@ class InvalidParameterTypeException extends InvalidArgumentException
         $acceptedType = $acceptedType instanceof \ReflectionNamedType ? $acceptedType->getName() : (string) $acceptedType;
         $this->code = $type;
 
-        parent::__construct(sprintf('Invalid definition for service "%s": argument %d of "%s::%s" accepts "%s", "%s" passed.', $serviceId, 1 + $parameter->getPosition(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName(), $acceptedType, $type));
+        parent::__construct(sprintf('Invalid definition for service "%s": argument %d of "%s::%s()" accepts "%s", "%s" passed.', $serviceId, 1 + $parameter->getPosition(), $parameter->getDeclaringClass()->getName(), $parameter->getDeclaringFunction()->getName(), $acceptedType, $type));
     }
 }

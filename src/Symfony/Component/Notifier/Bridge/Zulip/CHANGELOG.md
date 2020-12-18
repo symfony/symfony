@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * The bridge is not marked as `@experimental` anymore
+* [BC BREAK] `ZulipTransport` is now final
+* [BC BREAK] `ZulipTransportFactory` is now final
 
 5.2.0
 -----

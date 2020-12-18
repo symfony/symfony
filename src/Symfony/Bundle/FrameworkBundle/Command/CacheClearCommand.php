@@ -207,8 +207,8 @@ EOF
 
         if (null === $mounts) {
             $mounts = [];
-            if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
-                foreach ($mounts as $mount) {
+            if ('/' === \DIRECTORY_SEPARATOR && $files = @file('/proc/mounts')) {
+                foreach ($files as $mount) {
                     $mount = \array_slice(explode(' ', $mount), 1, -3);
                     if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {
                         continue;

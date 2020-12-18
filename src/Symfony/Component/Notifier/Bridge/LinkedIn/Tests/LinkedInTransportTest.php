@@ -34,7 +34,7 @@ final class LinkedInTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows()
     {
-        $transport = $this->getTransport();
+        $transport = $this->createTransport();
 
         $this->expectException(UnsupportedMessageTypeException::class);
 

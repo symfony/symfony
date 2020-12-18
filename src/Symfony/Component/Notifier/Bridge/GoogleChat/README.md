@@ -7,15 +7,14 @@ DSN example
 -----------
 
 ```
-// .env file
-INFOBIP_DSN=googlechat://ACCESS_KEY:ACCESS_TOKEN@default/SPACE?threadKey=THREAD_KEY
+GOOGLE_CHAT_DSN=googlechat://ACCESS_KEY:ACCESS_TOKEN@default/SPACE?threadKey=THREAD_KEY
 ```
 
 where:
  - `ACCESS_KEY` is your Google Chat access key
  - `ACCESS_TOKEN` is your Google Chat access token
  - `SPACE` is the Google Chat space
- - `THREAD_KEY` is the the Google Chat message thread to group messages into a single thread
+ - `THREAD_KEY` is the the Google Chat message thread to group messages into a single thread (optional)
 
 Resources
 ---------

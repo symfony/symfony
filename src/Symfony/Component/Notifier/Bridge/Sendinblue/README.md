@@ -1,19 +1,18 @@
 Sendinblue Notifier
 ===================
 
-Provides Sendinblue integration for Symfony Notifier.
+Provides [Sendinblue](https://sendinblue.com) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-// .env file
-SENDINBLUE_DSN=sendinblue://API_KEY@default?sender=PHONE
+SENDINBLUE_DSN=sendinblue://API_KEY@default?sender=SENDER
 ```
 
 where:
  - `API_KEY` is your api key from your Sendinblue account
- - `PHONE` is your sender's phone number
+ - `SENDER` is your sender's phone number
 
 See more info at https://developers.sendinblue.com/reference#sendtransacsms
 

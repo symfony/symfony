@@ -89,6 +89,7 @@ final class GoogleChatTransport extends AbstractTransport
         if (!$message instanceof ChatMessage) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, ChatMessage::class, \get_class($message)));
         }
+
         if ($message->getOptions() && !$message->getOptions() instanceof GoogleChatOptions) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" for options.', __CLASS__, GoogleChatOptions::class));
         }

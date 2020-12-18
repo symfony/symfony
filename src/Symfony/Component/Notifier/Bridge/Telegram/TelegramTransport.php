@@ -21,10 +21,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * TelegramTransport.
- *
  * To get the chat id, send a message in Telegram with the user you want
- * and then curl 'https://api.telegram.org/bot%token%/getUpdates' | json_pp
+ * and then execute curl 'https://api.telegram.org/bot%token%/getUpdates' | json_pp
+ * command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -96,9 +95,9 @@ final class TelegramTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['result']['message_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['result']['message_id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

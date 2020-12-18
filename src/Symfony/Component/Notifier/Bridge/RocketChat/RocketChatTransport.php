@@ -92,9 +92,9 @@ final class RocketChatTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $message = new SentMessage($message, (string) $this);
-        $message->setMessageId($success['message']['_id']);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($success['message']['_id']);
 
-        return $message;
+        return $sentMessage;
     }
 }

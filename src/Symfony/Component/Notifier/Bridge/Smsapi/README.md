@@ -1,19 +1,18 @@
 SMSAPI Notifier
 ===============
 
-Provides Smsapi integration for Symfony Notifier.
+Provides [Smsapi](https://ssl.smsapi.pl) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-// .env file
 SMSAPI_DSN=smsapi://TOKEN@default?from=FROM
 ```
 
 where:
- - `TOKEN` is API Token (OAuth)
- - `FROM` is sender name
+ - `TOKEN` is your API Token (OAuth)
+ - `FROM` is the sender name
 
 See your account info at https://ssl.smsapi.pl/
 

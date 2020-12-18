@@ -7,7 +7,6 @@ DSN example
 -----------
 
 ```
-// .env file
 INFOBIP_DSN=infobip://AUTH_TOKEN@INFOBIP_HOST?from=FROM
 ```
 

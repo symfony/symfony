@@ -21,46 +21,64 @@ final class DiscordTransportFactoryTest extends TestCase
 {
     public function testCreateWithDsn()
     {
-        $factory = new DiscordTransportFactory();
+        $factory = $this->createFactory();
 
-        $host = 'testHost';
-        $webhookId = 'testChannel';
+        $transport = $factory->create(Dsn::fromString('discord://token@host.test?webhook_id=testWebhookId'));
 
-        $transport = $factory->create(Dsn::fromString(sprintf('discord://%s@%s/?webhook_id=%s', 'token', $host, $webhookId)));
-
-        $this->assertSame(sprintf('discord://%s?webhook_id=%s', $host, $webhookId), (string) $transport);
+        $this->assertSame('discord://host.test?webhook_id=testWebhookId', (string) $transport);
     }
 
-    public function testCreateWithNoWebhookIdThrowsMalformed()
+    public function testCreateWithMissingOptionWebhookIdThrowsIncompleteDsnException()
     {
-        $factory = new DiscordTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
 
         $factory->create(Dsn::fromString('discord://token@host'));
     }
 
-    public function testCreateWithNoTokenThrowsMalformed()
+    public function testCreateWithNoTokenThrowsIncompleteDsnException()
     {
-        $factory = new DiscordTransportFactory();
+        $factory = $this->createFactory();
 
         $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString(sprintf('discord://%s/?webhook_id=%s', 'testHost', 'testChannel')));
+        $factory->create(Dsn::fromString('discord://host.test?webhook_id=testWebhookId'));
     }
 
-    public function testSupportsDiscordScheme()
+    public function testSupportsReturnsTrueWithSupportedScheme()
     {
-        $factory = new DiscordTransportFactory();
+        $factory = $this->createFactory();
 
-        $this->assertTrue($factory->supports(Dsn::fromString('discord://host/?webhook_id=testChannel')));
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/?webhook_id=testChannel')));
+        $this->assertTrue($factory->supports(Dsn::fromString('discord://host?webhook_id=testWebhookId')));
     }
 
-    public function testNonDiscordSchemeThrows()
+    public function testSupportsReturnsFalseWithUnsupportedScheme()
     {
-        $factory = new DiscordTransportFactory();
+        $factory = $this->createFactory();
+
+        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?webhook_id=testWebhookId')));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
+    {
+        $factory = $this->createFactory();
 
         $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://token@host/?webhook_id=testChannel'));
+        $factory->create(Dsn::fromString('somethingElse://token@host?webhook_id=testWebhookId'));
+    }
+
+    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(UnsupportedSchemeException::class);
+
+        // unsupported scheme and missing "webhook_id" option
+        $factory->create(Dsn::fromString('somethingElse://token@host'));
+    }
+
+    private function createFactory(): DiscordTransportFactory
+    {
+        return new DiscordTransportFactory();
     }
 }

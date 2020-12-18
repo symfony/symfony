@@ -7,8 +7,7 @@ DSN example
 -----------
 
 ```
-// .env file
-LINKEDIN_DSN='linkedin://ACCESS_TOKEN:USER_ID@default'
+LINKEDIN_DSN=linkedin://ACCESS_TOKEN:USER_ID@default
 ```
 
 where:

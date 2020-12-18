@@ -16,14 +16,16 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TestCase
 {
-    public function testToString()
+    public function testToStringContainsProperties()
     {
-        $this->assertSame(sprintf('linkedin://host.test'), (string) $this->getTransport());
+        $transport = $this->createTransport();
+
+        $this->assertSame('linkedin://host.test', (string) $transport);
     }
 
     public function testSupportsChatMessage()
     {
-        $transport = $this->getTransport();
+        $transport = $this->createTransport();
 
         $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
@@ -31,10 +33,9 @@ final class LinkedInTransportTest extends TestCase
 
     public function testSendNonChatMessageThrows()
     {
+        $transport = $this->createTransport();
+
         $this->expectException(LogicException::class);
-
-        $transport = $this->getTransport();
-
         $transport->send($this->createMock(MessageInterface::class));
     }
 
@@ -54,7 +55,7 @@ final class LinkedInTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->getTransport($client);
+        $transport = $this->createTransport($client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -77,7 +78,7 @@ final class LinkedInTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->getTransport($client);
+        $transport = $this->createTransport($client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -98,19 +99,19 @@ final class LinkedInTransportTest extends TestCase
 
         $expectedBody = json_encode([
             'specificContent' => [
-                    'com.linkedin.ugc.ShareContent' => [
-                            'shareCommentary' => [
-                                    'attributes' => [],
-                                    'text' => 'testMessage',
-                                ],
-                            'shareMediaCategory' => 'NONE',
-                        ],
+                'com.linkedin.ugc.ShareContent' => [
+                    'shareCommentary' => [
+                        'attributes' => [],
+                        'text' => 'testMessage',
                     ],
-            'visibility' => [
-                    'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+                    'shareMediaCategory' => 'NONE',
                 ],
+            ],
+            'visibility' => [
+                'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+            ],
             'lifecycleState' => 'PUBLISHED',
-            'author' => 'urn:li:person:MyLogin',
+            'author' => 'urn:li:person:AccountId',
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
@@ -121,7 +122,7 @@ final class LinkedInTransportTest extends TestCase
 
             return $response;
         });
-        $transport = $this->getTransport($client);
+        $transport = $this->createTransport($client);
 
         $transport->send(new ChatMessage($message));
     }
@@ -145,19 +146,19 @@ final class LinkedInTransportTest extends TestCase
 
         $expectedBody = json_encode([
             'specificContent' => [
-                    'com.linkedin.ugc.ShareContent' => [
-                            'shareCommentary' => [
-                                    'attributes' => [],
-                                    'text' => 'testMessage',
-                                ],
-                            'shareMediaCategory' => 'NONE',
-                        ],
+                'com.linkedin.ugc.ShareContent' => [
+                    'shareCommentary' => [
+                        'attributes' => [],
+                        'text' => 'testMessage',
                     ],
-            'visibility' => [
-                    'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+                    'shareMediaCategory' => 'NONE',
                 ],
+            ],
+            'visibility' => [
+                'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+            ],
             'lifecycleState' => 'PUBLISHED',
-            'author' => 'urn:li:person:MyLogin',
+            'author' => 'urn:li:person:AccountId',
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
@@ -169,7 +170,7 @@ final class LinkedInTransportTest extends TestCase
             return $response;
         });
 
-        $transport = $this->getTransport($client);
+        $transport = $this->createTransport($client);
 
         $transport->send($chatMessage);
     }
@@ -182,17 +183,13 @@ final class LinkedInTransportTest extends TestCase
             return $this->createMock(ResponseInterface::class);
         });
 
-        $transport = $this->getTransport($client);
+        $transport = $this->createTransport($client);
 
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
-    public function getTransport($client = null)
+    private function createTransport(?HttpClientInterface $client = null): LinkedInTransport
     {
-        return (new LinkedInTransport(
-            'MyToken',
-            'MyLogin',
-            $client ?? $this->createMock(HttpClientInterface::class)
-        ))->setHost('host.test');
+        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

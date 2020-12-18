@@ -29,20 +29,23 @@ final class SendinblueTransportFactory extends AbstractTransportFactory
      */
     public function create(Dsn $dsn): TransportInterface
     {
-        if (!$sender = $dsn->getOption('sender')) {
+        $scheme = $dsn->getScheme();
+
+        if ('sendinblue' !== $scheme) {
+            throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());
+        }
+
+        $apiKey = $this->getUser($dsn);
+        $sender = $dsn->getOption('sender');
+
+        if (!$sender) {
             throw new IncompleteDsnException('Missing sender.', $dsn->getOriginalDsn());
         }
 
-        $scheme = $dsn->getScheme();
-        $apiKey = $this->getUser($dsn);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        if ('sendinblue' === $scheme) {
-            return (new SendinblueTransport($apiKey, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
-        }
-
-        throw new UnsupportedSchemeException($dsn, 'sendinblue', $this->getSupportedSchemes());
+        return (new SendinblueTransport($apiKey, $sender, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

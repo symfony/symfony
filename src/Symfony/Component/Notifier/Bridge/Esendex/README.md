@@ -1,21 +1,20 @@
 Esendex Notifier
 ================
 
-Provides Esendex integration for Symfony Notifier.
+Provides [Esendex](https://esendex.com) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-// .env file
-ESENDEX_DSN='esendex://EMAIL:PASSWORD@default?accountreference=ACCOUNT_REFERENCE&from=FROM'
+ESENDEX_DSN=esendex://EMAIL:PASSWORD@default?accountreference=ACCOUNT_REFERENCE&from=FROM
 ```
 
 where:
  - `EMAIL` is your Esendex account email
  - `PASSWORD` is the Esendex API password
- - `ACCOUNT_REFERENCE` is the Esendex account reference that the messages should be sent from.
- - `FROM` is the alphanumeric originator for the message to appear to originate from.
+ - `ACCOUNT_REFERENCE` is the Esendex account reference that the messages should be sent from
+ - `FROM` is the alphanumeric originator for the message to appear to originate from
 
 See Esendex documentation at https://developers.esendex.com/api-reference#smsapis
 

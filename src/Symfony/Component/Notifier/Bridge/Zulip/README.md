@@ -7,12 +7,13 @@ DSN example
 -----------
 
 ```
-ZULIP_DSN=zulip://EMAIL:TOKEN@default?channel=CHANNEL
+ZULIP_DSN=zulip://EMAIL:TOKEN@HOST?channel=CHANNEL
 ```
 
 where:
  - `EMAIL` is your Zulip email
  - `TOKEN` is your Zulip token
+ - `HOST` is your Zulip host
  - `CHANNEL` is the channel
 
 Resources

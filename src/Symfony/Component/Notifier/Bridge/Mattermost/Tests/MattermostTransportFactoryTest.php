@@ -31,6 +31,24 @@ final class MattermostTransportFactoryTest extends TestCase
         $this->assertSame('mattermost://host.test?channel=testChannel', (string) $transport);
     }
 
+    public function testCreateWithDsnHostWithSubfolder()
+    {
+        $factory = $this->createFactory();
+
+        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@example.com/sub?channel=testChannel'));
+
+        $this->assertSame('mattermost://example.com/sub?channel=testChannel', (string) $transport);
+    }
+
+    public function testCreateWithDsnHostWithSubfolderWithTrailingSlash()
+    {
+        $factory = $this->createFactory();
+
+        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@example.com/sub/?channel=testChannel'));
+
+        $this->assertSame('mattermost://example.com/sub?channel=testChannel', (string) $transport);
+    }
+
     public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
     {
         $factory = $this->createFactory();

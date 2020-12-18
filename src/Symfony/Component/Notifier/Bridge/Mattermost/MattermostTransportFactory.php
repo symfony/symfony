@@ -32,6 +32,7 @@ final class MattermostTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'mattermost', $this->getSupportedSchemes());
         }
 
+        $path = $dsn->getPath();
         $token = $this->getUser($dsn);
         $channel = $dsn->getOption('channel');
 
@@ -42,7 +43,7 @@ final class MattermostTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new MattermostTransport($token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new MattermostTransport($token, $channel, $this->client, $this->dispatcher, $path))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

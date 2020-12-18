@@ -29,11 +29,13 @@ final class MattermostTransport extends AbstractTransport
 {
     private $token;
     private $channel;
+    private $path;
 
-    public function __construct(string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $token, string $channel, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, string $path = null)
     {
         $this->token = $token;
         $this->channel = $channel;
+        $this->path = $path;
 
         parent::__construct($client, $dispatcher);
     }
@@ -57,14 +59,15 @@ final class MattermostTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
-
         $options = ($opts = $message->getOptions()) ? $opts->toArray() : [];
         $options['message'] = $message->getSubject();
 
         if (!isset($options['channel_id'])) {
             $options['channel_id'] = $message->getRecipientId() ?: $this->channel;
         }
+
+        $endpoint = sprintf('https://%s/api/v4/posts', $this->getEndpoint());
+
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,
             'json' => array_filter($options),
@@ -87,5 +90,10 @@ final class MattermostTransport extends AbstractTransport
     protected function getEndpoint(): ?string
     {
         return $this->host.($this->port ? ':'.$this->port : '');
+    }
+
+    protected function getEndpoint(): ?string
+    {
+        return rtrim($this->host.($this->port ? ':'.$this->port : '').($this->path ?? ''), '/');
     }
 }

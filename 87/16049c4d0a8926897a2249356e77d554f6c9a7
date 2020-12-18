@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-18T12:34:35Z
+
+we should do this in all bridges actually
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:36:08Z
+
+Even if the others aren't affected by the BC break?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-18T12:37:25Z
+
+They can be affected by any BC break we might want to do in 5.3+
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:39:26Z
+
+All right.

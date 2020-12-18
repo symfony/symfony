@@ -22,8 +22,8 @@ use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
-    const VARIABLES_NOTE_CATEGORY = 'symfony-extractor-variables';
-    const VARIABLES_NOTE_PREFIX = 'Available variables: ';
+    private const VARIABLES_NOTE_CATEGORY = 'symfony-extractor-variables';
+    private const VARIABLES_NOTE_PREFIX = 'Available variables: ';
 
     /**
      * @dataProvider getExtractData

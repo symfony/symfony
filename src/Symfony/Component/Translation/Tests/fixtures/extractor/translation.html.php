@@ -70,7 +70,7 @@ EOF
 
 <?php $view['translator']->trans('default-domain-long-array', array(), null); ?>
 
-<?php // Check behavior when the same key is used multiple times (no duplicate variables notes, keep higher variables count) ?>
+Check behavior when the same key is used multiple times (no duplicate variables notes, keep higher variables count)
 <?php $view['translator']->trans('message-used-multiple-times', ['var1' => 'val1', 'var2' => 'val2']); ?>
 <?php $view['translator']->trans('message-used-multiple-times', ['var1' => 'val1', 'var2' => 'val2', 'var3' => 'val3']); ?>
 <?php $view['translator']->trans('message-used-multiple-times', ['var1' => 'val1']); ?>

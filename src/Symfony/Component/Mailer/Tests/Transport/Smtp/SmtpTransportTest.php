@@ -31,7 +31,7 @@ class SmtpTransportTest extends TestCase
         $this->assertEquals('smtp://127.0.0.1:2525', (string) $t);
     }
 
-    public function testSendDoesNotPingBelowThreshold(): void
+    public function testSendDoesNotPingBelowThreshold()
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
@@ -44,7 +44,7 @@ class SmtpTransportTest extends TestCase
         $this->assertNotContains("NOOP\r\n", $stream->getCommands());
     }
 
-    public function testSendPingAfterTransportException(): void
+    public function testSendPingAfterTransportException()
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
@@ -67,7 +67,7 @@ class SmtpTransportTest extends TestCase
         $this->assertFalse($stream->isClosed());
     }
 
-    public function testSendDoesPingAboveThreshold(): void
+    public function testSendDoesPingAboveThreshold()
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);

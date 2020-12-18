@@ -1470,7 +1470,7 @@ EOTXT;
         return str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 
-    public function testWithColspanAndMaxWith(): void
+    public function testWithColspanAndMaxWith()
     {
         $table = new Table($output = $this->getOutputStream());
 

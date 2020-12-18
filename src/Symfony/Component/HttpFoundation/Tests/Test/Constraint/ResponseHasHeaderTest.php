@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseHasHeader;
 
 class ResponseHasHeaderTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new ResponseHasHeader('Date');
         $this->assertTrue($constraint->evaluate(new Response(), '', true));

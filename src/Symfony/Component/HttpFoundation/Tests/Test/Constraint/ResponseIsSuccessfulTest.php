@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsSuccessful;
 
 class ResponseIsSuccessfulTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new ResponseIsSuccessful();
 

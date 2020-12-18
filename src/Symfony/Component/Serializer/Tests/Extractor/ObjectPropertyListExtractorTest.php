@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Extractor\ObjectPropertyListExtractor;
 
 class ObjectPropertyListExtractorTest extends TestCase
 {
-    public function testGetPropertiesWithoutObjectClassResolver(): void
+    public function testGetPropertiesWithoutObjectClassResolver()
     {
         $object = new \stdClass();
         $context = ['bar' => true];
@@ -35,7 +35,7 @@ class ObjectPropertyListExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesWithObjectClassResolver(): void
+    public function testGetPropertiesWithObjectClassResolver()
     {
         $object = new \stdClass();
         $classResolver = function ($objectArg) use ($object): string {

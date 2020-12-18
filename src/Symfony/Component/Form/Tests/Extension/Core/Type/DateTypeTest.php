@@ -1048,7 +1048,7 @@ class DateTypeTest extends BaseTypeTest
         ];
     }
 
-    public function testSubmitStringWithCustomInputFormat(): void
+    public function testSubmitStringWithCustomInputFormat()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseStatusCodeSame;
 
 class ResponseStatusCodeSameTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new ResponseStatusCodeSame(200);
         $this->assertTrue($constraint->evaluate(new Response(), '', true));

@@ -99,7 +99,7 @@ class NumberTypeTest extends BaseTypeTest
         ]);
     }
 
-    public function testDefaultFormattingWithRounding(): void
+    public function testDefaultFormattingWithRounding()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP]);
         $form->setData('12345.54321');
@@ -139,7 +139,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertNull($form->getData());
     }
 
-    public function testSubmitNumericInput(): void
+    public function testSubmitNumericInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number']);
         $form->submit('1,234');
@@ -149,7 +149,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitNumericInputWithScale(): void
+    public function testSubmitNumericInputWithScale()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number', 'scale' => 2]);
         $form->submit('1,234');
@@ -159,7 +159,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,23', $form->getViewData());
     }
 
-    public function testSubmitStringInput(): void
+    public function testSubmitStringInput()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
         $form->submit('1,234');
@@ -169,7 +169,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitStringInputWithScale(): void
+    public function testSubmitStringInputWithScale()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 2]);
         $form->submit('1,234');

@@ -1,18 +1,18 @@
 Infobip Notifier
 ================
 
-Provides Infobip integration for Symfony Notifier.
+Provides [Infobip](https://infobip.com) integration for Symfony Notifier.
 
 DSN example
 -----------
 
 ```
-INFOBIP_DSN=infobip://AUTH_TOKEN@INFOBIP_HOST?from=FROM
+INFOBIP_DSN=infobip://AUTH_TOKEN@HOST?from=FROM
 ```
 
 where:
  - `AUTH_TOKEN` is your Infobip auth token
- - `INFOBIP_HOST` is your Infobip host
+ - `HOST` is your Infobip host
  - `FROM` is the sender
 
 Resources

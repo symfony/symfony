@@ -78,9 +78,14 @@ final class MattermostTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        $sentMessage = new SentMessage($sentMessage, (string) $this);
+        $sentMessage = new SentMessage($message, (string) $this);
         $sentMessage->setMessageId($success['id']);
 
         return $sentMessage;
+    }
+
+    protected function getEndpoint(): ?string
+    {
+        return $this->host.($this->port ? ':'.$this->port : '');
     }
 }

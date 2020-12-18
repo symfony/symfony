@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class GoogleChatTransportTest extends TestCase
+final class GoogleChatTransportTest extends TestCase
 {
     public function testToStringContainsProperties()
     {

@@ -61,7 +61,7 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
     }
 
-    public function testAliasedEventSubscriber(): void
+    public function testAliasedEventSubscriber()
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
@@ -210,7 +210,7 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    public function testAliasedEventListener(): void
+    public function testAliasedEventListener()
     {
         $container = new ContainerBuilder();
         $eventAliases = [AliasedEvent::class => 'aliased_event'];
@@ -251,7 +251,7 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    public function testOmitEventNameOnTypedListener(): void
+    public function testOmitEventNameOnTypedListener()
     {
         $container = new ContainerBuilder();
         $container->setParameter('event_dispatcher.event_aliases', [AliasedEvent::class => 'aliased_event']);
@@ -284,7 +284,7 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    public function testOmitEventNameOnUntypedListener(): void
+    public function testOmitEventNameOnUntypedListener()
     {
         $container = new ContainerBuilder();
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener', ['method' => 'onEvent']);
@@ -297,7 +297,7 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($container);
     }
 
-    public function testOmitEventNameAndMethodOnUntypedListener(): void
+    public function testOmitEventNameAndMethodOnUntypedListener()
     {
         $container = new ContainerBuilder();
         $container->register('foo', InvokableListenerService::class)->addTag('kernel.event_listener');
@@ -313,7 +313,7 @@ class RegisterListenersPassTest extends TestCase
     /**
      * @requires PHP 7.2
      */
-    public function testOmitEventNameAndMethodOnGenericListener(): void
+    public function testOmitEventNameAndMethodOnGenericListener()
     {
         $container = new ContainerBuilder();
         $container->register('foo', GenericListener::class)->addTag('kernel.event_listener');
@@ -326,7 +326,7 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($container);
     }
 
-    public function testOmitEventNameOnSubscriber(): void
+    public function testOmitEventNameOnSubscriber()
     {
         $container = new ContainerBuilder();
         $container->register('subscriber', IncompleteSubscriber::class)

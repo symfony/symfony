@@ -31,7 +31,7 @@ class ExceptionListenerPassTest extends TestCase
         $this->assertTrue($builder->hasDefinition('twig.exception_listener'));
     }
 
-    public function testRemovesTwigExceptionListenerWhenNoExceptionListenerControllerExists(): void
+    public function testRemovesTwigExceptionListenerWhenNoExceptionListenerControllerExists()
     {
         $builder = new ContainerBuilder();
         $builder->register('twig', Environment::class);
@@ -45,7 +45,7 @@ class ExceptionListenerPassTest extends TestCase
         $this->assertFalse($builder->hasDefinition('twig.exception_listener'));
     }
 
-    public function testRemovesTwigExceptionListenerIfTwigIsNotUsedAsTemplateEngine(): void
+    public function testRemovesTwigExceptionListenerIfTwigIsNotUsedAsTemplateEngine()
     {
         $builder = new ContainerBuilder();
         $builder->register('twig', Environment::class);
@@ -60,7 +60,7 @@ class ExceptionListenerPassTest extends TestCase
         $this->assertFalse($builder->hasDefinition('twig.exception_listener'));
     }
 
-    public function testRemovesKernelExceptionListenerIfTwigIsUsedAsTemplateEngine(): void
+    public function testRemovesKernelExceptionListenerIfTwigIsUsedAsTemplateEngine()
     {
         $builder = new ContainerBuilder();
         $builder->register('twig', Environment::class);

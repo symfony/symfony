@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsRedirected;
 
 class ResponseIsRedirectedTest extends TestCase
 {
-    public function testConstraint(): void
+    public function testConstraint()
     {
         $constraint = new ResponseIsRedirected();
 

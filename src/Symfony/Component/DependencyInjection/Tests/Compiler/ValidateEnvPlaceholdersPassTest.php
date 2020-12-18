@@ -206,7 +206,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNode(): void
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -225,7 +225,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
      * @group legacy
      * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.3. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
      */
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -238,7 +238,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void
+    public function testPartialEnvWhichCannotBeEmptyForScalarNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -251,7 +251,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvWithVariableNode(): void
+    public function testEnvWithVariableNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -268,7 +268,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
      * @group legacy
      * @expectedDeprecation A tree builder without a root node is deprecated since Symfony 4.2 and will not be supported anymore in 5.0.
      */
-    public function testConfigurationWithoutRootNode(): void
+    public function testConfigurationWithoutRootNode()
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension(new EnvConfigurationWithoutRootNode()));
@@ -288,7 +288,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testDiscardedEnvInConfig(): void
+    public function testDiscardedEnvInConfig()
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(BOOLISH)', '1');

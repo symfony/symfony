@@ -124,7 +124,7 @@ final class GoogleChatTransport extends AbstractTransport
         try {
             $result = $response->toArray(false);
         } catch (JsonException $jsonException) {
-            throw new TransportException(sprintf('Unable to post the Google Chat message: Invalid response.'), $response, $response->getStatusCode(), $jsonException);
+            throw new TransportException('Unable to post the Google Chat message: Invalid response.', $response, $response->getStatusCode(), $jsonException);
         }
 
         if (200 !== $response->getStatusCode()) {

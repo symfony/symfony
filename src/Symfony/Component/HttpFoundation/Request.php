@@ -405,7 +405,7 @@ class Request
 
         $queryString = '';
         if (isset($components['query'])) {
-            $qs = HeaderUtils::parseQuery(html_entity_decode($components['query']));
+            parse_str(html_entity_decode($components['query']), $qs);
 
             if ($query) {
                 $query = array_replace($qs, $query);

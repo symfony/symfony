@@ -123,13 +123,14 @@ class RequestTest extends TestCase
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
 
-        $request = Request::create('https://test.com/foo?bar=baz');
-        $this->assertEquals('https://test.com/foo?bar=baz', $request->getUri());
+        $request = Request::create('https://test.com/foo?foo.bar=baz');
+        $this->assertEquals('https://test.com/foo?foo.bar=baz', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
-        $this->assertEquals('bar=baz', $request->getQueryString());
+        $this->assertEquals('foo.bar=baz', $request->getQueryString());
         $this->assertEquals(443, $request->getPort());
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertTrue($request->isSecure());
+        $this->assertSame(['foo_bar' => 'baz'], $request->query->all());
 
         $request = Request::create('test.com:90/foo');
         $this->assertEquals('http://test.com:90/foo', $request->getUri());

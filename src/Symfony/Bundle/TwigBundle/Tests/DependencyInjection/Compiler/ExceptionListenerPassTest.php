@@ -19,7 +19,7 @@ use Twig\Environment;
 
 class ExceptionListenerPassTest extends TestCase
 {
-    public function testExitsWhenTwigIsNotAvailable(): void
+    public function testExitsWhenTwigIsNotAvailable()
     {
         $builder = new ContainerBuilder();
         $builder->register('exception_listener', ExceptionListener::class);

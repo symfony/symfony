@@ -25,7 +25,7 @@ class DsnTest extends TestCase
         $this->assertEquals($dsn, Dsn::fromString($string));
     }
 
-    public function testGetOption(): void
+    public function testGetOption()
     {
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('smtp', 'example.com', null, null, null, $options);

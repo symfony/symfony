@@ -872,7 +872,7 @@ class ProgressBarTest extends TestCase
         ];
     }
 
-    public function testIterate(): void
+    public function testIterate()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
 
@@ -887,7 +887,7 @@ class ProgressBarTest extends TestCase
         );
     }
 
-    public function testIterateUncountable(): void
+    public function testIterateUncountable()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
 
@@ -936,7 +936,7 @@ class ProgressBarTest extends TestCase
         putenv('COLUMNS=120');
     }
 
-    public function testMinAndMaxSecondsBetweenRedraws(): void
+    public function testMinAndMaxSecondsBetweenRedraws()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());
         $bar->setRedrawFrequency(1);
@@ -959,7 +959,7 @@ class ProgressBarTest extends TestCase
         );
     }
 
-    public function testMaxSecondsBetweenRedraws(): void
+    public function testMaxSecondsBetweenRedraws()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
         $bar->setRedrawFrequency(4); // disable step based redraws
@@ -1014,7 +1014,7 @@ class ProgressBarTest extends TestCase
         );
     }
 
-    public function testNoWriteWhenMessageIsSame(): void
+    public function testNoWriteWhenMessageIsSame()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 2);
         $bar->start();

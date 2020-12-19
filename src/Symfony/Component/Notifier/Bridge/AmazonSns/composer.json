@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "^5.3",
+        "symfony/notifier": "~5.3.0",
         "async-aws/sns": "^1.0",
         "async-aws/core": "^1.7"
     },

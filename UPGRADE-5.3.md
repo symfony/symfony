@@ -42,3 +42,8 @@ Security
 --------
 
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
+
+Serializer
+----------
+
+ * Deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.

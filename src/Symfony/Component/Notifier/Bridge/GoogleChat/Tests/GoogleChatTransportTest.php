@@ -31,14 +31,15 @@ final class GoogleChatTransportTest extends TransportTestCase
     /**
      * @return GoogleChatTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(?HttpClientInterface $client = null, string $threadKey = null): TransportInterface
     {
-        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $client ?: $this->createMock(HttpClientInterface::class));
+        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?: $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable
     {
         yield ['googlechat://chat.googleapis.com/My-Space', $this->createTransport()];
+        yield ['googlechat://chat.googleapis.com/My-Space?thread_key=abcdefg', $this->createTransport(null, 'abcdefg')];
     }
 
     public function supportedMessagesProvider(): iterable
@@ -125,8 +126,7 @@ final class GoogleChatTransportTest extends TransportTestCase
             return $response;
         });
 
-        $transport = $this->createTransport($client);
-        $transport->setThreadKey('My-Thread');
+        $transport = $this->createTransport($client, 'My-Thread');
 
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 

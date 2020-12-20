@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -22,7 +23,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {
     /**
-     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?threadKey=<thread>
+     * @param Dsn $dsn Format: googlechat://<key>:<token>@default/<space>?thread_key=<thread>
      *
      * @return GoogleChatTransport
      */
@@ -37,11 +38,20 @@ final class GoogleChatTransportFactory extends AbstractTransportFactory
         $space = explode('/', $dsn->getPath())[1];
         $accessKey = $this->getUser($dsn);
         $accessToken = $this->getPassword($dsn);
-        $threadKey = $dsn->getOption('threadKey');
+
+        $threadKey = $dsn->getOption('thread_key');
+
+        /*
+         * Remove this check for 5.4
+         */
+        if (null === $threadKey && null !== $dsn->getOption('threadKey')) {
+            throw new IncompleteDsnException('GoogleChat DSN has changed since 5.3, use "thread_key" instead of "threadKey" parameter.');
+        }
+
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new GoogleChatTransport($space, $accessKey, $accessToken, $this->client, $this->dispatcher))->setThreadKey($threadKey)->setHost($host)->setPort($port);
+        return (new GoogleChatTransport($space, $accessKey, $accessToken, $threadKey, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

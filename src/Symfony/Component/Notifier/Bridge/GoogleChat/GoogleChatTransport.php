@@ -32,38 +32,25 @@ final class GoogleChatTransport extends AbstractTransport
     private $space;
     private $accessKey;
     private $accessToken;
-
-    /**
-     * @var ?string
-     */
     private $threadKey;
 
     /**
-     * @param string $space       The space name the the webhook url "/v1/spaces/<space>/messages"
-     * @param string $accessKey   The "key" parameter of the webhook url
-     * @param string $accessToken The "token" parameter of the webhook url
+     * @param string      $space       The space name the the webhook url "/v1/spaces/<space>/messages"
+     * @param string      $accessKey   The "key" parameter of the webhook url
+     * @param string      $accessToken The "token" parameter of the webhook url
+     * @param string|null $threadKey   Opaque thread identifier string that can be specified to group messages into a single thread.
+     *                                 If this is the first message with a given thread identifier, a new thread is created.
+     *                                 Subsequent messages with the same thread identifier will be posted into the same thread.
+     *                                 {@see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters}
      */
-    public function __construct(string $space, string $accessKey, string $accessToken, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $space, string $accessKey, string $accessToken, string $threadKey = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->space = $space;
         $this->accessKey = $accessKey;
         $this->accessToken = $accessToken;
-
-        parent::__construct($client, $dispatcher);
-    }
-
-    /**
-     * Opaque thread identifier string that can be specified to group messages into a single thread.
-     * If this is the first message with a given thread identifier, a new thread is created.
-     * Subsequent messages with the same thread identifier will be posted into the same thread.
-     *
-     * @see https://developers.google.com/hangouts/chat/reference/rest/v1/spaces.messages/create#query-parameters
-     */
-    public function setThreadKey(?string $threadKey): self
-    {
         $this->threadKey = $threadKey;
 
-        return $this;
+        parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
@@ -71,7 +58,7 @@ final class GoogleChatTransport extends AbstractTransport
         return sprintf('googlechat://%s/%s%s',
             $this->getEndpoint(),
             $this->space,
-            $this->threadKey ? '?threadKey='.urlencode($this->threadKey) : ''
+            $this->threadKey ? '?thread_key='.urlencode($this->threadKey) : ''
         );
     }
 

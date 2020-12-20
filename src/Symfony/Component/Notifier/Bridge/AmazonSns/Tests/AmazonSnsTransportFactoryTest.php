@@ -21,37 +21,33 @@ class AmazonSnsTransportFactoryTest extends TestCase
     public function testCreateWithDsn()
     {
         $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://auth@default?region=eu-west-3&profile=myProfile'));
-        $transport->setHost('example.com');
+        $transport = $factory->create(Dsn::fromString('sns://auth@test.host?region=eu-west-3&profile=myProfile'));
 
-        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
+        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
     }
 
     public function testCreateWithoutCredentialDsn()
     {
         $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3'));
-        $transport->setHost('example.com');
+        $transport = $factory->create(Dsn::fromString('sns://test.host?region=eu-west-3'));
 
-        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
+        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
     }
 
     public function testDefaultRegionIsCorrectlySet()
     {
         $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://default'));
-        $transport->setHost('example.com');
+        $transport = $factory->create(Dsn::fromString('sns://test.host'));
 
-        $this->assertSame('sns://example.com?region=eu-west-1', (string) $transport);
+        $this->assertSame('sns://test.host?region=eu-west-1', (string) $transport);
     }
 
     public function testDsnWithRegionOption()
     {
         $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://default?region=eu-west-3'));
-        $transport->setHost('example.com');
+        $transport = $factory->create(Dsn::fromString('sns://test.host?region=eu-west-3'));
 
-        $this->assertSame('sns://example.com?region=eu-west-3', (string) $transport);
+        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
     }
 
     public function testSupportsSnsScheme()
@@ -60,15 +56,5 @@ class AmazonSnsTransportFactoryTest extends TestCase
 
         $this->assertTrue($factory->supports(Dsn::fromString('sns://default')));
         $this->assertFalse($factory->supports(Dsn::fromString('not-sns://default')));
-    }
-
-    public function testNonFreeMobileSchemeThrows()
-    {
-        $factory = new AmazonSnsTransportFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $unsupportedDsn = 'not-sns://example.com';
-        $factory->create(Dsn::fromString($unsupportedDsn));
     }
 }

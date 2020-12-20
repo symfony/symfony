@@ -32,16 +32,19 @@ final class AmazonSnsTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'sns', $this->getSupportedSchemes());
         }
 
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
+
         $options = [
                 'region' => $dsn->getOption('region') ?: 'eu-west-1',
                 'profile' => $dsn->getOption('profile'),
                 'accessKeyId' => $dsn->getUser(),
                 'accessKeySecret' => $dsn->getPassword(),
             ] + (
-            'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
+            null === $host ? [] : ['endpoint' => 'https://'.$host.($port ? ':'.$port : '')]
             );
 
-        return new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher);
+        return (new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

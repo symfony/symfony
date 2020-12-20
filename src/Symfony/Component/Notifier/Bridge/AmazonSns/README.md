@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-AMAZON_DSN=sns://ACCESS_ID:ACCESS_KEY@default?region=REGION
+AMAZON_SNS_DSN=sns://ACCESS_ID:ACCESS_KEY@default?region=REGION
 ```
 
 Resources

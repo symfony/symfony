@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 class AmazonSnsTransportFactoryTest extends TestCase

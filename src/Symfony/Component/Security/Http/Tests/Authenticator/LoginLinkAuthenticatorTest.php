@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\LoginLinkAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -103,6 +104,17 @@ class LoginLinkAuthenticatorTest extends TestCase
             ->method('consumeLoginLink');
 
         $this->authenticator->authenticate($request);
+    }
+
+    public function testPassportBadges()
+    {
+        $this->setUpAuthenticator();
+
+        $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
+
+        $passport = $this->authenticator->authenticate($request);
+
+        $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
     }
 
     private function setUpAuthenticator(array $options = [])

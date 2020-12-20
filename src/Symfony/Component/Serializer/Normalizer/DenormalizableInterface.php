@@ -33,8 +33,6 @@ interface DenormalizableInterface
      * @param string|null                 $format       The format is optionally given to be able to denormalize
      *                                                  differently based on different input formats
      * @param array                       $context      Options for denormalizing
-     *
-     * @return object|object[]
      */
     public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = []);
 }

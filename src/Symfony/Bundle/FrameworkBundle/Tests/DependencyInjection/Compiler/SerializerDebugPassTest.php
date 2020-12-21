@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerDebugPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Serializer\Debug\SerializerActionFactory;
+use Symfony\Component\Serializer\Debug\SerializerActionFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestHybridNormalizer;
@@ -28,6 +30,8 @@ class SerializerDebugPassTest extends TestCase
         $serializerDebugPass = new SerializerDebugPass();
         $container = new ContainerBuilder();
         $container->register('serializer', SerializerInterface::class);
+        $container->register('debug.serializer.action_factory', SerializerActionFactory::class);
+        $container->setAlias(SerializerActionFactoryInterface::class, 'debug.serializer.action_factory');
 
         $container->register('Test\normalizer', TestNormalizer::class)
             ->addTag(self::NORMALIZER_TAG);

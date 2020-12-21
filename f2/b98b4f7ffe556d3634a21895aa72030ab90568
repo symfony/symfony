@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-18T12:52:00Z
+
+What about removing all of them actually?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:53:37Z
+
+We have already released version 5.2.0 of the bridges that claim compatibility with Notifier 5.3.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:59:09Z
+
+I don't like them either, but imho we should not remove them before 6.0. Otherwise, we would allow Composer to make a bad decision.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-18T13:35:00Z
+
+Then shouldn't we specifically conflit with the only bridges that have a 5.2.0 tag?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T13:49:09Z
+
+> Then shouldn't we specifically conflit with the only bridges that have a 5.2.0 tag?
+
+All of the bridges listed here existed in 5.2 already. Note that for some of the bridges, the 5.1.0, 5.1.1 and 5.1.2 tags are also affected.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T13:58:16Z
+
+I agree. 😞

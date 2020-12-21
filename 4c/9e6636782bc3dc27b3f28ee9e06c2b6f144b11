@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-21T09:21:33Z
+
+Did you cheked if other bridges have the same issue?
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2020-12-21T09:26:00Z
+
+@jderusse Good question! :sweat_smile:
+It looks like everything is fine for others transports. :ok_hand:
+This "issue" have been introduced to deal with slack DSN change between 5.0 & 5.2, that's why it's the only impacted transport.

@@ -49,6 +49,6 @@ final class MattermostTransportTest extends TestCase
 
     private function createTransport(): MattermostTransport
     {
-        return (new MattermostTransport('testAccessToken', 'testChannel', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new MattermostTransport('testAccessToken', 'testChannel', null, $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

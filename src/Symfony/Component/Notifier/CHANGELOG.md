@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Add `SentMessageEvent` and `FailedMessageEvent`
+
 5.3
 ---
 

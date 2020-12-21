@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * Class TraceableSerializerTest.
- */
 final class TraceableSerializerTest extends TestCase
 {
     private const JSON = 'json';

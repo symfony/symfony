@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use ReflectionException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -25,9 +24,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SerializerDebugPass implements CompilerPassInterface
 {
-    /**
-     * @throws ReflectionException
-     */
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('serializer')) {
@@ -39,9 +35,6 @@ class SerializerDebugPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @throws ReflectionException
-     */
     private function decorateNormalizer(string $id, ContainerBuilder $container): void
     {
         $aliasName = 'debug.'.$id;
@@ -74,9 +67,7 @@ class SerializerDebugPass implements CompilerPassInterface
         $decoratorDef = (new Definition($decoratorClass))
             ->setArguments([$normalizerDef])
             ->addTag('debug.normalizer')
-            ->setDecoratedService($id)
-            ->setAutowired(true)
-            ->setAutoconfigured(true);
+            ->setDecoratedService($id);
 
         $container->setDefinition($aliasName, $decoratorDef);
     }

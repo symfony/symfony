@@ -13,14 +13,11 @@ namespace Symfony\Component\Serializer\Debug;
 
 class Deserialization extends SerializerAction
 {
-    /**
-     * @var string
-     */
     public $type;
 
-    public function __construct($data, string $type, string $format, array $context = [])
+    public function __construct($data, $result, string $type, string $format, array $context = [])
     {
-        parent::__construct($data, $format, $context);
+        parent::__construct($data, $result, $format, $context);
         $this->type = $type;
     }
 }

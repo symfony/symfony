@@ -19,17 +19,10 @@ use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\Service\ResetInterface;
-use Throwable;
 
 class SerializerDataCollector extends DataCollector
 {
-    /**
-     * @var SerializerInterface|null
-     */
     private $serializer;
-    /**
-     * @var array|iterable
-     */
     private $normalizers;
 
     public function __construct(SerializerInterface $serializer = null, iterable $normalizers = [])
@@ -38,7 +31,7 @@ class SerializerDataCollector extends DataCollector
         $this->normalizers = $normalizers;
     }
 
-    public function collect(Request $request, Response $response, Throwable $exception = null): void
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->initData();
 

@@ -16,19 +16,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class Denormalization extends Deserialization
 {
-    /**
-     * @var DenormalizerInterface
-     */
     public $denormalizer;
 
-    public function __construct(
-        DenormalizerInterface $denormalizer,
-        $data,
-        string $type,
-        string $format,
-        array $context = []
-    ) {
-        parent::__construct($data, $type, $format, $context);
+    public function __construct(DenormalizerInterface $denormalizer, $data, $result, string $type, string $format, array $context = [])
+    {
+        parent::__construct($data, $result, $type, $format, $context);
         $this->denormalizer = $denormalizer;
     }
 }

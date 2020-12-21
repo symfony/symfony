@@ -14,25 +14,20 @@ namespace Symfony\Component\Serializer\Debug;
 abstract class SerializerAction
 {
     /**
-     * @var mixed
+     * @var object|string
      */
     public $data;
-    /**
-     * @var string
-     */
     public $format;
-    /**
-     * @var array
-     */
     public $context;
     /**
-     * @var mixed
+     * @var object|string
      */
     public $result;
 
-    public function __construct($data, string $format, array $context = [])
+    public function __construct($data, $result, string $format, array $context = [])
     {
         $this->data = $data;
+        $this->result = $result;
         $this->format = $format;
         $this->context = $context;
     }

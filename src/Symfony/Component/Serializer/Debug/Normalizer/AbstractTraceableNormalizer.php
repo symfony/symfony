@@ -29,22 +29,19 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
     private $denormalizations = [];
 
     /**
-     * AbstractTraceableNormalizer constructor.
-     *
      * @param DenormalizerInterface|NormalizerInterface $delegate
      */
-    public function __construct($delegate)
+    public function __construct(object $delegate)
     {
         $this->delegate = $delegate;
     }
 
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $denormalization = new Denormalization($this->delegate, $data, $type, $format, $context);
-        $denormalization->result = $this->delegate->denormalize($data, $type, $format, $context);
-        $this->denormalizations[] = $denormalization;
+        $result = $this->delegate->denormalize($data, $type, $format, $context);
+        $this->denormalizations[] = new Denormalization($this->delegate, $result, $data, $type, $format, $context);
 
-        return $denormalization->result;
+        return $result;
     }
 
     public function supportsDenormalization($data, string $type, string $format = null): bool
@@ -54,11 +51,10 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
 
     public function normalize($object, string $format = null, array $context = [])
     {
-        $normalization = new Normalization($this->delegate, $object, $format, $context);
-        $normalization->result = $this->delegate->normalize($object, $format, $context);
-        $this->normalizations[] = $normalization;
+        $result = $this->delegate->normalize($object, $format, $context);
+        $this->normalizations[] = new Normalization($this->delegate, $object, $result, $format, $context);
 
-        return $normalization->result;
+        return $result;
     }
 
     public function supportsNormalization($data, string $format = null): bool
@@ -72,7 +68,7 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
      * and pass them to the delegate.
      *
      * Unfortunately this is heavily bound to the Serializer implementation. :(
-     * @see \Symfony\Component\Serializer\Serializer:77
+     * @see \Symfony\Component\Serializer\Serializer:__construct()
      */
 
     public function setSerializer(SerializerInterface $serializer): void
@@ -98,11 +94,7 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
 
     public function hasCacheableSupportsMethod(): bool
     {
-        if ($this->delegate instanceof CacheableSupportsMethodInterface) {
-            return $this->delegate->hasCacheableSupportsMethod();
-        }
-
-        return false;
+        return $this->delegate instanceof CacheableSupportsMethodInterface && $this->delegate->hasCacheableSupportsMethod();
     }
 
     public function getNormalizations(): array

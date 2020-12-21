@@ -16,9 +16,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class TestCacheableNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    /**
-     * @var bool
-     */
     private $cacheable;
 
     public function __construct(bool $cacheable)

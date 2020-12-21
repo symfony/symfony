@@ -25,7 +25,25 @@ final class EsendexTransportFactoryTest extends TestCase
 
         $transport = $factory->create(Dsn::fromString('esendex://email:password@host.test?accountreference=testAccountreference&from=testFrom'));
 
-        $this->assertSame('esendex://host.test', (string) $transport);
+        $this->assertSame('esendex://host.test?accountreference=testAccountreference&from=testFrom', (string) $transport);
+    }
+
+    public function testCreateWithMissingEmailThrowsIncompleteDsnException()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(IncompleteDsnException::class);
+
+        $factory->create(Dsn::fromString('esendex://:password@host?accountreference=testAccountreference&from=FROM'));
+    }
+
+    public function testCreateWithMissingPasswordThrowsIncompleteDsnException()
+    {
+        $factory = $this->createFactory();
+
+        $this->expectException(IncompleteDsnException::class);
+
+        $factory->create(Dsn::fromString('esendex://email:@host?accountreference=testAccountreference&from=FROM'));
     }
 
     public function testCreateWithMissingOptionAccountreferenceThrowsIncompleteDsnException()

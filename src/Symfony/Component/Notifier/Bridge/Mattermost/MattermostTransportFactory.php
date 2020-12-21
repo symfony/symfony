@@ -41,7 +41,7 @@ final class MattermostTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new MattermostTransport($token, $channel, $this->client, $this->dispatcher, $path))->setHost($host)->setPort($port);
+        return (new MattermostTransport($token, $channel, $path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

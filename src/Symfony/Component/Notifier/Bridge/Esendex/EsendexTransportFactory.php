@@ -30,7 +30,8 @@ final class EsendexTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'esendex', $this->getSupportedSchemes());
         }
 
-        $token = $this->getUser($dsn).':'.$this->getPassword($dsn);
+        $email = $this->getUser($dsn);
+        $password = $this->getPassword($dsn);
         $accountReference = $dsn->getOption('accountreference');
 
         if (!$accountReference) {
@@ -46,7 +47,7 @@ final class EsendexTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new EsendexTransport($token, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new EsendexTransport($email, $password, $accountReference, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

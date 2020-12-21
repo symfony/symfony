@@ -29,6 +29,15 @@ final class SlackTransportFactoryTest extends TestCase
         $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
     }
 
+    public function testCreateWithDsnWithoutPath()
+    {
+        $factory = $this->createFactory();
+
+        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test?channel=testChannel'));
+
+        $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
+    }
+
     public function testCreateWithDeprecatedDsn()
     {
         $factory = $this->createFactory();

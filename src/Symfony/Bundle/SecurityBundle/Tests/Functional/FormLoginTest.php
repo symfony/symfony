@@ -131,7 +131,7 @@ class FormLoginTest extends AbstractWebTestCase
         $client->submit($form);
 
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringContainsString('Too many failed login attempts, please try again in 1 minute.', $text);
+        $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in %d minute%s', $text);
     }
 
     public function provideInvalidCredentials()

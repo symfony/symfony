@@ -106,4 +106,13 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
     {
         return $this->denormalizations;
     }
+
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this->delegate, $name)) {
+            return $this->delegate->$name(...$arguments);
+        }
+
+        throw new \LogicException('Unexpected method call');
+    }
 }

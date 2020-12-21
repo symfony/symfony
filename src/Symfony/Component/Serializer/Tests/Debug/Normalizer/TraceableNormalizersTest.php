@@ -232,6 +232,33 @@ final class TraceableNormalizersTest extends TestCase
         self::assertFalse($this->traceableNormalizer->hasCacheableSupportsMethod());
     }
 
+    public function testCallingUnknownMethodsOnDelegates(): void
+    {
+        $delegate = new class() implements NormalizerInterface {
+            public function normalize($object, string $format = null, array $context = [])
+            {
+            }
+
+            public function supportsNormalization($data, string $format = null)
+            {
+                return true;
+            }
+
+            public function someAction(string $text)
+            {
+                return $text;
+            }
+        };
+        $tracer = new TraceableNormalizer($delegate);
+        self::assertSame('foo', $tracer->someAction('foo'));
+    }
+
+    public function testCallingUnknownButNotExistingMethodsOnDelegates(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->traceableNormalizer->someAction('foo');
+    }
+
     public function provideYesNo(): iterable
     {
         yield 'yes' => [true];

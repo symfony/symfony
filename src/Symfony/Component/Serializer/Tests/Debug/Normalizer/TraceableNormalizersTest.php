@@ -48,7 +48,7 @@ final class TraceableNormalizersTest extends TestCase
     private $hybridDelegate;
     private $serializerActionFactory;
 
-    public function testInterfaces(): void
+    public function testInterfaces()
     {
         self::assertInstanceOf(NormalizerInterface::class, $this->traceableNormalizer);
         self::assertInstanceOf(DenormalizerInterface::class, $this->traceableDenormalizer);
@@ -208,7 +208,7 @@ final class TraceableNormalizersTest extends TestCase
         ];
     }
 
-    public function testAwarenessDelegation(): void
+    public function testAwarenessDelegation()
     {
         $serializer = $this->createMock(SerializerInterface::class);
         $delegate = new TestSerializerNormalizerDenormalizerAware();
@@ -232,12 +232,12 @@ final class TraceableNormalizersTest extends TestCase
         self::assertSame($isCachable, $tracer->hasCacheableSupportsMethod());
     }
 
-    public function testCacheableSupportOnNonCacheableDelegates(): void
+    public function testCacheableSupportOnNonCacheableDelegates()
     {
         self::assertFalse($this->traceableNormalizer->hasCacheableSupportsMethod());
     }
 
-    public function testCallingUnknownMethodsOnDelegates(): void
+    public function testCallingUnknownMethodsOnDelegates()
     {
         $delegate = new class() implements NormalizerInterface {
             public function normalize($object, string $format = null, array $context = [])
@@ -258,7 +258,7 @@ final class TraceableNormalizersTest extends TestCase
         self::assertSame('foo', $tracer->someAction('foo'));
     }
 
-    public function testCallingUnknownButNotExistingMethodsOnDelegates(): void
+    public function testCallingUnknownButNotExistingMethodsOnDelegates()
     {
         $this->expectException(\LogicException::class);
         $this->traceableNormalizer->someAction('foo');
@@ -279,8 +279,8 @@ final class TraceableNormalizersTest extends TestCase
         $serializerActionFactory = $this->getSerializerActionFactory();
 
         $this->traceableNormalizer = new TraceableNormalizer($this->normalizerDelegate, $serializerActionFactory);
-        $this->traceableDenormalizer = new TraceableDenormalizer($this->denormalizerDelegate,$serializerActionFactory);
-        $this->traceableHybridNormalizer = new TraceableHybridNormalizer($this->hybridDelegate,$serializerActionFactory);
+        $this->traceableDenormalizer = new TraceableDenormalizer($this->denormalizerDelegate, $serializerActionFactory);
+        $this->traceableHybridNormalizer = new TraceableHybridNormalizer($this->hybridDelegate, $serializerActionFactory);
     }
 
     private function getSerializerActionFactory(): SerializerActionFactory

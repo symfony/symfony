@@ -45,13 +45,13 @@ final class TraceableSerializerTest extends TestCase
         $this->emptyContext = [];
     }
 
-    public function testTracerIsSerializer(): void
+    public function testTracerIsSerializer()
     {
         self::assertInstanceOf('Symfony\Component\Serializer\SerializerInterface', $this->traceableSerializer);
         self::assertInstanceOf('Symfony\Contracts\Service\ResetInterface', $this->traceableSerializer);
     }
 
-    public function testSerializeMustCallDelegate(): void
+    public function testSerializeMustCallDelegate()
     {
         $this->assertSerializeToBeCalled();
 
@@ -61,7 +61,7 @@ final class TraceableSerializerTest extends TestCase
         );
     }
 
-    public function testTracerAddsSerializationToSerializationsStack(): void
+    public function testTracerAddsSerializationToSerializationsStack()
     {
         $this->assertSerializeToBeCalled();
 
@@ -70,7 +70,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertCount(1, $this->traceableSerializer->getSerializations());
     }
 
-    public function testCollectedSerializationContainsResultOfSerialization(): void
+    public function testCollectedSerializationContainsResultOfSerialization()
     {
         $this->assertSerializeToBeCalled();
 
@@ -80,7 +80,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertSame(self::SERIALIZED_OBJECT, $serializations[0]->result);
     }
 
-    public function testDeserializeMustCallDelegate(): void
+    public function testDeserializeMustCallDelegate()
     {
         $this->assertDeserializeToBeCalled();
 
@@ -95,7 +95,7 @@ final class TraceableSerializerTest extends TestCase
         );
     }
 
-    public function testTracerAddsDeserializationToDeserializationsStack(): void
+    public function testTracerAddsDeserializationToDeserializationsStack()
     {
         $this->assertDeserializeToBeCalled();
 
@@ -104,7 +104,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertCount(1, $this->traceableSerializer->getDeserializations());
     }
 
-    public function testCollectedDeserializationContainsResultOfDescerialization(): void
+    public function testCollectedDeserializationContainsResultOfDescerialization()
     {
         $this->assertDeserializeToBeCalled();
 
@@ -114,7 +114,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertSame($this->something, $deserializations[0]->result);
     }
 
-    public function testResetClearsSerializationsAndDeserializationsStacks(): void
+    public function testResetClearsSerializationsAndDeserializationsStacks()
     {
         $this->assertSerializeToBeCalled();
         $this->assertDeserializeToBeCalled();

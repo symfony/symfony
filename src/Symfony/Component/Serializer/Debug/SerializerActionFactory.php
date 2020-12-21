@@ -50,7 +50,7 @@ final class SerializerActionFactory implements SerializerActionFactoryInterface
         );
     }
 
-    public function createDeserialization(string $data, $result, string $type, string $format, array $context = [] ): Deserialization
+    public function createDeserialization(string $data, $result, string $type, string $format, array $context = []): Deserialization
     {
         return new Deserialization(
             $this->sanitize($data),
@@ -63,6 +63,7 @@ final class SerializerActionFactory implements SerializerActionFactoryInterface
 
     /**
      * @param mixed $data
+     *
      * @return mixed|string|LargeContent
      */
     private function sanitize($data)
@@ -76,12 +77,13 @@ final class SerializerActionFactory implements SerializerActionFactoryInterface
 
     /**
      * @param mixed $data
+     *
      * @return string|LargeContent
      */
     private function markAsHugeContent($data)
     {
         $output = new LargeContent();
-        if (is_string($data)) {
+        if (\is_string($data)) {
             return (string) $output;
         }
 
@@ -90,6 +92,6 @@ final class SerializerActionFactory implements SerializerActionFactoryInterface
 
     private function getVarSize($data): int
     {
-        return \mb_strlen(serialize($data), 'UTF-8') ?? 0;
+        return mb_strlen(serialize($data), 'UTF-8') ?? 0;
     }
 }

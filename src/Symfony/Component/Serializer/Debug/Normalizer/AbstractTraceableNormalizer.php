@@ -116,6 +116,6 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
             return $this->delegate->$name(...$arguments);
         }
 
-        throw new \LogicException('Unexpected method call');
+        throw new \LogicException('Unexpected method call.');
     }
 }

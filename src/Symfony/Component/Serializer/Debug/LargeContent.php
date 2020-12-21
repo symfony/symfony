@@ -18,7 +18,7 @@ final class LargeContent
     public function __construct()
     {
         $this->message = sprintf(
-            "The content of the serialized/deserialized data exceeded %d kB.",
+            'The content of the serialized/deserialized data exceeded %d kB.',
             self::LIMIT_BYTES / 1024
         );
     }

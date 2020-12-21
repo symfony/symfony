@@ -23,7 +23,7 @@ class SerializerDebugPassTest extends TestCase
 {
     private const NORMALIZER_TAG = 'serializer.normalizer';
 
-    public function testProcess(): void
+    public function testProcess()
     {
         $serializerDebugPass = new SerializerDebugPass();
         $container = new ContainerBuilder();

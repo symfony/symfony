@@ -18,20 +18,20 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class SerializerActionFactoryTest extends TestCase
 {
-    private const EXPECTED_STRING_RESULT = "The content of the serialized/deserialized data exceeded 1024 kB.";
+    private const EXPECTED_STRING_RESULT = 'The content of the serialized/deserialized data exceeded 1024 kB.';
     private static $hugeContent;
     private static $obj;
     private $factory;
 
     public static function setUpBeforeClass(): void
     {
-        self::$hugeContent = \str_repeat('X', 2000000);
+        self::$hugeContent = str_repeat('X', 2000000);
 
         self::$obj = new \stdClass();
         self::$obj->message = self::$hugeContent;
     }
 
-    public function testCreateLargeContentObjects(): void
+    public function testCreateLargeContentObjects()
     {
         self::assertSame(
             self::EXPECTED_STRING_RESULT,
@@ -54,7 +54,7 @@ final class SerializerActionFactoryTest extends TestCase
         );
     }
 
-    public function testCreateLargeContentObjectsWithDelegate(): void
+    public function testCreateLargeContentObjectsWithDelegate()
     {
         self::assertSame(
             self::EXPECTED_STRING_RESULT,

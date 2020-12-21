@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Debug\SerializerActionFactory;
 use Symfony\Component\Serializer\Debug\TraceableSerializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -39,7 +40,7 @@ final class TraceableSerializerTest extends TestCase
     protected function setUp(): void
     {
         $this->delegateMock = $this->createMock(SerializerInterface::class);
-        $this->traceableSerializer = new TraceableSerializer($this->delegateMock);
+        $this->traceableSerializer = new TraceableSerializer($this->delegateMock, new SerializerActionFactory());
         $this->something = new \stdClass();
         $this->emptyContext = [];
     }

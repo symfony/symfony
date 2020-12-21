@@ -67,7 +67,9 @@ class SerializerDebugPass implements CompilerPassInterface
         $decoratorDef = (new Definition($decoratorClass))
             ->setArguments([$normalizerDef])
             ->addTag('debug.normalizer')
-            ->setDecoratedService($id);
+            ->setDecoratedService($id)
+            ->setAutowired(true)
+        ;
 
         $container->setDefinition($aliasName, $decoratorDef);
     }

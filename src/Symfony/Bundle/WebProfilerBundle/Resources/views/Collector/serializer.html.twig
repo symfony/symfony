@@ -44,6 +44,11 @@
         </div>
     </div>
 
+    <p class="help">To avoid storing huge amounts of serialized/deserialized data in memory, all content
+        bigger than {{ constant('Symfony\\Component\\Serializer\\Debug\\LargeContent::LIMIT_BYTES') / 1024 }} kB
+        will be displayed as an instance of {{ 'Symfony\\Component\\Serializer\\Debug\\LargeContent' | abbr_class }}
+        or a string with a representative message on the tabs below.</p>
+
     <div class="sf-tabs">
         <div class="tab {{ collector.serializations|length == 0 ? 'disabled' }}">
             <h3 class="tab-title">Serializations <span class="badge">{{ collector.serializations | length }}</span></h3>
@@ -96,7 +101,7 @@
                         <tr>
                             <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                             <td class="nowrap">{{ deserialization.format }}</td>
-                            <td class="nowrap">{{ deserialization.type }}</td>
+                            <td class="nowrap">{{ deserialization.type | abbr_class }}</td>
                             <td>{{ deserialization.data }}</td>
                             <td>{{ profiler_dump(deserialization.result, maxDepth=2) }}</td>
                             <td>{{ profiler_dump(deserialization.context, maxDepth=2) }}</td>
@@ -128,9 +133,9 @@
                         <tr>
                             <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                             <td class="nowrap">{{ normalization.format }}</td>
-                            <td>{{ profiler_dump(normalization.normalizer, maxDepth=2) }}</td>
+                            <td class="nowrap">{{ normalization.normalizer | abbr_class }}</td>
                             <td>{{ profiler_dump(normalization.data, maxDepth=2) }}</td>
-                            <td>{{ normalization.result }}</td>
+                            <td>{{ profiler_dump(normalization.result, maxDepth=2) }}</td>
                             <td>{{ profiler_dump(normalization.context, maxDepth=2) }}</td>
                         </tr>
                     {% endfor %}
@@ -161,9 +166,9 @@
                         <tr>
                             <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                             <td class="nowrap">{{ denormalization.format }}</td>
-                            <td class="nowrap">{{ denormalization.denormalizer }}</td>
-                            <td class="nowrap">{{ denormalization.type }}</td>
-                            <td>{{ denormalization.data }}</td>
+                            <td class="nowrap">{{ denormalization.denormalizer | abbr_class }}</td>
+                            <td class="nowrap">{{ denormalization.type | abbr_class }}</td>
+                            <td>{{ profiler_dump(denormalization.data, maxDepth=2) }}</td>
                             <td>{{ profiler_dump(denormalization.result, maxDepth=2) }}</td>
                             <td>{{ profiler_dump(denormalization.context, maxDepth=2) }}</td>
                         </tr>
@@ -175,8 +180,9 @@
     </div>
 
     <footer>
-        <small>
-            The icon is taken from <a href="https://fontawesome.com/icons/exchange-alt?style=solid">fontawesome</a> and
+        <small class="text-muted">
+            The icon is taken from <a href="https://fontawesome.com/icons/exchange-alt?style=solid">fontawesome</a>
+            and
             is under <a href="https://fontawesome.com/license/free">Creative Commons Attribution 4.0 International
                 license</a>.
         </small>

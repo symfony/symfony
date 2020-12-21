@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableDenormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableHybridNormalizer;
 use Symfony\Component\Serializer\Debug\Normalizer\TraceableNormalizer;
+use Symfony\Component\Serializer\Debug\SerializerActionFactory;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\TestHybridNormalizer;
  * @covers \Symfony\Component\Serializer\Debug\Normalizer\TraceableDenormalizer
  * @covers \Symfony\Component\Serializer\Debug\Normalizer\TraceableHybridNormalizer
  * @covers \Symfony\Component\Serializer\Debug\Normalizer\AbstractTraceableNormalizer
+ * @covers \Symfony\Component\Serializer\Debug\SerializerActionFactory
  */
 final class TraceableNormalizersTest extends TestCase
 {
@@ -44,6 +46,7 @@ final class TraceableNormalizersTest extends TestCase
     private $normalizerDelegate;
     private $denormalizerDelegate;
     private $hybridDelegate;
+    private $serializerActionFactory;
 
     public function testInterfaces(): void
     {
@@ -96,33 +99,34 @@ final class TraceableNormalizersTest extends TestCase
     {
         $normalizerDelegate = $this->createMock(NormalizerInterface::class);
         $hybridDelegate = $this->createMock(TestHybridNormalizer::class);
+        $serializerActionFactory = $this->getSerializerActionFactory();
 
         $delegate = clone $normalizerDelegate;
         yield 'normalizer:yes' => [
             true,
             $delegate,
-            new TraceableNormalizer($delegate),
+            new TraceableNormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $normalizerDelegate;
         yield 'normalizer:no' => [
             false,
             $delegate,
-            new TraceableNormalizer($delegate),
+            new TraceableNormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $hybridDelegate;
         yield 'hybrid:yes' => [
             true,
             $delegate,
-            new TraceableHybridNormalizer($delegate),
+            new TraceableHybridNormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $hybridDelegate;
         yield 'hybrid:no' => [
             false,
             $delegate,
-            new TraceableHybridNormalizer($delegate),
+            new TraceableHybridNormalizer($delegate, $serializerActionFactory),
         ];
     }
 
@@ -173,33 +177,34 @@ final class TraceableNormalizersTest extends TestCase
     {
         $denormalizerDelegate = $this->createMock(DenormalizerInterface::class);
         $hybridDelegate = $this->createMock(TestHybridNormalizer::class);
+        $serializerActionFactory = $this->getSerializerActionFactory();
 
         $delegate = clone $denormalizerDelegate;
         yield 'denormalizer:yes' => [
             true,
             $delegate,
-            new TraceableDenormalizer($delegate),
+            new TraceableDenormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $denormalizerDelegate;
         yield 'denormalizer:no' => [
             false,
             $delegate,
-            new TraceableDenormalizer($delegate),
+            new TraceableDenormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $hybridDelegate;
         yield 'hybrid:yes' => [
             true,
             $delegate,
-            new TraceableHybridNormalizer($delegate),
+            new TraceableHybridNormalizer($delegate, $serializerActionFactory),
         ];
 
         $delegate = clone $hybridDelegate;
         yield 'hybrid:no' => [
             false,
             $delegate,
-            new TraceableHybridNormalizer($delegate),
+            new TraceableHybridNormalizer($delegate, $serializerActionFactory),
         ];
     }
 
@@ -207,7 +212,7 @@ final class TraceableNormalizersTest extends TestCase
     {
         $serializer = $this->createMock(SerializerInterface::class);
         $delegate = new TestSerializerNormalizerDenormalizerAware();
-        $tracer = new TraceableHybridNormalizer($delegate);
+        $tracer = new TraceableHybridNormalizer($delegate, $this->serializerActionFactory);
 
         $tracer->setNormalizer($this->normalizerDelegate);
         $tracer->setDenormalizer($this->denormalizerDelegate);
@@ -223,7 +228,7 @@ final class TraceableNormalizersTest extends TestCase
      */
     public function testCacheableSupport(bool $isCachable): void
     {
-        $tracer = new TraceableHybridNormalizer(new TestCacheableNormalizer($isCachable));
+        $tracer = new TraceableHybridNormalizer(new TestCacheableNormalizer($isCachable), $this->serializerActionFactory);
         self::assertSame($isCachable, $tracer->hasCacheableSupportsMethod());
     }
 
@@ -249,7 +254,7 @@ final class TraceableNormalizersTest extends TestCase
                 return $text;
             }
         };
-        $tracer = new TraceableNormalizer($delegate);
+        $tracer = new TraceableNormalizer($delegate, $this->serializerActionFactory);
         self::assertSame('foo', $tracer->someAction('foo'));
     }
 
@@ -271,8 +276,19 @@ final class TraceableNormalizersTest extends TestCase
         $this->denormalizerDelegate = $this->createMock(DenormalizerInterface::class);
         $this->hybridDelegate = $this->createMock(TestHybridNormalizer::class);
 
-        $this->traceableNormalizer = new TraceableNormalizer($this->normalizerDelegate);
-        $this->traceableDenormalizer = new TraceableDenormalizer($this->denormalizerDelegate);
-        $this->traceableHybridNormalizer = new TraceableHybridNormalizer($this->hybridDelegate);
+        $serializerActionFactory = $this->getSerializerActionFactory();
+
+        $this->traceableNormalizer = new TraceableNormalizer($this->normalizerDelegate, $serializerActionFactory);
+        $this->traceableDenormalizer = new TraceableDenormalizer($this->denormalizerDelegate,$serializerActionFactory);
+        $this->traceableHybridNormalizer = new TraceableHybridNormalizer($this->hybridDelegate,$serializerActionFactory);
+    }
+
+    private function getSerializerActionFactory(): SerializerActionFactory
+    {
+        if (!$this->serializerActionFactory) {
+            $this->serializerActionFactory = new SerializerActionFactory();
+        }
+
+        return $this->serializerActionFactory;
     }
 }

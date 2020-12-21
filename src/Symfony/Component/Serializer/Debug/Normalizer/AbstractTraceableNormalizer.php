@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Debug\Normalizer;
 
+use Symfony\Component\Serializer\Debug\SerializerActionFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -25,21 +26,23 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
      * @var DenormalizerInterface|NormalizerInterface
      */
     protected $delegate;
+    private $serializerActionFactory;
     private $normalizations = [];
     private $denormalizations = [];
 
     /**
      * @param DenormalizerInterface|NormalizerInterface $delegate
      */
-    public function __construct(object $delegate)
+    public function __construct(object $delegate, SerializerActionFactoryInterface $serializerActionFactory)
     {
         $this->delegate = $delegate;
+        $this->serializerActionFactory = $serializerActionFactory;
     }
 
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $result = $this->delegate->denormalize($data, $type, $format, $context);
-        $this->denormalizations[] = new Denormalization($this->delegate, $result, $data, $type, $format, $context);
+        $this->denormalizations[] = $this->serializerActionFactory->createDenormalization($this->delegate, $data, $result, $type, $format, $context);
 
         return $result;
     }
@@ -52,7 +55,7 @@ abstract class AbstractTraceableNormalizer implements SerializerAwareInterface, 
     public function normalize($object, string $format = null, array $context = [])
     {
         $result = $this->delegate->normalize($object, $format, $context);
-        $this->normalizations[] = new Normalization($this->delegate, $object, $result, $format, $context);
+        $this->normalizations[] = $this->serializerActionFactory->createNormalization($this->delegate, $object, $result, $format, $context);
 
         return $result;
     }

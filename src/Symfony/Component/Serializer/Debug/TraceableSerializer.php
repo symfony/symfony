@@ -25,28 +25,27 @@ final class TraceableSerializer implements SerializerInterface, ResetInterface
      */
     private $deserializations = [];
 
-    /**
-     * @var SerializerInterface
-     */
-    private $delegate;
+    private $serializerDelegate;
+    private $serializerActionFactory;
 
-    public function __construct(SerializerInterface $delegate)
+    public function __construct(SerializerInterface $serializerDelegate, SerializerActionFactoryInterface $serializerActionFactory)
     {
-        $this->delegate = $delegate;
+        $this->serializerDelegate = $serializerDelegate;
+        $this->serializerActionFactory = $serializerActionFactory;
     }
 
     public function serialize($data, string $format, array $context = []): string
     {
-        $result = $this->delegate->serialize($data, $format, $context);
-        $this->serializations[] = new Serialization($data, $result, $format, $context);
+        $result = $this->serializerDelegate->serialize($data, $format, $context);
+        $this->serializations[] = $this->serializerActionFactory->createSerialization($data, $result, $format, $context);
 
         return $result;
     }
 
     public function deserialize($data, string $type, string $format, array $context = [])
     {
-        $result = $this->delegate->deserialize($data, $type, $format, $context);
-        $this->deserializations[] = new Deserialization($data, $result, $type, $format, $context);
+        $result = $this->serializerDelegate->deserialize($data, $type, $format, $context);
+        $this->deserializations[] = $this->serializerActionFactory->createDeserialization($data, $result, $type, $format, $context);
 
         return $result;
     }

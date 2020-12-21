@@ -33,7 +33,7 @@ final class SlackTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());
         }
 
-        if ('/' !== $dsn->getPath()) {
+        if (null !== $dsn->getPath() && '/' !== $dsn->getPath()) {
             throw new IncompleteDsnException('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
         }
 

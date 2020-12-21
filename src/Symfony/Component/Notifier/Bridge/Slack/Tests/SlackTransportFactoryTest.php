@@ -20,13 +20,22 @@ use Symfony\Component\Notifier\Transport\Dsn;
 
 final class SlackTransportFactoryTest extends TestCase
 {
-    public function testCreateWithDsn()
+    /**
+     * @dataProvider provideValidDsn
+     */
+    public function testCreateWithDsn(string $dsn)
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test/?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString($dsn));
 
         $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
+    }
+
+    public function provideValidDsn(): iterable
+    {
+        yield ['slack://testUser@host.test?channel=testChannel'];
+        yield ['slack://testUser@host.test/?channel=testChannel'];
     }
 
     public function testCreateWithDeprecatedDsn()

@@ -179,8 +179,14 @@ trait RedisTrait
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
             $redis = new $class();
 
-            $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts) {
+            $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts, $query) {
                 $host = $hosts[0]['host'] ?? $hosts[0]['path'];
+                if (array_key_exists('tls', $query)) {
+                    $tls = filter_var($query['tls'], FILTER_VALIDATE_BOOLEAN);
+                    if ($tls) {
+                        $host = 'tls://' . $host;
+                    }
+                }
                 $port = $hosts[0]['port'] ?? null;
 
                 if (isset($params['redis_sentinel'])) {

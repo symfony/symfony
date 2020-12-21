@@ -364,27 +364,27 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Այս արժեքը պետք է լինի միջև {{ min }} և {{ max }}.</target>
+                <target>Այս արժեքը պետք է լինի  {{ min }}-ի և {{ max }}-ի միջև։</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>This value is not a valid hostname.</target>
+                <target>Այս հոստի անունը վավեր չէ։</target>
             </trans-unit>
             <trans-unit id="96">
-                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>The number of elements in this collection should be a multiple of {{ compared_value }}.</target>
-            </trans-unit>
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}․</source>
+                <target>Այս համախմբի տարրերի քանակը պետք է հավասար լինի {{ compared_value }}-ի բազմապատիկներին։</target>
+            </trans-unit>           
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>This value should satisfy at least one of the following constraints:</target>
+                <target>Այս արժեքը պետք է բավարարի հետևյալ սահմանափակումներից առնվազն մեկը:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>Each element of this collection should satisfy its own set of constraints.</target>
+                <target>Այս հավաքածուի յուրաքանչյուր տարր պետք է բավարարի իր սեփական սահմանափակումները։.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>This value is not a valid International Securities Identification Number (ISIN).</target>
+                <target>Այս արժեքը Արժեթղթերի Նույնականացման Միջազգային Համարը վավեր չէ։(ISIN).</target>
             </trans-unit>
         </body>
     </file>

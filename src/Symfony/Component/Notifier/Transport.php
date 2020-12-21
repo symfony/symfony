@@ -112,7 +112,7 @@ class Transport
             return new RoundRobinTransport($this->createFromDsns($dsns));
         }
 
-        return $this->fromDsnObject(Dsn::fromString($dsn));
+        return $this->fromDsnObject(new Dsn($dsn));
     }
 
     public function fromDsnObject(Dsn $dsn): TransportInterface
@@ -133,7 +133,7 @@ class Transport
     {
         $transports = [];
         foreach ($dsns as $dsn) {
-            $transports[] = $this->fromDsnObject(Dsn::fromString($dsn));
+            $transports[] = $this->fromDsnObject(new Dsn($dsn));
         }
 
         return $transports;

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T23:31:24Z
+
+😭
+
+Would setting a branch alias on the notifier package help?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-12-19T10:25:41Z
+
+@derrabus Probably, but I'll let @nicolas-grekas confirm it's desirable.
+Anyway, do we really want to forbid `5.4.x` and later?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-19T10:56:09Z
+
+How does composer behave if we use the `branch-version` entry to say this is 5.3.x-dev?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-12-19T11:38:19Z
+
+@nicolas-grekas Tried using `"branch-version": "5.3.x"`, first on the root's composer.json then on the Notifier's root one. Either way, it didn't help (any chance we need to merge that entry first to see the result actually?)

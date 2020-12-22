@@ -181,10 +181,10 @@ trait RedisTrait
 
             $initializer = static function ($redis) use ($connect, $params, $dsn, $auth, $hosts, $query) {
                 $host = $hosts[0]['host'] ?? $hosts[0]['path'];
-                if (array_key_exists('tls', $query)) {
-                    $tls = filter_var($query['tls'], FILTER_VALIDATE_BOOLEAN);
+                if (\array_key_exists('tls', $query)) {
+                    $tls = filter_var($query['tls'], \FILTER_VALIDATE_BOOLEAN);
                     if ($tls) {
-                        $host = 'tls://' . $host;
+                        $host = 'tls://'.$host;
                     }
                 }
                 $port = $hosts[0]['port'] ?? null;

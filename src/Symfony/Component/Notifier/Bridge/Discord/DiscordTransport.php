@@ -68,7 +68,7 @@ final class DiscordTransport extends AbstractTransport
         $content = $message->getSubject();
 
         if (mb_strlen($content, 'UTF-8') > self::SUBJECT_LIMIT) {
-            throw new LogicException('The subject length of a Discord message must not exceed 2000 characters.');
+            throw new LogicException(sprintf('The subject length of a Discord message must not exceed %d characters.', self::SUBJECT_LIMIT));
         }
 
         $endpoint = sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);

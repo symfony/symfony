@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Marked the `containsOption()`, `availableOptionValues()`, and `disableValidation()` methods of the
+   `ChoiceFormField` class as internal
+
 5.1.0
 -----
 

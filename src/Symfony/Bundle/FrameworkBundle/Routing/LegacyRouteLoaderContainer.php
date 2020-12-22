@@ -29,6 +29,8 @@ class LegacyRouteLoaderContainer implements ContainerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($id)
     {

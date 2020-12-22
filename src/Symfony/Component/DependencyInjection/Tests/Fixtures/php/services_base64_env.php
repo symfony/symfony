@@ -46,6 +46,9 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
         ];
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter($name)
     {
         $name = (string) $name;

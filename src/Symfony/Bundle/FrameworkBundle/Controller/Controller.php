@@ -31,7 +31,7 @@ abstract class Controller implements ContainerAwareInterface
     /**
      * Gets a container configuration parameter by its name.
      *
-     * @return mixed
+     * @return array|bool|float|int|string|null
      *
      * @final
      */

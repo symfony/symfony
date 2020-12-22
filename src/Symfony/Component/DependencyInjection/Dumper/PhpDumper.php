@@ -1449,6 +1449,9 @@ EOF;
 
         $code = <<<'EOF'
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter($name)
     {
         $name = (string) $name;

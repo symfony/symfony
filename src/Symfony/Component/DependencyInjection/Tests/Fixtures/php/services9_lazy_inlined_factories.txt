@@ -94,6 +94,9 @@ class ProjectServiceContainer extends Container
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter($name)
     {
         $name = (string) $name;

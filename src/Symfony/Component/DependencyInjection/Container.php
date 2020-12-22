@@ -109,7 +109,7 @@ class Container implements ResettableContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return mixed The parameter value
+     * @return array|bool|float|int|string|null The parameter value
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */

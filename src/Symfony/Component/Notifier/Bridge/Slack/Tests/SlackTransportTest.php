@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
@@ -20,34 +19,37 @@ use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class SlackTransportTest extends TestCase
+final class SlackTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return SlackTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('slack://host.test/testPath', (string) $transport);
+        return new SlackTransport('id', $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsChatMessage()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['slack://hooks.slack.com/id', $this->createTransport()];
     }
 
-    public function testSendNonChatMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
+        yield [new ChatMessage('Hello!')];
+    }
 
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 
     public function testSendWithEmptyArrayResponseThrows()
@@ -195,10 +197,5 @@ final class SlackTransportTest extends TestCase
         $this->expectException(TransportException::class);
 
         $transport->send(new ChatMessage($message));
-    }
-
-    private function createTransport(?HttpClientInterface $client = null): SlackTransport
-    {
-        return (new SlackTransport('testPath', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

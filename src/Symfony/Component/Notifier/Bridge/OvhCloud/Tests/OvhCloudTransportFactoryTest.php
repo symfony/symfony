@@ -11,76 +11,44 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class OvhCloudTransportFactoryTest extends TestCase
+final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@host.test?consumer_key=consumerKey&service_name=serviceName'));
-
-        $this->assertSame('ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionConsumerKeyThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?service_name=serviceName'));
-    }
-
-    public function testCreateWithMissingOptionServiceNameThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?consumeer_key=consumerKey'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('ovhcloud://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey&service_name=serviceName'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "service_name" option
-        $factory->create(Dsn::fromString('somethingElse://applicationKey:applicationSecret@default?consumer_key=consumerKey'));
-    }
-
-    private function createFactory(): OvhCloudTransportFactory
+    /**
+     * @return OvhCloudTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new OvhCloudTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName',
+            'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: consumer_key' => ['ovhcloud://key:secret@default?service_name=serviceName'];
+        yield 'missing option: service_name' => ['ovhcloud://key:secret@default?consumer_key=consumerKey'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield ['somethingElse://key:secret@default?service_name=serviceName'];
+        yield ['somethingElse://key:secret@default?consumer_key=consumerKey'];
     }
 }

@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 final class SlackOptions implements MessageOptionsInterface
 {
-    private $options = [];
+    private $options;
 
     public function __construct(array $options = [])
     {

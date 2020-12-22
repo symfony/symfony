@@ -24,7 +24,7 @@ final class SlackTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test/?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString('slack://xoxb-TestUser@host.test/?channel=testChannel'));
 
         $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
     }
@@ -33,7 +33,7 @@ final class SlackTransportFactoryTest extends TestCase
     {
         $factory = $this->createFactory();
 
-        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test?channel=testChannel'));
+        $transport = $factory->create(Dsn::fromString('slack://xoxb-TestUser@host.test?channel=testChannel'));
 
         $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
     }

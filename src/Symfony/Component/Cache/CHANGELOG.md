@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
+ * added TLS support for \Redis connection in the DNS. Example: `redis://127.0.0.1?tls=1`
 
 5.2.0
 -----

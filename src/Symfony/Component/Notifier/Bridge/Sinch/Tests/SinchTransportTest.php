@@ -11,41 +11,37 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class SinchTransportTest extends TestCase
+final class SinchTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return SinchTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('sinch://host.test?from=sender', (string) $transport);
+        return new SinchTransport('accountSid', 'authToken', 'sender', $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsMessageInterface()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['sinch://sms.api.sinch.com?from=sender', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    private function createTransport(): SinchTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new SinchTransport('accountSid', 'authToken', 'sender', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

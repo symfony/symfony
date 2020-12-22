@@ -11,44 +11,40 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class FirebaseTransportTest extends TestCase
+final class FirebaseTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return FirebaseTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('firebase://host.test', (string) $transport);
+        return new FirebaseTransport('username:password', $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsMessageInterface()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['firebase://fcm.googleapis.com/fcm/send', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new ChatMessage('Hello!')];
     }
 
-    private function createTransport(): FirebaseTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new FirebaseTransport('username:password', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

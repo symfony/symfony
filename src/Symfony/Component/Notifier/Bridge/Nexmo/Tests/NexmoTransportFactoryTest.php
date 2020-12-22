@@ -11,67 +11,42 @@
 
 namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class NexmoTransportFactoryTest extends TestCase
+final class NexmoTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('nexmo://apiKey:apiSecret@host.test?from=0611223344'));
-
-        $this->assertSame('nexmo://host.test?from=0611223344', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('nexmo://apiKey:apiSecret@default'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('nexmo://apiKey:apiSecret@default?from=0611223344')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('nexmoo://apiKey:apiSecret@default?from=0611223344')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://apiKey:apiSecret@default?from=0611223344'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://apiKey:apiSecret@default'));
-    }
-
-    private function createFactory(): NexmoTransportFactory
+    /**
+     * @return NexmoTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new NexmoTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'nexmo://host.test?from=0611223344',
+            'nexmo://apiKey:apiSecret@host.test?from=0611223344',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'nexmo://apiKey:apiSecret@default?from=0611223344'];
+        yield [false, 'somethingElse://apiKey:apiSecret@default?from=0611223344'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: from' => ['nexmo://apiKey:apiSecret@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://apiKey:apiSecret@default?from=0611223344'];
+        yield ['somethingElse://apiKey:apiSecret@default']; // missing "from" option
     }
 }

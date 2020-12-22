@@ -11,41 +11,37 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class OvhCloudTransportTest extends TestCase
+final class OvhCloudTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return OvhCloudTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName', (string) $transport);
+        return new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsMessageInterface()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['ovhcloud://eu.api.ovh.com?consumer_key=consumerKey&service_name=serviceName', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    private function createTransport(): OvhCloudTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new OvhCloudTransport('applicationKey', 'applicationSecret', 'consumerKey', 'serviceName', $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

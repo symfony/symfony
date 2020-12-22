@@ -11,67 +11,42 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sinch\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class SinchTransportFactoryTest extends TestCase
+final class SinchTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('sinch://accountSid:authToken@host.test?from=0611223344'));
-
-        $this->assertSame('sinch://host.test?from=0611223344', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('sinch://accountSid:authToken@default'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('sinch://accountSid:authToken@default?from=0611223344')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default'));
-    }
-
-    private function createFactory(): SinchTransportFactory
+    /**
+     * @return SinchTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new SinchTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'sinch://host.test?from=0611223344',
+            'sinch://accountSid:authToken@host.test?from=0611223344',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'sinch://accountSid:authToken@default?from=0611223344'];
+        yield [false, 'somethingElse://accountSid:authToken@default?from=0611223344'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: from' => ['sinch://accountSid:authToken@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://accountSid:authToken@default?from=0611223344'];
+        yield ['somethingElse://accountSid:authToken@default']; // missing "from" option
     }
 }

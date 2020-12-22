@@ -12,11 +12,14 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class NormalizationTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @dataProvider getEncoderTests
      */
@@ -182,8 +185,70 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
     }
 
+    public function testNormalizeEmptyMap()
+    {
+        $tb = new TreeBuilder('root', 'array');
+        $tree = $tb
+            ->getRootNode()
+                ->useAttributeAsKey('key')
+                ->prototype('array')
+                    ->children()
+                        ->node('foo', 'scalar')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $data = ['first' => []];
+
+        $this->assertNormalized($tree, $data, $data);
+    }
+
+    public function testNormalizeEmptyList()
+    {
+        $tb = new TreeBuilder('root', 'array');
+        $tree = $tb
+            ->getRootNode()
+                ->prototype('array')
+                    ->children()
+                        ->node('foo', 'scalar')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $this->assertNormalized($tree, [], []);
+    }
+
     public function testAssociativeArrayPreserveKeys()
     {
+        $tb = new TreeBuilder('root', 'array');
+        $tree = $tb
+            ->getRootNode()
+                ->useAttributeAsKey('key')
+                ->prototype('array')
+                    ->children()
+                        ->node('foo', 'scalar')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $data = ['first' => ['foo' => 'bar']];
+
+        $this->assertNormalized($tree, $data, $data);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAssociativeArrayPreserveKeysForList()
+    {
+        $this->expectDeprecation('Since symfony/config 5.3: Support for passing a map to a node that is configured as a list is deprecated for path "root".');
+
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * deprecated support for passing maps to nodes configured as lists
+
 5.1.0
 -----
 

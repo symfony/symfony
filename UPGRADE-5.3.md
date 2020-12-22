@@ -6,6 +6,11 @@ Asset
 
  * Deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
 
+Config
+------
+
+ * Deprecated support for passing maps to nodes configured as lists.
+
 DomCrawler
 ----------
 

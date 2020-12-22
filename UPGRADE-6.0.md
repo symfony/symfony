@@ -9,6 +9,7 @@ Asset
 Config
 ------
 
+ * Removed support for passing maps to nodes configured as lists.
  * The signature of method `NodeDefinition::setDeprecated()` has been updated to `NodeDefinition::setDeprecation(string $package, string $version, string $message)`.
  * The signature of method `BaseNode::setDeprecated()` has been updated to `BaseNode::setDeprecation(string $package, string $version, string $message)`.
  * Passing a null message to `BaseNode::setDeprecated()` to un-deprecate a node is not supported anymore.

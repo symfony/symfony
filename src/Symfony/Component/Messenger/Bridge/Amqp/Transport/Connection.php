@@ -79,6 +79,8 @@ class Connection
     private $exchangeOptions;
     private $queuesOptions;
     private $amqpFactory;
+    private $autoSetupExchange;
+    private $autoSetup;
 
     /**
      * @var \AMQPChannel|null
@@ -112,6 +114,7 @@ class Connection
                 'queue_name_pattern' => 'delay_%exchange_name%_%routing_key%_%delay%',
             ],
         ], $connectionOptions);
+        $this->autoSetupExchange = $this->autoSetup = $connectionOptions['auto_setup'] ?? true;
         $this->exchangeOptions = $exchangeOptions;
         $this->queuesOptions = $queuesOptions;
         $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
@@ -207,6 +210,9 @@ class Connection
         $exchangeOptions = $amqpOptions['exchange'];
         $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
+        if (isset($amqpOptions['auto_setup'])) {
+            $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOLEAN);
+        }
 
         $queuesOptions = array_map(function ($queueOptions) {
             if (!\is_array($queueOptions)) {
@@ -285,7 +291,7 @@ class Connection
             return;
         }
 
-        if ($this->shouldSetup()) {
+        if ($this->autoSetupExchange) {
             $this->setupExchangeAndQueues();
         }
 
@@ -347,7 +353,7 @@ class Connection
 
     private function setupDelay(int $delay, ?string $routingKey)
     {
-        if ($this->shouldSetup()) {
+        if ($this->autoSetup) {
             $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
         }
 
@@ -418,23 +424,12 @@ class Connection
     {
         $this->clearWhenDisconnected();
 
-        if ($this->shouldSetup()) {
+        if ($this->autoSetupExchange) {
             $this->setupExchangeAndQueues();
         }
 
-        try {
-            if (false !== $message = $this->queue($queueName)->get()) {
-                return $message;
-            }
-        } catch (\AMQPQueueException $e) {
-            if (404 === $e->getCode() && $this->shouldSetup()) {
-                // If we get a 404 for the queue, it means we need to set up the exchange & queue.
-                $this->setupExchangeAndQueues();
-
-                return $this->get($queueName);
-            }
-
-            throw $e;
+        if (false !== $message = $this->queue($queueName)->get()) {
+            return $message;
         }
 
         return null;
@@ -452,8 +447,11 @@ class Connection
 
     public function setup(): void
     {
-        $this->setupExchangeAndQueues();
+        if ($this->autoSetupExchange) {
+            $this->setupExchangeAndQueues();
+        }
         $this->getDelayExchange()->declareExchange();
+        $this->autoSetup = false;
     }
 
     private function setupExchangeAndQueues(): void
@@ -466,6 +464,7 @@ class Connection
                 $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey, $queueConfig['binding_arguments'] ?? []);
             }
         }
+        $this->autoSetupExchange = false;
     }
 
     /**
@@ -556,19 +555,6 @@ class Connection
             $this->amqpExchange = null;
             $this->amqpDelayExchange = null;
         }
-    }
-
-    private function shouldSetup(): bool
-    {
-        if (!\array_key_exists('auto_setup', $this->connectionOptions)) {
-            return true;
-        }
-
-        if (\in_array($this->connectionOptions['auto_setup'], [false, 'false'], true)) {
-            return false;
-        }
-
-        return true;
     }
 
     private function getDefaultPublishRoutingKey(): ?string

@@ -1,0 +1,67 @@
+{% use "form_div_layout.html.twig" %}
+
+{# Widgets #}
+
+{% block form_widget_simple -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-input')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-textarea')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget %}
+
+{% block money_widget -%}
+    {% set prepend = not (money_pattern starts with '{{') %}
+    {% set append = not (money_pattern ends with '}}') %}
+    {% if prepend or append %}
+        <div class="uk-inline{{ group_class|default('') }}">
+            {% if prepend %}
+                <span>{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+            {{- block('form_widget_simple') -}}
+            {% if append %}
+                <span>{{ money_pattern|form_encode_currency }}</span>
+            {% endif %}
+        </div>
+    {% else %}
+        {{- block('form_widget_simple') -}}
+    {% endif %}
+{%- endblock money_widget %}
+
+{% block percent_widget -%}
+    {%- if symbol -%}
+        <div class="uk-inline">
+            {{- block('form_widget_simple') -}}
+            <span>{{ symbol|default('%') }}</span>
+        </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
+{%- endblock percent_widget %}
+
+{%- block choice_widget_collapsed -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-select')|trim}) %}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block checkbox_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-checkbox')|trim}) %}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-radio')|trim}) %}
+    {{- parent() -}}
+{%- endblock radio_widget -%}
+
+{%- block range_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-range')|trim}) %}
+    {{- parent() -}}
+{%- endblock range_widget %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' uk-button')|trim}) %}
+    {{- parent() -}}
+{%- endblock button_widget %}

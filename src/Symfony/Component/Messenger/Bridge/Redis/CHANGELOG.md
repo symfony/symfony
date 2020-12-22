@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `rediss://` DSN scheme support for TLS protocol
+ * Deprecate TLS option, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
+
 5.2.0
 -----
 

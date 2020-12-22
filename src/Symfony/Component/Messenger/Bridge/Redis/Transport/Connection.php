@@ -119,9 +119,10 @@ class Connection
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
     {
         $url = $dsn;
+        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
 
-        if (preg_match('#^redis:///([^:@])+$#', $dsn)) {
-            $url = str_replace('redis:', 'file:', $dsn);
+        if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
+            $url = str_replace($scheme.':', 'file:', $dsn);
         }
 
         if (false === $parsedUrl = parse_url($url)) {
@@ -164,8 +165,9 @@ class Connection
             unset($redisOptions['dbindex']);
         }
 
-        $tls = false;
+        $tls = 'rediss' === $scheme;
         if (\array_key_exists('tls', $redisOptions)) {
+            trigger_deprecation('symfony/redis-messenger', '5.3', 'Providing "tls" parameter is deprecated, use "rediss://" DSN scheme instead');
             $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
             unset($redisOptions['tls']);
         }

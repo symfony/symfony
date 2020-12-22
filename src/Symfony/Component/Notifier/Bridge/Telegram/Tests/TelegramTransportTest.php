@@ -124,7 +124,7 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage'));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://host.test?channel=testChannel', $sentMessage->getTransport());
+        $this->assertEquals('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
     public function testSendWithChannelOverride()
@@ -183,6 +183,6 @@ JSON;
         $sentMessage = $transport->send(new ChatMessage('testMessage', $messageOptions));
 
         $this->assertEquals(1, $sentMessage->getMessageId());
-        $this->assertEquals('telegram://host.test?channel=defaultChannel', $sentMessage->getTransport());
+        $this->assertEquals('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 }

@@ -11,67 +11,42 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class TwilioTransportFactoryTest extends TestCase
+final class TwilioTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('twilio://accountSid:authToken@host.test?from=0611223344'));
-
-        $this->assertSame('twilio://host.test?from=0611223344', (string) $transport);
-    }
-
-    public function testCreateWithNoFromThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('twilio://accountSid:authToken@default'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('twilio://accountSid:authToken@default?from=0611223344')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://accountSid:authToken@default?from=0611223344'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://token@host'));
-    }
-
-    private function createFactory(): TwilioTransportFactory
+    /**
+     * @return TwilioTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new TwilioTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'twilio://host.test?from=0611223344',
+            'twilio://accountSid:authToken@host.test?from=0611223344',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'twilio://accountSid:authToken@default?from=0611223344'];
+        yield [false, 'somethingElse://accountSid:authToken@default?from=0611223344'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: from' => ['twilio://accountSid:authToken@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://accountSid:authToken@default?from=0611223344'];
+        yield ['somethingElse://accountSid:authToken@default']; // missing "from" option
     }
 }

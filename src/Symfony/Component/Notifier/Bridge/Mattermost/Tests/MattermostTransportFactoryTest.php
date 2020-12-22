@@ -11,97 +11,61 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mattermost\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class MattermostTransportFactoryTest extends TestCase
+final class MattermostTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@host.test?channel=testChannel'));
-
-        $this->assertSame('mattermost://host.test?channel=testChannel', (string) $transport);
-    }
-
-    public function testCreateWithDsnHostWithSubfolder()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@example.com/sub?channel=testChannel'));
-
-        $this->assertSame('mattermost://example.com/sub?channel=testChannel', (string) $transport);
-    }
-
-    public function testCreateWithDsnHostWithSubfolderWithTrailingSlash()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('mattermost://accessToken@example.com/sub/?channel=testChannel'));
-
-        $this->assertSame('mattermost://example.com/sub?channel=testChannel', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionChannelThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('mattermost://token@host'));
-    }
-
-    public function testCreateWithNoTokenThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('mattermost://host.test?channel=testChannel'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('mattermost://token@host?channel=testChannel')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "channel" option
-        $factory->create(Dsn::fromString('somethingElse://token@host'));
-    }
-
-    private function createFactory(): MattermostTransportFactory
+    /**
+     * @return MattermostTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new MattermostTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'mattermost://host.test?channel=testChannel',
+            'mattermost://accessToken@host.test?channel=testChannel',
+        ];
+
+        yield [
+            'mattermost://example.com/sub?channel=testChannel',
+            'mattermost://accessToken@example.com/sub?channel=testChannel',
+        ];
+
+        yield [
+            'mattermost://example.com/sub?channel=testChannel',
+            'mattermost://accessToken@example.com/sub/?channel=testChannel',
+        ];
+
+        yield [
+            'mattermost://example.com/sub/sub-2?channel=testChannel',
+            'mattermost://accessToken@example.com/sub/sub-2?channel=testChannel',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'mattermost://token@host?channel=testChannel'];
+        yield [false, 'somethingElse://token@host?channel=testChannel'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: token' => ['mattermost://host.test?channel=testChannel'];
+        yield 'missing option: channel' => ['mattermost://token@host'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://token@host?channel=testChannel'];
+        yield ['somethingElse://token@host']; // missing "channel" option
     }
 }

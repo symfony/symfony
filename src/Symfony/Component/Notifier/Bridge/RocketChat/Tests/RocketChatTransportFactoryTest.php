@@ -11,60 +11,44 @@
 
 namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class RocketChatTransportFactoryTest extends TestCase
+final class RocketChatTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('rocketchat://accessToken@host.test?channel=testChannel'));
-
-        $this->assertSame('rocketchat://host.test?channel=testChannel', (string) $transport);
-    }
-
-    public function testCreateWithNoTokenThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('rocketchat://host.test?channel=testChannel'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('rocketchat://token@host?channel=testChannel')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://token@host?channel=testChannel')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://token@host?channel=testChannel'));
-    }
-
-    private function createFactory(): RocketChatTransportFactory
+    /**
+     * @return RocketChatTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new RocketChatTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'rocketchat://host.test?channel=testChannel',
+            'rocketchat://accessToken@host.test?channel=testChannel',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'rocketchat://token@host?channel=testChannel'];
+        yield [false, 'somethingElse://token@host?channel=testChannel'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: token' => ['rocketchat://host.test?channel=testChannel'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://token@host?channel=testChannel'];
     }
 }

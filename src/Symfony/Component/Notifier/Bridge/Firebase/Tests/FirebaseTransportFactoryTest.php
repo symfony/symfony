@@ -11,50 +11,39 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class FirebaseTransportFactoryTest extends TestCase
+final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('firebase://username:password@host.test'));
-
-        $this->assertSame('firebase://host.test', (string) $transport);
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('firebase://username:password@default')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://username:password@default')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://username:password@default'));
-    }
-
-    private function createFactory(): FirebaseTransportFactory
+    /**
+     * @return FirebaseTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new FirebaseTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'firebase://host.test',
+            'firebase://username:password@host.test',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'firebase://username:password@default'];
+        yield [false, 'somethingElse://username:password@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://username:password@default'];
     }
 }

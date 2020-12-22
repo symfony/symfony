@@ -11,50 +11,41 @@
 
 namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
  */
-final class RocketChatTransportTest extends TestCase
+final class RocketChatTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return RocketChatTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('rocketchat://host.test?channel=testChannel', (string) $transport);
+        return new RocketChatTransport('testAccessToken', $channel, $client ?: $this->createMock(HttpClientInterface::class));
     }
 
-    public function testToStringContainsNoChannelBecauseItsOptional()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport(null);
-
-        $this->assertSame('rocketchat://host.test', (string) $transport);
+        yield ['rocketchat://rocketchat.com', $this->createTransport()];
+        yield ['rocketchat://rocketchat.com?channel=testChannel', $this->createTransport(null, 'testChannel')];
     }
 
-    public function testSupportsChatMessage()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield [new ChatMessage('Hello!')];
     }
 
-    public function testSendNonChatMessageThrowsLogicException()
+    public function unsupportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-        $transport->send($this->createMock(MessageInterface::class));
-    }
-
-    private function createTransport(?string $channel = 'testChannel'): RocketChatTransport
-    {
-        return (new RocketChatTransport('testAccessToken', $channel, $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

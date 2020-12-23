@@ -50,6 +50,8 @@ trait ServiceLocatorTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($id)
     {

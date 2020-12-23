@@ -26,6 +26,11 @@ class VarDumperFormatter implements FormatterInterface
         $this->cloner = $cloner ?: new VarCloner();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return mixed
+     */
     public function format(array $record)
     {
         $record['context'] = $this->cloner->cloneVar($record['context']);
@@ -34,6 +39,11 @@ class VarDumperFormatter implements FormatterInterface
         return $record;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return mixed
+     */
     public function formatBatch(array $records)
     {
         foreach ($records as $k => $record) {

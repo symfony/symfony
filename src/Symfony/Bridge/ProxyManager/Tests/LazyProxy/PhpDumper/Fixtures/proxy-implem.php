@@ -16,7 +16,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
         $this->initializer%s && ($this->initializer%s->__invoke($valueHolder%s, $this, 'dummy', array(), $this->initializer%s) || 1) && $this->valueHolder%s = $valueHolder%s;
 
         if ($this->valueHolder%s === $returnValue = $this->valueHolder%s->dummy()) {
-            $returnValue = $this;
+            return $this;
         }
 
         return $returnValue;
@@ -26,8 +26,8 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
     {
         $this->initializer%s && ($this->initializer%s->__invoke($valueHolder%s, $this, 'dummyRef', array(), $this->initializer%s) || 1) && $this->valueHolder%s = $valueHolder%s;
 
-        if ($this->valueHolder%s === $returnValue = &$this->valueHolder%s->dummyRef()) {
-            $returnValue = $this;
+        if ($this->valueHolder%s === $returnValue = & $this->valueHolder%s->dummyRef()) {
+            return $this;
         }
 
         return $returnValue;
@@ -38,7 +38,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
         $this->initializer%s && ($this->initializer%s->__invoke($valueHolder%s, $this, 'sunny', array(), $this->initializer%s) || 1) && $this->valueHolder%s = $valueHolder%s;
 
         if ($this->valueHolder%s === $returnValue = $this->valueHolder%s->sunny()) {
-            $returnValue = $this;
+            return $this;
         }
 
         return $returnValue;
@@ -96,7 +96,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
 
         $targetObject = $this->valueHolder%s;
 
-        return $targetObject->$name = $value;
+        $targetObject->$name = $value; return $targetObject->$name;
     }
 
     public function __isset($name)

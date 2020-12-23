@@ -18,6 +18,8 @@ class StringWrapperType extends StringType
 {
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
@@ -26,6 +28,8 @@ class StringWrapperType extends StringType
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {

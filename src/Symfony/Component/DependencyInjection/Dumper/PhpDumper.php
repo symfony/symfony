@@ -1512,6 +1512,9 @@ EOF;
 
         $code = <<<'EOF'
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter(string $name)
     {
         if (isset($this->buildParameters[$name])) {

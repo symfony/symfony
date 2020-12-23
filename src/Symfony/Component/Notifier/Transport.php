@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier;
 
+use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -55,6 +56,7 @@ class Transport
         IqsmsTransportFactory::class,
         RocketChatTransportFactory::class,
         TwilioTransportFactory::class,
+        AllMySmsTransportFactory::class,
         InfobipTransportFactory::class,
         OvhCloudTransportFactory::class,
         FirebaseTransportFactory::class,

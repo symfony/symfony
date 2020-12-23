@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Bastien Durand <bdurand-dev@outlook.com>
- *
- * @experimental in 5.3
  */
 final class MobytTransportFactory extends AbstractTransportFactory
 {

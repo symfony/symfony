@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Thomas Ferney <thomas.ferney@gmail.com>
- *
- * @experimental in 5.3
  */
 final class OvhCloudTransport extends AbstractTransport
 {

@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Notification\Notification;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @experimental in 5.3
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {

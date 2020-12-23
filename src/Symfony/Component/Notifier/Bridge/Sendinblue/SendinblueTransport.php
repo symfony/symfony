@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@gmail.com>
- *
- * @experimental in 5.3
  */
 final class SendinblueTransport extends AbstractTransport
 {

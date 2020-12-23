@@ -3,11 +3,6 @@ Notifier Component
 
 The Notifier component sends notifications via one or more channels (email, SMS, ...).
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Resources
 ---------
 

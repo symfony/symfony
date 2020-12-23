@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
- *
- * @experimental in 5.3
  */
 final class ZulipOptions implements MessageOptionsInterface
 {

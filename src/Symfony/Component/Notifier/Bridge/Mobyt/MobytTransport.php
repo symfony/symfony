@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Basien Durand <bdurand-dev@outlook.com>
- *
- * @experimental in 5.3
  */
 final class MobytTransport extends AbstractTransport
 {

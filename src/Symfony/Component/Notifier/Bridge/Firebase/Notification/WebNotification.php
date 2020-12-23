@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Firebase\Notification;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
 
-/**
- * @experimental in 5.3
- */
 final class WebNotification extends FirebaseOptions
 {
     public function icon(string $icon): self

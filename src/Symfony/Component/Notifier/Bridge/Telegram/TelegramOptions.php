@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
- *
- * @experimental in 5.3
  */
 final class TelegramOptions implements MessageOptionsInterface
 {

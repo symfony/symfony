@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Pierre Tondereau <pierre.tondereau@protonmail.com>
- *
- * @experimental in 5.3
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {

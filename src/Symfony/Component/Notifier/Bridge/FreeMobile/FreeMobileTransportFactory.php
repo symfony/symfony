@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Antoine Makdessi <amakdessi@me.com>
- *
- * @experimental in 5.3
  */
 final class FreeMobileTransportFactory extends AbstractTransportFactory
 {

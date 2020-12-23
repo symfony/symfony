@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
@@ -53,13 +54,15 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 
         $this->container->register('app.security_listener', \stdClass::class)
             ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20]);
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 
         $this->assertListeners([
             [LogoutEvent::class, ['app.security_listener', 'onLogout'], 0],
             [LoginSuccessEvent::class, ['app.security_listener', 'onLoginSuccess'], 20],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, ['app.security_listener', 'onAuthenticationSuccess'], 0],
         ]);
     }
 
@@ -79,6 +82,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             [LogoutEvent::class, [TestSubscriber::class, 'onLogout'], -200],
             [CheckPassportEvent::class, [TestSubscriber::class, 'onCheckPassport'], 120],
             [LoginSuccessEvent::class, [TestSubscriber::class, 'onLoginSuccess'], 0],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, [TestSubscriber::class, 'onAuthenticationSuccess'], 0],
         ]);
     }
 
@@ -95,17 +99,20 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 
         $this->container->register('app.security_listener', \stdClass::class)
             ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20]);
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 
         $this->assertListeners([
             [LogoutEvent::class, ['app.security_listener', 'onLogout'], 0],
             [LoginSuccessEvent::class, ['app.security_listener', 'onLoginSuccess'], 20],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, ['app.security_listener', 'onAuthenticationSuccess'], 0],
         ], 'security.event_dispatcher.main');
         $this->assertListeners([
             [LogoutEvent::class, ['app.security_listener', 'onLogout'], 0],
             [LoginSuccessEvent::class, ['app.security_listener', 'onLoginSuccess'], 20],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, ['app.security_listener', 'onAuthenticationSuccess'], 0],
         ], 'security.event_dispatcher.api');
     }
 
@@ -122,13 +129,15 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 
         $this->container->register('app.security_listener', \stdClass::class)
             ->addTag('kernel.event_listener', ['method' => 'onLogout', 'event' => LogoutEvent::class, 'dispatcher' => 'security.event_dispatcher.main'])
-            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20]);
+            ->addTag('kernel.event_listener', ['method' => 'onLoginSuccess', 'event' => LoginSuccessEvent::class, 'priority' => 20])
+            ->addTag('kernel.event_listener', ['method' => 'onAuthenticationSuccess', 'event' => AuthenticationEvents::AUTHENTICATION_SUCCESS]);
 
         $this->container->compile();
 
         $this->assertListeners([
             [LogoutEvent::class, ['app.security_listener', 'onLogout'], 0],
             [LoginSuccessEvent::class, ['app.security_listener', 'onLoginSuccess'], 20],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, ['app.security_listener', 'onAuthenticationSuccess'], 0],
         ], 'security.event_dispatcher.main');
     }
 
@@ -146,7 +155,8 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         }
 
         $foundListeners = array_uintersect($expectedListeners, $actualListeners, function (array $a, array $b) {
-            return $a === $b;
+            // PHP internally sorts all the arrays first, so returning proper 1 / -1 values is crucial
+            return $a <=> $b;
         });
 
         $this->assertEquals($expectedListeners, $foundListeners);
@@ -161,6 +171,7 @@ class TestSubscriber implements EventSubscriberInterface
             LogoutEvent::class => ['onLogout', -200],
             CheckPassportEvent::class => ['onCheckPassport', 120],
             LoginSuccessEvent::class => 'onLoginSuccess',
+            AuthenticationEvents::AUTHENTICATION_SUCCESS => 'onAuthenticationSuccess',
         ];
     }
 }

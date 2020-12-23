@@ -409,6 +409,9 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
         return new \SimpleFactoryClass('foo');
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter($name)
     {
         $name = (string) $name;

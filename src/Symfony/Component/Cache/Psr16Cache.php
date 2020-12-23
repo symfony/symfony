@@ -66,6 +66,8 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($key, $default = null)
     {

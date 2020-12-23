@@ -74,6 +74,9 @@ class ProjectServiceContainer extends Container
         return $instance;
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter($name)
     {
         $name = (string) $name;

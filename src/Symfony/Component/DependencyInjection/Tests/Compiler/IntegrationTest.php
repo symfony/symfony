@@ -537,6 +537,9 @@ class DecoratedServiceLocator implements ServiceProviderInterface
         $this->locator = $locator;
     }
 
+    /**
+     * @return mixed
+     */
     public function get($id)
     {
         return $this->locator->get($id);

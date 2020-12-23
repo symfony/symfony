@@ -43,6 +43,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
@@ -58,6 +60,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {

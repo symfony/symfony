@@ -11,9 +11,7 @@
 
 namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
-use ProxyManager\Exception\ExceptionInterface;
 use ProxyManager\Generator\ClassGenerator;
-use ProxyManager\Generator\MethodGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
@@ -84,18 +82,6 @@ EOF;
         $code = $this->classGenerator->generate($this->generateProxyClass($definition));
         $code = preg_replace('/^(class [^ ]++ extends )([^\\\\])/', '$1\\\\$2', $code);
 
-        if (!method_exists(MethodGenerator::class, 'fromReflectionWithoutBodyAndDocBlock')) { // proxy-manager < 2.2
-            $code = preg_replace(
-                '/((?:\$(?:this|initializer|instance)->)?(?:publicProperties|initializer|valueHolder))[0-9a-f]++/',
-                '${1}'.$this->getIdentifierSuffix($definition),
-                $code
-            );
-        }
-
-        if (!is_subclass_of(ExceptionInterface::class, 'Throwable')) { // proxy-manager < 2.5
-            $code = preg_replace('/ \\\\Closure::bind\(function ((?:& )?\(\$instance(?:, \$value)?\))/', ' \Closure::bind(static function \1', $code);
-        }
-
         return $code;
     }
 
@@ -114,8 +100,10 @@ EOF;
         $generatedClass = new ClassGenerator($this->getProxyClassName($definition));
         $class = $this->proxyGenerator->getProxifiedClass($definition);
 
-        $this->proxyGenerator->setFluentSafe($definition->hasTag('proxy'));
-        $this->proxyGenerator->generate(new \ReflectionClass($class), $generatedClass);
+        $this->proxyGenerator->generate(new \ReflectionClass($class), $generatedClass, [
+            'fluentSafe' => $definition->hasTag('proxy'),
+            'skipDestructor' => true,
+        ]);
 
         return $generatedClass;
     }

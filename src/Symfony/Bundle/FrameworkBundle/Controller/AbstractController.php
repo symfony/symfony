@@ -74,7 +74,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Gets a container parameter by its name.
      *
-     * @return mixed
+     * @return array|bool|float|int|string|null
      */
     protected function getParameter(string $name)
     {

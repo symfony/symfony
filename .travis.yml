@@ -149,7 +149,7 @@ before_install:
           if [[ $PHP = 8.* ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
           else
-              tfold ext.mongodb tpecl mongodb-1.6.16 mongodb.so $INI
+              tfold ext.mongodb tpecl mongodb-1.8.1 mongodb.so $INI
               tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI
               tfold ext.amqp tpecl amqp-1.10.2 amqp.so $INI
           fi
@@ -216,13 +216,6 @@ install:
       fi
 
     - |
-      # Set composer's platform to php 7.4 if we're on php 8.
-      if [[ $PHP = 8.* ]]; then
-          composer config platform.php 7.4.99
-          export SYMFONY_DEPRECATIONS_HELPER=max[total]=999
-      fi
-
-    - |
       # Install symfony/flex
       if [[ $deps = low ]]; then
           export SYMFONY_REQUIRE='>=3.4'
@@ -262,7 +255,7 @@ install:
           fi
           phpenv global $PHP
           rm vendor/composer/package-versions-deprecated -Rf
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb ~1.5.0)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.8.99; composer require --dev --no-update mongodb/mongodb ^1.8.1)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
@@ -279,7 +272,7 @@ install:
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
                   COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort)
-                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.6.99; composer require --dev --no-update mongodb/mongodb)
+                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.8.99; composer require --dev --no-update mongodb/mongodb)
                   [[ ! $COMPONENTS ]] || tfold 'phpunit install' SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1 ./phpunit install
                   [[ ! $COMPONENTS ]] || echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               fi

@@ -111,7 +111,7 @@ final class FormExtension extends AbstractExtension
         return $view->vars['value'];
     }
 
-    public function getFieldLabel(FormView $view): string
+    public function getFieldLabel(FormView $view): ?string
     {
         return $this->createFieldTranslation(
             $view->vars['label'],
@@ -120,7 +120,7 @@ final class FormExtension extends AbstractExtension
         );
     }
 
-    public function getFieldHelp(FormView $view): string
+    public function getFieldHelp(FormView $view): ?string
     {
         return $this->createFieldTranslation(
             $view->vars['help'],
@@ -164,7 +164,7 @@ final class FormExtension extends AbstractExtension
         }
     }
 
-    private function createFieldTranslation(?string $value, array $parameters, $domain): string
+    private function createFieldTranslation(?string $value, array $parameters, $domain): ?string
     {
         if (!$this->translator || !$value || false === $domain) {
             return $value;

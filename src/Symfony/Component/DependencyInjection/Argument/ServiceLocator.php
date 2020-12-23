@@ -34,6 +34,8 @@ class ServiceLocator extends BaseServiceLocator
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($id)
     {

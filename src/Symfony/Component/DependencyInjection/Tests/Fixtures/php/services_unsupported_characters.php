@@ -78,6 +78,9 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
         return $this->services['foo*/oh-no'] = new \FooClass();
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter(string $name)
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {

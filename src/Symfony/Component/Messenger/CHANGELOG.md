@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `StopWorkerExceptionInterface` and its implementation `StopWorkerException` to stop the worker.
+
 5.3
 ---
 

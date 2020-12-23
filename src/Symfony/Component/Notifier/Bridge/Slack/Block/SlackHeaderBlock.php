@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Exception\LengthException;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
- *
- * @experimental in 5.3
  */
 final class SlackHeaderBlock extends AbstractSlackBlock
 {

@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jérémy Romey <jeremy@free-agent.fr>
- *
- * @experimental in 5.3
  */
 final class InfobipTransport extends AbstractTransport
 {

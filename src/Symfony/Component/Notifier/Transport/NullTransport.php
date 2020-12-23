@@ -21,8 +21,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.3
  */
 class NullTransport implements TransportInterface
 {

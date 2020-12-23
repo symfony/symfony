@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Oleksandr Barabolia <alexandrbarabolya@gmail.com>
- *
- * @experimental in 5.3
  */
 final class IqsmsTransportFactory extends AbstractTransportFactory
 {

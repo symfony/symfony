@@ -4,6 +4,7 @@ CHANGELOG
 5.3.0
 -----
 
+ * The bridge is not marked as `@experimental` anymore
  * Check for maximum number of buttons in Slack action block
  * Add HeaderBlock
 

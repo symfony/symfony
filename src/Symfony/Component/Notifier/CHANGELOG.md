@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * The component is not marked as `@experimental` anymore
+
 5.2.0
 -----
 

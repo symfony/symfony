@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Mathieu Piot <math.piot@gmail.com>
- *
- * @experimental in 5.3
  */
 final class DiscordTransportFactory extends AbstractTransportFactory
 {

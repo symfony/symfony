@@ -19,7 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Marcin Szepczynski <szepczynski@gmail.com>
- * @experimental in 5.3
  */
 class SmsapiTransportFactory extends AbstractTransportFactory
 {

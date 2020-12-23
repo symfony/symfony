@@ -17,8 +17,6 @@ use Symfony\Component\Notifier\Exception\LogicException;
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
  *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#sharemedia
- *
- * @experimental in 5.3
  */
 class ShareMediaShare extends AbstractLinkedInShare
 {

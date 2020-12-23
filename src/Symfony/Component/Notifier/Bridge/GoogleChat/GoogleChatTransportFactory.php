@@ -18,8 +18,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @experimental in 5.3
  */
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {

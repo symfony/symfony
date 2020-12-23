@@ -421,6 +421,9 @@ class ProjectServiceContainer extends Container
         return new \SimpleFactoryClass('foo');
     }
 
+    /**
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter(string $name)
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {

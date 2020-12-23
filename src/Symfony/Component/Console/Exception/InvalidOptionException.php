@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Exception;
 
+use Throwable;
+
 /**
  * Represents an incorrect option name typed in the console.
  *
@@ -18,4 +20,8 @@ namespace Symfony\Component\Console\Exception;
  */
 class InvalidOptionException extends \InvalidArgumentException implements ExceptionInterface
 {
+    public function __construct($message = '', $code = 13, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

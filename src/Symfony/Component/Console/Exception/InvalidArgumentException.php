@@ -11,9 +11,15 @@
 
 namespace Symfony\Component\Console\Exception;
 
+use Throwable;
+
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
+    public function __construct($message = '', $code = 12, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

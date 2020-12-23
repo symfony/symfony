@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Exception;
 
+use Throwable;
+
 /**
  * Represents failure to read input from stdin.
  *
@@ -18,4 +20,8 @@ namespace Symfony\Component\Console\Exception;
  */
 class MissingInputException extends RuntimeException implements ExceptionInterface
 {
+    public function __construct($message = '', $code = 14, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

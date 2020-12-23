@@ -70,4 +70,13 @@ class AmqpStampTest extends TestCase
         $this->assertSame($amqpEnvelope->getAppId(), $stamp->getAttributes()['app_id']);
         $this->assertSame(\AMQP_MANDATORY, $stamp->getFlags());
     }
+
+    public function testCreateFromAmqpEnvelopeWithOriginQueueName()
+    {
+        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+
+        $stamp = AmqpStamp::createFromAmqpEnvelope($amqpEnvelope, null, 'origin_queue');
+
+        $this->assertSame('origin_queue', $stamp->getOriginQueueName());
+    }
 }

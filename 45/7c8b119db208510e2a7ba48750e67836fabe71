@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-23T14:49:18Z
+
+(there is a related test failure apparently)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-23T17:46:00Z
+
+good catch @nicolas-grekas the exception message changed in Mime component in the last version.
+
+Test fixed.

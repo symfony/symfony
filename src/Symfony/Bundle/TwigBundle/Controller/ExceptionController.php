@@ -67,7 +67,7 @@ class ExceptionController
             (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
             [
                 'status_code' => $code,
-                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'status_text' => Response::$statusTexts[$code] ?? '',
                 'exception' => $exception,
                 'logger' => $logger,
                 'currentContent' => $currentContent,

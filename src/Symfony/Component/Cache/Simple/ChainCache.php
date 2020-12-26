@@ -96,7 +96,7 @@ class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableI
     {
         $missing = [];
         $nextCacheIndex = $cacheIndex + 1;
-        $nextCache = isset($this->caches[$nextCacheIndex]) ? $this->caches[$nextCacheIndex] : null;
+        $nextCache = $this->caches[$nextCacheIndex] ?? null;
 
         foreach ($values as $k => $value) {
             if ($miss !== $value) {

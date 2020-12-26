@@ -141,8 +141,8 @@ trait TesterTrait
             }
         } else {
             $this->output = new ConsoleOutput(
-                isset($options['verbosity']) ? $options['verbosity'] : ConsoleOutput::VERBOSITY_NORMAL,
-                isset($options['decorated']) ? $options['decorated'] : null
+                $options['verbosity'] ?? ConsoleOutput::VERBOSITY_NORMAL,
+                $options['decorated'] ?? null
             );
 
             $errorOutput = new StreamOutput(fopen('php://memory', 'w', false));

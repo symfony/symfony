@@ -42,7 +42,7 @@ class HttpKernelRuntime
      */
     public function renderFragment($uri, $options = [])
     {
-        $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
+        $strategy = $options['strategy'] ?? 'inline';
         unset($options['strategy']);
 
         return $this->handler->render($uri, $strategy, $options);

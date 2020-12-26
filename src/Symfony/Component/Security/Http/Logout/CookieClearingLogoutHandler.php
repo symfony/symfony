@@ -38,7 +38,7 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
         foreach ($this->cookies as $cookieName => $cookieData) {
-            $response->headers->clearCookie($cookieName, $cookieData['path'], $cookieData['domain'], isset($cookieData['secure']) ? $cookieData['secure'] : false, true, isset($cookieData['samesite']) ? $cookieData['samesite'] : null);
+            $response->headers->clearCookie($cookieName, $cookieData['path'], $cookieData['domain'], $cookieData['secure'] ?? false, true, $cookieData['samesite'] ?? null);
         }
     }
 }

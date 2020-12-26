@@ -138,8 +138,8 @@ class FormDataExtractor implements FormDataExtractorInterface
     public function extractViewVariables(FormView $view)
     {
         $data = [
-            'id' => isset($view->vars['id']) ? $view->vars['id'] : null,
-            'name' => isset($view->vars['name']) ? $view->vars['name'] : null,
+            'id' => $view->vars['id'] ?? null,
+            'name' => $view->vars['name'] ?? null,
             'view_vars' => [],
         ];
 

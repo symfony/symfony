@@ -97,7 +97,7 @@ class Esi extends AbstractSurrogate
 
             $chunks[$i] = sprintf('<?php echo $this->surrogate->handle($this, %s, %s, %s) ?>'."\n",
                 var_export($options['src'], true),
-                var_export(isset($options['alt']) ? $options['alt'] : '', true),
+                var_export($options['alt'] ?? '', true),
                 isset($options['onerror']) && 'continue' === $options['onerror'] ? 'true' : 'false'
             );
             ++$i;

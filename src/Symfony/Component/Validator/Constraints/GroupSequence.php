@@ -84,6 +84,6 @@ class GroupSequence
     public function __construct(array $groups)
     {
         // Support for Doctrine annotations
-        $this->groups = isset($groups['value']) ? $groups['value'] : $groups;
+        $this->groups = $groups['value'] ?? $groups;
     }
 }

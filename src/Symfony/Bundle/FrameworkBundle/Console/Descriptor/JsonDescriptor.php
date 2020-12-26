@@ -144,7 +144,7 @@ class JsonDescriptor extends Descriptor
 
     protected function describeContainerParameter($parameter, array $options = [])
     {
-        $key = isset($options['parameter']) ? $options['parameter'] : '';
+        $key = $options['parameter'] ?? '';
 
         $this->writeData([$key => $parameter], $options);
     }
@@ -156,7 +156,7 @@ class JsonDescriptor extends Descriptor
 
     private function writeData(array $data, array $options)
     {
-        $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+        $flags = $options['json_encoding'] ?? 0;
 
         $this->write(json_encode($data, $flags | \JSON_PRETTY_PRINT)."\n");
     }

@@ -277,8 +277,8 @@ class Store implements StoreInterface
 
         foreach (preg_split('/[\s,]+/', $vary) as $header) {
             $key = str_replace('_', '-', strtolower($header));
-            $v1 = isset($env1[$key]) ? $env1[$key] : null;
-            $v2 = isset($env2[$key]) ? $env2[$key] : null;
+            $v1 = $env1[$key] ?? null;
+            $v2 = $env2[$key] ?? null;
             if ($v1 !== $v2) {
                 return false;
             }

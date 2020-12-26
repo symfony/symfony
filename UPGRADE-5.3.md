@@ -23,6 +23,11 @@ HttpKernel
 
  * Marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
 
+Notifier
+-------
+
+* Changed the return type of `Symfony\Component\Notifier\Transport\AbstractTransportFactory::getEndpoint()` from `?string` to `string`
+
 PhpunitBridge
 -------------
 

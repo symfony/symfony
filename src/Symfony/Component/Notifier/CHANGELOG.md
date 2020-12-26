@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * The component is not marked as `@experimental` anymore
+* [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
 
 5.2.0
 -----

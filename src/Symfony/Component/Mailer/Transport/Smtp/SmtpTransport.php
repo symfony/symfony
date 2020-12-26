@@ -159,7 +159,7 @@ class SmtpTransport extends AbstractTransport
             return $name;
         }
 
-        return sprintf('smtp://sendmail');
+        return 'smtp://sendmail';
     }
 
     /**
@@ -200,10 +200,19 @@ class SmtpTransport extends AbstractTransport
             }
 
             $this->executeCommand("DATA\r\n", [354]);
-            foreach (AbstractStream::replace("\r\n.", "\r\n..", $message->toIterable()) as $chunk) {
-                $this->stream->write($chunk, false);
+            try {
+                foreach (AbstractStream::replace("\r\n.", "\r\n..", $message->toIterable()) as $chunk) {
+                    $this->stream->write($chunk, false);
+                }
+                $this->stream->flush();
+            } catch (TransportExceptionInterface $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                $this->stream->terminate();
+                $this->started = false;
+                $this->getLogger()->debug(sprintf('Email transport "%s" stopped', __CLASS__));
+                throw $e;
             }
-            $this->stream->flush();
             $this->executeCommand("\r\n.\r\n", [250]);
             $message->appendDebug($this->stream->getDebug());
             $this->lastMessageTime = microtime(true);

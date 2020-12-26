@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-18T10:46:47Z
+
+Thank you @OskarStark for this PR.
+
+We cannot merge this since it is a BC break. I had a better look where this is used, and I can see that nowhere do we handle the scenario where this method returns null.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T10:55:00Z
+
+I switched it to `5.x` 👍
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-18T10:57:14Z
+
+I think the way to fix this is to deprecate the method and to add a new one with the correct syntax. But Im not sure it is worth the trouble.
+
+What is the reason you want to tighten this?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T10:58:49Z
+
+As this is experimental, we can break BC in a minor release, thats why I now target `5.x`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-12-18T11:08:47Z
+
+> As this is experimental, we can break BC in a minor release, thats why I now target 5.x
+
+Im not in my usual game today. I've been wrong twice in the same PR. I can admit that my mouse was even hovering the close button.
+
+Im currently extra happy that Im not the only reviewer.
+Thank you again Oskar for your work.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T11:13:11Z
+
+Thanks for your feedback Tobias 🌹 🌞
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:32:36Z
+
+see also #39558 for 5.2
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T12:39:01Z
+
+Sure, like this?
+
+    "conflict": {
+        ...
+        "symfony/infobib-notifier": "<5.3",
+        "symfony/mattermost-notifier": "<5.3",
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-18T12:56:04Z
+
+I've done this for all bridges now: #39559
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T13:21:12Z
+
+Thank you
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-25T10:55:55Z
+
+I rebased this PR @jderusse 👍

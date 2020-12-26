@@ -18,6 +18,8 @@ use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\RawMessage;
 
 class SmtpTransportTest extends TestCase
@@ -85,6 +87,29 @@ class SmtpTransportTest extends TestCase
 
         $transport->send(new RawMessage('Message 3'), $envelope);
         $this->assertContains("NOOP\r\n", $stream->getCommands());
+    }
+
+    public function testSendInvalidMessage()
+    {
+        $stream = new DummyStream();
+
+        $transport = new SmtpTransport($stream);
+        $transport->setPingThreshold(1);
+
+        $message = new Email();
+        $message->to('recipient@example.org');
+        $message->from('sender@example.org');
+        $message->attachFromPath('/does_not_exists');
+
+        try {
+            $transport->send($message);
+            $this->fail('Expected Symfony\Component\Mime\Exception\InvalidArgumentException to be thrown');
+        } catch (InvalidArgumentException $e) {
+            $this->assertMatchesRegularExpression('{Path "/does_not_exists"}i', $e->getMessage());
+        }
+
+        $this->assertNotContains("\r\n.\r\n", $stream->getCommands());
+        $this->assertTrue($stream->isClosed());
     }
 }
 
@@ -163,5 +188,11 @@ class DummyStream extends AbstractStream
     public function isClosed(): bool
     {
         return $this->closed;
+    }
+
+    public function terminate(): void
+    {
+        parent::terminate();
+        $this->closed = true;
     }
 }

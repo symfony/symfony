@@ -165,6 +165,68 @@ EOTXT
         );
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testReflectionParameterMixed()
+    {
+        $f = eval('return function (mixed $a) {};');
+        $var = new \ReflectionParameter($f, 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "a"
+  position: 0
+  allowsNull: true
+  typeHint: "mixed"
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testReflectionParameterUnion()
+    {
+        $f = eval('return function (int|float $a) {};');
+        $var = new \ReflectionParameter($f, 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "a"
+  position: 0
+  typeHint: "int|float"
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testReflectionParameterNullableUnion()
+    {
+        $f = eval('return function (int|float|null $a) {};');
+        $var = new \ReflectionParameter($f, 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "a"
+  position: 0
+  allowsNull: true
+  typeHint: "int|float|null"
+}
+EOTXT
+            , $var
+        );
+    }
+
     public function testReturnType()
     {
         $f = eval('return function ():int {};');
@@ -174,6 +236,72 @@ EOTXT
             <<<EOTXT
 Closure(): int {
   returnType: "int"
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+  file: "%sReflectionCasterTest.php($line) : eval()'d code"
+  line: "1 to 1"
+}
+EOTXT
+            , $f
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testMixedReturnType()
+    {
+        $f = eval('return function (): mixed {};');
+        $line = __LINE__ - 1;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure(): mixed {
+  returnType: "mixed"
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+  file: "%sReflectionCasterTest.php($line) : eval()'d code"
+  line: "1 to 1"
+}
+EOTXT
+            , $f
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionReturnType()
+    {
+        $f = eval('return function (): int|float {};');
+        $line = __LINE__ - 1;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure(): int|float {
+  returnType: "int|float"
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+  file: "%sReflectionCasterTest.php($line) : eval()'d code"
+  line: "1 to 1"
+}
+EOTXT
+            , $f
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testNullableUnionReturnType()
+    {
+        $f = eval('return function (): int|float|null {};');
+        $line = __LINE__ - 1;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure(): int|float|null {
+  returnType: "int|float|null"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
   file: "%sReflectionCasterTest.php($line) : eval()'d code"

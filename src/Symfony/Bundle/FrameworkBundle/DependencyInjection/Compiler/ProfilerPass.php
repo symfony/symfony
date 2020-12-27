@@ -35,7 +35,7 @@ class ProfilerPass implements CompilerPassInterface
         $collectors = new \SplPriorityQueue();
         $order = \PHP_INT_MAX;
         foreach ($container->findTaggedServiceIds('data_collector', true) as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $priority = $attributes[0]['priority'] ?? 0;
             $template = null;
 
             $collectorClass = $container->findDefinition($id)->getClass();

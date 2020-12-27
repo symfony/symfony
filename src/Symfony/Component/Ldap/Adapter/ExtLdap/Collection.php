@@ -101,7 +101,7 @@ class Collection implements CollectionInterface
     {
         $this->toArray();
 
-        return isset($this->entries[$offset]) ? $this->entries[$offset] : null;
+        return $this->entries[$offset] ?? null;
     }
 
     public function offsetSet($offset, $value)

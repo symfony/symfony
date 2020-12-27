@@ -32,7 +32,7 @@ class CheckboxType extends AbstractType
         // transformer handles this case).
         // We cannot solve this case via overriding the "data" option, because
         // doing so also calls setDataLocked(true).
-        $builder->setData(isset($options['data']) ? $options['data'] : false);
+        $builder->setData($options['data'] ?? false);
         $builder->addViewTransformer(new BooleanToStringTransformer($options['value'], $options['false_values']));
     }
 

@@ -397,8 +397,8 @@ class ProfilerController
 
         $nonces = $this->cspHandler ? $this->cspHandler->getNonces($request, $response) : [];
 
-        $variables['csp_script_nonce'] = isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null;
-        $variables['csp_style_nonce'] = isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null;
+        $variables['csp_script_nonce'] = $nonces['csp_script_nonce'] ?? null;
+        $variables['csp_style_nonce'] = $nonces['csp_style_nonce'] ?? null;
 
         $response->setContent($this->twig->render($template, $variables));
 

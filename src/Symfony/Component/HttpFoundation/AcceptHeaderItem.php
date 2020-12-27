@@ -146,7 +146,7 @@ class AcceptHeaderItem
      */
     public function getAttribute(string $name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+        return $this->attributes[$name] ?? $default;
     }
 
     /**

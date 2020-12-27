@@ -396,7 +396,7 @@ abstract class NumberFormatter
      */
     public function getAttribute(int $attr)
     {
-        return isset($this->attributes[$attr]) ? $this->attributes[$attr] : null;
+        return $this->attributes[$attr] ?? null;
     }
 
     /**

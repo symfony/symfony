@@ -22,18 +22,18 @@ interface LockFactoryInterface
     /**
      * Creates a lock for the given resource.
      *
-     * @param string $resource The resource to lock
-     * @param float|null $ttl Maximum expected lock duration in seconds
-     * @param bool $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param string     $resource    The resource to lock
+     * @param float|null $ttl         Maximum expected lock duration in seconds
+     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
     public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface;
 
     /**
      * Creates a lock from the given key.
      *
-     * @param Key $key The key containing the lock's state
-     * @param float|null $ttl Maximum expected lock duration in seconds
-     * @param bool $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
+     * @param Key        $key         The key containing the lock's state
+     * @param float|null $ttl         Maximum expected lock duration in seconds
+     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
     public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface;
 }

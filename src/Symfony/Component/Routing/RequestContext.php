@@ -293,7 +293,7 @@ class RequestContext
      */
     public function getParameter(string $name)
     {
-        return isset($this->parameters[$name]) ? $this->parameters[$name] : null;
+        return $this->parameters[$name] ?? null;
     }
 
     /**

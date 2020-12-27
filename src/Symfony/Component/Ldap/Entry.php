@@ -59,7 +59,7 @@ class Entry
      */
     public function getAttribute(string $name)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
+        return $this->attributes[$name] ?? null;
     }
 
     /**

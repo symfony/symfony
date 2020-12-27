@@ -186,7 +186,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $label,
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
-            \is_callable($attr) ? $attr($choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : [])
+            \is_callable($attr) ? $attr($choice, $key, $value) : ($attr[$key] ?? [])
         );
 
         // $isPreferred may be null if no choices are preferred

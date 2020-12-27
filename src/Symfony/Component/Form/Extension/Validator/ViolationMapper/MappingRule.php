@@ -60,7 +60,7 @@ class MappingRule
     {
         $length = \strlen($propertyPath);
         $prefix = substr($this->propertyPath, 0, $length);
-        $next = isset($this->propertyPath[$length]) ? $this->propertyPath[$length] : null;
+        $next = $this->propertyPath[$length] ?? null;
 
         return $prefix === $propertyPath && ('[' === $next || '.' === $next);
     }

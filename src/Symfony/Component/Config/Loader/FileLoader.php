@@ -90,7 +90,7 @@ abstract class FileLoader extends Loader
             }
 
             if ($isSubpath) {
-                return isset($ret[1]) ? $ret : (isset($ret[0]) ? $ret[0] : null);
+                return isset($ret[1]) ? $ret : ($ret[0] ?? null);
             }
         }
 

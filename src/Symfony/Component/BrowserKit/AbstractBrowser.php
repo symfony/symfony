@@ -147,7 +147,7 @@ abstract class AbstractBrowser
      */
     public function getServerParameter(string $key, $default = '')
     {
-        return isset($this->server[$key]) ? $this->server[$key] : $default;
+        return $this->server[$key] ?? $default;
     }
 
     public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
@@ -647,7 +647,7 @@ abstract class AbstractBrowser
         } else {
             $currentUri = sprintf('http%s://%s/',
                 isset($this->server['HTTPS']) ? 's' : '',
-                isset($this->server['HTTP_HOST']) ? $this->server['HTTP_HOST'] : 'localhost'
+                $this->server['HTTP_HOST'] ?? 'localhost'
             );
         }
 

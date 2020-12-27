@@ -105,7 +105,7 @@ class DateIntervalType extends AbstractType
                         'required' => $options['required'],
                         'translation_domain' => $options['translation_domain'],
                         // when compound the array entries are ignored, we need to cascade the configuration here
-                        'empty_data' => isset($options['empty_data'][$part]) ? $options['empty_data'][$part] : null,
+                        'empty_data' => $options['empty_data'][$part] ?? null,
                     ];
                     if ('choice' === $options['widget']) {
                         $childOptions['choice_translation_domain'] = false;

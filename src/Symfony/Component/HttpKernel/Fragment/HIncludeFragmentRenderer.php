@@ -73,7 +73,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.
         $uri = str_replace('&', '&amp;', $uri);
 
-        $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
+        $template = $options['default'] ?? $this->globalDefaultTemplate;
         if (null !== $this->twig && $template && $this->twig->getLoader()->exists($template)) {
             $content = $this->twig->render($template);
         } else {

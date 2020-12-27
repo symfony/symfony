@@ -298,15 +298,15 @@ class FullTransformer
     private function getDefaultValueForOptions(array $options): array
     {
         return [
-            'year' => isset($options['year']) ? $options['year'] : 1970,
-            'month' => isset($options['month']) ? $options['month'] : 1,
-            'day' => isset($options['day']) ? $options['day'] : 1,
-            'hour' => isset($options['hour']) ? $options['hour'] : 0,
-            'hourInstance' => isset($options['hourInstance']) ? $options['hourInstance'] : null,
-            'minute' => isset($options['minute']) ? $options['minute'] : 0,
-            'second' => isset($options['second']) ? $options['second'] : 0,
-            'marker' => isset($options['marker']) ? $options['marker'] : null,
-            'timezone' => isset($options['timezone']) ? $options['timezone'] : null,
+            'year' => $options['year'] ?? 1970,
+            'month' => $options['month'] ?? 1,
+            'day' => $options['day'] ?? 1,
+            'hour' => $options['hour'] ?? 0,
+            'hourInstance' => $options['hourInstance'] ?? null,
+            'minute' => $options['minute'] ?? 0,
+            'second' => $options['second'] ?? 0,
+            'marker' => $options['marker'] ?? null,
+            'timezone' => $options['timezone'] ?? null,
         ];
     }
 }

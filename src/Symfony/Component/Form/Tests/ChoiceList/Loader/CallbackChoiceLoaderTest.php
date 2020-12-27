@@ -51,7 +51,7 @@ class CallbackChoiceLoaderTest extends TestCase
             return self::$choices;
         });
         self::$value = function ($choice) {
-            return isset($choice->value) ? $choice->value : null;
+            return $choice->value ?? null;
         };
         self::$choices = [
             (object) ['value' => 'choice_one'],

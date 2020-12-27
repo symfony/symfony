@@ -78,7 +78,7 @@ class ViolationMapperTest extends TestCase
         $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, [
             'error_mapping' => $errorMapping,
         ] + $options);
-        $config->setMapped(isset($options['mapped']) ? $options['mapped'] : true);
+        $config->setMapped($options['mapped'] ?? true);
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);

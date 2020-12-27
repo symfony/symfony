@@ -219,8 +219,8 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
             }
 
             $props = [
-                'file' => isset($callerFrame['file']) ? $callerFrame['file'] : null,
-                'line' => isset($callerFrame['line']) ? $callerFrame['line'] : null,
+                'file' => $callerFrame['file'] ?? null,
+                'line' => $callerFrame['line'] ?? null,
                 'trace' => \array_slice($trace, 1 + $i),
             ];
 

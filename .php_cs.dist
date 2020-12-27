@@ -17,6 +17,7 @@ return PhpCsFixer\Config::create()
         'combine_nested_dirname' => true,
         'list_syntax' => ['syntax' => 'short'],
         'visibility_required' => ['property', 'method', 'const'],
+        'ternary_to_null_coalescing' => true,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

@@ -1709,7 +1709,7 @@ class FrameworkExtension extends Extension
                 $container->setAlias('lock.factory', new Alias('lock.'.$resourceName.'.factory', false));
                 $container->setAlias(LockFactoryInterface::class, new Alias('lock.factory', false));
 
-                $deprecationMessage = 'The "%alias_id%" alias is deprecated, use "' . LockFactoryInterface::class . '" instead.';
+                $deprecationMessage = 'The "%alias_id%" alias is deprecated, use "'.LockFactoryInterface::class.'" instead.';
                 $container->setAlias('lock.store', (new Alias($storeDefinitionId, false))->setDeprecated('symfony/framework-bundle', '5.2', $deprecationMessage));
                 $container->setAlias('lock', (new Alias('lock.'.$resourceName, false))->setDeprecated('symfony/framework-bundle', '5.2', $deprecationMessage));
                 $container->setAlias(PersistingStoreInterface::class, (new Alias($storeDefinitionId, false))->setDeprecated('symfony/framework-bundle', '5.2', $deprecationMessage));
@@ -1718,7 +1718,7 @@ class FrameworkExtension extends Extension
             } else {
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactoryInterface::class, $resourceName.'.lock.factory');
 
-                $deprecationMessage = 'The "%alias_id%" alias is deprecated, use "' . LockFactoryInterface::class . ' $' . $resourceName . 'LockFactory" instead.';
+                $deprecationMessage = 'The "%alias_id%" alias is deprecated, use "'.LockFactoryInterface::class.' $'.$resourceName.'LockFactory" instead.';
                 $container->registerAliasForArgument($storeDefinitionId, PersistingStoreInterface::class, $resourceName.'.lock.store')->setDeprecated('symfony/framework-bundle', '5.2', $deprecationMessage);
                 $container->registerAliasForArgument('lock.'.$resourceName.'.factory', LockFactory::class, $resourceName.'.lock.factory')->setDeprecated('symfony/framework-bundle', '5.3', $deprecationMessage);
                 $container->registerAliasForArgument('lock.'.$resourceName, LockInterface::class, $resourceName.'.lock')->setDeprecated('symfony/framework-bundle', '5.2', $deprecationMessage);

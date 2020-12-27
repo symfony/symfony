@@ -79,7 +79,7 @@
         "symfony/dom-crawler": "<4.4",
         "symfony/http-client": "<4.4",
         "symfony/form": "<5.2",
-        "symfony/lock": "<4.4",
+        "symfony/lock": "<5.3",
         "symfony/mailer": "<5.2",
         "symfony/messenger": "<4.4",
         "symfony/mime": "<4.4",

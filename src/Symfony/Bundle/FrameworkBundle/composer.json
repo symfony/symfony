@@ -45,7 +45,7 @@
         "symfony/form": "^5.2",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/http-client": "^4.4|^5.0",
-        "symfony/lock": "^4.4|^5.0",
+        "symfony/lock": "^5.3",
         "symfony/mailer": "^5.2",
         "symfony/messenger": "^5.2",
         "symfony/mime": "^4.4|^5.0",

@@ -18,6 +18,8 @@ use Psr\Log\NullLogger;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+ *
+ * @final since Symfony 5.3
  */
 class LockFactory implements LoggerAwareInterface, LockFactoryInterface
 {

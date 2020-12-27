@@ -20,9 +20,13 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 {
@@ -43,6 +47,42 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
 
         $securityBundle = new SecurityBundle();
         $securityBundle->build($this->container);
+    }
+
+    /**
+     * @dataProvider providePropagatedEvents
+     */
+    public function testEventIsPropagated(string $configuredEvent, string $registeredEvent)
+    {
+        $this->container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
+        ]);
+
+        $this->container->register('app.security_listener', \stdClass::class)
+            ->addTag('kernel.event_listener', ['method' => 'onEvent', 'event' => $configuredEvent]);
+
+        $this->container->compile();
+
+        $this->assertListeners([
+            [$registeredEvent, ['app.security_listener', 'onEvent'], 0],
+        ]);
+    }
+
+    public function providePropagatedEvents(): array
+    {
+        return [
+            [CheckPassportEvent::class, CheckPassportEvent::class],
+            [LoginFailureEvent::class, LoginFailureEvent::class],
+            [LoginSuccessEvent::class, LoginSuccessEvent::class],
+            [LogoutEvent::class, LogoutEvent::class],
+            [AuthenticationEvents::AUTHENTICATION_SUCCESS, AuthenticationEvents::AUTHENTICATION_SUCCESS],
+            [SecurityEvents::INTERACTIVE_LOGIN, SecurityEvents::INTERACTIVE_LOGIN],
+
+            // These events are ultimately registered by their event name instead of the FQN
+            [AuthenticationSuccessEvent::class, AuthenticationEvents::AUTHENTICATION_SUCCESS],
+            [InteractiveLoginEvent::class, SecurityEvents::INTERACTIVE_LOGIN],
+        ];
     }
 
     public function testRegisterCustomListener()

@@ -32,11 +32,17 @@ class LockFactory implements LoggerAwareInterface, LockFactoryInterface
         $this->logger = new NullLogger();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
     {
         return $this->createLockFromKey(new Key($resource), $ttl, $autoRelease);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
     {
         $lock = new Lock($key, $this->store, $ttl, $autoRelease);

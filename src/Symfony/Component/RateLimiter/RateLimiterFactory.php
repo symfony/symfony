@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\RateLimiter;
 
-use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockFactoryInterface;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -33,7 +33,7 @@ final class RateLimiterFactory
     private $storage;
     private $lockFactory;
 
-    public function __construct(array $config, StorageInterface $storage, ?LockFactory $lockFactory = null)
+    public function __construct(array $config, StorageInterface $storage, ?LockFactoryInterface $lockFactory = null)
     {
         $this->storage = $storage;
         $this->lockFactory = $lockFactory;

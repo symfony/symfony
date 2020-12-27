@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/lock": "^5.2",
+        "symfony/lock": "^5.3",
         "symfony/options-resolver": "^5.1"
     },
     "require-dev": {

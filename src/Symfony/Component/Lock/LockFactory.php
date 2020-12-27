@@ -16,12 +16,10 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 /**
- * Factory provides method to create locks.
- *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class LockFactory implements LoggerAwareInterface
+class LockFactory implements LoggerAwareInterface, LockFactoryInterface
 {
     use LoggerAwareTrait;
 
@@ -34,25 +32,11 @@ class LockFactory implements LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * Creates a lock for the given resource.
-     *
-     * @param string     $resource    The resource to lock
-     * @param float|null $ttl         Maximum expected lock duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
-     */
     public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
     {
         return $this->createLockFromKey(new Key($resource), $ttl, $autoRelease);
     }
 
-    /**
-     * Creates a lock from the given key.
-     *
-     * @param Key        $key         The key containing the lock's state
-     * @param float|null $ttl         Maximum expected lock duration in seconds
-     * @param bool       $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
-     */
     public function createLockFromKey(Key $key, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
     {
         $lock = new Lock($key, $this->store, $ttl, $autoRelease);

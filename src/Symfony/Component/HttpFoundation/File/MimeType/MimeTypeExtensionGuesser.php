@@ -821,6 +821,6 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
 
         $lcMimeType = strtolower($mimeType);
 
-        return isset($this->defaultExtensions[$lcMimeType]) ? $this->defaultExtensions[$lcMimeType] : null;
+        return $this->defaultExtensions[$lcMimeType] ?? null;
     }
 }

@@ -1,5 +1,5 @@
 <?php if (false !== $label): ?>
-<?php if ($required) { $label_attr['class'] = trim((isset($label_attr['class']) ? $label_attr['class'] : '').' required'); } ?>
+<?php if ($required) { $label_attr['class'] = trim(($label_attr['class'] ?? '').' required'); } ?>
 <?php if (!$compound) { $label_attr['for'] = $id; } ?>
 <?php if (!$label) { $label = isset($label_format)
     ? strtr($label_format, ['%name%' => $name, '%id%' => $id])

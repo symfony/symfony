@@ -31,7 +31,7 @@ class CheckboxType extends AbstractType
         // transformer handles this case).
         // We cannot solve this case via overriding the "data" option, because
         // doing so also calls setDataLocked(true).
-        $builder->setData(isset($options['data']) ? $options['data'] : false);
+        $builder->setData($options['data'] ?? false);
         $builder->addViewTransformer(new BooleanToStringTransformer($options['value'], $options['false_values']));
         $builder->setAttribute('_false_is_empty', true); // @internal - A boolean flag to treat false as empty, see Form::isEmpty() - Do not rely on it, it will be removed in Symfony 5.1.
     }

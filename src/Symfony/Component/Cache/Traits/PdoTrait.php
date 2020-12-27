@@ -62,14 +62,14 @@ trait PdoTrait
             throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, \is_object($connOrDsn) ? \get_class($connOrDsn) : \gettype($connOrDsn)));
         }
 
-        $this->table = isset($options['db_table']) ? $options['db_table'] : $this->table;
-        $this->idCol = isset($options['db_id_col']) ? $options['db_id_col'] : $this->idCol;
-        $this->dataCol = isset($options['db_data_col']) ? $options['db_data_col'] : $this->dataCol;
-        $this->lifetimeCol = isset($options['db_lifetime_col']) ? $options['db_lifetime_col'] : $this->lifetimeCol;
-        $this->timeCol = isset($options['db_time_col']) ? $options['db_time_col'] : $this->timeCol;
-        $this->username = isset($options['db_username']) ? $options['db_username'] : $this->username;
-        $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
-        $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
+        $this->table = $options['db_table'] ?? $this->table;
+        $this->idCol = $options['db_id_col'] ?? $this->idCol;
+        $this->dataCol = $options['db_data_col'] ?? $this->dataCol;
+        $this->lifetimeCol = $options['db_lifetime_col'] ?? $this->lifetimeCol;
+        $this->timeCol = $options['db_time_col'] ?? $this->timeCol;
+        $this->username = $options['db_username'] ?? $this->username;
+        $this->password = $options['db_password'] ?? $this->password;
+        $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
         $this->namespace = $namespace;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
 

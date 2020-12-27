@@ -367,7 +367,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     private function getPrototypeForChild(string $key)
     {
-        $prototype = isset($this->valuePrototypes[$key]) ? $this->valuePrototypes[$key] : $this->prototype;
+        $prototype = $this->valuePrototypes[$key] ?? $this->prototype;
         $prototype->setName($key);
 
         return $prototype;

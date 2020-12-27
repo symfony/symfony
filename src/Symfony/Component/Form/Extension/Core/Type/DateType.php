@@ -88,7 +88,7 @@ class DateType extends AbstractType
                     return static function (FormInterface $form) use ($emptyData, $option) {
                         $emptyData = $emptyData($form->getParent());
 
-                        return isset($emptyData[$option]) ? $emptyData[$option] : '';
+                        return $emptyData[$option] ?? '';
                     };
                 };
 

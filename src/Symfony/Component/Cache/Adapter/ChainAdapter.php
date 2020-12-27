@@ -152,7 +152,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         $missing = [];
         $misses = [];
         $nextAdapterIndex = $adapterIndex + 1;
-        $nextAdapter = isset($this->adapters[$nextAdapterIndex]) ? $this->adapters[$nextAdapterIndex] : null;
+        $nextAdapter = $this->adapters[$nextAdapterIndex] ?? null;
 
         foreach ($items as $k => $item) {
             if (!$nextAdapter || $item->isHit()) {

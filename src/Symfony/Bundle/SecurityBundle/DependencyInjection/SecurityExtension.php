@@ -283,9 +283,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
         } elseif (isset($firewall['pattern']) || isset($firewall['host'])) {
-            $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
-            $host = isset($firewall['host']) ? $firewall['host'] : null;
-            $methods = isset($firewall['methods']) ? $firewall['methods'] : [];
+            $pattern = $firewall['pattern'] ?? null;
+            $host = $firewall['host'] ?? null;
+            $methods = $firewall['methods'] ?? [];
             $matcher = $this->createRequestMatcher($container, $pattern, $host, null, $methods);
         }
 
@@ -394,7 +394,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         // Determine default entry point
-        $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
+        $configuredEntryPoint = $firewall['entry_point'] ?? null;
 
         // Authentication listeners
         [$authListeners, $defaultEntryPoint] = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);
@@ -415,8 +415,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
-        $config->replaceArgument(8, isset($firewall['access_denied_handler']) ? $firewall['access_denied_handler'] : null);
-        $config->replaceArgument(9, isset($firewall['access_denied_url']) ? $firewall['access_denied_url'] : null);
+        $config->replaceArgument(8, $firewall['access_denied_handler'] ?? null);
+        $config->replaceArgument(9, $firewall['access_denied_url'] ?? null);
 
         $container->setAlias('security.user_checker.'.$id, new Alias($firewall['user_checker'], false));
 
@@ -430,7 +430,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $config->replaceArgument(10, $listenerKeys);
-        $config->replaceArgument(11, isset($firewall['switch_user']) ? $firewall['switch_user'] : null);
+        $config->replaceArgument(11, $firewall['switch_user'] ?? null);
 
         return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
     }

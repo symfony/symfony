@@ -73,9 +73,8 @@ class PreloadedExtension implements FormExtensionInterface
      */
     public function getTypeExtensions($name)
     {
-        return isset($this->typeExtensions[$name])
-            ? $this->typeExtensions[$name]
-            : [];
+        return $this->typeExtensions[$name]
+            ?? [];
     }
 
     /**

@@ -309,11 +309,11 @@ class FlattenException extends LegacyFlattenException
             $this->trace[] = [
                 'namespace' => $namespace,
                 'short_class' => $class,
-                'class' => isset($entry['class']) ? $entry['class'] : '',
-                'type' => isset($entry['type']) ? $entry['type'] : '',
-                'function' => isset($entry['function']) ? $entry['function'] : null,
-                'file' => isset($entry['file']) ? $entry['file'] : null,
-                'line' => isset($entry['line']) ? $entry['line'] : null,
+                'class' => $entry['class'] ?? '',
+                'type' => $entry['type'] ?? '',
+                'function' => $entry['function'] ?? null,
+                'file' => $entry['file'] ?? null,
+                'line' => $entry['line'] ?? null,
                 'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : [],
             ];
         }

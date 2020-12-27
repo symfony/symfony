@@ -1134,7 +1134,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function getNode($position)
     {
-        return isset($this->nodes[$position]) ? $this->nodes[$position] : null;
+        return $this->nodes[$position] ?? null;
     }
 
     /**

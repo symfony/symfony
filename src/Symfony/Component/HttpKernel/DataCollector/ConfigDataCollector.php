@@ -219,7 +219,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function getPhpVersionExtra()
     {
-        return isset($this->data['php_version_extra']) ? $this->data['php_version_extra'] : null;
+        return $this->data['php_version_extra'] ?? null;
     }
 
     /**

@@ -112,7 +112,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getAttribute($key, $default = null)
     {
-        return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
+        return $this->attributes[$key] ?? $default;
     }
 
     /**

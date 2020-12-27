@@ -66,7 +66,7 @@ class TimeType extends AbstractType
                     if ($options['with_seconds']) {
                         // handle seconds ignored by user's browser when with_seconds enabled
                         // https://codereview.chromium.org/450533009/
-                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], isset($matches['seconds']) ? $matches['seconds'] : '00'));
+                        $e->setData(sprintf('%s:%s:%s', $matches['hours'], $matches['minutes'], $matches['seconds'] ?? '00'));
                     } else {
                         $e->setData(sprintf('%s:%s', $matches['hours'], $matches['minutes']));
                     }
@@ -100,7 +100,7 @@ class TimeType extends AbstractType
                     return static function (FormInterface $form) use ($emptyData, $option) {
                         $emptyData = $emptyData($form->getParent());
 
-                        return isset($emptyData[$option]) ? $emptyData[$option] : '';
+                        return $emptyData[$option] ?? '';
                     };
                 };
 

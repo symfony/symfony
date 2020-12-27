@@ -1843,7 +1843,7 @@ class Configuration implements ConfigurationInterface
                                         ->defaultNull()
                                     ->end()
                                     ->enumNode('policy')
-                                        ->info('The rate limiting algorithm to use for this rate')
+                                        ->info('The algorithm to be used by this limiter')
                                         ->isRequired()
                                         ->values(['fixed_window', 'token_bucket', 'sliding_window', 'no_limit'])
                                     ->end()

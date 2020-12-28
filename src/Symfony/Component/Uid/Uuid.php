@@ -22,7 +22,11 @@ class Uuid extends AbstractUid
 
     public function __construct(string $uuid)
     {
-        $type = uuid_type($uuid);
+        try {
+            $type = uuid_type($uuid);
+        } catch (\ValueError $e) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
+        }
 
         if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
@@ -55,7 +59,13 @@ class Uuid extends AbstractUid
             return new static($uuid);
         }
 
-        switch (uuid_type($uuid)) {
+        try {
+            $type = uuid_type($uuid);
+        } catch (\ValueError $e) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
+        }
+
+        switch ($type) {
             case UuidV1::TYPE: return new UuidV1($uuid);
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);

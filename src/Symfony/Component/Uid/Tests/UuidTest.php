@@ -26,12 +26,21 @@ class UuidTest extends TestCase
     private const A_UUID_V1 = 'd9e7a184-5d5b-11ea-a62a-3499710062d0';
     private const A_UUID_V4 = 'd6b3345b-2905-4048-a83c-b5988e765d98';
 
-    public function testConstructorWithInvalidUuid()
+    /**
+     * @dataProvider provideInvalidUuids
+     */
+    public function testConstructorWithInvalidUuid(string $uuid)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID: "this is not a uuid".');
+        $this->expectExceptionMessage('Invalid UUID: "'.$uuid.'".');
 
-        Uuid::fromString('this is not a uuid');
+        Uuid::fromString($uuid);
+    }
+
+    public function provideInvalidUuids(): iterable
+    {
+        yield ['this is not a uuid'];
+        yield ['these are just thirty-six characters'];
     }
 
     public function testConstructorWithValidUuid()

@@ -2,8 +2,7 @@
 
 class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\DummyInterface, \Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\SunnyInterface
 {
-
-    private $valueHolder%s = null;
+%w  private $valueHolder%s = null;
 
     private $initializer%s = null;
 
@@ -96,7 +95,7 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
 
         $targetObject = $this->valueHolder%s;
 
-        $targetObject->$name = $value; return $targetObject->$name;
+        $targetObject->$name = $value;%wreturn $targetObject->$name;
     }
 
     public function __isset($name)
@@ -158,7 +157,5 @@ class SunnyInterface_%s implements \ProxyManager\Proxy\VirtualProxyInterface, \S
     public function getWrappedValueHolderValue()%S
     {
         return $this->valueHolder%s;
-    }
-
-
+    }%w
 }

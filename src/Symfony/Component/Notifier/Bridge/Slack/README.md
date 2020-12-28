@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-SLACK_DSN=slack://TOKEN@default?channel=CHANNEL
+SLACK_DSN=slack://TOKEN@default/?channel=CHANNEL
 ```
 
 where:
@@ -16,14 +16,15 @@ where:
 
 valid DSN's are:
 ```
-SLACK_DSN=slack://xoxb-......@default?channel=my-channel-name
-SLACK_DSN=slack://xoxb-......@default?channel=@fabien
+SLACK_DSN=slack://xoxb-......@default/?channel=my-channel-name
+SLACK_DSN=slack://xoxb-......@default/?channel=@fabien
 ```
 
 invalid DSN's are:
 ```
-SLACK_DSN=slack://xoxb-......@default?channel=#my-channel-name
-SLACK_DSN=slack://xoxb-......@default?channel=fabien
+SLACK_DSN=slack://xoxb-......@default/?channel=#my-channel-name
+SLACK_DSN=slack://xoxb-......@default/?channel=fabien
+SLACK_DSN=slack://xoxb-......@default?channel=my-channel-name
 ```
 
 Resources

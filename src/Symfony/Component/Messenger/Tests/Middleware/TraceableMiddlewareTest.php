@@ -42,7 +42,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         };
 
         $stopwatch = $this->createMock(Stopwatch::class);
-        $stopwatch->expects($this->once())->method('isStarted')->willReturn(true);
+        $stopwatch->expects($this->exactly(2))->method('isStarted')->willReturn(true);
         $stopwatch->expects($this->exactly(2))
             ->method('start')
             ->withConsecutive(
@@ -90,5 +90,37 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $traced = new TraceableMiddleware($stopwatch, $busId);
         $traced->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator([null, $middleware])));
+    }
+
+    public function testHandleWhenStopwatchHasBeenReset()
+    {
+        $busId = 'command_bus';
+        $envelope = new Envelope(new DummyMessage('Hello'));
+
+        $stopwatch = new Stopwatch();
+
+        $middleware = new class($stopwatch) implements MiddlewareInterface {
+            public $calls = 0;
+            private $stopwatch;
+
+            public function __construct(Stopwatch $stopwatch)
+            {
+                $this->stopwatch = $stopwatch;
+            }
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $this->stopwatch->reset();
+
+                ++$this->calls;
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        };
+
+        $traced = new TraceableMiddleware($stopwatch, $busId);
+
+        $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
+        $this->assertSame(1, $middleware->calls);
     }
 }

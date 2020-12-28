@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-24T22:25:59Z
+
+The code looks correct, but I wonder if our code should have an opinion on valid Slack access tokens. To me, a token is a string that I present as I've received it if I need to authenticate. We usually don't need to parse such a token in any way. The format of those token is an implementation detail that Slack might decide to change anytime.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-25T08:55:40Z
+
+I agree but in this case Slack is dealing with webhook ids and tokens which can be confusing, I think it's much easier to adopt this bridge if you know you are in the right place or not.

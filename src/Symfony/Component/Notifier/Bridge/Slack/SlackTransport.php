@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -33,6 +34,10 @@ final class SlackTransport extends AbstractTransport
 
     public function __construct(string $accessToken, string $channel = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
+        if (!preg_match('/^xox(b-|p-|a-2)/', $accessToken)) {
+            throw new InvalidArgumentException('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');
+        }
+
         $this->accessToken = $accessToken;
         $this->chatChannel = $channel;
         $this->client = $client;

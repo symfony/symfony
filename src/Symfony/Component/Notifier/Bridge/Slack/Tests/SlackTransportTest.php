@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
@@ -31,15 +32,23 @@ final class SlackTransportTest extends TestCase
     {
         $channel = 'test Channel'; // invalid channel name to test url encoding of the channel
 
-        $transport = new SlackTransport('testToken', $channel, $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport('xoxb-TestToken', $channel, $this->createMock(HttpClientInterface::class));
         $transport->setHost('host.test');
 
         $this->assertSame('slack://host.test?channel=test+Channel', (string) $transport);
     }
 
+    public function testInstatiatingWithAnInvalidSlackTokenThrowsInvalidArgumentException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');
+
+        new SlackTransport('token', 'testChannel', $this->createMock(HttpClientInterface::class));
+    }
+
     public function testSupportsChatMessage()
     {
-        $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
         $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
         $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
@@ -47,7 +56,7 @@ final class SlackTransportTest extends TestCase
 
     public function testSendNonChatMessageThrowsLogicException()
     {
-        $transport = new SlackTransport('testToken', 'testChannel', $this->createMock(HttpClientInterface::class));
+        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $this->createMock(HttpClientInterface::class));
 
         $this->expectException(UnsupportedMessageTypeException::class);
 
@@ -70,7 +79,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
@@ -93,14 +102,14 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithOptions()
     {
-        $token = 'testToken';
+        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 
@@ -129,7 +138,7 @@ final class SlackTransportTest extends TestCase
 
     public function testSendWithNotification()
     {
-        $token = 'testToken';
+        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 
@@ -172,14 +181,14 @@ final class SlackTransportTest extends TestCase
             return $this->createMock(ResponseInterface::class);
         });
 
-        $transport = new SlackTransport('testToken', 'testChannel', $client);
+        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
 
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWith200ResponseButNotOk()
     {
-        $token = 'testToken';
+        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 

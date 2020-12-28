@@ -7,6 +7,7 @@ CHANGELOG
  * The bridge is not marked as `@experimental` anymore
  * Check for maximum number of buttons in Slack action block
  * Add HeaderBlock
+ * Slack access tokens needs to start with "xox" (see https://api.slack.com/authentication/token-types)
 
 5.2.0
 -----

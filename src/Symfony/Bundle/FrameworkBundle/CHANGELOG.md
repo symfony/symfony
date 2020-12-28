@@ -7,6 +7,7 @@ CHANGELOG
  * Added support for configuring PHP error level to log levels
  * Added the `dispatcher` option to `debug:event-dispatcher`
  * Added the `event_dispatcher.dispatcher` tag
+ * Deprecated the `lock.factory` alias, use `LockFactoryInterface` instead.
 
 5.2.0
 -----

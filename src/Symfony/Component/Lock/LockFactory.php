@@ -21,7 +21,7 @@ use Psr\Log\NullLogger;
  *
  * @final since Symfony 5.3
  */
-class LockFactory implements LoggerAwareInterface, LockFactoryInterface
+class LockFactory implements LockFactoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

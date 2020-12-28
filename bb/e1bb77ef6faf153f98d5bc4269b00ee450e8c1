@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-23T14:50:26Z
+
+Can you please add a test case?
+I suppose there is no way to know if the stopwatch has been reset without catching the exception?
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-12-23T15:00:46Z
+
+@lyrixx i plan to do the same thing on a personal project very soon,
+but i have a question: why the "traceable" logic is used here? are you runing on prod?
+for exemple for the event dispatcher, the "traceable" logic is ony for dev insnt it?
+
+thx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2020-12-23T17:01:54Z
+
+@nicolas-grekas Sure, i'll do :)
+
+@noniagriconomie It occurs in dev as I said
+> I'm slowly migrating an application to messenger (from swarrot) and I
+So I notice that in dev. I do not replace things in prod directly (yet) :) (huhu, this is a joke, no offence)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-12-23T18:15:20Z
+
+@lyrixx sorry I found no trace of this in the PR desc :s, thus my question :)

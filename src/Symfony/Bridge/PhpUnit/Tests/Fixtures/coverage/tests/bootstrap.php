@@ -12,6 +12,4 @@
 require __DIR__.'/../src/BarCov.php';
 require __DIR__.'/../src/FooCov.php';
 
-require __DIR__.'/../../../../Legacy/CoverageListenerTrait.php';
-require_once __DIR__.'/../../../../Legacy/CoverageListenerForV7.php';
 require __DIR__.'/../../../../CoverageListener.php';

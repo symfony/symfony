@@ -439,6 +439,9 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetChannelPrefetchWhenSetup()
     {
         $factory = new TestAmqpFactory(
@@ -451,10 +454,10 @@ class ConnectionTest extends TestCase
         // makes sure the channel looks connected, so it's not re-created
         $amqpChannel->expects($this->any())->method('isConnected')->willReturn(true);
 
-        $amqpChannel->expects($this->exactly(2))->method('setPrefetchCount')->with(2);
+        $amqpChannel->expects($this->never())->method('setPrefetchCount');
+
+        $this->expectDeprecation('Since symfony/messenger 5.3: The "prefetch_count" option passed to the AMQP Messenger transport has no effect and should not be used.');
         $connection = Connection::fromDsn('amqp://localhost?prefetch_count=2', [], $factory);
-        $connection->setup();
-        $connection = Connection::fromDsn('amqp://localhost', ['prefetch_count' => 2], $factory);
         $connection->setup();
     }
 

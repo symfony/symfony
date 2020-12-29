@@ -112,6 +112,7 @@ Messenger
  * Use of invalid options in Redis and AMQP connections now throws an error.
  * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
+ * Removed the `prefetch_count` parameter in the AMQP bridge.
 
 Mime
 ----

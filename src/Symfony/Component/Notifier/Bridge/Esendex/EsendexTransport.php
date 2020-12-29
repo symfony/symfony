@@ -26,13 +26,15 @@ final class EsendexTransport extends AbstractTransport
 {
     protected const HOST = 'api.esendex.com';
 
-    private $token;
+    private $email;
+    private $password;
     private $accountReference;
     private $from;
 
-    public function __construct(string $token, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $email, string $password, string $accountReference, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
-        $this->token = $token;
+        $this->email = $email;
+        $this->password = $password;
         $this->accountReference = $accountReference;
         $this->from = $from;
 
@@ -41,7 +43,7 @@ final class EsendexTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('esendex://%s', $this->getEndpoint());
+        return sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -65,18 +67,20 @@ final class EsendexTransport extends AbstractTransport
         }
 
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
-            'auth_basic' => $this->token,
+            'auth_basic' => sprintf('%s:%s', $this->email, $this->password),
             'json' => [
                 'accountreference' => $this->accountReference,
                 'messages' => [$messageData],
             ],
         ]);
 
-        if (200 === $response->getStatusCode()) {
+        $statusCode = $response->getStatusCode();
+
+        if (200 === $statusCode) {
             return new SentMessage($message, (string) $this);
         }
 
-        $message = sprintf('Unable to send the SMS: error %d.', $response->getStatusCode());
+        $message = sprintf('Unable to send the SMS: error %d.', $statusCode);
 
         try {
             $result = $response->toArray(false);

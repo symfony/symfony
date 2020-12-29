@@ -27,7 +27,7 @@ final class EsendexTransportTest extends TestCase
     {
         $transport = $this->createTransport();
 
-        $this->assertSame('esendex://host.test', (string) $transport);
+        $this->assertSame('esendex://host.test?accountreference=testAccountReference&from=testFrom', (string) $transport);
     }
 
     public function testSupportsSmsMessage()
@@ -90,6 +90,6 @@ final class EsendexTransportTest extends TestCase
 
     private function createTransport(?HttpClientInterface $client = null): EsendexTransport
     {
-        return (new EsendexTransport('testToken', 'testAccountReference', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new EsendexTransport('testEmail', 'testPassword', 'testAccountReference', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

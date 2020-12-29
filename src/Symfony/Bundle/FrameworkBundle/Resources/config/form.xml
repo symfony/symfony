@@ -69,6 +69,7 @@
         <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" />
             <argument type="service" id="form.choice_list_factory"/>
+            <argument type="service" id="translator" on-invalid="ignore" />
         </service>
         <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType" public="true">
             <tag name="form.type" />

@@ -51,14 +51,14 @@ class DateType extends AbstractType
         $dateFormat = \is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
         $timeFormat = \IntlDateFormatter::NONE;
         $calendar = \IntlDateFormatter::GREGORIAN;
-        $pattern = \is_string($options['format']) ? $options['format'] : null;
+        $pattern = \is_string($options['format']) ? $options['format'] : '';
 
         if (!\in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
         if ('single_text' === $options['widget']) {
-            if (null !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
+            if ('' !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
             }
 
@@ -71,7 +71,7 @@ class DateType extends AbstractType
                 $pattern
             ));
         } else {
-            if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
+            if ('' !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
             }
 

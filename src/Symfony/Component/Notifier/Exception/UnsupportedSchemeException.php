@@ -92,6 +92,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
             'package' => 'symfony/gatewayapi-notifier',
         ],
+        'octopush' => [
+            'class' => Bridge\Octopush\OctopushTransportFactory::class,
+            'package' => 'symfony/octopush-notifier',
+        ],
     ];
 
     /**

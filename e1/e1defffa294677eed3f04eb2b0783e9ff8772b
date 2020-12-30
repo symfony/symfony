@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T12:41:24Z
+
+I agree, but who knows whats coming, and the other bridges have a final keyword + the brdiges are experimental now.
+
+Just my 2cents, feel free to close
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-18T12:42:23Z
+
+BTW it helps to bring back people here if this class does not fit some of their requirements, instead of just extending the class...
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-27T09:46:02Z
+
+Rebased @jderusse not sure why the lower build fails 🧐
+
+Shall I or not add/move it to the upgrade file? I didn't do that either in the Return Type fix PR, Sorry I don't have a PR number yet, I am currently on a phone 📱

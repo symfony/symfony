@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
  */
-class ZulipTransport extends AbstractTransport
+final class ZulipTransport extends AbstractTransport
 {
     private $email;
     private $token;

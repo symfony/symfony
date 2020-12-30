@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 /**
  * @author Mohammad Emran Hasan <phpfour@gmail.com>
  */
-class ZulipTransportFactory extends AbstractTransportFactory
+final class ZulipTransportFactory extends AbstractTransportFactory
 {
     /**
      * @return ZulipTransport

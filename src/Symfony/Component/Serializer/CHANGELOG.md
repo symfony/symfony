@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * [DEPRECATION] denormalizing scalar values without registering the `BuiltinTypeDenormalizer`
+
 5.2.0
 -----
 

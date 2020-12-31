@@ -23,6 +23,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Cookie as HttpFoundationCookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
 class WebTestCaseTest extends TestCase
 {
@@ -73,6 +74,20 @@ class WebTestCaseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessageMatches('#(:?\( )?is redirected and has header "Location" with value "https://example\.com/" (:?\) )?and status code is 301\.#');
         $this->getResponseTester(new Response('', 302))->assertResponseRedirects('https://example.com/', 301);
+    }
+
+    public function testAssertResponseFormat()
+    {
+        if (!class_exists(ResponseFormatSame::class)) {
+            $this->markTestSkipped('Too old version of HttpFoundation.');
+        }
+
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/vnd.myformat']))->assertResponseFormatSame('custom');
+        $this->getResponseTester(new Response('', 200, ['Content-Type' => 'application/ld+json']))->assertResponseFormatSame('jsonld');
+        $this->getResponseTester(new Response())->assertResponseFormatSame(null);
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Failed asserting that the Response format is jsonld.\nHTTP/1.0 200 OK");
+        $this->getResponseTester(new Response())->assertResponseFormatSame('jsonld');
     }
 
     public function testAssertResponseHasHeader()
@@ -283,6 +298,10 @@ class WebTestCaseTest extends TestCase
     {
         $client = $this->createMock(KernelBrowser::class);
         $client->expects($this->any())->method('getResponse')->willReturn($response);
+
+        $request = new Request();
+        $request->setFormat('custom', ['application/vnd.myformat']);
+        $client->expects($this->any())->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }

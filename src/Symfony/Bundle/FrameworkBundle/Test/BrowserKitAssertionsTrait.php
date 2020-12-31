@@ -38,6 +38,11 @@ trait BrowserKitAssertionsTrait
         self::assertThatForResponse(new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
     }
 
+    public static function assertResponseFormatSame(?string $expectedFormat, string $message = ''): void
+    {
+        self::assertThatForResponse(new ResponseConstraint\ResponseFormatSame(self::getRequest(), $expectedFormat), $message);
+    }
+
     public static function assertResponseRedirects(string $expectedLocation = null, int $expectedCode = null, string $message = ''): void
     {
         $constraint = new ResponseConstraint\ResponseIsRedirected();

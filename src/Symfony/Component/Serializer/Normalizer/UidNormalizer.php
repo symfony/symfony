@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
@@ -18,12 +19,41 @@ use Symfony\Component\Uid\Uuid;
 
 final class UidNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
+    public const NORMALIZATION_FORMAT_KEY = 'uid_normalization_format';
+
+    public const NORMALIZATION_FORMAT_CANONICAL = 'canonical';
+    public const NORMALIZATION_FORMAT_BASE_58 = 'base_58';
+    public const NORMALIZATION_FORMAT_BASE_32 = 'base_32';
+    public const NORMALIZATION_FORMAT_RFC_4122 = 'rfc_4122';
+
+    private $defaultContext = [
+        self::NORMALIZATION_FORMAT_KEY => self::NORMALIZATION_FORMAT_CANONICAL,
+    ];
+
+    public function __construct(array $defaultContext = [])
+    {
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * @param AbstractUid $object
      */
     public function normalize($object, string $format = null, array $context = [])
     {
-        return (string) $object;
+        switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
+            case self::NORMALIZATION_FORMAT_CANONICAL:
+                return (string) $object;
+            case self::NORMALIZATION_FORMAT_BASE_58:
+                return $object->toBase58();
+            case self::NORMALIZATION_FORMAT_BASE_32:
+                return $object->toBase32();
+            case self::NORMALIZATION_FORMAT_RFC_4122:
+                return $object->toRfc4122();
+        }
+
+        throw new LogicException(sprintf('The "%s" format is not valid.', $context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]));
     }
 
     /**

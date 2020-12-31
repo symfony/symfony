@@ -33,6 +33,11 @@ PhpunitBridge
 
  * Deprecated the `SetUpTearDownTrait` trait, use original methods with "void" return typehint.
 
+PropertyInfo
+------------
+
+* Deprecated the `Type::getCollectionKeyType()` and `Type::getCollectionValueType()` methods, use `Type::getCollectionKeyTypes()` and `Type::getCollectionValueTypes()` instead.
+
 Security
 --------
 

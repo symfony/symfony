@@ -421,6 +421,24 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testItSetupQueuesOnce()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->once())->method('declareExchange');
+        $amqpQueue->expects($this->once())->method('declareQueue');
+        $amqpQueue->expects($this->once())->method('bind');
+
+        $connection = Connection::fromDsn('amqp://localhost', ['auto_setup' => true], $factory);
+        $connection->publish('body');
+        $connection->publish('body');
+    }
+
     public function testSetChannelPrefetchWhenSetup()
     {
         $factory = new TestAmqpFactory(

@@ -123,7 +123,7 @@ SQL
             , $this->configuration['table_name']),
             // register trigger
             sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
-            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
+            sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
             'COMMIT;',
         ];
     }

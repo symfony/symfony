@@ -172,7 +172,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 
-        $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern);
+        $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern ?? '');
 
         // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/66323
         if (!$intlDateFormatter) {

@@ -53,7 +53,7 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [2]: https://symfony.com/projects
 [3]: https://symfony.com/doc/current/reference/requirements.html
 [4]: https://symfony.com/doc/current/setup.html
-[5]: http://semver.org
+[5]: https://semver.org
 [6]: https://symfony.com/doc/current/contributing/community/releases.html
 [7]: https://symfony.com/doc/current/page_creation.html
 [8]: https://symfony.com/doc/current/index.html

@@ -145,6 +145,10 @@ abstract class IntlDateFormatter
         $this->datetype = null !== $datetype ? $datetype : self::FULL;
         $this->timetype = null !== $timetype ? $timetype : self::FULL;
 
+        if ('' === ($pattern ?? '')) {
+            $pattern = $this->getDefaultPattern();
+        }
+
         $this->setPattern($pattern);
         $this->setTimeZone($timezone);
     }
@@ -484,7 +488,7 @@ abstract class IntlDateFormatter
     /**
      * Set the formatter's pattern.
      *
-     * @param string|null $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
+     * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
      * @return bool true on success or false on failure
      *
@@ -493,11 +497,7 @@ abstract class IntlDateFormatter
      */
     public function setPattern(?string $pattern)
     {
-        if (null === $pattern) {
-            $pattern = $this->getDefaultPattern();
-        }
-
-        $this->pattern = $pattern;
+        $this->pattern = (string) $pattern;
 
         return true;
     }

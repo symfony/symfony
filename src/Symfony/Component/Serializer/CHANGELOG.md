@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.
+
 5.2.0
 -----
 

@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -76,6 +77,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             [LoginFailureEvent::class, LoginFailureEvent::class],
             [LoginSuccessEvent::class, LoginSuccessEvent::class],
             [LogoutEvent::class, LogoutEvent::class],
+            [AuthenticationTokenCreatedEvent::class, AuthenticationTokenCreatedEvent::class],
             [AuthenticationEvents::AUTHENTICATION_SUCCESS, AuthenticationEvents::AUTHENTICATION_SUCCESS],
             [SecurityEvents::INTERACTIVE_LOGIN, SecurityEvents::INTERACTIVE_LOGIN],
 

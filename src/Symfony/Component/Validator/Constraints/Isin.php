@@ -35,7 +35,7 @@ class Isin extends Constraint
         self::INVALID_CHECKSUM_ERROR => 'INVALID_CHECKSUM_ERROR',
     ];
 
-    public $message = 'This is not a valid International Securities Identification Number (ISIN).';
+    public $message = 'This value is not a valid International Securities Identification Number (ISIN).';
 
     public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
     {

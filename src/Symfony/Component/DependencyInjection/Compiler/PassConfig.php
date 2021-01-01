@@ -56,6 +56,7 @@ class PassConfig
             new RegisterServiceSubscribersPass(),
             new ResolveParameterPlaceHoldersPass(false, false),
             new ResolveFactoryClassPass(),
+            new ValidateConstructorArgumentsPass(),
             new ResolveNamedArgumentsPass(),
             new AutowireRequiredMethodsPass(),
             new AutowireRequiredPropertiesPass(),

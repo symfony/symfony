@@ -125,6 +125,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        arguments: %s\n", $this->dumper->dump($this->dumpValue($definition->getArguments()), 0));
         }
 
+        if ($definition->getConstraints()) {
+            $code .= sprintf("        constraints: %s\n", $this->dumper->dump($this->dumpValue($definition->getConstraints()), 0));
+        }
+
         if ($definition->getProperties()) {
             $code .= sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
         }

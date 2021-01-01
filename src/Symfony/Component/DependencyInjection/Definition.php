@@ -44,6 +44,7 @@ class Definition
     private $errors = [];
 
     protected $arguments = [];
+    protected $constraints = [];
 
     private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
 
@@ -322,6 +323,63 @@ class Definition
         }
 
         return $this->arguments[$index];
+    }
+
+    /**
+     * Sets constraints to validate arguments.
+     *
+     * @param mixed[] $constraints
+     *
+     * @return $this
+     */
+    public function setConstraints(array $constraints)
+    {
+        $this->constraints = $constraints;
+
+        return $this;
+    }
+
+    /**
+     * Gets constraints list to validate arguments.
+     *
+     * @return mixed[] The array of constraints
+     */
+    public function getConstraints()
+    {
+        return $this->constraints;
+    }
+
+    /**
+     * Sets specific constraints for argument.
+     *
+     * @param int|string $key
+     * @param mixed      $value
+     *
+     * @return $this
+     */
+    public function setConstraint($key, $value)
+    {
+        $this->constraints[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Gets constraints to validate argument.
+     *
+     * @param int|string $index
+     *
+     * @return mixed The arguments constraints
+     *
+     * @throws OutOfBoundsException When the constraint does not exist
+     */
+    public function getConstraint($index)
+    {
+        if (!\array_key_exists($index, $this->constraints)) {
+            throw new OutOfBoundsException(sprintf('The constraint "%s" doesn\'t exist.', $index));
+        }
+
+        return $this->constraints[$index];
     }
 
     /**

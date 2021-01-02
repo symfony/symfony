@@ -23,6 +23,11 @@ HttpKernel
 
  * Marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
 
+Messenger
+---------
+
+* Deprecated the `prefetch_count` parameter in the AMQP bridge, it has no effect and will be removed in Symfony 6.0.
+
 Notifier
 -------
 

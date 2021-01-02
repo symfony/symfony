@@ -149,7 +149,6 @@ class Connection
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
-     *   * prefetch_count: set channel prefetch count
      *
      *   * Connection tuning options (see http://www.rabbitmq.com/amqp-0-9-1-reference.html#connection.tune for details):
      *     * channel_max: Specifies highest channel number that the server permits. 0 means standard extension limit
@@ -236,6 +235,10 @@ class Connection
     {
         if (0 < \count($invalidOptions = array_diff(array_keys($options), self::AVAILABLE_OPTIONS))) {
             trigger_deprecation('symfony/messenger', '5.1', 'Invalid option(s) "%s" passed to the AMQP Messenger transport. Passing invalid options is deprecated.', implode('", "', $invalidOptions));
+        }
+
+        if (isset($options['prefetch_count'])) {
+            trigger_deprecation('symfony/messenger', '5.3', 'The "prefetch_count" option passed to the AMQP Messenger transport has no effect and should not be used.');
         }
 
         if (\is_array($options['queues'] ?? false)) {
@@ -491,10 +494,6 @@ class Connection
                 throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s).', json_encode($credentials, \JSON_UNESCAPED_SLASHES)), 0, $e);
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
-
-            if (isset($this->connectionOptions['prefetch_count'])) {
-                $this->amqpChannel->setPrefetchCount($this->connectionOptions['prefetch_count']);
-            }
 
             if ('' !== ($this->connectionOptions['confirm_timeout'] ?? '')) {
                 $this->amqpChannel->confirmSelect();

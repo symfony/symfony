@@ -567,7 +567,7 @@ YAML;
         ], 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
-    public function testNoTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
+    public function testNoExtraTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
     {
         $data = [
             "a\nb",
@@ -576,6 +576,44 @@ YAML;
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
         $this->assertSame("- |-\n    a\n    b\n- |-\n    c\n    d", $yaml);
+        $this->assertSame($data, Yaml::parse($yaml));
+    }
+
+    public function testDumpTrailingNewlineInMultiLineLiteralBlocks()
+    {
+        $data = [
+            'clip 1' => "one\ntwo\n",
+            'clip 2' => "one\ntwo\n",
+            'keep 1' => "one\ntwo\n",
+            'keep 2' => "one\ntwo\n\n",
+            'strip 1' => "one\ntwo",
+            'strip 2' => "one\ntwo",
+        ];
+        $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $expected = <<<YAML
+'clip 1': |
+    one
+    two
+'clip 2': |
+    one
+    two
+'keep 1': |
+    one
+    two
+'keep 2': |+
+    one
+    two
+
+'strip 1': |-
+    one
+    two
+'strip 2': |-
+    one
+    two
+YAML;
+
+        $this->assertSame($expected, $yaml);
         $this->assertSame($data, Yaml::parse($yaml));
     }
 

@@ -232,6 +232,34 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
     }
 
+    public function testLockMergeConfigs()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'lock' => [
+                    'payload' => 'flock',
+                ],
+            ],
+            [
+                'lock' => [
+                    'payload' => 'semaphore',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                'enabled' => true,
+                'resources' => [
+                    'payload' => ['semaphore'],
+                ],
+            ],
+            $config['lock']
+        );
+    }
+
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';

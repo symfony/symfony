@@ -67,6 +67,11 @@ PhpunitBridge
 
  * Deprecated the `SetUpTearDownTrait` trait, use original methods with "void" return typehint
 
+PropertyAccess
+--------------
+
+* Deprecate passing a boolean as the second argument of `PropertyAccessor::__construct()`, pass a combination of bitwise flags instead.
+
 PropertyInfo
 ------------
 

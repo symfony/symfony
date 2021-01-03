@@ -502,7 +502,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function parents()
     {
-        @trigger_deprecation('symfony/dom-crawler', '5.3', sprintf('The %s() method is deprecated, use ancestors() instead.', __METHOD__));
+        trigger_deprecation('symfony/dom-crawler', '5.3', sprintf('The %s() method is deprecated, use ancestors() instead.', __METHOD__));
 
         return $this->ancestors();
     }

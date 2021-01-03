@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * added `ResponseFormatSame` PHPUnit constraint
+
 5.2.0
 -----
 

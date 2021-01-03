@@ -362,7 +362,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if ([] !== $invariantViolations) {
-                return DenormalizationResult::failure($invariantViolations);
+                return DenormalizationResult::failure($invariantViolations, $object);
             }
 
             return DenormalizationResult::success($object);

@@ -83,7 +83,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         }
 
         if ([] !== $invariantViolations) {
-            return DenormalizationResult::failure($invariantViolations);
+            return DenormalizationResult::failure($invariantViolations, $data);
         }
 
         if ($collectInvariantViolations) {

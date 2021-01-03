@@ -31,10 +31,11 @@ final class DenormalizationResult
     /**
      * @param array<string, array<InvariantViolation>> $invariantViolations
      */
-    public static function failure(array $invariantViolations): self
+    public static function failure(array $invariantViolations, $partiallyDenormalizedValue = null): self
     {
         $result = new self();
         $result->invariantViolations = $invariantViolations;
+        $result->denormalizedValue = $partiallyDenormalizedValue;
 
         return $result;
     }

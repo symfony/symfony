@@ -518,6 +518,16 @@ class FormTypeTest extends BaseTypeTest
         $this->assertTrue($form->getConfig()->getErrorBubbling());
     }
 
+    public function testErrorBubblingForCompoundFieldsIsDisabledByDefaultIfInheritDataIsEnabled()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'compound' => true,
+            'inherit_data' => true,
+        ]);
+
+        $this->assertFalse($form->getConfig()->getErrorBubbling());
+    }
+
     public function testPropertyPath()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -734,6 +744,28 @@ class FormTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testErrorBubblingDoesNotSkipCompoundFieldsWithInheritDataConfigured()
+    {
+        $form = $this->factory->createNamedBuilder('form', self::TESTED_TYPE)
+            ->add(
+                $this->factory->createNamedBuilder('inherit_data_type', self::TESTED_TYPE, null, [
+                    'inherit_data' => true,
+                ])
+                ->add('child', self::TESTED_TYPE, [
+                    'compound' => false,
+                    'error_bubbling' => true,
+                ])
+            )
+            ->getForm();
+        $error = new FormError('error message');
+        $form->get('inherit_data_type')->get('child')->addError($error);
+
+        $this->assertCount(0, $form->getErrors());
+        $this->assertCount(1, $form->get('inherit_data_type')->getErrors());
+        $this->assertSame($error, $form->get('inherit_data_type')->getErrors()[0]);
+        $this->assertCount(0, $form->get('inherit_data_type')->get('child')->getErrors());
     }
 }
 

@@ -172,7 +172,7 @@ class FormType extends BaseType
         // For any form that is not represented by a single HTML control,
         // errors should bubble up by default
         $errorBubbling = function (Options $options) {
-            return $options['compound'];
+            return $options['compound'] && !$options['inherit_data'];
         };
 
         // If data is given, the form is locked to that data

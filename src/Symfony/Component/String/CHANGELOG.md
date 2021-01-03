@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Made `AsciiSlugger` fallback to parent locale's symbolsMap
+
 5.2.0
 -----
 

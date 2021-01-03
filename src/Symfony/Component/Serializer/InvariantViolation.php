@@ -15,13 +15,13 @@ final class InvariantViolation
 {
     private $normalizedValue;
     private $message;
-    private $exception;
+    private $throwable;
 
-    public function __construct($normalizedValue, string $message, ?\Throwable $exception = null)
+    public function __construct($normalizedValue, string $message, ?\Throwable $throwable = null)
     {
         $this->normalizedValue = $normalizedValue;
         $this->message = $message;
-        $this->exception = $exception;
+        $this->throwable = $throwable;
     }
 
     public function getNormalizedValue()
@@ -34,8 +34,8 @@ final class InvariantViolation
         return $this->message;
     }
 
-    public function getException(): ?\Throwable
+    public function getThrowable(): ?\Throwable
     {
-        return $this->exception;
+        return $this->throwable;
     }
 }

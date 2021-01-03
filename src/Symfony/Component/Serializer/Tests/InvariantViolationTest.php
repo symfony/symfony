@@ -18,6 +18,6 @@ class InvariantViolationTest extends TestCase
 
         self::assertSame('foo', $violation->getNormalizedValue());
         self::assertSame('"foo" is not an integer.', $violation->getMessage());
-        self::assertSame($exception, $violation->getException());
+        self::assertSame($exception, $violation->getThrowable());
     }
 }

@@ -42,8 +42,12 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
         if (null === $lockPath) {
             $lockPath = sys_get_temp_dir();
         }
-        if (!is_dir($lockPath) || !is_writable($lockPath)) {
-            throw new InvalidArgumentException(sprintf('The directory "%s" is not writable.', $lockPath));
+        if (!is_dir($lockPath)) {
+            if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
+                throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
+            }
+        } elseif (!is_writable($lockPath)) {
+            throw new InvalidArgumentException(sprintf('The FlockStore directory "%s" is not writable.', $lockPath));
         }
 
         $this->lockPath = $lockPath;

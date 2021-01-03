@@ -127,7 +127,7 @@ PhpUnitBridge
 PropertyAccess
 --------------
 
- * Dropped support of a boolean as the first argument of `PropertyAccessor::__construct()`.
+ * Dropped support for booleans as the first argument of `PropertyAccessor::__construct()`.
    Pass a combination of bitwise flags instead.
 
 PropertyInfo

@@ -262,7 +262,7 @@ class ConfigurationTest extends TestCase
             ],
             [
                 'lock' => [
-                    'payload' => 'semaphore'
+                    'payload' => 'semaphore',
                 ],
             ],
         ]);
@@ -271,7 +271,7 @@ class ConfigurationTest extends TestCase
             [
                 'enabled' => true,
                 'resources' => [
-                    'payload' => ['semaphore']
+                    'payload' => ['semaphore'],
                 ],
             ],
             $config['lock']

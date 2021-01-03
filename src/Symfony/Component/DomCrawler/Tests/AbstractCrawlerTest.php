@@ -12,10 +12,13 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     abstract public function getDoctype(): string;
 
     protected function createCrawler($node = null, string $uri = null, string $baseHref = null)
@@ -409,7 +412,7 @@ abstract class AbstractCrawlerTest extends TestCase
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
 
         $crawler = $this->createTestCrawler();
-        $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+        $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->ancestors(), '->filterXpath() preserves ancestors when chained');
     }
 
     public function testFilterRemovesDuplicates()
@@ -1082,8 +1085,13 @@ HTML;
         $this->assertEquals(1, $foo->children('.ipsum')->count());
     }
 
+    /**
+     * @group legacy
+     */
     public function testParents()
     {
+        $this->expectDeprecation('Since symfony/dom-crawler 5.3: The Symfony\Component\DomCrawler\Crawler::parents() method is deprecated, use ancestors() instead.');
+
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
         $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->parents() returns a new instance of a crawler');
@@ -1100,6 +1108,27 @@ HTML;
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
         }
+    }
+
+    public function testAncestors()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
+
+        $nodes = $crawler->ancestors();
+
+        $this->assertNotSame($crawler, $nodes, '->ancestors() returns a new instance of a crawler');
+        $this->assertInstanceOf(Crawler::class, $nodes, '->ancestors() returns a new instance of a crawler');
+
+        $this->assertEquals(3, $crawler->ancestors()->count());
+
+        $this->assertEquals(0, $this->createTestCrawler()->filterXPath('//html')->ancestors()->count());
+    }
+
+    public function testAncestorsThrowsIfNodeListIsEmpty()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->createTestCrawler()->filterXPath('//ol')->ancestors();
     }
 
     /**

@@ -6,6 +6,11 @@ Asset
 
  * Deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
 
+DomCrawler
+----------
+
+* Deprecated the `parents()` method, use `ancestors()` instead.
+
 Form
 ----
 

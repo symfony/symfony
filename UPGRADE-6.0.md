@@ -33,6 +33,11 @@ DependencyInjection
  * The `ref()` function from the PHP-DSL has been removed, use `service()` instead.
  * Removed `Definition::setPrivate()` and `Alias::setPrivate()`, use `setPublic()` instead
 
+DomCrawler
+----------
+
+ * Removed the `parents()` method, use `ancestors()` instead.
+
 Dotenv
 ------
 

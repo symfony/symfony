@@ -410,7 +410,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         if (__FILE__ === $trace['file']
                             && $name === $trace['function']
                             && $object instanceof $trace['class']
-                            && preg_match((sprintf('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/')), $e->getMessage(), $matches)
+                            && preg_match('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/', $e->getMessage(), $matches)
                         ) {
                             throw new UninitializedPropertyException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: key(class_implements($object)) ?: 'class').'@anonymous', $name, $matches[1]), 0, $e);
                         }

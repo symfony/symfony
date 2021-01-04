@@ -92,6 +92,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             trigger_deprecation('symfony/property-access', '5.2', 'Passing a boolean as the first argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);
 
             $magicMethods = ($magicMethods ? self::MAGIC_CALL : 0) | self::MAGIC_GET | self::MAGIC_SET;
+        } elseif (!\is_int($magicMethods)) {
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an integer, "%s" given.', __METHOD__, get_debug_type($readInfoExtractor)));
         }
 
         $this->magicMethodsFlags = $magicMethods;

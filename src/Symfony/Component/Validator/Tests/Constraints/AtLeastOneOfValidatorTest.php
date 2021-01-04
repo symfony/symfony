@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
@@ -159,5 +160,28 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
                 new Unique(),
             ]],
         ];
+    }
+
+    public function testGroupsArePropagatedToNestedConstraints()
+    {
+        $validator = Validation::createValidator();
+
+        $violations = $validator->validate(50, new AtLeastOneOf([
+            'constraints' => [
+                new Range([
+                    'groups' => 'non_default_group',
+                    'min' => 10,
+                    'max' => 20,
+                ]),
+                new Range([
+                    'groups' => 'non_default_group',
+                    'min' => 30,
+                    'max' => 40,
+                ]),
+            ],
+            'groups' => 'non_default_group',
+        ]), 'non_default_group');
+
+        $this->assertCount(1, $violations);
     }
 }

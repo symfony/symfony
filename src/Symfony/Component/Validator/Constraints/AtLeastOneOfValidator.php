@@ -34,7 +34,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
         $messages = [$constraint->message];
 
         foreach ($constraint->constraints as $key => $item) {
-            $violations = $validator->validate($value, $item);
+            $violations = $validator->validate($value, $item, $this->context->getGroup());
 
             if (0 === \count($violations)) {
                 return;

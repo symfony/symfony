@@ -59,7 +59,7 @@ final class EmailAddressContains extends Constraint
             return false;
         }
 
-        throw new \LogicException(sprintf('Unable to test a message address on a non-address header.'));
+        throw new \LogicException('Unable to test a message address on a non-address header.');
     }
 
     /**

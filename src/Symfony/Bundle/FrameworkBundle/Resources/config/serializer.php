@@ -109,7 +109,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => 1000])
 
         ->set('serializer.normalizer.uid', UidNormalizer::class)
-            ->tag('serializer.normalizer', ['priority' => -915])
+            ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('serializer.normalizer.form_error', FormErrorNormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -915])

@@ -31,6 +31,9 @@ class EarlyExpirationHandlerTest extends TestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
+    /**
+     * @group time-sensitive
+     */
     public function testHandle()
     {
         $pool = new FilesystemAdapter();

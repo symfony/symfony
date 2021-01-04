@@ -45,7 +45,7 @@ class RoutableMessageBus implements MessageBusInterface
 
         if (null === $busNameStamp) {
             if (null === $this->fallbackBus) {
-                throw new InvalidArgumentException(sprintf('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.'));
+                throw new InvalidArgumentException('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.');
             }
 
             return $this->fallbackBus->dispatch($envelope, $stamps);

@@ -6,17 +6,12 @@ if (3 > $_SERVER['argc']) {
 }
 chdir(dirname(__DIR__));
 
-$json = ltrim(file_get_contents('composer.json'));
-if ($json !== $package = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json)) {
-    file_put_contents('composer.json', $package);
-}
-
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
 $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($dirs))));
 $version = array_shift($dirs);
 
-$packages = array();
+$packages = [];
 $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 $preferredInstall = json_decode(file_get_contents(__DIR__.'/composer-config.json'), true)['config']['preferred-install'];
 
@@ -36,12 +31,12 @@ foreach ($dirs as $k => $dir) {
         exit(1);
     }
 
-    $package->repositories = array(array(
+    $package->repositories = [[
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
-    ));
+    ]];
     if (false === strpos($json, "\n    \"repositories\": [\n")) {
-        $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
+        $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
         file_put_contents($dir.'/composer.json', $json);
     }
 
@@ -61,7 +56,7 @@ foreach ($dirs as $k => $dir) {
     $versions = json_decode($versions)->packages->{$package->name};
 
     foreach ($versions as $v => $package) {
-        $packages[$package->name] += array($v => $package);
+        $packages[$package->name] += [$v => $package];
     }
 }
 
@@ -74,10 +69,12 @@ if ($dirs) {
         exit(1);
     }
 
-    $package->repositories = array(array(
+    $package->repositories[] = [
         'type' => 'composer',
         'url' => 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)).'/',
-    ));
-    $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
+    ];
+
+    $json = preg_replace('/\n    "repositories": \[\n.*?\n    \],/s', '', $json);
+    $json = rtrim(json_encode(['repositories' => $package->repositories], $flags), "\n}").','.substr($json, 1);
     file_put_contents('composer.json', $json);
 }

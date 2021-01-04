@@ -38,7 +38,7 @@ class DsnTest extends TestCase
     /**
      * @dataProvider invalidDsnProvider
      */
-    public function testInvalidDsn(string $dsn, string $exceptionMessage): void
+    public function testInvalidDsn(string $dsn, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);

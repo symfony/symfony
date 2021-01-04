@@ -30,7 +30,7 @@ class StringToFloatTransformerTest extends TestCase
     /**
      * @dataProvider provideTransformations
      */
-    public function testTransform($from, $to): void
+    public function testTransform($from, $to)
     {
         $transformer = new StringToFloatTransformer();
 

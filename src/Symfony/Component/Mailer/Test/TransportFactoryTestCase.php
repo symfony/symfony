@@ -54,7 +54,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(Dsn $dsn, bool $supports): void
+    public function testSupports(Dsn $dsn, bool $supports)
     {
         $factory = $this->getFactory();
 

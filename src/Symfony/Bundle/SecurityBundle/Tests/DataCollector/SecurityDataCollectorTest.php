@@ -345,7 +345,7 @@ class SecurityDataCollectorTest extends TestCase
      *
      * @dataProvider providerCollectDecisionLog
      */
-    public function testCollectDecisionLog(string $strategy, array $decisionLog, array $voters, array $expectedVoterClasses, array $expectedDecisionLog): void
+    public function testCollectDecisionLog(string $strategy, array $decisionLog, array $voters, array $expectedVoterClasses, array $expectedDecisionLog)
     {
         $accessDecisionManager = $this
             ->getMockBuilder(TraceableAccessDecisionManager::class)

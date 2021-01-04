@@ -289,7 +289,7 @@ abstract class AbstractDescriptorTest extends TestCase
     }
 
     /** @dataProvider getDescribeContainerBuilderWithPriorityTagsTestData */
-    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options): void
+    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options)
     {
         $this->assertDescription($expectedDescription, $builder, $options);
     }

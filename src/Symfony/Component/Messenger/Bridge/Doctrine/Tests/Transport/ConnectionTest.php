@@ -194,7 +194,7 @@ class ConnectionTest extends TestCase
             'expectedAutoSetup' => true,
         ];
 
-        yield  'test options array' => [
+        yield 'test options array' => [
             'dsn' => 'doctrine://default',
             'options' => [
                 'table_name' => 'name_from_options',

@@ -39,7 +39,7 @@ ERROR;
     /**
      * @dataProvider provideParseError
      */
-    public function testParseError(string $mimeType, string $json, string $expectedMessage): void
+    public function testParseError(string $mimeType, string $json, string $expectedMessage)
     {
         $response = $this->createMock(ResponseInterface::class);
         $response

@@ -1641,7 +1641,7 @@ abstract class FrameworkExtensionTest extends TestCase
     /**
      * @dataProvider provideMailer
      */
-    public function testMailer(string $configFile, array $expectedTransports): void
+    public function testMailer(string $configFile, array $expectedTransports)
     {
         $container = $this->createContainerFromFile($configFile);
 

@@ -20,7 +20,7 @@ class DsnTest extends TestCase
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $string, Dsn $dsn): void
+    public function testFromString(string $string, Dsn $dsn)
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
     }

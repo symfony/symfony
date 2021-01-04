@@ -71,7 +71,7 @@ class ObjectRouteLoaderTest extends TestCase
     /**
      * @dataProvider getBadResourceStrings
      */
-    public function testExceptionWithoutSyntax(string $resourceString): void
+    public function testExceptionWithoutSyntax(string $resourceString)
     {
         $this->expectException('InvalidArgumentException');
         $loader = new TestObjectRouteLoader();

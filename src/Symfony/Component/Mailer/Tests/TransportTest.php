@@ -27,7 +27,7 @@ class TransportTest extends TestCase
     /**
      * @dataProvider fromStringProvider
      */
-    public function testFromString(string $dsn, TransportInterface $transport): void
+    public function testFromString(string $dsn, TransportInterface $transport)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 

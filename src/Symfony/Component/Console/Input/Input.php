@@ -146,8 +146,11 @@ abstract class Input implements InputInterface, StreamableInputInterface
      */
     public function getOption(string $name)
     {
-        $option = $this->getOptionDefinition($name);
-        return \array_key_exists($name, $this->options) ? $this->options[$name] : $option->getDefault();
+        if (!$this->definition->hasOption($name)) {
+            throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
+        }
+
+        return \array_key_exists($name, $this->options) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
     }
 
     /**
@@ -155,8 +158,11 @@ abstract class Input implements InputInterface, StreamableInputInterface
      */
     public function setOption(string $name, $value)
     {
-        $option = $this->getOptionDefinition($name);
-        $this->options[$option->effectiveName()] = $option->checkValue($value);
+        if (!$this->definition->hasOption($name)) {
+            throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
+        }
+
+        $this->options[$name] = $value;
     }
 
     /**
@@ -191,21 +197,5 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getStream()
     {
         return $this->stream;
-    }
-
-    /**
-     * Look up the option definition for the given option name.
-     *
-     * @param string $name
-     *
-     * @return InputOption
-     */
-    protected function getOptionDefinition($name)
-    {
-        if (!$this->definition->hasOption($name)) {
-            throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
-        }
-
-        return $this->definition->getOption($name);
     }
 }

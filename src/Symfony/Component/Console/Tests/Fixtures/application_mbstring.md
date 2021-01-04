@@ -46,6 +46,7 @@ The output format (txt, xml, json, or md)
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
+* Is negatable: no
 * Default: `'txt'`
 
 #### `--raw`
@@ -55,6 +56,7 @@ To output raw command help
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--help|-h`
@@ -64,6 +66,7 @@ Display help for the given command. When no command is given display help for th
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -73,6 +76,7 @@ Do not output any message
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -82,6 +86,7 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--version|-V`
@@ -91,24 +96,17 @@ Display this application version
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
-#### `--ansi`
+#### `--ansi|--no-ansi`
 
-Force ANSI output
+Force (or disable --no-ansi) ANSI output
 
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
+* Is negatable: yes
 * Default: `false`
 
 #### `--no-interaction|-n`
@@ -118,6 +116,7 @@ Do not ask any interactive question
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 `list`
@@ -164,6 +163,7 @@ To output raw command list
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--format`
@@ -173,6 +173,7 @@ The output format (txt, xml, json, or md)
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
+* Is negatable: no
 * Default: `'txt'`
 
 #### `--help|-h`
@@ -182,6 +183,7 @@ Display help for the given command. When no command is given display help for th
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -191,6 +193,7 @@ Do not output any message
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -200,6 +203,7 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--version|-V`
@@ -209,24 +213,17 @@ Display this application version
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
-#### `--ansi`
+#### `--ansi|--no-ansi`
 
-Force ANSI output
+Force (or disable --no-ansi) ANSI output
 
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
+* Is negatable: yes
 * Default: `false`
 
 #### `--no-interaction|-n`
@@ -236,6 +233,7 @@ Do not ask any interactive question
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 `descriptor:åèä`
@@ -266,6 +264,7 @@ command åèä help
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--help|-h`
@@ -275,6 +274,7 @@ Display help for the given command. When no command is given display help for th
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -284,6 +284,7 @@ Do not output any message
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -293,6 +294,7 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
 #### `--version|-V`
@@ -302,24 +304,17 @@ Display this application version
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`
 
-#### `--ansi`
+#### `--ansi|--no-ansi`
 
-Force ANSI output
+Force (or disable --no-ansi) ANSI output
 
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Default: `false`
-
-#### `--no-ansi`
-
-Disable ANSI output
-
-* Accept value: no
-* Is value required: no
-* Is multiple: no
+* Is negatable: yes
 * Default: `false`
 
 #### `--no-interaction|-n`
@@ -329,4 +324,5 @@ Do not ask any interactive question
 * Accept value: no
 * Is value required: no
 * Is multiple: no
+* Is negatable: no
 * Default: `false`

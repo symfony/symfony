@@ -38,9 +38,7 @@ class XmlDescriptor extends Descriptor
 
         $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
         foreach ($definition->getOptions() as $option) {
-            if (!$option->isHidden()) {
-                $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
-            }
+            $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
         }
 
         return $dom;
@@ -212,7 +210,6 @@ class XmlDescriptor extends Descriptor
         $objectXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
         $objectXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);
         $objectXML->setAttribute('is_multiple', $option->isArray() ? 1 : 0);
-        $objectXML->setAttribute('is_negatable', $option->isNegatable() ? 1 : 0);
         $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
         $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 
@@ -226,6 +223,17 @@ class XmlDescriptor extends Descriptor
                     $defaultXML->appendChild($dom->createTextNode($default));
                 }
             }
+        }
+
+        if ($option->isNegatable()) {
+            $dom->appendChild($objectXML = $dom->createElement('option'));
+            $objectXML->setAttribute('name', '--no-'.$option->getName());
+            $objectXML->setAttribute('shortcut', '');
+            $objectXML->setAttribute('accept_value', 0);
+            $objectXML->setAttribute('is_value_required', 0);
+            $objectXML->setAttribute('is_multiple', 0);
+            $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
+            $descriptionXML->appendChild($dom->createTextNode('Negate the "--'.$option->getName().'" option'));
         }
 
         return $dom;

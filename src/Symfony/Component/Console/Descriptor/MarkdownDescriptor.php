@@ -68,8 +68,10 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
-        $negatable = $option->isNegatable() ? '[no-]' : '';
-        $name = '--'.$negatable.$option->getName();
+        $name = '--'.$option->getName();
+        if ($option->isNegatable()) {
+            $name .= '|--no-'.$option->getName();
+        }
         if ($option->getShortcut()) {
             $name .= '|-'.str_replace('|', '|-', $option->getShortcut()).'';
         }
@@ -107,9 +109,6 @@ class MarkdownDescriptor extends Descriptor
 
             $this->write('### Options');
             foreach ($definition->getOptions() as $option) {
-                if ($option->isHidden()) {
-                    continue;
-                }
                 $this->write("\n\n");
                 if (null !== $describeInputOption = $this->describeInputOption($option)) {
                     $this->write($describeInputOption);

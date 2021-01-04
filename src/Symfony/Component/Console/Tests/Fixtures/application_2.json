@@ -83,7 +83,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -92,7 +92,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {
@@ -186,7 +186,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -195,7 +195,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {
@@ -265,7 +265,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -274,7 +274,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {
@@ -361,7 +361,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -370,7 +370,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {
@@ -438,7 +438,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -447,7 +447,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {
@@ -517,7 +517,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Force ANSI output",
+                        "description": "Force (or disable --no-ansi) ANSI output",
                         "default": false
                     },
                     "no-ansi": {
@@ -526,7 +526,7 @@
                         "accept_value": false,
                         "is_value_required": false,
                         "is_multiple": false,
-                        "description": "Disable ANSI output",
+                        "description": "Negate the \"--ansi\" option",
                         "default": false
                     },
                     "no-interaction": {

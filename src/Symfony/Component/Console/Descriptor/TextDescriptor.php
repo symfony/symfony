@@ -56,12 +56,10 @@ class TextDescriptor extends Descriptor
      */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
-        $default = '';
         if ($option->acceptValue() && null !== $option->getDefault() && (!\is_array($option->getDefault()) || \count($option->getDefault()))) {
             $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($option->getDefault()));
-        } elseif ($option->isNegatable() && (null !== $option->getDefault())) {
-            $negative_default = $option->getDefault() ? '' : 'no-';
-            $default = sprintf('<comment> [default: --%s%s]</comment>', $negative_default, $option->getName());
+        } else {
+            $default = '';
         }
 
         $value = '';
@@ -74,10 +72,9 @@ class TextDescriptor extends Descriptor
         }
 
         $totalWidth = isset($options['total_width']) ? $options['total_width'] : $this->calculateTotalWidthForOptions([$option]);
-        $negatable = $option->isNegatable() ? '[no-]' : '';
         $synopsis = sprintf('%s%s',
             $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ',
-            sprintf('--%s%s%s', $negatable, $option->getName(), $value)
+            sprintf($option->isNegatable() ? '--%1$s|--no-%1$s' : '--%1$s%2$s', $option->getName(), $value)
         );
 
         $spacingWidth = $totalWidth - Helper::strlen($synopsis);
@@ -120,9 +117,6 @@ class TextDescriptor extends Descriptor
 
             $this->writeText('<comment>Options:</comment>', $options);
             foreach ($definition->getOptions() as $option) {
-                if ($option->isHidden()) {
-                    continue;
-                }
                 if (\strlen($option->getShortcut()) > 1) {
                     $laterOptions[] = $option;
                     continue;
@@ -331,8 +325,9 @@ class TextDescriptor extends Descriptor
         foreach ($options as $option) {
             // "-" + shortcut + ", --" + name
             $nameLength = 1 + max(Helper::strlen($option->getShortcut()), 1) + 4 + Helper::strlen($option->getName());
-
-            if ($option->acceptValue()) {
+            if ($option->isNegatable()) {
+                $nameLength += 6 + Helper::strlen($option->getName()); // |--no- + name
+            } elseif ($option->acceptValue()) {
                 $valueLength = 1 + Helper::strlen($option->getName()); // = + value
                 $valueLength += $option->isValueOptional() ? 2 : 0; // [ + ]
 

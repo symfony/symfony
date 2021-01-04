@@ -164,7 +164,30 @@ class ArrayInput extends Input
      */
     private function addLongOption(string $name, $value)
     {
-        $this->setOption($name, $value);
+        if (!$this->definition->hasOption($name)) {
+            if (!$this->definition->hasNegation($name)) {
+                throw new InvalidOptionException(sprintf('The "--%s" option does not exist.', $name));
+            }
+
+            $optionName = $this->definition->negationToName($name);
+            $this->options[$optionName] = false;
+
+            return;
+        }
+
+        $option = $this->definition->getOption($name);
+
+        if (null === $value) {
+            if ($option->isValueRequired()) {
+                throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $name));
+            }
+
+            if (!$option->isValueOptional()) {
+                $value = true;
+            }
+        }
+
+        $this->options[$name] = $value;
     }
 
     /**

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 
 /**
@@ -27,8 +26,6 @@ class InputOption
     public const VALUE_OPTIONAL = 4;
     public const VALUE_IS_ARRAY = 8;
     public const VALUE_NEGATABLE = 16;
-    public const VALUE_HIDDEN = 32;
-    public const VALUE_BINARY = (self::VALUE_NONE | self::VALUE_NEGATABLE);
 
     private $name;
     private $shortcut;
@@ -74,7 +71,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif ($mode >= (self::VALUE_HIDDEN << 1) || $mode < 1) {
+        } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -85,6 +82,9 @@ class InputOption
 
         if ($this->isArray() && !$this->acceptValue()) {
             throw new InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
+        }
+        if ($this->isNegatable() && $this->acceptValue()) {
+            throw new InvalidArgumentException('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
         }
 
         $this->setDefault($default);
@@ -108,11 +108,6 @@ class InputOption
     public function getName()
     {
         return $this->name;
-    }
-
-    public function effectiveName()
-    {
-        return $this->getName();
     }
 
     /**
@@ -155,37 +150,9 @@ class InputOption
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
 
-    /**
-     * Returns true if the option is negatable (option --foo can be forced
-     * to 'false' via the --no-foo option).
-     *
-     * @return bool true if mode is self::VALUE_NEGATABLE, false otherwise
-     */
-    public function isNegatable()
+    public function isNegatable(): bool
     {
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
-    }
-
-    /**
-     * Returns true if the option should not be shown in help (e.g. a negated
-     * option).
-     *
-     * @return bool true if mode is self::VALUE_HIDDEN, false otherwise
-     */
-    public function isHidden()
-    {
-        return self::VALUE_HIDDEN === (self::VALUE_HIDDEN & $this->mode);
-    }
-
-    /**
-     * Returns true if the option is binary (can be --foo or --no-foo, and
-     * nothing else).
-     *
-     * @return bool true if negatable and does not have a value.
-     */
-    public function isBinary()
-    {
-        return $this->isNegatable() && !$this->acceptValue();
     }
 
     /**
@@ -197,8 +164,11 @@ class InputOption
      */
     public function setDefault($default = null)
     {
-        if (self::VALUE_NONE === ((self::VALUE_NONE | self::VALUE_NEGATABLE) & $this->mode) && null !== $default) {
+        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
+        }
+        if (self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode) && null !== $default) {
+            throw new LogicException('Cannot set a default value when using InputOption::VALUE_NEGATABLE mode.');
         }
 
         if ($this->isArray()) {
@@ -209,7 +179,7 @@ class InputOption
             }
         }
 
-        $this->default = ($this->acceptValue() || $this->isNegatable()) ? $default : false;
+        $this->default = $this->acceptValue() ? $default : false;
     }
 
     /**
@@ -233,27 +203,6 @@ class InputOption
     }
 
     /**
-     * Checks the validity of a value, and alters it as necessary
-     *
-     * @param mixed $value
-     *
-     * @return @mixed
-     */
-    public function checkValue($value)
-    {
-        if (null === $value) {
-            if ($this->isValueRequired()) {
-                throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $this->getName()));
-            }
-
-            if (!$this->isValueOptional()) {
-                return true;
-            }
-        }
-        return $value;
-    }
-
-    /**
      * Checks whether the given option equals this one.
      *
      * @return bool
@@ -263,7 +212,6 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isHidden() === $this->isHidden()
             && $option->isNegatable() === $this->isNegatable()
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()

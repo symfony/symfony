@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-03T14:39:27Z
+
+> Are those classes used by DoctrineBundle?
+
+Just double-checked, it's not used in DoctrineBundle.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-04T07:48:50Z
+
+Would it be better to do the inheritance the other way around: move all code to the new class and the old class would extend the new one with deprecation triggers? That way, in 6.0, it's just a matter of removing the old files (we would need to remove the `final` keyword on the new class but that's not an issue as code is internal anyway).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-04T08:10:40Z
+
+@fabpot that's what we normally do, but I don't think it works in this case. The Tests directory is excluded in dist, so we would extend from an undefined class in the deprecated one.

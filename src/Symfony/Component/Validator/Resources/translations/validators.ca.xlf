@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Aquest valor hauria de ser JSON vàlid.</target>
+                <target>Aquest valor hauria de ser un JSON vàlid.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -144,6 +145,7 @@ class ObjectsProvider
                     new Reference('definition_1'),
                     new Reference('.definition_2'),
                 ]))
+                ->addArgument(new AbstractArgument('placeholder'))
                 ->setFactory(['Full\\Qualified\\FactoryClass', 'get']),
             '.definition_2' => $definition2
                 ->setPublic(false)

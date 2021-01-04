@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -347,6 +348,8 @@ class TextDescriptor extends Descriptor
                     $argumentsInformation[] = sprintf('Service locator (%d element(s))', \count($argument->getValues()));
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
+                } elseif ($argument instanceof AbstractArgument) {
+                    $argumentsInformation[] = sprintf('Abstract argument (%s)', $argument->getText());
                 } else {
                     $argumentsInformation[] = \is_array($argument) ? sprintf('Array (%d element(s))', \count($argument)) : $argument;
                 }

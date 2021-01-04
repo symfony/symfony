@@ -16,7 +16,7 @@ class Foo
 
     public static function createCallable(): callable
     {
-        return function() {};
+        return function () {};
     }
 
     public static function createArray(): array

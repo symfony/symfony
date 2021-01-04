@@ -13,12 +13,12 @@ if (!file_exists($autoload)) {
 require_once $autoload;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnSigtermSignalListener;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
-use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -40,7 +40,7 @@ $worker = new Worker(['the_receiver' => $receiver], new class() implements Messa
     public function dispatch($envelope, array $stamps = []): Envelope
     {
         echo 'Get envelope with message: '.get_class($envelope->getMessage())."\n";
-        echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
+        echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), \JSON_PRETTY_PRINT));
 
         sleep(30);
         echo "Done.\n";

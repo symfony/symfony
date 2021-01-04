@@ -116,7 +116,7 @@ class DummyTransport implements Transport\TransportInterface
 
     public function __toString(): string
     {
-        return sprintf('dummy://local');
+        return 'dummy://local';
     }
 }
 

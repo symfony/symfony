@@ -832,6 +832,39 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testSortAcrossDirectories()
+    {
+        $finder = $this->buildFinder()
+            ->in([
+                self::$tmpDir,
+                self::$tmpDir.'/qux',
+                self::$tmpDir.'/foo',
+            ])
+            ->depth(0)
+            ->files()
+            ->filter(static function (\SplFileInfo $file): bool {
+                return '' !== $file->getExtension();
+            })
+            ->sort(static function (\SplFileInfo $a, \SplFileInfo $b): int {
+                return strcmp($a->getExtension(), $b->getExtension()) ?: strcmp($a->getFilename(), $b->getFilename());
+            })
+        ;
+
+        $this->assertOrderedIterator($this->toAbsolute([
+            'qux_0_1.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
+            'qux_10_2.php',
+            'qux_12_0.php',
+            'qux_2_0.php',
+            'test.php',
+            'qux/baz_100_1.py',
+            'qux/baz_1_2.py',
+            'test.py',
+            'foo/bar.tmp',
+        ]), $finder->getIterator());
+    }
+
     public function testFilter()
     {
         $finder = $this->buildFinder();

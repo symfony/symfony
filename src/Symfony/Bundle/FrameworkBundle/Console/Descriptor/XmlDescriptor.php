@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -409,6 +410,9 @@ class XmlDescriptor extends Descriptor
                 }
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
+            } elseif ($argument instanceof AbstractArgument) {
+                $argumentXML->setAttribute('type', 'abstract');
+                $argumentXML->appendChild(new \DOMText($argument->getText()));
             } elseif (\is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 

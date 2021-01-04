@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -392,6 +393,10 @@ class JsonDescriptor extends Descriptor
                 'type' => 'service',
                 'id' => (string) $value,
             ];
+        }
+
+        if ($value instanceof AbstractArgument) {
+            return ['type' => 'abstract', 'text' => $value->getText()];
         }
 
         if ($value instanceof ArgumentInterface) {

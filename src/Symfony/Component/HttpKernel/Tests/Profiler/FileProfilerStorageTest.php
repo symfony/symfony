@@ -213,26 +213,25 @@ class FileProfilerStorageTest extends TestCase
 
     public function testStoreTime()
     {
-        $dt = new \DateTime('now');
-        $start = $dt->getTimestamp();
+        $start = $now = time();
 
         for ($i = 0; $i < 3; ++$i) {
-            $dt->modify('+1 minute');
+            $now += 60;
             $profile = new Profile('time_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
-            $profile->setTime($dt->getTimestamp());
+            $profile->setTime($now);
             $profile->setMethod('GET');
             $this->storage->write($profile);
         }
 
-        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 3 * 60);
+        $records = $this->storage->find('', '', 3, 'GET', $start, $start + 3 * 60);
         $this->assertCount(3, $records, '->find() returns all previously added records');
         $this->assertEquals('time_2', $records[0]['token'], '->find() returns records ordered by time in descendant order');
         $this->assertEquals('time_1', $records[1]['token'], '->find() returns records ordered by time in descendant order');
         $this->assertEquals('time_0', $records[2]['token'], '->find() returns records ordered by time in descendant order');
 
-        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 2 * 60);
+        $records = $this->storage->find('', '', 3, 'GET', $start, $start + 2 * 60);
         $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
     }
 

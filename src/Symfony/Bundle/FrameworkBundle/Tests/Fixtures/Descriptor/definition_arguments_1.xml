@@ -20,4 +20,5 @@
     <argument type="service" id="definition_1"/>
     <argument type="service" id=".definition_2"/>
   </argument>
+  <argument type="abstract">placeholder</argument>
 </definition>

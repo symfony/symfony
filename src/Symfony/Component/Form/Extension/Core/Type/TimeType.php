@@ -327,7 +327,7 @@ class TimeType extends AbstractType
 
         $resolver->setDeprecated('model_timezone', function (Options $options, $modelTimezone): string {
             if (null !== $modelTimezone && $options['view_timezone'] !== $modelTimezone && null === $options['reference_date']) {
-                return sprintf('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.');
+                return 'Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is deprecated since Symfony 4.4.';
             }
 
             return '';

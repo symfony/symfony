@@ -41,7 +41,7 @@ class Html5ParserCrawlerTest extends AbstractCrawlerTest
     }
 
     /** @dataProvider invalidHtml5Provider */
-    public function testHtml5ParserWithInvalidHeadedContent(string $content): void
+    public function testHtml5ParserWithInvalidHeadedContent(string $content)
     {
         $this->skipTestIfHTML5LibraryNotAvailable();
 

@@ -491,7 +491,7 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'expression':
                     if (!class_exists(Expression::class)) {
-                        throw new \LogicException(sprintf('The type="expression" attribute cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".'));
+                        throw new \LogicException('The type="expression" attribute cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
                     }
 
                     $arguments[$key] = new Expression($arg->nodeValue);

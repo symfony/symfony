@@ -11,7 +11,7 @@ $dirs = $_SERVER['argv'];
 
 function getRelevantContent(array $composerJson)
 {
-    $relevantKeys = array(
+    $relevantKeys = [
         'name',
         'require',
         'require-dev',
@@ -22,9 +22,9 @@ function getRelevantContent(array $composerJson)
         'prefer-stable',
         'repositories',
         'extra',
-    );
+    ];
 
-    $relevantContent = array();
+    $relevantContent = [];
 
     foreach (array_intersect($relevantKeys, array_keys($composerJson)) as $key) {
         $relevantContent[$key] = $composerJson[$key];
@@ -44,7 +44,7 @@ function getContentHash(array $composerJson)
     return md5(json_encode($relevantContent));
 }
 
-$composerJsons = array();
+$composerJsons = [];
 
 foreach ($dirs as $dir) {
     if (!file_exists($dir.'/composer.lock') || !$composerLock = @json_decode(file_get_contents($dir.'/composer.lock'), true)) {
@@ -61,11 +61,11 @@ foreach ($dirs as $dir) {
         @unlink($dir.'/composer.lock');
         continue;
     }
-    $composerLock += array('packages' => array(), 'packages-dev' => array());
-    $composerJsons[$composerJson['name']] = array($dir, $composerLock['packages'] + $composerLock['packages-dev'], getRelevantContent($composerJson));
+    $composerLock += ['packages' => [], 'packages-dev' => []];
+    $composerJsons[$composerJson['name']] = [$dir, $composerLock['packages'] + $composerLock['packages-dev'], getRelevantContent($composerJson)];
 }
 
-$referencedCommits = array();
+$referencedCommits = [];
 
 foreach ($composerJsons as list($dir, $lockedPackages)) {
     foreach ($lockedPackages as $lockedJson) {
@@ -85,7 +85,7 @@ foreach ($composerJsons as list($dir, $lockedPackages)) {
             continue;
         }
 
-        foreach (array('minimum-stability', 'prefer-stable') as $key) {
+        foreach (['minimum-stability', 'prefer-stable'] as $key) {
             if (array_key_exists($key, $composerJsons[$name][2])) {
                 $lockedJson[$key] = $composerJsons[$name][2][$key];
             }
@@ -116,10 +116,10 @@ $sh = curl_share_init();
 curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
 curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
 curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
-$chs = array();
+$chs = [];
 
 foreach ($referencedCommits as $name => $dirsByCommit) {
-    $chs[] = $ch = array(curl_init(), fopen($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json', 'wb'));
+    $chs[] = $ch = [curl_init(), fopen($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json', 'wb')];
     curl_setopt($ch[0], CURLOPT_URL, 'https://repo.packagist.org/p/'.$name.'.json');
     curl_setopt($ch[0], CURLOPT_FILE, $ch[1]);
     curl_setopt($ch[0], CURLOPT_SHARE, $sh);

@@ -185,7 +185,7 @@ install:
       export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*')
 
       if [[ ! $deps ]]; then
-          php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit src/Symfony/Contracts
+          php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit
       else
           export SYMFONY_DEPRECATIONS_HELPER=weak &&
           cp composer.json composer.json.orig &&
@@ -228,7 +228,6 @@ install:
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
       [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git ls-remote -q --heads | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
 
-      export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi
 
     - |
@@ -268,7 +267,6 @@ install:
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
                   export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
-                  export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
                   COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort)
@@ -287,8 +285,6 @@ install:
           else
               if [[ $PHP = 7.4* ]]; then
                   # add return types before running the test suite
-                  rm src/Symfony/Contracts -Rf && mv vendor/symfony/contracts src/Symfony/Contracts
-                  ln -sd $(realpath src/Symfony/Contracts) vendor/symfony/contracts
                   sed -i 's/"\*\*\/Tests\/"//' composer.json
                   composer install --optimize-autoloader
                   SYMFONY_PATCH_TYPE_DECLARATIONS=force=object php .github/patch-types.php

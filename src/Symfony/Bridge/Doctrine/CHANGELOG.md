@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * deprecated `DoctrineTestHelper` and `TestRepositoryFactory`
+
 5.2.0
 -----
 

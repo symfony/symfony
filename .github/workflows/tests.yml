@@ -149,7 +149,7 @@ jobs:
                 run: |
                     echo "::group::composer update"
                     composer require --dev --no-update mongodb/mongodb:@stable
-                    composer update --no-progress --no-suggest --ansi
+                    composer update --no-progress --ansi
                     echo "::endgroup::"
                     echo "::group::install phpunit"
                     ./phpunit install

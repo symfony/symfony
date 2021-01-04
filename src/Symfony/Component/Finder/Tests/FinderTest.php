@@ -631,7 +631,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sortByName());
-        $this->assertIterator($this->toAbsolute([
+        $this->assertOrderedIterator($this->toAbsolute([
             'foo',
             'foo bar',
             'foo/bar.tmp',
@@ -654,14 +654,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sortByType());
-        $this->assertIterator($this->toAbsolute([
+        $this->assertOrderedIterator($this->toAbsolute([
             'foo',
-            'foo bar',
-            'toto',
-            'foo/bar.tmp',
-            'test.php',
-            'test.py',
             'qux',
+            'toto',
+            'foo bar',
+            'foo/bar.tmp',
             'qux/baz_100_1.py',
             'qux/baz_1_2.py',
             'qux_0_1.php',
@@ -670,6 +668,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'test.php',
+            'test.py',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -770,19 +770,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sortByName(true));
-        $this->assertIterator($this->toAbsolute([
+        $this->assertOrderedIterator($this->toAbsolute([
             'foo',
-            'foo bar',
             'foo/bar.tmp',
+            'foo bar',
             'qux',
-            'qux/baz_100_1.py',
             'qux/baz_1_2.py',
+            'qux/baz_100_1.py',
             'qux_0_1.php',
-            'qux_1000_1.php',
-            'qux_1002_0.php',
+            'qux_2_0.php',
             'qux_10_2.php',
             'qux_12_0.php',
-            'qux_2_0.php',
+            'qux_1000_1.php',
+            'qux_1002_0.php',
             'test.php',
             'test.py',
             'toto',
@@ -790,7 +790,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sortByName(false));
-        $this->assertIterator($this->toAbsolute([
+        $this->assertOrderedIterator($this->toAbsolute([
             'foo',
             'foo bar',
             'foo/bar.tmp',
@@ -813,13 +813,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sort(function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealPath(), $b->getRealPath()); }));
-        $this->assertIterator($this->toAbsolute([
+        $this->assertOrderedIterator($this->toAbsolute([
             'foo',
             'foo bar',
             'foo/bar.tmp',
-            'test.php',
-            'test.py',
-            'toto',
             'qux',
             'qux/baz_100_1.py',
             'qux/baz_1_2.py',
@@ -829,6 +826,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_10_2.php',
             'qux_12_0.php',
             'qux_2_0.php',
+            'test.php',
+            'test.py',
+            'toto',
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 

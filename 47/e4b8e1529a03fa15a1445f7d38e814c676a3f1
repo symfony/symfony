@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-11T08:37:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-28T10:08:33Z
+
+Can you share the use cases you have in mind?
+
+---------------------------------------------------------------------------
+
+by brusch at 2020-12-28T10:34:39Z
+
+Yep, of course 😊
+One use case for us is, that we want to disable the debug toolbar for certain admin functionalities which are embedded by an `<iframe>`, because it's just not necessary and (sometimes) breaks the layout of the embedded contents:
+![image](https://user-images.githubusercontent.com/142037/103207948-d574e400-48ff-11eb-96fb-87489fdc63f7.png)
+
+We're currently doing this by removing the subscriber, which is also working fine. But as the functionality is already there, I thought it would make sense to also let it change dynamically 😉
+https://github.com/pimcore/pimcore/blob/master/bundles/CoreBundle/EventListener/WebDebugToolbarListener.php#L97

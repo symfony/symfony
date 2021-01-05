@@ -6,7 +6,7 @@ parameters:
     env(APP_IPS): '127.0.0.1, ::1'
 
 security:
-    encoders:
+    password_hashers:
         Symfony\Component\Security\Core\User\User: plaintext
 
     providers:

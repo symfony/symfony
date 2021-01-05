@@ -20,7 +20,13 @@ use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 
+/**
+ * @group legacy
+ */
 class EncoderFactoryTest extends TestCase
 {
     public function testGetEncoderWithMessageDigestEncoder()
@@ -176,6 +182,17 @@ class EncoderFactoryTest extends TestCase
             (new EncoderFactory([SomeUser::class => ['class' => SodiumPasswordEncoder::class, 'arguments' => []]]))->getEncoder(SomeUser::class)
         );
     }
+
+    public function testHasherAwareCompat()
+    {
+        $factory = new PasswordHasherFactory([
+            'encoder_name' => new MessageDigestPasswordHasher('sha1'),
+        ]);
+
+        $encoder = $factory->getPasswordHasher(new HasherAwareUser('user', 'pass'));
+        $expectedEncoder = new MessageDigestPasswordHasher('sha1');
+        $this->assertEquals($expectedEncoder->hash('foo', ''), $encoder->hash('foo', ''));
+    }
 }
 
 class SomeUser implements UserInterface
@@ -212,5 +229,16 @@ class EncAwareUser extends SomeUser implements EncoderAwareInterface
     public function getEncoderName(): ?string
     {
         return $this->encoderName;
+    }
+}
+
+
+class HasherAwareUser extends SomeUser implements PasswordHasherAwareInterface
+{
+    public $hasherName = 'encoder_name';
+
+    public function getPasswordHasherName(): ?string
+    {
+        return $this->hasherName;
     }
 }

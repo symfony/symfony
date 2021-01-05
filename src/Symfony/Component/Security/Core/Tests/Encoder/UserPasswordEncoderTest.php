@@ -19,6 +19,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class UserPasswordEncoderTest extends TestCase
 {
     public function testEncodePassword()

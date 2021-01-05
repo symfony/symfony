@@ -1,6 +1,6 @@
 <?php
 
-$this->load('container1.php');
+$this->load('legacy_encoders.php');
 
 $container->loadFromExtension('security', [
     'encoders' => [

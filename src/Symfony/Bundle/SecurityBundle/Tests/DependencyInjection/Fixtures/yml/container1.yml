@@ -1,5 +1,5 @@
 security:
-    encoders:
+    password_hashers:
         JMS\FooBundle\Entity\User1: plaintext
         JMS\FooBundle\Entity\User2:
             algorithm: sha1
@@ -8,7 +8,7 @@ security:
         JMS\FooBundle\Entity\User3:
             algorithm: md5
         JMS\FooBundle\Entity\User4:
-            id: security.encoder.foo
+            id: security.hasher.foo
         JMS\FooBundle\Entity\User5:
             algorithm: pbkdf2
             hash_algorithm: sha1

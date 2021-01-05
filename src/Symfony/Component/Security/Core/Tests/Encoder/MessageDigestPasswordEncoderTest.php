@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @group legacy
+ */
 class MessageDigestPasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()

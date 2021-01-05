@@ -18,6 +18,10 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -275,9 +279,12 @@ abstract class CompleteConfigurationTest extends TestCase
         ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testEncoders()
     {
-        $container = $this->getContainer('container1');
+        $container = $this->getContainer('legacy_encoders');
 
         $this->assertEquals([[
             'JMS\FooBundle\Entity\User1' => [
@@ -332,6 +339,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
     public function testEncodersWithLibsodium()
     {
         if (!SodiumPasswordEncoder::isSupported()) {
@@ -385,6 +395,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
     public function testEncodersWithArgon2i()
     {
         if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
@@ -438,6 +451,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
     public function testMigratingEncoder()
     {
         if (!($sodium = SodiumPasswordEncoder::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
@@ -499,6 +515,9 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    /**
+     * @group legacy
+     */
     public function testEncodersWithBCrypt()
     {
         $container = $this->getContainer('bcrypt_encoder');
@@ -548,6 +567,279 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
+    public function testHashers()
+    {
+        $container = $this->getContainer('container1');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => PlaintextPasswordHasher::class,
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.hasher.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => Pbkdf2PasswordHasher::class,
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'algorithm' => 'auto',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+        ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
+    }
+
+    public function testHashersWithLibsodium()
+    {
+        if (!SodiumPasswordHasher::isSupported()) {
+            $this->markTestSkipped('Libsodium is not available.');
+        }
+
+        $container = $this->getContainer('sodium_hasher');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => PlaintextPasswordHasher::class,
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.hasher.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => Pbkdf2PasswordHasher::class,
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'class' => SodiumPasswordHasher::class,
+                'arguments' => [8, 128 * 1024 * 1024],
+            ],
+        ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
+    }
+
+    public function testHashersWithArgon2i()
+    {
+        if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $container = $this->getContainer('argon2i_hasher');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => PlaintextPasswordHasher::class,
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.hasher.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => Pbkdf2PasswordHasher::class,
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'class' => $sodium ? SodiumPasswordHasher::class : NativePasswordHasher::class,
+                'arguments' => $sodium ? [256, 1] : [1, 262144, null, \PASSWORD_ARGON2I],
+            ],
+        ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
+    }
+
+    public function testMigratingHasher()
+    {
+        if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $container = $this->getContainer('migrating_hasher');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => PlaintextPasswordHasher::class,
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.hasher.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => Pbkdf2PasswordHasher::class,
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'algorithm' => 'argon2i',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => 256,
+                'time_cost' => 1,
+                'migrate_from' => ['bcrypt'],
+            ],
+        ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
+    }
+
+    public function testHashersWithBCrypt()
+    {
+        $container = $this->getContainer('bcrypt_hasher');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => PlaintextPasswordHasher::class,
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'migrate_from' => [],
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.hasher.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => Pbkdf2PasswordHasher::class,
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'class' => NativePasswordHasher::class,
+                'arguments' => [null, null, 15, \PASSWORD_BCRYPT],
+            ],
+        ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
+    }
+
     public function testRememberMeThrowExceptionsDefault()
     {
         $container = $this->getContainer('container1');
@@ -577,9 +869,9 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
     }
 
-    public function testUserPasswordEncoderCommandIsRegistered()
+    public function testUserPasswordHasherCommandIsRegistered()
     {
-        $this->assertTrue($this->getContainer('remember_me_options')->has('security.command.user_password_encoder'));
+        $this->assertTrue($this->getContainer('remember_me_options')->has('security.command.user_password_hash'));
     }
 
     public function testDefaultAccessDecisionManagerStrategyIsAffirmative()

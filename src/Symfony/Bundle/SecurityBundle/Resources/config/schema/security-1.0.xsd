@@ -11,6 +11,8 @@
             <xsd:element name="access-decision-manager" type="access_decision_manager" minOccurs="0" maxOccurs="1" />
             <xsd:element name="encoders" type="encoders" minOccurs="0" maxOccurs="1" />
             <xsd:element name="encoder" type="encoder" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="password_hashers" type="password_hashers" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="password_hasher" type="password_hasher" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="providers" type="providers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="provider" type="provider" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="firewalls" type="firewalls" minOccurs="0" maxOccurs="1" />
@@ -28,6 +30,12 @@
     <xsd:complexType name="encoders">
         <xsd:sequence>
             <xsd:element name="encoder" type="encoder" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="password_hashers">
+        <xsd:sequence>
+            <xsd:element name="password_hasher" type="password_hasher" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 
@@ -68,6 +76,23 @@
     </xsd:simpleType>
 
     <xsd:complexType name="encoder">
+        <xsd:sequence>
+            <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+        <xsd:attribute name="algorithm" type="xsd:string" />
+        <xsd:attribute name="hash-algorithm" type="xsd:string" />
+        <xsd:attribute name="key-length" type="xsd:string" />
+        <xsd:attribute name="ignore-case" type="xsd:boolean" />
+        <xsd:attribute name="encode-as-base64" type="xsd:boolean" />
+        <xsd:attribute name="iterations" type="xsd:string" />
+        <xsd:attribute name="cost" type="xsd:integer" />
+        <xsd:attribute name="memory-cost" type="xsd:string" />
+        <xsd:attribute name="time-cost" type="xsd:string" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="password_hasher">
         <xsd:sequence>
             <xsd:element name="migrate-from" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>

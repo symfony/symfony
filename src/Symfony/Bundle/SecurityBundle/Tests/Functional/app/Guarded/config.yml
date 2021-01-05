@@ -14,7 +14,7 @@ services:
         tags: [controller.service_arguments]
 
 security:
-    encoders:
+    password_hashers:
         Symfony\Component\Security\Core\User\User: plaintext
 
     providers:

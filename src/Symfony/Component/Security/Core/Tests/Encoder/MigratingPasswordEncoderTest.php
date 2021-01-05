@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\MigratingPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 
+/**
+ * @group legacy
+ */
 class MigratingPasswordEncoderTest extends TestCase
 {
     public function testValidation()

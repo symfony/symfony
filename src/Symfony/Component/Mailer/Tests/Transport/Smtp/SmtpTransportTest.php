@@ -22,6 +22,9 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\RawMessage;
 
+/**
+ * @group time-sensitive
+ */
 class SmtpTransportTest extends TestCase
 {
     public function testToString()
@@ -83,7 +86,7 @@ class SmtpTransportTest extends TestCase
         $this->assertNotContains("NOOP\r\n", $stream->getCommands());
 
         $stream->clearCommands();
-        sleep(1);
+        usleep(1500000);
 
         $transport->send(new RawMessage('Message 3'), $envelope);
         $this->assertContains("NOOP\r\n", $stream->getCommands());

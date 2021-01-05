@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
 class ErrorDetailsStampTest extends TestCase
 {
-    public function testGetters(): void
+    public function testGetters()
     {
         $exception = new \Exception('exception message');
         $flattenException = FlattenException::createFromThrowable($exception);
@@ -37,7 +37,7 @@ class ErrorDetailsStampTest extends TestCase
         $this->assertEquals($flattenException, $stamp->getFlattenException());
     }
 
-    public function testUnwrappingHandlerFailedException(): void
+    public function testUnwrappingHandlerFailedException()
     {
         $wrappedException = new \Exception('I am inside', 123);
         $envelope = new Envelope(new \stdClass());
@@ -52,7 +52,7 @@ class ErrorDetailsStampTest extends TestCase
         $this->assertEquals($flattenException, $stamp->getFlattenException());
     }
 
-    public function testDeserialization(): void
+    public function testDeserialization()
     {
         $exception = new \Exception('exception message');
         $stamp = ErrorDetailsStamp::create($exception);

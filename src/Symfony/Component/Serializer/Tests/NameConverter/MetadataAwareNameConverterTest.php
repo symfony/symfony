@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>

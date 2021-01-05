@@ -24,8 +24,8 @@ use Symfony\Component\Lock\Store\PostgreSqlStore;
  */
 class PostgreSqlStoreTest extends AbstractStoreTest
 {
-    use SharedLockStoreTestTrait;
     use BlockingStoreTestTrait;
+    use SharedLockStoreTestTrait;
 
     /**
      * {@inheritdoc}

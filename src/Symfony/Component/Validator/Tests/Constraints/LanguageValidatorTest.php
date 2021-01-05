@@ -161,7 +161,6 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
             eval('return new \Symfony\Component\Validator\Constraints\Language(alpha3: true, message: "myMessage");')
         );
 
-
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"DE"')
             ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)

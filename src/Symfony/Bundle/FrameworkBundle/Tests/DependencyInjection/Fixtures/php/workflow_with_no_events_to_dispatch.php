@@ -8,7 +8,7 @@ $container->loadFromExtension('framework', [
             'type' => 'state_machine',
             'marking_store' => [
                 'type' => 'method',
-                'property' => 'state'
+                'property' => 'state',
             ],
             'supports' => [
                 FrameworkExtensionTest::class,
@@ -33,9 +33,9 @@ $container->loadFromExtension('framework', [
                         'two',
                     ],
                     'to' => [
-                        'three'
-                    ]
-                ]
+                        'three',
+                    ],
+                ],
             ],
         ],
     ],

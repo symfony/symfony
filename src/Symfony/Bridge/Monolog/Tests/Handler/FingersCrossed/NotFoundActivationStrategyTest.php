@@ -26,7 +26,7 @@ class NotFoundActivationStrategyTest extends TestCase
      *
      * @group legacy
      */
-    public function testIsActivatedLegacy(string $url, array $record, bool $expected): void
+    public function testIsActivatedLegacy(string $url, array $record, bool $expected)
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));
@@ -39,7 +39,7 @@ class NotFoundActivationStrategyTest extends TestCase
     /**
      * @dataProvider isActivatedProvider
      */
-    public function testIsActivated(string $url, array $record, bool $expected): void
+    public function testIsActivated(string $url, array $record, bool $expected)
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));

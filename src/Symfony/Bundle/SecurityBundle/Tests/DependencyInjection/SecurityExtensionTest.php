@@ -629,7 +629,7 @@ class SecurityExtensionTest extends TestCase
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];
     }
 
-    public function testConfigureCustomFirewallListener(): void
+    public function testConfigureCustomFirewallListener()
     {
         $container = $this->getRawContainer();
         /** @var SecurityExtension $extension */

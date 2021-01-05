@@ -10,7 +10,7 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 
 final class AddErrorDetailsStampListenerTest extends TestCase
 {
-    public function testExceptionDetailsAreAdded(): void
+    public function testExceptionDetailsAreAdded()
     {
         $listener = new AddErrorDetailsStampListener();
 

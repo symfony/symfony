@@ -55,7 +55,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(bool $expected, string $dsn): void
+    public function testSupports(bool $expected, string $dsn)
     {
         $factory = $this->createFactory();
 
@@ -65,7 +65,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider createProvider
      */
-    public function testCreate(string $expected, string $dsn): void
+    public function testCreate(string $expected, string $dsn)
     {
         $factory = $this->createFactory();
         $transport = $factory->create(Dsn::fromString($dsn));
@@ -76,7 +76,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider unsupportedSchemeProvider
      */
-    public function testUnsupportedSchemeException(string $dsn, string $message = null): void
+    public function testUnsupportedSchemeException(string $dsn, string $message = null)
     {
         $factory = $this->createFactory();
 
@@ -93,7 +93,7 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider incompleteDsnProvider
      */
-    public function testIncompleteDsnException(string $dsn, string $message = null): void
+    public function testIncompleteDsnException(string $dsn, string $message = null)
     {
         $factory = $this->createFactory();
 

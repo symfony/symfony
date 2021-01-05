@@ -227,6 +227,12 @@ class CookieTest extends TestCase
 
         $cookie = Cookie::fromString('foo', true);
         $this->assertEquals(Cookie::create('foo', null, 0, '/', null, false, false, false, null), $cookie);
+
+        $cookie = Cookie::fromString('foo_cookie=foo=1&bar=2&baz=3; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/');
+        $this->assertEquals(Cookie::create('foo_cookie', 'foo=1&bar=2&baz=3', strtotime('Tue, 22-Sep-2020 06:27:09 GMT'), '/', null, false, false, true, null), $cookie);
+
+        $cookie = Cookie::fromString('foo_cookie=foo==; expires=Tue, 22-Sep-2020 06:27:09 GMT; path=/');
+        $this->assertEquals(Cookie::create('foo_cookie', 'foo==', strtotime('Tue, 22-Sep-2020 06:27:09 GMT'), '/', null, false, false, true, null), $cookie);
     }
 
     public function testFromStringWithHttpOnly()

@@ -59,7 +59,7 @@ class Ulid extends AbstractUid
     public static function fromString(string $ulid): parent
     {
         if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {
-            $ulid = Uuid::fromString($ulid)->toBinary();
+            $ulid = (new Uuid($ulid))->toBinary();
         } elseif (22 === \strlen($ulid) && 22 === strspn($ulid, BinaryUtil::BASE58[''])) {
             $ulid = BinaryUtil::fromBase($ulid, BinaryUtil::BASE58);
         }

@@ -22,5 +22,5 @@ namespace Symfony\Component\Uid;
  */
 class UuidV3 extends Uuid
 {
-    protected const TYPE = \UUID_TYPE_MD5;
+    protected const TYPE = 3;
 }

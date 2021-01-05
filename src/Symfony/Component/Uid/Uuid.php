@@ -18,7 +18,7 @@ namespace Symfony\Component\Uid;
  */
 class Uuid extends AbstractUid
 {
-    protected const TYPE = \UUID_TYPE_DEFAULT;
+    protected const TYPE = 0;
 
     public function __construct(string $uuid)
     {

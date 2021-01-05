@@ -31,6 +31,20 @@ class InputOptionTest extends TestCase
         new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
     }
 
+    public function testBooleanWithRequired()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        new InputOption('foo', 'f', InputOption::VALUE_REQUIRED | InputOption::VALUE_NEGATABLE);
+    }
+
+    public function testBooleanWithOptional()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Impossible to have an option mode VALUE_NEGATABLE if the option also accepts a value.');
+        new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_NEGATABLE);
+    }
+
     public function testShortcut()
     {
         $option = new InputOption('foo', 'f');
@@ -147,6 +161,14 @@ class InputOptionTest extends TestCase
         $this->expectException('LogicException');
         $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
+        $option->setDefault('default');
+    }
+
+    public function testDefaultValueWithValueBooleanMode()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NEGATABLE mode.');
+        $option = new InputOption('foo', 'f', InputOption::VALUE_NEGATABLE);
         $option->setDefault('default');
     }
 

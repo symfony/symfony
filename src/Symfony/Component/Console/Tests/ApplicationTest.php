@@ -1257,7 +1257,8 @@ class ApplicationTest extends TestCase
         $this->assertTrue($inputDefinition->hasOption('verbose'));
         $this->assertTrue($inputDefinition->hasOption('version'));
         $this->assertTrue($inputDefinition->hasOption('ansi'));
-        $this->assertTrue($inputDefinition->hasOption('no-ansi'));
+        $this->assertTrue($inputDefinition->hasNegation('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
         $this->assertTrue($inputDefinition->hasOption('no-interaction'));
     }
 
@@ -1277,7 +1278,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse($inputDefinition->hasOption('verbose'));
         $this->assertFalse($inputDefinition->hasOption('version'));
         $this->assertFalse($inputDefinition->hasOption('ansi'));
-        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasNegation('no-ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
@@ -1301,7 +1302,7 @@ class ApplicationTest extends TestCase
         $this->assertFalse($inputDefinition->hasOption('verbose'));
         $this->assertFalse($inputDefinition->hasOption('version'));
         $this->assertFalse($inputDefinition->hasOption('ansi'));
-        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasNegation('no-ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));

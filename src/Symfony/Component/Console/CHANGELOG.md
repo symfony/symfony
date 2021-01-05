@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `GithubActionReporter` to render annotations in a Github Action
+ * Added `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options.
 
 5.2.0
 -----

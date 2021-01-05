@@ -74,7 +74,7 @@ class TextDescriptor extends Descriptor
         $totalWidth = $options['total_width'] ?? $this->calculateTotalWidthForOptions([$option]);
         $synopsis = sprintf('%s%s',
             $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ',
-            sprintf('--%s%s', $option->getName(), $value)
+            sprintf($option->isNegatable() ? '--%1$s|--no-%1$s' : '--%1$s%2$s', $option->getName(), $value)
         );
 
         $spacingWidth = $totalWidth - Helper::strlen($synopsis);
@@ -325,8 +325,9 @@ class TextDescriptor extends Descriptor
         foreach ($options as $option) {
             // "-" + shortcut + ", --" + name
             $nameLength = 1 + max(Helper::strlen($option->getShortcut()), 1) + 4 + Helper::strlen($option->getName());
-
-            if ($option->acceptValue()) {
+            if ($option->isNegatable()) {
+                $nameLength += 6 + Helper::strlen($option->getName()); // |--no- + name
+            } elseif ($option->acceptValue()) {
                 $valueLength = 1 + Helper::strlen($option->getName()); // = + value
                 $valueLength += $option->isValueOptional() ? 2 : 0; // [ + ]
 

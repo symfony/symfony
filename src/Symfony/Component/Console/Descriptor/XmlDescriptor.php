@@ -225,6 +225,17 @@ class XmlDescriptor extends Descriptor
             }
         }
 
+        if ($option->isNegatable()) {
+            $dom->appendChild($objectXML = $dom->createElement('option'));
+            $objectXML->setAttribute('name', '--no-'.$option->getName());
+            $objectXML->setAttribute('shortcut', '');
+            $objectXML->setAttribute('accept_value', 0);
+            $objectXML->setAttribute('is_value_required', 0);
+            $objectXML->setAttribute('is_multiple', 0);
+            $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
+            $descriptionXML->appendChild($dom->createTextNode('Negate the "--'.$option->getName().'" option'));
+        }
+
         return $dom;
     }
 }

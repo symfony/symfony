@@ -77,7 +77,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testStringInputWithFloatData(): void
+    public function testStringInputWithFloatData()
     {
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->expectExceptionMessage('Expected a numeric string.');
@@ -88,7 +88,7 @@ class NumberTypeTest extends BaseTypeTest
         ]);
     }
 
-    public function testStringInputWithIntData(): void
+    public function testStringInputWithIntData()
     {
         $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->expectExceptionMessage('Expected a numeric string.');

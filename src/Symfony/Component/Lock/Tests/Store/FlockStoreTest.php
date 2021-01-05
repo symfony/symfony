@@ -56,11 +56,10 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWithSubdir()
     {
-        if (!getenv('USER') || 'root' === getenv('USER')) {
-            $this->markTestSkipped('This test will fail if run under superuser');
-        }
-
-        new FlockStore(sys_get_temp_dir().'/sf-flock');
+        new FlockStore($dir = (sys_get_temp_dir().'/sf-flock'));
+        $this->assertDirectoryExists($dir);
+        // cleanup
+        @rmdir($dir);
     }
 
     public function testSaveSanitizeName()

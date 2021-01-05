@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * already encoded slashes are not decoded nor double-encoded anymore when generating URLs
+
 5.2.0
 -----
 

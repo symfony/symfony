@@ -110,7 +110,7 @@ class DirectoryResourceTest extends TestCase
     {
         $resource = new DirectoryResource($this->directory);
         $time = time();
-        sleep(1);
+        usleep(1500000);
         unlink($this->directory.'/tmp.xml');
         $this->assertFalse($resource->isFresh($time), '->isFresh() returns false if an existing file is removed');
     }

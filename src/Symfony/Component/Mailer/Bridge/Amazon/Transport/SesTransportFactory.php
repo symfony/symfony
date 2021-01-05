@@ -40,7 +40,7 @@ final class SesTransportFactory extends AbstractTransportFactory
                 throw new \LogicException(sprintf('You cannot use "%s" as the HttpClient component or AsyncAws package is not installed. Try running "composer require async-aws/ses".', __CLASS__));
             }
 
-            trigger_deprecation('symfony/amazon-mailer', '5.1', 'Using the "%s" transport without AsyncAws is deprecated. Try running "composer require async-aws/ses".', $scheme, \get_called_class());
+            trigger_deprecation('symfony/amazon-mailer', '5.1', 'Using the "%s" transport without AsyncAws is deprecated. Try running "composer require async-aws/ses".', $scheme, static::class);
 
             $user = $this->getUser($dsn);
             $password = $this->getPassword($dsn);

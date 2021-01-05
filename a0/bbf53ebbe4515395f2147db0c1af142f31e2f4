@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2020-12-29T07:42:05Z
+
+I would only allow the `--no-` prefix for options that act as flags (the ones that do not take a value).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-30T08:00:22Z
+
+Can you please make fabbot happy? 😊
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-30T09:02:35Z
+
+> Can you please make fabbot happy? 😊
+
+I think, fabbot is a false positive here.
+Fixing it will break the test
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-30T09:15:21Z
+
+Indeed it looks weird 🧐
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2020-12-30T16:34:57Z
+
+Jérémy thanks for this contribution.
+
+As a super minor comment: is "negatable" the best word to describe this? Could we use "boolean" like the Golang boolean flags?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-30T17:47:41Z
+
+I like the Boolean naming a lot! Thank you for the proposal Javier 😃
+
+---------------------------------------------------------------------------
+
+by chalasr at 2020-12-30T21:50:25Z
+
+Boolean looks confusing IMO.
+Actually, Go' boolean flags are not about options that have a `--no-` alternative, but just options whose value can either be `true` or `false`.
+Negatable options can be found in [Perl](https://perldoc.perl.org/Getopt::Long#A-little-bit-less-simple-options) and [node](https://github.com/tj/commander.js/) and other languages. I would stick with it.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-30T21:50:59Z
+
+~renamed VALUE_NEGATABLE into VALUE_BOOLEAN~
+
+I also Replaced `--[no-]foo` notation by `--foo|no-foo` for consistency with shortcut `-v|vv|vvv` and respects docopt  (`|` means either X or X).
+But it lloks like we are not 100% compliant with the spec:
+* `-v|vv|vvv` should be `-v | -vv | -vvv`,
+* `-e, --env=ENV` should be `-e --env=ENV` or `-e, --env <env>`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-12-30T23:05:17Z
+
+You're correct about `-v|vv|vvv` (let's fix that in another PR), but `-e, --env=ENV` is correct afaics: _"Follow either `<angular-brackets>` or `UPPER-CASE` convention for options' arguments. You can use a comma if you want to separate options."_ Seems like all variations of comma/no-comma, and `<angular-brackets>`/`UPPER-CASE` are valid.
+
+(and sorry for being nitpicky about this, I just remember this as it was my first big PR to Symfony: #13220)

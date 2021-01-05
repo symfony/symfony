@@ -20,7 +20,7 @@ namespace Symfony\Component\Uid;
  */
 class UuidV4 extends Uuid
 {
-    protected const TYPE = \UUID_TYPE_RANDOM;
+    protected const TYPE = 4;
 
     public function __construct(string $uuid = null)
     {

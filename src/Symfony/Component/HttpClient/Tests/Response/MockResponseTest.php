@@ -33,7 +33,7 @@ class MockResponseTest extends TestCase
         $response->toArray();
     }
 
-    public function testUrlHttpMethodMockResponse(): void
+    public function testUrlHttpMethodMockResponse()
     {
         $responseMock = new MockResponse(json_encode(['foo' => 'bar']));
         $url = 'https://example.com/some-endpoint';

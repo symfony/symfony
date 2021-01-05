@@ -34,7 +34,7 @@ class Type extends Constraint
     /**
      * {@inheritdoc}
      *
-     * @param string|array $type One ore multiple types to validate against or a set of options.
+     * @param string|array $type One ore multiple types to validate against or a set of options
      */
     public function __construct($type, string $message = null, array $groups = null, $payload = null, array $options = [])
     {

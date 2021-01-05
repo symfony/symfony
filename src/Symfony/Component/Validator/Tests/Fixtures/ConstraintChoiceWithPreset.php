@@ -17,10 +17,11 @@ class ConstraintChoiceWithPreset extends Choice
 {
     public $type;
 
-    public function __construct(string $type) {
+    public function __construct(string $type)
+    {
         parent::__construct($type);
 
-        if ($this->type === 'A') {
+        if ('A' === $this->type) {
             $this->choices = ['A', 'B', 'C'];
         } else {
             $this->choices = ['D', 'E', 'F'];

@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class AmazonSqsSenderTest extends TestCase
 {
-    public function testSend(): void
+    public function testSend()
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -38,7 +38,7 @@ class AmazonSqsSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testSendWithAmazonSqsFifoStamp(): void
+    public function testSendWithAmazonSqsFifoStamp()
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))
             ->with($stamp = new AmazonSqsFifoStamp('testGroup', 'testDeduplicationId'));

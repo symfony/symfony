@@ -83,6 +83,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
             if (false === $this->content) {
                 return $this->response->getContent($throw);
             }
+
             return $this->content = $this->response->getContent(false);
         } finally {
             if ($this->event && $this->event->isStarted()) {
@@ -100,6 +101,7 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
             if (false === $this->content) {
                 return $this->response->toArray($throw);
             }
+
             return $this->content = $this->response->toArray(false);
         } finally {
             if ($this->event && $this->event->isStarted()) {

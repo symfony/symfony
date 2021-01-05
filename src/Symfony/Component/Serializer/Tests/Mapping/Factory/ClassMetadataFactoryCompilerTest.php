@@ -7,9 +7,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 final class ClassMetadataFactoryCompilerTest extends TestCase
 {

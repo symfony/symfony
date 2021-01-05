@@ -122,7 +122,7 @@ final class PhpDocTypeHelper
             $collectionKeyType = $this->getTypes($type->getKeyType())[0];
 
             $collectionValueTypes = $this->getTypes($type->getValueType());
-            if (\count($collectionValueTypes) != 1) {
+            if (1 != \count($collectionValueTypes)) {
                 // the Type class does not support union types yet, so assume that no type was defined
                 $collectionValueType = null;
             } else {

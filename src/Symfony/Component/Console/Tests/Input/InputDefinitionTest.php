@@ -242,6 +242,26 @@ class InputDefinitionTest extends TestCase
         $definition->addOption($this->foo2);
     }
 
+    public function testAddDuplicateNetgatedOption()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('An option named "no-foo" already exists.');
+
+        $definition = new InputDefinition();
+        $definition->addOption(new InputOption('no-foo'));
+        $definition->addOption(new InputOption('foo', null, InputOption::VALUE_NEGATABLE));
+    }
+
+    public function testAddDuplicateNetgatedReverseOption()
+    {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('An option named "no-foo" already exists.');
+
+        $definition = new InputDefinition();
+        $definition->addOption(new InputOption('foo', null, InputOption::VALUE_NEGATABLE));
+        $definition->addOption(new InputOption('no-foo'));
+    }
+
     public function testAddDuplicateShortcutOption()
     {
         $this->expectException('LogicException');

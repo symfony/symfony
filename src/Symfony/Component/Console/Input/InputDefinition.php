@@ -233,6 +233,9 @@ class InputDefinition
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
             throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         }
+        if (isset($this->negations[$option->getName()])) {
+            throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
+        }
 
         if ($option->getShortcut()) {
             foreach (explode('|', $option->getShortcut()) as $shortcut) {

@@ -156,7 +156,7 @@ class AuthenticatorManagerTest extends TestCase
         yield [false];
     }
 
-    public function testAuthenticateRequestCanModifyTokenFromEvent(): void
+    public function testAuthenticateRequestCanModifyTokenFromEvent()
     {
         $authenticator = $this->createAuthenticator();
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
@@ -191,7 +191,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateUser($this->user, $authenticator, $this->request);
     }
 
-    public function testAuthenticateUserCanModifyTokenFromEvent(): void
+    public function testAuthenticateUserCanModifyTokenFromEvent()
     {
         $authenticator = $this->createAuthenticator();
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);

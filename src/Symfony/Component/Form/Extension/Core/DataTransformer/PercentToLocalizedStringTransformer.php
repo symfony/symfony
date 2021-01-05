@@ -214,7 +214,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     {
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding
-            $roundingCoef = pow(10, $this->scale);
+            $roundingCoef = 10 ** $this->scale;
 
             if (self::FRACTIONAL == $this->type) {
                 $roundingCoef *= 100;

@@ -74,6 +74,6 @@ final class BodyRenderer implements BodyRendererInterface
             return $this->converter->convert($html);
         }
 
-        return strip_tags(preg_replace('{<(head|style)\b.*?</\1>}i', '', $html));
+        return strip_tags(preg_replace('{<(head|style)\b.*?</\1>}is', '', $html));
     }
 }

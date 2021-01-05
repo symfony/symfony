@@ -20,7 +20,7 @@ namespace Symfony\Component\Uid;
  */
 class UuidV1 extends Uuid
 {
-    protected const TYPE = \UUID_TYPE_TIME;
+    protected const TYPE = 1;
 
     public function __construct(string $uuid = null)
     {

@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
  */
 class DebugCommandTest extends TestCase
 {
-    public function testOutputWithClassArgument(): void
+    public function testOutputWithClassArgument()
     {
         $validator = $this->createMock(MetadataFactoryInterface::class);
         $classMetadata = $this->createMock(ClassMetadataInterface::class);
@@ -90,7 +90,7 @@ TXT
         );
     }
 
-    public function testOutputWithPathArgument(): void
+    public function testOutputWithPathArgument()
     {
         $validator = $this->createMock(MetadataFactoryInterface::class);
         $classMetadata = $this->createMock(ClassMetadataInterface::class);
@@ -171,7 +171,7 @@ TXT
         );
     }
 
-    public function testOutputWithInvalidClassArgument(): void
+    public function testOutputWithInvalidClassArgument()
     {
         $validator = $this->createMock(MetadataFactoryInterface::class);
 

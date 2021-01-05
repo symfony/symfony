@@ -347,7 +347,7 @@ class ConnectionTest extends TestCase
         $factory->method('createQueue')->will($this->onConsecutiveCalls($amqpQueue0, $amqpQueue1));
 
         $amqpExchange->expects($this->once())->method('declareExchange');
-        $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
+        $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
         $amqpQueue0->expects($this->exactly(2))->method('bind')->withConsecutive(
             [self::DEFAULT_EXCHANGE_NAME, 'binding_key0'],

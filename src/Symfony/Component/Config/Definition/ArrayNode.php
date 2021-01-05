@@ -215,7 +215,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 if ($child->isRequired()) {
                     $message = sprintf('The child config "%s" under "%s" must be configured', $name, $this->getPath());
                     if ($child->getInfo()) {
-                        $message .= sprintf(": %s", $child->getInfo());
+                        $message .= sprintf(': %s', $child->getInfo());
                     } else {
                         $message .= '.';
                     }

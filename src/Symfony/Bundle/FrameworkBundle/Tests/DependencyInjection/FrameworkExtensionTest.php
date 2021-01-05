@@ -1393,7 +1393,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expected, $chain->getArguments());
     }
 
-    public function testRedisTagAwareAdapter(): void
+    public function testRedisTagAwareAdapter()
     {
         $container = $this->createContainerFromFile('cache', [], true);
 

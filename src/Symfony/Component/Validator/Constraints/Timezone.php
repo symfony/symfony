@@ -44,7 +44,7 @@ class Timezone extends Constraint
     /**
      * {@inheritdoc}
      *
-     * @param int|array|null $zone A combination of {@see \DateTimeZone} class constants or a set of options.
+     * @param int|array|null $zone A combination of {@see \DateTimeZone} class constants or a set of options
      */
     public function __construct(
         $zone = null,

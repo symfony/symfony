@@ -38,7 +38,7 @@ class Regex extends Constraint
     /**
      * {@inheritdoc}
      *
-     * @param string|array $pattern The pattern to evaluate or an array of options.
+     * @param string|array $pattern The pattern to evaluate or an array of options
      */
     public function __construct(
         $pattern,

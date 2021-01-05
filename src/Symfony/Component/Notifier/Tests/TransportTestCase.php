@@ -47,7 +47,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider toStringProvider
      */
-    public function testToString(string $expected, TransportInterface $transport): void
+    public function testToString(string $expected, TransportInterface $transport)
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -55,7 +55,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider supportedMessagesProvider
      */
-    public function testSupportedMessages(MessageInterface $message, ?TransportInterface $transport = null): void
+    public function testSupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         if (null === $transport) {
             $transport = $this->createTransport();
@@ -67,7 +67,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessages(MessageInterface $message, ?TransportInterface $transport = null): void
+    public function testUnsupportedMessages(MessageInterface $message, ?TransportInterface $transport = null)
     {
         if (null === $transport) {
             $transport = $this->createTransport();
@@ -79,7 +79,7 @@ abstract class TransportTestCase extends TestCase
     /**
      * @dataProvider unsupportedMessagesProvider
      */
-    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, ?TransportInterface $transport = null): void
+    public function testUnsupportedMessagesTrowUnsupportedMessageTypeExceptionWhenSend(MessageInterface $message, ?TransportInterface $transport = null)
     {
         if (null === $transport) {
             $transport = $this->createTransport();
@@ -90,7 +90,7 @@ abstract class TransportTestCase extends TestCase
         $transport->send($message);
     }
 
-    public function testCanSetCustomHost(): void
+    public function testCanSetCustomHost()
     {
         $transport = $this->createTransport();
 
@@ -99,7 +99,7 @@ abstract class TransportTestCase extends TestCase
         $this->assertStringContainsString(sprintf('://%s', $customHost), (string) $transport);
     }
 
-    public function testCanSetCustomPort(): void
+    public function testCanSetCustomPort()
     {
         $transport = $this->createTransport();
 
@@ -111,7 +111,7 @@ abstract class TransportTestCase extends TestCase
         $this->assertMatchesRegularExpression(sprintf('/^.*\/\/.*\:%s.*$/', $customPort), (string) $transport);
     }
 
-    public function testCanSetCustomHostAndPort(): void
+    public function testCanSetCustomHostAndPort()
     {
         $transport = $this->createTransport();
 

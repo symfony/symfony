@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2020-11-18T20:11:59Z
+
+@noniagriconomie Thank you for the review! I have a question concerning the scalar type hints and the return types: are you sure I should add them? The reason why I didn't:
+- They are not allowed in the PHP version (5.5.9) specified in `composer.json`
+
+More reasons (maybe not valid reasons):
+- The only other files that use PHP 7 typing are in the `Legacy/` directory (if I looked correctly)
+- Code style: they would be the only ones in the whole file
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-11-20T11:32:31Z
+
+@michaelKaefer you are right yep
+
+I was thinking v5 was 7+ and I checked the main repo composer.json, not the one of the bridge, sorry for this wrong hint :/
+
+---------------------------------------------------------------------------
+
+by stof at 2020-11-20T11:42:28Z
+
+> I was thinking v5 was 7+
+
+The PHPUnit bridge is special in its PHP support. To make our maintenance easier, the latest version of the phpunit bridge is kept compatible with PHP versions supported by all maintained branches (and so the min version corresponds to the one of the LTS)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2020-11-20T11:46:35Z
+
+@stof very clear :) thx for this explanation

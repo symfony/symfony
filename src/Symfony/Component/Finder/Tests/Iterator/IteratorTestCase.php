@@ -31,7 +31,8 @@ abstract class IteratorTestCase extends TestCase
 
     protected function assertOrderedIterator($expected, \Traversable $iterator)
     {
-        $values = array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator));
+        $values = array_map(function (\SplFileInfo $fileinfo) { return str_replace('/', \DIRECTORY_SEPARATOR, $fileinfo->getPathname()); }, iterator_to_array($iterator));
+        $expected = array_map(function ($path) { return str_replace('/', \DIRECTORY_SEPARATOR, $path); }, $expected);
 
         $this->assertEquals($expected, array_values($values));
     }

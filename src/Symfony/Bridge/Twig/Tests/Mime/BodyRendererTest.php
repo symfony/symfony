@@ -37,6 +37,23 @@ class BodyRendererTest extends TestCase
         $this->assertEquals(str_replace('=', '=3D', $html), $body->getParts()[1]->bodyToString());
     }
 
+    public function testRenderMultiLineHtmlOnly()
+    {
+        $html = <<<HTML
+<head>
+<style type="text/css">
+css
+</style>
+</head>
+<b>HTML</b>
+HTML;
+        $email = $this->prepareEmail(null, $html);
+        $body = $email->getBody();
+        $this->assertInstanceOf(AlternativePart::class, $body);
+        $this->assertEquals('HTML', str_replace(["\r", "\n"], '', $body->getParts()[0]->bodyToString()));
+        $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
+    }
+
     public function testRenderHtmlOnlyWithTextSet()
     {
         $email = $this->prepareEmail(null, '<b>HTML</b>');

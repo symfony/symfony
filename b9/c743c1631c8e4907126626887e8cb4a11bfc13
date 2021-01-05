@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-05T15:56:35Z
+
+missed in #39714 as this rule is not part of the CS fixer config but enforced by fabbot

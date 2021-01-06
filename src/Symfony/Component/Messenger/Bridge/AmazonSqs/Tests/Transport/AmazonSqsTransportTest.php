@@ -96,48 +96,48 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertInstanceOf(MessageCountAwareInterface::class, $transport);
     }
 
-    public function testItCanGetMessagesViaTheReceiver(): void
+    public function testItCanGetMessagesViaTheReceiver()
     {
         $envelopes = [new Envelope(new \stdClass()), new Envelope(new \stdClass())];
         $this->receiver->expects($this->once())->method('get')->willReturn($envelopes);
         $this->assertSame($envelopes, $this->transport->get());
     }
 
-    public function testItCanAcknowledgeAMessageViaTheReceiver(): void
+    public function testItCanAcknowledgeAMessageViaTheReceiver()
     {
         $envelope = new Envelope(new \stdClass());
         $this->receiver->expects($this->once())->method('ack')->with($envelope);
         $this->transport->ack($envelope);
     }
 
-    public function testItCanRejectAMessageViaTheReceiver(): void
+    public function testItCanRejectAMessageViaTheReceiver()
     {
         $envelope = new Envelope(new \stdClass());
         $this->receiver->expects($this->once())->method('reject')->with($envelope);
         $this->transport->reject($envelope);
     }
 
-    public function testItCanGetMessageCountViaTheReceiver(): void
+    public function testItCanGetMessageCountViaTheReceiver()
     {
         $messageCount = 15;
         $this->receiver->expects($this->once())->method('getMessageCount')->willReturn($messageCount);
         $this->assertSame($messageCount, $this->transport->getMessageCount());
     }
 
-    public function testItCanSendAMessageViaTheSender(): void
+    public function testItCanSendAMessageViaTheSender()
     {
         $envelope = new Envelope(new \stdClass());
         $this->sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
         $this->assertSame($envelope, $this->transport->send($envelope));
     }
 
-    public function testItCanSetUpTheConnection(): void
+    public function testItCanSetUpTheConnection()
     {
         $this->connection->expects($this->once())->method('setup');
         $this->transport->setup();
     }
 
-    public function testItConvertsHttpExceptionDuringSetupIntoTransportException(): void
+    public function testItConvertsHttpExceptionDuringSetupIntoTransportException()
     {
         $this->connection
             ->expects($this->once())
@@ -149,13 +149,13 @@ class AmazonSqsTransportTest extends TestCase
         $this->transport->setup();
     }
 
-    public function testItCanResetTheConnection(): void
+    public function testItCanResetTheConnection()
     {
         $this->connection->expects($this->once())->method('reset');
         $this->transport->reset();
     }
 
-    public function testItConvertsHttpExceptionDuringResetIntoTransportException(): void
+    public function testItConvertsHttpExceptionDuringResetIntoTransportException()
     {
         $this->connection
             ->expects($this->once())

@@ -5,6 +5,6 @@ $container->loadFromExtension('framework', [
         'log' => [
             \E_NOTICE => \Psr\Log\LogLevel::ERROR,
             \E_WARNING => \Psr\Log\LogLevel::ERROR,
-        ]
+        ],
     ],
 ]);

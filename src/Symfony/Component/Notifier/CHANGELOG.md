@@ -5,7 +5,6 @@ CHANGELOG
 -----
 
  * [BC BREAK] The `TransportInterface::send()` and `AbstractTransport::doSend()` methods changed to return a `?SentMessage` instance instead of `void`.
- * Added the Zulip notifier bridge
  * The `EmailRecipientInterface` and `RecipientInterface` were introduced.
  * Added `email` and `phone` properties to `Recipient`.
  * [BC BREAK] Changed the type-hint of the `$recipient` argument in the `as*Message()` method

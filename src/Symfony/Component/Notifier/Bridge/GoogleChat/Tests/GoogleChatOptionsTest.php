@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 
-class GoogleChatOptionsTest extends TestCase
+final class GoogleChatOptionsTest extends TestCase
 {
     public function testToArray()
     {

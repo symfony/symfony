@@ -43,6 +43,10 @@ final class SlackTransport extends AbstractTransport
 
     public function __toString(): string
     {
+        if (null === $this->chatChannel) {
+            return sprintf('slack://%s', $this->getEndpoint());
+        }
+
         return sprintf('slack://%s?channel=%s', $this->getEndpoint(), urlencode($this->chatChannel));
     }
 

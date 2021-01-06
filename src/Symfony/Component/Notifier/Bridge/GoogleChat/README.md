@@ -14,7 +14,7 @@ where:
  - `ACCESS_KEY` is your Google Chat access key
  - `ACCESS_TOKEN` is your Google Chat access token
  - `SPACE` is the Google Chat space
- - `THREAD_KEY` is the the Google Chat message thread to group messages into a single thread (optional)
+ - `THREAD_KEY` is the Google Chat message thread to group messages into a single thread (optional)
 
 Resources
 ---------

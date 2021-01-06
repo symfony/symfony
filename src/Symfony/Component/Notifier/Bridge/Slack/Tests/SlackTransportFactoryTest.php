@@ -11,31 +11,38 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class SlackTransportFactoryTest extends TestCase
+final class SlackTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
+    /**
+     * @return SlackTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test/?channel=testChannel'));
-
-        $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
+        return new SlackTransportFactory();
     }
 
-    public function testCreateWithDsnWithoutPath()
+    public function createProvider(): iterable
     {
-        $factory = $this->createFactory();
+        yield [
+            'slack://host.test',
+            'slack://testUser@host.test',
+        ];
 
-        $transport = $factory->create(Dsn::fromString('slack://testUser@host.test?channel=testChannel'));
+        yield 'with path' => [
+            'slack://host.test?channel=testChannel',
+            'slack://testUser@host.test/?channel=testChannel',
+        ];
 
-        $this->assertSame('slack://host.test?channel=testChannel', (string) $transport);
+        yield 'without path' => [
+            'slack://host.test?channel=testChannel',
+            'slack://testUser@host.test?channel=testChannel',
+        ];
     }
 
     public function testCreateWithDeprecatedDsn()
@@ -48,38 +55,19 @@ final class SlackTransportFactoryTest extends TestCase
         $factory->create(Dsn::fromString('slack://default/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX'));
     }
 
-    public function testCreateWithNoTokenThrowsInclompleteDsnException()
+    public function supportsProvider(): iterable
     {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString('slack://host.test?channel=testChannel'));
+        yield [true, 'slack://host?channel=testChannel'];
+        yield [false, 'somethingElse://host?channel=testChannel'];
     }
 
-    public function testSupportsReturnsTrueWithSupportedScheme()
+    public function incompleteDsnProvider(): iterable
     {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('slack://host?channel=testChannel')));
+        yield 'missing token' => ['slack://host.test?channel=testChannel'];
     }
 
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
+    public function unsupportedSchemeProvider(): iterable
     {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?channel=testChannel')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://host?channel=testChannel'));
-    }
-
-    private function createFactory(): SlackTransportFactory
-    {
-        return new SlackTransportFactory();
+        yield ['somethingElse://host?channel=testChannel'];
     }
 }

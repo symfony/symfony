@@ -50,7 +50,7 @@ final class TelegramTransportTest extends TransportTestCase
         yield [$this->createMock(MessageInterface::class)];
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrowsTransportException()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');

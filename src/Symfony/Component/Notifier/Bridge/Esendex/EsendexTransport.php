@@ -44,7 +44,7 @@ final class EsendexTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('esendex://%s', $this->getEndpoint());
+        return sprintf('esendex://%s?accountreference=%s&from=%s', $this->getEndpoint(), $this->accountReference, $this->from);
     }
 
     public function supports(MessageInterface $message): bool

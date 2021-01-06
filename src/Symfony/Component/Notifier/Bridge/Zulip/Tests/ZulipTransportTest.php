@@ -11,40 +11,37 @@
 
 namespace Symfony\Component\Notifier\Bridge\Zulip\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class ZulipTransportTest extends TestCase
+final class ZulipTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return ZulipTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('zulip://test.host?channel=testChannel', (string) $transport);
+        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
-    public function testSupportsChatMessage()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['zulip://test.host?channel=testChannel', $this->createTransport()];
     }
 
-    public function testSendNonChatMessageThrows()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(LogicException::class);
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new ChatMessage('Hello!')];
     }
 
-    private function createTransport(): ZulipTransport
+    public function unsupportedMessagesProvider(): iterable
     {
-        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 }

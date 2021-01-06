@@ -2,55 +2,41 @@
 
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class LinkedInTransportFactoryTest extends TestCase
+final class LinkedInTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('linkedin://accessToken:UserId@host.test'));
-
-        $this->assertSame('linkedin://host.test', (string) $transport);
-    }
-
-    public function testCreateWithOnlyAccessTokenOrUserIdThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString('linkedin://AccessTokenOrUserId@default'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('linkedin://host/path')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://accessToken:UserId@default'));
-    }
-
-    private function createFactory(): LinkedInTransportFactory
+    /**
+     * @return LinkedInTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new LinkedInTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'linkedin://host.test',
+            'linkedin://accessToken:UserId@host.test',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'linkedin://host'];
+        yield [false, 'somethingElse://host'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing account or user_id' => ['linkedin://AccessTokenOrUserId@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://accessToken:UserId@default'];
     }
 }

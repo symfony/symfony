@@ -39,7 +39,7 @@ final class NexmoTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://apiKey:apiSecret@default?from=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['nexmo://apiKey:apiSecret@default'];
     }

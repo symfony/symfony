@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Sendinblue\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,11 +29,11 @@ final class SendinblueTransportFactoryTest extends TestCase
         $this->assertSame('sendinblue://host.test?sender=0611223344', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionSenderThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionSenderThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('sendinblue://apiKey@host.test'));
     }

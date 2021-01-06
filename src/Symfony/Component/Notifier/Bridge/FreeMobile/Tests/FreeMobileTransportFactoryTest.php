@@ -39,7 +39,7 @@ final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://login:pass@default?phone=0611223344'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: phone' => ['freemobile://login:pass@default'];
     }

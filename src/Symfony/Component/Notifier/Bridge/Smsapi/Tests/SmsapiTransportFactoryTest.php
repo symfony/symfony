@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,11 +29,11 @@ final class SmsapiTransportFactoryTest extends TestCase
         $this->assertSame('smsapi://host.test?from=testFrom', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionFromThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('smsapi://token@host'));
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Transport;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -92,6 +93,15 @@ final class Dsn
     public function getOption(string $key, $default = null)
     {
         return $this->options[$key] ?? $default;
+    }
+
+    public function getRequiredOption(string $key)
+    {
+        if (!\array_key_exists($key, $this->options) || '' === trim($this->options[$key])) {
+            throw new MissingRequiredOptionException($key);
+        }
+
+        return $this->options[$key];
     }
 
     public function getPath(): ?string

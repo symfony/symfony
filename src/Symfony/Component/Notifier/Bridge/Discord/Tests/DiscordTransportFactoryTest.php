@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 
@@ -28,11 +29,11 @@ final class DiscordTransportFactoryTest extends TestCase
         $this->assertSame('discord://host.test?webhook_id=testWebhookId', (string) $transport);
     }
 
-    public function testCreateWithMissingOptionWebhookIdThrowsIncompleteDsnException()
+    public function testCreateWithMissingOptionWebhookIdThrowsMissingRequiredOptionException()
     {
         $factory = $this->createFactory();
 
-        $this->expectException(IncompleteDsnException::class);
+        $this->expectException(MissingRequiredOptionException::class);
 
         $factory->create(Dsn::fromString('discord://token@host'));
     }

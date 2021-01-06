@@ -52,7 +52,7 @@ class SesHttpTransport extends AbstractHttpTransport
         $date = gmdate('D, d M Y H:i:s e');
         $auth = sprintf('AWS3-HTTPS AWSAccessKeyId=%s,Algorithm=HmacSHA256,Signature=%s', $this->accessKey, $this->getSignature($date));
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), [
+        $request = [
             'headers' => [
                 'X-Amzn-Authorization' => $auth,
                 'Date' => $date,
@@ -61,7 +61,13 @@ class SesHttpTransport extends AbstractHttpTransport
                 'Action' => 'SendRawEmail',
                 'RawMessage.Data' => base64_encode($message->toString()),
             ],
-        ]);
+        ];
+        $index = 1;
+        foreach ($message->getEnvelope()->getRecipients() as $recipient) {
+            $request['body']['Destinations.member.'.$index++] = $recipient->getAddress();
+        }
+
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), $request);
 
         $result = new \SimpleXMLElement($response->getContent(false));
         if (200 !== $response->getStatusCode()) {

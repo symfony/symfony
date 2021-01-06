@@ -60,6 +60,12 @@ class SesHttpTransportTest extends TestCase
             $this->assertStringContainsString('AWS3-HTTPS AWSAccessKeyId=ACCESS_KEY,Algorithm=HmacSHA256,Signature=', $options['headers'][0] ?? $options['request_headers'][0]);
 
             parse_str($options['body'], $body);
+
+            $this->assertArrayHasKey('Destinations_member_1', $body);
+            $this->assertSame('saif.gmati@symfony.com', $body['Destinations_member_1']);
+            $this->assertArrayHasKey('Destinations_member_2', $body);
+            $this->assertSame('jeremy@derusse.com', $body['Destinations_member_2']);
+
             $content = base64_decode($body['RawMessage_Data']);
 
             $this->assertStringContainsString('Hello!', $content);
@@ -83,6 +89,7 @@ class SesHttpTransportTest extends TestCase
         $mail = new Email();
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->bcc(new Address('jeremy@derusse.com', 'Jérémy Derussé'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 

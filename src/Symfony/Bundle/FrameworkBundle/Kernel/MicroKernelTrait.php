@@ -29,7 +29,7 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @method void configureRoutes(RoutingConfigurator $routes)
- * @method void configureContainer(ContainerConfigurator $c)
+ * @method void configureContainer(ContainerConfigurator $container)
  */
 trait MicroKernelTrait
 {

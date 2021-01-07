@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * The component is not marked as `@experimental` anymore
-* [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
+ * [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
  * Added `DSN::getRequiredOption` method which throws a new `MissingRequiredOptionException`.
 
 5.2.0

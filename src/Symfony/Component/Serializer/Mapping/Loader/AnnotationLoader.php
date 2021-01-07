@@ -33,7 +33,7 @@ class AnnotationLoader implements LoaderInterface
     private const KNOWN_ANNOTATIONS = [
         DiscriminatorMap::class => true,
         Groups::class => true,
-        Ignore:: class => true,
+        Ignore::class => true,
         MaxDepth::class => true,
         SerializedName::class => true,
     ];

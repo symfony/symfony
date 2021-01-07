@@ -132,7 +132,7 @@ jobs:
                 uses: docker://bitnami/openldap
                 with:
                   entrypoint: /bin/bash
-                  args: -c "(ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
+                  args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
             -   name: Configure composer
                 run: |

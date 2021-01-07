@@ -11,65 +11,46 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class GoogleChatTransportFactoryTest extends TestCase
+final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY'));
-
-        $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY', (string) $transport);
-    }
-
-    public function testCreateWithThreadKeyInDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg'));
-
-        $this->assertSame('googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg', (string) $transport);
-    }
-
-    public function testCreateRequiresCredentials()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('googlechat://host/path')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host/path')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://host/path'));
-    }
-
-    private function createFactory(): GoogleChatTransportFactory
+    /**
+     * @return GoogleChatTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new GoogleChatTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'googlechat://chat.googleapis.com/AAAAA_YYYYY',
+            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY',
+        ];
+
+        yield [
+            'googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
+            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'googlechat://host/path'];
+        yield [false, 'somethingElse://host/path'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing credentials' => ['googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://host/path'];
     }
 }

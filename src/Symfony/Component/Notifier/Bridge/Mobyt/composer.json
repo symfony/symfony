@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "ext-json": "*",
         "symfony/http-client": "^4.3|^5.0",
-        "symfony/notifier": "~5.2.0"
+        "symfony/notifier": "~5.2.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Mobyt\\": "" },

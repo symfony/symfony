@@ -11,75 +11,43 @@
 
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class EsendexTransportFactoryTest extends TestCase
+final class EsendexTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('esendex://email:password@host.test?accountreference=testAccountreference&from=testFrom'));
-
-        $this->assertSame('esendex://host.test', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionAccountreferenceThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('esendex://email:password@host?from=FROM'));
-    }
-
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('esendex://email:password@host?accountreference=ACCOUNTREFERENCE'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('esendex://email:password@host?accountreference=ACCOUNTREFERENCE&from=FROM')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://email:password@host?accountreference=ACCOUNTREFERENCE&from=FROM')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://email:password@host?accountreference=REFERENCE&from=FROM'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://email:password@host?accountreference=REFERENCE'));
-    }
-
-    private function createFactory(): EsendexTransportFactory
+    /**
+     * @return EsendexTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new EsendexTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'esendex://host.test?accountreference=ACCOUNTREFERENCE&from=FROM',
+            'esendex://email:password@host.test?accountreference=ACCOUNTREFERENCE&from=FROM',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'esendex://email:password@host?accountreference=ACCOUNTREFERENCE&from=FROM'];
+        yield [false, 'somethingElse://email:password@default'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing option: from' => ['esendex://email:password@host?accountreference=ACCOUNTREFERENCE'];
+        yield 'missing option: accountreference' => ['esendex://email:password@host?from=FROM'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://email:password@default?accountreference=ACCOUNTREFERENCE&from=FROM'];
+        yield ['somethingElse://email:password@host?accountreference=ACCOUNTREFERENCE']; // missing "from" option
     }
 }

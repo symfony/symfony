@@ -11,66 +11,49 @@
 
 namespace Symfony\Component\Notifier\Bridge\Iqsms\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class IqsmsTransportFactoryTest extends TestCase
+final class IqsmsTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('iqsms://login:password@host.test?from=some'));
-        $this->assertSame('iqsms://host.test?from=some', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionFromThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-
-        $factory->create(Dsn::fromString('iqsms://login:password@default'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('iqsms://login:password@default?from=some')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://login:password@default?from=some')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        $factory->create(Dsn::fromString('somethingElse://login:password@default?from=some'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://login:password@default'));
-    }
-
-    private function createFactory(): IqsmsTransportFactory
+    /**
+     * @return IqsmsTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new IqsmsTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'iqsms://host.test?from=FROM',
+            'iqsms://login:password@host.test?from=FROM',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'iqsms://login:password@default?from=FROM'];
+        yield [false, 'somethingElse://login:password@default?from=FROM'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing login' => ['iqsms://:password@host.test?from=FROM'];
+        yield 'missing password' => ['iqsms://login:@host.test?from=FROM'];
+        yield 'missing credentials' => ['iqsms://@host.test?from=FROM'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
+        yield 'missing option: from' => ['iqsms://login:password@default'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://login:password@default?from=FROM'];
+        yield ['somethingElse://login:password@default']; // missing "from" option
     }
 }

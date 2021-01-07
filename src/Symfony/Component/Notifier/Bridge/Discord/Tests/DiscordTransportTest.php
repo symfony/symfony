@@ -11,41 +11,42 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransport;
 use Symfony\Component\Notifier\Exception\LengthException;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class DiscordTransportTest extends TestCase
+final class DiscordTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return DiscordTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('discord://host.test?webhook_id=testWebhookId', (string) $transport);
+        return (new DiscordTransport('testToken', 'testWebhookId', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSupportsChatMessage()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['discord://host.test?webhook_id=testWebhookId', $this->createTransport()];
     }
 
-    public function testSendNonChatMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
+        yield [new ChatMessage('Hello!')];
+    }
 
-        $this->expectException(UnsupportedMessageTypeException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 
     public function testSendChatMessageWithMoreThan2000CharsThrowsLogicException()
@@ -78,10 +79,5 @@ final class DiscordTransportTest extends TestCase
         $this->expectExceptionMessageMatches('/testDescription.+testErrorCode/');
 
         $transport->send(new ChatMessage('testMessage'));
-    }
-
-    private function createTransport(?HttpClientInterface $client = null): DiscordTransport
-    {
-        return (new DiscordTransport('testToken', 'testWebhookId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

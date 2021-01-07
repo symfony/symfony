@@ -93,19 +93,16 @@ class GenericRetryStrategyTest extends TestCase
     public function testJitter()
     {
         $strategy = new GenericRetryStrategy([], 1000, 1, 0, 1);
-        $belowHalf = 0;
-        $aboveHalf = 0;
-        for ($i = 0; $i < 20; ++$i) {
+        $min = 2000;
+        $max = 0;
+        for ($i = 0; $i < 50; ++$i) {
             $delay = $strategy->getDelay($this->getContext(0, 'GET', 'http://example.com/', 200), null, null);
-            if ($delay < 500) {
-                ++$belowHalf;
-            } elseif ($delay > 1500) {
-                ++$aboveHalf;
-            }
+            $min = min($min, $delay);
+            $max = max($max, $delay);
         }
-
-        $this->assertGreaterThanOrEqual(1, $belowHalf);
-        $this->assertGreaterThanOrEqual(1, $aboveHalf);
+        $this->assertGreaterThanOrEqual(1000, $max - $min);
+        $this->assertGreaterThanOrEqual(1000, $max);
+        $this->assertLessThanOrEqual(1000, $min);
     }
 
     private function getContext($retryCount, $method, $url, $statusCode): AsyncContext

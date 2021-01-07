@@ -439,6 +439,7 @@ EOTXT
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
+     * @requires PHP < 8.1
      */
     public function testSpecialVars56()
     {
@@ -453,11 +454,11 @@ array:3 [
     ]
   ]
   1 => array:1 [
-    "GLOBALS" => &2 array:1 [
-      "GLOBALS" => &2 array:1 [&2]
-    ]
+    "GLOBALS" => & array:1 [ …1]
   ]
-  2 => &2 array:1 [&2]
+  2 => &3 array:1 [
+    "GLOBALS" => &3 array:1 [&3]
+  ]
 ]
 EOTXT
             ,
@@ -468,6 +469,7 @@ EOTXT
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
+     * @requires PHP < 8.1
      */
     public function testGlobals()
     {
@@ -490,11 +492,11 @@ EOTXT
             <<<'EOTXT'
 array:2 [
   1 => array:1 [
-    "GLOBALS" => &1 array:1 [
-      "GLOBALS" => &1 array:1 [&1]
-    ]
+    "GLOBALS" => & array:1 [ …1]
   ]
-  2 => &1 array:1 [&1]
+  2 => &2 array:1 [
+    "GLOBALS" => &2 array:1 [&2]
+  ]
 ]
 
 EOTXT
@@ -584,6 +586,6 @@ EOTXT
             return $var;
         };
 
-        return [$var(), $GLOBALS, &$GLOBALS];
+        return eval('return [$var(), $GLOBALS, &$GLOBALS];');
     }
 }

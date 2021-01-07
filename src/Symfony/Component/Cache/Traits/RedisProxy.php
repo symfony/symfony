@@ -35,6 +35,11 @@ class RedisProxy
         return $this->redis->{$method}(...$args);
     }
 
+    public function isConnected()
+    {
+        return $this->redis->isConnected();
+    }
+
     public function hscan($strKey, &$iIterator, $strPattern = null, $iCount = null)
     {
         $this->ready ?: $this->ready = $this->initializer->__invoke($this->redis);

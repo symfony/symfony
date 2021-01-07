@@ -143,13 +143,19 @@ class VarCloner extends AbstractCloner
                         if (Stub::ARRAY_ASSOC === $stub->class) {
                             // Copies of $GLOBALS have very strange behavior,
                             // let's detect them with some black magic
-                            $a[$gid] = true;
-
-                            // Happens with copies of $GLOBALS
-                            if (isset($v[$gid])) {
+                            if (\PHP_VERSION_ID < 80100 && ($a[$gid] = true) && isset($v[$gid])) {
                                 unset($v[$gid]);
                                 $a = [];
                                 foreach ($v as $gk => &$gv) {
+                                    if ($v === $gv) {
+                                        unset($v);
+                                        $v = new Stub();
+                                        $v->value = [$v->cut = \count($gv), Stub::TYPE_ARRAY => 0];
+                                        $v->handle = -1;
+                                        $gv = &$hardRefs[spl_object_id($v)];
+                                        $gv = $v;
+                                    }
+
                                     $a[$gk] = &$gv;
                                 }
                                 unset($gv);

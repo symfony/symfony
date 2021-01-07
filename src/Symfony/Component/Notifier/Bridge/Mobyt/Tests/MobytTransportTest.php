@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
+namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
-use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransport;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
+use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -19,19 +20,23 @@ use Symfony\Component\Notifier\Tests\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class SmsapiTransportTest extends TransportTestCase
+/**
+ * @author Oskar Stark <oskarstark@googlemail.com>
+ */
+final class MobytTransportTest extends TransportTestCase
 {
     /**
-     * @return SmsapiTransport
+     * @return MobytTransport
      */
-    public function createTransport(?HttpClientInterface $client = null): TransportInterface
+    public function createTransport(?HttpClientInterface $client = null, string $messageType = MobytOptions::MESSAGE_TYPE_QUALITY_LOW): TransportInterface
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new MobytTransport('accountSid', 'authToken', 'from', $messageType, $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable
     {
-        yield ['smsapi://test.host?from=testFrom', $this->createTransport()];
+        yield ['mobyt://host.test?from=from&type_quality=LL', $this->createTransport()];
+        yield ['mobyt://host.test?from=from&type_quality=N', $this->createTransport(null, MobytOptions::MESSAGE_TYPE_QUALITY_HIGH)];
     }
 
     public function supportedMessagesProvider(): iterable

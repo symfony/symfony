@@ -12,7 +12,6 @@ CHANGELOG
 -----
 
  * [BC BREAK] The `TransportInterface::send()` and `AbstractTransport::doSend()` methods changed to return a `?SentMessage` instance instead of `void`.
- * Added the Zulip notifier bridge
  * The `EmailRecipientInterface` and `RecipientInterface` were introduced.
  * Added `email` and `phone` properties to `Recipient`.
  * [BC BREAK] Changed the type-hint of the `$recipient` argument in the `as*Message()` method
@@ -30,7 +29,6 @@ CHANGELOG
 5.1.0
 -----
 
- * Added the Mattermost notifier bridge
  * [BC BREAK] The `ChatMessage::fromNotification()` method's `$recipient` and `$transport`
    arguments were removed.
  * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`

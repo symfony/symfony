@@ -280,15 +280,26 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return;
         }
 
+        if ('mixed' === $type) {
+            return;
+        }
+
         if (is_a($class, $type, true)) {
             return;
         }
 
-        $checkFunction = sprintf('is_%s', $type);
-
-        if (!$reflectionType->isBuiltin() || !$checkFunction($value)) {
-            throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : \gettype($value), $parameter);
+        if ('false' === $type) {
+            if (false === $value) {
+                return;
+            }
+        } elseif ($reflectionType->isBuiltin()) {
+            $checkFunction = sprintf('is_%s', $type);
+            if ($checkFunction($value)) {
+                return;
+            }
         }
+
+        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : \gettype($value), $parameter);
     }
 
     private function getExpressionLanguage(): ExpressionLanguage

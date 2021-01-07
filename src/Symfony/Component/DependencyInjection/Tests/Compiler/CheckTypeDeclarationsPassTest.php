@@ -839,6 +839,22 @@ class CheckTypeDeclarationsPassTest extends TestCase
     /**
      * @requires PHP 8
      */
+    public function testUnionTypePassesWithFalse()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('union', UnionConstructor::class)
+            ->setFactory([UnionConstructor::class, 'create'])
+            ->setArguments([false]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @requires PHP 8
+     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -851,8 +867,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\UnionConstructor::__construct()" accepts "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo|int", "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo" passed.');
 
         (new CheckTypeDeclarationsPass(true))->process($container);
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -867,6 +881,57 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CheckTypeDeclarationsPass\\UnionConstructor::__construct()" accepts "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo|int", "array" passed.');
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionTypeWithFalseFailsWithReference()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+        $container->register('union', UnionConstructor::class)
+            ->setFactory([UnionConstructor::class, 'create'])
+            ->setArguments([new Reference('waldo')]);
+
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Waldo" passed.');
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testUnionTypeWithFalseFailsWithTrue()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+        $container->register('union', UnionConstructor::class)
+            ->setFactory([UnionConstructor::class, 'create'])
+            ->setArguments([true]);
+
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "boolean" passed.');
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testReferencePassesMixed()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('waldo', Waldo::class);
+        $container->register('union', UnionConstructor::class)
+            ->setFactory([UnionConstructor::class, 'make'])
+            ->setArguments([new Reference('waldo')]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

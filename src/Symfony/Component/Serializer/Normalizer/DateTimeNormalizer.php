@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.

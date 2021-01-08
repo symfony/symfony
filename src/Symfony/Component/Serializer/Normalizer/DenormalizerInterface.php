@@ -31,7 +31,7 @@ interface DenormalizerInterface
      *
      * When context option `collect_invariant_violations` is enabled, the
      * denormalizer must always return an instance of
-     * {@see \Symfony\Component\Serializer\DenormalizationResult}.
+     * {@see \Symfony\Component\Serializer\Result\DenormalizationResult}.
      *
      * @param mixed  $data    Data to restore
      * @param string $type    The expected class to instantiate

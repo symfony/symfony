@@ -14,10 +14,10 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
-use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 
 /**
  * Normalizes an {@see \SplFileInfo} object to a data URI.

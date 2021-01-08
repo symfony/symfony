@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Serializer;
+namespace Symfony\Component\Serializer\Result;
+
+use Symfony\Component\Serializer\InvariantViolation;
 
 final class DenormalizationResult
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
-use Symfony\Component\Serializer\DenormalizationResult;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 

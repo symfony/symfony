@@ -13,9 +13,9 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

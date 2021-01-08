@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;

@@ -3,10 +3,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\DenormalizationResult;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;

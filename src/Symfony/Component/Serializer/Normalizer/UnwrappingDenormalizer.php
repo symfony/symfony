@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\DenormalizationResult;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 

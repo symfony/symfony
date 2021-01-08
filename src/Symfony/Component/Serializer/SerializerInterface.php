@@ -32,7 +32,7 @@ interface SerializerInterface
      *
      * When context option `collect_invariant_violations` is enabled, the
      * serializer must always return an instance of
-     * {@see \Symfony\Component\Serializer\DenormalizationResult}.
+     * {@see \Symfony\Component\Serializer\Result\DenormalizationResult}.
      *
      * @param mixed $data
      *

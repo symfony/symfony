@@ -1,7 +1,7 @@
 {
     "name": "symfony/string",
     "type": "library",
-    "description": "Symfony String component",
+    "description": "Symfony String Component",
     "keywords": ["string", "utf8", "utf-8", "grapheme", "i18n", "unicode"],
     "homepage": "https://symfony.com",
     "license": "MIT",

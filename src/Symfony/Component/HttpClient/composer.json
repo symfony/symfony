@@ -1,7 +1,7 @@
 {
     "name": "symfony/http-client",
     "type": "library",
-    "description": "Symfony HttpClient component",
+    "description": "Symfony HttpClient Component",
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

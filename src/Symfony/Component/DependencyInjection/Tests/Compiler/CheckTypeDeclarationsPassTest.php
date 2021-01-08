@@ -916,7 +916,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->setArguments([true]);
 
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "boolean" passed.');
+        $this->expectExceptionMessage('Invalid definition for service "union": argument 1 of "Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor::create()" accepts "array|false", "bool" passed.');
 
         (new CheckTypeDeclarationsPass(true))->process($container);
     }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-07T17:10:06Z
+
+According to the failing test `gettype()` now returns `bool` instead of `boolean` as it was in 8.0.0 and before.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-07T22:21:23Z
+
+According to https://3v4l.org/Lf7H1 , `gettype()` always returns `boolean`. Looking at https://wiki.php.net/rfc/get_debug_type , it seems like the `bool` return value is coming from `get_debug_type()`. We're using `get_debug_type()` (or it's polyfill) since 5.1 (ref daf1c6605eb3571e2176c46281acba36b37cf536).
+
+In my understanding, this means that we should test for `boolean` in the 4.4 branch, and `bool` in 5.1+ branch. This also explains why the build passes on 4.4, but doesn't on 5.1.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-08T07:50:20Z
+
+Thanks for checking Wouter. That explains it perfectly.

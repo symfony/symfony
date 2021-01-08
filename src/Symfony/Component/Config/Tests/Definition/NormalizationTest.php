@@ -201,6 +201,32 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $data, $data);
     }
 
+    public function testFloatLikeValueAsMapKeyAttribute()
+    {
+        $tree = (new TreeBuilder('root'))
+            ->getRootNode()
+                ->useAttributeAsKey('number')
+                ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('foo')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $this->assertNormalized($tree, [
+            [
+                'number' => 3.0,
+                'foo' => 'bar',
+            ],
+        ], [
+            '3.0' => [
+                'foo' => 'bar',
+            ],
+        ]);
+    }
+
     public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
     {
         self::assertSame($normalized, $tree->normalize($denormalized));

@@ -1,7 +1,7 @@
 {
     "name": "symfony/uid",
     "type": "library",
-    "description": "Symfony Uid component",
+    "description": "Symfony Uid Component",
     "keywords": ["uid", "uuid"],
     "homepage": "https://symfony.com",
     "license": "MIT",

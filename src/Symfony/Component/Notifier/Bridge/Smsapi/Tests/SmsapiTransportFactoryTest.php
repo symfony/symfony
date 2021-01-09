@@ -11,75 +11,47 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-final class SmsapiTransportFactoryTest extends TestCase
+final class SmsapiTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
-    {
-        $factory = $this->createFactory();
-
-        $transport = $factory->create(Dsn::fromString('smsapi://token@host.test?from=testFrom'));
-
-        $this->assertSame('smsapi://host.test?from=testFrom', (string) $transport);
-    }
-
-    public function testCreateWithMissingOptionFromThrowsMissingRequiredOptionException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(MissingRequiredOptionException::class);
-
-        $factory->create(Dsn::fromString('smsapi://token@host'));
-    }
-
-    public function testCreateWithNoTokenThrowsIncompleteDsnException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(IncompleteDsnException::class);
-        $factory->create(Dsn::fromString('smsapi://host.test?from=testFrom'));
-    }
-
-    public function testSupportsReturnsTrueWithSupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('smsapi://host?from=testFrom')));
-    }
-
-    public function testSupportsReturnsFalseWithUnsupportedScheme()
-    {
-        $factory = $this->createFactory();
-
-        $this->assertFalse($factory->supports(Dsn::fromString('somethingElse://host?from=testFrom')));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeException()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-        $factory->create(Dsn::fromString('somethingElse://token@host?from=testFrom'));
-    }
-
-    public function testUnsupportedSchemeThrowsUnsupportedSchemeExceptionEvenIfRequiredOptionIsMissing()
-    {
-        $factory = $this->createFactory();
-
-        $this->expectException(UnsupportedSchemeException::class);
-
-        // unsupported scheme and missing "from" option
-        $factory->create(Dsn::fromString('somethingElse://token@host'));
-    }
-
-    private function createFactory(): SmsapiTransportFactory
+    /**
+     * @return SmsapiTransportFactory
+     */
+    public function createFactory(): TransportFactoryInterface
     {
         return new SmsapiTransportFactory();
+    }
+
+    public function createProvider(): iterable
+    {
+        yield [
+            'smsapi://host.test?from=testFrom',
+            'smsapi://token@host.test?from=testFrom',
+        ];
+    }
+
+    public function supportsProvider(): iterable
+    {
+        yield [true, 'smsapi://host?from=testFrom'];
+        yield [false, 'somethingElse://host?from=testFrom'];
+    }
+
+    public function incompleteDsnProvider(): iterable
+    {
+        yield 'missing token' => ['smsapi://host.test?from=testFrom'];
+    }
+
+    public function missingRequiredOptionProvider(): iterable
+    {
+        yield 'missing option: from' => ['smsapi://token@host'];
+    }
+
+    public function unsupportedSchemeProvider(): iterable
+    {
+        yield ['somethingElse://token@host?from=testFrom'];
+        yield ['somethingElse://token@host']; // missing "from" option
     }
 }

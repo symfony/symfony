@@ -11,43 +11,44 @@
 
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class EsendexTransportTest extends TestCase
+final class EsendexTransportTest extends TransportTestCase
 {
-    public function testToString()
+    /**
+     * @return EsendexTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('esendex://host.test?accountreference=testAccountReference&from=testFrom', (string) $transport);
+        return (new EsendexTransport('email', 'password', 'testAccountReference', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSupportsSmsMessage()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new SmsMessage('phone', 'testSmsMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['esendex://host.test?accountreference=testAccountReference&from=testFrom', $this->createTransport()];
     }
 
-    public function testSendNonSmsMessageThrowsLogicException()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(UnsupportedMessageTypeException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new SmsMessage('0611223344', 'Hello!')];
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [new ChatMessage('Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
+    }
+
+    public function testSendWithErrorResponseThrowsTransportException()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -66,7 +67,7 @@ final class EsendexTransportTest extends TestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithErrorResponseContainingDetailsThrows()
+    public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
@@ -86,10 +87,5 @@ final class EsendexTransportTest extends TestCase
         $this->expectExceptionMessage('Unable to send the SMS: error 500. Details from Esendex: accountreference_invalid: "Invalid Account Reference EX0000000".');
 
         $transport->send(new SmsMessage('phone', 'testMessage'));
-    }
-
-    private function createTransport(?HttpClientInterface $client = null): EsendexTransport
-    {
-        return (new EsendexTransport('testEmail', 'testPassword', 'testAccountReference', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

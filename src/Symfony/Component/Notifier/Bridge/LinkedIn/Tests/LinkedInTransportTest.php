@@ -2,49 +2,48 @@
 
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class LinkedInTransportTest extends TestCase
+final class LinkedInTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return LinkedInTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = $this->createTransport();
-
-        $this->assertSame('linkedin://host.test', (string) $transport);
+        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSupportsChatMessage()
+    public function toStringProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        yield ['linkedin://host.test', $this->createTransport()];
     }
 
-    public function testSendNonChatMessageThrows()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = $this->createTransport();
-
-        $this->expectException(UnsupportedMessageTypeException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
+        yield [new ChatMessage('Hello!')];
     }
 
-    public function testSendWithEmptyArrayResponseThrows()
+    public function unsupportedMessagesProvider(): iterable
     {
-        $this->expectException(TransportException::class);
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
+    }
 
+    public function testSendWithEmptyArrayResponseThrowsTransportException()
+    {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -59,10 +58,12 @@ final class LinkedInTransportTest extends TestCase
 
         $transport = $this->createTransport($client);
 
+        $this->expectException(TransportException::class);
+
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrowsTransportException()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('testErrorCode');
@@ -188,10 +189,5 @@ final class LinkedInTransportTest extends TestCase
         $transport = $this->createTransport($client);
 
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
-    }
-
-    private function createTransport(?HttpClientInterface $client = null): LinkedInTransport
-    {
-        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 }

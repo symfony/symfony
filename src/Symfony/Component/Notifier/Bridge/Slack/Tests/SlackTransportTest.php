@@ -11,31 +11,47 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
-use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
+use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class SlackTransportTest extends TestCase
+final class SlackTransportTest extends TransportTestCase
 {
-    public function testToStringContainsProperties()
+    /**
+     * @return SlackTransport
+     */
+    public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
-        $channel = 'test Channel'; // invalid channel name to test url encoding of the channel
+        return new SlackTransport('xoxb-TestToken', $channel, $client ?: $this->createMock(HttpClientInterface::class));
+    }
 
-        $transport = new SlackTransport('xoxb-TestToken', $channel, $this->createMock(HttpClientInterface::class));
-        $transport->setHost('host.test');
+    public function toStringProvider(): iterable
+    {
+        yield ['slack://slack.com', $this->createTransport()];
+        yield ['slack://slack.com?channel=test+Channel', $this->createTransport(null, 'test Channel')];
+    }
 
-        $this->assertSame('slack://host.test?channel=test+Channel', (string) $transport);
+    public function supportedMessagesProvider(): iterable
+    {
+        yield [new ChatMessage('Hello!')];
+    }
+
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [new SmsMessage('0611223344', 'Hello!')];
+        yield [$this->createMock(MessageInterface::class)];
     }
 
     public function testInstatiatingWithAnInvalidSlackTokenThrowsInvalidArgumentException()
@@ -46,24 +62,7 @@ final class SlackTransportTest extends TestCase
         new SlackTransport('token', 'testChannel', $this->createMock(HttpClientInterface::class));
     }
 
-    public function testSupportsChatMessage()
-    {
-        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $this->createMock(HttpClientInterface::class));
-
-        $this->assertTrue($transport->supports(new ChatMessage('testChatMessage')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
-    }
-
-    public function testSendNonChatMessageThrowsLogicException()
-    {
-        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $this->createMock(HttpClientInterface::class));
-
-        $this->expectException(UnsupportedMessageTypeException::class);
-
-        $transport->send($this->createMock(MessageInterface::class));
-    }
-
-    public function testSendWithEmptyArrayResponseThrows()
+    public function testSendWithEmptyArrayResponseThrowsTransportException()
     {
         $this->expectException(TransportException::class);
 
@@ -79,12 +78,12 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
+        $transport = $this->createTransport($client, 'testChannel');
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrowsTransportException()
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testErrorCode/');
@@ -102,14 +101,13 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
+        $transport = $this->createTransport($client, 'testChannel');
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithOptions()
     {
-        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 
@@ -131,14 +129,13 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = $this->createTransport($client, $channel);
 
         $transport->send(new ChatMessage('testMessage'));
     }
 
     public function testSendWithNotification()
     {
-        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 
@@ -168,7 +165,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = $this->createTransport($client, $channel);
 
         $transport->send($chatMessage);
     }
@@ -181,14 +178,13 @@ final class SlackTransportTest extends TestCase
             return $this->createMock(ResponseInterface::class);
         });
 
-        $transport = new SlackTransport('xoxb-TestToken', 'testChannel', $client);
+        $transport = $this->createTransport($client, 'testChannel');
 
         $transport->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
     public function testSendWith200ResponseButNotOk()
     {
-        $token = 'xoxb-TestToken';
         $channel = 'testChannel';
         $message = 'testMessage';
 
@@ -212,7 +208,7 @@ final class SlackTransportTest extends TestCase
             return $response;
         });
 
-        $transport = new SlackTransport($token, $channel, $client);
+        $transport = $this->createTransport($client, $channel);
 
         $transport->send(new ChatMessage('testMessage'));
     }

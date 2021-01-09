@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-07T14:56:49Z
+
+I did not merge your changes from #39736 into 5.x because I didn't know how to resolve merge conflicts.
+
+Could you please update this PR to include the relevant changes that should be borrowed from 5.2?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-07T16:20:52Z
+
+Sure 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-08T06:32:40Z
+
+Looks ok now, don't know why two bridges have:
+```
+Fatal error: Uncaught Error: Class 'Symfony\Component\Notifier\Tests\TransportFactoryTestCase' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Discord/Tests/DiscordTransportFactoryTest.php:18
+```
+
+```
+Fatal error: Uncaught Error: Class 'Symfony\Component\Notifier\Tests\TransportFactoryTestCase' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/Notifier/Bridge/Esendex/Tests/EsendexTransportFactoryTest.php:18
+```
+
+but not the other 🤔
+
+cc @derrabus @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-08T23:43:13Z
+
+Didn't we want to move those abstract test classes out of the Tests folder anyway on 5.x?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-09T07:22:48Z
+
+Let's do it a little bit later because IIRC some open PRs for new bridges use it like this, and I want to get them merged before, otherwise it's a never ending story for them to get in 😑
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-09T22:57:18Z
+
+Those failures look like composer hickups to me: Composer could not fetch from git so it fell back to fetching the ZIP. I've rebased the PR to verify my hypothesis.

@@ -1,7 +1,7 @@
 {
     "name": "symfony/var-dumper",
     "type": "library",
-    "description": "Symfony mechanism for exploring and dumping PHP variables",
+    "description": "Provides mechanisms for walking through any arbitrary PHP variable",
     "keywords": ["dump", "debug"],
     "homepage": "https://symfony.com",
     "license": "MIT",

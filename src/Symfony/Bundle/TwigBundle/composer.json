@@ -1,7 +1,7 @@
 {
     "name": "symfony/twig-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony TwigBundle",
+    "description": "Provides a tight integration of Twig into the Symfony full-stack framework",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

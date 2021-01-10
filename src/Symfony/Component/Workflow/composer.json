@@ -1,7 +1,7 @@
 {
     "name": "symfony/workflow",
     "type": "library",
-    "description": "Symfony Workflow Component",
+    "description": "Provides tools for managing a workflow or finite state machine",
     "keywords": ["workflow", "petrinet", "place", "transition", "statemachine", "state"],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -1,7 +1,7 @@
 {
     "name": "symfony/phpunit-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony PHPUnit Bridge",
+    "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

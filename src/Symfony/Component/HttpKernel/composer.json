@@ -1,7 +1,7 @@
 {
     "name": "symfony/http-kernel",
     "type": "library",
-    "description": "Symfony HttpKernel Component",
+    "description": "Provides a structured process for converting a Request into a Response",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

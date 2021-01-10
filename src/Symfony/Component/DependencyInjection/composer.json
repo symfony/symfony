@@ -1,7 +1,7 @@
 {
     "name": "symfony/dependency-injection",
     "type": "library",
-    "description": "Symfony DependencyInjection Component",
+    "description": "Allows you to standardize and centralize the way objects are constructed in your application",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

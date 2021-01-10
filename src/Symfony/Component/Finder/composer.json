@@ -1,7 +1,7 @@
 {
     "name": "symfony/finder",
     "type": "library",
-    "description": "Symfony Finder Component",
+    "description": "Finds files and directories via an intuitive fluent interface",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

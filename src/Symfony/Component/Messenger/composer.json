@@ -1,7 +1,7 @@
 {
     "name": "symfony/messenger",
     "type": "library",
-    "description": "Symfony Messenger Component",
+    "description": "Helps applications send and receive messages to/from other applications or via message queues",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

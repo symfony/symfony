@@ -1,7 +1,7 @@
 {
     "name": "symfony/mime",
     "type": "library",
-    "description": "A library to manipulate MIME messages",
+    "description": "Allows manipulating MIME messages",
     "keywords": ["mime", "mime-type"],
     "homepage": "https://symfony.com",
     "license": "MIT",

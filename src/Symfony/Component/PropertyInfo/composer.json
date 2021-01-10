@@ -1,7 +1,7 @@
 {
     "name": "symfony/property-info",
     "type": "library",
-    "description": "Symfony Property Info Component",
+    "description": "Extracts information about PHP class' properties using metadata of popular sources",
     "keywords": [
         "property",
         "type",

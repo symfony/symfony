@@ -1,7 +1,7 @@
 {
     "name": "symfony/options-resolver",
     "type": "library",
-    "description": "Symfony OptionsResolver Component",
+    "description": "Provides an improved replacement for the array_replace PHP function",
     "keywords": ["options", "config", "configuration"],
     "homepage": "https://symfony.com",
     "license": "MIT",

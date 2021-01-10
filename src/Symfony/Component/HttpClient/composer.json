@@ -1,7 +1,7 @@
 {
     "name": "symfony/http-client",
     "type": "library",
-    "description": "Symfony HttpClient component",
+    "description": "Provides powerful methods to fetch HTTP resources synchronously or asynchronously",
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

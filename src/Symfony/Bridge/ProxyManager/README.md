@@ -1,7 +1,8 @@
 ProxyManager Bridge
 ===================
 
-Provides integration for [ProxyManager][1] with various Symfony components.
+The ProxyManager bridge provides integration for [ProxyManager][1] with various
+Symfony components.
 
 Resources
 ---------

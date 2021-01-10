@@ -1,6 +1,9 @@
 FrameworkBundle
 ===============
 
+FrameworkBundle provides a tight integration between Symfony components and the
+Symfony full-stack framework.
+
 Resources
 ---------
 

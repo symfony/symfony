@@ -1,7 +1,7 @@
 {
     "name": "symfony/form",
     "type": "library",
-    "description": "Symfony Form Component",
+    "description": "Allows to easily create, process and reuse HTML forms",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

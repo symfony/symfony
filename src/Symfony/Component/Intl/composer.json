@@ -1,8 +1,8 @@
 {
     "name": "symfony/intl",
     "type": "library",
-    "description": "This package provides access to the CLDR localization data of the ICU library.",
-    "keywords": ["intl", "icu", "internationalization", "localization", "i18n", "l10n", "cldr"],
+    "description": "Provides a PHP replacement layer for the C intl extension that includes additional data from the ICU library",
+    "keywords": ["intl", "icu", "internationalization", "localization", "i18n", "l10n"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

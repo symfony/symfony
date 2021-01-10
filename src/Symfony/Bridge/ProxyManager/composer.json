@@ -1,7 +1,7 @@
 {
     "name": "symfony/proxy-manager-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony ProxyManager Bridge",
+    "description": "Provides integration for ProxyManager with various Symfony components",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

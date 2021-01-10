@@ -1,7 +1,7 @@
 {
     "name": "symfony/translation",
     "type": "library",
-    "description": "Symfony Translation Component",
+    "description": "Provides tools to internationalize your application",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

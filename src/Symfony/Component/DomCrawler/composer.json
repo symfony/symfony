@@ -1,7 +1,7 @@
 {
     "name": "symfony/dom-crawler",
     "type": "library",
-    "description": "Symfony DomCrawler Component",
+    "description": "Eases DOM navigation for HTML and XML documents",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

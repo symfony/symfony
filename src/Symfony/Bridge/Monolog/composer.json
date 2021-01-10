@@ -1,7 +1,7 @@
 {
     "name": "symfony/monolog-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony Monolog Bridge",
+    "description": "Provides integration for Monolog with various Symfony components",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

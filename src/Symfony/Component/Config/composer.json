@@ -1,7 +1,7 @@
 {
     "name": "symfony/config",
     "type": "library",
-    "description": "Symfony Config Component",
+    "description": "Helps you find, load, combine, autofill and validate configuration values of any kind",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

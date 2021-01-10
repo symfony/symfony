@@ -1,7 +1,7 @@
 {
     "name": "symfony/debug-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony DebugBundle",
+    "description": "Provides a tight integration of the Symfony Debug component into the Symfony full-stack framework",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -6,7 +6,8 @@ Inflector Component
 
 -----
 
-Inflector converts words between their singular and plural forms (English only).
+The Inflector component converts words between their singular and plural forms
+(English only).
 
 Resources
 ---------

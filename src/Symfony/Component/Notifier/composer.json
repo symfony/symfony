@@ -1,7 +1,7 @@
 {
     "name": "symfony/notifier",
     "type": "library",
-    "description": "A library to notify messages",
+    "description": "Sends notifications via one or more channels (email, SMS, ...)",
     "keywords": ["notifier", "notification"],
     "homepage": "https://symfony.com",
     "license": "MIT",

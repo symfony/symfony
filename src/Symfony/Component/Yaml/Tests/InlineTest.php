@@ -511,6 +511,10 @@ class InlineTest extends TestCase
             ['"0123\r"', "0123\r"],
             ['"0123\t"', "0123\t"],
             ['"0123\v"', "0123\v"],
+
+            // whitespaces
+            'ideographic space' => ["'　'", '　'],
+            'ideographic space surrounded by characters' => ["'a　b'", 'a　b'],
         ];
     }
 

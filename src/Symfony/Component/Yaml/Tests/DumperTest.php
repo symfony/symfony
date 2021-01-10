@@ -635,6 +635,21 @@ YAML;
     {
         $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
     }
+
+    public function testDumpIdeographicSpaces()
+    {
+        $expected = <<<YAML
+alone: '　'
+within_string: 'a　b'
+regular_space: 'a b'
+
+YAML;
+        $this->assertSame($expected, $this->dumper->dump([
+            'alone' => '　',
+            'within_string' => 'a　b',
+            'regular_space' => 'a b',
+        ], 2));
+    }
 }
 
 class A

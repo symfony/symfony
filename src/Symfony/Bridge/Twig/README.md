@@ -1,8 +1,8 @@
 Twig Bridge
 ===========
 
-Provides integration for [Twig](https://twig.symfony.com/) with various
-Symfony components.
+The Twig bridge provides integration for [Twig](https://twig.symfony.com/) with
+various Symfony components.
 
 Resources
 ---------

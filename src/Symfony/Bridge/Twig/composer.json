@@ -1,7 +1,7 @@
 {
     "name": "symfony/twig-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony Twig Bridge",
+    "description": "Provides integration for Twig with various Symfony components",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

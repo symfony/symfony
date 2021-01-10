@@ -1,7 +1,7 @@
 {
     "name": "symfony/cache",
     "type": "library",
-    "description": "Symfony Cache component with PSR-6, PSR-16, and tags",
+    "description": "Provides an extended PSR-6, PSR-16 (and tags) implementation",
     "keywords": ["caching", "psr6"],
     "homepage": "https://symfony.com",
     "license": "MIT",

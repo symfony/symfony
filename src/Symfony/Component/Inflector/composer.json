@@ -1,7 +1,7 @@
 {
     "name": "symfony/inflector",
     "type": "library",
-    "description": "Symfony Inflector Component",
+    "description": "Converts words between their singular and plural forms (English only)",
     "keywords": [
         "string",
         "inflection",

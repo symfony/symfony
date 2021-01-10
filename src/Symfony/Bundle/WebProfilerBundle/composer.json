@@ -1,7 +1,7 @@
 {
     "name": "symfony/web-profiler-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony WebProfilerBundle",
+    "description": "Provides a development tool that gives detailed information about the execution of any request",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

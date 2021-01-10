@@ -1,7 +1,7 @@
 {
     "name": "symfony/framework-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony FrameworkBundle",
+    "description": "Provides a tight integration between Symfony components and the Symfony full-stack framework",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -1,7 +1,7 @@
 {
     "name": "symfony/serializer",
     "type": "library",
-    "description": "Symfony Serializer Component",
+    "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

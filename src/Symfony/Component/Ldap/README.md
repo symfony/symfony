@@ -1,7 +1,8 @@
 Ldap Component
 ==============
 
-A Ldap client for PHP on top of PHP's ldap extension.
+The LDAP component provides a LDAP client for PHP on top of PHP's ldap
+extension.
 
 Disclaimer
 ----------

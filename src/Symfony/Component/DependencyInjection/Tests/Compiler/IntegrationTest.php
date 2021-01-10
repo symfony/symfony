@@ -16,6 +16,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -24,6 +25,10 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
+use Symfony\Contracts\Service\Attribute\TagInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -506,6 +511,45 @@ class IntegrationTest extends TestCase
         ];
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTagsViaAttribute()
+    {
+        if (!\interface_exists(TagInterface::class)) {
+            self::markTestSkipped('This test requires symfony/service-contracts 2.4 or newer.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('one', TaggedService1::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->register('two', TaggedService2::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->register('three', TaggedService3::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            'one' => [
+                ['foo' => 'bar', 'priority' => 0],
+                ['bar' => 'baz', 'priority' => 0],
+            ],
+            'two' => [
+                ['someAttribute' => 'prio 100', 'priority' => 100],
+            ],
+            'three' => [
+                ['someAttribute' => 'custom_tag_class'],
+            ],
+        ], $collector->collectedTags);
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
@@ -564,5 +608,15 @@ class IntegrationTestStubParent
 
     public function setSunshine($type)
     {
+    }
+}
+
+final class TagCollector implements CompilerPassInterface
+{
+    public $collectedTags;
+
+    public function process(ContainerBuilder $container): void
+    {
+        $this->collectedTags = $container->findTaggedServiceIds('app.custom_tag');
     }
 }

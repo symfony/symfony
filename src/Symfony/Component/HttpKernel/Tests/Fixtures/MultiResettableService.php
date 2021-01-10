@@ -2,6 +2,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fixtures;
 
+use Symfony\Component\HttpKernel\Attribute\Reset;
+
+#[Reset(method: 'resetFirst')]
+#[Reset(method: 'resetSecond')]
 class MultiResettableService
 {
     public static $resetFirstCounter = 0;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+* added `Service\Attribute\Tag` attribute for PHP 8
+
 2.3.0
 -----
 

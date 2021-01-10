@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+ * added the `Reset` service tag attribute for PHP 8.
 
 5.2.0
 -----

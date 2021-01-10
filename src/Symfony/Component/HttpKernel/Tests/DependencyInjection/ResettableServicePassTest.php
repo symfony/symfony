@@ -55,6 +55,48 @@ class ResettableServicePassTest extends TestCase
         );
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testCompilerPassWithAutoconfiguration()
+    {
+        $container = new ContainerBuilder();
+        $container->register('one', ResettableService::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->register('two', ClearableService::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->register('three', MultiResettableService::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $container->register('services_resetter', ServicesResetter::class)
+            ->setPublic(true)
+            ->setArguments([null, []]);
+        $container->addCompilerPass(new ResettableServicePass());
+
+        $container->compile();
+
+        $definition = $container->getDefinition('services_resetter');
+
+        $this->assertEquals(
+            [
+                new IteratorArgument([
+                    'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+                    'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+                    'three' => new Reference('three', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
+                ]),
+                [
+                    'one' => ['reset'],
+                    'two' => ['clear'],
+                    'three' => ['resetFirst', 'resetSecond'],
+                ],
+            ],
+            $definition->getArguments()
+        );
+    }
+
     public function testMissingMethod()
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);

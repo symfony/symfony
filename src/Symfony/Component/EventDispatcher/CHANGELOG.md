@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * Added the `EventListener` service tag attribute for PHP 8.
+
 5.1.0
 -----
 

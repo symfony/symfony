@@ -1,7 +1,7 @@
 {
     "name": "symfony/uid",
     "type": "library",
-    "description": "Symfony Uid component",
+    "description": "Provides an object-oriented API to generate and represent UIDs",
     "keywords": ["uid", "uuid"],
     "homepage": "https://symfony.com",
     "license": "MIT",

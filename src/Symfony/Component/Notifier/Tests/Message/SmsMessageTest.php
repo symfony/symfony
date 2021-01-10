@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Tests\Message;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
 /**
@@ -56,5 +57,31 @@ class SmsMessageTest extends TestCase
         $this->assertSame('+3312345678', $message->getPhone());
 
         $message->phone('');
+    }
+
+    public function testOptionsDefaultsToNull()
+    {
+        $message = new SmsMessage('+3715673920', 'subject');
+
+        $this->assertNull($message->getOptions());
+    }
+
+    public function testSetOptions()
+    {
+        $options = new class() implements MessageOptionsInterface {
+            public function toArray(): array
+            {
+                return [];
+            }
+
+            public function getRecipientId(): ?string
+            {
+                return 'id';
+            }
+        };
+
+        $message = new SmsMessage('+3715673920', 'subject', $options);
+
+        $this->assertInstanceOf(MessageOptionsInterface::class, $message->getOptions());
     }
 }

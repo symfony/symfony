@@ -1,7 +1,7 @@
 {
     "name": "symfony/rate-limiter",
     "type": "library",
-    "description": "Symfony Rate Limiter Component",
+    "description": "Provides a Token Bucket implementation to rate limit input and output in your application",
     "keywords": ["limiter", "rate-limiter"],
     "homepage": "https://symfony.com",
     "license": "MIT",

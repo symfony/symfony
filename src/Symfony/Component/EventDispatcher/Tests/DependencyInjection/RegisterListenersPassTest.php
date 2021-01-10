@@ -331,9 +331,6 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($container);
     }
 
-    /**
-     * @requires PHP 7.2
-     */
     public function testOmitEventNameAndMethodOnGenericListener()
     {
         $container = new ContainerBuilder();

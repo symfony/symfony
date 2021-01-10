@@ -399,9 +399,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 7.2
-     */
     public function testProcessSuccessWhenPassingDefinitionForObjectType()
     {
         $container = new ContainerBuilder();

@@ -1,7 +1,7 @@
 {
     "name": "symfony/string",
     "type": "library",
-    "description": "Symfony String component",
+    "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way",
     "keywords": ["string", "utf8", "utf-8", "grapheme", "i18n", "unicode"],
     "homepage": "https://symfony.com",
     "license": "MIT",

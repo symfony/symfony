@@ -1,7 +1,7 @@
 {
     "name": "symfony/doctrine-bridge",
     "type": "symfony-bridge",
-    "description": "Symfony Doctrine Bridge",
+    "description": "Provides integration for Doctrine with various Symfony components",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

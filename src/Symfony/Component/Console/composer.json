@@ -1,7 +1,7 @@
 {
     "name": "symfony/console",
     "type": "library",
-    "description": "Symfony Console Component",
+    "description": "Eases the creation of beautiful and testable command line interfaces",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

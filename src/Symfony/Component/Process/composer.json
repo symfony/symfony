@@ -1,7 +1,7 @@
 {
     "name": "symfony/process",
     "type": "library",
-    "description": "Symfony Process Component",
+    "description": "Executes commands in sub-processes",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

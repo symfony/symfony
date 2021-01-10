@@ -1,7 +1,7 @@
 {
     "name": "symfony/web-server-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony WebServerBundle",
+    "description": "Provides commands for running applications using the PHP built-in web server",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

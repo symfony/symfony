@@ -1,7 +1,8 @@
 PHPUnit Bridge
 ==============
 
-Provides utilities for PHPUnit, especially user deprecation notices management.
+The PHPUnit bridge provides utilities for [PHPUnit](https://phpunit.de/),
+especially user deprecation notices management.
 
 Resources
 ---------

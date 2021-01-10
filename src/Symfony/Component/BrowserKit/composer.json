@@ -1,7 +1,7 @@
 {
     "name": "symfony/browser-kit",
     "type": "library",
-    "description": "Symfony BrowserKit Component",
+    "description": "Simulates the behavior of a web browser, allowing you to make requests, click on links and submit forms programmatically",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

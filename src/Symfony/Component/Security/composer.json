@@ -1,7 +1,7 @@
 {
     "name": "symfony/security",
     "type": "library",
-    "description": "Symfony Security Component",
+    "description": "Provides a complete security system for your web application",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

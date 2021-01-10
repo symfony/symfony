@@ -1,7 +1,7 @@
 {
     "name": "symfony/event-dispatcher",
     "type": "library",
-    "description": "Symfony EventDispatcher Component",
+    "description": "Provides tools that allow your application components to communicate with each other by dispatching events and listening to them",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

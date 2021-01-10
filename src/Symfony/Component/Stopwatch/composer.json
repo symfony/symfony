@@ -1,7 +1,7 @@
 {
     "name": "symfony/stopwatch",
     "type": "library",
-    "description": "Symfony Stopwatch Component",
+    "description": "Provides a way to profile code",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

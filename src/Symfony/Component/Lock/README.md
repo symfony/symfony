@@ -1,6 +1,9 @@
 Lock Component
 ==============
 
+The Lock component creates and manages locks, a mechanism to provide exclusive
+access to a shared resource. 
+
 Resources
 ---------
 

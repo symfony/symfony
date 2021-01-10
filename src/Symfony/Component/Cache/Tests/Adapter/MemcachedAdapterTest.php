@@ -186,7 +186,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function provideDsnWithOptions(): iterable
     {
-        if (!class_exists('\Memcached')) {
+        if (!class_exists(\Memcached::class)) {
             self::markTestSkipped('Extension memcached required.');
         }
 

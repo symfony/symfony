@@ -121,7 +121,7 @@ class SimpleFormTest extends AbstractFormTest
         $preSetData = false;
         $preSubmit = false;
 
-        $mock = $this->getMockBuilder('\stdClass')
+        $mock = $this->getMockBuilder(\stdClass::class)
             ->setMethods(['preSetData', 'preSubmit'])
             ->getMock();
         $mock->expects($this->once())
@@ -153,7 +153,7 @@ class SimpleFormTest extends AbstractFormTest
     // https://github.com/symfony/symfony/pull/7789
     public function testFalseIsConvertedToNull()
     {
-        $mock = $this->getMockBuilder('\stdClass')
+        $mock = $this->getMockBuilder(\stdClass::class)
             ->setMethods(['preSubmit'])
             ->getMock();
         $mock->expects($this->once())
@@ -394,7 +394,7 @@ class SimpleFormTest extends AbstractFormTest
     public function testSetDataClonesObjectIfNotByReference()
     {
         $data = new \stdClass();
-        $form = $this->getBuilder('name', null, '\stdClass')->setByReference(false)->getForm();
+        $form = $this->getBuilder('name', null, \stdClass::class)->setByReference(false)->getForm();
         $form->setData($data);
 
         $this->assertNotSame($data, $form->getData());
@@ -404,7 +404,7 @@ class SimpleFormTest extends AbstractFormTest
     public function testSetDataDoesNotCloneObjectIfByReference()
     {
         $data = new \stdClass();
-        $form = $this->getBuilder('name', null, '\stdClass')->setByReference(true)->getForm();
+        $form = $this->getBuilder('name', null, \stdClass::class)->setByReference(true)->getForm();
         $form->setData($data);
 
         $this->assertSame($data, $form->getData());

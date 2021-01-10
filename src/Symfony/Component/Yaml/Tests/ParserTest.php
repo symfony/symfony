@@ -68,7 +68,7 @@ class ParserTest extends TestCase
 
                 $this->fail('YAML files must not contain tabs');
             } catch (\Exception $e) {
-                $this->assertInstanceOf('\Exception', $e, 'YAML files must not contain tabs');
+                $this->assertInstanceOf(\Exception::class, $e, 'YAML files must not contain tabs');
                 $this->assertEquals('A YAML file cannot contain tabs as indentation at line 2 (near "'.strpbrk($yaml, "\t").'").', $e->getMessage(), 'YAML files must not contain tabs');
             }
         }
@@ -1415,7 +1415,7 @@ EOT;
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
     {
-        $this->expectException('\Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectException(ParseException::class);
         $this->expectExceptionMessage(sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber));
 
         $this->parser->parse($yaml);

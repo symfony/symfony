@@ -34,7 +34,7 @@ class IntlBundleReaderTest extends TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro');
 
-        $this->assertInstanceOf('\ArrayAccess', $data);
+        $this->assertInstanceOf(\ArrayAccess::class, $data);
         $this->assertSame('Bar', $data['Foo']);
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
@@ -44,7 +44,7 @@ class IntlBundleReaderTest extends TestCase
         // "alias" = "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'alias');
 
-        $this->assertInstanceOf('\ArrayAccess', $data);
+        $this->assertInstanceOf(\ArrayAccess::class, $data);
         $this->assertSame('Bar', $data['Foo']);
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
@@ -54,7 +54,7 @@ class IntlBundleReaderTest extends TestCase
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
-        $this->assertInstanceOf('\ArrayAccess', $data);
+        $this->assertInstanceOf(\ArrayAccess::class, $data);
         $this->assertSame('Bam', $data['Baz']);
         $this->assertArrayNotHasKey('Foo', $data);
         $this->assertNull($data['Foo']);

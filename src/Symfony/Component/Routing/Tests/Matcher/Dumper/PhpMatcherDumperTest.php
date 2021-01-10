@@ -480,7 +480,7 @@ class PhpMatcherDumperTest extends TestCase
         $options = ['class' => $this->matcherClass];
 
         if ($redirectableStub) {
-            $options['base_class'] = '\Symfony\Component\Routing\Tests\Matcher\Dumper\RedirectableUrlMatcherStub';
+            $options['base_class'] = RedirectableUrlMatcherStub::class;
         }
 
         $dumper = new PhpMatcherDumper($collection);

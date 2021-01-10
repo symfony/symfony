@@ -1,7 +1,7 @@
 {
     "name": "symfony/validator",
     "type": "library",
-    "description": "Symfony Validator Component",
+    "description": "Provides tools to validate values",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -1,7 +1,7 @@
 {
     "name": "symfony/asset",
     "type": "library",
-    "description": "Symfony Asset Component",
+    "description": "Manages URL generation and versioning of web assets such as CSS stylesheets, JavaScript files and image files",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

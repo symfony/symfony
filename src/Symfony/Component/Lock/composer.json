@@ -1,7 +1,7 @@
 {
     "name": "symfony/lock",
     "type": "library",
-    "description": "Symfony Lock Component",
+    "description": "Creates and manages locks, a mechanism to provide exclusive access to a shared resource",
     "keywords": ["locking", "redlock", "mutex", "semaphore", "flock", "cas"],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -1,7 +1,7 @@
 {
     "name": "symfony/templating",
     "type": "library",
-    "description": "Symfony Templating Component",
+    "description": "Provides all the tools needed to build any kind of template system",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -1,7 +1,7 @@
 {
     "name": "symfony/mailer",
     "type": "library",
-    "description": "Symfony Mailer Component",
+    "description": "Helps sending emails",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

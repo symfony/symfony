@@ -1,7 +1,7 @@
 PropertyAccess Component
 ========================
 
-The PropertyAccess component provides function to read and write from/to an
+The PropertyAccess component provides functions to read and write from/to an
 object or array using a simple string notation.
 
 Resources

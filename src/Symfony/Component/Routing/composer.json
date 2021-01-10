@@ -1,7 +1,7 @@
 {
     "name": "symfony/routing",
     "type": "library",
-    "description": "Symfony Routing Component",
+    "description": "Maps an HTTP request to a set of configuration variables",
     "keywords": ["routing", "router", "URL", "URI"],
     "homepage": "https://symfony.com",
     "license": "MIT",

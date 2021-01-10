@@ -1,7 +1,7 @@
 {
     "name": "symfony/ldap",
     "type": "library",
-    "description": "An abstraction in front of PHP's LDAP functions, compatible with PHP 5.3.9 onwards.",
+    "description": "Provides a LDAP client for PHP on top of PHP's ldap extension",
     "keywords": ["ldap", "active directory"],
     "homepage": "https://symfony.com",
     "license": "MIT",

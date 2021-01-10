@@ -1,7 +1,7 @@
 {
     "name": "symfony/error-handler",
     "type": "library",
-    "description": "Symfony ErrorHandler Component",
+    "description": "Provides tools to manage errors and ease debugging PHP code",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

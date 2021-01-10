@@ -1,7 +1,7 @@
 {
     "name": "symfony/security-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony SecurityBundle",
+    "description": "Provides a tight integration of the Security component into the Symfony full-stack framework",
     "keywords": [],
     "homepage": "https://symfony.com",
     "license": "MIT",

@@ -29,7 +29,7 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertEquals('halloween', $response->getContent());
         $this->assertEquals('Have a great day!', $kernel->getContainer()->getParameter('halloween'));
-        $this->assertInstanceOf('stdClass', $kernel->getContainer()->get('halloween'));
+        $this->assertInstanceOf(\stdClass::class, $kernel->getContainer()->get('halloween'));
     }
 
     public function testAsEventSubscriber()

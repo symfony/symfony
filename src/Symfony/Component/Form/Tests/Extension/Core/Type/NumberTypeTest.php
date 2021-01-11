@@ -200,7 +200,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testGroupingNotAllowedWithHtml5Widget()
     {
-        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,

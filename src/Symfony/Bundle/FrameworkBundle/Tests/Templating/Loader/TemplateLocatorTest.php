@@ -82,7 +82,7 @@ class TemplateLocatorTest extends TestCase
 
     public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $locator = new TemplateLocator($this->getFileLocator());
         $locator->locate('template');
     }
@@ -90,7 +90,7 @@ class TemplateLocatorTest extends TestCase
     protected function getFileLocator()
     {
         return $this
-            ->getMockBuilder('Symfony\Component\Config\FileLocator')
+            ->getMockBuilder(\Symfony\Component\Config\FileLocator::class)
             ->setMethods(['locate'])
             ->setConstructorArgs(['/path/to/fallback'])
             ->getMock()

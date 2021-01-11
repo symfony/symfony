@@ -33,7 +33,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertMatchesRegularExpression('~^'.preg_quote($c->getPhpVersion(), '~').'~', \PHP_VERSION);
         $this->assertMatchesRegularExpression('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', \PHP_VERSION);
         $this->assertSame(\PHP_INT_SIZE * 8, $c->getPhpArchitecture());
-        $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
+        $this->assertSame(class_exists(\Locale::class, false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertSame(4 === Kernel::MINOR_VERSION, $c->isSymfonyLts());

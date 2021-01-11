@@ -182,7 +182,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidMethods()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foobar']]));
@@ -190,7 +190,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectValidCallbacks()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(['callback' => ['foo', 'bar']]));

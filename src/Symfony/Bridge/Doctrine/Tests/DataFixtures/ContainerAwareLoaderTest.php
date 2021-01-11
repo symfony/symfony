@@ -19,7 +19,7 @@ class ContainerAwareLoaderTest extends TestCase
 {
     public function testShouldSetContainerOnContainerAwareFixture()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
         $loader = new ContainerAwareLoader($container);
         $fixture = new ContainerAwareFixture();
 

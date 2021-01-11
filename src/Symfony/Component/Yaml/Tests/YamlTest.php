@@ -26,14 +26,14 @@ class YamlTest extends TestCase
 
     public function testZeroIndentationThrowsException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         Yaml::dump(['lorem' => 'ipsum', 'dolor' => 'sit'], 2, 0);
     }
 
     public function testNegativeIndentationThrowsException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         Yaml::dump(['lorem' => 'ipsum', 'dolor' => 'sit'], 2, -4);
     }

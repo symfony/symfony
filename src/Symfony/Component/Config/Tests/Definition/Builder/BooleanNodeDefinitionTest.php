@@ -18,7 +18,7 @@ class BooleanNodeDefinitionTest extends TestCase
 {
     public function testCannotBeEmptyThrowsAnException()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
         $def = new BooleanNodeDefinition('foo');
         $def->cannotBeEmpty();

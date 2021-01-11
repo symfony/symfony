@@ -32,8 +32,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
+        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller[0]);
+        $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
 
@@ -45,8 +45,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
+        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller);
+        $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
     /**
@@ -69,8 +69,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
+        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller[0]);
+        $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
 
@@ -200,12 +200,12 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     protected function createMockParser()
     {
-        return $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')->disableOriginalConstructor()->getMock();
+        return $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();
     }
 
     protected function createMockContainer()
     {
-        return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        return $this->getMockBuilder(ContainerInterface::class)->getMock();
     }
 }
 

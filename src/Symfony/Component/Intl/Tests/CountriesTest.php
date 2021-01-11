@@ -592,7 +592,7 @@ class CountriesTest extends ResourceBundleTestCase
 
     public function testGetNameWithInvalidCountryCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Countries::getName('foo');
     }
 

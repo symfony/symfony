@@ -29,7 +29,7 @@ class ChainEncoderTest extends TestCase
     protected function setUp(): void
     {
         $this->encoder1 = $this
-            ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')
+            ->getMockBuilder(EncoderInterface::class)
             ->getMock();
 
         $this->encoder1
@@ -42,7 +42,7 @@ class ChainEncoderTest extends TestCase
             ]);
 
         $this->encoder2 = $this
-            ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')
+            ->getMockBuilder(EncoderInterface::class)
             ->getMock();
 
         $this->encoder2
@@ -74,7 +74,7 @@ class ChainEncoderTest extends TestCase
 
     public function testEncodeUnsupportedFormat()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
         $this->chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 

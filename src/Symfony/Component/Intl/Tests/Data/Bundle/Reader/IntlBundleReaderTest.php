@@ -66,7 +66,7 @@ class IntlBundleReaderTest extends TestCase
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 
-        $this->assertInstanceOf('\ArrayAccess', $data);
+        $this->assertInstanceOf(\ArrayAccess::class, $data);
         $this->assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
         $this->assertArrayNotHasKey('Foo', $data);
         $this->assertNull($data['Foo']);
@@ -75,19 +75,19 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
+        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
 
     public function testReadFailsIfNonExistingFallbackLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
+        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Intl\Exception\RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'ro');
     }
 }

@@ -25,7 +25,7 @@ class TemplateNameParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
         $kernel
             ->expects($this->any())
             ->method('getBundle')
@@ -79,7 +79,7 @@ class TemplateNameParserTest extends TestCase
 
     public function testParseValidNameWithNotFoundBundle()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->parser->parse('BarBundle:Post:index.html.php');
     }
 }

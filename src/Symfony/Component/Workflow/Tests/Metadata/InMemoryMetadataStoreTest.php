@@ -77,7 +77,7 @@ class InMemoryMetadataStoreTest extends TestCase
 
     public function testGetMetadataWithUnknownType()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not find a MetadataBag for the subject of type "boolean".');
         $this->store->getMetadata('title', true);
     }

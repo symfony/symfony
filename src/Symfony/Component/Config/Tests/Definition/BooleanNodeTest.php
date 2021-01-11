@@ -51,7 +51,7 @@ class BooleanNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
         $node = new BooleanNode('test');
         $node->normalize($value);
     }

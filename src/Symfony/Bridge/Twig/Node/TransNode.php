@@ -20,7 +20,7 @@ use Twig\Node\Node;
 use Twig\Node\TextNode;
 
 // BC/FC with namespaced Twig
-class_exists('Twig\Node\Expression\ArrayExpression');
+class_exists(ArrayExpression::class);
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

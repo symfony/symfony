@@ -18,7 +18,7 @@ class InstantiatorTest extends TestCase
 {
     public function testNotFoundClass()
     {
-        $this->expectException('Symfony\Component\VarExporter\Exception\ClassNotFoundException');
+        $this->expectException(\Symfony\Component\VarExporter\Exception\ClassNotFoundException::class);
         $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         Instantiator::instantiate('SomeNotExistingClass');
     }
@@ -28,7 +28,7 @@ class InstantiatorTest extends TestCase
      */
     public function testFailingInstantiation(string $class)
     {
-        $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
+        $this->expectException(\Symfony\Component\VarExporter\Exception\NotInstantiableTypeException::class);
         $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         Instantiator::instantiate($class);
     }

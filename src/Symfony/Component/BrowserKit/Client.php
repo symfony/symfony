@@ -117,7 +117,7 @@ abstract class Client
      */
     public function insulate($insulated = true)
     {
-        if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
+        if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
             throw new \LogicException('Unable to isolate requests as the Symfony Process Component is not installed.');
         }
 
@@ -527,7 +527,7 @@ abstract class Client
      */
     protected function createCrawlerFromContent($uri, $content, $type)
     {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+        if (!class_exists(Crawler::class)) {
             return null;
         }
 

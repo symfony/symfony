@@ -153,7 +153,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_service')
         ;
 
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->process($container);
     }
 
@@ -177,7 +177,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_decorated', null, 0, 12)
         ;
 
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->process($container);
     }
 

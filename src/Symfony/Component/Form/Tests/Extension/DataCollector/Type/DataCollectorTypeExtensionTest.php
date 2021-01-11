@@ -29,7 +29,7 @@ class DataCollectorTypeExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dataCollector = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface')->getMock();
+        $this->dataCollector = $this->getMockBuilder(\Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface::class)->getMock();
         $this->extension = new DataCollectorTypeExtension($this->dataCollector);
     }
 
@@ -43,10 +43,10 @@ class DataCollectorTypeExtensionTest extends TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
+        $builder = $this->getMockBuilder(\Symfony\Component\Form\Test\FormBuilderInterface::class)->getMock();
         $builder->expects($this->atLeastOnce())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener'));
+            ->with($this->isInstanceOf(\Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener::class));
 
         $this->extension->buildForm($builder, []);
     }

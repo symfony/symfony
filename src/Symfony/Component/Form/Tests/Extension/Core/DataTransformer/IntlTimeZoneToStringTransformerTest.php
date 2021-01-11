@@ -43,13 +43,13 @@ class IntlTimeZoneToStringTransformerTest extends TestCase
 
     public function testInvalidTimezone()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer())->transform(1);
     }
 
     public function testUnknownTimezone()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
 }

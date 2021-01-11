@@ -45,7 +45,7 @@ class IntlTest extends TestCase
      */
     public function testGetCurrencyBundleCreatesTheCurrencyBundle()
     {
-        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface', Intl::getCurrencyBundle());
+        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface::class, Intl::getCurrencyBundle());
     }
 
     /**
@@ -53,7 +53,7 @@ class IntlTest extends TestCase
      */
     public function testGetLanguageBundleCreatesTheLanguageBundle()
     {
-        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface', Intl::getLanguageBundle());
+        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface::class, Intl::getLanguageBundle());
     }
 
     /**
@@ -61,7 +61,7 @@ class IntlTest extends TestCase
      */
     public function testGetLocaleBundleCreatesTheLocaleBundle()
     {
-        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface', Intl::getLocaleBundle());
+        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface::class, Intl::getLocaleBundle());
     }
 
     /**
@@ -69,7 +69,7 @@ class IntlTest extends TestCase
      */
     public function testGetRegionBundleCreatesTheRegionBundle()
     {
-        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\RegionBundleInterface', Intl::getRegionBundle());
+        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\RegionBundleInterface::class, Intl::getRegionBundle());
     }
 
     public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary()

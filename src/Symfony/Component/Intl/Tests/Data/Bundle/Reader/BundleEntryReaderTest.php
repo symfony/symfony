@@ -64,7 +64,7 @@ class BundleEntryReaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
+        $this->readerImpl = $this->getMockBuilder(\Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface::class)->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 
@@ -103,7 +103,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testReadNonExistingEntry()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
@@ -127,7 +127,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
@@ -154,7 +154,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
@@ -279,7 +279,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testFailIfEntryFoundNeitherInParentNorChild()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->readerImpl
             ->method('read')
             ->withConsecutive(

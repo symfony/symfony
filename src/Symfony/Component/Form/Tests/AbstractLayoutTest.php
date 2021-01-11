@@ -34,7 +34,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         \Locale::setDefault('en');
 
-        $this->csrfTokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        $this->csrfTokenManager = $this->getMockBuilder(\Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class)->getMock();
 
         parent::setUp();
     }

@@ -49,7 +49,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Url());
     }
 
@@ -367,7 +367,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      */
     public function testCheckDnsWithInvalidType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidOptionsException::class);
         DnsMock::withMockedHosts(['example.com' => [['type' => 'A']]]);
 
         $constraint = new Url([

@@ -106,7 +106,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvIntInvalid($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
         $processor = new EnvVarProcessor(new Container());
 
@@ -156,7 +156,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvFloatInvalid($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Non-numeric env var');
         $processor = new EnvVarProcessor(new Container());
 
@@ -205,7 +205,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvConstInvalid($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('undefined constant');
         $processor = new EnvVarProcessor(new Container());
 
@@ -283,7 +283,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvInvalidJson()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Syntax error');
         $processor = new EnvVarProcessor(new Container());
 
@@ -299,7 +299,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvJsonOther($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid JSON env var');
         $processor = new EnvVarProcessor(new Container());
 
@@ -323,7 +323,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvUnknown()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported env var prefix');
         $processor = new EnvVarProcessor(new Container());
 
@@ -336,7 +336,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvKeyInvalidKey()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid env "key:foo": a key specifier should be provided.');
         $processor = new EnvVarProcessor(new Container());
 
@@ -350,7 +350,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyNoArrayResult($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Resolved value of "foo" did not result in an array value.');
         $processor = new EnvVarProcessor(new Container());
 
@@ -376,7 +376,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException::class);
         $this->expectExceptionMessage('Key "index" not found in');
         $processor = new EnvVarProcessor(new Container());
 
@@ -465,7 +465,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testRequireMissingFile()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException::class);
         $this->expectExceptionMessage('missing-file');
         $processor = new EnvVarProcessor(new Container());
 

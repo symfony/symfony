@@ -110,7 +110,7 @@ class LocaleAwareListenerTest extends TestCase
 
     private function createHttpKernel()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        return $this->getMockBuilder(HttpKernelInterface::class)->getMock();
     }
 
     private function createRequest($locale)

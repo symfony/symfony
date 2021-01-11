@@ -38,7 +38,7 @@ class LoggingMiddlewareTest extends MiddlewareTestCase
 
     public function testWarningLogOnException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Thrown from next middleware.');
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);

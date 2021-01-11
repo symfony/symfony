@@ -57,7 +57,7 @@ class CacheMetadataFactoryTest extends TestCase
 
     public function testInvalidClassThrowsException()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         $decorated = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
         $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
 

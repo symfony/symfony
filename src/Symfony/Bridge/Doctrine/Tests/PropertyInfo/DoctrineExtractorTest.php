@@ -105,7 +105,7 @@ class DoctrineExtractorTest extends TestCase
 
     private function doTestGetPropertiesWithEmbedded(bool $legacy)
     {
-        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+        if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 
@@ -151,7 +151,7 @@ class DoctrineExtractorTest extends TestCase
 
     private function doTestExtractWithEmbedded(bool $legacy)
     {
-        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+        if (!class_exists(\Doctrine\ORM\Mapping\Embedded::class)) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
         }
 

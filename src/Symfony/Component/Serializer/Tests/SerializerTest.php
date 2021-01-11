@@ -54,11 +54,11 @@ class SerializerTest extends TestCase
     {
         $serializer = new Serializer();
 
-        $this->assertInstanceOf('Symfony\Component\Serializer\SerializerInterface', $serializer);
-        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $serializer);
-        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $serializer);
-        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\EncoderInterface', $serializer);
-        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\DecoderInterface', $serializer);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\SerializerInterface::class, $serializer);
+        $this->assertInstanceOf(NormalizerInterface::class, $serializer);
+        $this->assertInstanceOf(DenormalizerInterface::class, $serializer);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\Encoder\EncoderInterface::class, $serializer);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\Encoder\DecoderInterface::class, $serializer);
     }
 
     /**
@@ -81,8 +81,8 @@ class SerializerTest extends TestCase
 
     public function testNormalizeNoMatch()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
-        $serializer = new Serializer([$this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()]);
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $serializer = new Serializer([$this->getMockBuilder(CustomNormalizer::class)->getMock()]);
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -102,21 +102,21 @@ class SerializerTest extends TestCase
 
     public function testNormalizeOnDenormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $serializer = new Serializer([new TestDenormalizer()], []);
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
 
     public function testDenormalizeNoMatch()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
-        $serializer = new Serializer([$this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()]);
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $serializer = new Serializer([$this->getMockBuilder(CustomNormalizer::class)->getMock()]);
         $serializer->denormalize('foo', 'stdClass');
     }
 
     public function testDenormalizeOnNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $serializer = new Serializer([new TestNormalizer()], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $this->assertTrue($serializer->denormalize(json_encode($data), 'stdClass', 'json'));
@@ -133,14 +133,14 @@ class SerializerTest extends TestCase
 
     public function testNormalizeWithSupportOnData()
     {
-        $normalizer1 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\NormalizerInterface')->getMock();
+        $normalizer1 = $this->getMockBuilder(NormalizerInterface::class)->getMock();
         $normalizer1->method('supportsNormalization')
             ->willReturnCallback(function ($data, $format) {
                 return isset($data->test);
             });
         $normalizer1->method('normalize')->willReturn('test1');
 
-        $normalizer2 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\NormalizerInterface')->getMock();
+        $normalizer2 = $this->getMockBuilder(NormalizerInterface::class)->getMock();
         $normalizer2->method('supportsNormalization')
             ->willReturn(true);
         $normalizer2->method('normalize')->willReturn('test2');
@@ -156,14 +156,14 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeWithSupportOnData()
     {
-        $denormalizer1 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\DenormalizerInterface')->getMock();
+        $denormalizer1 = $this->getMockBuilder(DenormalizerInterface::class)->getMock();
         $denormalizer1->method('supportsDenormalization')
             ->willReturnCallback(function ($data, $type, $format) {
                 return isset($data['test1']);
             });
         $denormalizer1->method('denormalize')->willReturn('test1');
 
-        $denormalizer2 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\DenormalizerInterface')->getMock();
+        $denormalizer2 = $this->getMockBuilder(DenormalizerInterface::class)->getMock();
         $denormalizer2->method('supportsDenormalization')
             ->willReturn(true);
         $denormalizer2->method('denormalize')->willReturn('test2');
@@ -213,7 +213,7 @@ class SerializerTest extends TestCase
 
     public function testSerializeNoEncoder()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->serialize($data, 'json');
@@ -221,7 +221,7 @@ class SerializerTest extends TestCase
 
     public function testSerializeNoNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->serialize(Model::fromArray($data), 'json');
@@ -247,7 +247,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeNoNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\LogicException::class);
         $serializer = new Serializer([], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->deserialize(json_encode($data), Model::class, 'json');
@@ -255,7 +255,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeWrongNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->deserialize(json_encode($data), Model::class, 'json');
@@ -263,7 +263,7 @@ class SerializerTest extends TestCase
 
     public function testDeserializeNoEncoder()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $serializer = new Serializer([], []);
         $data = ['title' => 'foo', 'numbers' => [5, 3]];
         $serializer->deserialize(json_encode($data), Model::class, 'json');
@@ -471,14 +471,14 @@ class SerializerTest extends TestCase
 
     public function testExceptionWhenTypeIsNotKnownInDiscriminator()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
         $this->expectExceptionMessage('The type "second" has no mapped class for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"');
         $this->serializerWithClassDiscriminator()->deserialize('{"type":"second","one":1}', DummyMessageInterface::class, 'json');
     }
 
     public function testExceptionWhenTypeIsNotInTheBodyToDeserialiaze()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface"');
         $this->serializerWithClassDiscriminator()->deserialize('{"one":1}', DummyMessageInterface::class, 'json');
     }

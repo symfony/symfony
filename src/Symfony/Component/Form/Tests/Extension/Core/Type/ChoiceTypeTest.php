@@ -82,7 +82,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => new \stdClass(),
         ]);
@@ -90,7 +90,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_loader' => new \stdClass(),
         ]);
@@ -98,7 +98,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, null, []));
+        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
@@ -1802,7 +1802,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'choices' => [],
         ]));
     }

@@ -106,7 +106,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testAttemptAuthenticationNoJson()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('Invalid JSON');
         $this->createListener();
         $request = new Request();
@@ -118,7 +118,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testAttemptAuthenticationNoUsername()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "username" must be provided');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"usr": "dunglas", "password": "foo"}');
@@ -129,7 +129,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testAttemptAuthenticationNoPassword()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "password" must be provided');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "pass": "foo"}');
@@ -140,7 +140,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testAttemptAuthenticationUsernameNotAString()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "username" must be a string.');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": 1, "password": "foo"}');
@@ -151,7 +151,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     public function testAttemptAuthenticationPasswordNotAString()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "password" must be a string.');
         $this->createListener();
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": 1}');
@@ -221,7 +221,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->configurePreviousSession($request);
         $event = new RequestEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
-        $sessionStrategy = $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock();
+        $sessionStrategy = $this->getMockBuilder(\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface::class)->getMock();
         $sessionStrategy->expects($this->once())
             ->method('onAuthentication')
             ->with($request, $this->isInstanceOf(TokenInterface::class));
@@ -233,7 +233,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 
     private function configurePreviousSession(Request $request)
     {
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
         $session->expects($this->any())
             ->method('getName')
             ->willReturn('test_session_name');

@@ -25,7 +25,7 @@ class FragmentHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
+        $this->requestStack = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -38,14 +38,14 @@ class FragmentHandlerTest extends TestCase
 
     public function testRenderWhenRendererDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
     public function testRenderWithUnknownRenderer()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $handler = $this->getHandler($this->returnValue(new Response('foo')));
 
         $handler->render('/', 'bar');
@@ -53,7 +53,7 @@ class FragmentHandlerTest extends TestCase
 
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Error when rendering "http://localhost/" (Status code is 404).');
         $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
 
@@ -69,7 +69,7 @@ class FragmentHandlerTest extends TestCase
 
     protected function getHandler($returnValue, $arguments = [])
     {
-        $renderer = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface')->getMock();
+        $renderer = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface::class)->getMock();
         $renderer
             ->expects($this->any())
             ->method('getName')

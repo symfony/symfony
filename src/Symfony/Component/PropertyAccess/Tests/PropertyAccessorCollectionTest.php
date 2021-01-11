@@ -148,7 +148,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
         $this->expectExceptionMessageMatches('/Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./');
         $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
@@ -187,7 +187,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException');
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
         $this->expectExceptionMessageMatches('/Could not determine access type for property "axes" in class "Symfony\\\\Component\\\\PropertyAccess\\\\Tests\\\\PropertyAccessorCollectionTest_Car[^"]*": The property "axes" in class "Symfony\\\\Component\\\\PropertyAccess\\\\Tests\\\\PropertyAccessorCollectionTest_Car[^"]*" can be defined with the methods "addAxis\(\)", "removeAxis\(\)" but the new value must be an array or an instance of \\\\Traversable, "string" given./');
         $car = new PropertyAccessorCollectionTest_Car();
 

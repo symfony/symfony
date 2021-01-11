@@ -59,7 +59,7 @@ class ExpressionVoterTest extends TestCase
         foreach ($roles as $i => $role) {
             $roles[$i] = new Role($role);
         }
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
 
         if ($tokenExpectsGetRoles) {
             $token->expects($this->once())
@@ -85,7 +85,7 @@ class ExpressionVoterTest extends TestCase
 
     protected function createExpressionLanguage($expressionLanguageExpectsEvaluate = true)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\ExpressionLanguage')->getMock();
+        $mock = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\ExpressionLanguage::class)->getMock();
 
         if ($expressionLanguageExpectsEvaluate) {
             $mock->expects($this->once())
@@ -98,7 +98,7 @@ class ExpressionVoterTest extends TestCase
 
     protected function createTrustResolver()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface::class)->getMock();
     }
 
     protected function createAuthorizationChecker()
@@ -108,7 +108,7 @@ class ExpressionVoterTest extends TestCase
 
     protected function createExpression()
     {
-        return $this->getMockBuilder('Symfony\Component\ExpressionLanguage\Expression')
+        return $this->getMockBuilder(\Symfony\Component\ExpressionLanguage\Expression::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

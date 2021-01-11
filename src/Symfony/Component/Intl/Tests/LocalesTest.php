@@ -86,7 +86,7 @@ class LocalesTest extends ResourceBundleTestCase
 
     public function testGetNameWithInvalidLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         Locales::getName('foo');
     }
 

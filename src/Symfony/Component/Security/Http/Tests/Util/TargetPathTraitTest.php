@@ -12,7 +12,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
+        $session = $this->getMockBuilder(SessionInterface::class)
                     ->getMock();
 
         $session->expects($this->once())
@@ -26,7 +26,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
+        $session = $this->getMockBuilder(SessionInterface::class)
                     ->getMock();
 
         $session->expects($this->once())
@@ -45,7 +45,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
+        $session = $this->getMockBuilder(SessionInterface::class)
                     ->getMock();
 
         $session->expects($this->once())

@@ -95,14 +95,14 @@ class RegexTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => new \stdClass()]);
     }

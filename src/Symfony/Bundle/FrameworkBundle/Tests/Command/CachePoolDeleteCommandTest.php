@@ -89,7 +89,7 @@ class CachePoolDeleteCommandTest extends TestCase
     private function getKernel()
     {
         $container = $this
-            ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
+            ->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)
             ->getMock();
 
         $kernel = $this

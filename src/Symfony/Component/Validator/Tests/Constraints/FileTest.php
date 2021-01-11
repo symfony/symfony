@@ -55,7 +55,7 @@ class FileTest extends TestCase
      */
     public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $file = new File(['maxSize' => 1000]);
         $file->maxSize = $maxSize;
     }
@@ -80,7 +80,7 @@ class FileTest extends TestCase
      */
     public function testInvalidMaxSize($maxSize)
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         new File(['maxSize' => $maxSize]);
     }
 

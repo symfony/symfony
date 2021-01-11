@@ -49,13 +49,13 @@ class TimedPhpEngineTest extends TestCase
 
     private function getContainer(): Container
     {
-        return $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')->getMock();
+        return $this->getMockBuilder(Container::class)->getMock();
     }
 
     private function getTemplateNameParser(): TemplateNameParserInterface
     {
-        $templateReference = $this->getMockBuilder('Symfony\Component\Templating\TemplateReferenceInterface')->getMock();
-        $templateNameParser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
+        $templateReference = $this->getMockBuilder(\Symfony\Component\Templating\TemplateReferenceInterface::class)->getMock();
+        $templateNameParser = $this->getMockBuilder(TemplateNameParserInterface::class)->getMock();
         $templateNameParser->expects($this->any())
             ->method('parse')
             ->willReturn($templateReference);
@@ -65,14 +65,14 @@ class TimedPhpEngineTest extends TestCase
 
     private function getGlobalVariables(): GlobalVariables
     {
-        return $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables')
+        return $this->getMockBuilder(GlobalVariables::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     private function getStorage(): StringStorage
     {
-        return $this->getMockBuilder('Symfony\Component\Templating\Storage\StringStorage')
+        return $this->getMockBuilder(StringStorage::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
     }
@@ -82,7 +82,7 @@ class TimedPhpEngineTest extends TestCase
      */
     private function getLoader($storage): Loader
     {
-        $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
+        $loader = $this->getMockForAbstractClass(Loader::class);
         $loader->expects($this->once())
             ->method('load')
             ->willReturn($storage);
@@ -92,13 +92,13 @@ class TimedPhpEngineTest extends TestCase
 
     private function getStopwatchEvent(): StopwatchEvent
     {
-        return $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
+        return $this->getMockBuilder(StopwatchEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     private function getStopwatch(): Stopwatch
     {
-        return $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
+        return $this->getMockBuilder(Stopwatch::class)->getMock();
     }
 }

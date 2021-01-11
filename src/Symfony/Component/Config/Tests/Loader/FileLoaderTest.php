@@ -20,9 +20,9 @@ class FileLoaderTest extends TestCase
 {
     public function testImportWithFileLocatorDelegation()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
 
-        $locatorMockForAdditionalLoader = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMockForAdditionalLoader = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
                 ['path/to/file1'],                    // Default
                 ['path/to/file1', 'path/to/file2'],   // First is imported
@@ -55,7 +55,7 @@ class FileLoaderTest extends TestCase
             $fileLoader->import('my_resource');
             $this->fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException', $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            $this->assertInstanceOf(\Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
 
         // Check exception throws if all files are already loading
@@ -64,13 +64,13 @@ class FileLoaderTest extends TestCase
             $fileLoader->import('my_resource');
             $this->fail('->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException', $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
+            $this->assertInstanceOf(\Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException::class, $e, '->import() throws a FileLoaderImportCircularReferenceException if the resource is already loading');
         }
     }
 
     public function testImportWithGlobLikeResource()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
@@ -79,7 +79,7 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithGlobLikeResourceWhichContainsSlashes()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 
@@ -88,7 +88,7 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $loader = new TestFileLoader($locatorMock);
 
         $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
@@ -96,7 +96,7 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $loader = new TestFileLoader($locatorMock);
 
         $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
@@ -104,7 +104,7 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithNoGlobMatch()
     {
-        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locatorMock = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
         $loader = new TestFileLoader($locatorMock);
 

@@ -89,7 +89,7 @@ class AbstractBrowserTest extends TestCase
         $client->request('GET', 'http://example.com/');
 
         $this->assertSame('foo', $client->getResponse()->getContent(), '->getCrawler() returns the Response of the last request');
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
+        $this->assertInstanceOf(Response::class, $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
     /**
@@ -300,7 +300,7 @@ class AbstractBrowserTest extends TestCase
             $client->clickLink('foo');
             $this->fail('->clickLink() throws a \InvalidArgumentException if the link could not be found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->clickLink() throws a \InvalidArgumentException if the link could not be found');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->clickLink() throws a \InvalidArgumentException if the link could not be found');
         }
     }
 
@@ -359,7 +359,7 @@ class AbstractBrowserTest extends TestCase
             ], 'POST');
             $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
         }
     }
 
@@ -410,7 +410,7 @@ class AbstractBrowserTest extends TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request was not redirected');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request was not redirected');
+            $this->assertInstanceOf(\LogicException::class, $e, '->followRedirect() throws a \LogicException if the request was not redirected');
         }
 
         $client->setNextResponse(new Response('', 302, ['Location' => 'http://www.example.com/redirected']));
@@ -440,7 +440,7 @@ class AbstractBrowserTest extends TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
+            $this->assertInstanceOf(\LogicException::class, $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         }
     }
 
@@ -470,7 +470,7 @@ class AbstractBrowserTest extends TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
+            $this->assertInstanceOf(\LogicException::class, $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         }
 
         $client->setNextResponse(new Response('', 302, ['Location' => 'http://www.example.com/redirected']));
@@ -753,7 +753,7 @@ class AbstractBrowserTest extends TestCase
             $client->request('GET', 'http://www.example.com/foo/foobar');
             $this->fail('->request() throws a \RuntimeException if the script has an error');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('RuntimeException', $e, '->request() throws a \RuntimeException if the script has an error');
+            $this->assertInstanceOf(\RuntimeException::class, $e, '->request() throws a \RuntimeException if the script has an error');
         }
     }
 
@@ -841,7 +841,7 @@ class AbstractBrowserTest extends TestCase
             'NEW_SERVER_KEY' => 'new-server-key-value',
         ]);
 
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
+        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Request::class, $client->getInternalRequest());
     }
 
     /**

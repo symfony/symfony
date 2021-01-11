@@ -99,7 +99,7 @@ class HeaderUtilsTest extends TestCase
 
     public function testMakeDispositionInvalidDisposition()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
@@ -128,7 +128,7 @@ class HeaderUtilsTest extends TestCase
      */
     public function testMakeDispositionFail($disposition, $filename)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition($disposition, $filename);
     }
 

@@ -101,7 +101,7 @@ class IdentificationHeaderTest extends TestCase
 
     public function testInvalidIdLeftThrowsException()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a b c@d');
     }
@@ -137,14 +137,14 @@ class IdentificationHeaderTest extends TestCase
 
     public function testInvalidIdRightThrowsException()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a@b c d');
     }
 
     public function testMissingAtSignThrowsException()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
         /* -- RFC 2822, 3.6.4.
          msg-id          =       [CFWS] "<" id-left "@" id-right ">" [CFWS]

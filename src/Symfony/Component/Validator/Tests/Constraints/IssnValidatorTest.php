@@ -108,7 +108,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $constraint = new Issn();
         $this->validator->validate(new \stdClass(), $constraint);
     }

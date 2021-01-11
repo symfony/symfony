@@ -62,7 +62,7 @@ class HttpFoundationExtensionTest extends TestCase
      */
     public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
     {
-        if (!class_exists('Symfony\Component\Routing\RequestContext')) {
+        if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
@@ -77,7 +77,7 @@ class HttpFoundationExtensionTest extends TestCase
      */
     public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path)
     {
-        if (!class_exists('Symfony\Component\Routing\RequestContext')) {
+        if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
         }
 
@@ -120,7 +120,7 @@ class HttpFoundationExtensionTest extends TestCase
      */
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {
-        if (!method_exists('Symfony\Component\HttpFoundation\Request', 'getRelativeUriForPath')) {
+        if (!method_exists(Request::class, 'getRelativeUriForPath')) {
             $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');
         }
 

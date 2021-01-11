@@ -34,7 +34,7 @@ class MainConfigurationTest extends TestCase
 
     public function testNoConfigForProvider()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [],
@@ -48,7 +48,7 @@ class MainConfigurationTest extends TestCase
 
     public function testManyConfigForProvider()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [

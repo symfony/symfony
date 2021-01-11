@@ -23,7 +23,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists('RedisCluster')) {
+        if (!class_exists(\RedisCluster::class)) {
             self::markTestSkipped('The RedisCluster class is required.');
         }
         if (!$hosts = getenv('REDIS_CLUSTER_HOSTS')) {
@@ -46,7 +46,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
      */
     public function testFailedCreateConnection(string $dsn)
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Redis connection ');
         RedisAdapter::createConnection($dsn);
     }

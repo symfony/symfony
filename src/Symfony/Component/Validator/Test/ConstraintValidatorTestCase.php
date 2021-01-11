@@ -107,7 +107,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     {
         $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $translator->expects($this->any())->method('trans')->willReturnArgument(0);
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+        $validator = $this->getMockBuilder(\Symfony\Component\Validator\Validator\ValidatorInterface::class)->getMock();
 
         $context = new ExecutionContext($validator, $this->root, $translator);
         $context->setGroup($this->group);

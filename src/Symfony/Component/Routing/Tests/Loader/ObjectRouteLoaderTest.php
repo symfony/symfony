@@ -73,7 +73,7 @@ class ObjectRouteLoaderTest extends TestCase
      */
     public function testExceptionWithoutSyntax(string $resourceString)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $loader = new TestObjectRouteLoader();
         $loader->load($resourceString);
     }
@@ -100,7 +100,7 @@ class ObjectRouteLoaderTest extends TestCase
 
     public function testExceptionOnBadMethod()
     {
-        $this->expectException('BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $loader = new TestObjectRouteLoader();
         $loader->loaderMap = ['my_service' => new \stdClass()];
         $loader->load('my_service::method');
@@ -108,8 +108,8 @@ class ObjectRouteLoaderTest extends TestCase
 
     public function testExceptionOnMethodNotReturningCollection()
     {
-        $this->expectException('LogicException');
-        $service = $this->getMockBuilder('stdClass')
+        $this->expectException(\LogicException::class);
+        $service = $this->getMockBuilder(\stdClass::class)
             ->setMethods(['loadRoutes'])
             ->getMock();
         $service->expects($this->once())

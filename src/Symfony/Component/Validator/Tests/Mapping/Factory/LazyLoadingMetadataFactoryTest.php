@@ -131,8 +131,8 @@ class LazyLoadingMetadataFactoryTest extends TestCase
      */
     public function testReadMetadataFromLegacyCache()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
-        $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
+        $loader = $this->getMockBuilder(LoaderInterface::class)->getMock();
+        $cache = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Cache\CacheInterface::class)->getMock();
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
 
         $metadata = new ClassMetadata(self::PARENT_CLASS);
@@ -165,9 +165,9 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
     public function testNonClassNameStringValues()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\NoSuchMetadataException');
+        $this->expectException(\Symfony\Component\Validator\Exception\NoSuchMetadataException::class);
         $testedValue = 'error@example.com';
-        $loader = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(LoaderInterface::class)->getMock();
         $cache = $this->createMock(CacheItemPoolInterface::class);
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
         $cache

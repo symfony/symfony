@@ -21,8 +21,8 @@ class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
-        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
+        $cacheMock = $this->getMockBuilder(\Psr\Cache\CacheItemPoolInterface::class)->getMock();
+        $cacheItemMock = $this->getMockBuilder(\Psr\Cache\CacheItemInterface::class)->getMock();
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
@@ -107,7 +107,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function testParseThrowsInsteadOfNotice()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
         $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
@@ -115,7 +115,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function shortCircuitProviderEvaluate()
     {
-        $object = $this->getMockBuilder('stdClass')->setMethods(['foo'])->getMock();
+        $object = $this->getMockBuilder(\stdClass::class)->setMethods(['foo'])->getMock();
         $object->expects($this->never())->method('foo');
 
         return [
@@ -155,8 +155,8 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
-        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
+        $cacheMock = $this->getMockBuilder(\Psr\Cache\CacheItemPoolInterface::class)->getMock();
+        $cacheItemMock = $this->getMockBuilder(\Psr\Cache\CacheItemInterface::class)->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpression = null;
 
@@ -211,7 +211,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterParse($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', []);
         $registerCallback($el);
@@ -222,7 +222,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterEval($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
         $registerCallback($el);
@@ -230,7 +230,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCallBadCallable()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('/Unable to call method "\w+" of object "\w+"./');
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', ['foo' => new \stdClass()]);
@@ -241,7 +241,7 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testRegisterAfterCompile($registerCallback)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
         $registerCallback($el);

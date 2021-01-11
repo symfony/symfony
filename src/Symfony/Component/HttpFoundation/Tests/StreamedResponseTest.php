@@ -83,14 +83,14 @@ class StreamedResponseTest extends TestCase
 
     public function testSendContentWithNonCallable()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $response = new StreamedResponse(null);
         $response->sendContent();
     }
 
     public function testSetContent()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $response = new StreamedResponse(function () { echo 'foo'; });
         $response->setContent('foo');
     }
@@ -105,19 +105,19 @@ class StreamedResponseTest extends TestCase
     {
         $response = StreamedResponse::create(function () {}, 204);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertEquals(204, $response->getStatusCode());
     }
 
     public function testReturnThis()
     {
         $response = new StreamedResponse(function () {});
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendContent());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendContent());
+        $this->assertInstanceOf(StreamedResponse::class, $response->sendContent());
+        $this->assertInstanceOf(StreamedResponse::class, $response->sendContent());
 
         $response = new StreamedResponse(function () {});
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendHeaders());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response->sendHeaders());
+        $this->assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
+        $this->assertInstanceOf(StreamedResponse::class, $response->sendHeaders());
     }
 
     public function testSetNotModified()

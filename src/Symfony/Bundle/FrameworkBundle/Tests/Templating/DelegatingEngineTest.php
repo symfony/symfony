@@ -49,7 +49,7 @@ class DelegatingEngineTest extends TestCase
 
     public function testGetInvalidEngine()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -83,12 +83,12 @@ class DelegatingEngineTest extends TestCase
         $container = $this->getContainerMock(['engine' => $engine]);
         $delegatingEngine = new DelegatingEngine($container, ['engine']);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $delegatingEngine->renderResponse('template.php', ['foo' => 'bar']));
+        $this->assertInstanceOf(Response::class, $delegatingEngine->renderResponse('template.php', ['foo' => 'bar']));
     }
 
     private function getEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder('Symfony\Component\Templating\EngineInterface')->getMock();
+        $engine = $this->getMockBuilder(\Symfony\Component\Templating\EngineInterface::class)->getMock();
 
         $engine->expects($this->once())
             ->method('supports')
@@ -100,7 +100,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getFrameworkEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
+        $engine = $this->getMockBuilder(\Symfony\Bundle\FrameworkBundle\Templating\EngineInterface::class)->getMock();
 
         $engine->expects($this->once())
             ->method('supports')

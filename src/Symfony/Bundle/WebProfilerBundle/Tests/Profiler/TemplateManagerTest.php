@@ -57,7 +57,7 @@ class TemplateManagerTest extends TestCase
 
     public function testGetNameOfInvalidTemplate()
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
         $this->templateManager->getName(new Profile('token'), 'notexistingpanel');
     }
 
@@ -98,12 +98,12 @@ class TemplateManagerTest extends TestCase
 
     protected function mockProfile()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')->disableOriginalConstructor()->getMock();
+        return $this->getMockBuilder(Profile::class)->disableOriginalConstructor()->getMock();
     }
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $this->twigEnvironment = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         if (Environment::MAJOR_VERSION > 1) {
             $loader = $this->createMock(LoaderInterface::class);
@@ -122,7 +122,7 @@ class TemplateManagerTest extends TestCase
 
     protected function mockProfiler()
     {
-        $this->profiler = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+        $this->profiler = $this->getMockBuilder(\Symfony\Component\HttpKernel\Profiler\Profiler::class)
             ->disableOriginalConstructor()
             ->getMock();
 

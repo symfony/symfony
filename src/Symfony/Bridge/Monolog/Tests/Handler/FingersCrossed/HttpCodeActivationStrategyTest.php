@@ -22,13 +22,13 @@ class HttpCodeActivationStrategyTest extends TestCase
 {
     public function testExclusionsWithoutCode()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
     }
 
     public function testExclusionsWithoutUrls()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
     }
 

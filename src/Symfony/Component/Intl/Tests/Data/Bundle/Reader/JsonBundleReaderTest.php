@@ -40,31 +40,31 @@ class JsonBundleReaderTest extends TestCase
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
+        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'foo');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Intl\Exception\RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'en');
     }
 
     public function testReadFailsIfNotAFile()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Intl\Exception\RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 
     public function testReadFailsIfInvalidJson()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Intl\Exception\RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'en_Invalid');
     }
 
     public function testReaderDoesNotBreakOutOfGivenPath()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\ResourceBundleNotFoundException');
+        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', '../invalid_directory/en');
     }
 }

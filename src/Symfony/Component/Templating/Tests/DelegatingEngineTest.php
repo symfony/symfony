@@ -36,7 +36,7 @@ class DelegatingEngineTest extends TestCase
 
     public function testRenderWithNoSupportedEngine()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -61,7 +61,7 @@ class DelegatingEngineTest extends TestCase
 
     public function testStreamRequiresStreamingEngine()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Template "template.php" cannot be streamed as the engine supporting it does not implement StreamingEngineInterface');
         $delegatingEngine = new DelegatingEngine([new TestEngine()]);
         $delegatingEngine->stream('template.php', ['foo' => 'bar']);
@@ -110,7 +110,7 @@ class DelegatingEngineTest extends TestCase
 
     public function testGetInvalidEngine()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No engine is able to work with the template "template.php"');
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -121,7 +121,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder('Symfony\Component\Templating\EngineInterface')->getMock();
+        $engine = $this->getMockBuilder(EngineInterface::class)->getMock();
 
         $engine->expects($this->once())
             ->method('supports')
@@ -133,7 +133,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getStreamingEngineMock($template, $supports)
     {
-        $engine = $this->getMockForAbstractClass('Symfony\Component\Templating\Tests\MyStreamingEngine');
+        $engine = $this->getMockForAbstractClass(\Symfony\Component\Templating\Tests\MyStreamingEngine::class);
 
         $engine->expects($this->once())
             ->method('supports')

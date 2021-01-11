@@ -23,7 +23,7 @@ class ComparatorTest extends TestCase
             $comparator->setOperator('foo');
             $this->fail('->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
         }
 
         $comparator = new Comparator();

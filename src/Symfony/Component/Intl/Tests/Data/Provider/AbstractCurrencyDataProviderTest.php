@@ -758,7 +758,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->dataProvider->getNumericCode($currency);
     }
 
@@ -803,7 +803,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         $this->dataProvider->forNumericCode($currency);
     }
 

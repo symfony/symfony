@@ -91,7 +91,7 @@ class ChildDefinitionTest extends TestCase
 
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $def = new ChildDefinition('foo');
 
         $def->replaceArgument('0', 'foo');
@@ -118,7 +118,7 @@ class ChildDefinitionTest extends TestCase
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $def = new ChildDefinition('foo');
 
         $def->setArguments([0 => 'foo']);
@@ -129,14 +129,14 @@ class ChildDefinitionTest extends TestCase
 
     public function testCannotCallSetAutoconfigured()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\BadMethodCallException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\BadMethodCallException::class);
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
     }
 
     public function testCannotCallSetInstanceofConditionals()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\BadMethodCallException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\BadMethodCallException::class);
         $def = new ChildDefinition('foo');
         $def->setInstanceofConditionals(['Foo' => new ChildDefinition('')]);
     }

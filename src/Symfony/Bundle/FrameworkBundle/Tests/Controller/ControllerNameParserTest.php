@@ -151,7 +151,7 @@ class ControllerNameParserTest extends TestCase
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
         ];
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
         $kernel
             ->expects($this->any())
             ->method('getBundle')
@@ -180,7 +180,7 @@ class ControllerNameParserTest extends TestCase
 
     private function getBundle($namespace, $name)
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
+        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
         $bundle->expects($this->any())->method('getName')->willReturn($name);
         $bundle->expects($this->any())->method('getNamespace')->willReturn($namespace);
 

@@ -187,7 +187,7 @@ class ErrorHandler
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
         }
-        $traceReflector = new \ReflectionProperty('Exception', 'trace');
+        $traceReflector = new \ReflectionProperty(\Exception::class, 'trace');
         $traceReflector->setAccessible(true);
         $this->configureException = \Closure::bind(static function ($e, $trace, $file = null, $line = null) use ($traceReflector) {
             $traceReflector->setValue($e, $trace);

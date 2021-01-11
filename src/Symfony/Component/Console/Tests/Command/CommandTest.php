@@ -42,7 +42,7 @@ class CommandTest extends TestCase
 
     public function testCommandNameCannotBeEmpty()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.');
         (new Application())->add(new Command());
     }
@@ -115,7 +115,7 @@ class CommandTest extends TestCase
      */
     public function testInvalidCommandNames($name)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Command name "%s" is invalid.', $name));
 
         $command = new \TestCommand();
@@ -207,7 +207,7 @@ class CommandTest extends TestCase
 
     public function testGetHelperWithoutHelperSet()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
         $command = new \TestCommand();
         $command->getHelper('formatter');
@@ -278,7 +278,7 @@ class CommandTest extends TestCase
 
     public function testExecuteMethodNeedsToBeOverridden()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
         $command = new Command('foo');
         $command->run(new StringInput(''), new NullOutput());
@@ -286,7 +286,7 @@ class CommandTest extends TestCase
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException('Symfony\Component\Console\Exception\InvalidOptionException');
+        $this->expectException(\Symfony\Component\Console\Exception\InvalidOptionException::class);
         $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);

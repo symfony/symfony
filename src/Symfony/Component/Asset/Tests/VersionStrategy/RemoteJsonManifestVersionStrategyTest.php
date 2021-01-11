@@ -42,7 +42,7 @@ class RemoteJsonManifestVersionStrategyTest extends TestCase
 
     public function testMissingManifestFileThrowsException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('HTTP 404 returned for "https://cdn.example.com/non-existent-file.json"');
         $strategy = $this->createStrategy('https://cdn.example.com/non-existent-file.json');
         $strategy->getVersion('main.js');

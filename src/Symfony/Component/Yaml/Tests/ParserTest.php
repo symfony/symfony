@@ -525,7 +525,7 @@ EOF;
 
     public function testMappingKeyInMultiLineStringTriggersDeprecationNotice()
     {
-        $this->expectException('Symfony\Component\Yaml\Exception\ParseException');
+        $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").');
 
         $yaml = <<<'EOF'

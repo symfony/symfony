@@ -738,7 +738,7 @@ class ApplicationTest extends TestCase
         $application->add(new \FooCommand());
         $application->add(new \FooHiddenCommand());
 
-        $this->assertInstanceOf('FooCommand', $application->find('foo:'));
+        $this->assertInstanceOf(\FooCommand::class, $application->find('foo:'));
     }
 
     public function testSetCatchExceptions()

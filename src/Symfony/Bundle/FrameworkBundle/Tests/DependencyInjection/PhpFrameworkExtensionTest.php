@@ -25,7 +25,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testAssetsCannotHavePathAndUrl()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -38,7 +38,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testAssetPackageCannotHavePathAndUrl()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
                 'assets' => [
@@ -55,7 +55,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testWorkflowValidationStateMachine()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [

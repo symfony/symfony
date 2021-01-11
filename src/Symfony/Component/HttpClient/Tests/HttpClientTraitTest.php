@@ -193,28 +193,28 @@ class HttpClientTraitTest extends TestCase
 
     public function testInvalidAuthBearerOption()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "auth_bearer" must be a string, "stdClass" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testInvalidAuthBearerValue()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid character found in option "auth_bearer": "a\nb".');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testSetAuthBasicAndBearerOptions()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     public function testSetJSONAndBodyOptions()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
         self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
@@ -256,14 +256,14 @@ class HttpClientTraitTest extends TestCase
 
     public function testNormalizePeerFingerprintException()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot auto-detect fingerprint algorithm for "foo".');
         $this->normalizePeerFingerprint('foo');
     }
 
     public function testNormalizePeerFingerprintTypeException()
     {
-        $this->expectException('Symfony\Component\HttpClient\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "stdClass" given.');
         $fingerprint = new \stdClass();
 

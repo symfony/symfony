@@ -21,7 +21,7 @@ class UserCheckerTest extends TestCase
     {
         $checker = new UserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock()));
+        $this->assertNull($checker->checkPostAuth($this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock()));
     }
 
     public function testCheckPostAuthPass()
@@ -32,28 +32,28 @@ class UserCheckerTest extends TestCase
 
     public function testCheckPostAuthCredentialsExpired()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\CredentialsExpiredException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\CredentialsExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPostAuth(new User('John', 'password', [], true, true, false, true));
     }
 
     public function testCheckPreAuthAccountLocked()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\LockedException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, true, false, false));
     }
 
     public function testCheckPreAuthDisabled()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\DisabledException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], false, true, false, true));
     }
 
     public function testCheckPreAuthAccountExpired()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AccountExpiredException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccountExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, false, true, true));
     }

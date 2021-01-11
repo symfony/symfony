@@ -160,7 +160,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPathNamed()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time');
 
         eval('new \Symfony\Component\Validator\Constraints\Bic(iban: "value", ibanPropertyPath: "propertyPath");');

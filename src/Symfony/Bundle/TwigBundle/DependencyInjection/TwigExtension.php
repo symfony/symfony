@@ -37,7 +37,7 @@ class TwigExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
-        if (class_exists('Symfony\Component\Form\Form')) {
+        if (class_exists(\Symfony\Component\Form\Form::class)) {
             $loader->load('form.php');
         }
 

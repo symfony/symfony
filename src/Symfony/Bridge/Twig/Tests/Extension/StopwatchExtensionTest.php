@@ -21,7 +21,7 @@ class StopwatchExtensionTest extends TestCase
 {
     public function testFailIfStoppingWrongEvent()
     {
-        $this->expectException('Twig\Error\SyntaxError');
+        $this->expectException(\Twig\Error\SyntaxError::class);
         $this->testTiming('{% stopwatch "foo" %}{% endstopwatch "bar" %}', []);
     }
 
@@ -55,7 +55,7 @@ class StopwatchExtensionTest extends TestCase
     protected function getStopwatch($events = [])
     {
         $events = \is_array($events) ? $events : [$events];
-        $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
+        $stopwatch = $this->getMockBuilder(\Symfony\Component\Stopwatch\Stopwatch::class)->getMock();
 
         $expectedCalls = 0;
         $expectedStartCalls = [];

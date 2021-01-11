@@ -29,9 +29,9 @@ class BasicAuthenticationListenerTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -43,11 +43,11 @@ class BasicAuthenticationListenerTest extends TestCase
             ->with($this->equalTo($token))
         ;
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
         $authenticationManager
             ->expects($this->once())
             ->method('authenticate')
-            ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'))
+            ->with($this->isInstanceOf(UsernamePasswordToken::class))
             ->willReturn($token)
         ;
 
@@ -55,7 +55,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
-            $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
+            $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock()
         );
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
@@ -75,7 +75,7 @@ class BasicAuthenticationListenerTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -88,17 +88,17 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $response = new Response();
 
-        $authenticationEntryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
+        $authenticationEntryPoint = $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock();
         $authenticationEntryPoint
             ->expects($this->any())
             ->method('start')
-            ->with($this->equalTo($request), $this->isInstanceOf('Symfony\Component\Security\Core\Exception\AuthenticationException'))
+            ->with($this->equalTo($request), $this->isInstanceOf(\Symfony\Component\Security\Core\Exception\AuthenticationException::class))
             ->willReturn($response)
         ;
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager([$this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock()]),
+            new AuthenticationProviderManager([$this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface::class)->getMock()]),
             'TheProviderKey',
             $authenticationEntryPoint
         );
@@ -122,7 +122,7 @@ class BasicAuthenticationListenerTest extends TestCase
     {
         $request = new Request();
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->never())
             ->method('getToken')
@@ -130,9 +130,9 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             'TheProviderKey',
-            $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
+            $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock()
         );
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
@@ -151,14 +151,14 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', ['ROLE_FOO']);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
         $authenticationManager
             ->expects($this->never())
             ->method('authenticate')
@@ -168,7 +168,7 @@ class BasicAuthenticationListenerTest extends TestCase
             $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
-            $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
+            $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock()
         );
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
@@ -183,13 +183,13 @@ class BasicAuthenticationListenerTest extends TestCase
 
     public function testItRequiresProviderKey()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$providerKey must not be empty');
         new BasicAuthenticationListener(
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             '',
-            $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock()
+            $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock()
         );
     }
 
@@ -202,7 +202,7 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', ['ROLE_FOO']);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -215,17 +215,17 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $response = new Response();
 
-        $authenticationEntryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
+        $authenticationEntryPoint = $this->getMockBuilder(\Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface::class)->getMock();
         $authenticationEntryPoint
             ->expects($this->any())
             ->method('start')
-            ->with($this->equalTo($request), $this->isInstanceOf('Symfony\Component\Security\Core\Exception\AuthenticationException'))
+            ->with($this->equalTo($request), $this->isInstanceOf(\Symfony\Component\Security\Core\Exception\AuthenticationException::class))
             ->willReturn($response)
         ;
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager([$this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock()]),
+            new AuthenticationProviderManager([$this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface::class)->getMock()]),
             'TheProviderKey',
             $authenticationEntryPoint
         );

@@ -185,7 +185,7 @@ abstract class MergeCollectionListenerTest extends TestCase
      */
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
         $listener = new MergeCollectionListener($allowAdd, $allowDelete);

@@ -49,16 +49,16 @@ class FilesystemLoaderTest extends TestCase
         $path = self::$fixturesPath.'/templates';
         $loader = new ProjectTemplateLoader2($pathPattern);
         $storage = $loader->load(new TemplateReference($path.'/foo.php', 'php'));
-        $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass an absolute path');
+        $this->assertInstanceOf(\Symfony\Component\Templating\Storage\FileStorage::class, $storage, '->load() returns a FileStorage if you pass an absolute path');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the passed absolute path');
 
         $this->assertFalse($loader->load(new TemplateReference('bar', 'php')), '->load() returns false if the template is not found');
 
         $storage = $loader->load(new TemplateReference('foo.php', 'php'));
-        $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass a relative template that exists');
+        $this->assertInstanceOf(\Symfony\Component\Templating\Storage\FileStorage::class, $storage, '->load() returns a FileStorage if you pass a relative template that exists');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the absolute path of the template');
 
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $logger->expects($this->exactly(2))->method('debug');
 
         $loader = new ProjectTemplateLoader2($pathPattern);

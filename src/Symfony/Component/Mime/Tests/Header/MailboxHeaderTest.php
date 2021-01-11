@@ -60,7 +60,7 @@ class MailboxHeaderTest extends TestCase
 
     public function testUtf8CharsInLocalPartThrows()
     {
-        $this->expectException('Symfony\Component\Mime\Exception\AddressEncoderException');
+        $this->expectException(\Symfony\Component\Mime\Exception\AddressEncoderException::class);
         $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com'));
         $header->getBodyAsString();
     }

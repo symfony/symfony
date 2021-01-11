@@ -22,7 +22,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens)
     {
-        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
@@ -188,8 +188,8 @@ class RouteCompilerTest extends TestCase
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {
-        $this->expectException('LogicException');
-        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $this->expectException(\LogicException::class);
+        $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
@@ -244,7 +244,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithSameVariableTwice()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $route = new Route('/{name}/{name}');
 
         $route->compile();
@@ -252,7 +252,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteCharsetMismatch()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
         $route->compile();
@@ -260,7 +260,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRequirementCharsetMismatch()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
         $route->compile();
@@ -268,7 +268,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithFragmentAsPathParameter()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $route = new Route('/{_fragment}');
 
         $route->compile();
@@ -279,7 +279,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testRouteWithVariableNameStartingWithADigit($name)
     {
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $route = new Route('/{'.$name.'}');
         $route->compile();
     }
@@ -298,7 +298,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testCompileWithHost($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostRegex, $hostVariables, $hostTokens)
     {
-        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
 
         $compiled = $route->compile();
@@ -366,7 +366,7 @@ class RouteCompilerTest extends TestCase
 
     public function testRouteWithTooLongVariableName()
     {
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
         $route->compile();
     }

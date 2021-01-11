@@ -22,7 +22,7 @@ class VarExporterTest extends TestCase
 
     public function testPhpIncompleteClassesAreForbidden()
     {
-        $this->expectException('Symfony\Component\VarExporter\Exception\ClassNotFoundException');
+        $this->expectException(\Symfony\Component\VarExporter\Exception\ClassNotFoundException::class);
         $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
@@ -37,7 +37,7 @@ class VarExporterTest extends TestCase
      */
     public function testFailingSerialization($value)
     {
-        $this->expectException('Symfony\Component\VarExporter\Exception\NotInstantiableTypeException');
+        $this->expectException(\Symfony\Component\VarExporter\Exception\NotInstantiableTypeException::class);
         $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         $expectedDump = $this->getDump($value);
         try {
@@ -50,7 +50,7 @@ class VarExporterTest extends TestCase
     public function provideFailingSerialization()
     {
         yield [hash_init('md5')];
-        yield [new \ReflectionClass('stdClass')];
+        yield [new \ReflectionClass(\stdClass::class)];
         yield [(new \ReflectionFunction(function (): int {}))->getReturnType()];
         yield [new \ReflectionGenerator((function () { yield 123; })())];
         yield [function () {}];
@@ -173,11 +173,11 @@ class VarExporterTest extends TestCase
 
         $value = new \Error();
 
-        $rt = new \ReflectionProperty('Error', 'trace');
+        $rt = new \ReflectionProperty(\Error::class, 'trace');
         $rt->setAccessible(true);
         $rt->setValue($value, ['file' => __FILE__, 'line' => 123]);
 
-        $rl = new \ReflectionProperty('Error', 'line');
+        $rl = new \ReflectionProperty(\Error::class, 'line');
         $rl->setAccessible(true);
         $rl->setValue($value, 234);
 

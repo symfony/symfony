@@ -29,11 +29,11 @@ class TypeTest extends TestCase
         $this->assertTrue($type->isCollection());
 
         $collectionKeyType = $type->getCollectionKeyType();
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\Type', $collectionKeyType);
+        $this->assertInstanceOf(Type::class, $collectionKeyType);
         $this->assertEquals(Type::BUILTIN_TYPE_INT, $collectionKeyType->getBuiltinType());
 
         $collectionValueType = $type->getCollectionValueType();
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\Type', $collectionValueType);
+        $this->assertInstanceOf(Type::class, $collectionValueType);
         $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueType->getBuiltinType());
     }
 
@@ -45,7 +45,7 @@ class TypeTest extends TestCase
 
     public function testInvalidType()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"foo" is not a valid PHP type.');
         new Type('foo');
     }

@@ -169,7 +169,7 @@ class PhpDumperTest extends TestCase
      */
     public function testExportParameters($parameters)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $container = new ContainerBuilder(new ParameterBag($parameters));
         $container->compile();
         $dumper = new PhpDumper($container);
@@ -196,7 +196,7 @@ class PhpDumperTest extends TestCase
 
     public function testAddServiceWithoutCompilation()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
         $this->expectExceptionMessage('Cannot dump an uncompiled container.');
         $container = include self::$fixturesPath.'/containers/container9.php';
         new PhpDumper($container);
@@ -381,7 +381,7 @@ class PhpDumperTest extends TestCase
      */
     public function testInvalidFactories($factory)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Cannot dump definition');
         $container = new ContainerBuilder();
         $def = new Definition('stdClass');
@@ -449,7 +449,7 @@ class PhpDumperTest extends TestCase
 
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "decorator_service" service is already initialized, you cannot replace it.');
         require_once self::$fixturesPath.'/php/services9_compiled.php';
 
@@ -666,7 +666,7 @@ class PhpDumperTest extends TestCase
 
     public function testUnusedEnvParameter()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
         $this->expectExceptionMessage('Environment variables "FOO" are never used. Please, check your container\'s configuration.');
         $container = new ContainerBuilder();
         $container->getParameter('env(FOO)');
@@ -677,7 +677,7 @@ class PhpDumperTest extends TestCase
 
     public function testCircularDynamicEnv()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").');
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%bar%');
@@ -827,11 +827,11 @@ class PhpDumperTest extends TestCase
             switch (++$i) {
                 case 0:
                     $this->assertEquals('k1', $k);
-                    $this->assertInstanceOf('stdCLass', $v);
+                    $this->assertInstanceOf(\stdCLass::class, $v);
                     break;
                 case 1:
                     $this->assertEquals('k2', $k);
-                    $this->assertInstanceOf('Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator', $v);
+                    $this->assertInstanceOf(\Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator::class, $v);
                     break;
             }
         }
@@ -972,7 +972,7 @@ class PhpDumperTest extends TestCase
         eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference']));
 
         $container = new \Symfony_DI_PhpDumper_Test_Private_With_Ignore_On_Invalid_Reference();
-        $this->assertInstanceOf('BazClass', $container->get('bar')->getBaz());
+        $this->assertInstanceOf(\BazClass::class, $container->get('bar')->getBaz());
     }
 
     public function testArrayParameters()
@@ -1100,7 +1100,7 @@ class PhpDumperTest extends TestCase
         $this->assertSame($manager3, $listener3->manager);
 
         $listener4 = $container->get('listener4');
-        $this->assertInstanceOf('stdClass', $listener4);
+        $this->assertInstanceOf(\stdClass::class, $listener4);
     }
 
     public function provideAlmostCircular()
@@ -1179,7 +1179,7 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Literal_Class_With_Root_Namespace();
 
-        $this->assertInstanceOf('stdClass', $container->get('foo'));
+        $this->assertInstanceOf(\stdClass::class, $container->get('foo'));
     }
 
     public function testDumpHandlesObjectClassNames()
@@ -1204,7 +1204,7 @@ class PhpDumperTest extends TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Object_Class_Name();
 
-        $this->assertInstanceOf('stdClass', $container->get('bar'));
+        $this->assertInstanceOf(\stdClass::class, $container->get('bar'));
     }
 
     public function testUninitializedSyntheticReference()
@@ -1283,7 +1283,7 @@ class PhpDumperTest extends TestCase
 
     public function testErroredDefinition()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Service "errored_definition" is broken.');
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->setParameter('foo_bar', 'foo_bar');

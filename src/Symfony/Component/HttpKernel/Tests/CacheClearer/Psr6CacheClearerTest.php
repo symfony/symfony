@@ -39,7 +39,7 @@ class Psr6CacheClearerTest extends TestCase
 
     public function testClearPoolThrowsExceptionOnUnreferencedPool()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache pool not found: "unknown"');
         (new Psr6CacheClearer())->clearPool('unknown');
     }

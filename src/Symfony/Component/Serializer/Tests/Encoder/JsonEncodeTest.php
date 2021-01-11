@@ -53,7 +53,7 @@ class JsonEncodeTest extends TestCase
 
     public function testEncodeWithError()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $this->encode->encode("\xB1\x31", JsonEncoder::FORMAT);
     }
 }

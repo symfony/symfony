@@ -66,7 +66,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
     public function testHandleWithException()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Thrown from next middleware.');
         $busId = 'command_bus';
 

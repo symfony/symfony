@@ -167,7 +167,7 @@ class ExprBuilderTest extends TestCase
 
     public function testThenInvalid()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $test = $this->getTestBuilder()
             ->ifString()
             ->thenInvalid('Invalid value')
@@ -186,14 +186,14 @@ class ExprBuilderTest extends TestCase
 
     public function testEndIfPartNotSpecified()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must specify an if part.');
         $this->getTestBuilder()->end();
     }
 
     public function testEndThenPartNotSpecified()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must specify a then part.');
         $builder = $this->getTestBuilder();
         $builder->ifPart = 'test';

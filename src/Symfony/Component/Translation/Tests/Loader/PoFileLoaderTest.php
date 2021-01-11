@@ -55,7 +55,7 @@ class PoFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
+        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.po';
         $loader->load($resource, 'en', 'domain1');

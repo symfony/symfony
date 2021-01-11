@@ -67,7 +67,7 @@ class EsiFragmentRendererTest extends TestCase
 
     public function testRenderControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -79,7 +79,7 @@ class EsiFragmentRendererTest extends TestCase
 
     public function testRenderAltControllerReferenceWithoutSignerThrowsException()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
@@ -91,7 +91,7 @@ class EsiFragmentRendererTest extends TestCase
 
     private function getInlineStrategy($called = false)
     {
-        $inline = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer')->disableOriginalConstructor()->getMock();
+        $inline = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer::class)->disableOriginalConstructor()->getMock();
 
         if ($called) {
             $inline->expects($this->once())->method('render');

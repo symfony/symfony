@@ -122,7 +122,7 @@ class AliasTest extends TestCase
      */
     public function testCannotDeprecateWithAnInvalidTemplate($message)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $def = new Alias('foo');
         $def->setDeprecated('package', '1.1', $message);
     }

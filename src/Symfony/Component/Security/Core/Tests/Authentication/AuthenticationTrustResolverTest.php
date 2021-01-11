@@ -91,17 +91,17 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        return $this->getMockBuilder(TokenInterface::class)->getMock();
     }
 
     protected function getAnonymousToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(['', ''])->getMock();
+        return $this->getMockBuilder(AnonymousToken::class)->setConstructorArgs(['', ''])->getMock();
     }
 
     protected function getRememberMeToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
+        return $this->getMockBuilder(RememberMeToken::class)->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
     }
 
     protected function getResolver()

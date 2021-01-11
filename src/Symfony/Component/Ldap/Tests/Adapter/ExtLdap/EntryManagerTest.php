@@ -19,7 +19,7 @@ class EntryManagerTest extends TestCase
 {
     public function testMove()
     {
-        $this->expectException('Symfony\Component\Ldap\Exception\LdapException');
+        $this->expectException(\Symfony\Component\Ldap\Exception\LdapException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
         $connection = $this->createMock(Connection::class);
         $connection
@@ -33,7 +33,7 @@ class EntryManagerTest extends TestCase
 
     public function testGetResources()
     {
-        $this->expectException('Symfony\Component\Ldap\Exception\NotBoundException');
+        $this->expectException(\Symfony\Component\Ldap\Exception\NotBoundException::class);
         $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
         $connection = $this->getMockBuilder(Connection::class)->getMock();
         $connection

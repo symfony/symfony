@@ -23,13 +23,13 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {
     public function testRequestShouldNotBeNull()
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'));
     }
 
     public function testRequestShouldBeInstanceOfRequest()
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
     }
 

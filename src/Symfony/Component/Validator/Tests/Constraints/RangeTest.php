@@ -12,7 +12,7 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         new Range([
             'min' => 'min',
@@ -22,7 +22,7 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range([
             'max' => 'max',
@@ -32,14 +32,14 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\MissingOptionsException');
+        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
         $this->expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
         new Range([]);
     }
 
     public function testThrowsNoDefaultOptionConfiguredException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('No default option is configured');
         new Range('value');
     }

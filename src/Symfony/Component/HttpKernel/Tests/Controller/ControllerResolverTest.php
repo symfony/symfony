@@ -20,7 +20,7 @@ class ControllerResolverTest extends TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 
@@ -94,7 +94,7 @@ class ControllerResolverTest extends TestCase
 
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');

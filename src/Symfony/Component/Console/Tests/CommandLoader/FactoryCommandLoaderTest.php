@@ -42,7 +42,7 @@ class FactoryCommandLoaderTest extends TestCase
 
     public function testGetUnknownCommandThrows()
     {
-        $this->expectException('Symfony\Component\Console\Exception\CommandNotFoundException');
+        $this->expectException(\Symfony\Component\Console\Exception\CommandNotFoundException::class);
         (new FactoryCommandLoader([]))->get('unknown');
     }
 

@@ -22,9 +22,9 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider();
 
         $this->assertTrue($provider->supports($this->getSupportedToken()));
-        $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
+        $this->assertFalse($provider->supports($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock()));
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken')
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class)
                     ->disableOriginalConstructor()
                     ->getMock()
         ;
@@ -38,23 +38,23 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenTokenIsNotSupported()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
         $this->expectExceptionMessage('The token is not supported by this authentication provider.');
         $provider = $this->getProvider();
 
-        $provider->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $provider->authenticate($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
     }
 
     public function testAuthenticateWhenNoUserIsSet()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $provider = $this->getProvider();
         $provider->authenticate($this->getSupportedToken(''));
     }
 
     public function testAuthenticate()
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -63,7 +63,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider($user);
 
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken', $token);
+        $this->assertInstanceOf(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class, $token);
         $this->assertEquals('pass', $token->getCredentials());
         $this->assertEquals('key', $token->getProviderKey());
         $this->assertEquals([], $token->getRoleNames());
@@ -73,10 +73,10 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenUserCheckerThrowsException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $this->expectException(LockedException::class);
+        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
 
-        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
                     ->willThrowException(new LockedException())
@@ -89,7 +89,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken')->setMethods(['getUser', 'getCredentials', 'getProviderKey'])->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getProviderKey'])->disableOriginalConstructor()->getMock();
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')
@@ -116,7 +116,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getProvider($user = null, $userChecker = null)
     {
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $userProvider = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
@@ -125,7 +125,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         }
 
         if (null === $userChecker) {
-            $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+            $userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
         }
 
         return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker, 'key');

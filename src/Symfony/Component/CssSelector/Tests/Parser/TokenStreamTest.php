@@ -53,7 +53,7 @@ class TokenStreamTest extends TestCase
 
     public function testFailToGetNextIdentifier()
     {
-        $this->expectException('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
+        $this->expectException(\Symfony\Component\CssSelector\Exception\SyntaxErrorException::class);
 
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_DELIMITER, '.', 2));
@@ -73,7 +73,7 @@ class TokenStreamTest extends TestCase
 
     public function testFailToGetNextIdentifierOrStar()
     {
-        $this->expectException('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
+        $this->expectException(\Symfony\Component\CssSelector\Exception\SyntaxErrorException::class);
 
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_DELIMITER, '.', 2));

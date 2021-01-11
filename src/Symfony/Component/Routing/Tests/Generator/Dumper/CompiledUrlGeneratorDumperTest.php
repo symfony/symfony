@@ -118,7 +118,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDumpWithRouteNotFoundLocalizedRoutes()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
         $this->expectExceptionMessage('Unable to generate a URL for the named route "test" as such route does not exist.');
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
 
@@ -178,7 +178,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testDumpWithoutRoutes()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
         $projectUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
@@ -188,7 +188,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
 
     public function testGenerateNonExistingRoute()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
         $this->routeCollection->add('Test', new Route('/test'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());

@@ -19,7 +19,7 @@ class AutoAliasServicePassTest extends TestCase
 {
     public function testProcessWithMissingParameter()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
@@ -31,7 +31,7 @@ class AutoAliasServicePassTest extends TestCase
 
     public function testProcessWithMissingFormat()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')

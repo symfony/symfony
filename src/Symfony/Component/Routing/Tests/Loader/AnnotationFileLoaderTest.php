@@ -44,7 +44,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoadFileWithoutStartTag()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Did you forgot to add the "<?php" start tag at the beginning of the file?');
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/NoStartTagClass.php');
     }

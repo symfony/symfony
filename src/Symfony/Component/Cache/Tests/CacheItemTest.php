@@ -27,7 +27,7 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidKey($key)
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache key');
         CacheItem::validateKey($key);
     }
@@ -75,7 +75,7 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidTag($tag)
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
@@ -87,7 +87,7 @@ class CacheItemTest extends TestCase
 
     public function testNonTaggableItem()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Cache\Exception\LogicException::class);
         $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');

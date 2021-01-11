@@ -23,14 +23,14 @@ class ArrayNodeTest extends TestCase
 
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
         $node = new ArrayNode('root');
         $node->normalize(false);
     }
 
     public function testExceptionThrownOnUnrecognizedChild()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unrecognized option "foo" under "root"');
         $node = new ArrayNode('root');
         $node->normalize(['foo' => 'bar']);
@@ -38,7 +38,7 @@ class ArrayNodeTest extends TestCase
 
     public function testNormalizeWithProposals()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Did you mean "alpha1", "alpha2"?');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
@@ -49,7 +49,7 @@ class ArrayNodeTest extends TestCase
 
     public function testNormalizeWithoutProposals()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Available options are "alpha1", "alpha2".');
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
@@ -198,7 +198,7 @@ class ArrayNodeTest extends TestCase
 
     public function testAddChildEmptyName()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Child nodes must be named.');
         $node = new ArrayNode('root');
 
@@ -208,7 +208,7 @@ class ArrayNodeTest extends TestCase
 
     public function testAddChildNameAlreadyExists()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A child node named "foo" already exists.');
         $node = new ArrayNode('root');
 
@@ -221,7 +221,7 @@ class ArrayNodeTest extends TestCase
 
     public function testGetDefaultValueWithoutDefaultValue()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The node at path "foo" has no default value.');
         $node = new ArrayNode('foo');
         $node->getDefaultValue();
@@ -298,7 +298,7 @@ class ArrayNodeTest extends TestCase
      */
     public function testMergeWithoutIgnoringExtraKeys($prenormalizeds, $merged)
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('merge() expects a normalized config array.');
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -316,7 +316,7 @@ class ArrayNodeTest extends TestCase
      */
     public function testMergeWithIgnoringAndRemovingExtraKeys($prenormalizeds, $merged)
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('merge() expects a normalized config array.');
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));

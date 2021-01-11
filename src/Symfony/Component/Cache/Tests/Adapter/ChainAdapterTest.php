@@ -44,14 +44,14 @@ class ChainAdapterTest extends AdapterTestCase
 
     public function testEmptyAdaptersException()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one adapter must be specified.');
         new ChainAdapter([]);
     }
 
     public function testInvalidAdapterException()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" does not implement');
         new ChainAdapter([new \stdClass()]);
     }

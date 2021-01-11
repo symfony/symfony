@@ -43,7 +43,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
+        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
         new RedisStore($this->getRedisConnection(), -1);
     }
 }

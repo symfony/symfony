@@ -47,13 +47,13 @@ class BooleanToStringTransformerTest extends TestCase
 
     public function testTransformFailsIfString()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->transformer->transform('1');
     }
 
     public function testReverseTransformFailsIfInteger()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->transformer->reverseTransform(1);
     }
 
@@ -75,7 +75,7 @@ class BooleanToStringTransformerTest extends TestCase
 
     public function testTrueValueContainedInFalseValues()
     {
-        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         new BooleanToStringTransformer('0', [null, '0']);
     }
 

@@ -70,7 +70,7 @@ class CacheWarmerAggregateTest extends TestCase
 
     protected function getCacheWarmerMock()
     {
-        $warmer = $this->getMockBuilder('Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface')
+        $warmer = $this->getMockBuilder(\Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 

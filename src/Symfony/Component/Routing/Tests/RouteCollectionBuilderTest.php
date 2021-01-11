@@ -26,8 +26,8 @@ class RouteCollectionBuilderTest extends TestCase
 {
     public function testImport()
     {
-        $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
-        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
+        $resolvedLoader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
+        $resolver = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderResolverInterface::class)->getMock();
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('admin_routing.yml', 'yaml')
@@ -44,7 +44,7 @@ class RouteCollectionBuilderTest extends TestCase
             ->with('admin_routing.yml', 'yaml')
             ->willReturn($expectedCollection);
 
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader->expects($this->any())
             ->method('getResolver')
             ->willReturn($resolver);
@@ -54,7 +54,7 @@ class RouteCollectionBuilderTest extends TestCase
         $importedRoutes = $routes->import('admin_routing.yml', '/', 'yaml');
 
         // we should get back a RouteCollectionBuilder
-        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollectionBuilder', $importedRoutes);
+        $this->assertInstanceOf(RouteCollectionBuilder::class, $importedRoutes);
 
         // get the collection back so we can look at it
         $addedCollection = $importedRoutes->build();
@@ -80,7 +80,7 @@ class RouteCollectionBuilderTest extends TestCase
 
     public function testImportWithoutLoaderThrowsException()
     {
-        $this->expectException('BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $collectionBuilder = new RouteCollectionBuilder();
         $collectionBuilder->import('routing.yml');
     }
@@ -91,7 +91,7 @@ class RouteCollectionBuilderTest extends TestCase
 
         $addedRoute = $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout');
         $addedRoute2 = $collectionBuilder->add('/blogs', 'AppBundle:Blog:list', 'blog_list');
-        $this->assertInstanceOf('Symfony\Component\Routing\Route', $addedRoute);
+        $this->assertInstanceOf(Route::class, $addedRoute);
         $this->assertEquals('AppBundle:Order:checkout', $addedRoute->getDefault('_controller'));
 
         $finalCollection = $collectionBuilder->build();
@@ -104,7 +104,7 @@ class RouteCollectionBuilderTest extends TestCase
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
@@ -267,7 +267,7 @@ class RouteCollectionBuilderTest extends TestCase
 
     public function testFlushSetsPrefixedWithMultipleLevels()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $routes = new RouteCollectionBuilder($loader);
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
@@ -345,7 +345,7 @@ class RouteCollectionBuilderTest extends TestCase
         $secondCollection = new RouteCollection();
         $secondCollection->add('b', new Route('/b'));
 
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader->expects($this->any())
             ->method('supports')
             ->willReturn(true);

@@ -30,11 +30,11 @@ class LdapBindAuthenticationProviderTest extends TestCase
 {
     public function testEmptyPasswordShouldThrowAnException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password must not be empty.');
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 
         $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
@@ -45,11 +45,11 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
     public function testNullPasswordShouldThrowAnException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password must not be empty.');
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapInterface')->getMock();
-        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 
         $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
@@ -60,7 +60,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
     public function testBindFailureShouldThrowAnException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password is invalid.');
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
@@ -182,7 +182,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
     public function testEmptyQueryResultShouldThrowAnException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $this->expectExceptionMessage('The presented username is invalid.');
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
 

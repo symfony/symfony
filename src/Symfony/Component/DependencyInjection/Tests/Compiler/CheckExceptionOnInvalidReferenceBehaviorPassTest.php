@@ -40,7 +40,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReference()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container
@@ -53,7 +53,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $def = new Definition();
@@ -83,7 +83,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testWithErroredServiceLocator()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
         $container = new ContainerBuilder();
 
@@ -96,7 +96,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testWithErroredHiddenService()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');
         $container = new ContainerBuilder();
 

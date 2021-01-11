@@ -42,16 +42,16 @@ class SwitchUserListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->tokenStorage = new TokenStorage();
-        $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
-        $this->accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $this->userProvider = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
+        $this->userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
+        $this->accessDecisionManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface::class)->getMock();
         $this->request = new Request();
         $this->event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $this->request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     public function testProviderKeyIsRequired()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$providerKey must not be empty');
         new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
     }
@@ -67,7 +67,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', '_exit');
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
@@ -76,7 +76,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
@@ -98,15 +98,15 @@ class SwitchUserListenerTest extends TestCase
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $this->event->getResponse());
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\RedirectResponse::class, $this->event->getResponse());
         $this->assertSame($this->request->getUri(), $this->event->getResponse()->getTargetUrl());
         $this->assertSame($originalToken, $this->tokenStorage->getToken());
     }
 
     public function testExitUserDispatchesEventWithRefreshedUser()
     {
-        $originalUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $refreshedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $originalUser = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
+        $refreshedUser = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
         $this
             ->userProvider
             ->expects($this->any())
@@ -156,7 +156,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserIsDisallowed()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
         $user = new User('username', 'password', []);
 
@@ -178,7 +178,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserTurnsAuthenticationExceptionTo403()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_ALLOWED_TO_SWITCH']);
 
         $this->tokenStorage->setToken($token);
@@ -220,7 +220,7 @@ class SwitchUserListenerTest extends TestCase
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
+        $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
     public function testSwitchUserAlreadySwitched()
@@ -280,7 +280,7 @@ class SwitchUserListenerTest extends TestCase
 
         $this->assertSame([], $this->request->query->all());
         $this->assertSame('', $this->request->server->get('QUERY_STRING'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
+        $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
     public function testSwitchUserKeepsOtherQueryStringParameters()
@@ -310,7 +310,7 @@ class SwitchUserListenerTest extends TestCase
         $listener($this->event);
 
         $this->assertSame('page=3&section=2', $this->request->server->get('QUERY_STRING'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
+        $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
     public function testSwitchUserWithReplacedToken()
@@ -357,7 +357,7 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserThrowsAuthenticationExceptionIfNoCurrentToken()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', 'username');
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
@@ -386,7 +386,7 @@ class SwitchUserListenerTest extends TestCase
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, true);
         $listener($this->event);
 
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $this->tokenStorage->getToken());
+        $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
         $this->assertFalse($this->event->hasResponse());
     }
 }

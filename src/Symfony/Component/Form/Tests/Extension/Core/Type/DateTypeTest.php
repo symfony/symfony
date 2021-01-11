@@ -38,7 +38,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testInvalidWidgetOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'fake_widget',
         ]);
@@ -46,7 +46,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testInvalidInputOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'fake_input',
         ]);
@@ -373,7 +373,7 @@ class DateTypeTest extends BaseTypeTest
      */
     public function testThrowExceptionIfFormatIsNoPattern()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => '0',
             'html5' => false,
@@ -384,7 +384,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->expectExceptionMessage('The "format" option should contain the letters "y", "M" and "d". Its current value is "yy".');
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => [6, 7],
@@ -394,7 +394,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatMissesYearMonthAndDayWithSingleTextWidget()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->expectExceptionMessage('The "format" option should contain the letters "y", "M" or "d". Its current value is "wrong".');
         $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
@@ -405,7 +405,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatIsNoConstant()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => 105,
         ]);
@@ -413,7 +413,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfFormatIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'format' => [],
         ]);
@@ -421,7 +421,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfYearsIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'years' => 'bad value',
         ]);
@@ -429,7 +429,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfMonthsIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'months' => 'bad value',
         ]);
@@ -437,7 +437,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfDaysIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'days' => 'bad value',
         ]);
@@ -733,7 +733,7 @@ class DateTypeTest extends BaseTypeTest
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()

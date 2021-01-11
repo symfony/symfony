@@ -17,7 +17,7 @@ abstract class AbstractAnnotationLoaderTest extends TestCase
 {
     public function getReader()
     {
-        return $this->getMockBuilder('Doctrine\Common\Annotations\Reader')
+        return $this->getMockBuilder(\Doctrine\Common\Annotations\Reader::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -25,7 +25,7 @@ abstract class AbstractAnnotationLoaderTest extends TestCase
 
     public function getClassLoader($reader)
     {
-        return $this->getMockBuilder('Symfony\Component\Routing\Loader\AnnotationClassLoader')
+        return $this->getMockBuilder(\Symfony\Component\Routing\Loader\AnnotationClassLoader::class)
             ->setConstructorArgs([$reader])
             ->getMockForAbstractClass()
         ;

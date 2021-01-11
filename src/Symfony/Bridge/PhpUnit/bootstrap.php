@@ -12,7 +12,7 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+if (class_exists(\PHPUnit_Runner_Version::class) && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
     $classes = [
         'PHPUnit_Framework_Assert', // override PhpUnit's ForwardCompat child class
         'PHPUnit_Framework_AssertionFailedError', // override PhpUnit's ForwardCompat child class
@@ -110,15 +110,15 @@ if ($file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
 }
 
 // Detect if we're loaded by an actual run of phpunit
-if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Command', false) && !class_exists('PHPUnit\TextUI\Command', false)) {
+if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit_TextUI_Command::class, false) && !class_exists(\PHPUnit\TextUI\Command::class, false)) {
     return;
 }
 
 // Enforce a consistent locale
 setlocale(\LC_ALL, 'C');
 
-if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
-    if (method_exists('Doctrine\Common\Annotations\AnnotationRegistry', 'registerUniqueLoader')) {
+if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
+    if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
         AnnotationRegistry::registerUniqueLoader('class_exists');
     } else {
         AnnotationRegistry::registerLoader('class_exists');

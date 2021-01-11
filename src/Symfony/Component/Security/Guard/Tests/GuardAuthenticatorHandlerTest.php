@@ -190,7 +190,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     private function configurePreviousSession()
     {
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
         $session->expects($this->any())
             ->method('getName')
             ->willReturn('test_session_name');

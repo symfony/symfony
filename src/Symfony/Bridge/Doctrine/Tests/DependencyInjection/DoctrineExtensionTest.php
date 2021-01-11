@@ -31,7 +31,7 @@ class DoctrineExtensionTest extends TestCase
         parent::setUp();
 
         $this->extension = $this
-            ->getMockBuilder('Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension')
+            ->getMockBuilder(\Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension::class)
             ->setMethods([
                 'getMappingResourceConfigDirectory',
                 'getObjectManagerElementName',
@@ -52,7 +52,7 @@ class DoctrineExtensionTest extends TestCase
 
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $emConfigs = [
             'em1' => [
                 'auto_mapping' => true,
@@ -235,7 +235,7 @@ class DoctrineExtensionTest extends TestCase
 
     public function testUnrecognizedCacheDriverException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();

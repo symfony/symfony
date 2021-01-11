@@ -28,7 +28,7 @@ class RegisterListenersPassTest extends TestCase
      */
     public function testEventSubscriberWithoutInterface()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('event_dispatcher');
         $builder->register('my_event_subscriber', 'stdClass')
@@ -98,7 +98,7 @@ class RegisterListenersPassTest extends TestCase
 
     public function testAbstractEventListener()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "foo" tagged "kernel.event_listener" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', []);
@@ -110,7 +110,7 @@ class RegisterListenersPassTest extends TestCase
 
     public function testAbstractEventSubscriber()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "foo" tagged "kernel.event_subscriber" must not be abstract.');
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_subscriber', []);
@@ -180,7 +180,7 @@ class RegisterListenersPassTest extends TestCase
 
     public function testEventSubscriberUnresolvableClassName()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('You have requested a non-existent parameter "subscriber.class"');
         $container = new ContainerBuilder();
         $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', []);

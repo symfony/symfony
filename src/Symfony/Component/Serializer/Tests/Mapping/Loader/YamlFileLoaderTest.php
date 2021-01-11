@@ -45,7 +45,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Loader\LoaderInterface', $this->loader);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\Loader\LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
@@ -61,7 +61,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadClassMetadataReturnsThrowsInvalidMapping()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\MappingException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\MappingException::class);
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-mapping.yml');
         $loader->loadClassMetadata($this->metadata);
     }

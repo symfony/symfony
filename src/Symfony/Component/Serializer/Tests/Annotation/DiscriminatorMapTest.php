@@ -35,25 +35,25 @@ class DiscriminatorMapTest extends TestCase
 
     public function testExceptionWithoutTypeProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
     }
 
     public function testExceptionWithEmptyTypeProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
     public function testExceptionWithoutMappingProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => 'type']);
     }
 
     public function testExceptionWitEmptyMappingProperty()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new DiscriminatorMap(['typeProperty' => 'type', 'mapping' => []]);
     }
 }

@@ -26,7 +26,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionCaster()
     {
-        $var = new \ReflectionClass('ReflectionClass');
+        $var = new \ReflectionClass(\ReflectionClass::class);
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'

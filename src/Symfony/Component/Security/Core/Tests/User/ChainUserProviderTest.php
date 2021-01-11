@@ -44,7 +44,7 @@ class ChainUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameThrowsUsernameNotFoundException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
+        $this->expectException(UsernameNotFoundException::class);
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
@@ -138,7 +138,7 @@ class ChainUserProviderTest extends TestCase
 
     public function testRefreshUserThrowsUnsupportedUserException()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\UnsupportedUserException');
+        $this->expectException(UnsupportedUserException::class);
         $provider1 = $this->getProvider();
         $provider1
             ->expects($this->once())
@@ -269,11 +269,11 @@ class ChainUserProviderTest extends TestCase
 
     protected function getAccount()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
     }
 
     protected function getProvider()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
     }
 }

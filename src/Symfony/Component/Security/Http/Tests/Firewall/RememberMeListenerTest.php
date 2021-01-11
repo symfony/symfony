@@ -32,7 +32,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->willReturn($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock())
         ;
 
         $tokenStorage
@@ -79,7 +79,7 @@ class RememberMeListenerTest extends TestCase
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->willReturn($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock())
         ;
 
         $service
@@ -101,7 +101,7 @@ class RememberMeListenerTest extends TestCase
 
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Authentication failed.');
         [$listener, $tokenStorage, $service, $manager] = $this->getListener(false, false);
 
@@ -114,7 +114,7 @@ class RememberMeListenerTest extends TestCase
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->willReturn($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock())
         ;
 
         $service
@@ -176,7 +176,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $service
             ->expects($this->once())
             ->method('autoLogin')
@@ -210,7 +210,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $service
             ->expects($this->once())
             ->method('autoLogin')
@@ -260,7 +260,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $service
             ->expects($this->once())
             ->method('autoLogin')
@@ -308,7 +308,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $service
             ->expects($this->once())
             ->method('autoLogin')
@@ -333,7 +333,7 @@ class RememberMeListenerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf('Symfony\Component\Security\Http\Event\InteractiveLoginEvent'),
+                $this->isInstanceOf(\Symfony\Component\Security\Http\Event\InteractiveLoginEvent::class),
                 SecurityEvents::INTERACTIVE_LOGIN
             )
         ;
@@ -379,22 +379,22 @@ class RememberMeListenerTest extends TestCase
 
     protected function getLogger()
     {
-        return $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        return $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
     }
 
     protected function getManager()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
     }
 
     protected function getService()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface::class)->getMock();
     }
 
     protected function getTokenStorage()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
     }
 
     protected function getDispatcher()

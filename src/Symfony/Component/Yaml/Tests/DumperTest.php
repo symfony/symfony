@@ -194,7 +194,7 @@ EOF;
 
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->expectException('Symfony\Component\Yaml\Exception\DumpException');
+        $this->expectException(\Symfony\Component\Yaml\Exception\DumpException::class);
         $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
 
@@ -619,14 +619,14 @@ YAML;
 
     public function testZeroIndentationThrowsException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(0);
     }
 
     public function testNegativeIndentationThrowsException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(-4);
     }

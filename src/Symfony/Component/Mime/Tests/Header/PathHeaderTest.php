@@ -25,7 +25,7 @@ class PathHeaderTest extends TestCase
 
     public function testAddressMustComplyWithRfc2822()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
     }
 
@@ -51,7 +51,7 @@ class PathHeaderTest extends TestCase
 
     public function testAddressMustBeEncodable()
     {
-        $this->expectException('Symfony\Component\Mime\Exception\AddressEncoderException');
+        $this->expectException(\Symfony\Component\Mime\Exception\AddressEncoderException::class);
         $header = new PathHeader('Return-Path', new Address('chrïs@swiftmailer.org'));
         $header->getBodyAsString();
     }

@@ -42,7 +42,7 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
+        $this->listener = $this->getMockForAbstractClass(\Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener::class);
         $this->session = $this->getSession();
         $this->listener->expects($this->any())
              ->method('getSession')
@@ -209,7 +209,7 @@ class TestSessionListenerTest extends TestCase
 
     private function getSession()
     {
-        $mock = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
+        $mock = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\Session::class)
             ->disableOriginalConstructor()
             ->getMock();
 

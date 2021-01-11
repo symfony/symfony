@@ -660,7 +660,7 @@ class TimeTypeTest extends BaseTypeTest
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, new \DateTime()));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, new \DateTime()));
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
@@ -857,7 +857,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testInitializeWithSecondsAndWithoutMinutes()
     {
-        $this->expectException('Symfony\Component\Form\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidConfigurationException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'with_minutes' => false,
             'with_seconds' => true,
@@ -866,7 +866,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfHoursIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'hours' => 'bad value',
         ]);
@@ -874,7 +874,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfMinutesIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'minutes' => 'bad value',
         ]);
@@ -882,7 +882,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testThrowExceptionIfSecondsIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'seconds' => 'bad value',
         ]);
@@ -890,7 +890,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testReferenceDateTimezoneMustMatchModelTimezone()
     {
-        $this->expectException('Symfony\Component\Form\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidConfigurationException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'Europe/Berlin',

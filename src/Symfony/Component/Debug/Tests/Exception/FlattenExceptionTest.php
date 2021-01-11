@@ -286,7 +286,7 @@ class FlattenExceptionTest extends TestCase
 
         $args = $array[$i++];
         $this->assertSame($args[0], 'object');
-        $this->assertTrue('Closure' === $args[1] || is_subclass_of($args[1], '\Closure'), 'Expect object class name to be Closure or a subclass of Closure.');
+        $this->assertTrue('Closure' === $args[1] || is_subclass_of($args[1], \Closure::class), 'Expect object class name to be Closure or a subclass of Closure.');
 
         $this->assertSame(['array', [['integer', 1], ['integer', 2]]], $array[$i++]);
         $this->assertSame(['array', ['foo' => ['integer', 123]]], $array[$i++]);

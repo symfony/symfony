@@ -80,7 +80,7 @@ class GenericEventTest extends TestCase
 
     public function testGetArgException()
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->event->getArgument('nameNotExist');
     }
 
@@ -90,7 +90,7 @@ class GenericEventTest extends TestCase
         $this->assertEquals('Event', $this->event['name']);
 
         // test getting invalid arg
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->assertFalse($this->event['nameNotExist']);
     }
 

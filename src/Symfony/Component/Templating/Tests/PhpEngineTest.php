@@ -51,7 +51,7 @@ class PhpEngineTest extends TestCase
             $engine['bar'];
             $this->fail('->offsetGet() throws an InvalidArgumentException if the helper is not defined');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->offsetGet() throws an InvalidArgumentException if the helper is not defined');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->offsetGet() throws an InvalidArgumentException if the helper is not defined');
             $this->assertEquals('The helper "bar" is not defined.', $e->getMessage(), '->offsetGet() throws an InvalidArgumentException if the helper is not defined');
         }
     }
@@ -72,7 +72,7 @@ class PhpEngineTest extends TestCase
             $engine->get('foobar');
             $this->fail('->get() throws an InvalidArgumentException if the helper is not defined');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the helper is not defined');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->get() throws an InvalidArgumentException if the helper is not defined');
             $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
         }
 
@@ -87,7 +87,7 @@ class PhpEngineTest extends TestCase
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
         $engine->set($foo);
 
-        $this->expectException('\LogicException');
+        $this->expectException(\LogicException::class);
 
         unset($engine['foo']);
     }
@@ -99,7 +99,7 @@ class PhpEngineTest extends TestCase
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if the template does not exist');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->render() throws an InvalidArgumentException if the template does not exist');
             $this->assertEquals('The template "name" does not exist.', $e->getMessage(), '->render() throws an InvalidArgumentException if the template does not exist');
         }
 

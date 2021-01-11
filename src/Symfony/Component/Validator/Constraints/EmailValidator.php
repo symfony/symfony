@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Egulias\EmailValidator\EmailValidator as EguliasEmailValidator;
 use Egulias\EmailValidator\Validation\EmailValidation;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
@@ -107,11 +108,11 @@ class EmailValidator extends ConstraintValidator
         }
 
         if (Email::VALIDATION_MODE_STRICT === $constraint->mode) {
-            if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
+            if (!class_exists(EguliasEmailValidator::class)) {
                 throw new LogicException('Strict email validation requires egulias/email-validator ~1.2|~2.0.');
             }
 
-            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+            $strictValidator = new EguliasEmailValidator();
 
             if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
                 $this->context->buildViolation($constraint->message)

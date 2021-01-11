@@ -89,7 +89,7 @@ class SessionTest extends TestCase
         } catch (\Exception $e) {
         }
 
-        $this->assertInstanceOf('\LogicException', $e);
+        $this->assertInstanceOf(\LogicException::class, $e);
     }
 
     public function testSetName()

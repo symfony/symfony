@@ -66,7 +66,7 @@ class RouteCollectionTest extends TestCase
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
 
-        $this->assertInstanceOf('\ArrayIterator', $collection->getIterator());
+        $this->assertInstanceOf(\ArrayIterator::class, $collection->getIterator());
         $this->assertSame(['bar' => $bar, 'foo' => $foo, 'last' => $last], $collection->getIterator()->getArrayCopy());
     }
 

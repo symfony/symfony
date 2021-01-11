@@ -12,10 +12,14 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
+use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 class ExtensionPassTest extends TestCase
 {
@@ -24,17 +28,17 @@ class ExtensionPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $container->register('twig.app_variable', '\Symfony\Bridge\Twig\AppVariable');
-        $container->register('templating', '\Symfony\Bundle\TwigBundle\TwigEngine');
+        $container->register('twig.app_variable', AppVariable::class);
+        $container->register('templating', TwigEngine::class);
         $container->register('twig.extension.yaml');
         $container->register('twig.extension.debug.stopwatch');
         $container->register('twig.extension.expression');
 
-        $nativeTwigLoader = new Definition('\Twig\Loader\FilesystemLoader');
+        $nativeTwigLoader = new Definition(TwigFilesystemLoader::class);
         $nativeTwigLoader->addMethodCall('addPath', []);
         $container->setDefinition('twig.loader.native_filesystem', $nativeTwigLoader);
 
-        $filesystemLoader = new Definition('\Symfony\Bundle\TwigBundle\Loader\FilesystemLoader');
+        $filesystemLoader = new Definition(FilesystemLoader::class);
         $filesystemLoader->setArguments([null, null, null]);
         $filesystemLoader->addMethodCall('addPath', []);
         $container->setDefinition('twig.loader.filesystem', $filesystemLoader);

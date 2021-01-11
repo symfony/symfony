@@ -36,7 +36,7 @@ class ButtonBuilderTest extends TestCase
      */
     public function testValidNames($name)
     {
-        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
+        $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder($name));
     }
 
     /**
@@ -44,7 +44,7 @@ class ButtonBuilderTest extends TestCase
      */
     public function testNameContainingIllegalCharacters()
     {
-        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder('button[]'));
+        $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder('button[]'));
     }
 
     public function getInvalidNames()

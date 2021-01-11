@@ -54,10 +54,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 
     public function testConstructWithoutLocale()
     {
-        $this->assertInstanceOf(
-            '\Symfony\Component\Intl\NumberFormatter\NumberFormatter',
-            $this->getNumberFormatter(null, NumberFormatter::DECIMAL)
-        );
+        $this->assertInstanceOf(NumberFormatter::class, $this->getNumberFormatter(null, NumberFormatter::DECIMAL));
     }
 
     public function testCreate()

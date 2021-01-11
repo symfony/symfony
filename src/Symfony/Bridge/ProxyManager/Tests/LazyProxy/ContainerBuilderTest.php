@@ -14,6 +14,8 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy;
 require_once __DIR__.'/Fixtures/includes/foo.php';
 
 use PHPUnit\Framework\TestCase;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManagerBridgeFooClass;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -31,7 +33,7 @@ class ContainerBuilderTest extends TestCase
 
         $builder->setProxyInstantiator(new RuntimeInstantiator());
 
-        $builder->register('foo1', 'ProxyManagerBridgeFooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
+        $builder->register('foo1', ProxyManagerBridgeFooClass::class)->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
         $builder->getDefinition('foo1')->setLazy(true);
 
         $builder->compile();
@@ -43,16 +45,16 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(0, $foo1::$destructorCount);
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1);
-        $this->assertInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1);
+        $this->assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1);
+        $this->assertInstanceOf(LazyLoadingInterface::class, $foo1);
         $this->assertFalse($foo1->isProxyInitialized());
 
         $foo1->initializeProxy();
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved after initialization');
         $this->assertTrue($foo1->isProxyInitialized());
-        $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1->getWrappedValueHolderValue());
-        $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());
+        $this->assertInstanceOf(ProxyManagerBridgeFooClass::class, $foo1->getWrappedValueHolderValue());
+        $this->assertNotInstanceOf(LazyLoadingInterface::class, $foo1->getWrappedValueHolderValue());
 
         $foo1->__destruct();
         $this->assertSame(1, $foo1::$destructorCount);

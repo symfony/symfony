@@ -21,6 +21,7 @@ use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class EntityUserProviderTest extends TestCase
 {
@@ -154,7 +155,7 @@ class EntityUserProviderTest extends TestCase
             ->method('loadUserByUsername')
             ->with('name')
             ->willReturn(
-                $this->getMockBuilder('\Symfony\Component\Security\Core\User\UserInterface')->getMock()
+                $this->getMockBuilder(UserInterface::class)->getMock()
             );
 
         $provider = new EntityUserProvider(

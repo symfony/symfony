@@ -45,7 +45,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf('\Closure'))
+            ->with($choices, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($choices, $callback) {
                 return new ArrayChoiceList(array_map($callback, $choices));
             });
@@ -59,7 +59,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf('\Closure'))
+            ->with($choices, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($choices, $callback) {
                 return new ArrayChoiceList(array_map($callback, $choices));
             });
@@ -114,7 +114,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf('\Closure'))
+            ->with($loader, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($loader, $callback) {
                 return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
             });
@@ -149,7 +149,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf('\Closure'))
+            ->with($choices, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($choices, $callback) {
                 return new ArrayChoiceList(array_map($callback, $choices));
             });
@@ -164,7 +164,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf('\Closure'))
+            ->with($loader, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($loader, $callback) {
                 return new ArrayChoiceList((array) $callback(null));
             });
@@ -178,7 +178,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf('\Closure'))
+            ->with($loader, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($loader, $callback) {
                 return new ArrayChoiceList((array) $callback((object) ['property' => 'value']));
             });
@@ -192,7 +192,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, $this->isInstanceOf('\Closure'))
+            ->with($list, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred) {
                 return new ChoiceListView((array) $preferred((object) ['property' => true]));
             });
@@ -206,7 +206,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, $this->isInstanceOf('\Closure'))
+            ->with($list, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred) {
                 return new ChoiceListView((array) $preferred((object) ['property' => true]));
             });
@@ -221,7 +221,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, $this->isInstanceOf('\Closure'))
+            ->with($list, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred) {
                 return new ChoiceListView((array) $preferred((object) ['category' => null]));
             });
@@ -235,7 +235,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label) {
                 return new ChoiceListView((array) $label((object) ['property' => 'label']));
             });
@@ -249,7 +249,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label) {
                 return new ChoiceListView((array) $label((object) ['property' => 'label']));
             });
@@ -263,7 +263,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index) {
                 return new ChoiceListView((array) $index((object) ['property' => 'index']));
             });
@@ -277,7 +277,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index) {
                 return new ChoiceListView((array) $index((object) ['property' => 'index']));
             });
@@ -291,7 +291,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
             });
@@ -305,7 +305,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return new ChoiceListView((array) $groupBy((object) ['property' => 'group']));
             });
@@ -320,7 +320,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return new ChoiceListView((array) $groupBy((object) ['group' => null]));
             });
@@ -334,7 +334,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
                 return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
             });
@@ -348,7 +348,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
+            ->with($list, null, null, null, null, $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
                 return new ChoiceListView((array) $attr((object) ['property' => 'attr']));
             });

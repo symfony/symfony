@@ -82,7 +82,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             );
         }
         if (!$dateInterval instanceof \DateInterval) {
-            throw new UnexpectedTypeException($dateInterval, '\DateInterval');
+            throw new UnexpectedTypeException($dateInterval, \DateInterval::class);
         }
         $result = [];
         foreach (self::$availableFields as $field => $char) {

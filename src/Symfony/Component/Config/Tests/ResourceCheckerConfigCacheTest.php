@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
+use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ResourceCheckerConfigCacheTest extends TestCase
@@ -45,7 +46,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshIfEmpty()
     {
-        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock()
+        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock()
             ->expects($this->never())->method('supports');
 
         /* If there is nothing in the cache, it needs to be filled (and thus it's not fresh).
@@ -82,7 +83,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testIsFreshWithchecker()
     {
-        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
+        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -100,7 +101,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testIsNotFreshWithchecker()
     {
-        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
+        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -118,7 +119,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshWhenUnserializeFails()
     {
-        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
+        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 
@@ -138,7 +139,8 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshIfNotExistsMetaFile()
     {
-        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
+        $checker = $this->getMockBuilder(ResourceCheckerInterface::class
+        )->getMock();
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 

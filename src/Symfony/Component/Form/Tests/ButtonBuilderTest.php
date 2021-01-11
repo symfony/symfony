@@ -36,15 +36,15 @@ class ButtonBuilderTest extends TestCase
      */
     public function testValidNames($name)
     {
-        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
+        $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder($name));
     }
 
     public function testNameContainingIllegalCharacters()
     {
-        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The name "button[]" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").');
 
-        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder('button[]'));
+        $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder('button[]'));
     }
 
     public function getInvalidNames()

@@ -81,7 +81,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->method('request')
             ->with('POST', 'http://example.com/', $this->callback(function ($options) {
                 $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf('\Generator', $options['body']);
+                $this->assertInstanceOf(\Generator::class, $options['body']);
                 $this->assertStringContainsString('my_file', implode('', iterator_to_array($options['body'])));
 
                 return true;
@@ -191,7 +191,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->method('request')
             ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
                 $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf('\Generator', $options['body']);
+                $this->assertInstanceOf(\Generator::class, $options['body']);
                 $body = implode('', iterator_to_array($options['body'], false));
                 foreach ($fileContents as $content) {
                     $this->assertStringContainsString($content, $body);
@@ -209,7 +209,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->method('request')
             ->with('POST', 'http://example.com/', $this->callback(function ($options) use ($fileContents) {
                 $this->assertStringContainsString('Content-Type: multipart/form-data', implode('', $options['headers']));
-                $this->assertInstanceOf('\Generator', $options['body']);
+                $this->assertInstanceOf(\Generator::class, $options['body']);
                 $body = implode('', iterator_to_array($options['body'], false));
                 foreach ($fileContents as $content) {
                     $this->assertStringNotContainsString($content, $body);

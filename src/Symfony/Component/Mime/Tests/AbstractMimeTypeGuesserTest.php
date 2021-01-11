@@ -57,7 +57,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/directory');
     }
 
@@ -94,7 +94,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/not_here');
     }
 

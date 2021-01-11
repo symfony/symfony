@@ -53,10 +53,10 @@ class FormFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
-        $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
-        $this->registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
-        $this->builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
+        $this->guesser1 = $this->getMockBuilder(\Symfony\Component\Form\FormTypeGuesserInterface::class)->getMock();
+        $this->guesser2 = $this->getMockBuilder(\Symfony\Component\Form\FormTypeGuesserInterface::class)->getMock();
+        $this->registry = $this->getMockBuilder(\Symfony\Component\Form\FormRegistryInterface::class)->getMock();
+        $this->builder = $this->getMockBuilder(\Symfony\Component\Form\Test\FormBuilderInterface::class)->getMock();
         $this->factory = new FormFactory($this->registry);
 
         $this->registry->expects($this->any())
@@ -155,7 +155,7 @@ class FormFactoryTest extends TestCase
         $resolvedOptions = ['a' => '2', 'b' => '3'];
 
         // the interface does not have the method, so use the real class
-        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
+        $resolvedType = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormType::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -225,8 +225,8 @@ class FormFactoryTest extends TestCase
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
     {
-        $registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
-        $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
+        $registry = $this->getMockBuilder(\Symfony\Component\Form\FormRegistryInterface::class)->getMock();
+        $factory = $this->getMockBuilder(FormFactory::class)
             ->setMethods(['createNamedBuilder'])
             ->setConstructorArgs([$registry])
             ->getMock();
@@ -463,7 +463,7 @@ class FormFactoryTest extends TestCase
 
     private function getMockFactory(array $methods = [])
     {
-        return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
+        return $this->getMockBuilder(FormFactory::class)
             ->setMethods($methods)
             ->setConstructorArgs([$this->registry])
             ->getMock();
@@ -471,6 +471,6 @@ class FormFactoryTest extends TestCase
 
     private function getMockResolvedType()
     {
-        return $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        return $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
     }
 }

@@ -52,7 +52,7 @@ class CookieTest extends TestCase
      */
     public function testWithRawThrowsExceptionIfCookieNameContainsSpecialCharacters($name)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::create($name)->withRaw();
     }
 

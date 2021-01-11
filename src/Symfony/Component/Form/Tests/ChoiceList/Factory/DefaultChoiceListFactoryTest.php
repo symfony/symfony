@@ -271,7 +271,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromLoaderWithFilter()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class)->getMock();
         $filter = function () {};
 
         $list = $this->factory->createListFromLoader($loader, null, $filter);

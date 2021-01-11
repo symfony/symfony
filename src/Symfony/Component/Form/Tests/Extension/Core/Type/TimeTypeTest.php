@@ -476,7 +476,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testSetDataDifferentTimezonesWithoutReferenceDate()
     {
-        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
         $this->expectExceptionMessage('Using different values for the "model_timezone" and "view_timezone" options without configuring a reference date is not supported.');
 
         $form = $this->factory->create(static::TESTED_TYPE, null, [

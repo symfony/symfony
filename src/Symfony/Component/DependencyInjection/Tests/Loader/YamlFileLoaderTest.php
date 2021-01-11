@@ -52,7 +52,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadUnExistFile()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file ".+" does not exist./');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
@@ -64,7 +64,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadInvalidYamlFile()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file ".+" does not contain valid YAML./');
         $path = self::$fixturesPath.'/ini';
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator($path));
@@ -80,7 +80,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testLoadInvalidFile($file)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
 
         $loader->load($file.'.yml');
@@ -146,11 +146,11 @@ class YamlFileLoaderTest extends TestCase
             $loader->load('services4_bad_import_with_errors.yml');
             $this->fail('->load() throws a LoaderLoadException if the imported yaml file does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\LoaderLoadException', $e, '->load() throws a LoaderLoadException if the imported yaml file does not exist');
+            $this->assertInstanceOf(\Symfony\Component\Config\Exception\LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the imported yaml file does not exist');
             $this->assertMatchesRegularExpression(sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.yml', 'services4_bad_import_with_errors\.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported yaml file does not exist');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\FileLocatorFileNotFoundException', $e, '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
+            $this->assertInstanceOf(\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException::class, $e, '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
             $this->assertMatchesRegularExpression(sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.yml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported yaml file does not exist');
         }
 
@@ -158,11 +158,11 @@ class YamlFileLoaderTest extends TestCase
             $loader->load('services4_bad_import_nonvalid.yml');
             $this->fail('->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\LoaderLoadException', $e, '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
+            $this->assertInstanceOf(\Symfony\Component\Config\Exception\LoaderLoadException::class, $e, '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
             $this->assertMatchesRegularExpression(sprintf('#^The service file ".+%1$s" is not valid\. It should contain an array\. Check your YAML syntax in .+%1$s \(which is being imported from ".+%2$s"\)\.$#', 'nonvalid2\.yml', 'services4_bad_import_nonvalid.yml'), $e->getMessage(), '->load() throws a LoaderLoadException if the tag in the imported yaml file is not valid');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
+            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
             $this->assertMatchesRegularExpression(sprintf('#^The service file ".+%s" is not valid\. It should contain an array\. Check your YAML syntax\.$#', 'nonvalid2\.yml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the tag in the imported yaml file is not valid');
         }
     }
@@ -175,7 +175,7 @@ class YamlFileLoaderTest extends TestCase
         $services = $container->getDefinitions();
         $this->assertArrayHasKey('foo', $services, '->load() parses service elements');
         $this->assertFalse($services['not_shared']->isShared(), '->load() parses the shared flag');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Definition', $services['foo'], '->load() converts service element to Definition instances');
+        $this->assertInstanceOf(\Symfony\Component\DependencyInjection\Definition::class, $services['foo'], '->load() converts service element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(['foo', new Reference('foo'), [true, false]], $services['arguments']->getArguments(), '->load() parses the argument tags');
@@ -313,7 +313,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->load('badtag1.yml');
             $this->fail('->load() should throw an exception when the tags key of a service is not an array');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tags key is not an array');
+            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if the tags key is not an array');
             $this->assertStringStartsWith('Parameter "tags" must be an array for service', $e->getMessage(), '->load() throws an InvalidArgumentException if the tags key is not an array');
         }
     }
@@ -325,7 +325,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->load('badtag2.yml');
             $this->fail('->load() should throw an exception when a tag is missing the name key');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
+            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
             $this->assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
     }
@@ -366,7 +366,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->load('badtag3.yml');
             $this->fail('->load() should throw an exception when a tag-attribute is not a scalar');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
+            $this->assertInstanceOf(InvalidArgumentException::class, $e, '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
             $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
         }
     }
@@ -385,7 +385,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testTagWithEmptyNameThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_empty_string.yml');
@@ -393,7 +393,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testTagWithNonStringNameThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The tag name for service ".+" in .+ must be a non-empty string/');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('tag_name_no_string.yml');
@@ -493,7 +493,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testPrototypeWithNamespaceAndNoResource()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/A "resource" attribute must be set when the "namespace" attribute is set for service ".+" in .+/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -597,7 +597,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testChildDefinitionWithWrongSyntaxThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "parent" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_parent.yml');
@@ -605,7 +605,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testDecoratedServicesWithWrongSyntaxThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decorates.yml');
@@ -613,7 +613,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testDecoratedServicesWithWrongOnInvalidSyntaxThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Did you mean null (without quotes)');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decoration_on_invalid_null.yml');
@@ -621,7 +621,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testInvalidTagsWithDefaults()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Parameter "tags" must be an array for service "Foo\\\Bar" in ".+services31_invalid_tags\.yml"\. Check your YAML syntax./');
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services31_invalid_tags.yml');
@@ -629,7 +629,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testUnderscoreServiceId()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service names that start with an underscore are reserved. Rename the "_foo" service or define it in XML instead.');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -711,7 +711,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testAnonymousServicesWithAliases()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Creating an alias using the tag "!service" is not allowed in ".+anonymous_services_alias\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -720,7 +720,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testAnonymousServicesInParameters()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Using an anonymous service in a parameter is not allowed in ".+anonymous_services_in_parameters\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -739,7 +739,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testEmptyDefaultsThrowsClearException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Service "_defaults" key must be an array, "null" given in ".+bad_empty_defaults\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -748,7 +748,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testEmptyInstanceofThrowsClearException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Service "_instanceof" key must be an array, "null" given in ".+bad_empty_instanceof\.yml"\./');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -757,7 +757,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testUnsupportedKeywordThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/^The configuration key "private" is unsupported for definition "bar"/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -766,7 +766,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testUnsupportedKeywordInServiceAliasThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/^The configuration key "calls" is unsupported for the service "bar" which is defined as an alias/');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -826,7 +826,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testProcessNotExistingActionParam()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Fixtures\ConstructNotExists": argument "$notExist" of method "__construct()" has type "Symfony\Component\DependencyInjection\Tests\Fixtures\NotExist" but this class was not found.');
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));

@@ -26,8 +26,8 @@ class FormBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
+        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
@@ -51,7 +51,7 @@ class FormBuilderTest extends TestCase
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $this->builder->add(true);
     }
 
@@ -133,7 +133,7 @@ class FormBuilderTest extends TestCase
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
-        $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
+        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $form);
     }
 
     public function testCreateNoTypeNo()
@@ -156,7 +156,7 @@ class FormBuilderTest extends TestCase
 
     public function testGetUnknown()
     {
-        $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The child with the name "foo" does not exist.');
 
         $this->builder->get('foo');
@@ -223,7 +223,7 @@ class FormBuilderTest extends TestCase
 
     private function getFormBuilder($name = 'name')
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+        $mock = $this->getMockBuilder(FormBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
 

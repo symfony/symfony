@@ -31,8 +31,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
+        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller[0]);
+        $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
 
@@ -44,8 +44,8 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
+        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller);
+        $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
     public function testContainerAwareControllerGetsContainerWhenNotSet()
@@ -68,7 +68,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     public function testAbstractControllerGetsContainerWhenNotSet()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
 
         class_exists(AbstractControllerTest::class);
@@ -89,7 +89,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
 
         class_exists(AbstractControllerTest::class);
@@ -159,12 +159,12 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     protected function createMockParser()
     {
-        return $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')->disableOriginalConstructor()->getMock();
+        return $this->getMockBuilder(\Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser::class)->disableOriginalConstructor()->getMock();
     }
 
     protected function createMockContainer()
     {
-        return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        return $this->getMockBuilder(ContainerInterface::class)->getMock();
     }
 }
 

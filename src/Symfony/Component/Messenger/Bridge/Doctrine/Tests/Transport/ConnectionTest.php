@@ -93,7 +93,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -108,7 +108,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\TransportException');
+        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -257,14 +257,14 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }

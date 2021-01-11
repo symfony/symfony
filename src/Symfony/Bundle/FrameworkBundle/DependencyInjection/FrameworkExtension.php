@@ -232,7 +232,7 @@ class FrameworkExtension extends Extension
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
         if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
+            if (!class_exists(Translator::class) && $this->isConfigEnabled($container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed. Try running "composer require symfony/translation".');
             }
 
@@ -320,14 +320,14 @@ class FrameworkExtension extends Extension
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
-            if (!class_exists('Symfony\Component\Form\Form')) {
+            if (!class_exists(\Symfony\Component\Form\Form::class)) {
                 throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
             }
 
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
 
-            if (class_exists('Symfony\Component\Validator\Validation')) {
+            if (class_exists(\Symfony\Component\Validator\Validation::class)) {
                 $config['validation']['enabled'] = true;
             } else {
                 $container->setParameter('validator.translation_domain', 'validators');
@@ -340,7 +340,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
-            if (!class_exists('Symfony\Component\Asset\Package')) {
+            if (!class_exists(\Symfony\Component\Asset\Package::class)) {
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed. Try running "composer require symfony/asset".');
             }
 
@@ -408,7 +408,7 @@ class FrameworkExtension extends Extension
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
-            if (!class_exists('Symfony\Component\Serializer\Serializer')) {
+            if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {
                 throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed. Try running "composer require symfony/serializer-pack".');
             }
 
@@ -1170,18 +1170,18 @@ class FrameworkExtension extends Extension
         $dirs = [];
         $transPaths = [];
         $nonExistingDirs = [];
-        if (class_exists('Symfony\Component\Validator\Validation')) {
-            $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
+        if (class_exists(\Symfony\Component\Validator\Validation::class)) {
+            $r = new \ReflectionClass(\Symfony\Component\Validator\Validation::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Form\Form')) {
-            $r = new \ReflectionClass('Symfony\Component\Form\Form');
+        if (class_exists(\Symfony\Component\Form\Form::class)) {
+            $r = new \ReflectionClass(\Symfony\Component\Form\Form::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
-            $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        if (class_exists(\Symfony\Component\Security\Core\Exception\AuthenticationException::class)) {
+            $r = new \ReflectionClass(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';
         }
@@ -1279,7 +1279,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Validator\Validation')) {
+        if (!class_exists(\Symfony\Component\Validator\Validation::class)) {
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require symfony/validator".');
         }
 
@@ -1346,8 +1346,8 @@ class FrameworkExtension extends Extension
             $files['yaml' === $extension ? 'yml' : $extension][] = $path;
         };
 
-        if (interface_exists('Symfony\Component\Form\FormInterface')) {
-            $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
+        if (interface_exists(\Symfony\Component\Form\FormInterface::class)) {
+            $reflClass = new \ReflectionClass(\Symfony\Component\Form\FormInterface::class);
             $fileRecorder('xml', \dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         }
 
@@ -1408,7 +1408,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Doctrine\Common\Annotations\Annotation')) {
+        if (!class_exists(\Doctrine\Common\Annotations\Annotation::class)) {
             throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
         }
 
@@ -1420,7 +1420,7 @@ class FrameworkExtension extends Extension
         }
 
         if ('none' !== $config['cache']) {
-            if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
+            if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
                 throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
             }
 
@@ -1531,7 +1531,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
+        if (!class_exists(\Symfony\Component\Security\Csrf\CsrfToken::class)) {
             throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed. Try running "composer require symfony/security-csrf".');
         }
 
@@ -1646,7 +1646,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_info.php');
 
-        if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
+        if (interface_exists(\phpDocumentor\Reflection\DocBlockFactoryInterface::class)) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);

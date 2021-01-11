@@ -17,7 +17,7 @@
             );
         </script>
 
-        <?php if (class_exists('Symfony\Component\HttpKernel\Kernel')) { ?>
+        <?php if (class_exists(\Symfony\Component\HttpKernel\Kernel::class)) { ?>
             <header>
                 <div class="container">
                     <h1 class="logo"><?= $this->include('assets/images/symfony-logo.svg'); ?> Symfony Exception</h1>

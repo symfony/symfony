@@ -70,7 +70,7 @@ class ExtensionTest extends TestCase
 
     public function testInvalidConfiguration()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
         $this->expectExceptionMessage('The extension configuration class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Extension\\InvalidConfig\\Configuration" must implement "Symfony\\Component\\Config\\Definition\\ConfigurationInterface".');
 
         $extension = new InvalidConfigExtension();

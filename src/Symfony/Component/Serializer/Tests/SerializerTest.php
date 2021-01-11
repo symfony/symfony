@@ -66,7 +66,7 @@ class SerializerTest extends TestCase
 
     public function testItThrowsExceptionOnInvalidNormalizer()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" neither implements "Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface" nor "Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface".');
 
         new Serializer([new \stdClass()]);
@@ -74,7 +74,7 @@ class SerializerTest extends TestCase
 
     public function testItThrowsExceptionOnInvalidEncoder()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" neither implements "Symfony\\Component\\Serializer\\Encoder\\EncoderInterface" nor "Symfony\\Component\\Serializer\\Encoder\\DecoderInterface"');
 
         new Serializer([], [new \stdClass()]);

@@ -41,7 +41,7 @@ class ValidatorBuilderTest extends TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->getMockBuilder('Symfony\Component\Validator\ObjectInitializerInterface')->getMock()
+            $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock()
         ));
     }
 
@@ -163,14 +163,14 @@ class ValidatorBuilderTest extends TestCase
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->getMockBuilder('Symfony\Component\Validator\ConstraintValidatorFactoryInterface')->getMock())
+            $this->getMockBuilder(\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class)->getMock())
         );
     }
 
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')->getMock())
+            $this->getMockBuilder(\Symfony\Contracts\Translation\TranslatorInterface::class)->getMock())
         );
     }
 
@@ -181,6 +181,6 @@ class ValidatorBuilderTest extends TestCase
 
     public function testGetValidator()
     {
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
+        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\RecursiveValidator::class, $this->builder->getValidator());
     }
 }

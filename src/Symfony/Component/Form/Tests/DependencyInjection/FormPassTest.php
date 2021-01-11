@@ -222,7 +222,7 @@ class FormPassTest extends TestCase
 
     public function testAddTaggedFormTypeExtensionWithoutExtendingAnyType()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The getExtendedTypes() method for service "my.type_extension" does not return any extended types.');
         $container = $this->createContainerBuilder();
 

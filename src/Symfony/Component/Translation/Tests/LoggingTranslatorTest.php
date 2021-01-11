@@ -19,7 +19,7 @@ class LoggingTranslatorTest extends TestCase
 {
     public function testTransWithNoTranslationIsLogged()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $logger->expects($this->exactly(1))
             ->method('warning')
             ->with('Translation not found.')

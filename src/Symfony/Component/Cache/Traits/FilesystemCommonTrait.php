@@ -21,7 +21,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 trait FilesystemCommonTrait
 {
     private $directory;
-    private $tmp;
 
     private function init(string $namespace, ?string $directory)
     {
@@ -92,17 +91,24 @@ trait FilesystemCommonTrait
     {
         set_error_handler(__CLASS__.'::throwError');
         try {
-            if (null === $this->tmp) {
-                $this->tmp = $this->directory.uniqid('', true);
-            }
-            file_put_contents($this->tmp, $data);
+            $tmp = $this->directory.bin2hex(random_bytes(40));
+
+            file_put_contents($tmp, $data);
 
             if (null !== $expiresAt) {
-                touch($this->tmp, $expiresAt);
+                touch($tmp, $expiresAt);
             }
 
-            return rename($this->tmp, $file);
+            $result = rename($tmp, $file);
+            if ($result) {
+                unset($tmp);
+            }
+
+            return $result;
         } finally {
+            if (isset($tmp) && file_exists($tmp)) {
+                unlink($tmp);
+            }
             restore_error_handler();
         }
     }
@@ -177,9 +183,6 @@ trait FilesystemCommonTrait
     {
         if (method_exists(parent::class, '__destruct')) {
             parent::__destruct();
-        }
-        if (null !== $this->tmp && file_exists($this->tmp)) {
-            unlink($this->tmp);
         }
     }
 }

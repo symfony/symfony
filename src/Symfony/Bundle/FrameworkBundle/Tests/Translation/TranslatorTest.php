@@ -81,7 +81,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
         // do it another time as the cache is primed now
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Loader\LoaderInterface::class)->getMock();
         $loader->expects($this->never())->method('load');
 
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir]);
@@ -99,9 +99,9 @@ class TranslatorTest extends TestCase
 
     public function testTransWithCachingWithInvalidLocale()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "invalid locale" locale.');
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Loader\LoaderInterface::class)->getMock();
         $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', TranslatorWithInvalidLocale::class);
 
         $translator->trans('foo');
@@ -132,9 +132,9 @@ class TranslatorTest extends TestCase
 
     public function testInvalidOptions()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
 
         (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
     }
@@ -144,7 +144,7 @@ class TranslatorTest extends TestCase
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);
 
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Loader\LoaderInterface::class)->getMock();
 
         $loader->expects($this->exactly(2))
             ->method('load')
@@ -262,7 +262,7 @@ class TranslatorTest extends TestCase
 
     protected function getLoader()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Loader\LoaderInterface::class)->getMock();
         $loader
             ->expects($this->exactly(7))
             ->method('load')
@@ -298,7 +298,7 @@ class TranslatorTest extends TestCase
 
     protected function getContainer($loader)
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
         $container
             ->expects($this->any())
             ->method('get')
@@ -339,7 +339,7 @@ class TranslatorTest extends TestCase
         $translator->setFallbackLocales(['fr']);
         $translator->warmup($this->tmpDir);
 
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Loader\LoaderInterface::class)->getMock();
         $loader
             ->expects($this->never())
             ->method('load');

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Writer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Dumper\DumperInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 

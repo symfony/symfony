@@ -22,7 +22,7 @@ class AtLeastOneOfTest extends TestCase
 {
     public function testRejectNonConstraints()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new AtLeastOneOf([
             'foo',
         ]);
@@ -30,7 +30,7 @@ class AtLeastOneOfTest extends TestCase
 
     public function testRejectValidConstraint()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new AtLeastOneOf([
             new Valid(),
         ]);

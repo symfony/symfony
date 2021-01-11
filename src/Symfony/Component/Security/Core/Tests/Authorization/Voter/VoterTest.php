@@ -65,7 +65,7 @@ class VoterTest extends TestCase
 
     public function testVoteWithTypeError()
     {
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');
         $voter = new TypeErrorVoterTest_Voter();
         $voter->vote($this->token, new \stdClass(), ['EDIT']);

@@ -121,12 +121,12 @@ class GuardAuthenticationProviderTest extends TestCase
 
     public function testGuardWithNoLongerAuthenticatedTriggersLogout()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationExpiredException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationExpiredException::class);
         $providerKey = 'my_firewall_abc';
 
         // create a token and mark it as NOT authenticated anymore
         // this mimics what would happen if a user "changed" between request
-        $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $mockedUser = $this->getMockBuilder(UserInterface::class)->getMock();
         $token = new PostAuthenticationGuardToken($mockedUser, $providerKey, ['ROLE_USER']);
         $token->setAuthenticated(false);
 
@@ -140,7 +140,7 @@ class GuardAuthenticationProviderTest extends TestCase
         $authenticatorB = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = [$authenticatorA, $authenticatorB];
 
-        $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $mockedUser = $this->getMockBuilder(UserInterface::class)->getMock();
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);
 
         $token = new PreAuthenticationGuardToken($mockedUser, 'first_firewall_1');
@@ -154,12 +154,12 @@ class GuardAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateFailsOnNonOriginatingToken()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
         $this->expectExceptionMessageMatches('/second_firewall_0/');
         $authenticatorA = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticators = [$authenticatorA];
 
-        $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $mockedUser = $this->getMockBuilder(UserInterface::class)->getMock();
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, 'first_firewall', $this->userChecker);
 
         $token = new PreAuthenticationGuardToken($mockedUser, 'second_firewall_0');
@@ -168,9 +168,9 @@ class GuardAuthenticationProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
-        $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
-        $this->preAuthenticationToken = $this->getMockBuilder('Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken')
+        $this->userProvider = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
+        $this->userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
+        $this->preAuthenticationToken = $this->getMockBuilder(PreAuthenticationGuardToken::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

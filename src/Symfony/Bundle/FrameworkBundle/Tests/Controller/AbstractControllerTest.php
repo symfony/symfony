@@ -101,7 +101,7 @@ class AbstractControllerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         });
@@ -148,7 +148,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUserWithEmptyContainer()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The SecurityBundle is not registered in your application.');
 
         $controller = $this->createController();
@@ -162,7 +162,7 @@ class AbstractControllerTest extends TestCase
      */
     private function getContainerWithTokenStorage($token = null): Container
     {
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')->getMock();
+        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::class)->getMock();
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
@@ -231,7 +231,7 @@ class AbstractControllerTest extends TestCase
     public function testFile()
     {
         $container = new Container();
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernelInterface::class)->getMock();
         $container->set('http_kernel', $kernel);
 
         $controller = $this->createController();
@@ -332,7 +332,7 @@ class AbstractControllerTest extends TestCase
 
     public function testFileWhichDoesNotExist()
     {
-        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->expectException(\Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException::class);
 
         $controller = $this->createController();
 
@@ -341,7 +341,7 @@ class AbstractControllerTest extends TestCase
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
+        $authorizationChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::class)->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
 
         $container = new Container();
@@ -355,9 +355,9 @@ class AbstractControllerTest extends TestCase
 
     public function testdenyAccessUnlessGranted()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
 
-        $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
+        $authorizationChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::class)->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
 
         $container = new Container();
@@ -371,7 +371,7 @@ class AbstractControllerTest extends TestCase
 
     public function testRenderViewTwig()
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -385,7 +385,7 @@ class AbstractControllerTest extends TestCase
 
     public function testRenderTwig()
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -399,7 +399,7 @@ class AbstractControllerTest extends TestCase
 
     public function testStreamTwig()
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -407,12 +407,12 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $controller->stream('foo'));
     }
 
     public function testRedirectToRoute()
     {
-        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
+        $router = $this->getMockBuilder(\Symfony\Component\Routing\RouterInterface::class)->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
 
         $container = new Container();
@@ -422,7 +422,7 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
         $response = $controller->redirectToRoute('foo');
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\RedirectResponse::class, $response);
         $this->assertSame('/foo', $response->getTargetUrl());
         $this->assertSame(302, $response->getStatusCode());
     }
@@ -433,7 +433,7 @@ class AbstractControllerTest extends TestCase
     public function testAddFlash()
     {
         $flashBag = new FlashBag();
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
+        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\Session::class)->getMock();
         $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
 
         $container = new Container();
@@ -450,12 +450,12 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Exception\AccessDeniedException', $controller->createAccessDeniedException());
+        $this->assertInstanceOf(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class, $controller->createAccessDeniedException());
     }
 
     public function testIsCsrfTokenValid()
     {
-        $tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        $tokenManager = $this->getMockBuilder(\Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class)->getMock();
         $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
 
         $container = new Container();
@@ -469,7 +469,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGenerateUrl()
     {
-        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
+        $router = $this->getMockBuilder(\Symfony\Component\Routing\RouterInterface::class)->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
 
         $container = new Container();
@@ -486,7 +486,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $response = $controller->redirect('http://dunglas.fr', 301);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\RedirectResponse::class, $response);
         $this->assertSame('http://dunglas.fr', $response->getTargetUrl());
         $this->assertSame(301, $response->getStatusCode());
     }
@@ -495,14 +495,14 @@ class AbstractControllerTest extends TestCase
     {
         $controller = $this->createController();
 
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException', $controller->createNotFoundException());
+        $this->assertInstanceOf(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class, $controller->createNotFoundException());
     }
 
     public function testCreateForm()
     {
         $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
 
-        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $formFactory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
         $formFactory->expects($this->once())->method('create')->willReturn($form);
 
         $container = new Container();
@@ -516,9 +516,9 @@ class AbstractControllerTest extends TestCase
 
     public function testCreateFormBuilder()
     {
-        $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilderInterface')->getMock();
+        $formBuilder = $this->getMockBuilder(\Symfony\Component\Form\FormBuilderInterface::class)->getMock();
 
-        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $formFactory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
         $formFactory->expects($this->once())->method('createBuilder')->willReturn($formBuilder);
 
         $container = new Container();
@@ -532,7 +532,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')->getMock();
+        $doctrine = $this->getMockBuilder(\Doctrine\Persistence\ManagerRegistry::class)->getMock();
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

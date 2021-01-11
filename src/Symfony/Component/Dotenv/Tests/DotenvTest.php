@@ -322,7 +322,7 @@ class DotenvTest extends TestCase
 
     public function testLoadDirectory()
     {
-        $this->expectException('Symfony\Component\Dotenv\Exception\PathException');
+        $this->expectException(\Symfony\Component\Dotenv\Exception\PathException::class);
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__);
     }

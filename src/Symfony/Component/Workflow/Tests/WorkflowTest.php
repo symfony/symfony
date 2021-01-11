@@ -24,7 +24,7 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithInvalidStoreReturn()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
@@ -34,7 +34,7 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithEmptyDefinition()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
@@ -44,7 +44,7 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithImpossiblePlace()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
         $subject = new Subject();
         $subject->setMarking(['nope' => 1]);
@@ -171,7 +171,7 @@ class WorkflowTest extends TestCase
 
     public function testBuildTransitionBlockerListReturnsUndefinedTransition()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\UndefinedTransitionException');
+        $this->expectException(UndefinedTransitionException::class);
         $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createSimpleWorkflowDefinition();
         $subject = new Subject();

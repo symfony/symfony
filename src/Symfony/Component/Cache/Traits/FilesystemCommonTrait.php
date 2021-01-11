@@ -93,9 +93,20 @@ trait FilesystemCommonTrait
         set_error_handler(__CLASS__.'::throwError');
         try {
             if (null === $this->tmp) {
-                $this->tmp = $this->directory.uniqid('', true);
+                $this->tmp = $this->directory.bin2hex(random_bytes(6));
             }
-            file_put_contents($this->tmp, $data);
+            try {
+                $h = fopen($this->tmp, 'x');
+            } catch (\ErrorException $e) {
+                if (false === strpos($e->getMessage(), 'File exists')) {
+                    throw $e;
+                }
+
+                $this->tmp = $this->directory.bin2hex(random_bytes(6));
+                $h = fopen($this->tmp, 'x');
+            }
+            fwrite($h, $data);
+            fclose($h);
 
             if (null !== $expiresAt) {
                 touch($this->tmp, $expiresAt);

@@ -78,7 +78,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf('\Closure'), $this->isInstanceOf('\Closure'))
+            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($choices, $value, $callback) {
                 return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
             });
@@ -97,7 +97,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
-            ->with($choices, $this->isInstanceOf('\Closure'), $this->isInstanceOf('\Closure'))
+            ->with($choices, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($choices, $value, $callback) {
                 return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
             });
@@ -134,7 +134,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
-            ->with($loader, $this->isInstanceOf('\Closure'), $this->isInstanceOf('\Closure'))
+            ->with($loader, $this->isInstanceOf(\Closure::class), $this->isInstanceOf(\Closure::class))
             ->willReturnCallback(function ($loader, $value, $callback) use ($choices) {
                 return new ArrayChoiceList(array_map($value, array_filter($choices, $callback)));
             });

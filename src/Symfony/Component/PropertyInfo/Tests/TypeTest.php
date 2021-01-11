@@ -107,7 +107,7 @@ class TypeTest extends TestCase
 
     public function testInvalidCollectionArgument()
     {
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('"Symfony\Component\PropertyInfo\Type::validateCollectionArgument()": Argument #5 ($collectionKeyType) must be of type "Symfony\Component\PropertyInfo\Type[]", "Symfony\Component\PropertyInfo\Type" or "null", "stdClass" given.');
 
         new Type('array', false, null, true, new \stdClass(), [new Type('string')]);
@@ -115,7 +115,7 @@ class TypeTest extends TestCase
 
     public function testInvalidCollectionValueArgument()
     {
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('"Symfony\Component\PropertyInfo\Type::validateCollectionArgument()": Argument #5 ($collectionKeyType) must be of type "Symfony\Component\PropertyInfo\Type[]", "Symfony\Component\PropertyInfo\Type" or "null", array value "array" given.');
 
         new Type('array', false, null, true, [new \stdClass()], [new Type('string')]);

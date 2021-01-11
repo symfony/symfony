@@ -234,7 +234,7 @@ class ArgvInputTest extends TestCase
      */
     public function testInvalidInputNegatable($argv, $definition, $expectedExceptionMessage)
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         $input = new ArgvInput($argv);

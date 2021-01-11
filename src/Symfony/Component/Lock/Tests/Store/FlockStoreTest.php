@@ -34,7 +34,7 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryCannotBeCreated()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Lock\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
@@ -45,7 +45,7 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryIsNotWriteable()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Lock\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');

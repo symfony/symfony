@@ -244,7 +244,7 @@ class InputDefinitionTest extends TestCase
 
     public function testAddDuplicateNegatedOption()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('An option named "no-foo" already exists.');
 
         $definition = new InputDefinition();
@@ -254,7 +254,7 @@ class InputDefinitionTest extends TestCase
 
     public function testAddDuplicateNegatedReverseOption()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('An option named "no-foo" already exists.');
 
         $definition = new InputDefinition();

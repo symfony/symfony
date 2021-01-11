@@ -79,7 +79,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testStringInputWithFloatData()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
 
         $this->factory->create(static::TESTED_TYPE, 12345.6789, [
@@ -90,7 +90,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testStringInputWithIntData()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
 
         $this->factory->create(static::TESTED_TYPE, 12345, [

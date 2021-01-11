@@ -31,14 +31,14 @@ class FormRendererTest extends TestCase
 
     public function testRenderARenderedField()
     {
-        $this->expectException('Symfony\Component\Form\Exception\BadMethodCallException');
+        $this->expectException(\Symfony\Component\Form\Exception\BadMethodCallException::class);
         $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
 
         $formView = new FormView();
         $formView->vars['name'] = 'foo';
         $formView->setRendered();
 
-        $engine = $this->getMockBuilder('Symfony\Component\Form\FormRendererEngineInterface')->getMock();
+        $engine = $this->getMockBuilder(\Symfony\Component\Form\FormRendererEngineInterface::class)->getMock();
         $renderer = new FormRenderer($engine);
         $renderer->searchAndRenderBlock($formView, 'row');
     }

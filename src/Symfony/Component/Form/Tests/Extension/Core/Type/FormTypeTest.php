@@ -343,7 +343,7 @@ class FormTypeTest extends BaseTypeTest
 
     public function testActionCannotBeNull()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, ['action' => null]);
     }
 

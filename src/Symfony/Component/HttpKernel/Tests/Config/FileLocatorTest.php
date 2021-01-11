@@ -18,7 +18,7 @@ class FileLocatorTest extends TestCase
 {
     public function testLocate()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
         $kernel
             ->expects($this->atLeastOnce())
             ->method('locateResource')
@@ -30,7 +30,7 @@ class FileLocatorTest extends TestCase
         $kernel
             ->expects($this->never())
             ->method('locateResource');
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $locator->locate('/some/path');
     }
 }

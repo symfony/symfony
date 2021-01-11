@@ -33,9 +33,9 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     public function testHandleWhenUsernameLength($username, $ok)
     {
         $request = Request::create('/login_check', 'POST', ['_username' => $username]);
-        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
 
-        $httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
+        $httpUtils = $this->getMockBuilder(HttpUtils::class)->getMock();
         $httpUtils
             ->expects($this->any())
             ->method('checkRequestPath')
@@ -46,14 +46,14 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ->willReturn(new RedirectResponse('/hello'))
         ;
 
-        $failureHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface')->getMock();
+        $failureHandler = $this->getMockBuilder(\Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface::class)->getMock();
         $failureHandler
             ->expects($ok ? $this->never() : $this->once())
             ->method('onAuthenticationFailure')
             ->willReturn(new Response())
         ;
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')->disableOriginalConstructor()->getMock();
+        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager::class)->disableOriginalConstructor()->getMock();
         $authenticationManager
             ->expects($ok ? $this->once() : $this->never())
             ->method('authenticate')
@@ -61,9 +61,9 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         ;
 
         $listener = new UsernamePasswordFormAuthenticationListener(
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock(),
             $authenticationManager,
-            $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface::class)->getMock(),
             $httpUtils,
             'TheProviderKey',
             new DefaultAuthenticationSuccessHandler($httpUtils),
@@ -86,18 +86,18 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
      */
     public function testHandleNonStringUsernameWithArray($postOnly)
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "_username" must be a string, "array" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => []]);
-        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
             $httpUtils = new HttpUtils(),
             'foo',
             new DefaultAuthenticationSuccessHandler($httpUtils),
-            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
         $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
@@ -109,18 +109,18 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
      */
     public function testHandleNonStringUsernameWithInt($postOnly)
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "_username" must be a string, "int" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
-        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
             $httpUtils = new HttpUtils(),
             'foo',
             new DefaultAuthenticationSuccessHandler($httpUtils),
-            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
         $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
@@ -132,18 +132,18 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
      */
     public function testHandleNonStringUsernameWithObject($postOnly)
     {
-        $this->expectException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
         $this->expectExceptionMessage('The key "_username" must be a string, "stdClass" given.');
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
-        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
             $httpUtils = new HttpUtils(),
             'foo',
             new DefaultAuthenticationSuccessHandler($httpUtils),
-            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
         $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
@@ -162,15 +162,15 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             ->willReturn('someUsername');
 
         $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass]);
-        $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock(),
             new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE),
             $httpUtils = new HttpUtils(),
             'foo',
             new DefaultAuthenticationSuccessHandler($httpUtils),
-            new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
+            new DefaultAuthenticationFailureHandler($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
         $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);

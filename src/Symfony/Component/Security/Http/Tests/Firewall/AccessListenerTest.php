@@ -247,9 +247,9 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock(),
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(),
             false
         );
 
@@ -270,9 +270,9 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock(),
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(),
             false
         );
 
@@ -297,9 +297,9 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock(),
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(),
             false
         );
 

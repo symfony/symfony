@@ -667,7 +667,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public static function createCache(string $namespace, int $defaultLifetime, string $version, LoggerInterface $logger = null)
     {
-        if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
+        if (!class_exists(ApcuAdapter::class)) {
             throw new \LogicException(sprintf('The Symfony Cache component must be installed to use "%s()".', __METHOD__));
         }
 

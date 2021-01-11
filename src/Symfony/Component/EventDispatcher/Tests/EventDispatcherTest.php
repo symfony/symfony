@@ -133,8 +133,8 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher->dispatch(new Event(), self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
-        $this->assertInstanceOf('Symfony\Contracts\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), 'noevent'));
-        $this->assertInstanceOf('Symfony\Contracts\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), self::preFoo));
+        $this->assertInstanceOf(Event::class, $this->dispatcher->dispatch(new Event(), 'noevent'));
+        $this->assertInstanceOf(Event::class, $this->dispatcher->dispatch(new Event(), self::preFoo));
         $event = new Event();
         $return = $this->dispatcher->dispatch($event, self::preFoo);
         $this->assertSame($event, $return);
@@ -213,7 +213,7 @@ class EventDispatcherTest extends TestCase
         $listeners = $this->dispatcher->getListeners('pre.foo');
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertCount(2, $listeners);
-        $this->assertInstanceOf('Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithPriorities', $listeners[0][0]);
+        $this->assertInstanceOf(\Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithPriorities::class, $listeners[0][0]);
     }
 
     public function testAddSubscriberWithMultipleListeners()

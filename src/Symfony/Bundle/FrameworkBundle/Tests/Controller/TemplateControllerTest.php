@@ -23,7 +23,7 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
@@ -34,7 +34,7 @@ class TemplateControllerTest extends TestCase
 
     public function testNoTwig()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You can not use the TemplateController if the Twig Bundle is not available.');
         $controller = new TemplateController();
 

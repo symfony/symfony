@@ -169,7 +169,7 @@ class TimezoneTypeTest extends BaseTypeTest
 
     public function testChoiceTranslationLocaleOptionWithoutIntl()
     {
-        $this->expectException('Symfony\Component\Form\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
         $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'uk',

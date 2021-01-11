@@ -882,7 +882,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testViewDataMayBeArrayAccessIfDataClassIsNull()
     {
-        $arrayAccess = $this->getMockBuilder('\ArrayAccess')->getMock();
+        $arrayAccess = $this->getMockBuilder(\ArrayAccess::class)->getMock();
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
         $config->addViewTransformer(new FixedDataTransformer([
             '' => '',

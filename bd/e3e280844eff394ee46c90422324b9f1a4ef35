@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-11T09:12:00Z
+
+> (I don't add use statements, which should probably be done as another fixer).
+
+If I'm correct, PHP CS Fixer has a rule for that (which is also in the `@Symfony` ruleset): https://cs.symfony.com/doc/rules/import/fully_qualified_strict_types.html (nvm, seems like it only works for already existing `use` statements?)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-11T09:39:29Z
+
+> > (I don't add use statements, which should probably be done as another fixer).
+>
+> If I'm correct, PHP CS Fixer has a rule for that (which is also in the `@Symfony` ruleset): https://cs.symfony.com/doc/rules/import/fully_qualified_strict_types.html (nvm, seems like it only works for already existing `use` statements?)
+
+Apparently, it does not work for our use case here.

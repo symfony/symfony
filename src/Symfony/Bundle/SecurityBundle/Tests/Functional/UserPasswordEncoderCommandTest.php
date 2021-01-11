@@ -258,7 +258,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
 
     public function testEncodePasswordNoConfigForGivenUserClass()
     {
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No encoder has been configured for account "Foo\Bar\User".');
 
         $this->passwordEncoderCommandTester->execute([

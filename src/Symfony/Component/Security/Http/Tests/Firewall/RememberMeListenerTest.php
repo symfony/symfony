@@ -13,12 +13,14 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class RememberMeListenerTest extends TestCase
@@ -227,7 +229,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $session = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
         $session
             ->expects($this->once())
             ->method('isStarted')
@@ -277,7 +279,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $session = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
         $session
             ->expects($this->once())
             ->method('isStarted')
@@ -402,6 +404,6 @@ class RememberMeListenerTest extends TestCase
 
     private function getSessionStrategy()
     {
-        return $this->getMockBuilder('\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock();
+        return $this->getMockBuilder(SessionAuthenticationStrategyInterface::class)->getMock();
     }
 }

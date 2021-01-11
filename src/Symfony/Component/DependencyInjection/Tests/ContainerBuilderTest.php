@@ -420,7 +420,7 @@ class ContainerBuilderTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->register('foo1', '%class%');
         $builder->setParameter('class', 'stdClass');
-        $this->assertInstanceOf('\stdClass', $builder->get('foo1'), '->createService() replaces parameters in the class provided by the service definition');
+        $this->assertInstanceOf(\stdClass::class, $builder->get('foo1'), '->createService() replaces parameters in the class provided by the service definition');
     }
 
     public function testCreateServiceArguments()
@@ -519,7 +519,7 @@ class ContainerBuilderTest extends TestCase
         foreach ($lazyContext->lazyValues as $k => $v) {
             ++$i;
             $this->assertEquals('k1', $k);
-            $this->assertInstanceOf('\stdClass', $v);
+            $this->assertInstanceOf(\stdClass::class, $v);
         }
 
         // The second argument should have been ignored.

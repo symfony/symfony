@@ -132,7 +132,7 @@ class ArgumentResolverTest extends TestCase
             self::$resolver->getArguments($request, $controller);
             $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+            $this->assertInstanceOf(\RuntimeException::class, $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         }
     }
 

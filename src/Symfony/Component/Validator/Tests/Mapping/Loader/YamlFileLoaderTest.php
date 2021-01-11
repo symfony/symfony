@@ -69,7 +69,7 @@ class YamlFileLoaderTest extends TestCase
             $loader->loadClassMetadata($metadata);
         } catch (\InvalidArgumentException $e) {
             // Call again. Again an exception should be thrown
-            $this->expectException('\InvalidArgumentException');
+            $this->expectException(\InvalidArgumentException::class);
             $loader->loadClassMetadata($metadata);
         }
     }
@@ -85,7 +85,7 @@ class YamlFileLoaderTest extends TestCase
     public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }

@@ -89,7 +89,7 @@ class AbstractTokenTest extends TestCase
             $token->getAttribute('foobar');
             $this->fail('->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
             $this->assertEquals('This token has no "foobar" attribute.', $e->getMessage(), '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
         }
     }

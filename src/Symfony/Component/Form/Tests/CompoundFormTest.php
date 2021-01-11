@@ -227,7 +227,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testAddUsingNameButNoType()
     {
-        $this->form = $this->getBuilder('name', null, '\stdClass')
+        $this->form = $this->getBuilder('name', null, \stdClass::class)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
             ->getForm();
@@ -236,7 +236,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createForProperty')
-            ->with('\stdClass', 'foo')
+            ->with(\stdClass::class, 'foo')
             ->willReturn($child);
 
         $this->form->add('foo');
@@ -248,7 +248,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testAddUsingNameButNoTypeAndOptions()
     {
-        $this->form = $this->getBuilder('name', null, '\stdClass')
+        $this->form = $this->getBuilder('name', null, \stdClass::class)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
             ->getForm();
@@ -257,7 +257,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createForProperty')
-            ->with('\stdClass', 'foo', null, [
+            ->with(\stdClass::class, 'foo', null, [
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ])
@@ -348,7 +348,7 @@ class CompoundFormTest extends AbstractFormTest
         $child = $this->getBuilder()->getForm();
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->with('bar', $this->isInstanceOf(\RecursiveIteratorIterator::class))
             ->willReturnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame([$child->getName() => $child], iterator_to_array($iterator));
@@ -438,7 +438,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->with('bar', $this->isInstanceOf(\RecursiveIteratorIterator::class))
             ->willReturnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(['firstName' => $child1, 'lastName' => $child2], iterator_to_array($iterator));

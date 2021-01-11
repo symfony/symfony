@@ -298,7 +298,7 @@ class PdoSessionHandlerTest extends TestCase
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);
 
-        $this->assertInstanceOf('\PDO', $method->invoke($storage));
+        $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
     public function testGetConnectionConnectsIfNeeded()
@@ -308,7 +308,7 @@ class PdoSessionHandlerTest extends TestCase
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);
 
-        $this->assertInstanceOf('\PDO', $method->invoke($storage));
+        $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
     /**

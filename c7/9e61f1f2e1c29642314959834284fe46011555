@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-10T12:59:17Z
+
+I was thinking about this as well. Can we update fabbot to enforce the usage of the class constant?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-10T15:44:15Z
+
+@xabbuh That's probably the job of PHP CS Fixer, and it's not trivial, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/2918 for reference
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-10T16:53:03Z
+
+Merging this up is going to be a huge one-time PITA, but I think we'll have a nicer codebase afterwards.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-10T17:02:28Z
+
+I will merge this one up. My strategy with such a PR is always the following: merge everything up, then merge the PR, merge up again and ignore all conflicts. Start again the work on branch n + 1, rinse and repeat.

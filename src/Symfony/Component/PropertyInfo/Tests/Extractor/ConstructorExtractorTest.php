@@ -33,7 +33,7 @@ class ConstructorExtractorTest extends TestCase
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface', $this->extractor);
+        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->extractor);
     }
 
     public function testGetTypes()

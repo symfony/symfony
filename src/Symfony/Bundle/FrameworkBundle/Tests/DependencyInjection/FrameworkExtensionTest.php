@@ -137,7 +137,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testCsrfProtectionNeedsSessionToBeEnabled()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('CSRF protection needs sessions to be enabled.');
         $this->createContainerFromFile('csrf_needs_session');
     }
@@ -317,21 +317,21 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testWorkflowAreValidated()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" were found on StateMachine "my_workflow".');
         $this->createContainerFromFile('workflow_not_valid');
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" and "support_strategy" cannot be used together.');
         $this->createContainerFromFile('workflow_with_support_and_support_strategy');
     }
 
     public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" or "support_strategy" should be configured.');
         $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
@@ -513,7 +513,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testRouterRequiresResourceOption()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['router' => true]], $container);
@@ -774,14 +774,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, {"foo":["qux"],"bar":["baz"]} given.');
         $this->createContainerFromFile('messenger_middleware_factory_erroneous_format');
     }
 
     public function testMessengerInvalidTransportRouting()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Invalid Messenger routing configuration: the "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage" class is being routed to a sender called "invalid". This is not a valid transport or service id.');
         $this->createContainerFromFile('messenger_routing_invalid_transport');
     }
@@ -797,19 +797,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
 
         $files = array_map('realpath', $options['resource_files']['en']);
-        $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
+        $ref = new \ReflectionClass(\Symfony\Component\Validator\Validation::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
-        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
+        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
+        $ref = new \ReflectionClass(\Symfony\Component\Security\Core\Security::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
@@ -866,7 +866,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
         $projectDir = $container->getParameter('kernel.project_dir');
 
-        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
+        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
         $xmlMappings = [
             \dirname($ref->getFileName()).'/Resources/config/validation.xml',
             strtr($projectDir.'/config/validator/foo.xml', '/', \DIRECTORY_SEPARATOR),
@@ -900,7 +900,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('validation_annotations', ['kernel.charset' => 'UTF-8'], false);
 
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator.alias'));
+        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\ValidatorInterface::class, $container->get('validator.alias'));
     }
 
     public function testAnnotations()

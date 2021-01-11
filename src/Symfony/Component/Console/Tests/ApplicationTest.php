@@ -764,7 +764,7 @@ class ApplicationTest extends TestCase
             $tester->run(['command' => 'foo'], ['decorated' => false]);
             $this->fail('->setCatchExceptions() sets the catch exception flag');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
+            $this->assertInstanceOf(\Exception::class, $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }
     }

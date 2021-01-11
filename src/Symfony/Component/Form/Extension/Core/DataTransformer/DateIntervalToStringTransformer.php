@@ -51,7 +51,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
             return '';
         }
         if (!$value instanceof \DateInterval) {
-            throw new UnexpectedTypeException($value, '\DateInterval');
+            throw new UnexpectedTypeException($value, \DateInterval::class);
         }
 
         return $value->format($this->format);

@@ -156,7 +156,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testCreateBuilderWithDataClassOption()
     {
         $givenOptions = ['data_class' => 'Foo'];
-        $resolvedOptions = ['data_class' => '\stdClass'];
+        $resolvedOptions = ['data_class' => \stdClass::class];
         $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')->getMock();
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
@@ -178,7 +178,7 @@ class ResolvedFormTypeTest extends TestCase
 
         $this->assertSame($this->resolvedType, $builder->getType());
         $this->assertSame($resolvedOptions, $builder->getOptions());
-        $this->assertSame('\stdClass', $builder->getDataClass());
+        $this->assertSame(\stdClass::class, $builder->getDataClass());
     }
 
     public function testFailsCreateBuilderOnInvalidFormOptionsResolution()

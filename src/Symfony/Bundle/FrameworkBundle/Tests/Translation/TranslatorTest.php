@@ -102,7 +102,7 @@ class TranslatorTest extends TestCase
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Invalid "invalid locale" locale.');
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
-        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', TranslatorWithInvalidLocale::class);
 
         $translator->trans('foo');
     }
@@ -308,7 +308,7 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en', array $enabledLocales = [])
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = Translator::class, $defaultLocale = 'en', array $enabledLocales = [])
     {
         $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale, $enabledLocales);
 
@@ -390,7 +390,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
     }
 
-    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])
+    private function createTranslator($loader, $options, $translatorClass = Translator::class, $loaderFomat = 'loader', $defaultLocale = 'en', array $enabledLocales = [])
     {
         if (null === $defaultLocale) {
             return new $translatorClass(

@@ -85,7 +85,7 @@ class OutputFormatterStyleTest extends TestCase
             $style->setOption('foo');
             $this->fail('->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
             $this->assertStringContainsString('Invalid option specified: "foo"', $e->getMessage(), '->setOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         }
     }

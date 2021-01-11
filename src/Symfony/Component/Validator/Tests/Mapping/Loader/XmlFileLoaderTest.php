@@ -116,7 +116,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');
         $metadata = new ClassMetadata(Entity::class);
 
-        $this->expectException('\Symfony\Component\Validator\Exception\MappingException');
+        $this->expectException(MappingException::class);
         $loader->loadClassMetadata($metadata);
     }
 
@@ -131,7 +131,7 @@ class XmlFileLoaderTest extends TestCase
         try {
             $loader->loadClassMetadata($metadata);
         } catch (MappingException $e) {
-            $this->expectException('\Symfony\Component\Validator\Exception\MappingException');
+            $this->expectException(MappingException::class);
             $loader->loadClassMetadata($metadata);
         }
     }

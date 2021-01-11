@@ -38,13 +38,13 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Ip());
     }
 
     public function testInvalidValidatorVersion()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new Ip([
             'version' => 666,
         ]);

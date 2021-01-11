@@ -18,7 +18,7 @@ class LinkTest extends TestCase
 {
     public function testConstructorWithANonATag()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -36,7 +36,7 @@ class LinkTest extends TestCase
 
     public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
 

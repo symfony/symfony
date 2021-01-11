@@ -917,7 +917,7 @@ class RequestTest extends TestCase
 
     public function testGetHostWithFakeHttpHostValue()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $request = new Request();
         $request->initialize([], [], [], [], [], ['HTTP_HOST' => 'www.host.com?query=string']);
         $request->getHost();
@@ -1086,7 +1086,7 @@ class RequestTest extends TestCase
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
-        $this->expectException('Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException');
+        $this->expectException(\Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException::class);
         $request = new Request();
 
         $server = [
@@ -1848,7 +1848,7 @@ class RequestTest extends TestCase
 
     private function disableHttpMethodParameterOverride()
     {
-        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
+        $class = new \ReflectionClass(Request::class);
         $property = $class->getProperty('httpMethodParameterOverride');
         $property->setAccessible(true);
         $property->setValue(false);

@@ -109,7 +109,7 @@ class WebProcessorTest extends TestCase
 
     private function isExtraFieldsSupported()
     {
-        $monologWebProcessorClass = new \ReflectionClass('Monolog\Processor\WebProcessor');
+        $monologWebProcessorClass = new \ReflectionClass(\Monolog\Processor\WebProcessor::class);
 
         foreach ($monologWebProcessorClass->getConstructor()->getParameters() as $parameter) {
             if ('extraFields' === $parameter->getName()) {

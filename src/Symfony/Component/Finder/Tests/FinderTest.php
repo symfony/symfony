@@ -17,7 +17,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 {
     public function testCreate()
     {
-        $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
+        $this->assertInstanceOf(Finder::class, Finder::create());
     }
 
     public function testDirectories()
@@ -922,14 +922,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testInWithNonExistentDirectory()
     {
-        $this->expectException('Symfony\Component\Finder\Exception\DirectoryNotFoundException');
+        $this->expectException(\Symfony\Component\Finder\Exception\DirectoryNotFoundException::class);
         $finder = new Finder();
         $finder->in('foobar');
     }
 
     public function testInWithNonExistentDirectoryLegacyException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $finder = new Finder();
         $finder->in('foobar');
     }
@@ -944,7 +944,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testInWithNonDirectoryGlob()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $finder = new Finder();
         $finder->in(__DIR__.'/Fixtures/A/a*');
     }
@@ -963,7 +963,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testGetIteratorWithoutIn()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $finder = Finder::create();
         $finder->getIterator();
     }
@@ -1104,7 +1104,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testAppendReturnsAFinder()
     {
-        $this->assertInstanceOf('Symfony\\Component\\Finder\\Finder', Finder::create()->append([]));
+        $this->assertInstanceOf(Finder::class, Finder::create()->append([]));
     }
 
     public function testAppendDoesNotRequireIn()
@@ -1143,7 +1143,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountWithoutIn()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $finder = Finder::create()->files();
         \count($finder);
     }

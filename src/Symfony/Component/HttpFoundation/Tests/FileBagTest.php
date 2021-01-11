@@ -25,7 +25,7 @@ class FileBagTest extends TestCase
 {
     public function testFileMustBeAnArrayOrUploadedFile()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new FileBag(['file' => 'foo']);
     }
 

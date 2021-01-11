@@ -47,7 +47,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
 
     public function testGetValueFailsIfNoSuchIndex()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
+        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchIndexException::class);
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();

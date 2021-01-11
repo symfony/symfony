@@ -56,7 +56,7 @@ class DefaultMarshallerTest extends TestCase
 
     public function testNativeUnserializeNotFoundClass()
     {
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall('O:16:"NotExistingClass":0:{}');
@@ -71,7 +71,7 @@ class DefaultMarshallerTest extends TestCase
             $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
         }
 
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Class not found: NotExistingClass');
         $marshaller = new DefaultMarshaller();
         $marshaller->unmarshall(rawurldecode('%00%00%00%02%17%10NotExistingClass%14%00'));
@@ -79,7 +79,7 @@ class DefaultMarshallerTest extends TestCase
 
     public function testNativeUnserializeInvalid()
     {
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('unserialize(): Error at offset 0 of 3 bytes');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });
@@ -99,7 +99,7 @@ class DefaultMarshallerTest extends TestCase
             $this->markTestSkipped('igbinary is not compatible with PHP 7.4.');
         }
 
-        $this->expectException('DomainException');
+        $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('igbinary_unserialize_zval: unknown type \'61\', position 5');
         $marshaller = new DefaultMarshaller();
         set_error_handler(function () { return false; });

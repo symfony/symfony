@@ -24,7 +24,7 @@ class StringInputTest extends TestCase
     public function testTokenize($input, $tokens, $message)
     {
         $input = new StringInput($input);
-        $r = new \ReflectionClass('Symfony\Component\Console\Input\ArgvInput');
+        $r = new \ReflectionClass(\Symfony\Component\Console\Input\ArgvInput::class);
         $p = $r->getProperty('tokens');
         $p->setAccessible(true);
         $this->assertEquals($tokens, $p->getValue($input), $message);

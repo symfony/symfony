@@ -17,11 +17,11 @@ class TemplateIteratorTest extends TestCase
 {
     public function testGetIterator()
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
+        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
         $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
         $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')->disableOriginalConstructor()->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\Kernel::class)->disableOriginalConstructor()->getMock();
         $kernel->expects($this->any())->method('getBundles')->willReturn([
             $bundle,
         ]);

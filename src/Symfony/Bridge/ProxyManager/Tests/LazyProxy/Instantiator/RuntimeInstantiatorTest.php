@@ -38,7 +38,7 @@ class RuntimeInstantiatorTest extends TestCase
     public function testInstantiateProxy()
     {
         $instance = new \stdClass();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
         $definition = new Definition('stdClass');
         $instantiator = function () use ($instance) {
             return $instance;
@@ -47,8 +47,8 @@ class RuntimeInstantiatorTest extends TestCase
         /* @var $proxy \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
         $proxy = $this->instantiator->instantiateProxy($container, $definition, 'foo', $instantiator);
 
-        $this->assertInstanceOf('ProxyManager\Proxy\LazyLoadingInterface', $proxy);
-        $this->assertInstanceOf('ProxyManager\Proxy\ValueHolderInterface', $proxy);
+        $this->assertInstanceOf(\ProxyManager\Proxy\LazyLoadingInterface::class, $proxy);
+        $this->assertInstanceOf(\ProxyManager\Proxy\ValueHolderInterface::class, $proxy);
         $this->assertFalse($proxy->isProxyInitialized());
 
         $proxy->initializeProxy();

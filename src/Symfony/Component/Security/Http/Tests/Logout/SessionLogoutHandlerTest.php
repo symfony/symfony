@@ -21,9 +21,9 @@ class SessionLogoutHandlerTest extends TestCase
     {
         $handler = new SessionLogoutHandler();
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
         $response = new Response();
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
+        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\Session::class)->disableOriginalConstructor()->getMock();
 
         $request
             ->expects($this->once())
@@ -36,6 +36,6 @@ class SessionLogoutHandlerTest extends TestCase
             ->method('invalidate')
         ;
 
-        $handler->logout($request, $response, $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $handler->logout($request, $response, $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
     }
 }

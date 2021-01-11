@@ -75,7 +75,7 @@ class UrlTypeTest extends TextTypeTest
 
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => [],
         ]);

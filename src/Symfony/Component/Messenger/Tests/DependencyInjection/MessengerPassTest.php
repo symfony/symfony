@@ -156,7 +156,7 @@ class MessengerPassTest extends TestCase
 
     public function testProcessTagWithUnknownBus()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler": bus "unknown_bus" specified on the tag "messenger.message_handler" does not exist (known ones are: "command_bus").');
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
 
@@ -256,7 +256,7 @@ class MessengerPassTest extends TestCase
 
     public function testThrowsExceptionIfTheHandlerClassDoesNotExist()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid service "NonExistentHandlerClass": class "NonExistentHandlerClass" does not exist.');
         $container = $this->getContainerBuilder();
         $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
@@ -270,7 +270,7 @@ class MessengerPassTest extends TestCase
 
     public function testThrowsExceptionIfTheHandlerMethodDoesNotExist()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerMappingWithNonExistentMethod::dummyMethod()" does not exist.');
         $container = $this->getContainerBuilder();
         $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
@@ -400,7 +400,7 @@ class MessengerPassTest extends TestCase
 
     public function testItThrowsAnExceptionOnUnknownBus()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid configuration returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerOnUndefinedBus::getHandledMessages()" for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage": bus "some_undefined_bus" does not exist.');
         $container = $this->getContainerBuilder();
         $container
@@ -413,7 +413,7 @@ class MessengerPassTest extends TestCase
 
     public function testUndefinedMessageClassForHandler()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler::__invoke()" not found.');
         $container = $this->getContainerBuilder();
         $container
@@ -426,7 +426,7 @@ class MessengerPassTest extends TestCase
 
     public function testUndefinedMessageClassForHandlerImplementingMessageHandlerInterface()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface::__invoke()" not found.');
         $container = $this->getContainerBuilder();
         $container
@@ -439,7 +439,7 @@ class MessengerPassTest extends TestCase
 
     public function testUndefinedMessageClassForHandlerImplementingMessageSubscriberInterface()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface::getHandledMessages()" not found.');
         $container = $this->getContainerBuilder();
         $container
@@ -452,7 +452,7 @@ class MessengerPassTest extends TestCase
 
     public function testNotInvokableHandler()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\NotInvokableHandler": class "Symfony\Component\Messenger\Tests\DependencyInjection\NotInvokableHandler" must have an "__invoke()" method.');
         $container = $this->getContainerBuilder();
         $container
@@ -465,7 +465,7 @@ class MessengerPassTest extends TestCase
 
     public function testMissingArgumentHandler()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentHandler::__invoke()" requires at least one argument, first one being the message it handles.');
         $container = $this->getContainerBuilder();
         $container
@@ -478,7 +478,7 @@ class MessengerPassTest extends TestCase
 
     public function testMissingArgumentTypeHandler()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentTypeHandler": argument "$message" of method "Symfony\Component\Messenger\Tests\DependencyInjection\MissingArgumentTypeHandler::__invoke()" must have a type-hint corresponding to the message class it handles.');
         $container = $this->getContainerBuilder();
         $container
@@ -491,7 +491,7 @@ class MessengerPassTest extends TestCase
 
     public function testBuiltinArgumentTypeHandler()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\BuiltinArgumentTypeHandler": type-hint of argument "$message" in method "Symfony\Component\Messenger\Tests\DependencyInjection\BuiltinArgumentTypeHandler::__invoke()" must be a class , "string" given.');
         $container = $this->getContainerBuilder();
         $container
@@ -504,7 +504,7 @@ class MessengerPassTest extends TestCase
 
     public function testNeedsToHandleAtLeastOneMessage()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler": method "Symfony\Component\Messenger\Tests\DependencyInjection\HandleNoMessageHandler::getHandledMessages()" must return one or more messages.');
         $container = $this->getContainerBuilder();
         $container
@@ -583,7 +583,7 @@ class MessengerPassTest extends TestCase
 
     public function testCannotRegistersAnUndefinedMiddleware()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid middleware: service "not_defined_middleware" not found.');
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
         $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
@@ -595,7 +595,7 @@ class MessengerPassTest extends TestCase
 
     public function testMiddlewareFactoryDefinitionMustBeAbstract()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Invalid middleware factory "not_an_abstract_definition": a middleware factory must be an abstract definition.');
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
         $container->register('not_an_abstract_definition', UselessMiddleware::class);

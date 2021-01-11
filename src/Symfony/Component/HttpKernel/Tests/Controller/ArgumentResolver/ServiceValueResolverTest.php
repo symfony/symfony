@@ -107,7 +107,7 @@ class ServiceValueResolverTest extends TestCase
 
     public function testErrorIsTruncated()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Cannot autowire argument $dummy of "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references class "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyService" but no such service exists.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());

@@ -127,7 +127,7 @@ class ArrayInputTest extends TestCase
      */
     public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         new ArrayInput($parameters, $definition);

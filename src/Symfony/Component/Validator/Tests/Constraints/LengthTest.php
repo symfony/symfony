@@ -33,14 +33,14 @@ class LengthTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }

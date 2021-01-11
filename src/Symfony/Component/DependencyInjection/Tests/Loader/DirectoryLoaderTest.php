@@ -60,7 +60,7 @@ class DirectoryLoaderTest extends TestCase
 
     public function testExceptionIsRaisedWhenDirectoryDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file "foo" does not exist (in:');
         $this->loader->load('foo/');
     }

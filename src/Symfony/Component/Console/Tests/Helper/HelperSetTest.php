@@ -68,7 +68,7 @@ class HelperSetTest extends TestCase
             $this->fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->get() throws InvalidArgumentException when helper not found');
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\ExceptionInterface', $e, '->get() throws domain specific exception when helper not found');
+            $this->assertInstanceOf(\Symfony\Component\Console\Exception\ExceptionInterface::class, $e, '->get() throws domain specific exception when helper not found');
             $this->assertStringContainsString('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
     }

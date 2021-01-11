@@ -65,7 +65,7 @@ class DirectoryResourceTest extends TestCase
 
     public function testResourceDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The directory ".*" does not exist./');
         new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
     }

@@ -60,7 +60,7 @@ class JsonDecodeTest extends TestCase
      */
     public function testDecodeWithException($value)
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $this->decode->decode($value, JsonEncoder::FORMAT);
     }
 

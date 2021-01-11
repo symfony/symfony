@@ -24,7 +24,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsUniqueConstraintCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $this->validator->validate('', new Unique());
     }
 

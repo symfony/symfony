@@ -544,7 +544,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testFailOnScalarReferences()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\NoSuchMetadataException');
+        $this->expectException(\Symfony\Component\Validator\Exception\NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = 'string';
 
@@ -799,7 +799,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\NoSuchMetadataException');
+        $this->expectException(\Symfony\Component\Validator\Exception\NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
@@ -1667,7 +1667,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $entity = new Entity();
 
         $this->metadata->addConstraint(new Traverse(true));
@@ -1902,7 +1902,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testValidateFailsIfNoConstraintsAndNoObjectOrArray()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Validator\Exception\RuntimeException::class);
         $this->validate('Foobar');
     }
 
@@ -1933,8 +1933,8 @@ class RecursiveValidatorTest extends TestCase
         $entity->initialized = false;
 
         // prepare initializers that set "initialized" to true
-        $initializer1 = $this->getMockBuilder('Symfony\\Component\\Validator\\ObjectInitializerInterface')->getMock();
-        $initializer2 = $this->getMockBuilder('Symfony\\Component\\Validator\\ObjectInitializerInterface')->getMock();
+        $initializer1 = $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock();
+        $initializer2 = $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock();
 
         $initializer1->expects($this->once())
             ->method('initialize')
@@ -2076,7 +2076,7 @@ class RecursiveValidatorTest extends TestCase
         $childB->name = 'fake';
         $entity->childA = [$childA];
         $entity->childB = [$childB];
-        $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
+        $validatorContext = $this->getMockBuilder(\Symfony\Component\Validator\Validator\ContextualValidatorInterface::class)->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')
@@ -2084,7 +2084,7 @@ class RecursiveValidatorTest extends TestCase
             ->willReturnSelf();
 
         $validator = $this
-            ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
+            ->getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
             ->setMethods(['startContext'])
             ->getMock();
@@ -2110,7 +2110,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->childA = [$childA];
         $entity->childB = [$childB];
 
-        $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
+        $validatorContext = $this->getMockBuilder(\Symfony\Component\Validator\Validator\ContextualValidatorInterface::class)->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')
@@ -2118,7 +2118,7 @@ class RecursiveValidatorTest extends TestCase
             ->willReturnSelf();
 
         $validator = $this
-            ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
+            ->getMockBuilder(RecursiveValidator::class)
             ->disableOriginalConstructor()
             ->setMethods(['startContext'])
             ->getMock();

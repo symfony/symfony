@@ -26,7 +26,7 @@ class RealServiceInstantiatorTest extends TestCase
     {
         $instantiator = new RealServiceInstantiator();
         $instance = new \stdClass();
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
         $callback = function () use ($instance) {
             return $instance;
         };

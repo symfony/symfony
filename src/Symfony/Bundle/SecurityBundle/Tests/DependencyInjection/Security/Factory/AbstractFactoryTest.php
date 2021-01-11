@@ -127,7 +127,7 @@ class AbstractFactoryTest extends TestCase
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
-        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', []);
+        $factory = $this->getMockForAbstractClass(\Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory::class, []);
 
         $factory
             ->expects($this->once())

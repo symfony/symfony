@@ -45,7 +45,7 @@ class CheckArgumentsValidityPassTest extends TestCase
      */
     public function testException(array $arguments, array $methodCalls)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
         $definition->setArguments($arguments);

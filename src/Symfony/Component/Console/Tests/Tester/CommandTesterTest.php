@@ -160,7 +160,7 @@ class CommandTesterTest extends TestCase
 
     public function testCommandWithWrongInputsNumber()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',
@@ -185,7 +185,7 @@ class CommandTesterTest extends TestCase
 
     public function testCommandWithQuestionsButNoInputs()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
         $questions = [
             'What\'s your name?',

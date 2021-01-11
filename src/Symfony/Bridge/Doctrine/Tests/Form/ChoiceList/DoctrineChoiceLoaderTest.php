@@ -77,11 +77,11 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
+        $this->factory = $this->getMockBuilder(ChoiceListFactoryInterface::class)->getMock();
         $this->om = $this->getMockBuilder(ObjectManager::class)->getMock();
         $this->repository = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $this->class = 'stdClass';
-        $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
+        $this->idReader = $this->getMockBuilder(IdReader::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->idReader->expects($this->any())
@@ -89,7 +89,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->willReturn(true)
         ;
 
-        $this->objectLoader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface')->getMock();
+        $this->objectLoader = $this->getMockBuilder(EntityLoaderInterface::class)->getMock();
         $this->obj1 = (object) ['name' => 'A'];
         $this->obj2 = (object) ['name' => 'B'];
         $this->obj3 = (object) ['name' => 'C'];

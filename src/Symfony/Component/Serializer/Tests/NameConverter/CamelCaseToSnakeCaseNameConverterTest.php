@@ -22,7 +22,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
-        $this->assertInstanceOf('Symfony\Component\Serializer\NameConverter\NameConverterInterface', $attributeMetadata);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\NameConverter\NameConverterInterface::class, $attributeMetadata);
     }
 
     /**

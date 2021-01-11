@@ -38,15 +38,15 @@ class PhpDumperTest extends TestCase
      */
     public function testDumpContainerWithProxyServiceWillShareProxies()
     {
-        if (!class_exists('LazyServiceProjectServiceContainer', false)) {
+        if (!class_exists(\LazyServiceProjectServiceContainer::class, false)) {
             eval('?>'.$this->dumpLazyServiceProjectServiceContainer());
         }
 
         $container = new \LazyServiceProjectServiceContainer();
 
         $proxy = $container->get('foo');
-        $this->assertInstanceOf('stdClass', $proxy);
-        $this->assertInstanceOf('ProxyManager\Proxy\LazyLoadingInterface', $proxy);
+        $this->assertInstanceOf(\stdClass::class, $proxy);
+        $this->assertInstanceOf(\ProxyManager\Proxy\LazyLoadingInterface::class, $proxy);
         $this->assertSame($proxy, $container->get('foo'));
 
         $this->assertFalse($proxy->isProxyInitialized());

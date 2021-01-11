@@ -30,7 +30,7 @@ class EncoderFactoryTest extends TestCase
             'arguments' => ['sha512', true, 5],
         ]]);
 
-        $encoder = $factory->getEncoder($this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
+        $encoder = $factory->getEncoder($this->getMockBuilder(UserInterface::class)->getMock());
         $expectedEncoder = new MessageDigestPasswordEncoder('sha512', true, 5);
 
         $this->assertEquals($expectedEncoder->encodePassword('foo', 'moo'), $encoder->encodePassword('foo', 'moo'));
@@ -42,7 +42,7 @@ class EncoderFactoryTest extends TestCase
             'Symfony\Component\Security\Core\User\UserInterface' => new MessageDigestPasswordEncoder('sha1'),
         ]);
 
-        $encoder = $factory->getEncoder($this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
+        $encoder = $factory->getEncoder($this->getMockBuilder(UserInterface::class)->getMock());
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
         $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
 
@@ -112,7 +112,7 @@ class EncoderFactoryTest extends TestCase
 
     public function testGetInvalidNamedEncoderForEncoderAware()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $factory = new EncoderFactory([
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha1'),
             'encoder_name' => new MessageDigestPasswordEncoder('sha256'),

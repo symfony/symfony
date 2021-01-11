@@ -677,7 +677,7 @@ EOD;
 
     public function testAmbiguousChoiceFromChoicelist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The provided answer is ambiguous. Value should be one of "env_2" or "env_3".');
         $possibleChoices = [
             'env_1' => 'My first environment',
@@ -744,7 +744,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -752,7 +752,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
@@ -760,7 +760,7 @@ EOD;
 
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
-        $this->expectException('Symfony\Component\Console\Exception\MissingInputException');
+        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
 
@@ -808,7 +808,7 @@ EOD;
 
     public function testEmptyChoices()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Choice question must have at least 1 choice available.');
         new ChoiceQuestion('Question', [], 'irrelevant');
     }
@@ -941,7 +941,7 @@ EOD;
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $mock = $this->getMockBuilder(\Symfony\Component\Console\Input\InputInterface::class)->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);

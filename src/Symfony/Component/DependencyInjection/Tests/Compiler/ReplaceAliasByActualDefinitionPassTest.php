@@ -54,7 +54,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
 
     public function testProcessWithInvalidAlias()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $container = new ContainerBuilder();
         $container->setAlias('a_alias', 'a');
         $this->process($container);

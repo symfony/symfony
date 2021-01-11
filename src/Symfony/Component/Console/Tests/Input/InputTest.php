@@ -49,7 +49,7 @@ class InputTest extends TestCase
 
     public function testSetInvalidOption()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "foo" option does not exist.');
         $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $input->setOption('foo', 'bar');
@@ -57,7 +57,7 @@ class InputTest extends TestCase
 
     public function testGetInvalidOption()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "foo" option does not exist.');
         $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $input->getOption('foo');
@@ -79,7 +79,7 @@ class InputTest extends TestCase
 
     public function testSetInvalidArgument()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "foo" argument does not exist.');
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
         $input->setArgument('foo', 'bar');
@@ -87,7 +87,7 @@ class InputTest extends TestCase
 
     public function testGetInvalidArgument()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "foo" argument does not exist.');
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
         $input->getArgument('foo');
@@ -95,7 +95,7 @@ class InputTest extends TestCase
 
     public function testValidateWithMissingArguments()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "name").');
         $input = new ArrayInput([]);
         $input->bind(new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]));
@@ -104,7 +104,7 @@ class InputTest extends TestCase
 
     public function testValidateWithMissingRequiredArguments()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "name").');
         $input = new ArrayInput(['bar' => 'baz']);
         $input->bind(new InputDefinition([new InputArgument('name', InputArgument::REQUIRED), new InputArgument('bar', InputArgument::OPTIONAL)]));

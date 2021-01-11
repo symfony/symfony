@@ -20,7 +20,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
 {
     public function testThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Things went wrong!');
         $container = new ContainerBuilder();
         $def = new Definition();

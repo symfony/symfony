@@ -145,7 +145,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         parent::__construct($parameterBag);
 
-        $this->trackResources = interface_exists('Symfony\Component\Config\Resource\ResourceInterface');
+        $this->trackResources = interface_exists(ResourceInterface::class);
         $this->setDefinition('service_container', (new Definition(ContainerInterface::class))->setSynthetic(true)->setPublic(true));
         $this->setAlias(PsrContainerInterface::class, new Alias('service_container', false))->setDeprecated('symfony/dependency-injection', '5.1', $deprecationMessage = 'The "%alias_id%" autowiring alias is deprecated. Define it explicitly in your app if you want to keep using it.');
         $this->setAlias(ContainerInterface::class, new Alias('service_container', false))->setDeprecated('symfony/dependency-injection', '5.1', $deprecationMessage);
@@ -1587,7 +1587,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!class_exists(\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);

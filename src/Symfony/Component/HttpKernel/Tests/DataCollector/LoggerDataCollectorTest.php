@@ -24,7 +24,7 @@ class LoggerDataCollectorTest extends TestCase
     public function testCollectWithUnexpectedFormat()
     {
         $logger = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->willReturn(123);
@@ -91,7 +91,7 @@ class LoggerDataCollectorTest extends TestCase
     public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
     {
         $logger = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->willReturn($nb);
@@ -123,7 +123,7 @@ class LoggerDataCollectorTest extends TestCase
     public function testReset()
     {
         $logger = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->getMockBuilder(DebugLoggerInterface::class)
             ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('clear');

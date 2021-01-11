@@ -26,8 +26,8 @@ class AuthorizationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
-        $this->accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $this->authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
+        $this->accessDecisionManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface::class)->getMock();
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
@@ -70,7 +70,7 @@ class AuthorizationCheckerTest extends TestCase
 
     public function testVoteWithoutAuthenticationToken()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
         $this->authorizationChecker->isGranted('ROLE_FOO');
     }
 

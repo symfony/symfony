@@ -72,10 +72,10 @@ class MemcachedAdapterTest extends AdapterTestCase
     public function testBadOptions($name, $value)
     {
         if (\PHP_VERSION_ID < 80000) {
-            $this->expectException('ErrorException');
+            $this->expectException(\ErrorException::class);
             $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
         } else {
-            $this->expectException('Error');
+            $this->expectException(\Error::class);
             $this->expectExceptionMessage('Undefined constant Memcached::');
         }
 
@@ -106,7 +106,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testOptionSerializer()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\CacheException');
+        $this->expectException(\Symfony\Component\Cache\Exception\CacheException::class);
         $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');

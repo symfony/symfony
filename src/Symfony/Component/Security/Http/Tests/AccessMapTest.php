@@ -18,7 +18,7 @@ class AccessMapTest extends TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
         $requestMatcher1 = $this->getRequestMatcher($request, false);
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
@@ -31,7 +31,7 @@ class AccessMapTest extends TestCase
 
     public function testReturnsEmptyPatternIfNoneMatched()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();
@@ -42,7 +42,7 @@ class AccessMapTest extends TestCase
 
     private function getRequestMatcher($request, $matches)
     {
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestMatcherInterface::class)->getMock();
         $requestMatcher->expects($this->once())
             ->method('matches')->with($request)
             ->willReturn($matches);

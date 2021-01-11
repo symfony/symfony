@@ -21,7 +21,7 @@ class ReflectionClassResourceTest extends TestCase
 {
     public function testToString()
     {
-        $res = new ReflectionClassResource(new \ReflectionClass('ErrorException'));
+        $res = new ReflectionClassResource(new \ReflectionClass(\ErrorException::class));
 
         $this->assertSame('reflection.ErrorException', (string) $res);
     }
@@ -54,7 +54,7 @@ class ReflectionClassResourceTest extends TestCase
         file_put_contents($tmp, '<?php class ReflectionClassResourceTestClass {}');
         require $tmp;
 
-        $res = new ReflectionClassResource(new \ReflectionClass('ReflectionClassResourceTestClass'));
+        $res = new ReflectionClassResource(new \ReflectionClass(\ReflectionClassResourceTestClass::class));
         $this->assertTrue($res->isFresh($now));
 
         unlink($tmp);

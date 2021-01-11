@@ -63,7 +63,7 @@ class MemcachedStoreTest extends AbstractStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\InvalidTtlException');
+        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }

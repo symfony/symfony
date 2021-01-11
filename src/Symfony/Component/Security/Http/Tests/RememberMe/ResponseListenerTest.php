@@ -83,7 +83,7 @@ class ResponseListenerTest extends TestCase
     private function getResponse()
     {
         $response = new Response();
-        $response->headers = $this->getMockBuilder('Symfony\Component\HttpFoundation\ResponseHeaderBag')->getMock();
+        $response->headers = $this->getMockBuilder(\Symfony\Component\HttpFoundation\ResponseHeaderBag::class)->getMock();
 
         return $response;
     }

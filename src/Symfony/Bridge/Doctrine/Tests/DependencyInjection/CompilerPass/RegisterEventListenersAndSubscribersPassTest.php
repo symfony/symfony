@@ -23,7 +23,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
     public function testExceptionOnAbstractTaggedSubscriber()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');
@@ -37,7 +37,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
     public function testExceptionOnAbstractTaggedListener()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $container = $this->createBuilder();
 
         $abstractDefinition = new Definition('stdClass');

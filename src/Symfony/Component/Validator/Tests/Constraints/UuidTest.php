@@ -30,14 +30,14 @@ class UuidTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Uuid(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Uuid(['normalizer' => new \stdClass()]);
     }

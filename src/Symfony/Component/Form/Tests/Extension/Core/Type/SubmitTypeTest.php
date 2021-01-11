@@ -20,7 +20,7 @@ class SubmitTypeTest extends ButtonTypeTest
 
     public function testCreateSubmitButtonInstances()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create(static::TESTED_TYPE));
+        $this->assertInstanceOf(\Symfony\Component\Form\SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
     }
 
     public function testNotClickedByDefault()

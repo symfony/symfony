@@ -44,7 +44,7 @@ class DateTimeZoneNormalizerTest extends TestCase
 
     public function testNormalizeBadObjectTypeThrowsException()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         $this->normalizer->normalize(new \stdClass());
     }
 
@@ -63,13 +63,13 @@ class DateTimeZoneNormalizerTest extends TestCase
 
     public function testDenormalizeNullTimeZoneThrowsException()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\NotNormalizableValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\NotNormalizableValueException::class);
         $this->normalizer->denormalize(null, \DateTimeZone::class, null);
     }
 
     public function testDenormalizeBadTimeZoneThrowsException()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\NotNormalizableValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\NotNormalizableValueException::class);
         $this->normalizer->denormalize('Jupiter/Europa', \DateTimeZone::class, null);
     }
 }

@@ -43,7 +43,7 @@ class ContextListenerTest extends TestCase
 {
     public function testItRequiresContextKey()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$contextKey must not be empty');
         new ContextListener(
             $this->getMockBuilder(TokenStorageInterface::class)->getMock(),
@@ -54,7 +54,7 @@ class ContextListenerTest extends TestCase
 
     public function testUserProvidersNeedToImplementAnInterface()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('User provider "stdClass" must implement "Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->handleEventWithPreviousSession([new \stdClass()]);
     }
@@ -67,7 +67,7 @@ class ContextListenerTest extends TestCase
         );
 
         $token = unserialize($session->get('_security_session'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $token);
+        $this->assertInstanceOf(UsernamePasswordToken::class, $token);
         $this->assertEquals('test1', $token->getUsername());
     }
 
@@ -79,7 +79,7 @@ class ContextListenerTest extends TestCase
         );
 
         $token = unserialize($session->get('_security_session'));
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $token);
+        $this->assertInstanceOf(UsernamePasswordToken::class, $token);
         $this->assertEquals('test1', $token->getUsername());
     }
 
@@ -149,8 +149,8 @@ class ContextListenerTest extends TestCase
         $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
 
         $event->expects($this->any())
             ->method('getRequest')
@@ -199,7 +199,7 @@ class ContextListenerTest extends TestCase
             ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->willReturn($this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock());
+            ->willReturn($this->getMockBuilder(Request::class)->getMock());
 
         $dispatcher->expects($this->once())
             ->method('addListener')
@@ -216,7 +216,7 @@ class ContextListenerTest extends TestCase
 
         $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMockBuilder(Request::class)->getMock();
         $request->expects($this->any())
             ->method('hasSession')
             ->willReturn(true);
@@ -235,7 +235,7 @@ class ContextListenerTest extends TestCase
 
     public function testHandleRemovesTokenIfNoPreviousSessionWasFound()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMockBuilder(Request::class)->getMock();
         $request->expects($this->any())->method('hasPreviousSession')->willReturn(false);
 
         $event = $this->getMockBuilder(RequestEvent::class)
@@ -305,7 +305,7 @@ class ContextListenerTest extends TestCase
 
     public function testRuntimeExceptionIsThrownIfNoSupportingUserProviderWasRegistered()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->handleEventWithPreviousSession([new NotSupportingUserProvider(false), new NotSupportingUserProvider(true)]);
     }
 

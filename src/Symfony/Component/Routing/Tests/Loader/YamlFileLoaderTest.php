@@ -22,7 +22,7 @@ class YamlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new YamlFileLoader($this->getMockBuilder('Symfony\Component\Config\FileLocator')->getMock());
+        $loader = new YamlFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
 
         $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
@@ -47,7 +47,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
@@ -71,7 +71,7 @@ class YamlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('special_route_name.yml');
         $route = $routeCollection->get('#$péß^a|');
 
-        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
+        $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('/true', $route->getPath());
     }
 
@@ -81,7 +81,7 @@ class YamlFileLoaderTest extends TestCase
         $routeCollection = $loader->load('validpattern.yml');
         $route = $routeCollection->get('blog_show');
 
-        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
+        $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('/blog/{slug}', $route->getPath());
         $this->assertSame('{locale}.example.com', $route->getHost());
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
@@ -144,7 +144,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testOverrideControllerInDefaults()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "app_blog"/');
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.yml');
@@ -176,7 +176,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportWithOverriddenController()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The routing file "[^"]*" must not specify both the "controller" key and the defaults key "_controller" for "_static"/');
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.yml');

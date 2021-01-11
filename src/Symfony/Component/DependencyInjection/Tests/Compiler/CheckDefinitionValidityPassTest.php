@@ -20,7 +20,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 {
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
 
@@ -29,7 +29,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
 
@@ -77,7 +77,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testInvalidTags()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
 
@@ -86,7 +86,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
@@ -96,7 +96,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\EnvParameterException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);

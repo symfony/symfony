@@ -11,7 +11,7 @@ class StateMachineValidatorTest extends TestCase
 {
     public function testWithMultipleTransitionWithSameNameShareInput()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
@@ -35,7 +35,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleTos()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one output.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', ['b', 'c']);
@@ -58,7 +58,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithMultipleFroms()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one input.');
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', ['a', 'b'], 'c');
@@ -106,7 +106,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testWithTooManyInitialPlaces()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\InvalidDefinitionException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
         $this->expectExceptionMessage('The state machine "foo" can not store many places. But the definition has 2 initial places. Only one is supported.');
         $places = range('a', 'c');
         $transitions = [];

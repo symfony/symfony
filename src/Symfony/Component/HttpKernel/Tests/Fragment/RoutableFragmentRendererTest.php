@@ -60,7 +60,7 @@ class RoutableFragmentRendererTest extends TestCase
      */
     public function testGenerateFragmentUriWithNonScalar($controller)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }
 
@@ -74,7 +74,7 @@ class RoutableFragmentRendererTest extends TestCase
 
     private function callGenerateFragmentUriMethod(ControllerReference $reference, Request $request, $absolute = false)
     {
-        $renderer = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer');
+        $renderer = $this->getMockForAbstractClass(\Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer::class);
         $r = new \ReflectionObject($renderer);
         $m = $r->getMethod('generateFragmentUri');
         $m->setAccessible(true);

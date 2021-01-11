@@ -21,13 +21,13 @@ class NativePasswordEncoderTest extends TestCase
 {
     public function testCostBelowRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new NativePasswordEncoder(null, null, 3);
     }
 
     public function testCostAboveRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new NativePasswordEncoder(null, null, 32);
     }
 

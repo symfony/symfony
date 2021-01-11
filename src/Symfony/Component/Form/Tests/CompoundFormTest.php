@@ -22,6 +22,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -513,9 +514,9 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), 'bar')
+            ->with($this->isInstanceOf(\RecursiveIteratorIterator::class), 'bar')
             ->willReturnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(['firstName' => $child1, 'lastName' => $child2], iterator_to_array($iterator));
                 $this->assertEquals('Bernhard', $child1->getData());
                 $this->assertEquals('Schussek', $child2->getData());
@@ -585,9 +586,9 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
+            ->with($this->isInstanceOf(\RecursiveIteratorIterator::class), $object)
             ->willReturnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(['name' => $child], iterator_to_array($iterator));
             });
 

@@ -66,7 +66,7 @@ class IntlBundleReaderTest extends TestCase
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 
-        $this->assertInstanceOf('\ArrayAccess', $data);
+        $this->assertInstanceOf(\ArrayAccess::class, $data);
         $this->assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
         $this->assertArrayNotHasKey('Foo', $data);
         $this->assertNull($data['Foo']);

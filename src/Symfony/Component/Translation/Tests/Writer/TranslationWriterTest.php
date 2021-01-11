@@ -19,7 +19,7 @@ class TranslationWriterTest extends TestCase
 {
     public function testWrite()
     {
-        $dumper = $this->getMockBuilder('Symfony\Component\Translation\Dumper\DumperInterface')->getMock();
+        $dumper = $this->getMockBuilder(DumperInterface::class)->getMock();
         $dumper
             ->expects($this->once())
             ->method('dump');

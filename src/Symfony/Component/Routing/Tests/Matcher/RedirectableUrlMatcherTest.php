@@ -39,7 +39,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
 
     public function testRedirectWhenNoSlashForNonSafeMethod()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $this->expectException(\Symfony\Component\Routing\Exception\ResourceNotFoundException::class);
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
@@ -209,6 +209,6 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
-        return $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', [$routes, $context ?: new RequestContext()]);
+        return $this->getMockForAbstractClass(\Symfony\Component\Routing\Matcher\RedirectableUrlMatcher::class, [$routes, $context ?: new RequestContext()]);
     }
 }

@@ -118,13 +118,13 @@ class PropertyPathBuilderTest extends TestCase
 
     public function testReplaceByIndexDoesNotAllowInvalidOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->replaceByIndex(6, 'new1');
     }
 
     public function testReplaceByIndexDoesNotAllowNegativeOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->replaceByIndex(-1, 'new1');
     }
 
@@ -148,13 +148,13 @@ class PropertyPathBuilderTest extends TestCase
 
     public function testReplaceByPropertyDoesNotAllowInvalidOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->replaceByProperty(6, 'new1');
     }
 
     public function testReplaceByPropertyDoesNotAllowNegativeOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->replaceByProperty(-1, 'new1');
     }
 
@@ -190,7 +190,7 @@ class PropertyPathBuilderTest extends TestCase
      */
     public function testReplaceDoesNotAllowInvalidOffsets($offset)
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));
     }
 
@@ -264,13 +264,13 @@ class PropertyPathBuilderTest extends TestCase
 
     public function testRemoveDoesNotAllowInvalidOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->remove(6);
     }
 
     public function testRemoveDoesNotAllowNegativeOffsets()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->builder->remove(-1);
     }
 

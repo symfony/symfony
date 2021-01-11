@@ -48,7 +48,7 @@ class ConfigurationTest extends TestCase
      */
     public function testInvalidSessionName($sessionName)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),

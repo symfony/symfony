@@ -606,7 +606,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
 
-        $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enSymbols');
+        $r = new \ReflectionProperty(NumberFormatter::class, 'enSymbols');
         $r->setAccessible(true);
         $expected = $r->getValue();
 
@@ -623,7 +623,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
 
-        $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enTextAttributes');
+        $r = new \ReflectionProperty(NumberFormatter::class, 'enTextAttributes');
         $r->setAccessible(true);
         $expected = $r->getValue();
 

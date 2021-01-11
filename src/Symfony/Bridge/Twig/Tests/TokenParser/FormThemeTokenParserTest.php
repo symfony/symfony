@@ -28,7 +28,7 @@ class FormThemeTokenParserTest extends TestCase
      */
     public function testCompile($source, $expected)
     {
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $env->addTokenParser(new FormThemeTokenParser());
         $source = new Source($source, '');
         $stream = $env->tokenize($source);

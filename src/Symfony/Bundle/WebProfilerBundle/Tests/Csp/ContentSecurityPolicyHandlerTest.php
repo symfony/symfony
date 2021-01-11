@@ -210,7 +210,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
+        $generator = $this->getMockBuilder(\Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator::class)->getMock();
 
         $generator->expects($this->any())
             ->method('generate')

@@ -39,7 +39,7 @@ class LexerTest extends TestCase
 
     public function testTokenizeThrowsErrorWithMessage()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
         $this->expectExceptionMessage('Unexpected character "\'" around position 33 for expression `service(faulty.expression.example\').dummyMethod()`.');
         $expression = "service(faulty.expression.example').dummyMethod()";
         $this->lexer->tokenize($expression);
@@ -47,7 +47,7 @@ class LexerTest extends TestCase
 
     public function testTokenizeThrowsErrorOnUnclosedBrace()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
+        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
         $this->expectExceptionMessage('Unclosed "(" around position 7 for expression `service(unclosed.expression.dummyMethod()`.');
         $expression = 'service(unclosed.expression.dummyMethod()';
         $this->lexer->tokenize($expression);

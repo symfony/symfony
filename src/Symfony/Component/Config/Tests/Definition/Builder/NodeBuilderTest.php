@@ -19,14 +19,14 @@ class NodeBuilderTest extends TestCase
 {
     public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder->node('', 'foobar');
     }
 
     public function testThrowsAnExceptionWhenTheNodeClassIsNotFound()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder
             ->setNodeClass('noclasstype', '\\foo\\bar\\noclass')
@@ -79,10 +79,10 @@ class NodeBuilderTest extends TestCase
         $builder = new BaseNodeBuilder();
 
         $node = $builder->integerNode('foo')->min(3)->max(5);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition', $node);
+        $this->assertInstanceOf(\Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition::class, $node);
 
         $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\FloatNodeDefinition', $node);
+        $this->assertInstanceOf(\Symfony\Component\Config\Definition\Builder\FloatNodeDefinition::class, $node);
     }
 }
 

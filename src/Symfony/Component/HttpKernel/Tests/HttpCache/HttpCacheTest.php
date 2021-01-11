@@ -25,7 +25,7 @@ class HttpCacheTest extends HttpCacheTestCase
 {
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
-        $storeMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\HttpCache\\StoreInterface')
+        $storeMock = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpCache\StoreInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -37,7 +37,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertFalse($kernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
 
         // implements TerminableInterface
-        $kernelMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
+        $kernelMock = $this->getMockBuilder(\Symfony\Component\HttpKernel\Kernel::class)
             ->disableOriginalConstructor()
             ->setMethods(['terminate', 'registerBundles', 'registerContainerConfiguration'])
             ->getMock();
@@ -1488,8 +1488,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesOriginalRequestForSurrogate()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $store = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\StoreInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $store = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpCache\StoreInterface::class)->getMock();
 
         $kernel
             ->expects($this->exactly(2))

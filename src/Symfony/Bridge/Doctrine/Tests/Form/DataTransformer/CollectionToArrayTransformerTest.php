@@ -64,7 +64,7 @@ class CollectionToArrayTransformerTest extends TestCase
 
     public function testTransformExpectsArrayOrCollection()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->transformer->transform('Foo');
     }
 

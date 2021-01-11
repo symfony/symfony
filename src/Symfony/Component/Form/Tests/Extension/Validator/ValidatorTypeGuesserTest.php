@@ -132,7 +132,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $constraint = new Length(['max' => '2']);
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
+        $this->assertInstanceOf(ValueGuess::class, $result);
         $this->assertEquals(2, $result->getValue());
         $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
     }
@@ -150,7 +150,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $mimeTypes = ['image/png', 'image/jpeg'];
         $constraint = new File(['mimeTypes' => $mimeTypes]);
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayHasKey('attr', $typeGuess->getOptions());
         $this->assertArrayHasKey('accept', $typeGuess->getOptions()['attr']);
         $this->assertEquals(implode(',', $mimeTypes), $typeGuess->getOptions()['attr']['accept']);
@@ -160,7 +160,7 @@ class ValidatorTypeGuesserTest extends TestCase
     {
         $constraint = new File();
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
     }
 
@@ -168,7 +168,7 @@ class ValidatorTypeGuesserTest extends TestCase
     {
         $constraint = new File(['mimeTypes' => 'image/*']);
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayHasKey('attr', $typeGuess->getOptions());
         $this->assertArrayHasKey('accept', $typeGuess->getOptions()['attr']);
         $this->assertEquals('image/*', $typeGuess->getOptions()['attr']['accept']);
@@ -178,7 +178,7 @@ class ValidatorTypeGuesserTest extends TestCase
     {
         $constraint = new File(['mimeTypes' => '']);
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $typeGuess);
+        $this->assertInstanceOf(TypeGuess::class, $typeGuess);
         $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
     }
 
@@ -200,7 +200,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $constraint = new Type($type);
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
+        $this->assertInstanceOf(ValueGuess::class, $result);
         $this->assertNull($result->getValue());
         $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $result->getConfidence());
     }

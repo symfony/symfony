@@ -66,7 +66,7 @@ class TestHttpClient extends HttpBrowser
 
     protected function getScript($request)
     {
-        $r = new \ReflectionClass('Symfony\Component\BrowserKit\Response');
+        $r = new \ReflectionClass(Response::class);
         $path = $r->getFileName();
 
         return <<<EOF

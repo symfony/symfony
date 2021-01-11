@@ -36,7 +36,7 @@ class SessionHandlerProxyTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
+        $this->mock = $this->getMockBuilder(\SessionHandlerInterface::class)->getMock();
         $this->proxy = new SessionHandlerProxy($this->mock);
     }
 

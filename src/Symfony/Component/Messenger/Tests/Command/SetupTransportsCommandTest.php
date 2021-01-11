@@ -71,7 +71,7 @@ class SetupTransportsCommandTest extends TestCase
 
     public function testReceiverNameArgumentNotFound()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "not_found" transport does not exist.');
         // mock a service locator
         /** @var MockObject|ServiceLocator $serviceLocator */

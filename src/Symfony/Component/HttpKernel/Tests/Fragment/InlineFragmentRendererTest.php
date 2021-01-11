@@ -71,7 +71,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
 
@@ -106,7 +106,7 @@ class InlineFragmentRendererTest extends TestCase
 
     private function getKernel($returnValue)
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernelInterface::class)->getMock();
         $kernel
             ->expects($this->any())
             ->method('handle')
@@ -118,7 +118,7 @@ class InlineFragmentRendererTest extends TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
-        $controllerResolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
+        $controllerResolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ControllerResolverInterface::class)->getMock();
         $controllerResolver
             ->expects($this->once())
             ->method('getController')
@@ -129,7 +129,7 @@ class InlineFragmentRendererTest extends TestCase
             })
         ;
 
-        $argumentResolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolverInterface')->getMock();
+        $argumentResolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class)->getMock();
         $argumentResolver
             ->expects($this->once())
             ->method('getArguments')
@@ -258,7 +258,7 @@ class InlineFragmentRendererTest extends TestCase
      */
     private function getKernelExpectingRequest(Request $request, $strict = false)
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernelInterface::class)->getMock();
         $kernel
             ->expects($this->once())
             ->method('handle')

@@ -42,7 +42,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
+        $this->serverParams = $this->getMockBuilder(\Symfony\Component\Form\Util\ServerParams::class)->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
@@ -405,7 +405,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function createBuilder($name, $compound = false, array $options = [])
     {
-        $builder = new FormBuilder($name, null, new EventDispatcher(), $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(), $options);
+        $builder = new FormBuilder($name, null, new EventDispatcher(), $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock(), $options);
         $builder->setCompound($compound);
 
         if ($compound) {

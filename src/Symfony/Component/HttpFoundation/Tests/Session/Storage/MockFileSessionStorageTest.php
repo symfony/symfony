@@ -109,7 +109,7 @@ class MockFileSessionStorageTest extends TestCase
 
     public function testSaveWithoutStart()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $storage1 = $this->getStorage();
         $storage1->save();
     }

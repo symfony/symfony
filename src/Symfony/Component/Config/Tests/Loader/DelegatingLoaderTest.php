@@ -34,12 +34,12 @@ class DelegatingLoaderTest extends TestCase
 
     public function testSupports()
     {
-        $loader1 = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader1 = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader1->expects($this->once())->method('supports')->willReturn(true);
         $loader = new DelegatingLoader(new LoaderResolver([$loader1]));
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
 
-        $loader1 = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader1 = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader1->expects($this->once())->method('supports')->willReturn(false);
         $loader = new DelegatingLoader(new LoaderResolver([$loader1]));
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
@@ -47,7 +47,7 @@ class DelegatingLoaderTest extends TestCase
 
     public function testLoad()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader->expects($this->once())->method('supports')->willReturn(true);
         $loader->expects($this->once())->method('load');
         $resolver = new LoaderResolver([$loader]);
@@ -58,8 +58,8 @@ class DelegatingLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {
-        $this->expectException('Symfony\Component\Config\Exception\LoaderLoadException');
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $this->expectException(\Symfony\Component\Config\Exception\LoaderLoadException::class);
+        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
         $loader->expects($this->once())->method('supports')->willReturn(false);
         $resolver = new LoaderResolver([$loader]);
         $loader = new DelegatingLoader($resolver);

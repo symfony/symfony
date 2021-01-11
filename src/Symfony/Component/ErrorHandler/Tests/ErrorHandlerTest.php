@@ -35,7 +35,7 @@ class ErrorHandlerTest extends TestCase
         $handler = ErrorHandler::register();
 
         try {
-            $this->assertInstanceOf('Symfony\Component\ErrorHandler\ErrorHandler', $handler);
+            $this->assertInstanceOf(ErrorHandler::class, $handler);
             $this->assertSame($handler, ErrorHandler::register());
 
             $newHandler = new ErrorHandler();
@@ -62,7 +62,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testErrorGetLast()
     {
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $handler = ErrorHandler::register();
         $handler->setDefaultLogger($logger);
         $handler->screamAt(\E_ALL);
@@ -194,7 +194,7 @@ class ErrorHandlerTest extends TestCase
     public function testDefaultLogger()
     {
         try {
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
             $handler = ErrorHandler::register();
 
             $handler->setDefaultLogger($logger, \E_NOTICE);
@@ -269,7 +269,7 @@ class ErrorHandlerTest extends TestCase
             restore_error_handler();
             restore_exception_handler();
 
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
 
             $warnArgCheck = function ($logLevel, $message, $context) {
                 $this->assertEquals('info', $logLevel);
@@ -294,7 +294,7 @@ class ErrorHandlerTest extends TestCase
             restore_error_handler();
             restore_exception_handler();
 
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
 
             $line = null;
             $logArgCheck = function ($level, $message, $context) use (&$line) {
@@ -395,7 +395,7 @@ class ErrorHandlerTest extends TestCase
             $this->assertSame('User Deprecated: Foo deprecation', $exception->getMessage());
         };
 
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $logger
             ->expects($this->once())
             ->method('log')
@@ -413,7 +413,7 @@ class ErrorHandlerTest extends TestCase
     public function testHandleException(string $expectedMessage, \Throwable $exception)
     {
         try {
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
             $handler = ErrorHandler::register();
 
             $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
@@ -505,7 +505,7 @@ class ErrorHandlerTest extends TestCase
 
         $bootLogger->log(LogLevel::WARNING, 'Foo message', ['exception' => $exception]);
 
-        $mockLogger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $mockLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $mockLogger->expects($this->once())
             ->method('log')
             ->with(LogLevel::WARNING, 'Foo message', ['exception' => $exception]);
@@ -520,7 +520,7 @@ class ErrorHandlerTest extends TestCase
 
         $exception = new \Exception('Foo message');
 
-        $mockLogger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $mockLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
         $mockLogger->expects($this->once())
             ->method('log')
             ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', ['exception' => $exception]);
@@ -535,7 +535,7 @@ class ErrorHandlerTest extends TestCase
     public function testHandleFatalError()
     {
         try {
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
             $handler = ErrorHandler::register();
 
             $error = [
@@ -584,7 +584,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testCustomExceptionHandler()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function ($e) use ($handler) {
             $handler->setExceptionHandler(null);

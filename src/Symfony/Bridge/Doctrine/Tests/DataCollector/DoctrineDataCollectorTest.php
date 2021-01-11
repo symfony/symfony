@@ -229,7 +229,7 @@ EOTXT
 
     private function createCollector($queries)
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+        $connection = $this->getMockBuilder(\Doctrine\DBAL\Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
         $connection->expects($this->any())
@@ -249,7 +249,7 @@ EOTXT
             ->method('getConnection')
             ->willReturn($connection);
 
-        $logger = $this->getMockBuilder('Doctrine\DBAL\Logging\DebugStack')->getMock();
+        $logger = $this->getMockBuilder(\Doctrine\DBAL\Logging\DebugStack::class)->getMock();
         $logger->queries = $queries;
 
         $collector = new DoctrineDataCollector($registry);

@@ -29,14 +29,14 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->httpKernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $this->httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $this->httpUtils = $this->getMockBuilder(\Symfony\Component\Security\Http\HttpUtils::class)->getMock();
+        $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
 
-        $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
-        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $this->request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
         $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
-        $this->exception = $this->getMockBuilder('Symfony\Component\Security\Core\Exception\AuthenticationException')->setMethods(['getMessage'])->getMock();
+        $this->exception = $this->getMockBuilder(\Symfony\Component\Security\Core\Exception\AuthenticationException::class)->setMethods(['getMessage'])->getMock();
     }
 
     public function testForward()
@@ -183,8 +183,8 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     private function getRequest()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request->attributes = $this->getMockBuilder('Symfony\Component\HttpFoundation\ParameterBag')->getMock();
+        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $request->attributes = $this->getMockBuilder(\Symfony\Component\HttpFoundation\ParameterBag::class)->getMock();
 
         return $request;
     }

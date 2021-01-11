@@ -42,12 +42,12 @@ class RequestDataCollectorTest extends TestCase
         $attributes = $c->getRequestAttributes();
 
         $this->assertSame('request', $c->getName());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestHeaders());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestServer());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestCookies());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $attributes);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestRequest());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestHeaders());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestServer());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestCookies());
+        $this->assertInstanceOf(ParameterBag::class, $attributes);
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestRequest());
+        $this->assertInstanceOf(ParameterBag::class, $c->getRequestQuery());
         $this->assertInstanceOf(ParameterBag::class, $c->getResponseCookies());
         $this->assertSame('html', $c->getFormat());
         $this->assertEquals('foobar', $c->getRoute());
@@ -57,7 +57,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertContainsEquals(__FILE__, $attributes->get('resource'));
         $this->assertSame('stdClass', $attributes->get('object')->getType());
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getResponseHeaders());
+        $this->assertInstanceOf(ParameterBag::class, $c->getResponseHeaders());
         $this->assertSame('OK', $c->getStatusText());
         $this->assertSame(200, $c->getStatusCode());
         $this->assertSame('application/json', $c->getContentType());
@@ -371,7 +371,7 @@ class RequestDataCollectorTest extends TestCase
      */
     protected function injectController($collector, $controller, $request)
     {
-        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
+        $resolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ControllerResolverInterface::class)->getMock();
         $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMockBuilder(ArgumentResolverInterface::class)->getMock());
         $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
         $collector->onKernelController($event);

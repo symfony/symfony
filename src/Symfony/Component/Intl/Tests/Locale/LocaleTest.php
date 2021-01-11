@@ -17,7 +17,7 @@ class LocaleTest extends AbstractLocaleTest
 {
     public function testAcceptFromHttp()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('acceptFromHttp', 'pt-br,en-us;q=0.7,en;q=0.5');
     }
 
@@ -34,7 +34,7 @@ class LocaleTest extends AbstractLocaleTest
 
     public function testComposeLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $subtags = [
             'language' => 'pt',
             'script' => 'Latn',
@@ -45,73 +45,73 @@ class LocaleTest extends AbstractLocaleTest
 
     public function testFilterMatches()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('filterMatches', 'pt-BR', 'pt-BR');
     }
 
     public function testGetAllVariants()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getAllVariants', 'pt_BR_Latn');
     }
 
     public function testGetDisplayLanguage()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getDisplayLanguage', 'pt-Latn-BR', 'en');
     }
 
     public function testGetDisplayName()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getDisplayName', 'pt-Latn-BR', 'en');
     }
 
     public function testGetDisplayRegion()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getDisplayRegion', 'pt-Latn-BR', 'en');
     }
 
     public function testGetDisplayScript()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getDisplayScript', 'pt-Latn-BR', 'en');
     }
 
     public function testGetDisplayVariant()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getDisplayVariant', 'pt-Latn-BR', 'en');
     }
 
     public function testGetKeywords()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getKeywords', 'pt-BR@currency=BRL');
     }
 
     public function testGetPrimaryLanguage()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getPrimaryLanguage', 'pt-Latn-BR');
     }
 
     public function testGetRegion()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getRegion', 'pt-Latn-BR');
     }
 
     public function testGetScript()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('getScript', 'pt-Latn-BR');
     }
 
     public function testLookup()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $langtag = [
             'pt-Latn-BR',
             'pt-BR',
@@ -121,13 +121,13 @@ class LocaleTest extends AbstractLocaleTest
 
     public function testParseLocale()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('parseLocale', 'pt-Latn-BR');
     }
 
     public function testSetDefault()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MethodNotImplementedException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
         $this->call('setDefault', 'pt_BR');
     }
 

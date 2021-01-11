@@ -22,7 +22,7 @@ class AttributeMetadataTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface', $attributeMetadata);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\AttributeMetadataInterface::class, $attributeMetadata);
     }
 
     public function testGetName()

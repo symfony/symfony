@@ -73,7 +73,7 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testSaveThrowsExceptionOnFailure()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\LockConflictedException');
+        $this->expectException(LockConflictedException::class);
         $key = new Key(uniqid(__METHOD__, true));
 
         $this->store1
@@ -168,7 +168,7 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testputOffExpirationThrowsExceptionOnFailure()
     {
-        $this->expectException('Symfony\Component\Lock\Exception\LockConflictedException');
+        $this->expectException(LockConflictedException::class);
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
 

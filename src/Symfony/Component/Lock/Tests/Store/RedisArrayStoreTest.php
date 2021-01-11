@@ -21,7 +21,7 @@ class RedisArrayStoreTest extends AbstractRedisStoreTest
 {
     public static function setUpBeforeClass(): void
     {
-        if (!class_exists('RedisArray')) {
+        if (!class_exists(\RedisArray::class)) {
             self::markTestSkipped('The RedisArray class is required.');
         }
         try {

@@ -137,7 +137,7 @@ class RouteTest extends TestCase
      */
     public function testSetInvalidRequirement($req)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $route = new Route('/{foo}');
         $route->setRequirement('foo', $req);
     }
@@ -198,7 +198,7 @@ class RouteTest extends TestCase
     public function testCompile()
     {
         $route = new Route('/{foo}');
-        $this->assertInstanceOf('Symfony\Component\Routing\CompiledRoute', $compiled = $route->compile(), '->compile() returns a compiled route');
+        $this->assertInstanceOf(\Symfony\Component\Routing\CompiledRoute::class, $compiled = $route->compile(), '->compile() returns a compiled route');
         $this->assertSame($compiled, $route->compile(), '->compile() only compiled the route once if unchanged');
         $route->setRequirement('foo', '.*');
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');

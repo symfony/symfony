@@ -40,7 +40,7 @@ class ExtensionTest extends TestCase
 
     public function testIsConfigEnabledOnNonEnableableConfig()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config array has no \'enabled\' key.');
         $extension = new EnableableExtension();
 

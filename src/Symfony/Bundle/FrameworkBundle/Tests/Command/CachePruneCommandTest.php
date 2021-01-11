@@ -55,7 +55,7 @@ class CachePruneCommandTest extends TestCase
     private function getKernel(): object
     {
         $container = $this
-            ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
+            ->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)
             ->getMock();
 
         $kernel = $this

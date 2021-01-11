@@ -212,7 +212,7 @@ class SessionTest extends TestCase
 
     public function testGetFlashBag()
     {
-        $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class, $this->session->getFlashBag());
     }
 
     public function testGetIterator()
@@ -241,7 +241,7 @@ class SessionTest extends TestCase
 
     public function testGetMeta()
     {
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\Session\Storage\MetadataBag::class, $this->session->getMetadataBag());
     }
 
     public function testIsEmpty()

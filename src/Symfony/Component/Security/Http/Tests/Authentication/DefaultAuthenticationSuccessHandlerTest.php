@@ -23,10 +23,10 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
      */
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
         $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');
         $httpUtils = new HttpUtils($urlGenerator);
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
             $handler->setFirewallName('admin');
@@ -36,7 +36,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
     public function getRequestRedirections()
     {
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
         $session->expects($this->once())->method('get')->with('_security.admin.target_path')->willReturn('/admin/dashboard');
         $session->expects($this->once())->method('remove')->with('_security.admin.target_path');
         $requestWithSession = Request::create('/');

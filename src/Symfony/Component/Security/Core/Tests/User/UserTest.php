@@ -20,7 +20,7 @@ class UserTest extends TestCase
 {
     public function testConstructorException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new User('', 'superpass');
     }
 

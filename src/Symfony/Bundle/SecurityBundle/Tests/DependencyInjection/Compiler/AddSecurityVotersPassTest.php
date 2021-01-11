@@ -24,7 +24,7 @@ class AddSecurityVotersPassTest extends TestCase
 {
     public function testNoVoters()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No security voters found. You need to tag at least one with "security.voter".');
         $container = new ContainerBuilder();
         $container

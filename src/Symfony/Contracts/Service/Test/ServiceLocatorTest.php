@@ -67,7 +67,7 @@ abstract class ServiceLocatorTest extends TestCase
     public function testThrowsOnUndefinedInternalService()
     {
         if (!$this->getExpectedException()) {
-            $this->expectException('Psr\Container\NotFoundExceptionInterface');
+            $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
             $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
         }
         $locator = $this->getServiceLocator([
@@ -79,7 +79,7 @@ abstract class ServiceLocatorTest extends TestCase
 
     public function testThrowsOnCircularReference()
     {
-        $this->expectException('Psr\Container\ContainerExceptionInterface');
+        $this->expectException(\Psr\Container\ContainerExceptionInterface::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         $locator = $this->getServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },

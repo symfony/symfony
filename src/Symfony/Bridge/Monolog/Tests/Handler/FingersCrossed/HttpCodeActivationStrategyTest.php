@@ -26,7 +26,7 @@ class HttpCodeActivationStrategyTest extends TestCase
      */
     public function testExclusionsWithoutCodeLegacy()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
     }
 
@@ -35,7 +35,7 @@ class HttpCodeActivationStrategyTest extends TestCase
      */
     public function testExclusionsWithoutUrlsLegacy()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
     }
 

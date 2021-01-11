@@ -111,7 +111,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $transformer->transform('1234');
     }
@@ -150,7 +150,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform(1234);
     }
@@ -159,7 +159,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
@@ -168,7 +168,7 @@ class DateTimeToStringTransformerTest extends TestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $reverseTransformer->reverseTransform('2010-04-31');
     }

@@ -30,7 +30,7 @@ class RememberMeTokenTest extends TestCase
 
     public function testConstructorSecretCannotBeEmptyString()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new RememberMeToken(
             $this->getUser(),
             '',
@@ -40,7 +40,7 @@ class RememberMeTokenTest extends TestCase
 
     protected function getUser($roles = ['ROLE_FOO'])
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
         $user
             ->expects($this->any())
             ->method('getRoles')

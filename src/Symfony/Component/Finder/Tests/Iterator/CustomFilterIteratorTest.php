@@ -17,7 +17,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
 {
     public function testWithInvalidFilter()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new CustomFilterIterator(new Iterator(), ['foo']);
     }
 

@@ -234,7 +234,7 @@ class GuardAuthenticationListenerTest extends TestCase
 
     public function testReturnNullFromGetCredentials()
     {
-        $this->expectException('UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall4';
 
@@ -262,17 +262,17 @@ class GuardAuthenticationListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
+        $this->authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->guardAuthenticatorHandler = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorHandler')
+        $this->guardAuthenticatorHandler = $this->getMockBuilder(\Symfony\Component\Security\Guard\GuardAuthenticatorHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->request = new Request([], [], [], [], [], []);
 
-        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\RequestEvent')
+        $this->event = $this->getMockBuilder(\Symfony\Component\HttpKernel\Event\RequestEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(['getRequest'])
             ->getMock();
@@ -281,8 +281,8 @@ class GuardAuthenticationListenerTest extends TestCase
             ->method('getRequest')
             ->willReturn($this->request);
 
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-        $this->rememberMeServices = $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
+        $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $this->rememberMeServices = $this->getMockBuilder(\Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface::class)->getMock();
     }
 
     protected function tearDown(): void

@@ -86,7 +86,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCreateRedirectResponseWithRouteName()
     {
-        $utils = new HttpUtils($urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock());
+        $utils = new HttpUtils($urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock());
 
         $urlGenerator
             ->expects($this->any())
@@ -97,7 +97,7 @@ class HttpUtilsTest extends TestCase
         $urlGenerator
             ->expects($this->any())
             ->method('getContext')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock())
+            ->willReturn($this->getMockBuilder(\Symfony\Component\Routing\RequestContext::class)->getMock())
         ;
 
         $response = $utils->createRedirectResponse($this->getRequest(), 'foobar');
@@ -120,7 +120,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCreateRequestWithRouteName()
     {
-        $utils = new HttpUtils($urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock());
+        $utils = new HttpUtils($urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock());
 
         $urlGenerator
             ->expects($this->once())
@@ -130,7 +130,7 @@ class HttpUtilsTest extends TestCase
         $urlGenerator
             ->expects($this->any())
             ->method('getContext')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock())
+            ->willReturn($this->getMockBuilder(\Symfony\Component\Routing\RequestContext::class)->getMock())
         ;
 
         $subRequest = $utils->createRequest($this->getRequest(), 'foobar');
@@ -140,7 +140,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCreateRequestWithAbsoluteUrl()
     {
-        $utils = new HttpUtils($this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock());
+        $utils = new HttpUtils($this->getMockBuilder(UrlGeneratorInterface::class)->getMock());
         $subRequest = $utils->createRequest($this->getRequest(), 'http://symfony.com/');
 
         $this->assertEquals('/', $subRequest->getPathInfo());
@@ -149,7 +149,7 @@ class HttpUtilsTest extends TestCase
     public function testCreateRequestPassesSessionToTheNewRequest()
     {
         $request = $this->getRequest();
-        $request->setSession($session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
+        $request->setSession($session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock());
 
         $utils = new HttpUtils($this->getUrlGenerator());
         $subRequest = $utils->createRequest($request, '/foobar');
@@ -195,7 +195,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckRequestPathWithUrlMatcherAndResourceNotFound()
     {
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\UrlMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('match')
@@ -210,7 +210,7 @@ class HttpUtilsTest extends TestCase
     public function testCheckRequestPathWithUrlMatcherAndMethodNotAllowed()
     {
         $request = $this->getRequest();
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\RequestMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('matchRequest')
@@ -224,7 +224,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckRequestPathWithUrlMatcherAndResourceFoundByUrl()
     {
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\UrlMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('match')
@@ -239,7 +239,7 @@ class HttpUtilsTest extends TestCase
     public function testCheckRequestPathWithUrlMatcherAndResourceFoundByRequest()
     {
         $request = $this->getRequest();
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\RequestMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('matchRequest')
@@ -253,8 +253,8 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
-        $this->expectException('RuntimeException');
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $this->expectException(\RuntimeException::class);
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\UrlMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('match')
@@ -267,7 +267,7 @@ class HttpUtilsTest extends TestCase
 
     public function testCheckPathWithoutRouteParam()
     {
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $urlMatcher = $this->getMockBuilder(\Symfony\Component\Routing\Matcher\UrlMatcherInterface::class)->getMock();
         $urlMatcher
             ->expects($this->any())
             ->method('match')
@@ -280,7 +280,7 @@ class HttpUtilsTest extends TestCase
 
     public function testUrlMatcher()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface');
         new HttpUtils($this->getUrlGenerator(), new \stdClass());
     }
@@ -305,7 +305,7 @@ class HttpUtilsTest extends TestCase
 
     public function testUrlGeneratorIsRequiredToGenerateUrl()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         $utils = new HttpUtils();
         $utils->generateUri(new Request(), 'route_name');
@@ -313,7 +313,7 @@ class HttpUtilsTest extends TestCase
 
     private function getUrlGenerator($generatedUrl = '/foo/bar')
     {
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
+        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
         $urlGenerator
             ->expects($this->any())
             ->method('generate')

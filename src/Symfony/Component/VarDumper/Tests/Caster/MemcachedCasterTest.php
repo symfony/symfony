@@ -23,7 +23,7 @@ class MemcachedCasterTest extends TestCase
 
     public function testCastMemcachedWithDefaultOptions()
     {
-        if (!class_exists('Memcached')) {
+        if (!class_exists(\Memcached::class)) {
             $this->markTestSkipped('Memcached not available');
         }
 
@@ -53,7 +53,7 @@ EOTXT;
 
     public function testCastMemcachedWithCustomOptions()
     {
-        if (!class_exists('Memcached')) {
+        if (!class_exists(\Memcached::class)) {
             $this->markTestSkipped('Memcached not available');
         }
 

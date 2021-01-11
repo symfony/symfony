@@ -37,14 +37,14 @@ class Pbkdf2PasswordEncoderTest extends TestCase
 
     public function testEncodePasswordAlgorithmDoesNotExist()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $encoder = new Pbkdf2PasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
 
     public function testEncodePasswordLength()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $encoder = new Pbkdf2PasswordEncoder('foobar');
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

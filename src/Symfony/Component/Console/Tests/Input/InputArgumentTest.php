@@ -39,7 +39,7 @@ class InputArgumentTest extends TestCase
 
     public function testInvalidModes()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument mode "-1" is not valid.');
 
         new InputArgument('foo', '-1');
@@ -82,7 +82,7 @@ class InputArgumentTest extends TestCase
 
     public function testSetDefaultWithRequiredArgument()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
         $argument->setDefault('default');
@@ -90,7 +90,7 @@ class InputArgumentTest extends TestCase
 
     public function testSetDefaultWithArrayArgument()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A default value for an array argument must be an array.');
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
         $argument->setDefault('default');

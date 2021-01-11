@@ -244,7 +244,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testConstructorWithUnknownObjectTypeHintDenormalize()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Could not determine the class of the parameter "unknown".');
         $data = [
             'id' => 10,
@@ -519,9 +519,9 @@ class ObjectNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\LogicException::class);
         $this->expectExceptionMessage('Cannot normalize attribute "object" because the injected serializer is not a normalizer');
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->normalizer->setSerializer($serializer);
 
         $obj = new ObjectDummy();
@@ -583,7 +583,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testThrowUnexpectedValueException()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $this->normalizer->denormalize(['foo' => 'bar'], ObjectTypeHinted::class);
     }
 

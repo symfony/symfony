@@ -65,7 +65,7 @@ class DebugCommandTest extends TestCase
 
     public function testMalformedTemplateName()
     {
-        $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Malformed namespaced template name "@foo" (expecting "@namespace/template_name").');
         $this->createCommandTester()->execute(['name' => '@foo']);
     }

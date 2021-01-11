@@ -25,7 +25,7 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testGetThrowsOnUndefinedService()
     {
-        $this->expectException('Psr\Container\NotFoundExceptionInterface');
+        $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
         $this->expectExceptionMessage('Service "dummy" not found: the container inside "Symfony\Component\DependencyInjection\Tests\ServiceLocatorTest" is a smaller service locator that only knows about the "foo" and "bar" services.');
         $locator = $this->getServiceLocator([
             'foo' => function () { return 'bar'; },
@@ -37,14 +37,14 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testThrowsOnCircularReference()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         parent::testThrowsOnCircularReference();
     }
 
     public function testThrowsInServiceSubscriber()
     {
-        $this->expectException('Psr\Container\NotFoundExceptionInterface');
+        $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
         $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "caller" is a smaller service locator that only knows about the "bar" service. Unless you need extra laziness, try using dependency injection instead. Otherwise, you need to declare it using "SomeServiceSubscriber::getSubscribedServices()".');
         $container = new Container();
         $container->set('foo', new \stdClass());
@@ -57,7 +57,7 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
 
     public function testGetThrowsServiceNotFoundException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('Service "foo" not found: even though it exists in the app\'s container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.');
         $container = new Container();
         $container->set('foo', new \stdClass());

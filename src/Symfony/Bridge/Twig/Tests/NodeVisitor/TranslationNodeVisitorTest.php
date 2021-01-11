@@ -25,7 +25,7 @@ class TranslationNodeVisitorTest extends TestCase
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationNodeVisitor();
         $visitor->enable();
         $visitor->enterNode($node, $env);

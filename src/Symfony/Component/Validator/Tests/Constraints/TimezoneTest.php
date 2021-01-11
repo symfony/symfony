@@ -36,7 +36,7 @@ class TimezoneTest extends TestCase
 
     public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new Timezone([
             'zone' => \DateTimeZone::ALL,
             'countryCode' => 'AR',
@@ -45,7 +45,7 @@ class TimezoneTest extends TestCase
 
     public function testExceptionForGroupedTimezonesByCountryWithoutZone()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new Timezone(['countryCode' => 'AR']);
     }
 
@@ -54,7 +54,7 @@ class TimezoneTest extends TestCase
      */
     public function testExceptionForInvalidGroupedTimezones(int $zone)
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         new Timezone(['zone' => $zone]);
     }
 

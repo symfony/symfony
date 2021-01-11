@@ -26,7 +26,7 @@ class ClassMetadataFactoryTest extends TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadataFactory(new LoaderChain([]));
-        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface', $classMetadata);
+        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface::class, $classMetadata);
     }
 
     public function testGetMetadataFor()

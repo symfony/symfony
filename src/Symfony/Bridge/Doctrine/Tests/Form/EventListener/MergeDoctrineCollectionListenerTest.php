@@ -32,7 +32,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
         $this->form = $this->getBuilder()
             ->getForm();
     }

@@ -24,7 +24,7 @@ class HttpKernelExtensionTest extends TestCase
 {
     public function testFragmentWithError()
     {
-        $this->expectException('Twig\Error\RuntimeError');
+        $this->expectException(\Twig\Error\RuntimeError::class);
         $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
 
         $this->renderTemplate($renderer);
@@ -41,13 +41,13 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testUnknownFragmentRenderer()
     {
-        $context = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
+        $context = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
         $renderer = new FragmentHandler($context);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "inline" renderer does not exist.');
 
         $renderer->render('/foo');
@@ -55,11 +55,11 @@ class HttpKernelExtensionTest extends TestCase
 
     protected function getFragmentHandler($return)
     {
-        $strategy = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Fragment\\FragmentRendererInterface')->getMock();
+        $strategy = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface::class)->getMock();
         $strategy->expects($this->once())->method('getName')->willReturn('inline');
         $strategy->expects($this->once())->method('render')->will($return);
 
-        $context = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
+        $context = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -75,7 +75,7 @@ class HttpKernelExtensionTest extends TestCase
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->getMockBuilder('Twig\RuntimeLoader\RuntimeLoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Twig\RuntimeLoader\RuntimeLoaderInterface::class)->getMock();
         $loader->expects($this->any())->method('load')->willReturnMap([
             ['Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)],
         ]);

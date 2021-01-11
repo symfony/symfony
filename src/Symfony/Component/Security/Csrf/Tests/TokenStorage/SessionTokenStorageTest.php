@@ -88,13 +88,13 @@ class SessionTokenStorageTest extends TestCase
 
     public function testGetNonExistingTokenFromClosedSession()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Csrf\Exception\TokenNotFoundException::class);
         $this->storage->getToken('token_id');
     }
 
     public function testGetNonExistingTokenFromActiveSession()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Csrf\Exception\TokenNotFoundException::class);
         $this->session->start();
         $this->storage->getToken('token_id');
     }

@@ -124,7 +124,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException('Symfony\Component\Console\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new SymfonyQuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -192,7 +192,7 @@ EOT
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $mock = $this->getMockBuilder(\Symfony\Component\Console\Input\InputInterface::class)->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);

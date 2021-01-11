@@ -18,7 +18,7 @@ class ImageTest extends TestCase
 {
     public function testConstructorWithANonImgTag()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
 
@@ -36,7 +36,7 @@ class ImageTest extends TestCase
 
     public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="/foo" /></html>');
 

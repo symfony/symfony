@@ -81,7 +81,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testAutoConfigureAndChildDefinitionNotAllowed()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "child_service" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.');
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -92,7 +92,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testFactoryShortNotationNotAllowed()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[ref(\'factory\'), \'method\']" instead.');
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();

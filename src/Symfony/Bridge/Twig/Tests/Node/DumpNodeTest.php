@@ -24,7 +24,7 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -48,7 +48,7 @@ EOTXT;
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -75,7 +75,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -99,7 +99,7 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'

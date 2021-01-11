@@ -88,7 +88,7 @@ class NativeSessionTokenStorageTest extends TestCase
 
     public function testGetNonExistingToken()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
+        $this->expectException(\Symfony\Component\Security\Csrf\Exception\TokenNotFoundException::class);
         $this->storage->getToken('token_id');
     }
 

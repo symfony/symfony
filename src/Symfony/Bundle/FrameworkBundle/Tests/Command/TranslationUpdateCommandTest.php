@@ -154,7 +154,7 @@ class TranslationUpdateCommandTest extends TestCase
      */
     private function createCommandTester($extractedMessages = [], $loadedMessages = [], HttpKernel\KernelInterface $kernel = null, array $transPaths = [], array $viewsPaths = [])
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
+        $translator = $this->getMockBuilder(\Symfony\Component\Translation\Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -163,7 +163,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getFallbackLocales')
             ->willReturn(['en']);
 
-        $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
+        $extractor = $this->getMockBuilder(\Symfony\Component\Translation\Extractor\ExtractorInterface::class)->getMock();
         $extractor
             ->expects($this->any())
             ->method('extract')
@@ -175,7 +175,7 @@ class TranslationUpdateCommandTest extends TestCase
                 }
             );
 
-        $loader = $this->getMockBuilder('Symfony\Component\Translation\Reader\TranslationReader')->getMock();
+        $loader = $this->getMockBuilder(\Symfony\Component\Translation\Reader\TranslationReader::class)->getMock();
         $loader
             ->expects($this->any())
             ->method('read')
@@ -185,7 +185,7 @@ class TranslationUpdateCommandTest extends TestCase
                 }
             );
 
-        $writer = $this->getMockBuilder('Symfony\Component\Translation\Writer\TranslationWriter')->getMock();
+        $writer = $this->getMockBuilder(\Symfony\Component\Translation\Writer\TranslationWriter::class)->getMock();
         $writer
             ->expects($this->any())
             ->method('getFormats')
@@ -204,7 +204,7 @@ class TranslationUpdateCommandTest extends TestCase
                     ['test', true, $this->getBundle('test')],
                 ];
             }
-            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+            $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
@@ -233,7 +233,7 @@ class TranslationUpdateCommandTest extends TestCase
 
     private function getBundle($path)
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
+        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
         $bundle
             ->expects($this->any())
             ->method('getPath')

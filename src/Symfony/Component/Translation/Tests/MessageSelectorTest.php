@@ -41,7 +41,7 @@ class MessageSelectorTest extends TestCase
      */
     public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
         $selector = new MessageSelector();
 
         $selector->choose($id, $number, 'en');

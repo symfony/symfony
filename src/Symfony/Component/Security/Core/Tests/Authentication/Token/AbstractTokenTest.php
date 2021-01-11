@@ -28,7 +28,7 @@ class AbstractTokenTest extends TestCase
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
         $user->expects($this->once())->method('getUsername')->willReturn('fabien');
         $token->setUser($user);
         $this->assertEquals('fabien', $token->getUsername());
@@ -38,7 +38,7 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
 
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
         $user->expects($this->once())->method('eraseCredentials');
         $token->setUser($user);
 
@@ -151,7 +151,7 @@ class AbstractTokenTest extends TestCase
 
     public function getUsers()
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
 
         return [
             [$user],
@@ -178,7 +178,7 @@ class AbstractTokenTest extends TestCase
 
     public function getUserChanges()
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
 
         return [
             ['foo', 'bar'],
@@ -212,8 +212,8 @@ class AbstractTokenTest extends TestCase
 
     public function getUserChangesAdvancedUser()
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $advancedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $advancedUser = $this->getMockBuilder(\Symfony\Component\Security\Core\User\AdvancedUserInterface::class)->getMock();
 
         return [
             ['foo', 'bar'],

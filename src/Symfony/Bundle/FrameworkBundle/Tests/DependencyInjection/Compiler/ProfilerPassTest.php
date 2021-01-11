@@ -27,7 +27,7 @@ class ProfilerPassTest extends TestCase
      */
     public function testTemplateNoIdThrowsException()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')

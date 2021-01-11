@@ -50,7 +50,7 @@ class ContainerBagTest extends TestCase
 
     public function testGetParameterNotFound()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->containerBag->get('bar');
     }
 

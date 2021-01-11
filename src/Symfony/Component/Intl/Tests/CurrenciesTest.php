@@ -725,7 +725,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         Currencies::getNumericCode($currency);
     }
 
@@ -770,13 +770,13 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         Currencies::forNumericCode($currency);
     }
 
     public function testGetNameWithInvalidCurrencyCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
         Currencies::getName('foo');
     }
 

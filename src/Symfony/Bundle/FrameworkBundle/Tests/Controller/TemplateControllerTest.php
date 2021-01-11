@@ -22,7 +22,7 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
@@ -47,7 +47,7 @@ class TemplateControllerTest extends TestCase
 
     public function testNoTwigNorTemplating()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
         $controller = new TemplateController();
 

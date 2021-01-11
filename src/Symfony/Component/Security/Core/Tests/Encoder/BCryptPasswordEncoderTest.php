@@ -26,13 +26,13 @@ class BCryptPasswordEncoderTest extends TestCase
 
     public function testCostBelowRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new BCryptPasswordEncoder(3);
     }
 
     public function testCostAboveRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new BCryptPasswordEncoder(32);
     }
 
@@ -41,7 +41,7 @@ class BCryptPasswordEncoderTest extends TestCase
      */
     public function testCostInRange($cost)
     {
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder', new BCryptPasswordEncoder($cost));
+        $this->assertInstanceOf(BCryptPasswordEncoder::class, new BCryptPasswordEncoder($cost));
     }
 
     public function validRangeData()
@@ -69,7 +69,7 @@ class BCryptPasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
 
         $encoder->encodePassword(str_repeat('a', 73), 'salt');

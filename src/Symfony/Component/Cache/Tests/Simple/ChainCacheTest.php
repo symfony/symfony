@@ -30,14 +30,14 @@ class ChainCacheTest extends CacheTestCase
 
     public function testEmptyCachesException()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one cache must be specified.');
         new ChainCache([]);
     }
 
     public function testInvalidCacheException()
     {
-        $this->expectException('Symfony\Component\Cache\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" does not implement');
         new ChainCache([new \stdClass()]);
     }

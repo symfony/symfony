@@ -21,19 +21,19 @@ class GroupsTest extends TestCase
 {
     public function testEmptyGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new Groups(['value' => []]);
     }
 
     public function testNotAnArrayGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new Groups(['value' => 12]);
     }
 
     public function testInvalidGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
         new Groups(['value' => ['a', 1, new \stdClass()]]);
     }
 

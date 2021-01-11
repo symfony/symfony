@@ -73,7 +73,7 @@ class ResolveFactoryClassPassTest extends TestCase
 
     public function testNotAnyClassThrowsException()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?');
         $container = new ContainerBuilder();
 

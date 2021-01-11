@@ -112,7 +112,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $transformer->transform('foo');
     }
@@ -121,7 +121,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
 
         $transformer->reverseTransform(1);
     }
@@ -144,7 +144,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
@@ -157,7 +157,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
@@ -199,7 +199,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
@@ -209,7 +209,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
@@ -223,7 +223,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
 
-        $transformer = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer')
+        $transformer = $this->getMockBuilder(PercentToLocalizedStringTransformer::class)
             ->setMethods(['getNumberFormatter'])
             ->setConstructorArgs([1, 'integer'])
             ->getMock();
@@ -237,7 +237,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testReverseTransformDisallowsLeadingExtraCharacters()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new PercentToLocalizedStringTransformer();
 
         $transformer->reverseTransform('foo123');
@@ -245,7 +245,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testReverseTransformDisallowsCenteredExtraCharacters()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo3"');
         $transformer = new PercentToLocalizedStringTransformer();
 
@@ -257,7 +257,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo8"');
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -271,7 +271,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     public function testReverseTransformDisallowsTrailingExtraCharacters()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo"');
         $transformer = new PercentToLocalizedStringTransformer();
 
@@ -283,7 +283,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo"');
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);

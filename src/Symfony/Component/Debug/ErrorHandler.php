@@ -169,7 +169,7 @@ class ErrorHandler
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
         }
-        $this->traceReflector = new \ReflectionProperty('Exception', 'trace');
+        $this->traceReflector = new \ReflectionProperty(\Exception::class, 'trace');
         $this->traceReflector->setAccessible(true);
     }
 

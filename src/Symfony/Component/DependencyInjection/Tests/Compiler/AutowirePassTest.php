@@ -241,7 +241,7 @@ class AutowirePassTest extends TestCase
      */
     public function testTypeNotGuessableUnionType()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
+        $this->expectException(AutowiringFailedException::class);
         $this->expectExceptionMessage('Cannot autowire service "a": argument "$collision" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionClasses::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionA|Symfony\Component\DependencyInjection\Tests\Compiler\CollisionB" but this class was not found.');
         $container = new ContainerBuilder();
 
@@ -493,7 +493,7 @@ class AutowirePassTest extends TestCase
      */
     public function testUnionScalarArgsCannotBeAutowired()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\AutowiringFailedException');
+        $this->expectException(AutowiringFailedException::class);
         $this->expectExceptionMessage('Cannot autowire service "union_scalars": argument "$timeout" of method "Symfony\Component\DependencyInjection\Tests\Compiler\UnionScalars::__construct()" is type-hinted "int|float", you should configure its value explicitly.');
         $container = new ContainerBuilder();
 

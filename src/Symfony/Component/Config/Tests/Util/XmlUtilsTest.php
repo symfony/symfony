@@ -84,13 +84,13 @@ class XmlUtilsTest extends TestCase
             $this->assertMatchesRegularExpression('/The XML file ".+" is not valid\./', $e->getMessage());
         }
 
-        $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
+        $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile($fixtures.'valid.xml', [$mock, 'validate']));
         $this->assertSame([], libxml_get_errors());
     }
 
     public function testParseWithInvalidValidatorCallable()
     {
-        $this->expectException('Symfony\Component\Config\Util\Exception\InvalidXmlException');
+        $this->expectException(\Symfony\Component\Config\Util\Exception\InvalidXmlException::class);
         $this->expectExceptionMessage('The XML is not valid');
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -105,7 +105,7 @@ class XmlUtilsTest extends TestCase
         $internalErrors = libxml_use_internal_errors(true);
 
         $this->assertSame([], libxml_get_errors());
-        $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/invalid_schema.xml'));
+        $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/invalid_schema.xml'));
         $this->assertSame([], libxml_get_errors());
 
         libxml_clear_errors();
@@ -190,7 +190,7 @@ class XmlUtilsTest extends TestCase
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('File "%s" does not contain valid XML, it is empty.', $file));
 
         XmlUtils::loadFile($file);

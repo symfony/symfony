@@ -71,7 +71,7 @@ class PropertyNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = [])
     {
-        $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
+        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -395,9 +395,9 @@ class PropertyNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\LogicException::class);
         $this->expectExceptionMessage('Cannot normalize attribute "bar" because the injected serializer is not a normalizer');
-        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->normalizer->setSerializer($serializer);
 
         $obj = new PropertyDummy();

@@ -73,7 +73,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testTransformRequiresValidDateTime()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->transform('2010-01-01');
     }
@@ -94,14 +94,14 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testReverseTransformRequiresString()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->reverseTransform(12345);
     }
 
     public function testReverseTransformWithNonExistingDate()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-04-31T04:05');
@@ -109,7 +109,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testReverseTransformExpectsValidDateString()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-2010-2010');

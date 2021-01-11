@@ -20,7 +20,7 @@ class ExpressionRequestMatcherTest extends TestCase
 {
     public function testWhenNoExpressionIsSet()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $expressionRequestMatcher = new ExpressionRequestMatcher();
         $expressionRequestMatcher->matches(new Request());
     }

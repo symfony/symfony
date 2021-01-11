@@ -43,7 +43,7 @@ class MemberMetadataTest extends TestCase
 
     public function testAddConstraintRequiresClassConstraints()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
 
         $this->metadata->addConstraint(new ClassConstraint());
     }

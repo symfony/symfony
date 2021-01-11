@@ -38,7 +38,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetDefaultThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No default value was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
@@ -49,7 +49,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetDefaultThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -69,7 +69,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetLazyClosuresThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No lazy closures were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
@@ -80,7 +80,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetLazyClosuresThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -100,7 +100,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedTypesThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No allowed types were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
@@ -111,7 +111,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedTypesThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -131,7 +131,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedValuesThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No allowed values were set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
@@ -142,7 +142,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetAllowedValuesThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -162,7 +162,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizerThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
@@ -173,7 +173,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizerThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -194,7 +194,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizersThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No normalizer was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
@@ -205,7 +205,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetNormalizersThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 
@@ -235,7 +235,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetDeprecationMessageThrowsOnNoConfiguredValue()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\NoConfigurationException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoConfigurationException::class);
         $this->expectExceptionMessage('No deprecation was set for the "foo" option.');
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
@@ -246,7 +246,7 @@ class OptionsResolverIntrospectorTest extends TestCase
 
     public function testGetDeprecationMessageThrowsOnNotDefinedOption()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
         $this->expectExceptionMessage('The option "foo" does not exist.');
         $resolver = new OptionsResolver();
 

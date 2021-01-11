@@ -22,8 +22,8 @@ class FilesystemLoaderTest extends TestCase
 {
     public function testGetSourceContext()
     {
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locator
             ->expects($this->once())
             ->method('locate')
@@ -42,8 +42,8 @@ class FilesystemLoaderTest extends TestCase
     public function testExists()
     {
         // should return true for templates that Twig does not find, but Symfony does
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locator
             ->expects($this->once())
             ->method('locate')
@@ -56,8 +56,8 @@ class FilesystemLoaderTest extends TestCase
 
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
-        $this->expectException('Twig\Error\LoaderError');
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
+        $this->expectException(\Twig\Error\LoaderError::class);
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
         $parser
             ->expects($this->once())
             ->method('parse')
@@ -65,7 +65,7 @@ class FilesystemLoaderTest extends TestCase
             ->willReturn($this->getMockBuilder(TemplateReferenceInterface::class)->getMock())
         ;
 
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locator
             ->expects($this->once())
             ->method('locate')
@@ -78,8 +78,8 @@ class FilesystemLoaderTest extends TestCase
 
     public function testTwigErrorIfLocatorReturnsFalse()
     {
-        $this->expectException('Twig\Error\LoaderError');
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
+        $this->expectException(\Twig\Error\LoaderError::class);
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
         $parser
             ->expects($this->once())
             ->method('parse')
@@ -87,7 +87,7 @@ class FilesystemLoaderTest extends TestCase
             ->willReturn($this->getMockBuilder(TemplateReferenceInterface::class)->getMock())
         ;
 
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
         $locator
             ->expects($this->once())
             ->method('locate')
@@ -100,28 +100,28 @@ class FilesystemLoaderTest extends TestCase
 
     public function testTwigErrorIfTemplateDoesNotExist()
     {
-        $this->expectException('Twig\Error\LoaderError');
+        $this->expectException(\Twig\Error\LoaderError::class);
         $this->expectExceptionMessageMatches('/Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.templates\)/');
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
 
         $loader = new FilesystemLoader($locator, $parser);
         $loader->addPath(__DIR__.'/../DependencyInjection/Fixtures/templates');
 
-        $method = new \ReflectionMethod('Symfony\Bundle\TwigBundle\Loader\FilesystemLoader', 'findTemplate');
+        $method = new \ReflectionMethod(FilesystemLoader::class, 'findTemplate');
         $method->setAccessible(true);
         $method->invoke($loader, 'name.format.engine');
     }
 
     public function testTwigSoftErrorIfTemplateDoesNotExist()
     {
-        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
-        $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
+        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
+        $locator = $this->getMockBuilder(\Symfony\Component\Config\FileLocatorInterface::class)->getMock();
 
         $loader = new FilesystemLoader($locator, $parser);
         $loader->addPath(__DIR__.'/../DependencyInjection/Fixtures/templates');
 
-        $method = new \ReflectionMethod('Symfony\Bundle\TwigBundle\Loader\FilesystemLoader', 'findTemplate');
+        $method = new \ReflectionMethod(FilesystemLoader::class, 'findTemplate');
         $method->setAccessible(true);
         $this->assertNull($method->invoke($loader, 'name.format.engine', false));
     }

@@ -87,7 +87,7 @@ TXT
 
     public function testDebugSingleFormTypeNotFound()
     {
-        $this->expectException('Symfony\Component\Console\Exception\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not find type "NonExistentType"');
         $tester = $this->createCommandTester();
         $tester->execute(['class' => 'NonExistentType'], ['decorated' => false, 'interactive' => false]);
@@ -142,7 +142,7 @@ TXT
 
     public function testDebugInvalidFormType()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->createCommandTester()->execute(['class' => 'test']);
     }
 

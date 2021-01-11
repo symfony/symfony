@@ -21,7 +21,7 @@ class FormTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         // Ensure that the private helper class FormFieldRegistry is loaded
-        class_exists('Symfony\\Component\\DomCrawler\\Form');
+        class_exists(Form::class);
     }
 
     public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor()
@@ -70,7 +70,7 @@ class FormTest extends TestCase
      */
     public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
 
         new Form($node, 'http://example.com');
     }
@@ -682,7 +682,7 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
-        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Field\\InputFormField', $form->get('bar'), '->get() returns the field object associated with the given name');
+        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\InputFormField::class, $form->get('bar'), '->get() returns the field object associated with the given name');
 
         try {
             $form->get('foo');
@@ -698,7 +698,7 @@ class FormTest extends TestCase
 
         $fields = $form->all();
         $this->assertCount(1, $fields, '->all() return an array of form field objects');
-        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Field\\InputFormField', $fields['bar'], '->all() return an array of form field objects');
+        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\InputFormField::class, $fields['bar'], '->all() return an array of form field objects');
     }
 
     public function testSubmitWithoutAFormButton()
@@ -741,14 +741,14 @@ class FormTest extends TestCase
 
     public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $registry = new FormFieldRegistry();
         $registry->get('foo');
     }
 
     public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $registry = new FormFieldRegistry();
         $registry->set('foo', null);
     }
@@ -827,7 +827,7 @@ class FormTest extends TestCase
 
     public function testFormRegistrySetValueOnCompoundField()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot set value on a compound field "foo[bar]".');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[bar][baz]'));
@@ -837,7 +837,7 @@ class FormTest extends TestCase
 
     public function testFormRegistrySetArrayOnNotCompoundField()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unreachable field "0"');
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('bar'));
@@ -864,13 +864,13 @@ class FormTest extends TestCase
         ');
         $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
 
-        $this->assertInstanceOf('Symfony\Component\DomCrawler\Field\ChoiceFormField', $form->get('option'));
+        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\ChoiceFormField::class, $form->get('option'));
     }
 
     protected function getFormFieldMock($name, $value = null)
     {
         $field = $this
-            ->getMockBuilder('Symfony\\Component\\DomCrawler\\Field\\FormField')
+            ->getMockBuilder(\Symfony\Component\DomCrawler\Field\FormField::class)
             ->setMethods(['getName', 'getValue', 'setValue', 'initialize'])
             ->disableOriginalConstructor()
             ->getMock()

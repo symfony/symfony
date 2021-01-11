@@ -118,13 +118,13 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testClassOptionIsRequired()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\MissingOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE);
     }
 
     public function testInvalidClassOption()
     {
-        $this->expectException('Symfony\Component\Form\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Form\Exception\RuntimeException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => 'foo',
         ]);
@@ -219,7 +219,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $this->expectException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException');
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -229,7 +229,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -1242,7 +1242,7 @@ class EntityTypeTest extends BaseTypeTest
         $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
         $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertInstanceOf(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class, $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }
@@ -1302,7 +1302,7 @@ class EntityTypeTest extends BaseTypeTest
         $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
         $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertInstanceOf(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class, $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }

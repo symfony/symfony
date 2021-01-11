@@ -27,7 +27,7 @@ class ChainDecoderTest extends TestCase
     protected function setUp(): void
     {
         $this->decoder1 = $this
-            ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')
+            ->getMockBuilder(\Symfony\Component\Serializer\Encoder\DecoderInterface::class)
             ->getMock();
 
         $this->decoder1
@@ -40,7 +40,7 @@ class ChainDecoderTest extends TestCase
             ]);
 
         $this->decoder2 = $this
-            ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')
+            ->getMockBuilder(\Symfony\Component\Serializer\Encoder\DecoderInterface::class)
             ->getMock();
 
         $this->decoder2
@@ -72,7 +72,7 @@ class ChainDecoderTest extends TestCase
 
     public function testDecodeUnsupportedFormat()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
         $this->chainDecoder->decode('string_to_decode', self::FORMAT_3);
     }
 }

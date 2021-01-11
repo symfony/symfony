@@ -41,7 +41,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setForeground('default');
         $this->assertEquals("\033[39mfoo\033[39m", $style->apply('foo'));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $style->setForeground('undefined-color');
     }
 
@@ -58,7 +58,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setBackground('default');
         $this->assertEquals("\033[49mfoo\033[49m", $style->apply('foo'));
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $style->setBackground('undefined-color');
     }
 

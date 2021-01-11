@@ -262,7 +262,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!class_exists(ExpressionLanguage::class)) {
                 throw new \LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
@@ -276,7 +276,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function createRequest(string $pathinfo): ?Request
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+        if (!class_exists(Request::class)) {
             return null;
         }
 

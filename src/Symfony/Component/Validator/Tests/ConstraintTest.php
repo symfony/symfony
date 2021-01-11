@@ -38,7 +38,7 @@ class ConstraintTest extends TestCase
 
     public function testSetNotExistingPropertyThrowsException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException(InvalidOptionsException::class);
 
         new ConstraintA([
             'foo' => 'bar',
@@ -49,14 +49,14 @@ class ConstraintTest extends TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException(InvalidOptionsException::class);
 
         $constraint->foo = 'bar';
     }
 
     public function testInvalidAndRequiredOptionsPassed()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException(InvalidOptionsException::class);
 
         new ConstraintC([
             'option1' => 'default',
@@ -104,14 +104,14 @@ class ConstraintTest extends TestCase
 
     public function testSetUndefinedDefaultProperty()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
 
         new ConstraintB('foo');
     }
 
     public function testRequiredOptionsMustBeDefined()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\MissingOptionsException');
+        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
 
         new ConstraintC();
     }
@@ -209,7 +209,7 @@ class ConstraintTest extends TestCase
 
     public function testGetErrorNameForUnknownCode()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
         Constraint::getErrorName(1);
     }
 
@@ -226,7 +226,7 @@ class ConstraintTest extends TestCase
 
     public function testInvalidOptions()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\InvalidOptionsException');
+        $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage('The options "0", "5" do not exist in constraint "Symfony\Component\Validator\Tests\Fixtures\ConstraintA".');
         new ConstraintA(['property2' => 'foo', 'bar', 5 => 'baz']);
     }
@@ -244,7 +244,7 @@ class ConstraintTest extends TestCase
 
     public function testAnnotationSetUndefinedDefaultOption()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('No default option is configured for constraint "Symfony\Component\Validator\Tests\Fixtures\ConstraintB".');
         new ConstraintB(['value' => 1]);
     }

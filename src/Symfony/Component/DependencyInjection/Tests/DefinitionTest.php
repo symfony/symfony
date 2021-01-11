@@ -116,7 +116,7 @@ class DefinitionTest extends TestCase
 
         $def = new Definition('stdClass');
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The decorated service inner name for "foo" must be different than the service name itself.');
 
         $def->setDecoratedService('foo', 'foo');
@@ -152,7 +152,7 @@ class DefinitionTest extends TestCase
 
     public function testExceptionOnEmptyMethodCall()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Method name cannot be empty.');
         $def = new Definition('stdClass');
         $def->addMethodCall('');
@@ -221,7 +221,7 @@ class DefinitionTest extends TestCase
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $def = new Definition('stdClass');
         $def->setDeprecated(false, $message);
     }
@@ -306,7 +306,7 @@ class DefinitionTest extends TestCase
 
     public function testGetArgumentShouldCheckBounds()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $def = new Definition('stdClass');
 
         $def->addArgument('foo');
@@ -315,7 +315,7 @@ class DefinitionTest extends TestCase
 
     public function testReplaceArgumentShouldCheckBounds()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('The index "1" is not in the range [0, 0].');
         $def = new Definition('stdClass');
 
@@ -325,7 +325,7 @@ class DefinitionTest extends TestCase
 
     public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Cannot replace arguments if none have been configured yet.');
         $def = new Definition('stdClass');
         $def->replaceArgument(0, 'bar');

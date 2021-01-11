@@ -77,7 +77,7 @@ class ScalarNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
         $node = new ScalarNode('test');
         $node->normalize($value);
     }
@@ -95,7 +95,7 @@ class ScalarNodeTest extends TestCase
     {
         $node = new ScalarNode('test');
 
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "test". Expected scalar, but got array.');
 
         $node->normalize([]);
@@ -106,7 +106,7 @@ class ScalarNodeTest extends TestCase
         $node = new ScalarNode('test');
         $node->setInfo('"the test value"');
 
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidTypeException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
         $this->expectExceptionMessage("Invalid type for path \"test\". Expected scalar, but got array.\nHint: \"the test value\"");
 
         $node->normalize([]);
@@ -145,7 +145,7 @@ class ScalarNodeTest extends TestCase
      */
     public function testNotAllowedEmptyValuesThrowException($value)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
         $node->finalize($value);

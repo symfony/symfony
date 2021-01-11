@@ -133,8 +133,8 @@ class SymfonyTestsListenerTrait
             echo "Testing $suiteName\n";
             $this->state = 0;
 
-            if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
-                if (method_exists('Doctrine\Common\Annotations\AnnotationRegistry', 'registerUniqueLoader')) {
+            if (!class_exists(AnnotationRegistry::class, false) && class_exists(AnnotationRegistry::class)) {
+                if (method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
                     AnnotationRegistry::registerUniqueLoader('class_exists');
                 } else {
                     AnnotationRegistry::registerLoader('class_exists');

@@ -35,8 +35,8 @@ class ProfilerControllerTest extends WebTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->homeAction();
@@ -111,8 +111,8 @@ class ProfilerControllerTest extends WebTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->toolbarAction(Request::create('/_wdt/foo-token'), null);
@@ -123,10 +123,10 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testToolbarActionWithEmptyToken($token)
     {
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder(Profiler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -150,10 +150,10 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testOpeningDisallowedPaths($path, $isAllowed)
     {
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder(Profiler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -186,9 +186,9 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testReturns404onTokenNotFound($withCsp)
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder(Profiler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -214,8 +214,8 @@ class ProfilerControllerTest extends WebTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->searchBarAction(Request::create('/_profiler/search_bar'));
@@ -240,9 +240,9 @@ class ProfilerControllerTest extends WebTestCase
      */
     public function testSearchResultsAction($withCsp)
     {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder(Profiler::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -306,8 +306,8 @@ class ProfilerControllerTest extends WebTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->searchBarAction(Request::create('/_profiler/search'));
@@ -345,8 +345,8 @@ class ProfilerControllerTest extends WebTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The profiler must be enabled.');
 
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $controller = new ProfilerController($urlGenerator, null, $twig, []);
         $controller->phpinfoAction(Request::create('/_profiler/phpinfo'));
@@ -464,10 +464,10 @@ class ProfilerControllerTest extends WebTestCase
 
     private function createController($profiler, $twig, $withCSP, array $templates = []): ProfilerController
     {
-        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
+        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
 
         if ($withCSP) {
-            $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
+            $nonceGenerator = $this->getMockBuilder(\Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator::class)->getMock();
             $nonceGenerator->method('generate')->willReturn('dummy_nonce');
 
             return new ProfilerController($urlGenerator, $profiler, $twig, $templates, new ContentSecurityPolicyHandler($nonceGenerator));

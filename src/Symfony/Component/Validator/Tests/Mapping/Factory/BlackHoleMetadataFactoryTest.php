@@ -18,7 +18,7 @@ class BlackHoleMetadataFactoryTest extends TestCase
 {
     public function testGetMetadataForThrowsALogicException()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Validator\Exception\LogicException::class);
         $metadataFactory = new BlackHoleMetadataFactory();
         $metadataFactory->getMetadataFor('foo');
     }

@@ -21,14 +21,14 @@ class SwitchUserRoleTest extends TestCase
 {
     public function testGetSource()
     {
-        $role = new SwitchUserRole('FOO', $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $role = new SwitchUserRole('FOO', $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
 
         $this->assertSame($token, $role->getSource());
     }
 
     public function testGetRole()
     {
-        $role = new SwitchUserRole('FOO', $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $role = new SwitchUserRole('FOO', $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
 
         $this->assertEquals('FOO', $role->getRole());
     }

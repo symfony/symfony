@@ -117,7 +117,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         @chmod($path, 0333);
 
         if ('0333' == substr(sprintf('%o', fileperms($path)), -4)) {
-            $this->expectException('\InvalidArgumentException');
+            $this->expectException(\InvalidArgumentException::class);
             $this->getGuesser()->guessMimeType($path);
         } else {
             $this->markTestSkipped('Can not verify chmod operations, change of file permissions failed');

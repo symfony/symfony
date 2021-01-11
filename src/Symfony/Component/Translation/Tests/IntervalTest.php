@@ -29,7 +29,7 @@ class IntervalTest extends TestCase
 
     public function testTestException()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
         Interval::test(1, 'foobar');
     }
 

@@ -29,7 +29,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testGetNonExistingFails()
     {
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $map = new OrderedHashMap();
 
         $map['first'];

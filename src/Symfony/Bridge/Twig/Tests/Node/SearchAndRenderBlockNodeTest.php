@@ -31,7 +31,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -54,7 +54,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -74,7 +74,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -94,7 +94,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -116,7 +116,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -137,7 +137,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -161,7 +161,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -190,7 +190,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         $this->assertEquals(
             sprintf(
@@ -218,7 +218,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -255,7 +255,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock()));
+        $compiler = new Compiler(new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.

@@ -120,7 +120,7 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "my-command" tagged "console.command" must not be abstract.');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -136,7 +136,7 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".');
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -221,7 +221,7 @@ class AddConsoleCommandPassTest extends TestCase
 
     public function testProcessOnChildDefinitionWithoutClass()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The definition for "my-child-command" has no class.');
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);

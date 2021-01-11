@@ -43,7 +43,7 @@ class CookieTest extends TestCase
      */
     public function testInstantiationThrowsExceptionIfRawCookieNameContainsSpecialCharacters($name)
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::create($name, null, 0, null, null, null, false, true);
     }
 
@@ -57,13 +57,13 @@ class CookieTest extends TestCase
 
     public function testInstantiationThrowsExceptionIfCookieNameIsEmpty()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::create('');
     }
 
     public function testInvalidExpiration()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         Cookie::create('MyCookie', 'foo', 'bar');
     }
 

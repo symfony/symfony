@@ -21,8 +21,8 @@ class PackagesTest extends TestCase
     public function testGetterSetters()
     {
         $packages = new Packages();
-        $packages->setDefaultPackage($default = $this->getMockBuilder('Symfony\Component\Asset\PackageInterface')->getMock());
-        $packages->addPackage('a', $a = $this->getMockBuilder('Symfony\Component\Asset\PackageInterface')->getMock());
+        $packages->setDefaultPackage($default = $this->getMockBuilder(\Symfony\Component\Asset\PackageInterface::class)->getMock());
+        $packages->addPackage('a', $a = $this->getMockBuilder(\Symfony\Component\Asset\PackageInterface::class)->getMock());
 
         $this->assertSame($default, $packages->getPackage());
         $this->assertSame($a, $packages->getPackage('a'));
@@ -57,14 +57,14 @@ class PackagesTest extends TestCase
 
     public function testNoDefaultPackage()
     {
-        $this->expectException('Symfony\Component\Asset\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Asset\Exception\LogicException::class);
         $packages = new Packages();
         $packages->getPackage();
     }
 
     public function testUndefinedPackage()
     {
-        $this->expectException('Symfony\Component\Asset\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\Asset\Exception\InvalidArgumentException::class);
         $packages = new Packages();
         $packages->getPackage('a');
     }

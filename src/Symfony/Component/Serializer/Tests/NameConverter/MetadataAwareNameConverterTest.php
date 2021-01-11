@@ -30,7 +30,7 @@ final class MetadataAwareNameConverterTest extends TestCase
     {
         $classMetadataFactory = $this->createMock(ClassMetadataFactoryInterface::class);
         $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $this->assertInstanceOf('Symfony\Component\Serializer\NameConverter\NameConverterInterface', $nameConverter);
+        $this->assertInstanceOf(NameConverterInterface::class, $nameConverter);
     }
 
     /**

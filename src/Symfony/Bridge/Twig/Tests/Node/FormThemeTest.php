@@ -54,7 +54,7 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $environment = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $environment = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $formRenderer = new FormRenderer($this->getMockBuilder(FormRendererEngineInterface::class)->getMock());
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);

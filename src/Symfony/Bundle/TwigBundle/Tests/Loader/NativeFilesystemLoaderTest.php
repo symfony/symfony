@@ -17,7 +17,7 @@ class NativeFilesystemLoaderTest extends TestCase
 
     public function testWithLegacyStyle1()
     {
-        $this->expectException('Twig\Error\LoaderError');
+        $this->expectException(\Twig\Error\LoaderError::class);
         $this->expectExceptionMessage('Template reference "TestBundle::Foo/index.html.twig" not found, did you mean "@Test/Foo/index.html.twig"?');
         $loader = new NativeFilesystemLoader(null, __DIR__.'/../');
         $loader->addPath('Fixtures/templates', 'Test');
@@ -27,7 +27,7 @@ class NativeFilesystemLoaderTest extends TestCase
 
     public function testWithLegacyStyle2()
     {
-        $this->expectException('Twig\Error\LoaderError');
+        $this->expectException(\Twig\Error\LoaderError::class);
         $this->expectExceptionMessage('Template reference "TestBundle:Foo:index.html.twig" not found, did you mean "@Test/Foo/index.html.twig"?');
         $loader = new NativeFilesystemLoader(null, __DIR__.'/../');
         $loader->addPath('Fixtures/templates', 'Test');

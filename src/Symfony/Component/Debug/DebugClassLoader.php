@@ -90,8 +90,8 @@ class DebugClassLoader
     public static function enable()
     {
         // Ensures we don't hit https://bugs.php.net/42098
-        class_exists('Symfony\Component\Debug\ErrorHandler');
-        class_exists('Psr\Log\LogLevel');
+        class_exists(\Symfony\Component\Debug\ErrorHandler::class);
+        class_exists(\Psr\Log\LogLevel::class);
 
         if (!\is_array($functions = spl_autoload_functions())) {
             return;

@@ -65,7 +65,7 @@ class FormConfigTest extends TestCase
      */
     public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
     {
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
 
         if (null !== $expectedException) {
             $this->expectException($expectedException);
@@ -80,7 +80,7 @@ class FormConfigTest extends TestCase
     {
         $config = $this->getConfigBuilder()->getFormConfig();
 
-        $this->assertInstanceOf('Symfony\Component\Form\NativeRequestHandler', $config->getRequestHandler());
+        $this->assertInstanceOf(\Symfony\Component\Form\NativeRequestHandler::class, $config->getRequestHandler());
     }
 
     public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
@@ -133,7 +133,7 @@ class FormConfigTest extends TestCase
 
     private function getConfigBuilder($name = 'name')
     {
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
 
         return new FormConfigBuilder($name, null, $dispatcher);
     }

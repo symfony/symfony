@@ -92,21 +92,21 @@ class IniFileLoaderTest extends TestCase
 
     public function testExceptionIsRaisedWhenIniFileDoesNotExist()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file "foo.ini" does not exist (in:');
         $this->loader->load('foo.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "nonvalid.ini" file is not valid.');
         @$this->loader->load('nonvalid.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileIsAlmostValid()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "almostvalid.ini" file is not valid.');
         @$this->loader->load('almostvalid.ini');
     }

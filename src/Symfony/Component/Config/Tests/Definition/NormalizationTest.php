@@ -171,7 +171,7 @@ class NormalizationTest extends TestCase
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('The attribute "id" must be set for path "root.thing".');
         $denormalized = [
             'thing' => [

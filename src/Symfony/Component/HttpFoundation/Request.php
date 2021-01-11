@@ -1941,7 +1941,7 @@ class Request
         // setting the default locale, the intl module is not installed, and
         // the call can be ignored:
         try {
-            if (class_exists('Locale', false)) {
+            if (class_exists(\Locale::class, false)) {
                 \Locale::setDefault($locale);
             }
         } catch (\Exception $e) {

@@ -284,7 +284,7 @@ class FormPassTest extends TestCase
 
     public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttributeNorImplementingGetExtendedTypes()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"form.type_extension" tagged services have to implement the static getExtendedTypes() method. Class "stdClass" for service "my.type_extension" does not implement it.');
         $container = $this->createContainerBuilder();
 
@@ -298,7 +298,7 @@ class FormPassTest extends TestCase
 
     public function testAddTaggedFormTypeExtensionWithoutExtendingAnyType()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The getExtendedTypes() method for service "my.type_extension" does not return any extended types.');
         $container = $this->createContainerBuilder();
 

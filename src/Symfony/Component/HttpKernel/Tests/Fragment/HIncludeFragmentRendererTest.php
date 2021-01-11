@@ -23,7 +23,7 @@ class HIncludeFragmentRendererTest extends TestCase
 {
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }
@@ -86,7 +86,7 @@ class HIncludeFragmentRendererTest extends TestCase
      */
     public function testRenderWithDefaultTextLegacy()
     {
-        $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
+        $engine = $this->getMockBuilder(\Symfony\Component\Templating\EngineInterface::class)->getMock();
         $engine->expects($this->once())
             ->method('exists')
             ->with('default')

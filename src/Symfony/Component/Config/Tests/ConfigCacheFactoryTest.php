@@ -18,7 +18,7 @@ class ConfigCacheFactoryTest extends TestCase
 {
     public function testCacheWithInvalidCallback()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid type for callback argument. Expected callable, but got "object".');
         $cacheFactory = new ConfigCacheFactory(true);
 

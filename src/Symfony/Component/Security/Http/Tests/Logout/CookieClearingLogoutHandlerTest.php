@@ -24,7 +24,7 @@ class CookieClearingLogoutHandlerTest extends TestCase
     {
         $request = new Request();
         $response = new Response();
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
 
         $handler = new CookieClearingLogoutHandler(['foo' => ['path' => '/foo', 'domain' => 'foo.foo', 'secure' => true, 'samesite' => Cookie::SAMESITE_STRICT], 'foo2' => ['path' => null, 'domain' => null]]);
 

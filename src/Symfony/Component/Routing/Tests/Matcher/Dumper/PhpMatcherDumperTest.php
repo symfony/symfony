@@ -494,7 +494,7 @@ class PhpMatcherDumperTest extends TestCase
 
     public function testGenerateDumperMatcherWithObject()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));

@@ -33,7 +33,7 @@ class FormErrorIteratorTest extends TestCase
             'form',
             null,
             new EventDispatcher(),
-            $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(),
+            $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock(),
             []
         );
 

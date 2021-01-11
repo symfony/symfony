@@ -82,14 +82,14 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      */
     public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->createConstraint($options);
     }
 
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
         $this->createConstraint(([
             'value' => 'value',

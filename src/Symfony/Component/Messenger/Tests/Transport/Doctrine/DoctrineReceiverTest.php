@@ -60,7 +60,7 @@ class DoctrineReceiverTest extends TestCase
 
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
     {
-        $this->expectException('Symfony\Component\Messenger\Exception\MessageDecodingFailedException');
+        $this->expectException(MessageDecodingFailedException::class);
         $serializer = $this->createMock(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 

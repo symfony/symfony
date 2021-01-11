@@ -49,13 +49,13 @@ class FormDataExtractorTest extends TestCase
     protected function setUp(): void
     {
         $this->dataExtractor = new FormDataExtractor();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
+        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
     }
 
     public function testExtractConfiguration()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
             ->willReturn(new HiddenType());
@@ -76,7 +76,7 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationSortsPassedOptions()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
             ->willReturn(new HiddenType());
@@ -110,7 +110,7 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationSortsResolvedOptions()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
             ->willReturn(new HiddenType());
@@ -141,18 +141,18 @@ class FormDataExtractorTest extends TestCase
 
     public function testExtractConfigurationBuildsIdRecursively()
     {
-        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
             ->willReturn(new HiddenType());
 
         $grandParent = $this->createBuilder('grandParent')
             ->setCompound(true)
-            ->setDataMapper($this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock())
+            ->setDataMapper($this->getMockBuilder(\Symfony\Component\Form\DataMapperInterface::class)->getMock())
             ->getForm();
         $parent = $this->createBuilder('parent')
             ->setCompound(true)
-            ->setDataMapper($this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock())
+            ->setDataMapper($this->getMockBuilder(\Symfony\Component\Form\DataMapperInterface::class)->getMock())
             ->getForm();
         $form = $this->createBuilder('name')
             ->setType($type)

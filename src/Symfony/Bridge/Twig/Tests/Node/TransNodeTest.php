@@ -29,7 +29,7 @@ class TransNodeTest extends TestCase
         $vars = new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['strict_variables' => true]);
+        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), ['strict_variables' => true]);
         $compiler = new Compiler($env);
 
         $this->assertEquals(

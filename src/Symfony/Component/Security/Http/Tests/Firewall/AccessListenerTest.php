@@ -27,10 +27,10 @@ class AccessListenerTest extends TestCase
 {
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
         $request = new Request();
 
-        $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
+        $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -38,21 +38,21 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $token
             ->expects($this->any())
             ->method('isAuthenticated')
             ->willReturn(true)
         ;
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
 
-        $accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $accessDecisionManager = $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock();
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
@@ -64,7 +64,7 @@ class AccessListenerTest extends TestCase
             $tokenStorage,
             $accessDecisionManager,
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock()
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
@@ -74,7 +74,7 @@ class AccessListenerTest extends TestCase
     {
         $request = new Request();
 
-        $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
+        $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -82,21 +82,21 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar'], null])
         ;
 
-        $notAuthenticatedToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $notAuthenticatedToken = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $notAuthenticatedToken
             ->expects($this->any())
             ->method('isAuthenticated')
             ->willReturn(false)
         ;
 
-        $authenticatedToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $authenticatedToken = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $authenticatedToken
             ->expects($this->any())
             ->method('isAuthenticated')
             ->willReturn(true)
         ;
 
-        $authManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authManager = $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock();
         $authManager
             ->expects($this->once())
             ->method('authenticate')
@@ -104,7 +104,7 @@ class AccessListenerTest extends TestCase
             ->willReturn($authenticatedToken)
         ;
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -116,7 +116,7 @@ class AccessListenerTest extends TestCase
             ->with($this->equalTo($authenticatedToken))
         ;
 
-        $accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $accessDecisionManager = $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock();
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
@@ -138,7 +138,7 @@ class AccessListenerTest extends TestCase
     {
         $request = new Request();
 
-        $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
+        $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -146,13 +146,13 @@ class AccessListenerTest extends TestCase
             ->willReturn([null, null])
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $token
             ->expects($this->never())
             ->method('isAuthenticated')
         ;
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -161,9 +161,9 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock(),
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock()
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
@@ -201,8 +201,8 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException');
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
@@ -221,9 +221,9 @@ class AccessListenerTest extends TestCase
 
         $listener = new AccessListener(
             $tokenStorage,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock(),
+            $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock(),
             $accessMap,
-            $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock()
+            $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock()
         );
 
         $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
@@ -233,7 +233,7 @@ class AccessListenerTest extends TestCase
     {
         $request = new Request();
 
-        $accessMap = $this->getMockBuilder('Symfony\Component\Security\Http\AccessMapInterface')->getMock();
+        $accessMap = $this->getMockBuilder(AccessMapInterface::class)->getMock();
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
@@ -241,7 +241,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar', 'bar' => 'baz'], null])
         ;
 
-        $authenticatedToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $authenticatedToken = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $authenticatedToken
             ->expects($this->any())
             ->method('isAuthenticated')
@@ -251,7 +251,7 @@ class AccessListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);
 
-        $accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $accessDecisionManager = $this->getMockBuilder(AccessDecisionManagerInterface::class)->getMock();
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')

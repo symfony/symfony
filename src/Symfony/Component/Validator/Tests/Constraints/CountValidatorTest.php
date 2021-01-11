@@ -36,7 +36,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsCountableType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 

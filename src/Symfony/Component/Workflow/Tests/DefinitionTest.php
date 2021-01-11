@@ -36,7 +36,7 @@ class DefinitionTest extends TestCase
 
     public function testSetInitialPlaceAndPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
         new Definition([], [], 'd');
     }
@@ -54,7 +54,7 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndFromPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 
@@ -63,7 +63,7 @@ class DefinitionTest extends TestCase
 
     public function testAddTransitionAndToPlaceIsNotDefined()
     {
-        $this->expectException('Symfony\Component\Workflow\Exception\LogicException');
+        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
         $this->expectExceptionMessage('Place "c" referenced in transition "name" does not exist.');
         $places = range('a', 'b');
 

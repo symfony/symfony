@@ -24,7 +24,7 @@ class ResponseTest extends ResponseTestCase
     {
         $response = Response::create('foo', 301, ['Foo' => 'bar']);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(301, $response->getStatusCode());
         $this->assertEquals('bar', $response->headers->get('foo'));
     }
@@ -611,7 +611,7 @@ class ResponseTest extends ResponseTestCase
             $response->setCache(['wrong option' => 'value']);
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
             $this->assertStringContainsString('"wrong option"', $e->getMessage());
         }
 
@@ -916,7 +916,7 @@ class ResponseTest extends ResponseTestCase
      */
     public function testSetContentInvalid($content)
     {
-        $this->expectException('UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $response = new Response();
         $response->setContent($content);
     }

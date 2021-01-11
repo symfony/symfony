@@ -122,7 +122,7 @@ class SsiTest extends TestCase
 
     public function testProcessWhenNoSrcInAnSsi()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $ssi = new Ssi();
 
         $request = Request::create('/');
@@ -160,7 +160,7 @@ class SsiTest extends TestCase
 
     public function testHandleWhenResponseIsNot200()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $ssi = new Ssi();
         $response = new Response('foo');
         $response->setStatusCode(404);
@@ -189,7 +189,7 @@ class SsiTest extends TestCase
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\HttpCache')->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
+        $cache = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpCache\HttpCache::class)->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())
               ->method('getRequest')
               ->willReturn($request)

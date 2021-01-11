@@ -68,13 +68,13 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testLegacyExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Locale(['canonicalize' => true]));
     }
 

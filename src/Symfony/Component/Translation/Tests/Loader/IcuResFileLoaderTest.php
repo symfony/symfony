@@ -33,14 +33,14 @@ class IcuResFileLoaderTest extends LocalizedTestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\NotFoundResourceException');
+        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
     }
 
     public function testLoadInvalidResource()
     {
-        $this->expectException('Symfony\Component\Translation\Exception\InvalidResourceException');
+        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }

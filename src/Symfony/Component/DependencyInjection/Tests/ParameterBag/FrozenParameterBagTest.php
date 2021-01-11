@@ -28,28 +28,28 @@ class FrozenParameterBagTest extends TestCase
 
     public function testClear()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->clear();
     }
 
     public function testSet()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->set('foo', 'bar');
     }
 
     public function testAdd()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->add([]);
     }
 
     public function testRemove()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag(['foo' => 'bar']);
         $bag->remove('foo');
     }

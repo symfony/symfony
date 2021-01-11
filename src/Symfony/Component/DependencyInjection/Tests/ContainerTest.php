@@ -80,7 +80,7 @@ class ContainerTest extends TestCase
         $this->assertFalse($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
         $sc->compile();
         $this->assertTrue($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag', $sc->getParameterBag(), '->compile() changes the parameter bag to a FrozenParameterBag instance');
+        $this->assertInstanceOf(FrozenParameterBag::class, $sc->getParameterBag(), '->compile() changes the parameter bag to a FrozenParameterBag instance');
         $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
@@ -168,7 +168,7 @@ class ContainerTest extends TestCase
 
     public function testSetWithNullOnInitializedPredefinedService()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "bar" service is already initialized, you cannot replace it.');
         $sc = new Container();
         $sc->set('foo', new \stdClass());
@@ -207,7 +207,7 @@ class ContainerTest extends TestCase
             $sc->get('');
             $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
+            $this->assertInstanceOf(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class, $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
     }
@@ -233,7 +233,7 @@ class ContainerTest extends TestCase
             $sc->get('foo1');
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            $this->assertInstanceOf(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
             $this->assertEquals('You have requested a non-existent service "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
 
@@ -241,7 +241,7 @@ class ContainerTest extends TestCase
             $sc->get('bag');
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            $this->assertInstanceOf(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class, $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
             $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
     }
@@ -260,7 +260,7 @@ class ContainerTest extends TestCase
 
     public function testGetSyntheticServiceThrows()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('The "request" service is synthetic, it needs to be set at boot time before it can be used.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
@@ -270,7 +270,7 @@ class ContainerTest extends TestCase
 
     public function testGetRemovedServiceThrows()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.');
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
@@ -342,7 +342,7 @@ class ContainerTest extends TestCase
 
     public function testGetThrowsException()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Something went terribly wrong!');
         $c = new ProjectServiceContainer();
 
@@ -395,7 +395,7 @@ class ContainerTest extends TestCase
 
     public function testThatCloningIsNotSupported()
     {
-        $class = new \ReflectionClass('Symfony\Component\DependencyInjection\Container');
+        $class = new \ReflectionClass(Container::class);
         $clone = $class->getMethod('__clone');
         $this->assertFalse($class->isCloneable());
         $this->assertTrue($clone->isPrivate());
@@ -410,7 +410,7 @@ class ContainerTest extends TestCase
 
     public function testRequestAnInternalSharedPrivateService()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "internal".');
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');

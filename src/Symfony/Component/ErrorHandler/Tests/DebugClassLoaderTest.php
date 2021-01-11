@@ -51,7 +51,7 @@ class DebugClassLoaderTest extends TestCase
                 $reflProp = $reflClass->getProperty('classLoader');
                 $reflProp->setAccessible(true);
 
-                $this->assertNotInstanceOf('Symfony\Component\ErrorHandler\DebugClassLoader', $reflProp->getValue($function[0]));
+                $this->assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
 
                 return;
             }
@@ -62,7 +62,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testThrowingClass()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('boo');
         try {
             class_exists(Fixtures\Throwing::class);
@@ -77,14 +77,14 @@ class DebugClassLoaderTest extends TestCase
 
     public function testNameCaseMismatch()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(TestingCaseMismatch::class, true);
     }
 
     public function testFileCaseMismatch()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between class and real file names');
         if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
             $this->markTestSkipped('Can only be run on case insensitive filesystems');
@@ -95,7 +95,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testPsr4CaseMismatch()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
     }
@@ -176,7 +176,7 @@ class DebugClassLoaderTest extends TestCase
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
-        class_exists('Symfony\Bridge\ErrorHandler\Tests\Fixtures\ExtendsDeprecatedParent', true);
+        class_exists(\Symfony\Bridge\ErrorHandler\Tests\Fixtures\ExtendsDeprecatedParent::class, true);
 
         error_reporting($e);
         restore_error_handler();

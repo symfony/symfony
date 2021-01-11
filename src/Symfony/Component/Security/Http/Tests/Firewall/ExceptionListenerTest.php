@@ -77,13 +77,13 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent(new AuthenticationException());
 
-        $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
+        $entryPoint = $this->getMockBuilder(AuthenticationEntryPointInterface::class)->getMock();
         $entryPoint->expects($this->once())->method('start')->willReturn('NOT A RESPONSE');
 
         $listener = $this->createExceptionListener(null, null, null, $entryPoint);
         $listener->onKernelException($event);
         // the exception has been replaced by our LogicException
-        $this->assertInstanceOf('LogicException', $event->getThrowable());
+        $this->assertInstanceOf(\LogicException::class, $event->getThrowable());
         $this->assertStringEndsWith('start()" method must return a Response object ("string" returned).', $event->getThrowable()->getMessage());
     }
 
@@ -106,12 +106,12 @@ class ExceptionListenerTest extends TestCase
      */
     public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, \Exception $eventException = null)
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('handle')->willReturn(new Response('Unauthorized', 401));
 
         $event = $this->createEvent($exception, $kernel);
 
-        $httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
+        $httpUtils = $this->getMockBuilder(HttpUtils::class)->getMock();
         $httpUtils->expects($this->once())->method('createRequest')->willReturn(Request::create('/error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), $httpUtils, null, '/error');
@@ -131,7 +131,7 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $accessDeniedHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface')->getMock();
+        $accessDeniedHandler = $this->getMockBuilder(AccessDeniedHandlerInterface::class)->getMock();
         $accessDeniedHandler->expects($this->once())->method('handle')->willReturn(new Response('error'));
 
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), null, null, null, $accessDeniedHandler);
@@ -148,8 +148,8 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage->expects($this->once())->method('getToken')->willReturn($this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
 
         $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
         $listener->onKernelException($event);
@@ -182,7 +182,7 @@ class ExceptionListenerTest extends TestCase
 
     private function createEntryPoint(Response $response = null)
     {
-        $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
+        $entryPoint = $this->getMockBuilder(AuthenticationEntryPointInterface::class)->getMock();
         $entryPoint->expects($this->once())->method('start')->willReturn($response ?: new Response('OK'));
 
         return $entryPoint;
@@ -190,7 +190,7 @@ class ExceptionListenerTest extends TestCase
 
     private function createTrustResolver($fullFledged)
     {
-        $trustResolver = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface')->getMock();
+        $trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
         $trustResolver->expects($this->once())->method('isFullFledged')->willReturn($fullFledged);
 
         return $trustResolver;
@@ -199,7 +199,7 @@ class ExceptionListenerTest extends TestCase
     private function createEvent(\Exception $exception, $kernel = null)
     {
         if (null === $kernel) {
-            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+            $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         }
 
         return new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
@@ -208,9 +208,9 @@ class ExceptionListenerTest extends TestCase
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $tokenStorage ?: $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
-            $trustResolver ?: $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface')->getMock(),
-            $httpUtils ?: $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock(),
+            $tokenStorage ?: $this->getMockBuilder(TokenStorageInterface::class)->getMock(),
+            $trustResolver ?: $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock(),
+            $httpUtils ?: $this->getMockBuilder(HttpUtils::class)->getMock(),
             'key',
             $authenticationEntryPoint,
             $errorPage,

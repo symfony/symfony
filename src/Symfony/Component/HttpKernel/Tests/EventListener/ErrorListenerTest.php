@@ -99,7 +99,7 @@ class ErrorListenerTest extends TestCase
 
     public function provider()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+        if (!class_exists(Request::class)) {
             return [[null, null]];
         }
 
@@ -115,9 +115,9 @@ class ErrorListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+        $listener = new ErrorListener('foo', $this->getMockBuilder(LoggerInterface::class)->getMock());
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
@@ -135,12 +135,12 @@ class ErrorListenerTest extends TestCase
     public function testCSPHeaderIsRemoved()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ErrorListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), true);
+        $listener = new ErrorListener('foo', $this->getMockBuilder(LoggerInterface::class)->getMock(), true);
 
         $dispatcher->addSubscriber($listener);
 

@@ -58,7 +58,7 @@ class CachePoolPrunerPassTest extends TestCase
 
     public function testCompilerPassThrowsOnInvalidDefinitionClass()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Class "Symfony\Component\Cache\Tests\DependencyInjection\NotFound" used for service "pool.not-found" cannot be found.');
         $container = new ContainerBuilder();
         $container->register('console.command.cache_pool_prune')->addArgument([]);

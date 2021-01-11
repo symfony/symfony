@@ -68,7 +68,7 @@ class ExpressionValidator extends ConstraintValidator
     private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!class_exists(ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();

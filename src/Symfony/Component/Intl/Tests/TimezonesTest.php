@@ -529,13 +529,13 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetNameWithInvalidTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getName('foo');
     }
 
     public function testGetNameWithAliasTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getName('US/Pacific'); // alias in icu (not compiled), name unavailable in php
     }
 
@@ -559,7 +559,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testGetRawOffsetWithUnknownTimezone()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Unknown or bad timezone (foobar)');
         Timezones::getRawOffset('foobar');
     }
@@ -591,20 +591,20 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public function testForCountryCodeWithUnknownCountry()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::forCountryCode('foobar');
     }
 
     public function testForCountryCodeWithWrongCountryCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         $this->expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
         Timezones::forCountryCode('nl');
     }
 
     public function testGetCountryCodeWithUnknownTimezone()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Timezones::getCountryCode('foobar');
     }
 

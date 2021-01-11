@@ -269,7 +269,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testAllConfiguredFieldsAreCheckedOfBeingMappedByDoctrineWithIgnoreNullEnabled()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name', 'name2'],
@@ -578,7 +578,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testDedicatedEntityManagerNullObject()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Object manager "foo" does not exist.');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -598,7 +598,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testEntityManagerNullObject()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -680,7 +680,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidateRepositoryForInheritance()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',

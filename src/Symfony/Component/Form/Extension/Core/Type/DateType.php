@@ -124,7 +124,7 @@ class DateType extends AbstractType
                 $dateFormat,
                 $timeFormat,
                 // see https://bugs.php.net/66323
-                class_exists('IntlTimeZone', false) ? \IntlTimeZone::createDefault() : null,
+                class_exists(\IntlTimeZone::class, false) ? \IntlTimeZone::createDefault() : null,
                 $calendar,
                 $pattern
             );

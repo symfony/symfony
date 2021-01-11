@@ -26,7 +26,7 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock();
         $twig = new Environment($loader, [
             'strict_variables' => true,
             'debug' => true,
@@ -102,7 +102,7 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
+        $twig = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
         $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
 
         $extractor = new TwigExtractor($twig);

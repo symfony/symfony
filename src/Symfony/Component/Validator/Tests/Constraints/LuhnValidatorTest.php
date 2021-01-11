@@ -103,7 +103,7 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidTypes($number)
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
+        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
         $constraint = new Luhn();
 
         $this->validator->validate($number, $constraint);

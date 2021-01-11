@@ -1690,13 +1690,13 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getAlpha3Code($language);
     }
 
     public function testGetNameWithInvalidLanguageCode()
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getName('foo');
     }
 
@@ -1740,7 +1740,7 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
+        $this->expectException(MissingResourceException::class);
         Languages::getAlpha2Code($language);
     }
 

@@ -21,7 +21,7 @@ class StopwatchHelperTest extends TestCase
 {
     public function testDevEnvironment()
     {
-        $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
+        $stopwatch = $this->getMockBuilder(\Symfony\Component\Stopwatch\Stopwatch::class)->getMock();
         $stopwatch->expects($this->once())
             ->method('start')
             ->with('foo');

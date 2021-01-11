@@ -50,7 +50,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testWrongPdoErrMode()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
@@ -59,7 +59,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testInexistentTable()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), ['db_table' => 'inexistent_table']);
         $storage->open('', 'sid');
         $storage->read('id');
@@ -69,7 +69,7 @@ class PdoSessionHandlerTest extends TestCase
 
     public function testCreateTableTwice()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->createTable();
     }
@@ -131,7 +131,7 @@ class PdoSessionHandlerTest extends TestCase
     public function testReadConvertsStreamToString()
     {
         $pdo = new MockPdo('pgsql');
-        $pdo->prepareResult = $this->getMockBuilder('PDOStatement')->getMock();
+        $pdo->prepareResult = $this->getMockBuilder(\PDOStatement::class)->getMock();
 
         $content = 'foobar';
         $stream = $this->createStream($content);
@@ -152,8 +152,8 @@ class PdoSessionHandlerTest extends TestCase
         }
 
         $pdo = new MockPdo('pgsql');
-        $selectStmt = $this->getMockBuilder('PDOStatement')->getMock();
-        $insertStmt = $this->getMockBuilder('PDOStatement')->getMock();
+        $selectStmt = $this->getMockBuilder(\PDOStatement::class)->getMock();
+        $insertStmt = $this->getMockBuilder(\PDOStatement::class)->getMock();
 
         $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
             return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;

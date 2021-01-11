@@ -21,12 +21,12 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader1 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader1->expects($this->once())
             ->method('loadClassMetadata')
             ->with($this->equalTo($metadata));
 
-        $loader2 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader2 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader2->expects($this->once())
             ->method('loadClassMetadata')
             ->with($this->equalTo($metadata));
@@ -43,12 +43,12 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader1 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader1->expects($this->any())
             ->method('loadClassMetadata')
             ->willReturn(true);
 
-        $loader2 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader2 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader2->expects($this->any())
             ->method('loadClassMetadata')
             ->willReturn(false);
@@ -65,12 +65,12 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader1 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader1->expects($this->any())
             ->method('loadClassMetadata')
             ->willReturn(false);
 
-        $loader2 = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $loader2 = $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Loader\LoaderInterface::class)->getMock();
         $loader2->expects($this->any())
             ->method('loadClassMetadata')
             ->willReturn(false);

@@ -105,7 +105,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testImplements()
     {
-        $this->assertInstanceOf('Psr\Log\LoggerInterface', $this->getLogger());
+        $this->assertInstanceOf(LoggerInterface::class, $this->getLogger());
     }
 
     /**
@@ -140,7 +140,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testThrowsOnInvalidLevel()
     {
-        $this->expectException('Psr\Log\InvalidArgumentException');
+        $this->expectException(\Psr\Log\InvalidArgumentException::class);
         $logger = $this->getLogger();
         $logger->log('invalid level', 'Foo');
     }

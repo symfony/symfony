@@ -28,7 +28,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $tmpProviders = [];
 
-        $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
+        $extension = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Extension\ExtensionInterface::class)->getMock();
         $extension->expects($this->any())
             ->method('getXsdValidationBasePath')
             ->willReturn(false);
@@ -44,7 +44,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
                 $tmpProviders = $container->getExpressionLanguageProviders();
             });
 
-        $provider = $this->getMockBuilder('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface')->getMock();
+        $provider = $this->getMockBuilder(\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface::class)->getMock();
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
         $container->prependExtensionConfig('foo', ['bar' => true]);
@@ -105,7 +105,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testProcessedEnvsAreIncompatibleWithResolve()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.');
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());

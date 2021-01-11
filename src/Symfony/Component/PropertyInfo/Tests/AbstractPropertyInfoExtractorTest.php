@@ -36,10 +36,10 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface::class, $this->propertyInfo);
         $this->assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
     }
 

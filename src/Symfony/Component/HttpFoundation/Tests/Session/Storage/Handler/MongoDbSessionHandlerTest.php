@@ -55,7 +55,7 @@ class MongoDbSessionHandlerTest extends TestCase
 
     public function testConstructorShouldThrowExceptionForMissingOptions()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new MongoDbSessionHandler($this->mongo, []);
     }
 

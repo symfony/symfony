@@ -24,20 +24,20 @@ class SimpleAuthenticationProviderTest extends TestCase
 {
     public function testAuthenticateWhenPreChecksFails()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\DisabledException');
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $this->expectException(DisabledException::class);
+        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
 
-        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
         $userChecker->expects($this->once())
             ->method('checkPreAuth')
             ->willThrowException(new DisabledException());
 
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
+        $authenticator = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface::class)->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
             ->willReturn($token);
@@ -49,20 +49,20 @@ class SimpleAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPostChecksFails()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\LockedException');
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $this->expectException(LockedException::class);
+        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
 
-        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
         $userChecker->expects($this->once())
             ->method('checkPostAuth')
             ->willThrowException(new LockedException());
 
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
+        $authenticator = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface::class)->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
             ->willReturn($token);
@@ -74,11 +74,11 @@ class SimpleAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateSkipsUserChecksForNonUserInterfaceObjects()
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn('string-user');
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
+        $authenticator = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface::class)->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
             ->willReturn($token);
@@ -89,13 +89,13 @@ class SimpleAuthenticationProviderTest extends TestCase
     protected function getProvider($simpleAuthenticator = null, $userProvider = null, $userChecker = null, $key = 'test')
     {
         if (null === $userChecker) {
-            $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+            $userChecker = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserCheckerInterface::class)->getMock();
         }
         if (null === $simpleAuthenticator) {
-            $simpleAuthenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
+            $simpleAuthenticator = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface::class)->getMock();
         }
         if (null === $userProvider) {
-            $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+            $userProvider = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
         }
 
         return new SimpleAuthenticationProvider($simpleAuthenticator, $userProvider, $key, $userChecker);

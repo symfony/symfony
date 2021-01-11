@@ -56,7 +56,7 @@ class GitRepositoryTest extends TestCase
         $this->assertSame(self::REPO_URL, $git->getUrl());
         $this->assertMatchesRegularExpression('#^[0-9a-z]{40}$#', $git->getLastCommitHash());
         $this->assertNotEmpty($git->getLastAuthor());
-        $this->assertInstanceOf('DateTime', $git->getLastAuthoredDate());
+        $this->assertInstanceOf(\DateTime::class, $git->getLastAuthoredDate());
         $this->assertStringMatchesFormat('v%s', $git->getLastTag());
         $this->assertStringMatchesFormat('v3%s', $git->getLastTag(function ($tag) { return 0 === strpos($tag, 'v3'); }));
     }

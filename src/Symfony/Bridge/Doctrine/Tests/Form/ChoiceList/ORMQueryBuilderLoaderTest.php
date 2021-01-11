@@ -160,7 +160,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $query = $this->getMockBuilder('QueryMock')
+        $query = $this->getMockBuilder(\QueryMock::class)
             ->setMethods(['setParameter', 'getResult', 'getSql', '_doExecute'])
             ->getMock();
 
@@ -173,7 +173,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
             ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', [Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d')->toBinary(), Uuid::fromString('b98e8e11-2897-44df-ad24-d2627eb7f499')->toBinary()], Connection::PARAM_STR_ARRAY)
             ->willReturn($query);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();
@@ -205,7 +205,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $em = DoctrineTestHelper::createTestEntityManager();
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
             ->setConstructorArgs([$em])
             ->setMethods(['getQuery'])
             ->getMock();

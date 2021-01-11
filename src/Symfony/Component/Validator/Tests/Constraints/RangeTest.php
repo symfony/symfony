@@ -12,7 +12,7 @@ class RangeTest extends TestCase
 
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         new Range([
             'min' => 'min',
@@ -25,14 +25,14 @@ class RangeTest extends TestCase
      */
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         eval('new \Symfony\Component\Validator\Constraints\Range(min: "min", minPropertyPath: "minPropertyPath");');
     }
 
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range([
             'max' => 'max',
@@ -45,14 +45,14 @@ class RangeTest extends TestCase
      */
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         eval('new \Symfony\Component\Validator\Constraints\Range(max: "max", maxPropertyPath: "maxPropertyPath");');
     }
 
     public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\MissingOptionsException');
+        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
         $this->expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
         new Range([]);
     }

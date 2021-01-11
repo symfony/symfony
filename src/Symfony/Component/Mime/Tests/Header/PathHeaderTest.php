@@ -25,7 +25,7 @@ class PathHeaderTest extends TestCase
 
     public function testAddressMustComplyWithRfc2822()
     {
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         new PathHeader('Return-Path', new Address('chr is@swiftmailer.org'));
     }
 

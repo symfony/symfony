@@ -915,4 +915,21 @@ class InlineTest extends TestCase
             [['!'], '! ["!"]'],
         ];
     }
+
+    /**
+     * @dataProvider ideographicSpaceProvider
+     */
+    public function testParseIdeographicSpace(string $yaml, string $expected)
+    {
+        $this->assertSame($expected, Inline::parse($yaml));
+    }
+
+    public function ideographicSpaceProvider(): array
+    {
+        return [
+            ["\u{3000}", '　'],
+            ["'\u{3000}'", '　'],
+            ["'a　b'", 'a　b'],
+        ];
+    }
 }

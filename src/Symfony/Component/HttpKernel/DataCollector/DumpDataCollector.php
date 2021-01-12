@@ -179,7 +179,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $fileLinkFormat = array_pop($this->data);
         $this->dataCount = \count($this->data);
 
-        self::__construct($this->stopwatch, $fileLinkFormat, $charset);
+        self::__construct($this->stopwatch, \is_string($fileLinkFormat) || $fileLinkFormat instanceof FileLinkFormatter ? $fileLinkFormat : null, \is_string($charset) ? $charset : null);
     }
 
     public function getDumpsCount(): int

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,15 +57,24 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
 
         $this->connections = $container->getParameter($this->connections);
-        $this->addTaggedSubscribers($container);
-        $this->addTaggedListeners($container);
+        $listenerRefs = [];
+        $this->addTaggedSubscribers($container, $listenerRefs);
+        $this->addTaggedListeners($container, $listenerRefs);
+
+        // replace service container argument of event managers with smaller service locator
+        // so services can even remain private
+        foreach ($listenerRefs as $connection => $refs) {
+            $this->getEventManagerDef($container, $connection)
+                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $refs));
+        }
     }
 
-    private function addTaggedSubscribers(ContainerBuilder $container)
+    private function addTaggedSubscribers(ContainerBuilder $container, array &$listenerRefs)
     {
         $subscriberTag = $this->tagPrefix.'.event_subscriber';
         $taggedSubscribers = $this->findAndSortTags($subscriberTag, $container);
 
+        $managerDefs = [];
         foreach ($taggedSubscribers as $taggedSubscriber) {
             [$id, $tag] = $taggedSubscriber;
             $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
@@ -72,16 +83,33 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: "%s".', $con, $id, implode('", "', array_keys($this->connections))));
                 }
 
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', [new Reference($id)]);
+                if (!isset($managerDefs[$con])) {
+                    $managerDef = $parentDef = $this->getEventManagerDef($container, $con);
+                    while ($parentDef instanceof ChildDefinition) {
+                        $parentDef = $container->findDefinition($parentDef->getParent());
+                    }
+                    $managerClass = $container->getParameterBag()->resolveValue($parentDef->getClass());
+                    $managerDefs[$con] = [$managerDef, $managerClass];
+                } else {
+                    [$managerDef, $managerClass] = $managerDefs[$con];
+                }
+
+                if (ContainerAwareEventManager::class === $managerClass) {
+                    $listenerRefs[$con][$id] = new Reference($id);
+                    $refs = $managerDef->getArguments()[1] ?? [];
+                    $refs[] = $id;
+                    $managerDef->setArgument(1, $refs);
+                } else {
+                    $managerDef->addMethodCall('addEventSubscriber', [new Reference($id)]);
+                }
             }
         }
     }
 
-    private function addTaggedListeners(ContainerBuilder $container)
+    private function addTaggedListeners(ContainerBuilder $container, array &$listenerRefs)
     {
         $listenerTag = $this->tagPrefix.'.event_listener';
         $taggedListeners = $this->findAndSortTags($listenerTag, $container);
-        $listenerRefs = [];
 
         foreach ($taggedListeners as $taggedListener) {
             [$id, $tag] = $taggedListener;
@@ -99,13 +127,6 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 // we add one call per event per service so we have the correct order
                 $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', [[$tag['event']], $id]);
             }
-        }
-
-        // replace service container argument of event managers with smaller service locator
-        // so services can even remain private
-        foreach ($listenerRefs as $connection => $refs) {
-            $this->getEventManagerDef($container, $connection)
-                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $refs));
         }
     }
 

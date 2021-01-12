@@ -89,6 +89,12 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
 
     public function __wakeup()
     {
+        foreach ($this as $k => $v) {
+            if (\is_object($v)) {
+                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            }
+        }
+
         $this->__construct($this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug);
     }
 

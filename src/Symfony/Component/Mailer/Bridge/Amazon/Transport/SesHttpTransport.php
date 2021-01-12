@@ -66,8 +66,14 @@ class SesHttpTransport extends AbstractHttpTransport
             ],
         ];
 
-        if (($message->getOriginalMessage() instanceof Message)
-            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
+        $index = 1;
+        foreach ($message->getEnvelope()->getRecipients() as $recipient) {
+            $request['body']['Destinations.member.'.$index++] = $recipient->getAddress();
+        }
+
+        if ($message->getOriginalMessage() instanceof Message
+            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')
+        ) {
             $request['body']['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
         }
 

@@ -218,6 +218,16 @@ final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestF
         throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
     }
 
+    public function __sleep()
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
     public function __destruct()
     {
         $this->wait();

@@ -155,7 +155,13 @@ class DataPart extends TextPart
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
 
+        if (!\is_array($this->_parent)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
         foreach (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] as $name) {
+            if (null !== $this->_parent[$name] && !\is_string($this->_parent[$name])) {
+                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            }
             $r = new \ReflectionProperty(TextPart::class, $name);
             $r->setAccessible(true);
             $r->setValue($this, $this->_parent[$name]);

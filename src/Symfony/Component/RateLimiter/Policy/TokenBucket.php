@@ -104,6 +104,10 @@ final class TokenBucket implements LimiterStateInterface
      */
     public function __wakeup(): void
     {
+        if (!\is_string($this->stringRate)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
         $this->rate = Rate::fromString($this->stringRate);
         unset($this->stringRate);
     }

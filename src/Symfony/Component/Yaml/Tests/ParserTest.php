@@ -2733,6 +2733,22 @@ YAML;
         // (before, there was no \n after row2)
         $this->assertSame(['a' => ['b' => "row\nrow2\n"], 'c' => 'd'], $this->parser->parse($longDocument));
     }
+
+    public function testParseIdeographicSpaces()
+    {
+        $expected = <<<YAML
+unquoted: \u{3000}
+quoted: '\u{3000}'
+within_string: 'a　b'
+regular_space: 'a b'
+YAML;
+        $this->assertSame([
+            'unquoted' => '　',
+            'quoted' => '　',
+            'within_string' => 'a　b',
+            'regular_space' => 'a b',
+        ], $this->parser->parse($expected));
+    }
 }
 
 class B

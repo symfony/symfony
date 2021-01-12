@@ -12,11 +12,12 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
-use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -43,21 +44,21 @@ class UserCheckerListener implements EventSubscriberInterface
         $this->userChecker->checkPreAuth($passport->getUser());
     }
 
-    public function postCheckCredentials(LoginSuccessEvent $event): void
+    public function postCheckCredentials(AuthenticationSuccessEvent $event): void
     {
-        $passport = $event->getPassport();
-        if (!$passport instanceof UserPassportInterface || null === $passport->getUser()) {
+        $user = $event->getAuthenticationToken()->getUser();
+        if (!$user instanceof UserInterface) {
             return;
         }
 
-        $this->userChecker->checkPostAuth($passport->getUser());
+        $this->userChecker->checkPostAuth($user);
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             CheckPassportEvent::class => ['preCheckCredentials', 256],
-            LoginSuccessEvent::class => ['postCheckCredentials', 256],
+            AuthenticationSuccessEvent::class => ['postCheckCredentials', 256],
         ];
     }
 }

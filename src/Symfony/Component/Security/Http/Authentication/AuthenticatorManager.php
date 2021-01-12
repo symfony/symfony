@@ -185,18 +185,6 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             if (null !== $this->logger) {
                 $this->logger->info('Authenticator successful!', ['token' => $authenticatedToken, 'authenticator' => \get_class($authenticator)]);
             }
-
-            // success! (sets the token on the token storage, etc)
-            $response = $this->handleAuthenticationSuccess($authenticatedToken, $passport, $request, $authenticator);
-            if ($response instanceof Response) {
-                return $response;
-            }
-
-            if (null !== $this->logger) {
-                $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator)]);
-            }
-
-            return null;
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
             $response = $this->handleAuthenticationFailure($e, $request, $authenticator, $passport);
@@ -206,6 +194,18 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
             return null;
         }
+
+        // success! (sets the token on the token storage, etc)
+        $response = $this->handleAuthenticationSuccess($authenticatedToken, $passport, $request, $authenticator);
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->debug('Authenticator set no success response: request continues.', ['authenticator' => \get_class($authenticator)]);
+        }
+
+        return null;
     }
 
     private function handleAuthenticationSuccess(TokenInterface $authenticatedToken, PassportInterface $passport, Request $request, AuthenticatorInterface $authenticator): ?Response

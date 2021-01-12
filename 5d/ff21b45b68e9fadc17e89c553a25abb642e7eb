@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-12-08T17:56:13Z
+
+shouldn't the `$this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticatedToken), AuthenticationEvents::AUTHENTICATION_SUCCESS);` be moved as well ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2020-12-08T18:07:42Z
+
+We should investigate the impact on `UserChecker::checkPostAuth` here. I'm not sure what happens after this change if it throws an `AccountStatusException`.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-08T20:53:25Z
+
+Indeed, the `UserChecker::checkPostAuth` is hooked on `LoginSuccessEvent`. This break the behavior
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-08T21:19:06Z
+
+refactor to hook the `UserChecker::checkPostAuth` method to the `AuthenticationSuccessEvent` event.
+
+I kept `AuthenticationSuccessEvent` in the try/catch. This event is not exactly identical to `LoginSuccessEvent` and does not mean the authentication is completed: An exception thrown between the catch and the `LoginSuccessHandler` leaves the user neither authenticated, nor get an authentication failure message :/
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-03T10:06:34Z
+
+hey @wouterj would you mind to have a look?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-03T12:10:32Z
+
+Hi!
+
+My idea back in 5.1 when introducing `LoginSuccessEvent` was to deprecate `AuthenticationSuccessEvent` in 5.4 (we wanted to avoid duplicated class names between the current system and the new one, that's the main reason we called it `LoginSuccessEvent`).
+
+However, this PR shows that there is a need for an event that doesn't indicate success nor failure, but only indicates that the password was fully checked.  Would it make sense to introduce a new `PassportValidEvent` or the like in 5.3, where the user checker can listen to? Then for 5.1 and 5.2, we can make this change. (we must document this change however, an authentication exception thrown by a `LoginSuccessEvent` listener will now result in a 500 instead of redirecting back to the login form if I'm correct)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-03T16:30:44Z
+
+Thank you for your input :hugs:
+
+> However, this PR shows that there is a need for an event that doesn't indicate success nor failure, but only indicates that the password was fully checked. Would it make sense to introduce a new `PassportValidEvent` or the like in 5.3, where the user checker can listen to? Then for 5.1 and 5.2, we can make this change.
+
+If I understand well, we keep this PR as it (listen to AuthenticationSuccessEvent event), and we open a new PR in 5.3 to add a new event and plug AuthenticationSuccessEvent to this new event.
+
+When this PR will be merged UP, I'll take care of this :+1: .
+
+> we must document this change however, an authentication exception thrown by a `LoginSuccessEvent` listener will now result in a 500 instead of redirecting back to the login form if I'm correct
+
+The current behavior (LoginSuccess leads to a LoginFailure) is a bug (this is the root reason of this PR) and is not documented.
+We don't have any documentation about `LoginSuccessEvent` and `LoginFailureEvent`
+If we want adding a warning about this in the documentation, I don't see where :-(
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-03T16:34:54Z
+
+>  If we want adding a warning about this in the documentation, I don't see where :-(
+
+Sorry, I thought about CHANGELOG/UPGRADE, not the online docs. I'm not sure though if we do CHANGELOG for patch releases that changed behavior. Otherwise, let's leave it as is, I don't think many are using the experimental stuff in 5.1.
+
+> If I understand well, we keep this PR as it (listen to AuthenticationSuccessEvent event), and we open a new PR in 5.3 to add a new event and plug AuthenticationSuccessEvent to this new event.
+
+:+1: yes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-03T20:36:04Z
+
+5.1 goes out of maintenance at the end of the month.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-04T09:32:57Z
+
+@fabpot I'm not sure I understand what you're trying to say. Are you saying "don't bother about documenting the change" or are you suggesting not to fix this in 5.1? Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-04T11:58:46Z
+
+I was suggesting to not patch 5.1 in any way.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-05T10:29:56Z
+
+changed base to 5.2

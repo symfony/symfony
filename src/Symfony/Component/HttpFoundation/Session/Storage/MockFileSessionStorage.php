@@ -25,6 +25,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 class MockFileSessionStorage extends MockArraySessionStorage
 {
     private $savePath;
+    private $handle;
 
     /**
      * @param string $savePath Path of directory to save session files
@@ -103,7 +104,11 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
         try {
             if ($data) {
-                file_put_contents($this->getFilePath(), serialize($data));
+                rewind($this->handle);
+                fwrite($this->handle, serialize($data));
+                flock($this->handle, \LOCK_UN | \LOCK_NB);
+                fclose($this->handle);
+                $this->handle = null;
             } else {
                 $this->destroy();
             }
@@ -123,9 +128,12 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     private function destroy(): void
     {
-        if (is_file($this->getFilePath())) {
-            unlink($this->getFilePath());
-        }
+        $this->lock();
+        ftruncate($this->handle, 0);
+
+        flock($this->handle, \LOCK_UN | \LOCK_NB);
+        fclose($this->handle);
+        $this->handle = null;
     }
 
     /**
@@ -141,9 +149,38 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     private function read(): void
     {
-        $filePath = $this->getFilePath();
-        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : [];
+        $this->lock();
+        rewind($this->handle);
+        $this->data = unserialize(stream_get_contents($this->handle)) ?: [];
 
         $this->loadSession();
+    }
+
+    private function lock(): void
+    {
+        if (null !== $this->handle) {
+            return;
+        }
+
+        $filePath = $this->getFilePath();
+        // Silence error reporting
+        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+        if (!$this->handle = fopen($filePath, 'r+')) {
+            if ($this->handle = fopen($filePath, 'x+')) {
+                chmod($filePath, 0666);
+            } elseif (!$this->handle = fopen($filePath, 'r+')) {
+                usleep(100); // Give some time for chmod() to complete
+                $this->handle = fopen($filePath, 'r+');
+            }
+        }
+        restore_error_handler();
+        if (!$this->handle) {
+            throw new \RuntimeException('Unable to read session file.');
+        }
+        if (!flock($this->handle, \LOCK_EX | \LOCK_NB)) {
+            fclose($this->handle);
+            $this->handle = null;
+            throw new \RuntimeException('Unable to read session file.');
+        }
     }
 }

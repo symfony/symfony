@@ -45,6 +45,7 @@ class ServiceConfigurator extends AbstractServiceConfigurator
     private $instanceof;
     private $allowParent;
     private $path;
+    private $destructed = false;
 
     public function __construct(ContainerBuilder $container, array $instanceof, bool $allowParent, ServicesConfigurator $parent, Definition $definition, $id, array $defaultTags, string $path = null)
     {
@@ -58,6 +59,11 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     public function __destruct()
     {
+        if ($this->destructed) {
+            return;
+        }
+        $this->destructed = true;
+
         parent::__destruct();
 
         $this->container->removeBindings($this->id);

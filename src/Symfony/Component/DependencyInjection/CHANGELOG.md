@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `ServicesConfigurator::remove()` in the PHP-DSL
+
 5.2.0
 -----
 

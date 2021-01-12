@@ -304,11 +304,11 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Հոսթի անունը հնարավոր չի պարզել:</target>
+                <target>Հոսթի անունը հնարավոր չի պարզել։</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>Արժեքը չի համընկնում {{ charset }} կոդավորման հետ:</target>
+                <target>Արժեքը չի համընկնում {{ charset }} կոդավորման հետ։</target>
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
@@ -320,47 +320,47 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>Սա վավեր UUID չէ:</target>
+                <target>Սա վավեր UUID չէ։</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Այս արժեքը պետք է լինի բազմակի {{ compared_value }}.</target>
+                <target>Այս արժեքը պետք է լինի բազմակի {{ compared_value }}։</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Բիզնեսի նույնականացման կոդը (BIC) կապված չէ IBAN- ի հետ {{ iban }}.</target>
+                <target>Բիզնեսի նույնականացման կոդը (BIC) կապված չէ IBAN- ի հետ {{ iban }}։</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Այս արժեքը պետք է լինի վավեր JSON:</target>
+                <target>Այս արժեքը պետք է լինի վավեր JSON։</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Այս հավաքածուն պետք է պարունակի միայն եզակի տարրեր:</target>
+                <target>Այս հավաքածուն պետք է պարունակի միայն եզակի տարրեր։</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Այս արժեքը պետք է լինի դրական:</target>
+                <target>Այս արժեքը պետք է լինի դրական։</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Այս արժեքը պետք է լինի դրական կամ զրոյական:</target>
+                <target>Այս արժեքը պետք է լինի դրական կամ զրոյական։</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Այս արժեքը պետք է լինի բացասական:</target>
+                <target>Այս արժեքը պետք է լինի բացասական։</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Այս արժեքը պետք է լինի բացասական կամ զրոյական:</target>
+                <target>Այս արժեքը պետք է լինի բացասական կամ զրոյական։</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Այս արժեքը վավեր ժամանակի գոտի չէ:</target>
+                <target>Այս արժեքը վավեր ժամանակի գոտի չէ։</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Այս գաղտնաբառն արտահոսվել է տվյալների խախտման մեջ, այն չպետք է օգտագործվի: Խնդրում ենք օգտագործել մեկ այլ գաղտնաբառ:</target>
+                <target>Այս գաղտնաբառն արտահոսվել է տվյալների խախտման մեջ, այն չպետք է օգտագործվի: Խնդրում ենք օգտագործել մեկ այլ գաղտնաբառ։</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
@@ -376,15 +376,15 @@
             </trans-unit>           
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Այս արժեքը պետք է բավարարի հետևյալ սահմանափակումներից առնվազն մեկը:</target>
+                <target>Այս արժեքը պետք է բավարարի հետևյալ սահմանափակումներից առնվազն մեկը։</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>Այս հավաքածուի յուրաքանչյուր տարր պետք է բավարարի իր սեփական սահմանափակումները։.</target>
+                <target>Այս հավաքածուի յուրաքանչյուր տարր պետք է բավարարի իր սեփական սահմանափակումները։</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Այս արժեքը Արժեթղթերի Նույնականացման Միջազգային Համարը վավեր չէ։(ISIN).</target>
+                <target>Այս արժեքը Արժեթղթերի Նույնականացման Միջազգային Համարը վավեր չէ(ISIN)։</target>
             </trans-unit>
         </body>
     </file>

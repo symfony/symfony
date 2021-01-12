@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -171,7 +172,7 @@ class FileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
 
-        $prototype = new Definition();
+        $prototype = (new Definition())->setAutoconfigured(true);
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
 
         $this->assertTrue($container->has(Bar::class));
@@ -191,6 +192,10 @@ class FileLoaderTest extends TestCase
         $this->assertSame(Foo::class, (string) $alias);
         $this->assertFalse($alias->isPublic());
         $this->assertTrue($alias->isPrivate());
+
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
+        }
     }
 
     public function testMissingParentClass()

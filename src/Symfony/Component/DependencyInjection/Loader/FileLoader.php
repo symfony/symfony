@@ -18,6 +18,7 @@ use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -96,7 +97,8 @@ abstract class FileLoader extends BaseFileLoader
             throw new InvalidArgumentException(sprintf('Namespace is not a valid PSR-4 prefix: "%s".', $namespace));
         }
 
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude);
+        $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
 
@@ -149,7 +151,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses(string $namespace, string $pattern, array $excludePatterns): array
+    private function findClasses(string $namespace, string $pattern, array $excludePatterns, ?RegisterAutoconfigureAttributesPass $autoconfigureAttributes): array
     {
         $parameterBag = $this->container->getParameterBag();
 
@@ -206,6 +208,10 @@ abstract class FileLoader extends BaseFileLoader
 
             if ($r->isInstantiable() || $r->isInterface()) {
                 $classes[$class] = null;
+            }
+
+            if ($autoconfigureAttributes && !$r->isInstantiable()) {
+                $autoconfigureAttributes->processClass($this->container, $r);
             }
         }
 

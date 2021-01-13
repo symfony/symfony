@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Core\Exception\Http\ServerException;
+use AsyncAws\Core\Test\Http\SimpleMockedResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -49,6 +52,30 @@ class AmazonSqsReceiverTest extends TestCase
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($sqsEnvelop);
         $connection->expects($this->once())->method('delete');
+
+        $receiver = new AmazonSqsReceiver($connection, $serializer);
+        iterator_to_array($receiver->get());
+    }
+
+    public function testItThrowsRecoverableHandlingExceptionIfConnectionGetHasHttpException()
+    {
+        $this->expectException(RecoverableMessageHandlingException::class);
+
+        $serializer = $this->createMock(PhpSerializer::class);
+        $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+
+        // The concrete AWS SQS exception observed which prompted this feature is `ServerException`,
+        // which is a subclass of `HttpException` and is thrown e.g. when SQS returns an HTTP 500 with
+        // "We encountered an internal error. Please try again."
+        $connection->method('get')->willThrowException(
+            new ServerException(new SimpleMockedResponse(
+                'We encountered an internal error. Please try again.',
+                [],
+                500
+            ))
+        );
 
         $receiver = new AmazonSqsReceiver($connection, $serializer);
         iterator_to_array($receiver->get());

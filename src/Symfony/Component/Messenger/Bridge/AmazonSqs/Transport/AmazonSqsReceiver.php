@@ -15,6 +15,7 @@ use AsyncAws\Core\Exception\Http\HttpException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -43,7 +44,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
         try {
             $sqsEnvelope = $this->connection->get();
         } catch (HttpException $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
+            throw new RecoverableMessageHandlingException($e->getMessage(), 0, $e);
         }
         if (null === $sqsEnvelope) {
             return;

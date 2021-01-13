@@ -62,7 +62,10 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
         $alias = $container->getAlias($id);
 
         if ($alias->isDeprecated()) {
-            @trigger_error(sprintf('%s. It is being referenced by the "%s" %s.', rtrim($alias->getDeprecationMessage($id), '. '), $this->currentId, $container->hasDefinition($this->currentId) ? 'service' : 'alias'), \E_USER_DEPRECATED);
+            $referencingDefinition = $container->hasDefinition($this->currentId) ? $container->getDefinition($this->currentId) : $container->getAlias($this->currentId);
+            if (!$referencingDefinition->isDeprecated()) {
+                @trigger_error(sprintf('%s. It is being referenced by the "%s" %s.', rtrim($alias->getDeprecationMessage($id), '. '), $this->currentId, $container->hasDefinition($this->currentId) ? 'service' : 'alias'), \E_USER_DEPRECATED);
+            }
         }
 
         $seen = [];

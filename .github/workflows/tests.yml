@@ -12,7 +12,7 @@ jobs:
 
         strategy:
             matrix:
-                php: ['7.2', '7.4']
+                php: ['7.2.5', '7.4']
 
         services:
             ldap:

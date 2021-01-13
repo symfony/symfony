@@ -12,10 +12,11 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\ServerException;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Exception\SqsConnectionException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
-use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -43,8 +44,12 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $sqsEnvelope = $this->connection->get();
+        } catch (ServerException $e) {
+            // e.g. temporary HTTP 500 from SQS.
+            throw new SqsConnectionException($e->getMessage(), 0, $e);
         } catch (HttpException $e) {
-            throw new RecoverableMessageHandlingException($e->getMessage(), 0, $e);
+            // e.g. ClientException or something else not-necessarily-recoverable.
+            throw new TransportException($e->getMessage(), 0, $e);
         }
         if (null === $sqsEnvelope) {
             return;

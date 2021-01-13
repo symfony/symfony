@@ -7,7 +7,7 @@ CHANGELOG
  * Added support for using the `{{ label }}` placeholder in constraint messages, which is replaced in the `ViolationMapper` by the corresponding field form label.
  * Added `DataMapper`, `ChainAccessor`, `PropertyPathAccessor` and `CallbackAccessor` with new callable `getter` and `setter` options for each form type
  * Deprecated `PropertyPathMapper` in favor of `DataMapper` and `PropertyPathAccessor`
- * Added a `html5` option to `MoneyType` and `PercentType`, to use `<input type="number" />`
+ * Added an `html5` option to `MoneyType` and `PercentType`, to use `<input type="number" />`
 
 5.1.0
 -----

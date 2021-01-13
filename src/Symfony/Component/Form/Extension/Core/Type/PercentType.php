@@ -29,8 +29,7 @@ class PercentType extends AbstractType
         $builder->addViewTransformer(new PercentToLocalizedStringTransformer(
             $options['scale'],
             $options['type'],
-            $options['rounding_mode'],
-            false
+            $options['rounding_mode']
         ));
     }
 

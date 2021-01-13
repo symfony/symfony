@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added new `debug` option to log HTTP requests and responses.
  * Allowed for receiver & sender injection into AmazonSqsTransport
+ * Added support for AmazonSqsReceiver recovery on connection get HTTP errors
 
 5.2.0
 -----

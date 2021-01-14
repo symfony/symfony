@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * The `parents()` method is deprecated. Use `ancestors()` instead.
  * Marked the `containsOption()`, `availableOptionValues()`, and `disableValidation()` methods of the

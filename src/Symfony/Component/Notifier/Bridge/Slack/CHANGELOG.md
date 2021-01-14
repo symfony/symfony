@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * The bridge is not marked as `@experimental` anymore
  * Check for maximum number of buttons in Slack action block

@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
 * Deprecated the `prefetch_count` parameter, it has no effect and will be removed in Symfony 6.0.
 

@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
 

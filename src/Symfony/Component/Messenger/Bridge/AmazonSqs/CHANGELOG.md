@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * Added new `debug` option to log HTTP requests and responses.
  * Allowed for receiver & sender injection into AmazonSqsTransport

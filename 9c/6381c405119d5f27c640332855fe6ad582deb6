@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T13:12:10Z
+
+Unless we have reports that this happens IRL, I think we should fix as little as possible. The linked report is only about non-atomic writes. I'd wait before doing more on this topic.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-13T13:18:00Z
+
+> Unless we have reports that this happens IRL,
+
+I felt like the linked comment reported by @mpdude were a real case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T13:20:21Z
+
+> I felt like the linked comment reported by @mpdude were a real case.
+
+It is, and the message there is about "Notice: unserialize()". That's unrelated to the `is_file()` check you're mentioning for now.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-01-13T13:37:00Z
+
+Over [here](https://github.com/symfony/symfony/pull/39167#issuecomment-733531777), I also mentioned that the `unlink()` call may be a source of errors as well, since the file might have been deleted by another process in the meantime.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T13:41:10Z
+
+OK, thanks for the link. So you have processes that concurrently destroy the session?
+That cannot work of course, whatever we do here, there will always be an issue with concurrent requests that read and destroy at the same time.
+You should not destroy concurrently to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T14:23:35Z
+
+Now updated to guard against concurrent `unlink()`.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2021-01-13T14:35:00Z
+
+Regarding @jderusse's comment above, the `is_file($filePath) ? file_get_contents($filePath)` concurrency thing could also be addressed with something like
+
+```php
+        set_error_handler(static function () {});
+        try {
+            $this->data = [];
+            $this->data = unserialize(file_get_contents($filePath));
+        } finally {
+            restore_error_handler();
+        }
+```
+
+But regardless of that, :+1:  and thanks for the fix!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T14:38:50Z
+
+> the is_file($filePath) ? file_get_contents($filePath) concurrency thing
+
+code updated
+
+---------------------------------------------------------------------------
+
+by solverat at 2021-01-13T14:59:05Z
+
+@nicolas-grekas i just merged your PR into my largest test-set, and it's still passing! Thank you!

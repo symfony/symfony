@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-05T13:19:37Z
+
+I would love to get your feedback on this @fabpot 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-13T06:23:16Z
+
+Can you have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-13T07:32:39Z
+
+All green now @fabpot 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-13T13:08:24Z
+
+I also streamlined some changelog files.
+
+@fabpot I would love to hear your feedback on:
+> This should be done for the Mailer Dsn class too, but this class is not experimental anymore... 🤔
+
+and https://github.com/symfony/symfony/pull/39585#discussion_r546741774

@@ -113,6 +113,7 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
+use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
@@ -2238,6 +2239,7 @@ class FrameworkExtension extends Extension
             DiscordTransportFactory::class => 'notifier.transport_factory.discord',
             LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
             GatewayApiTransportFactory::class => 'notifier.transport_factory.gatewayapi',
+            OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
         ];
 
         foreach ($classToServices as $class => $service) {

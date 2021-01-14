@@ -88,7 +88,7 @@ class DoctrineDataCollectorTest extends TestCase
 
         $collectedParam = $collectedQueries['default'][0]['params'][0];
         if ($collectedParam instanceof Data) {
-            $dumper = new CliDumper($out = fopen('php://memory', 'r+b'));
+            $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
             $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));
@@ -162,7 +162,7 @@ class DoctrineDataCollectorTest extends TestCase
 
         $collectedParam = $collectedQueries['default'][0]['params'][0];
         if ($collectedParam instanceof Data) {
-            $dumper = new CliDumper($out = fopen('php://memory', 'r+b'));
+            $dumper = new CliDumper($out = fopen('php://memory', 'r+'));
             $dumper->setColors(false);
             $collectedParam->dump($dumper);
             $this->assertStringMatchesFormat($expected, print_r(stream_get_contents($out, -1, 0), true));

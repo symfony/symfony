@@ -141,7 +141,7 @@ EOTXT
 
     public function testAppend()
     {
-        $out = fopen('php://memory', 'r+b');
+        $out = fopen('php://memory', 'r+');
 
         $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');

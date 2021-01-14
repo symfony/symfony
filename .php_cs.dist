@@ -7,7 +7,7 @@ if (!file_exists(__DIR__.'/src')) {
 return PhpCsFixer\Config::create()
     ->setRules([
         '@PHP71Migration' => true,
-        '@PHPUnit75Migration:risky' => true,        
+        '@PHPUnit75Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,

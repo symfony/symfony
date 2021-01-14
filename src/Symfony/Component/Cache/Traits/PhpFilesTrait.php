@@ -288,7 +288,7 @@ trait PhpFilesTrait
 
     private function getFileKey(string $file): string
     {
-        if (!$h = @fopen($file, 'rb')) {
+        if (!$h = @fopen($file, 'r')) {
             return '';
         }
 

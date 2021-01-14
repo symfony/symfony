@@ -31,6 +31,8 @@
         "symfony/serializer": "^5.2"
     },
     "conflict": {
+        "phpdocumentor/reflection-docblock": "<3.2.2",
+        "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/mailer": "<4.4"
     },
     "autoload": {

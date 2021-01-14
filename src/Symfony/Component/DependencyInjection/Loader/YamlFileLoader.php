@@ -316,7 +316,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a definition.
      *
-     * @param array|string $service
+     * @param array|string|null $service
      *
      * @throws InvalidArgumentException When tags are invalid
      */

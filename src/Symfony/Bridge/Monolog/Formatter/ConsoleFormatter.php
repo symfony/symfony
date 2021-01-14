@@ -70,7 +70,7 @@ class ConsoleFormatter implements FormatterInterface
                 '*' => [$this, 'castObject'],
             ]);
 
-            $this->outputBuffer = fopen('php://memory', 'r+b');
+            $this->outputBuffer = fopen('php://memory', 'r+');
             if ($this->options['multiline']) {
                 $output = $this->outputBuffer;
             } else {

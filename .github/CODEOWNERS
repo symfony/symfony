@@ -13,6 +13,7 @@
 /src/Symfony/Bridge/Twig/Node/SearchAndRenderBlockNode.php @xabbuh
 /src/Symfony/Bridge/Twig/Tests/Extension/FormExtension* @xabbuh
 /src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php @xabbuh
+
 /src/Symfony/Bridge/Twig/Tests/TokenParser/FormThemeTokenParserTest.php @xabbuh
 /src/Symfony/Bridge/Twig/TokenParser/FormThemeTokenParser.php @xabbuh
 /src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/FormPass.php @xabbuh

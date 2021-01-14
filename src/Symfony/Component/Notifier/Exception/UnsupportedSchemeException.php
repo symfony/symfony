@@ -88,6 +88,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Discord\DiscordTransportFactory::class,
             'package' => 'symfony/discord-notifier',
         ],
+        'gatewayapi' => [
+            'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
+            'package' => 'symfony/gatewayapi-notifier',
+        ],
     ];
 
     /**

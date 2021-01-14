@@ -29,7 +29,9 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooserInterface;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -639,6 +641,18 @@ class SerializerTest extends TestCase
             $expectedData,
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
+    }
+
+    public function testUseCustomNormalizerChooser()
+    {
+        $chooser = $this->createMock(NormalizerChooserInterface::class);
+        $chooser->method('chooseNormalizer')->willReturn($normalizer = new DateTimeNormalizer());
+        $chooser->method('chooseDenormalizer')->willReturn($normalizer);
+
+        $serializer = new Serializer([$normalizer]);
+        $serializer->setNormalizerChooser($chooser);
+        $this->assertSame('1970-01-01T00:00:00+00:00', $serializer->normalize(new \DateTime('1970-01-01')));
+        $this->assertEquals(new \DateTime('1970-01-01'), $serializer->denormalize('1970-01-01T00:00:00+00:00', \DateTime::class));
     }
 }
 

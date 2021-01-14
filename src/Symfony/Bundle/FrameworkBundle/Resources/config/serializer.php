@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerNormalizerChooserCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
@@ -32,6 +33,9 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\Chooser\CacheNormalizerChooser;
+use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooser;
+use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooserInterface;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -52,13 +56,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->parameters()
-        ->set('serializer.mapping.cache.file', '%kernel.cache_dir%/serialization.php')
+        ->set('serializer.mapping.cache.file', '%kernel.cache_dir%/serialization.mapping.php')
+        ->set('serializer.normalizer_chooser.cache.file', '%kernel.cache_dir%/serialization.normalization.php')
     ;
 
     $container->services()
         ->set('serializer', Serializer::class)
             ->public()
             ->args([[], []])
+            ->call('setNormalizerChooser', [service('serializer.normalizer_chooser')])
             ->tag('container.private', ['package' => 'symfony/framework-bundle', 'version' => '5.2'])
 
         ->alias(SerializerInterface::class, 'serializer')
@@ -143,6 +149,11 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.denormalizer.array', ArrayDenormalizer::class)
             ->tag('serializer.normalizer', ['priority' => -990])
 
+        // Normalizer chooser
+        ->set('serializer.normalizer_chooser', NormalizerChooser::class)
+
+        ->alias(NormalizerChooserInterface::class, 'serializer.normalizer_chooser')
+
         // Loader
         ->set('serializer.mapping.chain_loader', LoaderChain::class)
             ->args([[]])
@@ -167,6 +178,25 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('serializer.mapping.cache_class_metadata_factory.inner'),
                 service('serializer.mapping.cache.symfony'),
+            ])
+
+        ->set('serializer.normalizer_chooser.cache_warmer', SerializerNormalizerChooserCacheWarmer::class)
+            ->args([
+                [],
+                abstract_arg('The normalization providers'),
+                param('serializer.normalizer_chooser.cache.file')
+            ])
+            ->tag('kernel.cache_warmer')
+
+        ->set('serializer.normalizer_chooser.cache.symfony', CacheItemPoolInterface::class)
+            ->factory([PhpArrayAdapter::class, 'create'])
+            ->args([param('serializer.normalizer_chooser.cache.file'), service('cache.serializer')])
+
+        ->set('serializer.normalizer_chooser.cache', CacheNormalizerChooser::class)
+            ->decorate('serializer.normalizer_chooser')
+            ->args([
+                service('serializer.normalizer_chooser.chooser.inner'),
+                service('serializer.normalizer_chooser.cache.symfony')
             ])
 
         // Encoders

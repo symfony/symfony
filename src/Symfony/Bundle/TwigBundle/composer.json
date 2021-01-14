@@ -21,7 +21,7 @@
         "symfony/http-foundation": "^4.3|^5.0",
         "symfony/http-kernel": "^4.4",
         "symfony/polyfill-ctype": "~1.8",
-        "twig/twig": "^1.41|^2.10|^3.0"
+        "twig/twig": "^1.43|^2.13|^3.0.4"
     },
     "require-dev": {
         "symfony/asset": "^3.4|^4.0|^5.0",
@@ -36,7 +36,7 @@
         "symfony/yaml": "^3.4|^4.0|^5.0",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/web-link": "^3.4|^4.0|^5.0",
-        "doctrine/annotations": "~1.7",
+        "doctrine/annotations": "^1.10.4",
         "doctrine/cache": "~1.0"
     },
     "conflict": {

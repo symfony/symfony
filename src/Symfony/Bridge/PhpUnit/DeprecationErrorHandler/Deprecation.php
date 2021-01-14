@@ -82,7 +82,9 @@ class Deprecation
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];
-                $this->originalFilesStack = $parsedMsg['files_stack'];
+                if (isset($parsedMsg['files_stack'])) {
+                    $this->originalFilesStack = $parsedMsg['files_stack'];
+                }
                 // If the deprecation has been triggered via
                 // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
                 // then we need to use the serialized information to determine

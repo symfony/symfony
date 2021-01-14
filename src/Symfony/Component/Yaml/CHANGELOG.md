@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * Added `github` format support & autodetection to render errors as annotations
    when running the YAML linter command in a Github Action environment.

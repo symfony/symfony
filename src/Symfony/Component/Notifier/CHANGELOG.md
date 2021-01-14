@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * The component is not marked as `@experimental` anymore
  * [BC BREAK] Change signature of `Dsn::__construct()` method from:

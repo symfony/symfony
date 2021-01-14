@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.
  * added normalization formats to `UidNormalizer`

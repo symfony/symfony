@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * added support for connecting to Redis Sentinel clusters when using the Redis PHP extension
 

@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
  * added the `mailer` monolog channel and set it on all transport definitions
 

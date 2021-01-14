@@ -23,6 +23,8 @@ interface LoaderInterface
      *
      * @param mixed $resource The resource
      *
+     * @return mixed
+     *
      * @throws \Exception If something went wrong
      */
     public function load($resource, string $type = null);

@@ -1519,7 +1519,7 @@ class Request
 
             $this->content = false;
 
-            return fopen('php://input', 'rb');
+            return fopen('php://input', 'r');
         }
 
         if ($currentContentIsResource) {

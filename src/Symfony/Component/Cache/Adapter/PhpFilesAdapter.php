@@ -305,7 +305,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 
     private function getFileKey(string $file): string
     {
-        if (!$h = @fopen($file, 'rb')) {
+        if (!$h = @fopen($file, 'r')) {
             return '';
         }
 

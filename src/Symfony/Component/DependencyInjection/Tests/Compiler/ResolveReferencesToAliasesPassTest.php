@@ -126,6 +126,44 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
     }
 
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedAlias()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated(true);
+        $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
+
+        $alias = new Alias('deprecated_foo_alias');
+        $alias->setDeprecated(true);
+        $container->setAlias('alias', $alias);
+
+        $this->process($container);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated(true);
+        $container->setAlias('foo_aliased', $aliasDeprecated);
+
+        $container
+            ->register('definition')
+            ->setDeprecated(true)
+            ->setArguments([new Reference('foo_aliased')])
+        ;
+
+        $this->process($container);
+        $this->addToAssertionCount(1);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveReferencesToAliasesPass();

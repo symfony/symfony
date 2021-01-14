@@ -2,7 +2,7 @@
 
 error_reporting(-1);
 set_error_handler(function ($type, $message, $file, $line) {
-    if (error_reporting()) {
+    if (error_reporting() & $type) {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }
 });

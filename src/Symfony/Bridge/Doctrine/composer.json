@@ -43,11 +43,11 @@
         "symfony/validator": "^5.0.2",
         "symfony/translation": "^4.4|^5.0",
         "symfony/var-dumper": "^4.4|^5.0",
-        "doctrine/annotations": "~1.7",
+        "doctrine/annotations": "^1.10.4",
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
-        "doctrine/dbal": "~2.4|^3.0",
+        "doctrine/dbal": "^2.6|^3.0",
         "doctrine/orm": "^2.6.3"
     },
     "conflict": {

@@ -49,7 +49,8 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php72": "~1.5",
         "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.15"
+        "symfony/polyfill-php80": "^1.15",
+        "symfony/polyfill-php81": "^1.22"
     },
     "replace": {
         "symfony/asset": "self.version",

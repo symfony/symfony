@@ -103,7 +103,7 @@ before_install:
           else
               rm ~/.pearrc /tmp/pear 2>/dev/null || true
               mkdir -p $ext_cache
-              echo $input | pecl install -f $ext_name &&
+              echo $input | pecl -q install -f $ext_name &&
               cp $ext_dir/$ext_so $ext_cache
           fi
       }
@@ -147,11 +147,11 @@ before_install:
           if [[ $PHP = 8.* ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
           else
-              tfold ext.mongodb tpecl mongodb-1.8.1 mongodb.so $INI
               tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI
               tfold ext.amqp tpecl amqp-1.10.2 amqp.so $INI
           fi
 
+          tfold ext.mongodb tpecl mongodb-1.9.0 mongodb.so $INI
           tfold ext.apcu tpecl apcu-5.1.19 apcu.so $INI
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
@@ -253,7 +253,7 @@ install:
           fi
           phpenv global $PHP
           rm vendor/composer/package-versions-deprecated -Rf
-          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer config platform.ext-mongodb 1.8.99; composer require --dev --no-update mongodb/mongodb ^1.8.1)
+          ([[ $deps ]] && cd src/Symfony/Component/HttpFoundation; cp composer.json composer.bak; composer require --dev --no-update mongodb/mongodb ^1.9.0)
           tfold 'composer update' $COMPOSER_UP
           tfold 'phpunit install' ./phpunit install
           if [[ $deps = high ]]; then
@@ -269,7 +269,7 @@ install:
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD
                   COMPONENTS=$(echo "$COMPONENTS" | xargs dirname | xargs -n1 -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort)
-                  (cd src/Symfony/Component/HttpFoundation; composer config platform.ext-mongodb 1.8.99; composer require --dev --no-update mongodb/mongodb)
+                  (cd src/Symfony/Component/HttpFoundation; composer require --dev --no-update mongodb/mongodb)
                   [[ ! $COMPONENTS ]] || tfold 'phpunit install' SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT=1 ./phpunit install
                   [[ ! $COMPONENTS ]] || echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && rm composer.lock vendor/ -Rf && $COMPOSER_UP && $PHPUNIT_X$LEGACY'" || X=1
               fi

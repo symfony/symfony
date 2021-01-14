@@ -26,7 +26,7 @@ class ConsoleSectionOutputTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->stream = fopen('php://memory', 'r+b', false);
+        $this->stream = fopen('php://memory', 'r+', false);
     }
 
     protected function tearDown(): void
@@ -143,7 +143,7 @@ class ConsoleSectionOutputTest extends TestCase
 
     public function testClearSectionContainingQuestion()
     {
-        $inputStream = fopen('php://memory', 'r+b', false);
+        $inputStream = fopen('php://memory', 'r+', false);
         fwrite($inputStream, "Batman & Robin\n");
         rewind($inputStream);
 

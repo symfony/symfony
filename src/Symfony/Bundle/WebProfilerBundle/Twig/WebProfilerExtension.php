@@ -45,7 +45,7 @@ class WebProfilerExtension extends ProfilerExtension
     public function __construct(HtmlDumper $dumper = null)
     {
         $this->dumper = $dumper ?: new HtmlDumper();
-        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
+        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
     }
 
     public function enter(Profile $profile): void
@@ -56,7 +56,7 @@ class WebProfilerExtension extends ProfilerExtension
     public function leave(Profile $profile): void
     {
         if (0 === --$this->stackLevel) {
-            $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
+            $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
         }
     }
 

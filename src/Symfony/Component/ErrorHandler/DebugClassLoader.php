@@ -67,10 +67,11 @@ class DebugClassLoader
         'string' => 'string',
         'self' => 'self',
         'parent' => 'parent',
+        'mixed' => 'mixed',
     ] + (\PHP_VERSION_ID >= 80000 ? [
+        'static' => 'static',
         '$this' => 'static',
     ] : [
-        'mixed' => 'mixed',
         'static' => 'object',
         '$this' => 'object',
     ]);

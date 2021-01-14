@@ -136,7 +136,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
     {
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!is_file($file) || !$h = @fopen($file, 'rb')) {
+            if (!is_file($file) || !$h = @fopen($file, 'r')) {
                 continue;
             }
 

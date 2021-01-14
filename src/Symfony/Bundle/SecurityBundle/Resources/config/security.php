@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
-use Symfony\Bundle\SecurityBundle\EventListener\FirewallEventBubblingListener;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -126,10 +125,6 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication_utils', AuthenticationUtils::class)
             ->args([service('request_stack')])
         ->alias(AuthenticationUtils::class, 'security.authentication_utils')
-
-        ->set('security.event_dispatcher.event_bubbling_listener', FirewallEventBubblingListener::class)
-            ->abstract()
-            ->args([service('event_dispatcher')])
 
         // Authorization related services
         ->set('security.access.decision_manager', AccessDecisionManager::class)

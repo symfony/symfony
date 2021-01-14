@@ -40,5 +40,6 @@ class GlobFileLoaderWithoutImport extends GlobFileLoader
 {
     public function import($resource, string $type = null, $ignoreErrors = false, string $sourceResource = null, $exclude = null)
     {
+        return null;
     }
 }

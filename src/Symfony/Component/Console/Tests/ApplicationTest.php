@@ -1827,7 +1827,7 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->setDispatcher($dispatcher);
-        $application->setSignalsToDispatchEvent(SIGALRM);
+        $application->setSignalsToDispatchEvent(\SIGALRM);
         $application->add($command);
 
         $this->assertFalse($command->signaled);
@@ -1910,7 +1910,7 @@ class SignableCommand extends Command implements SignalableCommandInterface
 
     public function getSubscribedSignals(): array
     {
-        return [SIGALRM];
+        return [\SIGALRM];
     }
 
     public function handleSignal(int $signal): void

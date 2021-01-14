@@ -127,7 +127,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         yield [
             [[
                 'attributes' => [new \stdClass()],
-                'object' => $x = fopen(__FILE__, 'rb'),
+                'object' => $x = fopen(__FILE__, 'r'),
                 'result' => true,
                 'voterDetails' => [],
             ]],

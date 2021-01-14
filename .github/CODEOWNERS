@@ -31,6 +31,8 @@
 # Messenger
 /src/Symfony/Bridge/Doctrine/Messenger/ @sroze
 /src/Symfony/Component/Messenger/ @sroze
+# Notifer
+/src/Symfony/Component/Notifier/ @OskarStark
 # OptionsResolver
 /src/Symfony/Component/OptionsResolver/ @yceruto
 # PropertyInfo

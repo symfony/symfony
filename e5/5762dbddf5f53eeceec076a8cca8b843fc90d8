@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-21T09:30:30Z
+
+I suppose test are green after https://github.com/symfony/symfony/pull/39571 🤔
+
+cc @chalasr
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-06T07:35:55Z
+
+Ready to merge
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-06T19:26:46Z
+
+Ready to merge 👍
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-07T09:41:34Z
+
+@OskarStark Can you have a look at the tests?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-07T10:04:57Z
+
+Done @derrabus , lets see if its working now.
+
+Btw, its weird that one passed... 🤔
+![CleanShot 2021-01-07 at 11 04 15](https://user-images.githubusercontent.com/995707/103879453-2ba00f00-50d8-11eb-80d3-23e4caf8186f.png)
+
+And fabbot.io is complaining:
+![CleanShot 2021-01-07 at 11 05 35](https://user-images.githubusercontent.com/995707/103879557-512d1880-50d8-11eb-8a69-5940d460e39f.png)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-07T12:14:05Z
+
+Tests green 💚

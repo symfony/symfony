@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `github` format & autodetection to render errors as annotations when
+  running the Twig linter command in a Github Actions environment.
+
 5.3
 ---
 

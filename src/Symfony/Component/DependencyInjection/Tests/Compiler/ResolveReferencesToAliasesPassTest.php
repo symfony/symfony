@@ -133,11 +133,11 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
 
         $alias = new Alias('deprecated_foo_alias');
-        $alias->setDeprecated(true);
+        $alias->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('alias', $alias);
 
         $this->process($container);
@@ -151,12 +151,12 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->register('foo', 'stdClass');
 
         $aliasDeprecated = new Alias('foo');
-        $aliasDeprecated->setDeprecated(true);
+        $aliasDeprecated->setDeprecated('foobar', '1.2.3.4', '');
         $container->setAlias('foo_aliased', $aliasDeprecated);
 
         $container
             ->register('definition')
-            ->setDeprecated(true)
+            ->setDeprecated('foobar', '1.2.3.4', '')
             ->setArguments([new Reference('foo_aliased')])
         ;
 

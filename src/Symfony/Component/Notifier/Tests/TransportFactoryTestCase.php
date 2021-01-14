@@ -13,8 +13,8 @@ namespace Symfony\Component\Notifier\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;
-use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
+use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
@@ -68,7 +68,7 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $this->assertSame($expected, $factory->supports(Dsn::fromString($dsn)));
+        $this->assertSame($expected, $factory->supports(new Dsn($dsn)));
     }
 
     /**
@@ -77,7 +77,7 @@ abstract class TransportFactoryTestCase extends TestCase
     public function testCreate(string $expected, string $dsn)
     {
         $factory = $this->createFactory();
-        $transport = $factory->create(Dsn::fromString($dsn));
+        $transport = $factory->create(new Dsn($dsn));
 
         $this->assertSame($expected, (string) $transport);
     }
@@ -89,7 +89,7 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = Dsn::fromString($dsn);
+        $dsn = new Dsn($dsn);
 
         $this->expectException(UnsupportedSchemeException::class);
         if (null !== $message) {
@@ -106,7 +106,7 @@ abstract class TransportFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = Dsn::fromString($dsn);
+        $dsn = new Dsn($dsn);
 
         $this->expectException(IncompleteDsnException::class);
         if (null !== $message) {
@@ -119,11 +119,11 @@ abstract class TransportFactoryTestCase extends TestCase
     /**
      * @dataProvider missingRequiredOptionProvider
      */
-    public function testMissingRequiredOptionException(string $dsn, string $message = null): void
+    public function testMissingRequiredOptionException(string $dsn, string $message = null)
     {
         $factory = $this->createFactory();
 
-        $dsn = Dsn::fromString($dsn);
+        $dsn = new Dsn($dsn);
 
         $this->expectException(MissingRequiredOptionException::class);
         if (null !== $message) {

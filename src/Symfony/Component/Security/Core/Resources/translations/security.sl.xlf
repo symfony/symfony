@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>Račun je zaklenjen.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Preveč neuspelih poskusov prijave, poskusite znova pozneje.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Neveljavna ali potekla povezava prijave.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

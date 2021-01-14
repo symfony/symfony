@@ -52,6 +52,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Twilio\TwilioTransportFactory::class,
             'package' => 'symfony/twilio-notifier',
         ],
+        'allmysms' => [
+            'class' => Bridge\AllMySms\AllMySmsTransportFactory::class,
+            'package' => 'symfony/allmysms-notifier',
+        ],
         'infobip' => [
             'class' => Bridge\Infobip\InfobipTransportFactory::class,
             'package' => 'symfony/infobip-notifier',

@@ -101,6 +101,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -2227,6 +2228,7 @@ class FrameworkExtension extends Extension
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             InfobipTransportFactory::class => 'notifier.transport_factory.infobip',
             TwilioTransportFactory::class => 'notifier.transport_factory.twilio',
+            AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',

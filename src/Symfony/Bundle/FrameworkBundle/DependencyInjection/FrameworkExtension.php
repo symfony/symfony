@@ -110,6 +110,7 @@ use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
+use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
@@ -2247,6 +2248,7 @@ class FrameworkExtension extends Extension
             GatewayApiTransportFactory::class => 'notifier.transport_factory.gatewayapi',
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
+            GitterTransportFactory::class => 'notifier.transport_factory.gitter',
         ];
 
         foreach ($classToServices as $class => $service) {

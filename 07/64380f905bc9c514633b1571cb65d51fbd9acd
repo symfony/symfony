@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by qdequippe at 2020-12-23T08:38:57Z
+
+@OskarStark bridge added ;)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-23T08:43:11Z
+
+Could you please add it to the documentation + add a recipe? 😎
+
+---------------------------------------------------------------------------
+
+by qdequippe at 2020-12-23T12:45:34Z
+
+> Could you please add it to the documentation + add a recipe?
+
+Yes of course! Where to add the documentation? in https://github.com/symfony/symfony-docs?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-23T12:46:45Z
+
+Yes you can search for other bridges, there is an open PR for GatewayAPI bridge, your should be the same, same for recipe in Symfony/recipes

@@ -46,7 +46,7 @@ final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing credentials' => ['googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'];
+        yield 'missing credentials' => ['googlechat://chat.googleapis.com/AAAAA_YYYYY'];
     }
 
     public function unsupportedSchemeProvider(): iterable

@@ -33,8 +33,8 @@ final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
         ];
 
         yield [
-            'googlechat://chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
-            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg',
+            'googlechat://chat.googleapis.com/AAAAA_YYYYY?thread_key=abcdefg',
+            'googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?thread_key=abcdefg',
         ];
     }
 
@@ -46,7 +46,8 @@ final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase
 
     public function incompleteDsnProvider(): iterable
     {
-        yield 'missing credentials' => ['googlechat://chat.googleapis.com/AAAAA_YYYYY'];
+        yield 'missing credentials' => ['googlechat://chat.googleapis.com/v1/spaces/AAAAA_YYYYY/messages'];
+        yield 'using old option: threadKey' => ['googlechat://abcde-fghij:kl_mnopqrstwxyz%3D@chat.googleapis.com/AAAAA_YYYYY?threadKey=abcdefg', 'GoogleChat DSN has changed since 5.3, use "thread_key" instead of "threadKey" parameter.']; // can be removed in Symfony 5.4
     }
 
     public function unsupportedSchemeProvider(): iterable

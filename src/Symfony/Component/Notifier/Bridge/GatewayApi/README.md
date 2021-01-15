@@ -1,5 +1,5 @@
 GatewayApi Notifier
-===============
+===================
 
 Provides GatewayApi integration for Symfony Notifier.
 

@@ -137,4 +137,9 @@ class DoctrineDummy
      * @OneToMany(targetEntity="DoctrineRelation", mappedBy="buzField", indexBy="buzField")
      */
     protected $indexedBuz;
+
+    /**
+     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="dummyRelation", indexBy="gen_value_col_id", orphanRemoval=true)
+     */
+    protected $dummyGeneratedValueList;
 }

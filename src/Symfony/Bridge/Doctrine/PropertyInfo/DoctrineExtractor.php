@@ -122,7 +122,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                             /** @var ClassMetadataInfo $subMetadata */
                             $indexProperty = $subMetadata->getSingleAssociationReferencedJoinColumnName($fieldName);
                             $subMetadata = $this->entityManager ? $this->entityManager->getClassMetadata($associationMapping['targetEntity']) : $this->classMetadataFactory->getMetadataFor($associationMapping['targetEntity']);
-                            $typeOfField = $subMetadata->getTypeOfField($indexProperty);
+
+                            //Not a property, maybe a column name?
+                            if (null === ($typeOfField = $subMetadata->getTypeOfField($indexProperty))) {
+                                $fieldName = $subMetadata->getFieldForColumn($indexProperty);
+                                $typeOfField = $subMetadata->getTypeOfField($fieldName);
+                            }
                         }
                     }
 

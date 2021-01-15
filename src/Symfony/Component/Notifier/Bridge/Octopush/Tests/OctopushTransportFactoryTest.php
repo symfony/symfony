@@ -39,7 +39,7 @@ final class OctopushTransportFactoryTest extends TransportFactoryTestCase
         yield [false, 'somethingElse://userLogin:apiKet@default?from=Heyliot&type=FR'];
     }
 
-    public function incompleteDsnProvider(): iterable
+    public function missingRequiredOptionProvider(): iterable
     {
         yield 'missing option: from' => ['octopush://userLogin:apiKey@default?type=FR'];
         yield 'missing option: type' => ['octopush://userLogin:apiKey@default?from=Heyliot'];

@@ -42,6 +42,7 @@ class TranslationUpdateCommand extends Command
     private const SORT_ORDERS = [self::ASC, self::DESC];
 
     protected static $defaultName = 'translation:update';
+    protected static $defaultDescription = 'Updates the translation file';
 
     private $writer;
     private $reader;
@@ -85,7 +86,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
-            ->setDescription('Updates the translation file')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the default translations directory. It can display them or merge

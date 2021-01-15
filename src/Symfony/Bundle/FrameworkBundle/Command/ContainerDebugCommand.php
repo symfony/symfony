@@ -35,6 +35,7 @@ class ContainerDebugCommand extends Command
     use BuildDebugContainerTrait;
 
     protected static $defaultName = 'debug:container';
+    protected static $defaultDescription = 'Displays current services for an application';
 
     /**
      * {@inheritdoc}
@@ -57,7 +58,7 @@ class ContainerDebugCommand extends Command
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
                 new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Displays deprecations generated when compiling and warming up the container'),
             ])
-            ->setDescription('Displays current services for an application')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 

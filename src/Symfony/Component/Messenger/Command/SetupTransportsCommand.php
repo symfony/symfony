@@ -25,6 +25,7 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 class SetupTransportsCommand extends Command
 {
     protected static $defaultName = 'messenger:setup-transports';
+    protected static $defaultDescription = 'Prepares the required infrastructure for the transport';
 
     private $transportLocator;
     private $transportNames;
@@ -41,7 +42,7 @@ class SetupTransportsCommand extends Command
     {
         $this
             ->addArgument('transport', InputArgument::OPTIONAL, 'Name of the transport to setup', null)
-            ->setDescription('Prepares the required infrastructure for the transport')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command setups the transports:
 

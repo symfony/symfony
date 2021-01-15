@@ -29,6 +29,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SecretsGenerateKeysCommand extends Command
 {
     protected static $defaultName = 'secrets:generate-keys';
+    protected static $defaultDescription = 'Generates new encryption keys';
 
     private $vault;
     private $localVault;
@@ -44,7 +45,7 @@ final class SecretsGenerateKeysCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Generates new encryption keys')
+            ->setDescription(self::$defaultDescription)
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Updates the local vault.')
             ->addOption('rotate', 'r', InputOption::VALUE_NONE, 'Re-encrypts existing secrets with the newly generated keys.')
             ->setHelp(<<<'EOF'

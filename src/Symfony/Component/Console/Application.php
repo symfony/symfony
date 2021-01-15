@@ -13,6 +13,7 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
@@ -489,8 +490,10 @@ class Application implements ResetInterface
             return null;
         }
 
-        // Will throw if the command is not correctly initialized.
-        $command->getDefinition();
+        if (!$command instanceof LazyCommand) {
+            // Will throw if the command is not correctly initialized.
+            $command->getDefinition();
+        }
 
         if (!$command->getName()) {
             throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_debug_type($command)));

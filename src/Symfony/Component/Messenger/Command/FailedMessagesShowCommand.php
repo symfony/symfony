@@ -28,6 +28,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:show';
+    protected static $defaultDescription = 'Shows one or more messages from the failure transport';
 
     /**
      * {@inheritdoc}
@@ -39,7 +40,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
             ])
-            ->setDescription('Shows one or more messages from the failure transport')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows message that are pending in the failure transport.
 

@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead.
  * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
  * Added a `choice_translation_parameters` option to `ChoiceType`
+ * Add `UuidType` and `UlidType`
 
 5.2.0
 -----

@@ -23,6 +23,11 @@ Form
  * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead.
  * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
 
+HttpFoundation
+--------------
+
+ * Deprecate the `NamespacedAttributeBag` class
+
 HttpKernel
 ----------
 

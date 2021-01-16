@@ -45,6 +45,7 @@ class Command
     private $aliases = [];
     private $definition;
     private $hidden = false;
+    private $enabled = true;
     private $help = '';
     private $description = '';
     private $fullDefinition;
@@ -73,8 +74,15 @@ class Command
     public function __construct(string $name = null)
     {
         $this->definition = new InputDefinition();
+        if ($this instanceof DescribableCommandInterface) {
+            $description = static::describe();
+            $this->setName($description->getName())
+                ->setAliases($description->getAliases())
+                ->setHidden($description->isHidden())
+                ->setDescription($description->getDescription());
 
-        if (null !== $name || null !== $name = static::getDefaultName()) {
+            $this->enabled = $description->isEnabled();
+        } elseif (null !== $name || null !== $name = static::getDefaultName()) {
             $this->setName($name);
         }
 
@@ -138,7 +146,7 @@ class Command
      */
     public function isEnabled()
     {
-        return true;
+        return $this->enabled;
     }
 
     /**

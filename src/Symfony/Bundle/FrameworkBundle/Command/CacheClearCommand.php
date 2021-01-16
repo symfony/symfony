@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandDescription;
+use Symfony\Component\Console\Command\DescribableCommandInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,10 +35,8 @@ use Symfony\Component\HttpKernel\RebootableInterface;
  *
  * @final
  */
-class CacheClearCommand extends Command
+class CacheClearCommand extends Command implements DescribableCommandInterface
 {
-    protected static $defaultName = 'cache:clear';
-
     private $cacheClearer;
     private $filesystem;
 
@@ -46,6 +46,14 @@ class CacheClearCommand extends Command
 
         $this->cacheClearer = $cacheClearer;
         $this->filesystem = $filesystem ?: new Filesystem();
+    }
+
+    public static function describe(): CommandDescription
+    {
+        return new CommandDescription(
+            'cache:clear',
+            'Clears the cache'
+        );
     }
 
     /**
@@ -58,7 +66,6 @@ class CacheClearCommand extends Command
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ])
-            ->setDescription('Clears the cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:

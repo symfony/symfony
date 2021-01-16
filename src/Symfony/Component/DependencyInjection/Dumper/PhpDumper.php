@@ -1757,7 +1757,7 @@ EOF;
 
                     $code = sprintf('return %s;', $code);
 
-                    return sprintf("function ()%s {\n            %s\n        }", $returnedType, $code);
+                    return sprintf("function () use (\$container) %s {\n            %s\n        }", $returnedType, $code);
                 }
 
                 if ($value instanceof IteratorArgument) {

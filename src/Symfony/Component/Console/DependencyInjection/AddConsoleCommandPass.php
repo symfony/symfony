@@ -12,11 +12,17 @@
 namespace Symfony\Component\Console\DependencyInjection;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandDescription;
+use Symfony\Component\Console\Command\DescribableCommandInterface;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
@@ -51,6 +57,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition->addTag($this->noPreloadTag);
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
+            $description = $r = null;
             if (isset($tags[0]['command'])) {
                 $commandName = $tags[0]['command'];
             } else {
@@ -60,7 +67,12 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 if (!$r->isSubclassOf(Command::class)) {
                     throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
                 }
-                $commandName = $class::getDefaultName();
+                if ($r->implementsInterface(DescribableCommandInterface::class)) {
+                    $description = $class::describe();
+                    $commandName = $description->getName();
+                } else {
+                    $commandName = $class::getDefaultName();
+                }
             }
 
             if (null === $commandName) {
@@ -77,7 +89,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             unset($tags[0]);
             $lazyCommandMap[$commandName] = $id;
             $lazyCommandRefs[$id] = new TypedReference($id, $class);
-            $aliases = [];
+            $aliases = $description ? $description->getAliases() : [];
 
             foreach ($tags as $tag) {
                 if (isset($tag['command'])) {
@@ -85,11 +97,35 @@ class AddConsoleCommandPass implements CompilerPassInterface
                     $lazyCommandMap[$tag['command']] = $id;
                 }
             }
+            if (null === $r) {
+                if (!$r = $container->getReflectionClass($class)) {
+                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                }
+                if ($r->implementsInterface(DescribableCommandInterface::class)) {
+                    $description = $class::describe();
+                }
+            }
+            if ($description) {
+                $container->register('.'.$id.'.lazy', LazyCommand::class)
+                    ->setArguments([
+                        (new Definition(CommandDescription::class))
+                            ->setArguments([$commandName, $description->getDescription(), $aliases, $description->isHidden(), $description->isEnabled()]),
+                        new ServiceClosureArgument($lazyCommandRefs[$id])
+                    ]);
 
-            $definition->addMethodCall('setName', [$commandName]);
+                $lazyCommandRefs[$id] = new Reference('.'.$id.'.lazy');
+                if ($description->getName() !== $commandName) {
+                    $definition->addMethodCall('setName', [$commandName]);
+                }
+                if ($aliases !== $description->getAliases()) {
+                    $definition->addMethodCall('setAliases', [$aliases]);
+                }
+            } else {
+                $definition->addMethodCall('setName', [$commandName]);
 
-            if ($aliases) {
-                $definition->addMethodCall('setAliases', [$aliases]);
+                if ($aliases) {
+                    $definition->addMethodCall('setAliases', [$aliases]);
+                }
             }
         }
 

@@ -147,6 +147,25 @@ class JsonLoginAuthenticatorTest extends TestCase
         $this->assertSame(['error' => 'foo'], json_decode($response->getContent(), true));
     }
 
+    public function testOnFailureReplacesMessageDataWithoutTranslator()
+    {
+        $this->setUpAuthenticator();
+
+        $response = $this->authenticator->onAuthenticationFailure(new Request(), new class() extends AuthenticationException {
+            public function getMessageData(): array
+            {
+                return ['%failed_attempts%' => 3];
+            }
+
+            public function getMessageKey(): string
+            {
+                return 'Session locked after %failed_attempts% failed attempts.';
+            }
+        });
+
+        $this->assertSame(['error' => 'Session locked after 3 failed attempts.'], json_decode($response->getContent(), true));
+    }
+
     private function setUpAuthenticator(array $options = [])
     {
         $this->authenticator = new JsonLoginAuthenticator(new HttpUtils(), $this->userProvider, null, null, $options);

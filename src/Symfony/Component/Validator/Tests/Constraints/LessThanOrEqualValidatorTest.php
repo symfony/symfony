@@ -80,6 +80,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2010-01-01 UTC'), 'Jan 1, 2010, 12:00 AM', '2000-01-01 UTC', 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(4), '4', __NAMESPACE__.'\ComparisonTest_Class'],
             ['c', '"c"', 'b', '"b"', 'string'],
+            [new \DateTime('2010-01-01'), '2010-01-01', new \DateTime('2000-01-01'), '2000-01-01', 'DateTime', 'Y-MM-dd'],
         ];
     }
 

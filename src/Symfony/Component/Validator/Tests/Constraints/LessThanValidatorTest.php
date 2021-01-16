@@ -78,6 +78,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             [new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             [new ComparisonTest_Class(6), '6', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
             ['333', '"333"', '22', '"22"', 'string'],
+            [new \DateTime('2010-01-01'), '2010-01-01', new \DateTime('2000-01-01'), '2000-01-01', 'DateTime', 'Y-MM-dd'],
         ];
     }
 

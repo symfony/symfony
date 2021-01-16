@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add a `dateFormat` option to comparison constraints (`EqualTo`,
+   `GreaterThanOrEqual`, `GreaterThan`, `LessThanOrEqual`, `LessThan`,
+   `IndenticalTo`, `NotEqualTo` and `NotIdenticalTo`) to format datetimes in
+   placeholders:
+   ```php
+   /**
+    * @Assert\EqualTo(value="2020-01-01", dateFormat="Y-d-m")
+    */
+   ```
+   will output a message like: `This value should be equal to 2020-01-01.`.
+
 5.3
 ---
  * Add the `normalizer` option to the `Unique` constraint

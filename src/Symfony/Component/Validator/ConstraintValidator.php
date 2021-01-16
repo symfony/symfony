@@ -84,11 +84,11 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, int $format = 0)
+    protected function formatValue($value, int $format = 0, ?string $dateFormat = null)
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists(\IntlDateFormatter::class)) {
-                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', null, $dateFormat);
 
                 return $formatter->format(new \DateTime(
                     $value->format('Y-m-d H:i:s.u'),
@@ -96,7 +96,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 ));
             }
 
-            return $value->format('Y-m-d H:i:s');
+            return $value->format($dateFormat ?? 'Y-m-d H:i:s');
         }
 
         if (\is_object($value)) {

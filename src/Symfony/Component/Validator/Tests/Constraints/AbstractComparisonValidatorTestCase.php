@@ -179,7 +179,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      * @param mixed  $comparedValueString
      * @param string $comparedValueType
      */
-    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType, $dateFormat = null)
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -189,6 +189,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
         $constraint = $this->createConstraint(['value' => $comparedValue]);
         $constraint->message = 'Constraint Message';
+        $constraint->dateFormat = $dateFormat;
 
         $this->validator->validate($dirtyValue, $constraint);
 

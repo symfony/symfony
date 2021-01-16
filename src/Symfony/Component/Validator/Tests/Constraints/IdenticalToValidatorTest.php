@@ -92,6 +92,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'],
             [new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999, 12:00 AM', 'DateTime'],
             [new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'],
+            [new \DateTime('2001-01-01'), '2001-01-01', new \DateTime('2001-01-01'), '2001-01-01', 'DateTime', 'Y-MM-dd'],
         ];
     }
 

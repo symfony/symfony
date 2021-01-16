@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -27,6 +28,7 @@ abstract class AbstractComparison extends Constraint
     public $message;
     public $value;
     public $propertyPath;
+    public $dateFormat;
 
     /**
      * {@inheritdoc}
@@ -56,6 +58,12 @@ abstract class AbstractComparison extends Constraint
 
         if (null !== $this->propertyPath && !class_exists(PropertyAccess::class)) {
             throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "propertyPath" option.', static::class));
+        }
+
+        $this->dateFormat = $options['dateFormat'] ?? null;
+
+        if (null !== $this->dateFormat && !\is_string($this->dateFormat)) {
+            throw new InvalidOptionsException('The "dateFormat" option must be null or a string.', $options);
         }
     }
 

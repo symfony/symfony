@@ -90,6 +90,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             ['a', '"a"', 'a', '"a"', 'string'],
             [$date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime'],
             [$object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'],
+            [$date, '2000-01-01', $date, '2000-01-01', 'DateTime', 'Y-MM-dd'],
         ];
 
         return $comparisons;

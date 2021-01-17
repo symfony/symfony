@@ -77,7 +77,7 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('manifest path'),
-                service('http_client'),
+                service('http_client')->nullOnInvalid(),
             ])
 
         ->set('assets.remote_json_manifest_version_strategy', RemoteJsonManifestVersionStrategy::class)

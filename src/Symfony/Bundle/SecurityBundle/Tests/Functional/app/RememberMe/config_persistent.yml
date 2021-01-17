@@ -1,0 +1,12 @@
+services:
+    app.static_token_provider:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\StaticTokenProvider
+        arguments: ['@kernel']
+
+security:
+    firewalls:
+        default:
+            remember_me:
+                always_remember_me: true
+                secret: key
+                token_provider: app.static_token_provider

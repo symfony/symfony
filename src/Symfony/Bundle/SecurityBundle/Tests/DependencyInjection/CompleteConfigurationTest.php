@@ -51,13 +51,15 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertEquals(3600, (string) $expiredStorage->getArgument(1));
 
         $linker = $container->getDefinition($linkerId = 'security.authenticator.login_link_handler.main');
-        $this->assertEquals(['id', 'email'], $linker->getArgument(3));
         $this->assertEquals([
             'route_name' => 'login_check',
             'lifetime' => 3600,
-            'max_uses' => 1,
-        ], $linker->getArgument(5));
-        $this->assertEquals($expiredStorageId, (string) $linker->getArgument(6));
+        ], $linker->getArgument(3));
+
+        $hasher = $container->getDefinition((string) $linker->getArgument(2));
+        $this->assertEquals(['id', 'email'], $hasher->getArgument(1));
+        $this->assertEquals($expiredStorageId, (string) $hasher->getArgument(3));
+        $this->assertEquals(1, $hasher->getArgument(4));
 
         $authenticator = $container->getDefinition('security.authenticator.login_link.main');
         $this->assertEquals($linkerId, (string) $authenticator->getArgument(0));

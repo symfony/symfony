@@ -9,16 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\LoginLink;
+namespace Symfony\Component\Security\Core\Signature;
 
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
+ * @author Ryan Weaver <ryan@symfonycasts.com>
+ *
  * @experimental in 5.2
  *
  * @final
  */
-class ExpiredLoginLinkStorage
+final class ExpiredSignatureStorage
 {
     private $cache;
     private $lifetime;

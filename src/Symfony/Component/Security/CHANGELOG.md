@@ -4,6 +4,11 @@ CHANGELOG
 5.3
 ---
 
+ * Add `RememberMeConditionsListener` to check if remember me is requested and supported, and set priority of `RememberMeListener` to -63
+ * Add `RememberMeHandlerInterface` and implementations, used as a replacement of `RememberMeServicesInterface` when using the AuthenticatorManager
+ * Add `TokenDeauthenticatedEvent` that is dispatched when the current security token is deauthenticated
+ * [BC break] Change constructor signature of `LoginLinkHandler` to `__construct(UrlGeneratorInterface $urlGenerator, UserProviderInterface $userProvider, SignatureHasher $signatureHashUtil, array $options)`
+ * Add `Core\Signature\SignatureHasher` and moved `Http\LoginLink\ExpiredLoginLinkStorage` to `Core\Signature\ExpiredLoginLinkStorage`
  * Deprecate `PersistentTokenInterface::getUsername()` in favor of `PersistentTokenInterface::getUserIdentifier()`
  * Deprecate `UsernameNotFoundException` in favor of `UserNotFoundException` and `getUsername()`/`setUsername()` in favor of `getUserIdentifier()`/`setUserIdentifier()`
  * Deprecate `UserProviderInterface::loadUserByUsername()` in favor of `UserProviderInterface::loadUserByIdentifier()`

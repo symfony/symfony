@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle;
 
-return [
-    new FrameworkBundle(),
-    new SecurityBundle(),
-];
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class RememberMeBundle extends Bundle
+{
+}

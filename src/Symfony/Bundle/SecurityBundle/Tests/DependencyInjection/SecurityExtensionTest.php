@@ -388,6 +388,27 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($secure, $definition->getArgument(3)['secure']);
     }
 
+    public function testCustomRememberMeHandler()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very', 'service' => 'custom_remember_me'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertEquals(\stdClass::class, $handler->getClass());
+        $this->assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
+    }
+
     public function sessionConfigurationProvider()
     {
         return [
@@ -661,12 +682,12 @@ class SecurityExtensionTest extends TestCase
         $security = new SecurityExtension();
         $container->registerExtension($security);
 
-        $bundle = new SecurityBundle();
-        $bundle->build($container);
-
         $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+        $bundle = new SecurityBundle();
+        $bundle->build($container);
 
         return $container;
     }

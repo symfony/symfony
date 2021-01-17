@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Security\RememberMe;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInter
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
- * This class provides storage for the tokens that is set in "remember me"
+ * This class provides storage for the tokens that is set in "remember-me"
  * cookies. This way no password secrets will be stored in the cookies on
  * the client machine, and thus the security is improved.
  *
@@ -53,8 +54,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     public function loadTokenBySeries(string $series)
     {
         // the alias for lastUsed works around case insensitivity in PostgreSQL
-        $sql = 'SELECT class, username, value, lastUsed AS last_used'
-            .' FROM rememberme_token WHERE series=:series';
+        $sql = 'SELECT class, username, value, lastUsed AS last_used FROM rememberme_token WHERE series=:series';
         $paramValues = ['series' => $series];
         $paramTypes = ['series' => \PDO::PARAM_STR];
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
@@ -87,8 +87,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
      */
     public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed)
     {
-        $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed'
-            .' WHERE series=:series';
+        $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed WHERE series=:series';
         $paramValues = [
             'value' => $tokenValue,
             'lastUsed' => $lastUsed,
@@ -114,9 +113,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
      */
     public function createNewToken(PersistentTokenInterface $token)
     {
-        $sql = 'INSERT INTO rememberme_token'
-            .' (class, username, series, value, lastUsed)'
-            .' VALUES (:class, :username, :series, :value, :lastUsed)';
+        $sql = 'INSERT INTO rememberme_token (class, username, series, value, lastUsed) VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
             'class' => $token->getClass(),
             // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
@@ -137,5 +134,33 @@ class DoctrineTokenProvider implements TokenProviderInterface
         } else {
             $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
         }
+    }
+
+    /**
+     * Adds the Table to the Schema if "remember me" uses this Connection.
+     */
+    public function configureSchema(Schema $schema, Connection $forConnection): void
+    {
+        // only update the schema for this connection
+        if ($forConnection !== $this->conn) {
+            return;
+        }
+
+        if ($schema->hasTable('rememberme_token')) {
+            return;
+        }
+
+        $this->addTableToSchema($schema);
+    }
+
+    private function addTableToSchema(Schema $schema): void
+    {
+        $table = $schema->createTable('rememberme_token');
+        $table->addColumn('series', Types::STRING, ['length' => 88]);
+        $table->addColumn('value', Types::STRING, ['length' => 88]);
+        $table->addColumn('lastUsed', Types::DATETIME_MUTABLE);
+        $table->addColumn('class', Types::STRING, ['length' => 100]);
+        $table->addColumn('username', Types::STRING, ['length' => 200]);
+        $table->setPrimaryKey(['series']);
     }
 }

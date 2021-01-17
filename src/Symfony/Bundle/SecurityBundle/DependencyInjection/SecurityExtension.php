@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
@@ -392,7 +393,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Context serializer listener
         if (false === $firewall['stateless']) {
             $contextKey = $firewall['context'] ?? $id;
-            $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey));
+            $listeners[] = new Reference($contextListenerId = $this->createContextListener($container, $contextKey, $this->authenticatorManagerEnabled ? $firewallEventDispatcherId : null));
             $sessionStrategyId = 'security.authentication.session_strategy';
 
             if ($this->authenticatorManagerEnabled) {
@@ -557,7 +558,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
     }
 
-    private function createContextListener(ContainerBuilder $container, string $contextKey)
+    private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
@@ -566,6 +567,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listenerId = 'security.context_listener.'.\count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
+        if (null !== $firewallEventDispatcherId) {
+            $listener->replaceArgument(4, new Reference($firewallEventDispatcherId));
+            $listener->addTag('kernel.event_listener', ['event' => KernelEvents::RESPONSE, 'method' => 'onKernelResponse']);
+        }
 
         return $this->contextListeners[$contextKey] = $listenerId;
     }

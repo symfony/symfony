@@ -13,18 +13,10 @@ security:
 
     firewalls:
         default:
+            logout: ~
             form_login:
                 check_path: login
                 remember_me: true
-            remember_me:
-                always_remember_me: true
-                secret: key
 
     access_control:
-        - { path: ^/foo, roles: ROLE_USER }
-
-services:
-    Symfony\Bundle\SecurityBundle\Tests\Functional\RememberMeUserProvider:
-        public: true
-        decorates: security.user.provider.concrete.in_memory
-        arguments: ['@Symfony\Bundle\SecurityBundle\Tests\Functional\RememberMeUserProvider.inner']
+        - { path: ^/profile, roles: ROLE_USER }

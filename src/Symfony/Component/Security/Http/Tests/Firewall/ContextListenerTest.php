@@ -106,6 +106,7 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
         $request = new Request();
+        $request->attributes->set('_security_firewall_run', true);
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
@@ -148,22 +149,18 @@ class ContextListenerTest extends TestCase
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $event = $this->createMock(RequestEvent::class);
-        $request = $this->createMock(Request::class);
         $session = $this->createMock(SessionInterface::class);
-
-        $event->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($request);
-        $request->expects($this->any())
-            ->method('hasPreviousSession')
-            ->willReturn(true);
-        $request->expects($this->any())
-            ->method('getSession')
-            ->willReturn($session);
+        $session->expects($this->any())->method('getName')->willReturn('SESSIONNAME');
         $session->expects($this->any())
             ->method('get')
             ->with('_security_key123')
             ->willReturn($token);
+        $request = new Request([], [], [], ['SESSIONNAME' => true]);
+        $request->setSession($session);
+
+        $event->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($request);
         $tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
@@ -196,7 +193,7 @@ class ContextListenerTest extends TestCase
             ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->willReturn($this->createMock(Request::class));
+            ->willReturn(new Request());
 
         $dispatcher->expects($this->once())
             ->method('addListener')
@@ -208,18 +205,15 @@ class ContextListenerTest extends TestCase
     public function testOnKernelResponseListenerRemovesItself()
     {
         $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->any())->method('getName')->willReturn('SESSIONNAME');
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $listener = new ContextListener($tokenStorage, [], 'key123', null, $dispatcher);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->any())
-            ->method('hasSession')
-            ->willReturn(true);
-        $request->expects($this->any())
-            ->method('getSession')
-            ->willReturn($session);
+        $request = new Request();
+        $request->attributes->set('_security_firewall_run', true);
+        $request->setSession($session);
 
         $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, new Response());
 
@@ -232,8 +226,7 @@ class ContextListenerTest extends TestCase
 
     public function testHandleRemovesTokenIfNoPreviousSessionWasFound()
     {
-        $request = $this->createMock(Request::class);
-        $request->expects($this->any())->method('hasPreviousSession')->willReturn(false);
+        $request = new Request();
 
         $event = $this->createMock(RequestEvent::class);
         $event->expects($this->any())->method('getRequest')->willReturn($request);
@@ -377,6 +370,7 @@ class ContextListenerTest extends TestCase
     {
         $session = new Session(new MockArraySessionStorage());
         $request = new Request();
+        $request->attributes->set('_security_firewall_run', true);
         $request->setSession($session);
         $requestStack = new RequestStack();
         $requestStack->push($request);

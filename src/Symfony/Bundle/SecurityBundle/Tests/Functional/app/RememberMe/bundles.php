@@ -11,10 +11,10 @@
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
-use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\TestBundle;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\RememberMeBundle;
 
 return [
     new FrameworkBundle(),
     new SecurityBundle(),
-    new TestBundle(),
+    new RememberMeBundle(),
 ];

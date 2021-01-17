@@ -113,18 +113,24 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
                 ->replaceArgument(1, $config['lifetime']);
         }
 
+        $signatureHasherId = 'security.authenticator.login_link_signature_hasher.'.$firewallName;
+        $container
+            ->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.abstract_login_link_signature_hasher'))
+            ->replaceArgument(1, $config['signature_properties'])
+            ->replaceArgument(3, $expiredStorageId ? new Reference($expiredStorageId) : null)
+            ->replaceArgument(4, $config['max_uses'] ?? null)
+        ;
+
         $linkerId = 'security.authenticator.login_link_handler.'.$firewallName;
         $linkerOptions = [
             'route_name' => $config['check_route'],
             'lifetime' => $config['lifetime'],
-            'max_uses' => $config['max_uses'] ?? null,
         ];
         $container
             ->setDefinition($linkerId, new ChildDefinition('security.authenticator.abstract_login_link_handler'))
             ->replaceArgument(1, new Reference($userProviderId))
-            ->replaceArgument(3, $config['signature_properties'])
-            ->replaceArgument(5, $linkerOptions)
-            ->replaceArgument(6, $expiredStorageId ? new Reference($expiredStorageId) : null)
+            ->replaceArgument(2, new Reference($signatureHasherId))
+            ->replaceArgument(3, $linkerOptions)
             ->addTag('security.authenticator.login_linker', ['firewall' => $firewallName])
         ;
 

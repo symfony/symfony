@@ -17,6 +17,7 @@ use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -285,6 +286,22 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         $response->setCallback($callback);
+
+        return $response;
+    }
+
+    /**
+     * Renders a form.
+     *
+     * The FormView instance is passed to the template in a variable named "form".
+     * If the form is invalid, a 422 status code is returned.
+     */
+    public function renderForm(string $view, FormInterface $form, array $parameters = [], Response $response = null): Response
+    {
+        $response = $this->render($view, ['form' => $form->createView()] + $parameters, $response);
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         return $response;
     }

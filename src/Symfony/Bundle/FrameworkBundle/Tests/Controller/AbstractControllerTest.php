@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,6 +33,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\Link;
+use Twig\Environment;
 
 class AbstractControllerTest extends TestCase
 {
@@ -371,7 +374,7 @@ class AbstractControllerTest extends TestCase
 
     public function testRenderViewTwig()
     {
-        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -385,7 +388,7 @@ class AbstractControllerTest extends TestCase
 
     public function testRenderTwig()
     {
-        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
@@ -399,7 +402,7 @@ class AbstractControllerTest extends TestCase
 
     public function testStreamTwig()
     {
-        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -408,6 +411,52 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $controller->stream('foo'));
+    }
+
+    public function testRenderFormTwig()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['form' => $formView, 'bar' => 'bar'])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', $form, ['bar' => 'bar']);
+
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRenderInvalidFormTwig()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(false);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['form' => $formView, 'bar' => 'bar'])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', $form, ['bar' => 'bar']);
+
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertSame('bar', $response->getContent());
     }
 
     public function testRedirectToRoute()

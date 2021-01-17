@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T17:47:02Z
+
+> BTW, why isn't an `in_array()` there?
+
+legacy of the time where roles could be represented as objects compared by name.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2021-01-16T20:17:15Z
+
+As mentioned by @stof, this should be most likely be deprecated and removed after that as it was not officially (from legacy point of view) dropped to not support objects (at least AFAIK, but I may be missing something 😉).

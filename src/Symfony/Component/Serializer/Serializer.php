@@ -115,7 +115,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
         $this->encoder = new ChainEncoder($realEncoders);
         $this->decoder = new ChainDecoder($decoders);
-        $this->normalizerChooser = new NormalizerChooser();
+        $this->normalizerChooser = new NormalizerChooser($this, $this);
     }
 
     public function setNormalizerChooser(NormalizerChooserInterface $normalizerChooser): void

@@ -12,13 +12,24 @@
 namespace Symfony\Component\Serializer\Normalizer\Chooser;
 
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class NormalizerChooser implements NormalizerChooserInterface
 {
     private $normalizerCache = [];
     private $denormalizerCache = [];
+    private $normalizer;
+    private $denormalizer;
+
+    public function __construct(NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    {
+        $this->normalizer = $normalizer;
+        $this->denormalizer = $denormalizer;
+    }
 
     public function chooseNormalizer(array $normalizers, $data, ?string $format = null, array $context = []): ?NormalizerInterface
     {
@@ -30,6 +41,10 @@ class NormalizerChooser implements NormalizerChooserInterface
             foreach ($normalizers as $key => $normalizer) {
                 if (!$normalizer instanceof NormalizerInterface) {
                     continue;
+                }
+
+                if ($normalizer instanceof NormalizerAwareInterface) {
+                    $normalizer->setNormalizer($this->serializer);
                 }
 
                 if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
@@ -59,6 +74,10 @@ class NormalizerChooser implements NormalizerChooserInterface
             foreach ($denormalizers as $key => $denormalizer) {
                 if (!$denormalizer instanceof DenormalizerInterface) {
                     continue;
+                }
+
+                if ($denormalizer instanceof DenormalizerAwareInterface) {
+                    $denormalizer->setDenormalizer($this->denormalizer);
                 }
 
                 if (!$denormalizer instanceof CacheableSupportsMethodInterface || !$denormalizer->hasCacheableSupportsMethod()) {

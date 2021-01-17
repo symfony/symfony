@@ -41,7 +41,7 @@ class CacheNormalizerChooser implements NormalizerChooserInterface
         $item = $this->cacheItemPool->getItem($key);
 
         if ($item->isHit()) {
-            return $this->loadedNormalizers[$key] = $normalizers[$item->getKey()];
+            return $this->loadedNormalizers[$key] = $normalizers[$item->get()];
         }
 
         $normalizer = $this->loadedNormalizers[$key] = $this->decorated->chooseNormalizer($normalizers, $data, $format, $context);
@@ -60,7 +60,8 @@ class CacheNormalizerChooser implements NormalizerChooserInterface
 
     public function chooseDenormalizer(array $denormalizers, $data, string $class, ?string $format = null, array $context = []): ?DenormalizerInterface
     {
-        $key = $this->generateKey(false, $class, $format, $context);
+        $type = str_replace('\\', '-', $class);
+        $key = $this->generateKey(false, $type, $format, $context);
 
         if (isset($this->loadedDenormalizers[$key])) {
             return $this->loadedDenormalizers[$key];
@@ -69,7 +70,7 @@ class CacheNormalizerChooser implements NormalizerChooserInterface
         $item = $this->cacheItemPool->getItem($key);
 
         if ($item->isHit()) {
-            return $this->loadedDenormalizers[$key] = $denormalizers[$item->getKey()];
+            return $this->loadedDenormalizers[$key] = $denormalizers[$item->get()];
         }
 
         $denormalizer = $this->loadedDenormalizers[$key] = $this->decorated->chooseDenormalizer($denormalizers, $data, $class, $format, $context);

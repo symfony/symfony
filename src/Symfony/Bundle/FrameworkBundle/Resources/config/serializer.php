@@ -151,6 +151,7 @@ return static function (ContainerConfigurator $container) {
 
         // Normalizer chooser
         ->set('serializer.normalizer_chooser', NormalizerChooser::class)
+            ->args([service('serializer'), service('serializer')])
 
         ->alias(NormalizerChooserInterface::class, 'serializer.normalizer_chooser')
 
@@ -184,7 +185,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 [],
                 abstract_arg('The normalization providers'),
-                param('serializer.normalizer_chooser.cache.file')
+                param('serializer.normalizer_chooser.cache.file'),
+                service('serializer'),
+                service('serializer')
             ])
             ->tag('kernel.cache_warmer')
 
@@ -195,7 +198,7 @@ return static function (ContainerConfigurator $container) {
         ->set('serializer.normalizer_chooser.cache', CacheNormalizerChooser::class)
             ->decorate('serializer.normalizer_chooser')
             ->args([
-                service('serializer.normalizer_chooser.chooser.inner'),
+                service('serializer.normalizer_chooser.cache.inner'),
                 service('serializer.normalizer_chooser.cache.symfony')
             ])
 

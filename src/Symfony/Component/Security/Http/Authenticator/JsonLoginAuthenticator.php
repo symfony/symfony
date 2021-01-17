@@ -126,10 +126,10 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         if (null === $this->failureHandler) {
-            $errorMessage = $exception->getMessageKey();
-
             if (null !== $this->translator) {
                 $errorMessage = $this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'security');
+            } else {
+                $errorMessage = strtr($exception->getMessageKey(), $exception->getMessageData());
             }
 
             return new JsonResponse(['error' => $errorMessage], JsonResponse::HTTP_UNAUTHORIZED);

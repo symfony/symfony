@@ -71,6 +71,7 @@ class DoctrineExtractorTest extends TestCase
             'indexedByDt',
             'indexedByCustomType',
             'indexedBuz',
+            'dummyGeneratedValueList',
         ]);
 
         $this->assertEquals(
@@ -196,6 +197,14 @@ class DoctrineExtractorTest extends TestCase
                 Collection::class,
                 true,
                 new Type(Type::BUILTIN_TYPE_STRING),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
+            )]],
+            ['dummyGeneratedValueList', [new Type(
+                Type::BUILTIN_TYPE_OBJECT,
+                false,
+                'Doctrine\Common\Collections\Collection',
+                true,
+                new Type(Type::BUILTIN_TYPE_INT),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
             )]],
             ['json', null],

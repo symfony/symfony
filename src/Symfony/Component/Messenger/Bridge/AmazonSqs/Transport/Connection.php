@@ -276,7 +276,9 @@ class Connection
         $parameters = ['QueueName' => $this->configuration['queue_name']];
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['FifoQueue'] = true;
+            $parameters['Attributes'] = [
+                'FifoQueue' => 'true',
+            ];
         }
 
         $this->client->createQueue($parameters);

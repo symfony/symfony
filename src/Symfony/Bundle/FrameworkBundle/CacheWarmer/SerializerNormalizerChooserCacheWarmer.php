@@ -15,6 +15,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Cache\CacheNormalizationProviderInterface;
 use Symfony\Component\Serializer\Normalizer\Chooser\CacheNormalizerChooser;
 use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooser;
+use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooserInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -24,20 +25,23 @@ class SerializerNormalizerChooserCacheWarmer extends AbstractPhpFileCacheWarmer
     private $normalizationProviders;
     private $normalizer;
     private $denormalizer;
+    /**
+     * @var NormalizerChooserInterface
+     */
+    private $normalizerChooser;
 
-    public function __construct(array $normalizers, array $cacheNormalizationProviders, string $phpArrayFile, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    public function __construct(array $normalizers, array $cacheNormalizationProviders, string $phpArrayFile, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer, NormalizerChooserInterface $normalizerChooser)
     {
         parent::__construct($phpArrayFile);
         $this->normalizers = $normalizers;
         $this->normalizationProviders = $cacheNormalizationProviders;
         $this->normalizer = $normalizer;
         $this->denormalizer = $denormalizer;
+        $this->normalizerChooser = $normalizerChooser;
     }
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter)
     {
-        $chooser = new CacheNormalizerChooser(new NormalizerChooser($this->normalizer, $this->denormalizer), $arrayAdapter);
-
         foreach ($this->normalizationProviders as $normalizationProvider) {
             if (!$normalizationProvider instanceof CacheNormalizationProviderInterface) {
                 continue;
@@ -48,8 +52,8 @@ class SerializerNormalizerChooserCacheWarmer extends AbstractPhpFileCacheWarmer
                 $data = $normalizationContext[1];
                 $context = $normalizationContext[2] ?? [];
 
-                $chooser->chooseNormalizer($this->normalizers, $data, $format, $context);
-                $chooser->chooseDenormalizer($this->normalizers, $data, get_class($data), $format, $context);
+                $this->normalizerChooser->chooseNormalizer($this->normalizers, $data, $format, $context);
+                $this->normalizerChooser->chooseDenormalizer($this->normalizers, $data, get_class($data), $format, $context);
             }
         }
 

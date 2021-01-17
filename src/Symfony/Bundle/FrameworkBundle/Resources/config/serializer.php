@@ -187,7 +187,8 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('The normalization providers'),
                 param('serializer.normalizer_chooser.cache.file'),
                 service('serializer'),
-                service('serializer')
+                service('serializer'),
+                service('serializer.normalizer_chooser')
             ])
             ->tag('kernel.cache_warmer')
 

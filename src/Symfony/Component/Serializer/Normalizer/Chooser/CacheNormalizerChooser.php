@@ -50,14 +50,6 @@ class CacheNormalizerChooser implements NormalizerChooserInterface
         return $normalizer;
     }
 
-    private function generateKey(bool $normalize, string $type, ?string $format, array $context = []): string
-    {
-        $compiledFormat = null !== $format ? '_'.$format : '';
-        $compiledContext = count($context) ? '_'.hash('md5', json_encode($context)) : '';
-
-        return sprintf('%s%s_%s%s', $normalize ? 'normalizer' : 'denormalizer', $compiledFormat, $type, $compiledContext);
-    }
-
     public function chooseDenormalizer(array $denormalizers, $data, string $class, ?string $format = null, array $context = []): ?DenormalizerInterface
     {
         $type = str_replace('\\', '-', $class);
@@ -77,5 +69,13 @@ class CacheNormalizerChooser implements NormalizerChooserInterface
         $this->cacheItemPool->save($item->set(array_search($denormalizer, $denormalizers)));
 
         return $denormalizer;
+    }
+
+    private function generateKey(bool $normalize, string $type, ?string $format, array $context = []): string
+    {
+        $compiledFormat = null !== $format ? '_'.$format : '';
+        $compiledContext = count($context) ? '_'.hash('md5', json_encode($context)) : '';
+
+        return sprintf('%s%s_%s%s', $normalize ? 'normalizer' : 'denormalizer', $compiledFormat, $type, $compiledContext);
     }
 }

@@ -44,7 +44,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -179,8 +178,6 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
-    use PriorityTaggedServiceTrait;
-
     private $formConfigEnabled = false;
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
@@ -1642,12 +1639,6 @@ class FrameworkExtension extends Extension
             $defaultContext += ['max_depth_handler' => new Reference($config['max_depth_handler'])];
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(6, $defaultContext);
         }
-
-        $cacheWarmer = $container->getDefinition('serializer.normalizer_chooser.cache_warmer');
-        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
-        $providers = $this->findAndSortTaggedServices('serializer.normalizer_chooser.cache.provider', $container);
-        $cacheWarmer->setArgument(0, $normalizers);
-        $cacheWarmer->setArgument(1, $providers);
     }
 
     private function registerPropertyInfoConfiguration(ContainerBuilder $container, PhpFileLoader $loader)

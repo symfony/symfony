@@ -30,11 +30,11 @@ class SerializerNormalizerChooserCacheWarmer extends AbstractPhpFileCacheWarmer
      */
     private $normalizerChooser;
 
-    public function __construct(array $normalizers, array $cacheNormalizationProviders, string $phpArrayFile, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer, NormalizerChooserInterface $normalizerChooser)
+    public function __construct(array $normalizers, array $normalizationProviders, string $phpArrayFile, NormalizerInterface $normalizer, DenormalizerInterface $denormalizer, NormalizerChooserInterface $normalizerChooser)
     {
         parent::__construct($phpArrayFile);
         $this->normalizers = $normalizers;
-        $this->normalizationProviders = $cacheNormalizationProviders;
+        $this->normalizationProviders = $normalizationProviders;
         $this->normalizer = $normalizer;
         $this->denormalizer = $denormalizer;
         $this->normalizerChooser = $normalizerChooser;

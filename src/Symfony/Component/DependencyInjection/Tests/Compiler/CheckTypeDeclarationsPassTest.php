@@ -726,7 +726,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foobar', Deprecated::class)
-            ->setDeprecated(true)
+            ->setDeprecated('foo/bar', '1.2.3', '')
         ;
 
         (new CheckTypeDeclarationsPass(true))->process($container);

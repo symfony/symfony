@@ -188,10 +188,10 @@ class UsernamePasswordJsonAuthenticationListener extends AbstractListener
         }
 
         if (!$this->failureHandler) {
-            $errorMessage = $failed->getMessageKey();
-
             if (null !== $this->translator) {
                 $errorMessage = $this->translator->trans($failed->getMessageKey(), $failed->getMessageData(), 'security');
+            } else {
+                $errorMessage = strtr($failed->getMessageKey(), $failed->getMessageData());
             }
 
             return new JsonResponse(['error' => $errorMessage], 401);

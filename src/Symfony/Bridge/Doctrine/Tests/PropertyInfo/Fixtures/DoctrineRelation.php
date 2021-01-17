@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @Entity
@@ -60,4 +61,15 @@ class DoctrineRelation
      * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="indexedBuz")
      */
     protected $buzField;
+
+    /**
+     * @ManyToOne(targetEntity="DoctrineDummy", inversedBy="dummyGeneratedValueList")
+     */
+    private $dummyRelation;
+
+    /**
+     * @ManyToOne(targetEntity="DoctrineGeneratedValue", inversedBy="relationList")
+     * @JoinColumn(name="gen_value_col_id", referencedColumnName="gen_value_col_id")
+     */
+    private $generatedValueRelation;
 }

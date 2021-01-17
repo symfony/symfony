@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarMethodCall;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\BarOptionalArgumentNotNull;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Deprecated;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Foo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\FooObject;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\UnionConstructor;
@@ -716,6 +717,19 @@ class CheckTypeDeclarationsPassTest extends TestCase
             ->addMethodCall('setArray', ['a string']);
 
         (new CheckTypeDeclarationsPass(true, ['foobar' => true]))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSkipsDeprecatedDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foobar', Deprecated::class)
+            ->setDeprecated(true)
+        ;
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
 
         $this->addToAssertionCount(1);
     }

@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate the `NamespacedAttributeBag` class
  * added `ResponseFormatSame` PHPUnit constraint
 
 5.2.0

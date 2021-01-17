@@ -79,6 +79,7 @@ FrameworkBundle
 HttpFoundation
 --------------
 
+ * Remove the `NamespacedAttributeBag` class
  * Removed `Response::create()`, `JsonResponse::create()`,
    `RedirectResponse::create()`, `StreamedResponse::create()` and
    `BinaryFileResponse::create()` methods (use `__construct()` instead)

@@ -122,7 +122,7 @@ class AppVariableTest extends TestCase
 
     public function testEnvironmentNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getEnvironment());
     }
 
@@ -134,14 +134,14 @@ class AppVariableTest extends TestCase
 
     public function testDebugNotSetStrictVariables()
     {
-        $this->setTwig(true);
+        $this->appVariable->setStrictVariables(true);
         $this->expectException('RuntimeException');
         $this->appVariable->getDebug();
     }
 
     public function testDebugNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getDebug());
     }
 
@@ -153,14 +153,14 @@ class AppVariableTest extends TestCase
 
     public function testGetTokenWithTokenStorageNotSetStrictVariables()
     {
-        $this->setTwig(true);
+        $this->appVariable->setStrictVariables(true);
         $this->expectException('RuntimeException');
         $this->appVariable->getToken();
     }
 
     public function testGetTokenWithTokenStorageNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getToken());
     }
 
@@ -172,14 +172,14 @@ class AppVariableTest extends TestCase
 
     public function testGetUserWithTokenStorageNotSetStrictVariables()
     {
-        $this->setTwig(true);
+        $this->appVariable->setStrictVariables(true);
         $this->expectException('RuntimeException');
         $this->appVariable->getUser();
     }
 
     public function testGetUserWithTokenStorageNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getUser());
     }
 
@@ -191,14 +191,14 @@ class AppVariableTest extends TestCase
 
     public function testGetRequestWithRequestStackNotSetStrictVariables()
     {
-        $this->setTwig(true);
+        $this->appVariable->setStrictVariables(true);
         $this->expectException('RuntimeException');
         $this->appVariable->getRequest();
     }
 
     public function testGetRequestWithRequestStackNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getRequest());
     }
 
@@ -210,14 +210,14 @@ class AppVariableTest extends TestCase
 
     public function testGetSessionWithRequestStackNotSetStrictVariables()
     {
-        $this->setTwig(true);
+        $this->appVariable->setStrictVariables(true);
         $this->expectException('RuntimeException');
         $this->appVariable->getSession();
     }
 
     public function testGetSessionWithRequestStackNotSetNotStrictVariables()
     {
-        $this->setTwig(false);
+        $this->appVariable->setStrictVariables(false);
         $this->assertNull($this->appVariable->getSession());
     }
 
@@ -332,12 +332,5 @@ class AppVariableTest extends TestCase
         $this->setRequestStack($request);
 
         return $flashMessages;
-    }
-
-    private function setTwig(bool $strictVariables = true)
-    {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
-        $twig->method('isStrictVariables')->willReturn($strictVariables);
-        $this->appVariable->setTwig($twig);
     }
 }

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Twig\Environment;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -29,7 +28,6 @@ class AppVariable
     private $requestStack;
     private $environment;
     private $debug;
-    private $twig;
     private $strictVariables = true;
 
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
@@ -50,12 +48,6 @@ class AppVariable
     public function setDebug(bool $debug)
     {
         $this->debug = $debug;
-    }
-
-    public function setTwig(Environment $twig)
-    {
-        $this->twig = $twig;
-        $this->setStrictVariables($twig->isStrictVariables());
     }
 
     public function setStrictVariables(bool $strictVariables)

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Notifier\Bridge\OvhCloud\Tests;
 
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -43,5 +45,40 @@ final class OvhCloudTransportTest extends TransportTestCase
     {
         yield [new ChatMessage('Hello!')];
         yield [$this->createMock(MessageInterface::class)];
+    }
+
+    public function validMessagesProvider(): iterable
+    {
+        yield 'without a slash' => ['hello'];
+        yield 'including a slash' => ['hel/lo'];
+    }
+
+    /**
+     * @group time-sensitive
+     *
+     * @dataProvider validMessagesProvider
+     */
+    public function testValidSignature(string $message)
+    {
+        $smsMessage = new SmsMessage('0611223344', $message);
+
+        $time = time();
+
+        $lastResponse = new MockResponse();
+        $responses = [
+            new MockResponse((string) $time),
+            $lastResponse,
+        ];
+
+        $transport = $this->createTransport(new MockHttpClient($responses));
+        $transport->send($smsMessage);
+
+        $body = $lastResponse->getRequestOptions()['body'];
+        $headers = $lastResponse->getRequestOptions()['headers'];
+        $signature = explode(': ', $headers[4])[1];
+
+        $endpoint = 'https://eu.api.ovh.com/1.0/sms/serviceName/jobs';
+        $toSign = 'applicationSecret+consumerKey+POST+'.$endpoint.'+'.$body.'+'.$time;
+        $this->assertSame('$1$'.sha1($toSign), $signature);
     }
 }

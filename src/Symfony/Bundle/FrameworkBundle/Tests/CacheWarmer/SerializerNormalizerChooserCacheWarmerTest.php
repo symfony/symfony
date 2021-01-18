@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerNormalizerChooserCacheW
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Serializer\Cache\CacheNormalizationProviderInterface;
+use Symfony\Component\Serializer\Normalizer\Chooser\NormalizerChooserInterface;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -39,8 +40,15 @@ class SerializerNormalizerChooserCacheWarmerTest extends TestCase
             yield ['json', new \DateTime()];
         });
 
+        $dateTimeNormalizer = new DateTimeNormalizer();
+        $objectNormalizer = new ObjectNormalizer();
+
+        $decoratedNormalizerChooser = $this->createMock(NormalizerChooserInterface::class);
+        $decoratedNormalizerChooser->method('chooseNormalizer')->willReturn();
+        $decoratedNormalizerChooser->method('chooseDenormalizer')->willReturn();
+
         $cacheWarmer = new SerializerNormalizerChooserCacheWarmer(
-            [new DateTimeNormalizer(), new ObjectNormalizer()],
+            [$dateTimeNormalizer, $objectNormalizer],
             [$provider1, $provider2],
             $file
         );

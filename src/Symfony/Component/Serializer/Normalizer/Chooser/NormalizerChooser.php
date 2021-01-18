@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class NormalizerChooser implements NormalizerChooserInterface
@@ -24,11 +25,13 @@ class NormalizerChooser implements NormalizerChooserInterface
     private $denormalizerCache = [];
     private $normalizer;
     private $denormalizer;
+    private $serializer;
 
-    public function __construct(NormalizerInterface $normalizer, DenormalizerInterface $denormalizer)
+    public function __construct(NormalizerInterface $normalizer, DenormalizerInterface $denormalizer, SerializerInterface $serializer)
     {
         $this->normalizer = $normalizer;
         $this->denormalizer = $denormalizer;
+        $this->serializer = $serializer;
     }
 
     public function chooseNormalizer(array $normalizers, $data, ?string $format = null, array $context = []): ?NormalizerInterface
@@ -43,9 +46,7 @@ class NormalizerChooser implements NormalizerChooserInterface
                     continue;
                 }
 
-                if ($normalizer instanceof NormalizerAwareInterface) {
-                    $normalizer->setNormalizer($this->serializer);
-                }
+                $normalizer = $this->prepareNormalizer($normalizer);
 
                 if (!$normalizer instanceof CacheableSupportsMethodInterface || !$normalizer->hasCacheableSupportsMethod()) {
                     $this->normalizerCache[$format][$type][$key] = false;
@@ -76,9 +77,7 @@ class NormalizerChooser implements NormalizerChooserInterface
                     continue;
                 }
 
-                if ($denormalizer instanceof DenormalizerAwareInterface) {
-                    $denormalizer->setDenormalizer($this->denormalizer);
-                }
+                $denormalizer = $this->prepareNormalizer($denormalizer);
 
                 if (!$denormalizer instanceof CacheableSupportsMethodInterface || !$denormalizer->hasCacheableSupportsMethod()) {
                     $this->denormalizerCache[$format][$class][$key] = false;
@@ -97,5 +96,22 @@ class NormalizerChooser implements NormalizerChooserInterface
         }
 
         return null;
+    }
+
+    private function prepareNormalizer($normalizer)
+    {
+        if ($normalizer instanceof NormalizerAwareInterface) {
+            $normalizer->setNormalizer($this->normalizer);
+        }
+
+        if ($normalizer instanceof DenormalizerAwareInterface) {
+            $normalizer->setDenormalizer($this->denormalizer);
+        }
+
+        if ($normalizer instanceof SerializerAwareInterface) {
+            $normalizer->setSerializer($this->serializer);
+        }
+
+        return $normalizer;
     }
 }

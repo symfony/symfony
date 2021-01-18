@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-18T09:41:03Z
+
+Hey!
+
+I had a quick look at this PR, I think it is alright.
+
+I think @jschaedl has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-01-18T10:40:48Z
+
+Hi @nicolas-grekas,
+
+This has been introduced in the 5.x branch for the 5.3.
+So if we want the HttpClient to be 100% explicit, I can remove the condition `!class_exists(HttpClient::class)` and throw the exception with a better message ? It will be easier to test like that
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-18T10:50:52Z
+
+Yes please:
+`if (null === $this->httpClient && 0 === strpos(parse_url($this->manifestPath, \PHP_URL_SCHEME), 'http')) {`

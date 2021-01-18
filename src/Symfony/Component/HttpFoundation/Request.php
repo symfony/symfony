@@ -1836,15 +1836,9 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri).'/', '/'.$basename.'/')) {
-            // strip autoindex filename, for virtualhost based on URL path
-            $baseUrl = \dirname($baseUrl).'/';
-
-            $basename = basename($baseUrl);
-            if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri).'/', '/'.$basename.'/')) {
-                // no match whatsoever; set it blank
-                return '';
-            }
+        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
+            // no match whatsoever; set it blank
+            return '';
         }
 
         // If using mod_rewrite or ISAPI_Rewrite strip the script filename

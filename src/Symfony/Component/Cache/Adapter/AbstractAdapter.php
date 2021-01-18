@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
@@ -133,7 +134,12 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return MemcachedAdapter::createConnection($dsn, $options);
         }
         if (0 === strpos($dsn, 'couchbase:')) {
-            return CouchbaseBucketAdapter::createConnection($dsn, $options);
+            if (CouchbaseBucketAdapter::isSupported()) {
+                return CouchbaseBucketAdapter::createConnection($dsn, $options);
+            }
+
+            return CouchbaseCollectionAdapter::createConnection($dsn, $options);
+
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));

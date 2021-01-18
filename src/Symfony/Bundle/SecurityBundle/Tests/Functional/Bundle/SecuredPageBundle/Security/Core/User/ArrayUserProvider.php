@@ -34,7 +34,10 @@ class ArrayUserProvider implements UserProviderInterface
         $user = $this->getUser($username);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
+            $e = new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
+            $e->setUsername($username);
+
+            throw $e;
         }
 
         return $user;

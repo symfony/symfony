@@ -904,7 +904,7 @@ EOF;
 
                 $factoryCode = $asFile ? 'self::do($container, false)' : sprintf('$this->%s(false)', $methodName);
                 $factoryCode = $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $factoryCode);
-                $code .= $asFile ? preg_replace('/function \(([^)]*+)\) {/', 'function (\1) use ($container) {', $factoryCode) : $factoryCode;
+                $code .= $asFile ? preg_replace('/function \(([^)]*+)\)( {|:)/', 'function (\1) use ($container)\2', $factoryCode) : $factoryCode;
             }
 
             $c = $this->addServiceInclude($id, $definition);
@@ -934,8 +934,7 @@ EOF;
 
         if ($asFile) {
             $code = str_replace('$this', '$container', $code);
-            $code = str_replace('function () {', 'function () use ($container) {', $code);
-            $code = str_replace('function ($lazyLoad = true) {', 'function ($lazyLoad = true) use ($container) {', $code);
+            $code = preg_replace('/function \(([^)]*+)\)( {|:)/', 'function (\1) use ($container)\2', $code);
         }
 
         $code .= "    }\n";

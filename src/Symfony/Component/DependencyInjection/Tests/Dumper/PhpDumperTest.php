@@ -244,6 +244,26 @@ class PhpDumperTest extends TestCase
         $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
     }
 
+    public function testDumpAsFilesWithTypedReference()
+    {
+        $container = include self::$fixturesPath.'/containers/container10.php';
+        $container->getDefinition('foo')->addTag('hot');
+        $container->register('bar', 'stdClass');
+        $container->register('closure', 'stdClass')
+            ->setProperty('closures', [
+                new ServiceClosureArgument(new TypedReference('foo', \stdClass::class, $container::IGNORE_ON_UNINITIALIZED_REFERENCE)),
+            ])
+            ->setPublic(true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot', 'inline_factories_parameter' => false, 'inline_class_loader_parameter' => false]), true);
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
+        }
+
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services10_as_files.txt', $dump);
+    }
+
     public function testDumpAsFilesWithFactoriesInlined()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';

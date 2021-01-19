@@ -1475,9 +1475,15 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_access.xml');
 
+        // Support constructor signature of PropertyAccess 5.2 and up.
+        $magicCall = $config['magic_call'];
+        if (\defined('Symfony\Component\PropertyAccess\PropertyAccessor::MAGIC_CALL')) {
+            $magicCall = ($magicCall ? PropertyAccessor::MAGIC_CALL : 0) | PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET;
+        }
+
         $container
             ->getDefinition('property_accessor')
-            ->replaceArgument(0, $config['magic_call'])
+            ->replaceArgument(0, $magicCall)
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
         ;

@@ -26,6 +26,8 @@ install:
     - echo memory_limit=-1 >> php.ini-min
     - echo serialize_precision=-1 >> php.ini-min
     - echo max_execution_time=1200 >> php.ini-min
+    - echo post_max_size=4G >> php.ini-min
+    - echo upload_max_filesize=4G >> php.ini-min
     - echo date.timezone="America/Los_Angeles" >> php.ini-min
     - echo extension_dir=ext >> php.ini-min
     - echo extension=php_xsl.dll >> php.ini-min

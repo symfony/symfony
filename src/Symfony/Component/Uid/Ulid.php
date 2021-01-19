@@ -104,6 +104,9 @@ class Ulid extends AbstractUid
         return $this->uid;
     }
 
+    /**
+     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
+     */
     public function getTime(): float
     {
         $time = strtr(substr($this->uid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');

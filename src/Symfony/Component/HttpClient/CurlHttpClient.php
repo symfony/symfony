@@ -173,7 +173,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_DNS_USE_GLOBAL_CACHE] = false;
         }
 
-        if (\defined('CURLOPT_HEADEROPT')) {
+        if (\defined('CURLOPT_HEADEROPT') && \defined('CURLHEADER_SEPARATE')) {
             $curlopts[\CURLOPT_HEADEROPT] = \CURLHEADER_SEPARATE;
         }
 

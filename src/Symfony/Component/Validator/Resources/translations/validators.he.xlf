@@ -84,7 +84,7 @@
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>הערך קצר מידי. הוא צריך להכיל {{ limit }} תווים לפחות.|הערך קצר מידיץ הוא צריך להכיל {{ limit }} תווים לפחות.</target>
+                <target>הערך קצר מידי. הוא צריך להכיל {{ limit }} תווים לפחות.|הערך קצר מידי. הערך צריך להכיל {{ limit }} תווים לפחות.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>

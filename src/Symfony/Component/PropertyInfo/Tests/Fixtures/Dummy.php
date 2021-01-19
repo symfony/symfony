@@ -130,6 +130,8 @@ class Dummy extends ParentDummy
      */
     public $nestedIterators;
 
+    private $elements;
+
     public static function getStatic()
     {
     }
@@ -216,6 +218,10 @@ class Dummy extends ParentDummy
     }
 
     public function addDate(\DateTime $date)
+    {
+    }
+
+    public function hasElement(string $element): bool
     {
     }
 }

@@ -39,7 +39,8 @@
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/security-csrf": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/var-dumper": "^4.4|^5.0",
+        "symfony/uid": "^5.1"
     },
     "conflict": {
         "phpunit/phpunit": "<5.4.3",

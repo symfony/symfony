@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Symfony\Component\HttpFoundation\File\Exception\ExtensionFileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FormSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
@@ -33,7 +34,7 @@ class UploadedFileTest extends TestCase
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException(\Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException::class);
+        $this->expectException(FileNotFoundException::class);
 
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',
@@ -324,13 +325,16 @@ class UploadedFileTest extends TestCase
     {
         $size = UploadedFile::getMaxFilesize();
 
-        $this->assertIsInt($size);
+        if ($size > \PHP_INT_MAX) {
+            $this->assertIsFloat($size);
+        } else {
+            $this->assertIsInt($size);
+        }
+
         $this->assertGreaterThan(0, $size);
 
         if (0 === (int) ini_get('post_max_size') && 0 === (int) ini_get('upload_max_filesize')) {
             $this->assertSame(\PHP_INT_MAX, $size);
-        } else {
-            $this->assertLessThan(\PHP_INT_MAX, $size);
         }
     }
 }

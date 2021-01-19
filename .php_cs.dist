@@ -11,8 +11,6 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
-        'native_constant_invocation' => true,
-        'list_syntax' => ['syntax' => 'short'],
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

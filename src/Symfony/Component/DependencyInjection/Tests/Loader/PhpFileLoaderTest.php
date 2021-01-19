@@ -80,6 +80,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['php7'];
         yield ['anonymous'];
         yield ['lazy_fqcn'];
+        yield ['remove'];
     }
 
     public function testAutoConfigureAndChildDefinition()

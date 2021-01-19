@@ -1764,8 +1764,8 @@ class RequestTest extends TestCase
                     'SCRIPT_NAME' => '/foo/app.php',
                     'PHP_SELF' => '/foo/app.php',
                 ],
-                '/sub/foo',
-                '/bar',
+                '',
+                '/sub/foo/bar',
             ],
             [
                 '/sub/foo/app.php/bar',
@@ -1784,8 +1784,18 @@ class RequestTest extends TestCase
                     'SCRIPT_NAME' => '/foo/app2.phpx',
                     'PHP_SELF' => '/foo/app2.phpx',
                 ],
-                '/sub/foo',
-                '/bar/baz',
+                '',
+                '/sub/foo/bar/baz',
+            ],
+            [
+                '/foo/api/bar',
+                [
+                    'SCRIPT_FILENAME' => '/var/www/api/index.php',
+                    'SCRIPT_NAME' => '/api/index.php',
+                    'PHP_SELF' => '/api/index.php',
+                ],
+                '',
+                '/foo/api/bar',
             ],
         ];
     }

@@ -459,14 +459,12 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
             // it correctly parses the maxSize option and not only uses simple string comparison
-            // 1000M should be bigger than the ini value
+            // 1000G should be bigger than the ini value
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => $limit,
                 '{{ suffix }}' => $suffix,
-            ], '1000M'];
+            ], '1000G'];
 
-            // it correctly parses the maxSize option and not only uses simple string comparison
-            // 1000M should be bigger than the ini value
             $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => '0.1',
                 '{{ suffix }}' => 'MB',

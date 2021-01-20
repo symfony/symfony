@@ -79,6 +79,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Intl\DateIntervalFormatter\DateIntervalFormatterInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
@@ -574,6 +575,10 @@ class FrameworkExtension extends Extension
             'kernel.locale_aware',
             'kernel.reset',
         ]);
+
+        if (class_exists(DateIntervalFormatterInterface::class)) {
+            $loader->load('intl.php');
+        }
     }
 
     /**

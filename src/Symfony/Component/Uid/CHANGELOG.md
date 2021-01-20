@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `AbstractUid::fromBinary()`, `AbstractUid::fromBase58()`, `AbstractUid::fromBase32()` and `AbstractUid::fromRfc4122()`
+
 5.2.0
 -----
 

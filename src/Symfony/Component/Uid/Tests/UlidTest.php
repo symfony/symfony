@@ -118,4 +118,96 @@ class UlidTest extends TestCase
         $this->assertLessThan(0, $b->compare($c));
         $this->assertGreaterThan(0, $c->compare($b));
     }
+
+    public function testFromBinary()
+    {
+        $this->assertEquals(
+            Ulid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Ulid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
+        );
+
+        foreach ([
+            '01EW2RYKDCT2SAK454KBR2QG08',
+            '1BVXue8CnY8ogucrHX3TeF',
+            '0177058f-4dac-d0b2-a990-a49af02bc008',
+        ] as $ulid) {
+            try {
+                Ulid::fromBinary($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromBase58()
+    {
+        $this->assertEquals(
+            Ulid::fromString('1BVXue8CnY8ogucrHX3TeF'),
+            Ulid::fromBase58('1BVXue8CnY8ogucrHX3TeF')
+        );
+
+        foreach ([
+            "\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08",
+            '01EW2RYKDCT2SAK454KBR2QG08',
+            '0177058f-4dac-d0b2-a990-a49af02bc008',
+        ] as $ulid) {
+            try {
+                Ulid::fromBase58($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromBase32()
+    {
+        $this->assertEquals(
+            Ulid::fromString('01EW2RYKDCT2SAK454KBR2QG08'),
+            Ulid::fromBase32('01EW2RYKDCT2SAK454KBR2QG08')
+        );
+
+        foreach ([
+            "\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08",
+            '1BVXue8CnY8ogucrHX3TeF',
+            '0177058f-4dac-d0b2-a990-a49af02bc008',
+        ] as $ulid) {
+            try {
+                Ulid::fromBase32($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromRfc4122()
+    {
+        $this->assertEquals(
+            Ulid::fromString('0177058f-4dac-d0b2-a990-a49af02bc008'),
+            Ulid::fromRfc4122('0177058f-4dac-d0b2-a990-a49af02bc008')
+        );
+
+        foreach ([
+            "\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08",
+            '01EW2RYKDCT2SAK454KBR2QG08',
+            '1BVXue8CnY8ogucrHX3TeF',
+        ] as $ulid) {
+            try {
+                Ulid::fromRfc4122($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
 }

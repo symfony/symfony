@@ -193,4 +193,96 @@ class UuidTest extends TestCase
         $this->assertInstanceOf(NilUuid::class, $uuid);
         $this->assertSame('00000000-0000-0000-0000-000000000000', (string) $uuid);
     }
+
+    public function testFromBinary()
+    {
+        $this->assertEquals(
+            Uuid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
+            Uuid::fromBinary("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08")
+        );
+
+        foreach ([
+            '01EW2RYKDCT2SAK454KBR2QG08',
+            '1BVXue8CnY8ogucrHX3TeF',
+            '0177058f-4dac-d0b2-a990-a49af02bc008',
+        ] as $ulid) {
+            try {
+                Uuid::fromBinary($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromBase58()
+    {
+        $this->assertEquals(
+            UuidV1::fromString('94fSqj9oxGtsNbkfQNntwx'),
+            UuidV1::fromBase58('94fSqj9oxGtsNbkfQNntwx')
+        );
+
+        foreach ([
+            "\x41\x4C\x08\x92\x57\x1B\x11\xEB\xBF\x70\x93\xF9\xB0\x82\x2C\x57",
+            '219G494NRV27NVYW4KZ6R84B2Q',
+            '414c0892-571b-11eb-bf70-93f9b0822c57',
+        ] as $ulid) {
+            try {
+                UuidV1::fromBase58($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromBase32()
+    {
+        $this->assertEquals(
+            UuidV5::fromString('2VN0S74HBDBB0AQRXAHFVG35KK'),
+            UuidV5::fromBase32('2VN0S74HBDBB0AQRXAHFVG35KK')
+        );
+
+        foreach ([
+            "\x5B\xA8\x32\x72\x45\x6D\x5A\xC0\xAB\xE3\xAA\x8B\xF7\x01\x96\x73",
+            'CKTRYycTes6WAqSQJsTDaz',
+            '5ba83272-456d-5ac0-abe3-aa8bf7019673',
+        ] as $ulid) {
+            try {
+                Ulid::fromBase32($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
+
+    public function testFromRfc4122()
+    {
+        $this->assertEquals(
+            UuidV6::fromString('1eb571b4-14c0-6893-bf70-2d4c83cf755a'),
+            UuidV6::fromRfc4122('1eb571b4-14c0-6893-bf70-2d4c83cf755a')
+        );
+
+        foreach ([
+            "\x1E\xB5\x71\xB4\x14\xC0\x68\x93\xBF\x70\x2D\x4C\x83\xCF\x75\x5A",
+            '0YPNRV8560D29VYW1D9J1WYXAT',
+            '4nwTLZ2TdMtTVDE5AwVjaR',
+        ] as $ulid) {
+            try {
+                Ulid::fromRfc4122($ulid);
+
+                $this->fail();
+            } catch (\Throwable $e) {
+            }
+
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
+        }
+    }
 }

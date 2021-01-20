@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-06T06:56:39Z
+
+friendly ping @dunglas 🙂
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-12-08T12:47:48Z
+
+In order to make it work, https://github.com/symfony/mercure-bundle/pull/36 has to be merged.
+Indeed, this PR adds a `mercure.publisher` tag on each publisher service so that they can be discovered.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2020-12-21T16:16:57Z
+
+Thank you very much for these reviews @OskarStark!

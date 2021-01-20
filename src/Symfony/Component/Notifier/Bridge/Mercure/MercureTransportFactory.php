@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -47,6 +48,10 @@ final class MercureTransportFactory extends AbstractTransportFactory
 
         $publisherId = $dsn->getHost();
         if (!$this->publisherLocator->has($publisherId)) {
+            if (!class_exists(MercureBundle::class) && !$this->publisherLocator->getProvidedServices()) {
+                throw new LogicException('No publishers found. Did you forget to install the MercureBundle? Try running "composer require symfony/mercure-bundle".');
+            }
+
             throw new LogicException(sprintf('"%s" not found. Did you mean one of: %s?', $publisherId, implode(', ', array_keys($this->publisherLocator->getProvidedServices()))));
         }
 

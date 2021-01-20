@@ -35,6 +35,7 @@ class ListCommand extends Command
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
+                new InputOption('short', null, InputOption::VALUE_NONE, 'To skip describing commands\' arguments'),
             ])
             ->setDescription('Lists commands')
             ->setHelp(<<<'EOF'
@@ -68,6 +69,7 @@ EOF
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
             'namespace' => $input->getArgument('namespace'),
+            'short' => $input->getOption('short'),
         ]);
 
         return 0;

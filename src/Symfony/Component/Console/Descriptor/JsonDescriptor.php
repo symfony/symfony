@@ -58,7 +58,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeCommand(Command $command, array $options = [])
     {
-        $this->writeData($this->getCommandData($command), $options);
+        $this->writeData($this->getCommandData($command, $options['short'] ?? false), $options);
     }
 
     /**
@@ -71,7 +71,7 @@ class JsonDescriptor extends Descriptor
         $commands = [];
 
         foreach ($description->getCommands() as $command) {
-            $commands[] = $this->getCommandData($command);
+            $commands[] = $this->getCommandData($command, $options['short'] ?? false);
         }
 
         $data = [];
@@ -153,17 +153,29 @@ class JsonDescriptor extends Descriptor
         return ['arguments' => $inputArguments, 'options' => $inputOptions];
     }
 
-    private function getCommandData(Command $command): array
+    private function getCommandData(Command $command, bool $short = false): array
     {
-        $command->mergeApplicationDefinition(false);
-
-        return [
+        $data = [
             'name' => $command->getName(),
-            'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
             'description' => $command->getDescription(),
-            'help' => $command->getProcessedHelp(),
-            'definition' => $this->getInputDefinitionData($command->getDefinition()),
-            'hidden' => $command->isHidden(),
         ];
+
+        if ($short) {
+            $data += [
+                'usage' => $command->getAliases(),
+            ];
+        } else {
+            $command->mergeApplicationDefinition(false);
+
+            $data += [
+                'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
+                'help' => $command->getProcessedHelp(),
+                'definition' => $this->getInputDefinitionData($command->getDefinition()),
+            ];
+        }
+
+        $data['hidden'] = $command->isHidden();
+
+        return $data;
     }
 }

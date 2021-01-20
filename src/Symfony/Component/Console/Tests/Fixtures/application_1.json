@@ -107,7 +107,7 @@
             "name": "list",
             "hidden": false,
             "usage": [
-                "list [--raw] [--format FORMAT] [--] [<namespace>]"
+                "list [--raw] [--format FORMAT] [--short] [--] [<namespace>]"
             ],
             "description": "Lists commands",
             "help": "The <info>list<\/info> command lists all commands:\n\n  <info>app\/console list<\/info>\n\nYou can also display the commands for a specific namespace:\n\n  <info>app\/console list test<\/info>\n\nYou can also output the information in other formats by using the <comment>--format<\/comment> option:\n\n  <info>app\/console list --format=xml<\/info>\n\nIt's also possible to get raw list of commands (useful for embedding command runner):\n\n  <info>app\/console list --raw<\/info>",
@@ -201,6 +201,15 @@
                         "is_value_required": false,
                         "is_multiple": false,
                         "description": "Do not ask any interactive question",
+                        "default": false
+                    },
+                    "short": {
+                        "name": "--short",
+                        "shortcut": "",
+                        "accept_value": false,
+                        "is_value_required": false,
+                        "is_multiple": false,
+                        "description": "To skip describing commands' arguments",
                         "default": false
                     }
                 }

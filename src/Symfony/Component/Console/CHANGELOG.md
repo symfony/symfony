@@ -8,6 +8,7 @@ CHANGELOG
  * Add `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options
  * Add the `Command::$defaultDescription` static property and the `description` attribute
    on the `console.command` tag to allow the `list` command to instantiate commands lazily
+ * Add option `--short` to the `list` command
 
 5.2.0
 -----

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 
@@ -117,5 +118,10 @@ class UlidTest extends TestCase
 
         $this->assertLessThan(0, $b->compare($c));
         $this->assertGreaterThan(0, $c->compare($b));
+    }
+
+    public function testFromStringOnExtendedClassReturnsStatic()
+    {
+        $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
 }

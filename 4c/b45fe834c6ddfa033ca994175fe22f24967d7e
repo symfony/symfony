@@ -1,0 +1,269 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-15T13:30:35Z
+
+Looks really nice, thank you.
+I'm going to challenge the new convention for hidden commands as I had to stare at it for a while before getting what it means. I'm not sure that the command visibility should be defined through its name, at least it's not obvious that an empty string before the first separator should be the way to control it.
+Could we use a special char in front of the name (`.` ?) or add another static prop+tag attr?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T13:32:23Z
+
+Not hidden:
+`$defaultName = 'app:foo|foo'`
+
+Hidden:
+`$defaultName = '|app:foo|goo'`
+
+I don't think this is worth adding another static property.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-01-15T14:26:23Z
+
+I don't like much the proposed convention to define a command as hidden because it's not self-explanatory.
+
+As an alternative, would it be possible to store the list of commands in the cache dir while "compiling" the app? Same as we do with routes. Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T14:30:36Z
+
+IMHO, there is no need to optimize for setting the "hidden" flag, as that's not a mainstream feature. It's readable enough as is.
+
+> would it be possible to store the list of commands in the cache dir while "compiling" the app? Same as we do with routes. Thanks.
+
+Sorry, I don't get what you mean, can you please describe your idea a bit more? What's the DX that goes with this?
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2021-01-15T14:57:45Z
+
+nice to have this lazy feature to be added :)
+
+my 2cts, why not `.app:foo|foo` for hidden? as a hidden Unix file for example
+
+that way:
+
+- the `|` for separating command name first and aliases next
+- the `.` to hide the command
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-15T15:05:48Z
+
+Instead of adding static property for everything, what's about making the method `configure` static?.
+
+```php
+class AppCommand extends Command implements StaticCommandDescribedInterface
+{
+  public static function configure(): CommandDescription
+  {
+    return new CommandDescription('app:test')
+      ->setDefinition()
+      ->setHelp()
+      ->addInput(...)
+    ;
+  }
+}
+```
+
+class that can't be static and need internal service to resolve could implement another interface (that is incompatible with the previous)
+```php
+class AppCommand extends Command implements InstanceCommandDescribedInterface
+{
+  public function configure(): CommandDescription
+  {
+    return new CommandDescription('app:test')
+      ->setDefinition()
+      ->setHelp($this->getHint())
+      ->addInput(...)
+    ;
+  }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T15:10:06Z
+
+@jderusse that would kill the possibility to make the command configuration sensitive to constructor argument. Aka that could kill a lot of flexibility in the class. Yes, we don't use/need that in typical Symfony DI, but the console component is very much used standalone. We should be sure to not degrade it's DX when used outside of a typical Symfony stack.
+
+From a SOLID pov, static methods are just bad.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T15:11:05Z
+
+> why not `.app:foo|foo` for hidden
+
+because it's not better than the current proposal?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-15T15:26:43Z
+
+> @jderusse that would kill the possibility to make the command configuration sensitive to constructor argument. Aka that could kill a lot of flexibility in the class. Yes, we don't use/need that in typical Symfony DI, but the console component is very much used standalone. We should be sure to not degrade it's DX when used outside of a typical Symfony stack.
+>
+> From a SOLID pov, static methods are just bad.
+
+Isn't it addressed by the second part of my comment?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T15:33:24Z
+
+@jderusse to not break BC, we should rather make static version opt-in. I don't know where this could lead, in terms of BC impact for example. Of course, feel free to give it a try, as I did here with my proposal.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2021-01-15T15:37:45Z
+
+> > why not `.app:foo|foo` for hidden
+>
+> because it's not better than the current proposal?
+
+I think it's more clear as to what the intention is. Prefixing with a dot is common convention for hiding a file/directory in Linux and Mac OS. Whereas using the separator as a prefix, it isn't clear without first reading documentation that it's hiding the command instead of just a typo.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T15:41:01Z
+
+@natewiebe13 but this reserves 2 chars (`.` and `|`) which cannot be used anymore in command names. `|` is fine as a reserved char is fine, as no one would use that char in their command name: `|` is a special char in all shells, and so using the command would require escaping it all the time.
+But `.` has no special meaning and could totally be used in command names (even though that's not the recommended Symfony naming convention).
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T15:43:11Z
+
+> Isn't it addressed by the second part of my comment?
+
+but that forbids lazy-loading these commands then, while the use case for relying in the constructor arguments in the configuration is much more likely to be related to configuring options or arguments than the description.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2021-01-15T15:44:44Z
+
+> @natewiebe13 but this reserves 2 chars (`.` and `|`) which cannot be used anymore in command names. `|` is fine as a reserved char is fine, as no one would use that char in their command name: `|` is a special char in all shells, and so using the command would require escaping it all the time.
+> But `.` has no special meaning and could totally be used in command names (even though that's not the recommended Symfony naming convention).
+
+But wouldn't that just be for the first char in a command name? I wouldn't expect any periods in the command name to cause issues, just if the name was *prefixed* by a period.
+
+**Edit**
+For example, I'd still think `.app.do-something` would still be valid as `app.do-something`. It would just be hidden.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T15:46:06Z
+
+@nicolas-grekas there is still the issue of `Command::isEnabled()` though. It impacts `list` as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T15:53:01Z
+
+> there is still the issue of Command::isEnabled() though. It impacts list as well.
+
+Isn't this covered? See the implementation of `isEnabled()`. Otherwise, I may have missed what you meant.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T15:55:03Z
+
+> I wouldn't expect any periods in the command name to cause issues, just if the name was prefixed by a period.
+
+Until one will report a BC break :) This happens all the time when we do such assumptions.
+
+Honestly, the leading pipe is fine, it's as readable. Everything needs to be taught anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T16:01:11Z
+
+> Isn't this covered? See the implementation of `isEnabled()`. Otherwise, I may have missed what you meant.
+
+disabled commands are excluded by `list`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-01-15T16:22:25Z
+
+@stof pipe char may be quoted 😅 im fine with it, otherwise `static $defaultAliases & co`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T16:29:08Z
+
+> disabled commands are excluded by list
+
+yep, and this is managed by a call to `$command->isEnabled()` when adding them to the app. I think this works as expected since `LazyCommand` will return `true` without instantiating the real command.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-15T16:30:47Z
+
+@nicolas-grekas that's precisely the issue. If LazyCommand always returns true, how does the feature actually work for commands overriding the method to use the feature ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T16:35:18Z
+
+> If LazyCommand always returns true, how does the feature actually work for commands overriding the method to use the feature ?
+
+Oh, OK. Easy then :) If one wants to disable a command in a Symfony app, on should use DI (eg disabling autoconfiguration, removing the tag). I think `isEnabled()` is useful for situations where DI is not in use. Alternatively, one would *not* set the description using the new way, and this would fall back to regular non-lazy registration.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-01-15T16:42:30Z
+
+@nicolas-grekas should we make the effort for full compat between DI and regular configuration? Meaning adding a bunch of DI tag attributes for description etc.
+
+#39804 then enables declarative syntax: `#[CommandAutoTag(name: 'foo:bar', desc: 'boo', hidden: true)]#`
+
+i tend to fancy it a bit more than our current "static prop" solution.
+
+edit: it does become a complex thing given we could leverage CommandAutoTag without autoconfig being applied in DI. But generally spoken attribute seems to scale well for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T18:41:39Z
+
+> should we make the effort for full compat between DI and regular configuration? Meaning adding a bunch of DI tag attributes for description etc.
+> #39804 then enables declarative syntax: #[CommandAutoTag(name: 'foo:bar', desc: 'boo', hidden: true)]#
+
+Yes, after this one and #39804 are merged, we'll be able to provide support for attributes for configuring commands, with or without DI.
+
+> tend to fancy it a bit more than our current "static prop" solution.
+
+the solution will rely on static methods that will read the attributes using reflection (the properties are a local implementation detail).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T19:00:21Z
+
+To make this explicit to everyone reading here:
+
+This PR will enable support for attributes for configuring a command name+description+etc.
+e.g. using the concepts in #39804:
+`#[CommandAutoTag(name: 'foo:bar', desc: 'boo', hidden: true)]#`
+
+The attribute could very well split the `hidden` and `aliases` settings apart - while the underlying code and pre-PHP8 apps would use the compact form, because dealing with many static properties + methods would be a maintenance pain imho.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-20T11:22:17Z
+
+@wouterj good catch, PR updated. I also removed the "command" attributes in service definitions since they're not needed: the pass will read `$defaultName` instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-20T12:54:29Z
+
+See https://github.com/symfony/maker-bundle/pull/792 for maker-bundle.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-20T12:55:35Z
+
+Thank you all for the great review.

@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -43,6 +44,8 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -112,6 +115,7 @@ use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
+use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
@@ -2242,12 +2246,22 @@ class FrameworkExtension extends Extension
             LinkedInTransportFactory::class => 'notifier.transport_factory.linkedin',
             GatewayApiTransportFactory::class => 'notifier.transport_factory.gatewayapi',
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
+            MercureTransportFactory::class => 'notifier.transport_factory.mercure',
         ];
 
         foreach ($classToServices as $class => $service) {
             if (!class_exists($class)) {
                 $container->removeDefinition($service);
             }
+        }
+
+        if (class_exists(MercureTransportFactory::class)) {
+            if (!class_exists(MercureBundle::class)) {
+                throw new \LogicException('The MercureBundle is not registered in your application. Try running "composer require symfony/mercure-bundle".');
+            }
+
+            $container->getDefinition($classToServices[MercureTransportFactory::class])
+                ->replaceArgument('$publisherLocator', new ServiceLocatorArgument(new TaggedIteratorArgument('mercure.publisher', null, null, true)));
         }
 
         if (isset($config['admin_recipients'])) {

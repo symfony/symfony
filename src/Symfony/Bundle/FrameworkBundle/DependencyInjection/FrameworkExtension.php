@@ -2257,13 +2257,11 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (class_exists(MercureTransportFactory::class)) {
-            if (!class_exists(MercureBundle::class)) {
-                throw new \LogicException('The MercureBundle is not registered in your application. Try running "composer require symfony/mercure-bundle".');
-            }
-
+        if (class_exists(MercureTransportFactory::class) && class_exists(MercureBundle::class)) {
             $container->getDefinition($classToServices[MercureTransportFactory::class])
                 ->replaceArgument('$publisherLocator', new ServiceLocatorArgument(new TaggedIteratorArgument('mercure.publisher', null, null, true)));
+        } elseif (class_exists(MercureTransportFactory::class)) {
+            $container->removeDefinition($classToServices[MercureTransportFactory::class]);
         }
 
         if (isset($config['admin_recipients'])) {

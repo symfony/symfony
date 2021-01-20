@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure\Tests;
 
+use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -86,6 +88,17 @@ final class MercureTransportTest extends TransportTestCase
         $this->createTransport()->send(new ChatMessage('testMessage', $this->createMock(MessageOptionsInterface::class)));
     }
 
+    public function testSendWithTransportFailureThrows()
+    {
+        $publisher = $this->createMock(PublisherInterface::class);
+        $publisher->method('__invoke')->willThrowException(new HttpClientTransportException('Cannot connect to mercure'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to post the Mercure message: Cannot connect to mercure');
+
+        $this->createTransport(null, $publisher)->send(new ChatMessage('subject'));
+    }
+
     public function testSendWithWrongResponseThrows()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -98,7 +111,7 @@ final class MercureTransportTest extends TransportTestCase
         $publisher->method('__invoke')->willThrowException($httpException);
 
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to post the Mercure message: "Service Unavailable".');
+        $this->expectExceptionMessage('Unable to post the Mercure message: Service Unavailable');
 
         $this->createTransport(null, $publisher)->send(new ChatMessage('subject'));
     }
@@ -109,7 +122,7 @@ final class MercureTransportTest extends TransportTestCase
         $publisher->method('__invoke')->willThrowException(new \InvalidArgumentException('The provided JWT is not valid'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to post the Mercure message: "The provided JWT is not valid".');
+        $this->expectExceptionMessage('Unable to post the Mercure message: The provided JWT is not valid');
 
         $this->createTransport(null, $publisher)->send(new ChatMessage('subject'));
     }

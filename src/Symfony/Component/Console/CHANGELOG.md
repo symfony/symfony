@@ -4,8 +4,10 @@ CHANGELOG
 5.3
 ---
 
- * Added `GithubActionReporter` to render annotations in a Github Action
- * Added `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options.
+ * Add `GithubActionReporter` to render annotations in a Github Action
+ * Add `InputOption::VALUE_NEGATABLE` flag to handle `--foo`/`--no-foo` options
+ * Add the `Command::$defaultDescription` static property and the `description` attribute
+   on the `console.command` tag to allow the `list` command to instantiate commands lazily
 
 5.2.0
 -----

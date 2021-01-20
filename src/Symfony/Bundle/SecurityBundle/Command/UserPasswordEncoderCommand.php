@@ -34,6 +34,7 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 class UserPasswordEncoderCommand extends Command
 {
     protected static $defaultName = 'security:encode-password';
+    protected static $defaultDescription = 'Encodes a password';
 
     private $encoderFactory;
     private $userClasses;
@@ -52,7 +53,7 @@ class UserPasswordEncoderCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Encodes a password')
+            ->setDescription(self::$defaultDescription)
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the encoder generate one.')

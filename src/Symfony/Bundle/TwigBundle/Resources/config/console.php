@@ -24,10 +24,10 @@ return static function (ContainerConfigurator $container) {
                 param('twig.default_path'),
                 service('debug.file_link_formatter')->nullOnInvalid(),
             ])
-            ->tag('console.command', ['command' => 'debug:twig'])
+            ->tag('console.command')
 
         ->set('twig.command.lint', LintCommand::class)
             ->args([service('twig')])
-            ->tag('console.command', ['command' => 'lint:twig'])
+            ->tag('console.command')
     ;
 };

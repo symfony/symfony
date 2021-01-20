@@ -32,6 +32,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:form';
+    protected static $defaultDescription = 'Displays form type information';
 
     private $formRegistry;
     private $namespaces;
@@ -64,7 +65,7 @@ class DebugCommand extends Command
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ])
-            ->setDescription('Displays form type information')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
 

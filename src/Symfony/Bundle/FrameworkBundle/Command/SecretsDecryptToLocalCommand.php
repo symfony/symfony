@@ -27,6 +27,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SecretsDecryptToLocalCommand extends Command
 {
     protected static $defaultName = 'secrets:decrypt-to-local';
+    protected static $defaultDescription = 'Decrypts all secrets and stores them in the local vault';
 
     private $vault;
     private $localVault;
@@ -42,7 +43,7 @@ final class SecretsDecryptToLocalCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Decrypts all secrets and stores them in the local vault')
+            ->setDescription(self::$defaultDescription)
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces overriding of secrets that already exist in the local vault')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.

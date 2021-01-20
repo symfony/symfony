@@ -20,6 +20,6 @@ return static function (ContainerConfigurator $container) {
                 service('security.encoder_factory'),
                 abstract_arg('encoders user classes'),
             ])
-            ->tag('console.command', ['command' => 'security:encode-password'])
+            ->tag('console.command')
     ;
 };

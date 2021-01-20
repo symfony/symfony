@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 final class CachePoolClearCommand extends Command
 {
     protected static $defaultName = 'cache:pool:clear';
+    protected static $defaultDescription = 'Clears cache pools';
 
     private $poolClearer;
 
@@ -47,7 +48,7 @@ final class CachePoolClearCommand extends Command
             ->setDefinition([
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ])
-            ->setDescription('Clears cache pools')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 

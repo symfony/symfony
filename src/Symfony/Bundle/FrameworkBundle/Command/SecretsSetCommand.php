@@ -30,6 +30,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SecretsSetCommand extends Command
 {
     protected static $defaultName = 'secrets:set';
+    protected static $defaultDescription = 'Sets a secret in the vault';
 
     private $vault;
     private $localVault;
@@ -45,7 +46,7 @@ final class SecretsSetCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Sets a secret in the vault')
+            ->setDescription(self::$defaultDescription)
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addArgument('file', InputArgument::OPTIONAL, 'A file where to read the secret from or "-" for reading from STDIN')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Updates the local vault.')

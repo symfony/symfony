@@ -33,6 +33,7 @@ class EventDispatcherDebugCommand extends Command
     private const DEFAULT_DISPATCHER = 'event_dispatcher';
 
     protected static $defaultName = 'debug:event-dispatcher';
+    protected static $defaultDescription = 'Displays configured listeners for an application';
     private $dispatchers;
 
     public function __construct(ContainerInterface $dispatchers)
@@ -54,7 +55,7 @@ class EventDispatcherDebugCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
-            ->setDescription('Displays configured listeners for an application')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 

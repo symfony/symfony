@@ -30,6 +30,7 @@ use Symfony\Component\Workflow\Marking;
 class WorkflowDumpCommand extends Command
 {
     protected static $defaultName = 'workflow:dump';
+    protected static $defaultDescription = 'Dump a workflow';
 
     /**
      * {@inheritdoc}
@@ -43,7 +44,7 @@ class WorkflowDumpCommand extends Command
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Labels a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
             ])
-            ->setDescription('Dump a workflow')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a
 workflow in different formats

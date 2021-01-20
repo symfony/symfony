@@ -33,6 +33,7 @@ use Symfony\Component\Yaml\Yaml;
 class LintCommand extends Command
 {
     protected static $defaultName = 'lint:yaml';
+    protected static $defaultDescription = 'Lints a file and outputs encountered errors';
 
     private $parser;
     private $format;
@@ -54,7 +55,7 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lints a file and outputs encountered errors')
+            ->setDescription(self::$defaultDescription)
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format')
             ->addOption('parse-tags', null, InputOption::VALUE_NONE, 'Parse custom tags')

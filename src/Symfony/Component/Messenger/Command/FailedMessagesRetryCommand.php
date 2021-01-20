@@ -35,6 +35,7 @@ use Symfony\Component\Messenger\Worker;
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:retry';
+    protected static $defaultDescription = 'Retries one or more messages from the failure transport';
 
     private $eventDispatcher;
     private $messageBus;
@@ -59,7 +60,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
             ])
-            ->setDescription('Retries one or more messages from the failure transport')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
 

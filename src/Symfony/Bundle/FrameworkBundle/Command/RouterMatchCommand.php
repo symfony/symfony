@@ -31,6 +31,7 @@ use Symfony\Component\Routing\RouterInterface;
 class RouterMatchCommand extends Command
 {
     protected static $defaultName = 'router:match';
+    protected static $defaultDescription = 'Helps debug routes by simulating a path info match';
 
     private $router;
     private $expressionLanguageProviders;
@@ -55,7 +56,7 @@ class RouterMatchCommand extends Command
                 new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Sets the URI scheme (usually http or https)'),
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
             ])
-            ->setDescription('Helps debug routes by simulating a path info match')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 

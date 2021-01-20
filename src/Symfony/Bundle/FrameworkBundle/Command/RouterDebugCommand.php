@@ -36,6 +36,7 @@ class RouterDebugCommand extends Command
     use BuildDebugContainerTrait;
 
     protected static $defaultName = 'debug:router';
+    protected static $defaultDescription = 'Displays current routes for an application';
     private $router;
     private $fileLinkFormatter;
 
@@ -59,7 +60,7 @@ class RouterDebugCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ])
-            ->setDescription('Displays current routes for an application')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:
 

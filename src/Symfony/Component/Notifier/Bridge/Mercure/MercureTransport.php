@@ -15,6 +15,7 @@ use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\RuntimeException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -23,6 +24,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -91,10 +93,12 @@ final class MercureTransport extends AbstractTransport
             $sentMessage->setMessageId($messageId);
 
             return $sentMessage;
+        } catch (HttpExceptionInterface $e) {
+            throw new TransportException('Unable to post the Mercure message: '.$e->getResponse()->getContent(false), $e->getResponse(), $e->getCode(), $e);
         } catch (ExceptionInterface $e) {
-            throw new TransportException(sprintf('Unable to post the Mercure message: "%s".', $e->getResponse()->getContent(false)), $e->getResponse(), $e->getCode(), $e);
+            throw new RuntimeException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to post the Mercure message: "%s".', $e->getMessage()), $e->getCode(), $e);
+            throw new InvalidArgumentException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 }

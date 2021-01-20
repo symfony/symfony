@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-20T12:46:00Z
+
+Can we throw this exception somewhere else? It seems nice for DX when one explicitly ask for the mercure transport via dsn.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-20T12:49:57Z
+
+I don't know. Maybe @OskarStark has some ideas.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-20T12:56:33Z
+
+Sure, I think we can double check here and throw, after the scheme check:
+https://github.com/symfony/symfony/blob/4818b282f75a38a3a2a52f7fed10037afbceae0b/src/Symfony/Component/Notifier/Bridge/Mercure/MercureTransportFactory.php#L44-L48
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-20T12:56:43Z
+
+cc @mtarld
+
+---------------------------------------------------------------------------
+
+by mtarld at 2021-01-20T13:02:31Z
+
+Agreed, this is much better. So the definition can be removed if not used. :+1:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-20T13:03:33Z
+
+Follow-up PR welcome for readding this check elsewhere :)

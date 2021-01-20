@@ -17,6 +17,7 @@ use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
 use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiTransportFactory;
+use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
@@ -137,6 +138,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.mercure', MercureTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.gitter', GitterTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 

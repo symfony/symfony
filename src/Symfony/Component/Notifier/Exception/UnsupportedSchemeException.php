@@ -104,6 +104,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Mercure\MercureTransportFactory::class,
             'package' => 'symfony/mercure-notifier',
         ],
+        'gitter' => [
+            'class' => Bridge\Gitter\GitterTransportFactory::class,
+            'package' => 'symfony/gitter-notifier',
+        ],
     ];
 
     /**

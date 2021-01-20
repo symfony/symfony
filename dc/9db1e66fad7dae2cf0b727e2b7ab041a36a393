@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-20T13:16:57Z
+
+Thanks :)
+
+Note that I started experimenting with autocompletion a while ago. I just pushed my progress thus far today: https://github.com/wouterj/symfony/commit/2bdf79850f0cdf113f8d1c630ee0d149ec096871 (it's really hacky, it should probably use a custom descriptor instead, relying on this new feature). I don't have much priority to finish this feature, so if anyone wants to continue: feel free to do so
+
+This is a little demo for a skeleton app without this fast option:
+
+![autocompletion demo](https://user-images.githubusercontent.com/749025/105180701-307aaf00-5b2b-11eb-9e4e-94b1cf7f171c.gif)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-20T14:03:35Z
+
+Thank you @nicolas-grekas.
+
+edit: Merge aborted just in time :)

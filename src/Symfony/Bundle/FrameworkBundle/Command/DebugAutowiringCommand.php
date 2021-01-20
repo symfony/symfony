@@ -31,6 +31,7 @@ class DebugAutowiringCommand extends ContainerDebugCommand
 {
     protected static $defaultName = 'debug:autowiring';
     protected static $defaultDescription = 'Lists classes/interfaces you can use for autowiring';
+
     private $supportsHref;
     private $fileLinkFormatter;
 

@@ -135,7 +135,7 @@ Lists commands
 
 ### Usage
 
-* `list [--raw] [--format FORMAT] [--] [<namespace>]`
+* `list [--raw] [--format FORMAT] [--short] [--] [<namespace>]`
 
 The list command lists all commands:
 
@@ -184,6 +184,16 @@ The output format (txt, xml, json, or md)
 * Is multiple: no
 * Is negatable: no
 * Default: `'txt'`
+
+#### `--short`
+
+To skip describing commands' arguments
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Is negatable: no
+* Default: `false`
 
 #### `--help|-h`
 

@@ -122,6 +122,20 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeCommand(Command $command, array $options = [])
     {
+        if ($options['short'] ?? false) {
+            $this->write(
+                '`'.$command->getName()."`\n"
+                .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+                .($command->getDescription() ? $command->getDescription()."\n\n" : '')
+                .'### Usage'."\n\n"
+                .array_reduce($command->getAliases(), function ($carry, $usage) {
+                    return $carry.'* `'.$usage.'`'."\n";
+                })
+            );
+
+            return;
+        }
+
         $command->mergeApplicationDefinition(false);
 
         $this->write(
@@ -171,7 +185,7 @@ class MarkdownDescriptor extends Descriptor
 
         foreach ($description->getCommands() as $command) {
             $this->write("\n\n");
-            if (null !== $describeCommand = $this->describeCommand($command)) {
+            if (null !== $describeCommand = $this->describeCommand($command, $options)) {
                 $this->write($describeCommand);
             }
         }

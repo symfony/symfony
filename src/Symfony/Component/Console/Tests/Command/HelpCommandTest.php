@@ -65,7 +65,7 @@ class HelpCommandTest extends TestCase
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
         $commandTester->execute(['command_name' => 'list', '--format' => 'xml']);
-        $this->assertStringContainsString('list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        $this->assertStringContainsString('list [--raw] [--format FORMAT] [--short] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
         $this->assertStringContainsString('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --format=xml is passed');
     }
 }

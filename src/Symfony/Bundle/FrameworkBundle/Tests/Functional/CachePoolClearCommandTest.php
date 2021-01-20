@@ -13,7 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @group functional
@@ -71,6 +73,35 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
         $this->createCommandTester()
             ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);
+    }
+
+    public function testClearFailed()
+    {
+        $tester = $this->createCommandTester();
+        /** @var FilesystemAdapter $pool */
+        $pool = static::$container->get('cache.public_pool');
+        $item = $pool->getItem('foo');
+        $item->set('baz');
+        $pool->save($item);
+        $r = new \ReflectionObject($pool);
+        $p = $r->getProperty('directory');
+        $p->setAccessible(true);
+        $poolDir = $p->getValue($pool);
+
+        /** @var SplFileInfo $entry */
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($poolDir)) as $entry) {
+            // converts files into dir to make adapter fail
+            if ($entry->isFile()) {
+                unlink($entry->getPathname());
+                mkdir($entry->getPathname());
+            }
+        }
+
+        $tester->execute(['pools' => ['cache.public_pool']]);
+
+        $this->assertSame(1, $tester->getStatusCode(), 'cache:pool:clear exits with 1 in case of error');
+        $this->assertStringNotContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
+        $this->assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
     }
 
     private function createCommandTester()

@@ -31,7 +31,7 @@ use Symfony\Component\Translation\Util\XliffUtils;
 class XliffLintCommand extends Command
 {
     protected static $defaultName = 'lint:xliff';
-    protected static $defaultDescription = 'Lints a XLIFF file and outputs encountered errors';
+    protected static $defaultDescription = 'Lints an XLIFF file and outputs encountered errors';
 
     private $format;
     private $displayCorrectFiles;

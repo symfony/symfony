@@ -1553,6 +1553,7 @@ class FrameworkExtension extends Extension
         if (!class_exists(CsrfExtension::class)) {
             $container->removeDefinition('twig.extension.security_csrf');
         }
+        $container->setParameter('security.csrf.ttl', $config['token_lifetime']);
     }
 
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

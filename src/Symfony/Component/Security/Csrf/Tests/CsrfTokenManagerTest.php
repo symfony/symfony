@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -155,6 +157,70 @@ class CsrfTokenManagerTest extends TestCase
             ->willReturn('REMOVED_TOKEN');
 
         $this->assertSame('REMOVED_TOKEN', $manager->removeToken('token_id'));
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testExpirationNotRefreshed()
+    {
+        $generator = $this->getMockBuilder(TokenGeneratorInterface::class)->getMock();
+        $storage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+
+        $manager = new CsrfTokenManager($generator, $storage, '', 300);
+
+        $generator->expects($this->once())
+            ->method('generateToken')
+            ->willReturn('TOKEN');
+        $storage->expects($this->exactly(3))
+            ->method('hasToken')
+            ->with('token_id')
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                true
+            );
+        $storage->expects($this->exactly(2))
+            ->method('getToken')
+            ->with('token_id')
+            ->willReturn(time().'.TOKEN');
+
+        $token1 = $manager->getToken('token_id');
+        $this->assertTrue($manager->isTokenValid($token1));
+        $token2 = $manager->getToken('token_id');
+        $this->assertSame($token1->getValue(), $token2->getValue());
+    }
+
+    /**
+     * @group time-sensitive
+     */
+    public function testExpirationRefreshed()
+    {
+        $generator = $this->getMockBuilder(TokenGeneratorInterface::class)->getMock();
+        $storage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+
+        $manager = new CsrfTokenManager($generator, $storage, '', -1);
+
+        $generator->expects($this->exactly(2))
+            ->method('generateToken')
+            ->willReturnOnConsecutiveCalls('TOKEN1', 'TOKEN2');
+        $storage->expects($this->exactly(3))
+            ->method('hasToken')
+            ->with('token_id')
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                true
+            );
+        $storage->expects($this->exactly(1))
+            ->method('getToken')
+            ->with('token_id')
+            ->willReturn(time().'.TOKEN1');
+
+        $token1 = $manager->getToken('token_id');
+        $this->assertFalse($manager->isTokenValid($token1));
+        $token2 = $manager->getToken('token_id');
+        $this->assertNotSame($token1->getValue(), $token2->getValue());
     }
 
     public function testNamespaced()

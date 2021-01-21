@@ -29,6 +29,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     private $generator;
     private $storage;
     private $namespace;
+    private $ttl;
 
     /**
      * @param string|RequestStack|callable|null $namespace
@@ -37,7 +38,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
      *                                                     * RequestStack: generates a namespace using the current master request
      *                                                     * callable: uses the result of this callable (must return a string)
      */
-    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null)
+    public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null, int $tokenLifeTimeInSeconds = null)
     {
         $this->generator = $generator ?: new UriSafeTokenGenerator();
         $this->storage = $storage ?: new NativeSessionTokenStorage();
@@ -61,6 +62,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         } else {
             throw new InvalidArgumentException(sprintf('$namespace must be a string, a callable returning a string, null or an instance of "RequestStack". "%s" given.', get_debug_type($namespace)));
         }
+        $this->ttl = $tokenLifeTimeInSeconds;
     }
 
     /**
@@ -71,8 +73,13 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         $namespacedId = $this->getNamespace().$tokenId;
         if ($this->storage->hasToken($namespacedId)) {
             $value = $this->storage->getToken($namespacedId);
+            if ($this->isExpired($value)) {
+                $value = (null !== $this->ttl ? time().'.' : '').$this->generator->generateToken();
+
+                $this->storage->setToken($namespacedId, $value);
+            }
         } else {
-            $value = $this->generator->generateToken();
+            $value = (null !== $this->ttl ? time().'.' : '').$this->generator->generateToken();
 
             $this->storage->setToken($namespacedId, $value);
         }
@@ -86,7 +93,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     public function refreshToken(string $tokenId)
     {
         $namespacedId = $this->getNamespace().$tokenId;
-        $value = $this->generator->generateToken();
+        $value = (null !== $this->ttl ? time().'.' : '').$this->generator->generateToken();
 
         $this->storage->setToken($namespacedId, $value);
 
@@ -110,8 +117,23 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         if (!$this->storage->hasToken($namespacedId)) {
             return false;
         }
+        if ($this->isExpired($value = $token->getValue())) {
+            return false;
+        }
 
-        return hash_equals($this->storage->getToken($namespacedId), $token->getValue());
+        return hash_equals($this->storage->getToken($namespacedId), $value);
+    }
+
+    private function isExpired(string $value): bool
+    {
+        if (null === $this->ttl) {
+            return false;
+        }
+        if ('.' !== $value[10] ?? null) {
+            return true;
+        }
+
+        return (int) substr($value, 0, 10) < time() - $this->ttl;
     }
 
     private function getNamespace(): string

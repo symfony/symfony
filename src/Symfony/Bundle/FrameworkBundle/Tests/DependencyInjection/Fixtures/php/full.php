@@ -3,7 +3,9 @@
 $container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
-    'csrf_protection' => true,
+    'csrf_protection' => [
+        'token_lifetime' => 60,
+    ],
     'form' => [
         'csrf_protection' => [
             'field_name' => '_csrf',

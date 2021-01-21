@@ -164,10 +164,19 @@ class Configuration implements ConfigurationInterface
                     ->treatFalseLike(['enabled' => false])
                     ->treatTrueLike(['enabled' => true])
                     ->treatNullLike(['enabled' => true])
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function ($v) {
+                            $v['enabled'] = $v['enabled'] ?? true;
+
+                            return $v;
+                        })
+                    ->end()
                     ->addDefaultsIfNotSet()
                     ->children()
                         // defaults to framework.session.enabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class)
                         ->booleanNode('enabled')->defaultNull()->end()
+                        ->integerNode('token_lifetime')->defaultNull()->end()
                     ->end()
                 ->end()
             ->end()

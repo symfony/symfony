@@ -63,6 +63,7 @@
 
     <xsd:complexType name="csrf_protection">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="token_lifetime" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="esi">

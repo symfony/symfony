@@ -374,7 +374,8 @@ class ConfigurationTest extends TestCase
                 'x-forwarded-proto',
             ],
             'csrf_protection' => [
-                'enabled' => false,
+                'enabled' => null,
+                'token_lifetime' => null,
             ],
             'form' => [
                 'enabled' => !class_exists(FullStack::class),

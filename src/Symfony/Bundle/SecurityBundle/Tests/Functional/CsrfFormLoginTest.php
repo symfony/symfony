@@ -36,7 +36,6 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $logoutLinks = $crawler->selectLink('Log out')->links();
         $this->assertCount(2, $logoutLinks);
         $this->assertStringContainsString('_csrf_token=', $logoutLinks[0]->getUri());
-        $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
 
         $client->click($logoutLinks[0]);
 

@@ -25,7 +25,7 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
 class XliffLintCommand extends BaseLintCommand
 {
     protected static $defaultName = 'lint:xliff';
-    protected static $defaultDescription = 'Lints a XLIFF file and outputs encountered errors';
+    protected static $defaultDescription = 'Lints an XLIFF file and outputs encountered errors';
 
     public function __construct()
     {

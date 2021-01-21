@@ -76,14 +76,16 @@ final class OvhCloudTransport extends AbstractTransport
         $now = time() + $this->calculateTimeDelta();
         $headers['X-Ovh-Application'] = $this->applicationKey;
         $headers['X-Ovh-Timestamp'] = $now;
+        $headers['Content-Type'] = 'application/json';
 
-        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.json_encode($content, \JSON_UNESCAPED_SLASHES).'+'.$now;
+        $body = json_encode($content, \JSON_UNESCAPED_SLASHES);
+        $toSign = $this->applicationSecret.'+'.$this->consumerKey.'+POST+'.$endpoint.'+'.$body.'+'.$now;
         $headers['X-Ovh-Consumer'] = $this->consumerKey;
         $headers['X-Ovh-Signature'] = '$1$'.sha1($toSign);
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => $headers,
-            'json' => $content,
+            'body' => $body,
         ]);
 
         if (200 !== $response->getStatusCode()) {

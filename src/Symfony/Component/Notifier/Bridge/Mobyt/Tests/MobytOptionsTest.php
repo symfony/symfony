@@ -4,6 +4,7 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytOptions;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Notification\Notification;
 
 final class MobytOptionsTest extends TestCase
@@ -64,11 +65,43 @@ final class MobytOptionsTest extends TestCase
         $this->assertEmpty($mobytOptions->toArray());
     }
 
-    public function testMessageType()
+    /**
+     * @dataProvider validMessageTypes
+     */
+    public function testMessageType(string $type)
     {
         $mobytOptions = new MobytOptions();
-        $mobytOptions->messageType('foo');
+        $mobytOptions->messageType($type);
 
-        $this->assertSame(['message_type' => 'foo'], $mobytOptions->toArray());
+        $this->assertSame(['message_type' => $type], $mobytOptions->toArray());
+    }
+
+    public function validMessageTypes(): iterable
+    {
+        yield [MobytOptions::MESSAGE_TYPE_QUALITY_HIGH];
+        yield [MobytOptions::MESSAGE_TYPE_QUALITY_MEDIUM];
+        yield [MobytOptions::MESSAGE_TYPE_QUALITY_LOW];
+    }
+
+    public function testCallingMessageTypeMethodWithUnknownTypeThrowsInvalidArgumentException()
+    {
+        $mobytOptions = new MobytOptions();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"');
+
+        $mobytOptions->messageType('foo-bar');
+    }
+
+    public function testSettingMessageTypeViaConstructorWithUnknownTypeThrowsInvalidArgumentException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The message type "foo-bar" is not supported; supported message types are: "N", "L", "LL"'
+        );
+
+        new MobytOptions([
+            'message_type' => 'foo-bar',
+        ]);
     }
 }

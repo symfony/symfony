@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by pamil at 2021-01-21T09:43:52Z
+
+It solves the issue for me (#39885), thanks! Travis CI build for PHP 8.0 is failing due to some networking issues, could it be restarted? Same for AppVeyor, it seems like an unrelated failure.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-21T10:48:44Z
+
+@pamil CI restarted and green

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\TemplateNameParser;
 
 /**
@@ -29,7 +30,7 @@ class PhpEngineTest extends TestCase
     public function testEvaluateAddsAppGlobal()
     {
         $container = $this->getContainer();
-        $loader = $this->getMockForAbstractClass(\Symfony\Component\Templating\Loader\Loader::class);
+        $loader = $this->getMockForAbstractClass(Loader::class);
         $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, $app = new GlobalVariables($container));
         $globals = $engine->getGlobals();
         $this->assertSame($app, $globals['app']);
@@ -38,7 +39,7 @@ class PhpEngineTest extends TestCase
     public function testEvaluateWithoutAvailableRequest()
     {
         $container = new Container();
-        $loader = $this->getMockForAbstractClass(\Symfony\Component\Templating\Loader\Loader::class);
+        $loader = $this->getMockForAbstractClass(Loader::class);
         $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, new GlobalVariables($container));
 
         $this->assertFalse($container->has('request_stack'));
@@ -50,7 +51,7 @@ class PhpEngineTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $container = $this->getContainer();
-        $loader = $this->getMockForAbstractClass(\Symfony\Component\Templating\Loader\Loader::class);
+        $loader = $this->getMockForAbstractClass(Loader::class);
         $engine = new PhpEngine(new TemplateNameParser(), $container, $loader);
 
         $engine->get('non-existing-helper');

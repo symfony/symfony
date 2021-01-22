@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 class ContainerConstraintValidatorFactoryTest extends TestCase
 {
@@ -47,8 +48,8 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
 
     public function testGetInstanceInvalidValidatorClass()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ValidatorException::class);
-        $constraint = $this->getMockBuilder(Constraint::class)->getMock();
+        $this->expectException(ValidatorException::class);
+        $constraint = $this->createMock(Constraint::class);
         $constraint
             ->expects($this->once())
             ->method('validatedBy')

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,9 +113,9 @@ class ExceptionListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ExceptionListener('foo', $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock());
+        $listener = new ExceptionListener('foo', $this->createMock(LoggerInterface::class));
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
@@ -132,12 +133,12 @@ class ExceptionListenerTest extends TestCase
     public function testCSPHeaderIsRemoved()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ExceptionListener('foo', $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock(), true);
+        $listener = new ExceptionListener('foo', $this->createMock(LoggerInterface::class), true);
 
         $dispatcher->addSubscriber($listener);
 

@@ -23,7 +23,7 @@ class SendersLocatorTest extends TestCase
 {
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'my_sender' => $sender,
         ]);
@@ -40,7 +40,7 @@ class SendersLocatorTest extends TestCase
      */
     public function testItReturnsTheSenderBasedOnTheMessageClassLegacy()
     {
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender = $this->createMock(SenderInterface::class);
         $locator = new SendersLocator([
             DummyMessage::class => [$sender],
         ]);
@@ -53,7 +53,7 @@ class SendersLocatorTest extends TestCase
      */
     public function testItYieldsProvidedSenderAliasAsKeyLegacy()
     {
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender = $this->createMock(SenderInterface::class);
         $locator = new SendersLocator([
             DummyMessage::class => ['dummy' => $sender],
         ]);

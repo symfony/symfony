@@ -62,7 +62,7 @@ class CombinedStoreTest extends AbstractStoreTest
 
     protected function setUp(): void
     {
-        $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
+        $this->strategy = $this->createMock(StrategyInterface::class);
         $this->store1 = $this->createMock(BlockingStoreInterface::class);
         $this->store2 = $this->createMock(BlockingStoreInterface::class);
 
@@ -264,8 +264,8 @@ class CombinedStoreTest extends AbstractStoreTest
 
     public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
-        $store1 = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
-        $store2 = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store1 = $this->createMock(PersistingStoreInterface::class);
+        $store2 = $this->createMock(PersistingStoreInterface::class);
 
         $store = new CombinedStore([$store1, $store2], $this->strategy);
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -22,7 +23,7 @@ class AttributeMetadataTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new AttributeMetadata('name');
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\AttributeMetadataInterface::class, $attributeMetadata);
+        $this->assertInstanceOf(AttributeMetadataInterface::class, $attributeMetadata);
     }
 
     public function testGetName()

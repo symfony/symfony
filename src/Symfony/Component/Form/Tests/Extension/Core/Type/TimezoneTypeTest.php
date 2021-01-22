@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class TimezoneTypeTest extends BaseTypeTest
@@ -90,7 +91,7 @@ class TimezoneTypeTest extends BaseTypeTest
      */
     public function testFilterByRegionsWithIntl()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "regions" option can only be used if the "intl" option is set to false.');
         $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE, 'intl' => true]);
     }
@@ -192,7 +193,7 @@ class TimezoneTypeTest extends BaseTypeTest
 
     public function testChoiceTranslationLocaleOptionWithoutIntl()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_locale' => 'uk',

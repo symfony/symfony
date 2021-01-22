@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
 use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -924,7 +925,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($currency)
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->dataProvider->getAlpha3Code($currency);
     }
 }

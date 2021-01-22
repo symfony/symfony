@@ -21,7 +21,7 @@ class StackMiddlewareTest extends TestCase
 {
     public function testClone()
     {
-        $middleware1 = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $middleware1 = $this->createMock(MiddlewareInterface::class);
         $middleware1
             ->expects($this->once())
             ->method('handle')
@@ -35,7 +35,7 @@ class StackMiddlewareTest extends TestCase
             })
         ;
 
-        $middleware2 = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $middleware2 = $this->createMock(MiddlewareInterface::class);
         $middleware2
             ->expects($this->exactly(2))
             ->method('handle')

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
 use Symfony\Component\Intl\Data\Provider\CurrencyDataProvider;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -758,7 +759,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->dataProvider->getNumericCode($currency);
     }
 
@@ -803,7 +804,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->dataProvider->forNumericCode($currency);
     }
 

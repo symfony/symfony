@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -26,8 +27,7 @@ class CachePoolDeleteCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->cachePool = $this->getMockBuilder(CacheItemPoolInterface::class)
-            ->getMock();
+        $this->cachePool = $this->createMock(CacheItemPoolInterface::class);
     }
 
     public function testCommandWithValidKey()
@@ -88,14 +88,9 @@ class CachePoolDeleteCommandTest extends TestCase
      */
     private function getKernel()
     {
-        $container = $this
-            ->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)
-            ->getMock();
+        $container = $this->createMock(ContainerInterface::class);
 
-        $kernel = $this
-            ->getMockBuilder(KernelInterface::class)
-            ->getMock();
-
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getContainer')

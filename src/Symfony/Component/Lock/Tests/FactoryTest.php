@@ -24,8 +24,8 @@ class FactoryTest extends TestCase
 {
     public function testCreateLock()
     {
-        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $store = $this->createMock(StoreInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
         $factory = new Factory($store);
         $factory->setLogger($logger);
 

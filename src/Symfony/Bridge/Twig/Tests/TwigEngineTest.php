@@ -13,9 +13,12 @@ namespace Symfony\Bridge\Twig\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\TwigEngine;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
+use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;
+use Twig\Template;
 
 /**
  * @group legacy
@@ -26,7 +29,7 @@ class TwigEngineTest extends TestCase
     {
         $engine = $this->getTwig();
 
-        $this->assertTrue($engine->exists($this->getMockForAbstractClass(\Twig\Template::class, [], '', false)));
+        $this->assertTrue($engine->exists($this->getMockForAbstractClass(Template::class, [], '', false)));
     }
 
     public function testExistsWithNonExistentTemplates()
@@ -63,7 +66,7 @@ class TwigEngineTest extends TestCase
 
     public function testRenderWithError()
     {
-        $this->expectException(\Twig\Error\SyntaxError::class);
+        $this->expectException(SyntaxError::class);
         $engine = $this->getTwig();
 
         $engine->render(new TemplateReference('error'));
@@ -75,7 +78,7 @@ class TwigEngineTest extends TestCase
             'index' => 'foo',
             'error' => '{{ foo }',
         ]));
-        $parser = $this->getMockBuilder(\Symfony\Component\Templating\TemplateNameParserInterface::class)->getMock();
+        $parser = $this->createMock(TemplateNameParserInterface::class);
 
         return new TwigEngine($twig, $parser);
     }

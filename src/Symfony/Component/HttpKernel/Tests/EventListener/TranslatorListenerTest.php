@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
@@ -30,8 +31,8 @@ class TranslatorListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->translator = $this->getMockBuilder(LocaleAwareInterface::class)->getMock();
-        $this->requestStack = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)->getMock();
+        $this->translator = $this->createMock(LocaleAwareInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->listener = new TranslatorListener($this->translator, $this->requestStack);
     }
 
@@ -105,7 +106,7 @@ class TranslatorListenerTest extends TestCase
 
     private function createHttpKernel()
     {
-        return $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        return $this->createMock(HttpKernelInterface::class);
     }
 
     private function createRequest($locale)

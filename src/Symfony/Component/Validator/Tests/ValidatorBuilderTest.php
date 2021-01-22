@@ -13,7 +13,12 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
@@ -37,7 +42,7 @@ class ValidatorBuilderTest extends TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock()
+            $this->createMock(ObjectInitializerInterface::class)
         ));
     }
 
@@ -98,27 +103,27 @@ class ValidatorBuilderTest extends TestCase
     public function testSetMetadataCache()
     {
         $this->assertSame($this->builder, $this->builder->setMetadataCache(
-            $this->getMockBuilder(\Symfony\Component\Validator\Mapping\Cache\CacheInterface::class)->getMock())
+            $this->createMock(CacheInterface::class))
         );
     }
 
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->getMockBuilder(\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class)->getMock())
+            $this->createMock(ConstraintValidatorFactoryInterface::class))
         );
     }
 
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->getMockBuilder(\Symfony\Component\Translation\TranslatorInterface::class)->getMock())
+            $this->createMock(TranslatorInterface::class))
         );
     }
 
     public function testLegacyTranslatorProxy()
     {
-        $proxy = $this->getMockBuilder(LegacyTranslatorProxy::class)->disableOriginalConstructor()->getMock();
+        $proxy = $this->createMock(LegacyTranslatorProxy::class);
         $proxy->expects($this->once())->method('getTranslator');
 
         $this->builder->setTranslator($proxy);
@@ -131,6 +136,6 @@ class ValidatorBuilderTest extends TestCase
 
     public function testGetValidator()
     {
-        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\RecursiveValidator::class, $this->builder->getValidator());
+        $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());
     }
 }

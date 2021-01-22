@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -20,6 +21,7 @@ use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -71,9 +73,7 @@ class EntityUserProviderTest extends TestCase
             ->with('user1')
             ->willReturn($user);
 
-        $em = $this->getMockBuilder(\Doctrine\ORM\EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em
             ->expects($this->once())
             ->method('getRepository')
@@ -125,7 +125,7 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
-        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
+        $this->expectException(UsernameNotFoundException::class);
         $this->expectExceptionMessage('User with id {"id1":1,"id2":2} not found');
 
         $provider->refreshUser($user2);
@@ -155,7 +155,7 @@ class EntityUserProviderTest extends TestCase
             ->method('loadUserByUsername')
             ->with('name')
             ->willReturn(
-                $this->getMockBuilder(UserInterface::class)->getMock()
+                $this->createMock(UserInterface::class)
             );
 
         $provider = new EntityUserProvider(
@@ -198,7 +198,7 @@ class EntityUserProviderTest extends TestCase
 
     private function getManager($em, $name = null)
     {
-        $manager = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $manager = $this->createMock(ManagerRegistry::class);
         $manager->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent;
 use Symfony\Component\Debug\DebugClassLoader;
 
 /**
@@ -179,7 +180,7 @@ class DebugClassLoaderTest extends TestCase
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
-        class_exists(\Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent::class, true);
+        class_exists(ExtendsDeprecatedParent::class, true);
 
         error_reporting($e);
         restore_error_handler();

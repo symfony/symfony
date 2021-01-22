@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\FormRenderer;
 
 class FormRendererTest extends TestCase
 {
     public function testHumanize()
     {
-        $renderer = $this->getMockBuilder(\Symfony\Component\Form\FormRenderer::class)
+        $renderer = $this->getMockBuilder(FormRenderer::class)
             ->setMethods(null)
             ->disableOriginalConstructor()
             ->getMock()

@@ -27,6 +27,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -190,7 +194,7 @@ class PhpDumperTest extends TestCase
 
     public function testAddServiceWithoutCompilation()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot dump an uncompiled container.');
         $container = include self::$fixturesPath.'/containers/container9.php';
         new PhpDumper($container);
@@ -442,7 +446,7 @@ class PhpDumperTest extends TestCase
 
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "decorator_service" service is already initialized, you cannot replace it.');
         require_once self::$fixturesPath.'/php/services9_compiled.php';
 
@@ -659,7 +663,7 @@ class PhpDumperTest extends TestCase
 
     public function testUnusedEnvParameter()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
+        $this->expectException(EnvParameterException::class);
         $this->expectExceptionMessage('Environment variables "FOO" are never used. Please, check your container\'s configuration.');
         $container = new ContainerBuilder();
         $container->getParameter('env(FOO)');
@@ -670,7 +674,7 @@ class PhpDumperTest extends TestCase
 
     public function testCircularDynamicEnv()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException::class);
+        $this->expectException(ParameterCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").');
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%bar%');

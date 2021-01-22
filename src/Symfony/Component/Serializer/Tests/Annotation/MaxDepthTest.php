@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -21,7 +22,7 @@ class MaxDepthTest extends TestCase
 {
     public function testNotSetMaxDepthParameter()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" should be set.');
         new MaxDepth([]);
     }
@@ -41,7 +42,7 @@ class MaxDepthTest extends TestCase
      */
     public function testNotAnIntMaxDepthParameter($value)
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" must be a positive integer.');
         new MaxDepth(['value' => $value]);
     }

@@ -25,7 +25,7 @@ class SecurityTest extends TestCase
     public function testGetToken()
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'provider');
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
@@ -42,11 +42,11 @@ class SecurityTest extends TestCase
      */
     public function testGetUser($userInToken, $expectedUser)
     {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($userInToken);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
@@ -76,11 +76,11 @@ class SecurityTest extends TestCase
      */
     public function testGetUserLegacy()
     {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user = new StringishUser());
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $tokenStorage->expects($this->once())
             ->method('getToken')
@@ -94,7 +94,7 @@ class SecurityTest extends TestCase
 
     public function testIsGranted()
     {
-        $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -109,7 +109,7 @@ class SecurityTest extends TestCase
 
     private function createContainer($serviceId, $serviceObject)
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container = $this->createMock(ContainerInterface::class);
 
         $container->expects($this->atLeastOnce())
             ->method('get')

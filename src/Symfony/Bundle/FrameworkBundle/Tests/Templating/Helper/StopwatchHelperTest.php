@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @group legacy
@@ -21,7 +22,7 @@ class StopwatchHelperTest extends TestCase
 {
     public function testDevEnvironment()
     {
-        $stopwatch = $this->getMockBuilder(\Symfony\Component\Stopwatch\Stopwatch::class)->getMock();
+        $stopwatch = $this->createMock(Stopwatch::class);
         $stopwatch->expects($this->once())
             ->method('start')
             ->with('foo');

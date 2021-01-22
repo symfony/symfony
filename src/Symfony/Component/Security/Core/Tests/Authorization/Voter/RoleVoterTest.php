@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\Role;
@@ -80,7 +81,7 @@ class RoleVoterTest extends TestCase
         foreach ($roles as $i => $role) {
             $roles[$i] = new Role($role);
         }
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
               ->method('getRoles')
               ->willReturn($roles);
@@ -90,7 +91,7 @@ class RoleVoterTest extends TestCase
 
     protected function getTokenWithRoleNames(array $roles)
     {
-        $token = $this->getMockBuilder(AbstractToken::class)->getMock();
+        $token = $this->createMock(AbstractToken::class);
         $token->expects($this->once())
               ->method('getRoleNames')
               ->willReturn($roles);

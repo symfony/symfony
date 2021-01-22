@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
@@ -99,14 +100,14 @@ class IniFileLoaderTest extends TestCase
 
     public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "nonvalid.ini" file is not valid.');
         @$this->loader->load('nonvalid.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileIsAlmostValid()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "almostvalid.ini" file is not valid.');
         @$this->loader->load('almostvalid.ini');
     }

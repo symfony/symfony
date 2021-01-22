@@ -30,8 +30,6 @@ class ClassInstanceSupportStrategyTest extends TestCase
 
     private function createWorkflow()
     {
-        return $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(Workflow::class);
     }
 }

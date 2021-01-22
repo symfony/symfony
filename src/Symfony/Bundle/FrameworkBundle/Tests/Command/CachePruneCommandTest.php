@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePruneCommandTest extends TestCase
@@ -54,14 +55,9 @@ class CachePruneCommandTest extends TestCase
      */
     private function getKernel()
     {
-        $container = $this
-            ->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)
-            ->getMock();
+        $container = $this->createMock(ContainerInterface::class);
 
-        $kernel = $this
-            ->getMockBuilder(KernelInterface::class)
-            ->getMock();
-
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getContainer')
@@ -80,10 +76,7 @@ class CachePruneCommandTest extends TestCase
      */
     private function getPruneableInterfaceMock()
     {
-        $pruneable = $this
-            ->getMockBuilder(PruneableInterface::class)
-            ->getMock();
-
+        $pruneable = $this->createMock(PruneableInterface::class);
         $pruneable
             ->expects($this->atLeastOnce())
             ->method('prune');

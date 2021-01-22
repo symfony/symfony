@@ -12,22 +12,25 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler;
+use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 class LazyLoadingFragmentHandlerTest extends TestCase
 {
     public function testRender()
     {
-        $renderer = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface::class)->getMock();
+        $renderer = $this->createMock(FragmentRendererInterface::class);
         $renderer->expects($this->once())->method('getName')->willReturn('foo');
         $renderer->expects($this->any())->method('render')->willReturn(new Response());
 
-        $requestStack = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)->getMock();
+        $requestStack = $this->createMock(RequestStack::class);
         $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
 
-        $container = $this->getMockBuilder(\Psr\Container\ContainerInterface::class)->getMock();
+        $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())->method('has')->with('foo')->willReturn(true);
         $container->expects($this->once())->method('get')->willReturn($renderer);
 

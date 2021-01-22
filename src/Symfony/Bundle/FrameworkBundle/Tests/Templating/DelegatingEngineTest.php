@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @group legacy
@@ -88,7 +89,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder(\Symfony\Component\Templating\EngineInterface::class)->getMock();
+        $engine = $this->createMock(EngineInterface::class);
 
         $engine->expects($this->once())
             ->method('supports')
@@ -100,7 +101,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getFrameworkEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder(\Symfony\Bundle\FrameworkBundle\Templating\EngineInterface::class)->getMock();
+        $engine = $this->createMock(\Symfony\Bundle\FrameworkBundle\Templating\EngineInterface::class);
 
         $engine->expects($this->once())
             ->method('supports')

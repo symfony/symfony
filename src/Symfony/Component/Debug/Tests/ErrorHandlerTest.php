@@ -12,10 +12,12 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\Debug\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
 use Symfony\Component\Debug\Tests\Fixtures\LoggerThatSetAnErrorHandler;
@@ -72,7 +74,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testErrorGetLast()
     {
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $handler = ErrorHandler::register();
         $handler->setDefaultLogger($logger);
         $handler->screamAt(\E_ALL);
@@ -150,7 +152,7 @@ class ErrorHandlerTest extends TestCase
     public function testDefaultLogger()
     {
         try {
-            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+            $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
             $handler->setDefaultLogger($logger, \E_NOTICE);
@@ -225,7 +227,7 @@ class ErrorHandlerTest extends TestCase
             restore_error_handler();
             restore_exception_handler();
 
-            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+            $logger = $this->createMock(LoggerInterface::class);
 
             $warnArgCheck = function ($logLevel, $message, $context) {
                 $this->assertEquals('info', $logLevel);
@@ -250,7 +252,7 @@ class ErrorHandlerTest extends TestCase
             restore_error_handler();
             restore_exception_handler();
 
-            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+            $logger = $this->createMock(LoggerInterface::class);
 
             $line = null;
             $logArgCheck = function ($level, $message, $context) use (&$line) {
@@ -355,7 +357,7 @@ class ErrorHandlerTest extends TestCase
             $this->assertSame('User Deprecated: Foo deprecation', $exception->getMessage());
         };
 
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('log')
@@ -370,7 +372,7 @@ class ErrorHandlerTest extends TestCase
     public function testHandleException()
     {
         try {
-            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+            $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
             $exception = new \Exception('foo');
@@ -450,7 +452,7 @@ class ErrorHandlerTest extends TestCase
 
         $bootLogger->log(LogLevel::WARNING, 'Foo message', ['exception' => $exception]);
 
-        $mockLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $mockLogger = $this->createMock(LoggerInterface::class);
         $mockLogger->expects($this->once())
             ->method('log')
             ->with(LogLevel::WARNING, 'Foo message', ['exception' => $exception]);
@@ -465,7 +467,7 @@ class ErrorHandlerTest extends TestCase
 
         $exception = new \Exception('Foo message');
 
-        $mockLogger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $mockLogger = $this->createMock(LoggerInterface::class);
         $mockLogger->expects($this->once())
             ->method('log')
             ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', ['exception' => $exception]);
@@ -480,7 +482,7 @@ class ErrorHandlerTest extends TestCase
     public function testHandleFatalError()
     {
         try {
-            $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+            $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
             $error = [
@@ -527,7 +529,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler->handleException($exception);
 
-        $this->assertInstanceOf(\Symfony\Component\Debug\Exception\ClassNotFoundException::class, $args[0]);
+        $this->assertInstanceOf(ClassNotFoundException::class, $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"IReallyReallyDoNotExistAnywhereInTheRepositoryISwear\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
     }
 

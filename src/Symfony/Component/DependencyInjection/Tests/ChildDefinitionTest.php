@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 
 class ChildDefinitionTest extends TestCase
 {
@@ -129,14 +130,14 @@ class ChildDefinitionTest extends TestCase
 
     public function testCannotCallSetAutoconfigured()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
     }
 
     public function testCannotCallSetInstanceofConditionals()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         $def = new ChildDefinition('foo');
         $def->setInstanceofConditionals(['Foo' => new ChildDefinition('')]);
     }

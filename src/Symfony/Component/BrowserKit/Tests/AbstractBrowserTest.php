@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
 
 class AbstractBrowserTest extends TestCase
@@ -841,7 +842,7 @@ class AbstractBrowserTest extends TestCase
             'NEW_SERVER_KEY' => 'new-server-key-value',
         ]);
 
-        $this->assertInstanceOf(\Symfony\Component\BrowserKit\Request::class, $client->getInternalRequest());
+        $this->assertInstanceOf(Request::class, $client->getInternalRequest());
     }
 
     /**

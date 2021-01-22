@@ -32,7 +32,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller[0]);
+        $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
         $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
@@ -45,7 +45,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller);
+        $this->assertInstanceOf(ContainerAwareController::class, $controller);
         $this->assertInstanceOf(ContainerInterface::class, $controller->getContainer());
     }
 
@@ -69,7 +69,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(\Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::class, $controller[0]);
+        $this->assertInstanceOf(ContainerAwareController::class, $controller[0]);
         $this->assertInstanceOf(ContainerInterface::class, $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
@@ -200,12 +200,12 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     protected function createMockParser()
     {
-        return $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();
+        return $this->createMock(ControllerNameParser::class);
     }
 
     protected function createMockContainer()
     {
-        return $this->getMockBuilder(ContainerInterface::class)->getMock();
+        return $this->createMock(ContainerInterface::class);
     }
 }
 

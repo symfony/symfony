@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
 
 class StringToFloatTransformerTest extends TestCase
@@ -39,14 +40,14 @@ class StringToFloatTransformerTest extends TestCase
 
     public function testFailIfTransformingANonString()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->transform(1.0);
     }
 
     public function testFailIfTransformingANonNumericString()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->transform('foobar');
     }
@@ -79,7 +80,7 @@ class StringToFloatTransformerTest extends TestCase
 
     public function testFailIfReverseTransformingANonNumeric()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->reverseTransform('foobar');
     }

@@ -3,6 +3,8 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 
 /**
@@ -82,7 +84,7 @@ class DateIntervalNormalizerTest extends TestCase
 
     public function testNormalizeInvalidObjectThrowsException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The object must be an instance of "\DateInterval".');
         $this->normalizer->normalize(new \stdClass());
     }
@@ -130,26 +132,26 @@ class DateIntervalNormalizerTest extends TestCase
 
     public function testDenormalizeExpectsString()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->normalizer->denormalize(1234, \DateInterval::class);
     }
 
     public function testDenormalizeNonISO8601IntervalStringThrowsException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected a valid ISO 8601 interval string.');
         $this->normalizer->denormalize('10 years 2 months 3 days', \DateInterval::class, null);
     }
 
     public function testDenormalizeInvalidDataThrowsException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('invalid interval', \DateInterval::class);
     }
 
     public function testDenormalizeFormatMismatchThrowsException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD']);
     }
 

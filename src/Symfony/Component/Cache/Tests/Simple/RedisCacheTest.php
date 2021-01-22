@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Simple\RedisCache;
 
 /**
@@ -52,7 +53,7 @@ class RedisCacheTest extends AbstractRedisCacheTest
      */
     public function testFailedCreateConnection(string $dsn)
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Redis connection ');
         RedisCache::createConnection($dsn);
     }
@@ -71,7 +72,7 @@ class RedisCacheTest extends AbstractRedisCacheTest
      */
     public function testInvalidCreateConnection(string $dsn)
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid Redis DSN');
         RedisCache::createConnection($dsn);
     }

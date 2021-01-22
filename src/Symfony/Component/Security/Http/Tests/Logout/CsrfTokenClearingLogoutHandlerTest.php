@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler;
 
@@ -39,7 +40,7 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
         $this->assertSame('bar', $this->session->get('foo/foo'));
         $this->assertSame('baz', $this->session->get('foo/foobar'));
 
-        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
+        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->createMock(TokenInterface::class));
 
         $this->assertFalse($this->csrfTokenStorage->hasToken('foo'));
         $this->assertFalse($this->csrfTokenStorage->hasToken('foobar'));
@@ -59,7 +60,7 @@ class CsrfTokenClearingLogoutHandlerTest extends TestCase
         $this->assertSame('bar', $this->session->get('bar/foo'));
         $this->assertSame('baz', $this->session->get('bar/foobar'));
 
-        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock());
+        $this->csrfTokenClearingLogoutHandler->logout(new Request(), new Response(), $this->createMock(TokenInterface::class));
 
         $this->assertTrue($barNamespaceCsrfSessionStorage->hasToken('foo'));
         $this->assertTrue($barNamespaceCsrfSessionStorage->hasToken('foobar'));

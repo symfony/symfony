@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Collator;
 
 use Symfony\Component\Intl\Collator\Collator;
+use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
@@ -19,7 +20,7 @@ class CollatorTest extends AbstractCollatorTest
 {
     public function testConstructorWithUnsupportedLocale()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException::class);
+        $this->expectException(MethodArgumentValueNotImplementedException::class);
         $this->getCollator('pt_BR');
     }
 

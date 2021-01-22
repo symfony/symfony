@@ -2,9 +2,11 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -124,7 +126,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new SymfonyQuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -149,7 +151,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
   [foo   ] foo
   [żółw  ] bar
   [łabądź] baz
- > 
+ >
 EOT
         , $output, true);
     }
@@ -168,7 +170,7 @@ EOT
         $this->assertOutputContains(<<<EOT
  qqq:
   [0] foo
- >ccc> 
+ >ccc>
 EOT
         , $output, true);
     }
@@ -192,7 +194,7 @@ EOT
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder(\Symfony\Component\Console\Input\InputInterface::class)->getMock();
+        $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);

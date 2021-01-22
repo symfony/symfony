@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
@@ -40,7 +41,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReference()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container
@@ -53,7 +54,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $container = new ContainerBuilder();
 
         $def = new Definition();
@@ -83,7 +84,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testWithErroredServiceLocator()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "foo" in the container provided to "bar" has a dependency on a non-existent service "baz".');
         $container = new ContainerBuilder();
 
@@ -96,7 +97,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     public function testWithErroredHiddenService()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('The service "bar" has a dependency on a non-existent service "foo".');
         $container = new ContainerBuilder();
 

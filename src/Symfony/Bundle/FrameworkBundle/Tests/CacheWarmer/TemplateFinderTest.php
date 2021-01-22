@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * @group legacy
@@ -23,12 +24,7 @@ class TemplateFinderTest extends TestCase
 {
     public function testFindAllTemplates()
     {
-        $kernel = $this
-            ->getMockBuilder(\Symfony\Component\HttpKernel\Kernel::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
+        $kernel = $this->createMock(Kernel::class);
         $kernel
             ->expects($this->any())
             ->method('getBundle')

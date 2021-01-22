@@ -21,7 +21,7 @@ class MigratingPasswordEncoderTest extends TestCase
     {
         $bestEncoder = new NativePasswordEncoder(4, 12000, 4);
 
-        $extraEncoder = $this->getMockBuilder(TestPasswordEncoderInterface::class)->getMock();
+        $extraEncoder = $this->createMock(TestPasswordEncoderInterface::class);
         $extraEncoder->expects($this->never())->method('encodePassword');
         $extraEncoder->expects($this->never())->method('isPasswordValid');
         $extraEncoder->expects($this->never())->method('needsRehash');
@@ -41,7 +41,7 @@ class MigratingPasswordEncoderTest extends TestCase
     {
         $bestEncoder = new NativePasswordEncoder(4, 12000, 4);
 
-        $extraEncoder1 = $this->getMockBuilder(TestPasswordEncoderInterface::class)->getMock();
+        $extraEncoder1 = $this->createMock(TestPasswordEncoderInterface::class);
         $extraEncoder1->expects($this->any())
             ->method('isPasswordValid')
             ->with('abc', 'foo', 'salt')
@@ -51,7 +51,7 @@ class MigratingPasswordEncoderTest extends TestCase
 
         $this->assertTrue($encoder->isPasswordValid('abc', 'foo', 'salt'));
 
-        $extraEncoder2 = $this->getMockBuilder(TestPasswordEncoderInterface::class)->getMock();
+        $extraEncoder2 = $this->createMock(TestPasswordEncoderInterface::class);
         $extraEncoder2->expects($this->any())
             ->method('isPasswordValid')
             ->willReturn(false);

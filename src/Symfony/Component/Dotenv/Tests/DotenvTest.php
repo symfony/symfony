@@ -14,6 +14,7 @@ namespace Symfony\Component\Dotenv\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
+use Symfony\Component\Dotenv\Exception\PathException;
 
 class DotenvTest extends TestCase
 {
@@ -322,7 +323,7 @@ class DotenvTest extends TestCase
 
     public function testLoadDirectory()
     {
-        $this->expectException(\Symfony\Component\Dotenv\Exception\PathException::class);
+        $this->expectException(PathException::class);
         $dotenv = new Dotenv(true);
         $dotenv->load(__DIR__);
     }

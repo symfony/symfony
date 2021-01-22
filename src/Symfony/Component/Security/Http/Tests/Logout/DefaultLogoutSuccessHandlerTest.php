@@ -13,16 +13,18 @@ namespace Symfony\Component\Security\Http\Tests\Logout;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler;
 
 class DefaultLogoutSuccessHandlerTest extends TestCase
 {
     public function testLogout()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $request = $this->createMock(Request::class);
         $response = new RedirectResponse('/dashboard');
 
-        $httpUtils = $this->getMockBuilder(\Symfony\Component\Security\Http\HttpUtils::class)->getMock();
+        $httpUtils = $this->createMock(HttpUtils::class);
         $httpUtils->expects($this->once())
             ->method('createRedirectResponse')
             ->with($request, '/dashboard')

@@ -13,12 +13,13 @@ namespace Symfony\Component\HttpKernel\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class FileLocatorTest extends TestCase
 {
     public function testLocate()
     {
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->atLeastOnce())
             ->method('locateResource')
@@ -39,7 +40,7 @@ class FileLocatorTest extends TestCase
      */
     public function testLocateWithGlobalResourcePath()
     {
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->atLeastOnce())
             ->method('locateResource')

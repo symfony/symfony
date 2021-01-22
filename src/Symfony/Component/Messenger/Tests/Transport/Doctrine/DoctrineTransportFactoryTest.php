@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Persistence\ConnectionRegistry;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory;
@@ -56,7 +57,7 @@ class DoctrineTransportFactoryTest extends TestCase
 
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry->expects($this->once())

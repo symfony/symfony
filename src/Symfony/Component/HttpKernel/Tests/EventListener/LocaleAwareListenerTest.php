@@ -28,7 +28,7 @@ class LocaleAwareListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->localeAwareService = $this->getMockBuilder(LocaleAwareInterface::class)->getMock();
+        $this->localeAwareService = $this->createMock(LocaleAwareInterface::class);
         $this->requestStack = new RequestStack();
         $this->listener = new LocaleAwareListener(new \ArrayIterator([$this->localeAwareService]), $this->requestStack);
     }
@@ -110,7 +110,7 @@ class LocaleAwareListenerTest extends TestCase
 
     private function createHttpKernel()
     {
-        return $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        return $this->createMock(HttpKernelInterface::class);
     }
 
     private function createRequest($locale)

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Logger;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -138,7 +139,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testThrowsOnInvalidLevel()
     {
-        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $logger = $this->getLogger();
         $logger->log('invalid level', 'Foo');
     }

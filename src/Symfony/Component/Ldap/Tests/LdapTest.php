@@ -29,13 +29,13 @@ class LdapTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
+        $this->adapter = $this->createMock(AdapterInterface::class);
         $this->ldap = new Ldap($this->adapter);
     }
 
     public function testLdapBind()
     {
-        $connection = $this->getMockBuilder(ConnectionInterface::class)->getMock();
+        $connection = $this->createMock(ConnectionInterface::class);
         $connection
             ->expects($this->once())
             ->method('bind')

@@ -14,8 +14,10 @@ namespace Symfony\Component\HttpFoundation\Tests\Session;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
@@ -212,7 +214,7 @@ class SessionTest extends TestCase
 
     public function testGetFlashBag()
     {
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface::class, $this->session->getFlashBag());
+        $this->assertInstanceOf(FlashBagInterface::class, $this->session->getFlashBag());
     }
 
     public function testGetIterator()
@@ -241,7 +243,7 @@ class SessionTest extends TestCase
 
     public function testGetMeta()
     {
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\Session\Storage\MetadataBag::class, $this->session->getMetadataBag());
+        $this->assertInstanceOf(MetadataBag::class, $this->session->getMetadataBag());
     }
 
     public function testIsEmpty()

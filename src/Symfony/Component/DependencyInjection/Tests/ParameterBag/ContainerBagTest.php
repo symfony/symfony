@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
@@ -50,7 +51,7 @@ class ContainerBagTest extends TestCase
 
     public function testGetParameterNotFound()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->containerBag->get('bar');
     }
 

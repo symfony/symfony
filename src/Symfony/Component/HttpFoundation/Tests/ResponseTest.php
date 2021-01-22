@@ -946,7 +946,7 @@ class ResponseTest extends ResponseTestCase
     public function testNoDeprecationsAreTriggered()
     {
         new DefaultResponse();
-        $this->getMockBuilder(Response::class)->getMock();
+        $this->createMock(Response::class);
 
         // we just need to ensure that subclasses of Response can be created without any deprecations
         // being triggered if the subclass does not override any final methods

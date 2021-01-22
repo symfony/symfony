@@ -29,7 +29,7 @@ class RedisReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $redisEnvelop = $this->createRedisEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($redisEnvelop);
 
         $receiver = new RedisReceiver($connection, $serializer);
@@ -46,7 +46,7 @@ class RedisReceiverTest extends TestCase
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $redisEnvelop = $this->createRedisEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($redisEnvelop);
         $connection->expects($this->once())->method('reject');
 

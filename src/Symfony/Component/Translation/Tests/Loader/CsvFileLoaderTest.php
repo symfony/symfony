@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 
 class CsvFileLoaderTest extends TestCase
@@ -41,7 +43,7 @@ class CsvFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../fixtures/not-exists.csv';
         $loader->load($resource, 'en', 'domain1');
@@ -49,7 +51,7 @@ class CsvFileLoaderTest extends TestCase
 
     public function testLoadNonLocalResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $loader = new CsvFileLoader();
         $resource = 'http://example.com/resources.csv';
         $loader->load($resource, 'en', 'domain1');

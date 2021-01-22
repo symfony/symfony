@@ -15,8 +15,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormValidatorInterface;
 
 abstract class AbstractFormTest extends TestCase
 {
@@ -26,7 +30,7 @@ abstract class AbstractFormTest extends TestCase
     protected $dispatcher;
 
     /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
+     * @var FormFactoryInterface
      */
     protected $factory;
 
@@ -38,7 +42,7 @@ abstract class AbstractFormTest extends TestCase
     protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
-        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
+        $this->factory = $this->createMock(FormFactoryInterface::class);
         $this->form = $this->createForm();
     }
 
@@ -58,16 +62,16 @@ abstract class AbstractFormTest extends TestCase
 
     protected function getDataMapper(): MockObject
     {
-        return $this->getMockBuilder(\Symfony\Component\Form\DataMapperInterface::class)->getMock();
+        return $this->createMock(DataMapperInterface::class);
     }
 
     protected function getDataTransformer(): MockObject
     {
-        return $this->getMockBuilder(\Symfony\Component\Form\DataTransformerInterface::class)->getMock();
+        return $this->createMock(DataTransformerInterface::class);
     }
 
     protected function getFormValidator(): MockObject
     {
-        return $this->getMockBuilder(\Symfony\Component\Form\FormValidatorInterface::class)->getMock();
+        return $this->createMock(FormValidatorInterface::class);
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute;
 use Symfony\Component\Routing\Tests\Fixtures\CustomRouteCompiler;
@@ -188,7 +189,7 @@ class RouteTest extends TestCase
     public function testCompile()
     {
         $route = new Route('/{foo}');
-        $this->assertInstanceOf(\Symfony\Component\Routing\CompiledRoute::class, $compiled = $route->compile(), '->compile() returns a compiled route');
+        $this->assertInstanceOf(CompiledRoute::class, $compiled = $route->compile(), '->compile() returns a compiled route');
         $this->assertSame($compiled, $route->compile(), '->compile() only compiled the route once if unchanged');
         $route->setRequirement('foo', '.*');
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');

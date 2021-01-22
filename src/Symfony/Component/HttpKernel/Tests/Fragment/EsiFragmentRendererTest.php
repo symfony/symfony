@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
+use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\UriSigner;
 
@@ -91,7 +92,7 @@ class EsiFragmentRendererTest extends TestCase
 
     private function getInlineStrategy($called = false)
     {
-        $inline = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer::class)->disableOriginalConstructor()->getMock();
+        $inline = $this->createMock(InlineFragmentRenderer::class);
 
         if ($called) {
             $inline->expects($this->once())->method('render');

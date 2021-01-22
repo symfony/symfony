@@ -12,14 +12,18 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 class ProfilerListenerTest extends TestCase
 {
@@ -30,27 +34,15 @@ class ProfilerListenerTest extends TestCase
     {
         $profile = new Profile('token');
 
-        $profiler = $this->getMockBuilder(\Symfony\Component\HttpKernel\Profiler\Profiler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $profiler = $this->createMock(Profiler::class);
         $profiler->expects($this->once())
             ->method('collect')
             ->willReturn($profile);
 
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernelInterface::class)->getMock();
-
-        $masterRequest = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subRequest = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $response = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Response::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $masterRequest = $this->createMock(Request::class);
+        $subRequest = $this->createMock(Request::class);
+        $response = $this->createMock(Response::class);
 
         $requestStack = new RequestStack();
         $requestStack->push($masterRequest);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 class EmailTest extends TestCase
 {
@@ -36,7 +37,7 @@ class EmailTest extends TestCase
 
     public function testUnknownModesTriggerException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(['mode' => 'Unknown Mode']);
     }
@@ -50,14 +51,14 @@ class EmailTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Email(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Email(['normalizer' => new \stdClass()]);
     }

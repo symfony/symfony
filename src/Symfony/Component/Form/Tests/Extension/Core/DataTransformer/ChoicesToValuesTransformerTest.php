@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 
 class ChoicesToValuesTransformerTest extends TestCase
@@ -55,7 +56,7 @@ class ChoicesToValuesTransformerTest extends TestCase
 
     public function testTransformExpectsArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('foobar');
     }
 
@@ -81,7 +82,7 @@ class ChoicesToValuesTransformerTest extends TestCase
 
     public function testReverseTransformExpectsArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('foobar');
     }
 }

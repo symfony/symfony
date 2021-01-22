@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -35,7 +36,7 @@ class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()
     {
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
         $eHandler = new ErrorHandler();
@@ -67,7 +68,7 @@ class DebugHandlersListenerTest extends TestCase
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
         $event = new KernelEvent(
-            $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
+            $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MASTER_REQUEST
         );
@@ -91,7 +92,7 @@ class DebugHandlersListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);
-        $app = $this->getMockBuilder(Application::class)->getMock();
+        $app = $this->createMock(Application::class);
         $app->expects($this->once())->method('getHelperSet')->willReturn(new HelperSet());
         $command = new Command(__FUNCTION__);
         $command->setApplication($app);

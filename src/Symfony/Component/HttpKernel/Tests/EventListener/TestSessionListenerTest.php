@@ -14,9 +14,11 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -42,7 +44,7 @@ class TestSessionListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->listener = $this->getMockForAbstractClass(\Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener::class);
+        $this->listener = $this->getMockForAbstractClass(AbstractTestSessionListener::class);
         $this->session = $this->getSession();
         $this->listener->expects($this->any())
              ->method('getSession')
@@ -95,7 +97,7 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -114,7 +116,7 @@ class TestSessionListenerTest extends TestCase
         $this->sessionIsEmpty();
         $this->fixSessionId('456');
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -145,7 +147,7 @@ class TestSessionListenerTest extends TestCase
 
     public function testDoesNotThrowIfRequestDoesNotHaveASession()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $event = new ResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, new Response());
 
         $this->listener->onKernelResponse($event);
@@ -157,7 +159,7 @@ class TestSessionListenerTest extends TestCase
     {
         $request->setSession($this->session);
         $response = $response ?: new Response();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $event = new ResponseEvent($kernel, $request, $type, $response);
 
         $this->listener->onKernelResponse($event);
@@ -209,11 +211,7 @@ class TestSessionListenerTest extends TestCase
 
     private function getSession()
     {
-        $mock = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // set return value for getName()
+        $mock = $this->createMock(Session::class);
         $mock->expects($this->any())->method('getName')->willReturn('MOCKSESSID');
 
         return $mock;

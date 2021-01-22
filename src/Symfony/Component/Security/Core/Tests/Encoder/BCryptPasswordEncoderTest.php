@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
@@ -69,7 +70,7 @@ class BCryptPasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
 
         $encoder->encodePassword(str_repeat('a', 73), 'salt');

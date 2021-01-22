@@ -177,7 +177,7 @@ class ArgumentResolverTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $factory = new ArgumentMetadataFactory();
-        $valueResolver = $this->getMockBuilder(ArgumentValueResolverInterface::class)->getMock();
+        $valueResolver = $this->createMock(ArgumentValueResolverInterface::class);
         $resolver = new ArgumentResolver($factory, [$valueResolver]);
 
         $valueResolver->expects($this->any())->method('supports')->willReturn(true);
@@ -241,7 +241,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetSessionArgumentsWithInterface()
     {
-        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
         $controller = [$this, 'controllerWithSessionInterface'];
@@ -252,7 +252,7 @@ class ArgumentResolverTest extends TestCase
     public function testGetSessionMissMatchWithInterface()
     {
         $this->expectException(\RuntimeException::class);
-        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $request = Request::create('/');
         $request->setSession($session);
         $controller = [$this, 'controllerWithExtendingSession'];

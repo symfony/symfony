@@ -20,7 +20,7 @@ class ControllerResolverTest extends TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 

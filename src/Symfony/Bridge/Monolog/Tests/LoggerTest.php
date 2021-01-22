@@ -84,7 +84,7 @@ class LoggerTest extends TestCase
     public function testGetLogsWithDebugProcessor3()
     {
         $request = new Request();
-        $processor = $this->getMockBuilder(DebugProcessor::class)->getMock();
+        $processor = $this->createMock(DebugProcessor::class);
         $processor->expects($this->once())->method('getLogs')->with($request);
         $processor->expects($this->once())->method('countErrors')->with($request);
 

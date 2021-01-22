@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * @group functional
@@ -67,7 +68,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
 
     public function testClearUnexistingPool()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
         $this->createCommandTester()
             ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);

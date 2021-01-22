@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
@@ -28,9 +29,9 @@ class ValidateRequestListenerTest extends TestCase
 
     public function testListenerThrowsWhenMasterRequestHasInconsistentClientIps()
     {
-        $this->expectException(\Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException::class);
+        $this->expectException(ConflictingHeadersException::class);
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);

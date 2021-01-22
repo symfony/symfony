@@ -4,6 +4,7 @@ namespace Symfony\Component\Workflow\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
@@ -19,9 +20,9 @@ class RegistryTest extends TestCase
     {
         $this->registry = new Registry();
 
-        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createWorkflowSupportStrategy(Subject1::class));
-        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->createWorkflowSupportStrategy(Subject2::class));
-        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
+        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow1'), $this->createWorkflowSupportStrategy(Subject1::class));
+        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow2'), $this->createWorkflowSupportStrategy(Subject2::class));
+        $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
     }
 
     protected function tearDown(): void
@@ -37,7 +38,7 @@ class RegistryTest extends TestCase
     {
         $registry = new Registry();
 
-        $registry->add($w = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
+        $registry->add($w = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class), $this->createMock(EventDispatcherInterface::class), 'workflow1'), $this->createSupportStrategy(Subject1::class));
 
         $workflow = $registry->get(new Subject1());
         $this->assertInstanceOf(Workflow::class, $workflow);
@@ -61,7 +62,7 @@ class RegistryTest extends TestCase
 
     public function testGetWithMultipleMatch()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Too many workflows (workflow2, workflow3) match this subject (Symfony\Component\Workflow\Tests\Subject2); set a different name on each and use the second (name) argument of this method.');
         $w1 = $this->registry->get(new Subject2());
         $this->assertInstanceOf(Workflow::class, $w1);
@@ -70,7 +71,7 @@ class RegistryTest extends TestCase
 
     public function testGetWithNoMatch()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to find a workflow for class "stdClass".');
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);
@@ -109,7 +110,7 @@ class RegistryTest extends TestCase
      */
     private function createSupportStrategy($supportedClassName)
     {
-        $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
+        $strategy = $this->createMock(SupportStrategyInterface::class);
         $strategy->expects($this->any())->method('supports')
             ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;
@@ -123,7 +124,7 @@ class RegistryTest extends TestCase
      */
     private function createWorkflowSupportStrategy($supportedClassName)
     {
-        $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();
+        $strategy = $this->createMock(WorkflowSupportStrategyInterface::class);
         $strategy->expects($this->any())->method('supports')
             ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 class ChainEncoderTest extends TestCase
 {
@@ -28,10 +29,7 @@ class ChainEncoderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->encoder1 = $this
-            ->getMockBuilder(EncoderInterface::class)
-            ->getMock();
-
+        $this->encoder1 = $this->createMock(EncoderInterface::class);
         $this->encoder1
             ->method('supportsEncoding')
             ->willReturnMap([
@@ -41,10 +39,7 @@ class ChainEncoderTest extends TestCase
                 [self::FORMAT_3, ['foo' => 'bar'], true],
             ]);
 
-        $this->encoder2 = $this
-            ->getMockBuilder(EncoderInterface::class)
-            ->getMock();
-
+        $this->encoder2 = $this->createMock(EncoderInterface::class);
         $this->encoder2
             ->method('supportsEncoding')
             ->willReturnMap([
@@ -74,7 +69,7 @@ class ChainEncoderTest extends TestCase
 
     public function testEncodeUnsupportedFormat()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 

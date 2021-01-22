@@ -13,6 +13,10 @@ namespace Symfony\Component\Intl\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
 
 class IntlTest extends TestCase
 {
@@ -45,7 +49,7 @@ class IntlTest extends TestCase
      */
     public function testGetCurrencyBundleCreatesTheCurrencyBundle()
     {
-        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface::class, Intl::getCurrencyBundle());
+        $this->assertInstanceOf(CurrencyBundleInterface::class, Intl::getCurrencyBundle());
     }
 
     /**
@@ -53,7 +57,7 @@ class IntlTest extends TestCase
      */
     public function testGetLanguageBundleCreatesTheLanguageBundle()
     {
-        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface::class, Intl::getLanguageBundle());
+        $this->assertInstanceOf(LanguageBundleInterface::class, Intl::getLanguageBundle());
     }
 
     /**
@@ -61,7 +65,7 @@ class IntlTest extends TestCase
      */
     public function testGetLocaleBundleCreatesTheLocaleBundle()
     {
-        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface::class, Intl::getLocaleBundle());
+        $this->assertInstanceOf(LocaleBundleInterface::class, Intl::getLocaleBundle());
     }
 
     /**
@@ -69,7 +73,7 @@ class IntlTest extends TestCase
      */
     public function testGetRegionBundleCreatesTheRegionBundle()
     {
-        $this->assertInstanceOf(\Symfony\Component\Intl\ResourceBundle\RegionBundleInterface::class, Intl::getRegionBundle());
+        $this->assertInstanceOf(RegionBundleInterface::class, Intl::getRegionBundle());
     }
 
     public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary()

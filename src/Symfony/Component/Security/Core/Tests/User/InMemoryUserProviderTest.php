@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 
@@ -70,7 +71,7 @@ class InMemoryUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameDoesNotExist()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException::class);
+        $this->expectException(UsernameNotFoundException::class);
         $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');
     }

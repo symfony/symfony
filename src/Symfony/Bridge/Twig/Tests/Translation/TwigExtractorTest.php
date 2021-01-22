@@ -18,6 +18,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
@@ -26,14 +27,14 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $twig = new Environment($loader, [
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -102,8 +103,8 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock());
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig = new Environment($this->createMock(LoaderInterface::class));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');
@@ -132,7 +133,7 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->getMockBuilder(TranslatorInterface::class)->getMock()));
+        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
 
 /**
@@ -25,7 +26,7 @@ class TemplateNameParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getBundle')

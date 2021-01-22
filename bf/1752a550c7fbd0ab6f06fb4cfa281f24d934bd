@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-22T09:55:51Z
+
+An idea for Symfony 6: "export-ignore" the whole `/src` directory to kill using `symfony/symfony`.

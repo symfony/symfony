@@ -181,7 +181,7 @@ EOF
 
             $namespace = $matches[1] ?? null;
 
-            if (false === preg_match('/class +([^{ ]+)/', $fileContent, $matches)) {
+            if (!preg_match('/class +([^{ ]+)/', $fileContent, $matches)) {
                 // no class found
                 continue;
             }

@@ -1,0 +1,32 @@
+{
+    "name": "symfony/fake-sms-notifier",
+    "type": "symfony-bridge",
+    "description": "Fake SMS (as email during development) Notifier Bridge.",
+    "keywords": ["sms", "development", "email", "notifier", "symfony"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "James Hemery",
+            "homepage": "https://github.com/JamesHemery"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/http-client": "^4.4|^5.2",
+        "symfony/notifier": "^5.3",
+        "symfony/event-dispatcher-contracts": "^2",
+        "symfony/mailer": "^5.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\FakeSms\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

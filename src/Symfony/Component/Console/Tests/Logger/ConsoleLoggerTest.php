@@ -20,8 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 /**
- * Console logger test.
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -157,9 +155,9 @@ class ConsoleLoggerTest extends TestCase
     public function testObjectCastToString()
     {
         if (method_exists($this, 'createPartialMock')) {
-            $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         } else {
-            $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         }
         $dummy->method('__toString')->willReturn('DUMMY');
 

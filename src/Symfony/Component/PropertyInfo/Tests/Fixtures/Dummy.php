@@ -233,4 +233,8 @@ class Dummy extends ParentDummy
     public function addDate(\DateTime $date)
     {
     }
+
+    public function hasElement(string $element): bool
+    {
+    }
 }

@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Randomize CSRF tokens to harden BREACH attacks
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
 
 5.2.0

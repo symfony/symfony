@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-22T20:15:13Z
+
+Can you please tell what is the bug about you are trying to fix? Thanks
+
+---------------------------------------------------------------------------
+
+by loic425 at 2021-01-22T20:32:20Z
+
+> Can you please tell what is the bug about you are trying to fix? Thanks
+
+It crashes when debuging validators in a directory path which contains other files than classes but with namespace (traits, interfaces). I will edit the first post with the error.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-23T09:48:43Z
+
+Does it apply to the 4.4 branch too?
+
+---------------------------------------------------------------------------
+
+by loic425 at 2021-01-23T10:34:44Z
+
+> Does it apply to the 4.4 branch too?
+
+No this feature was released on 5.2 :)
+https://symfony.com/doc/current/validation.html#debugging-the-constraints

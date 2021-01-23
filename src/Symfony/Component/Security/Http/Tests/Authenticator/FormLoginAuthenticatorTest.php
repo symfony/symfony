@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
@@ -165,7 +166,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     private function createSession()
     {
-        return $this->createMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        return $this->createMock(SessionInterface::class);
     }
 }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 
@@ -225,5 +226,10 @@ class UlidTest extends TestCase
             ['01EW2RYKDCT2SAK454KBR2QG08'],
             ['1BVXue8CnY8ogucrHX3TeF'],
         ];
+    }
+
+    public function testFromStringOnExtendedClassReturnsStatic()
+    {
+        $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
 }

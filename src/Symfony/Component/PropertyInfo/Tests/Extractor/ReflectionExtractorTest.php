@@ -81,6 +81,7 @@ class ReflectionExtractorTest extends TestCase
                 'xTotals',
                 'YT',
                 'date',
+                'element',
                 'c',
                 'd',
                 'e',
@@ -303,6 +304,7 @@ class ReflectionExtractorTest extends TestCase
             ['id', true],
             ['Guid', true],
             ['guid', false],
+            ['element', false],
         ];
     }
 

@@ -79,7 +79,7 @@ class Ulid extends AbstractUid
             base_convert(substr($ulid, 27, 5), 16, 32)
         );
 
-        return new self(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
+        return new static(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
     }
 
     public function toBinary(): string

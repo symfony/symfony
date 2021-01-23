@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
+use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 class LogoutListenerTest extends TestCase
@@ -183,7 +184,7 @@ class LogoutListenerTest extends TestCase
         $response = new Response();
         $logoutSuccessHandler->expects($this->any())->method('onLogoutSuccess')->willReturn($response);
 
-        $handler = $this->createMock('Symfony\Component\Security\Http\Logout\LogoutHandlerInterface');
+        $handler = $this->createMock(LogoutHandlerInterface::class);
         $handler->expects($this->once())->method('logout')->with($request, $response, $token);
         $listener->addHandler($handler);
 

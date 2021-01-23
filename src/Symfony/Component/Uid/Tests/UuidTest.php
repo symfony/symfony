@@ -13,6 +13,7 @@ namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\NilUuid;
+use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
@@ -300,5 +301,10 @@ class UuidTest extends TestCase
             ['0YPNRV8560D29VYW1D9J1WYXAT'],
             ['4nwTLZ2TdMtTVDE5AwVjaR'],
         ];
+    }
+
+    public function testFromStringOnExtendedClassReturnsStatic()
+    {
+        $this->assertInstanceOf(CustomUuid::class, CustomUuid::fromString(self::A_UUID_V4));
     }
 }

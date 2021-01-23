@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-21T13:27:12Z
+
+(failure is related)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-21T15:48:33Z
+
+last failed test is about tests in  branch < `5.3` working with my patch and failed.
+The test tries to generte 2 logout links (with CSRF token) and expect there are identical which is exactly what my PR prevent.
+
+Once this PR merge, I've to fix the test in downstream branches
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-21T17:36:11Z
+
+green \o/

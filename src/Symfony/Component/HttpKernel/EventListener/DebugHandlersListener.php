@@ -33,6 +33,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {
+    private $earlyHandler;
     private $exceptionHandler;
     private $logger;
     private $levels;
@@ -53,6 +54,10 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
     {
+        $handler = set_exception_handler('var_dump');
+        $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
+        restore_exception_handler();
+
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
         $this->levels = null === $levels ? \E_ALL : $levels;
@@ -78,6 +83,10 @@ class DebugHandlersListener implements EventSubscriberInterface
         $handler = set_exception_handler('var_dump');
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
+
+        if (!$handler instanceof ErrorHandler && !$handler instanceof LegacyErrorHandler) {
+            $handler = $this->earlyHandler;
+        }
 
         if ($this->logger || null !== $this->throwAt) {
             if ($handler instanceof ErrorHandler || $handler instanceof LegacyErrorHandler) {

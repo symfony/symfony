@@ -64,7 +64,17 @@ final class OvhCloudTransportTest extends TransportTestCase
 
         $time = time();
 
-        $lastResponse = new MockResponse();
+        $data = json_encode([
+            'totalCreditsRemoved' => '1',
+            'invalidReceivers' => [],
+            'ids' => [
+                '26929925',
+            ],
+            'validReceivers' => [
+                '0611223344',
+            ],
+        ]);
+        $lastResponse = new MockResponse($data);
         $responses = [
             new MockResponse((string) $time),
             $lastResponse,

@@ -66,7 +66,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private $propertyPathCache = [];
     private $readPropertyCache = [];
     private $writePropertyCache = [];
-    private static $resultProto = [self::VALUE => null];
+    private const RESULT_PROTO = [self::VALUE => null];
 
     /**
      * Should not be used by application code. Use
@@ -355,7 +355,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, \get_class($zval[self::VALUE])));
         }
 
-        $result = self::$resultProto;
+        $result = self::RESULT_PROTO;
 
         if (isset($zval[self::VALUE][$index])) {
             $result[self::VALUE] = $zval[self::VALUE][$index];
@@ -383,7 +383,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
         }
 
-        $result = self::$resultProto;
+        $result = self::RESULT_PROTO;
         $object = $zval[self::VALUE];
         $access = $this->getReadAccessInfo(\get_class($object), $property);
 

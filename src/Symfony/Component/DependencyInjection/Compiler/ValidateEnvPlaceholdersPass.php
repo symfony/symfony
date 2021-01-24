@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 {
-    private static $typeFixtures = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
+    private const TYPE_FIXTURES = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
 
     private $extensionConfig = [];
 
@@ -52,13 +52,13 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
             foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
                 $values = [];
                 if (false === $i = strpos($env, ':')) {
-                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::$typeFixtures['string'];
+                    $default = $defaultBag->has("env($env)") ? $defaultBag->get("env($env)") : self::TYPE_FIXTURES['string'];
                     $defaultType = null !== $default ? self::getType($default) : 'string';
                     $values[$defaultType] = $default;
                 } else {
                     $prefix = substr($env, 0, $i);
                     foreach ($envTypes[$prefix] ?? ['string'] as $type) {
-                        $values[$type] = self::$typeFixtures[$type] ?? null;
+                        $values[$type] = self::TYPE_FIXTURES[$type] ?? null;
                     }
                 }
                 foreach ($placeholders as $placeholder) {

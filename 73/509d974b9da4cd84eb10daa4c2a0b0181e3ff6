@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-20T15:18:27Z
+
+Would it make sense to add the MecureBundle as a dependency of the bridge then?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2021-01-20T15:48:13Z
+
+Actually, if that check lives in the bridge, then that bridge won't be able to exist without the bundle.
+Therefore, the Notifier component won't be able to exist as a single component when using the Mercure bridge.
+That was why I put before the check in the FrameworkExtension.
+
+So I see two options:
+- Require the bundle in composer.json and then assume that the Mercure bridge can't be used with Notifier as a single component.
+- Update changes made in https://github.com/symfony/symfony/pull/39903 in order to re-do the check in FrameworkExtension (and still remove the definition if not needed)
+
+WDYT?

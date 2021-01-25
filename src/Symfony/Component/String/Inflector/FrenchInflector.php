@@ -119,7 +119,7 @@ final class FrenchInflector implements InflectorInterface
             return [$plural];
         }
 
-        foreach (self::$singularizeRegexp as $rule) {
+        foreach (self::SINGULARIZE_REGEXP as $rule) {
             [$regexp, $replace] = $rule;
 
             if (1 === preg_match($regexp, $plural)) {

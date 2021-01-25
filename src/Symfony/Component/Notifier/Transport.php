@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -72,6 +73,7 @@ class Transport
         GatewayApiTransportFactory::class,
         OctopushTransportFactory::class,
         GitterTransportFactory::class,
+        ClickatellTransportFactory::class,
     ];
 
     private $factories;

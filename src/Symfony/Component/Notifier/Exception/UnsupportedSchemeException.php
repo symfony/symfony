@@ -108,6 +108,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Gitter\GitterTransportFactory::class,
             'package' => 'symfony/gitter-notifier',
         ],
+        'clickatell' => [
+            'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
+            'package' => 'symfony/clickatell-notifier',
+        ],
     ];
 
     /**

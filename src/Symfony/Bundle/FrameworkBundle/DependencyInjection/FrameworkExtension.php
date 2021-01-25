@@ -104,6 +104,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -2248,6 +2249,7 @@ class FrameworkExtension extends Extension
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
+            ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
         ];
 
         foreach ($classToServices as $class => $service) {

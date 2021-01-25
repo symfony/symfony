@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\AggregableExceptionInterface;
+use Symfony\Component\Serializer\Exception\AggregatedException;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\VariadicConstructorArgumentsException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -351,6 +354,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
             $constructorParameters = $constructor->getParameters();
 
+            $aggregatedException = new AggregatedException();
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
@@ -361,12 +365,28 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                         if (!\is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of "%s" from serialized data because the variadic parameter "%s" can only accept an array.', $class, $constructorParameter->name));
+                            $e = new VariadicConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because the variadic parameter "%s" can only accept an array.', $class, $constructorParameter->name));
+                            if (!($context[self::COLLECT_EXCEPTIONS] ?? false)) {
+                                throw $e;
+                            }
+
+                            $aggregatedException->put($paramName, $e);
+                            unset($data[$key]);
+                            continue;
                         }
 
                         $variadicParameters = [];
-                        foreach ($data[$paramName] as $parameterData) {
-                            $variadicParameters[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                        foreach ($data[$paramName] as $paramKey => $parameterData) {
+                            try {
+                                $variadicParameters[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                            } catch (AggregableExceptionInterface $e) {
+                                if (!($context[self::COLLECT_EXCEPTIONS] ?? false)) {
+                                    throw $e;
+                                }
+
+                                $aggregatedException->put("$paramName.$paramKey", $e);
+                                continue;
+                            }
                         }
 
                         $params = array_merge($params, $variadicParameters);
@@ -382,7 +402,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     }
 
                     // Don't run set for a parameter passed to the constructor
-                    $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    try {
+                        $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
+                    } catch (AggregableExceptionInterface $e) {
+                        if (!($context[self::COLLECT_EXCEPTIONS] ?? false)) {
+                            throw $e;
+                        }
+
+                        $aggregatedException->put($paramName, $e);
+                    }
                     unset($data[$key]);
                 } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
@@ -391,8 +419,18 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
+                    $e = new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
+
+                    if (!($context[self::COLLECT_EXCEPTIONS] ?? false)) {
+                        throw $e;
+                    }
+
+                    $aggregatedException->put($paramName, $e);
                 }
+            }
+
+            if (($context[self::COLLECT_EXCEPTIONS] ?? false) && !$aggregatedException->isEmpty) {
+                throw $aggregatedException;
             }
 
             if ($constructor->isConstructor()) {

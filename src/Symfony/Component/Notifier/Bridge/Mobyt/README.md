@@ -14,7 +14,7 @@ where:
  - `USER_KEY` is your Mobyt user key
  - `ACCESS_TOKEN` is your Mobyt access token
  - `FROM` is the sender
- - `TYPE_QUALITY` is the quality : `N` for high, `L` for medium, `LL` for low (default: `L`)
+ - `TYPE_QUALITY` is the quality of your message: `N` for high, `L` for medium, `LL` for low (default: `L`)
 
 Resources
 ---------

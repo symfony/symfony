@@ -36,7 +36,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  */
 class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
 {
-    private static $eventBubblingEvents = [
+    private const EVENT_BUBBLING_EVENTS = [
         CheckPassportEvent::class,
         LoginFailureEvent::class,
         LoginSuccessEvent::class,
@@ -75,7 +75,7 @@ class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
             }
 
             $methodCallArguments = $methodCall[1];
-            if (!\in_array($methodCallArguments[0], self::$eventBubblingEvents, true)) {
+            if (!\in_array($methodCallArguments[0], self::EVENT_BUBBLING_EVENTS, true)) {
                 continue;
             }
 

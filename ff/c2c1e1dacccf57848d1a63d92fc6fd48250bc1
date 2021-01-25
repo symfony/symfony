@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-10-31T15:03:06Z
+
+Thank you for this PR.
+
+Could you see why the fabbot.io is upset? They will give you some curl commands so it will fix things automatically.
+
+---------------------------------------------------------------------------
+
+by B-Galati at 2020-11-02T13:28:32Z
+
+A new recipe will be needed no?
+
+---------------------------------------------------------------------------
+
+by ke20 at 2020-11-02T20:25:08Z
+
+> A new recipe will be needed no?
+
+Yes thx, I created a PR for the recipe here : https://github.com/symfony/recipes/pull/838
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2020-11-04T20:19:30Z
+
+@ke20 As every bridge has its own LICENSE file could you please add one here as well?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-11-20T11:16:52Z
+
+Typo in the PR title:
+![CleanShot 2020-11-20 at 12 16 34](https://user-images.githubusercontent.com/995707/99794321-44556500-2b2a-11eb-8171-8b9fe9d2525d.png)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-06T20:04:50Z
+
+Hi @ke20 👋
+
+Are you interested in finishing this PR or am I allowed to take over?
+
+Cheers Oskar
+
+---------------------------------------------------------------------------
+
+by ke20 at 2021-01-07T07:41:30Z
+
+Hello Oskar,
+
+Yes I would like finished this PR and sorry I was a little busy this last
+time.
+
+I check that today or before the last of week.
+
+Thank you for your recall and sorry for my absence.
+
+Best regards and happy new year :)
+Kevin
+
+Le mer. 6 janv. 2021 à 21:05, Oskar Stark <notifications@github.com> a
+écrit :
+
+> Hi @ke20 <https://github.com/ke20> 👋
+>
+> Are you interested in finishing this PR or am I allowed to take over?
+>
+> Cheers Oskar
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/38922#issuecomment-755611325>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AAMIWIS7CLUMS2YV4AR53WLSYS67DANCNFSM4TF52L6Q>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-21T18:40:51Z
+
+Hi @ke20 👋
+
+Can you please rebase and apply my comments? Thanks
+
+---------------------------------------------------------------------------
+
+by ke20 at 2021-01-22T09:26:44Z
+
+> Hi @ke20 wave
+>
+> Can you please rebase and apply my comments? Thanks
+
+Done @OskarStark
+
+But Travis fails for PHP 7.4, there are flaky tests ?
+
+I don't know if it's "normal".

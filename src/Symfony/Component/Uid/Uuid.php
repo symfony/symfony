@@ -22,11 +22,7 @@ class Uuid extends AbstractUid
 
     public function __construct(string $uuid)
     {
-        try {
-            $type = uuid_type($uuid);
-        } catch (\ValueError $e) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
-        }
+        $type = uuid_is_valid($uuid) ? uuid_type($uuid) : false;
 
         if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
@@ -59,13 +55,11 @@ class Uuid extends AbstractUid
             return new static($uuid);
         }
 
-        try {
-            $type = uuid_type($uuid);
-        } catch (\ValueError $e) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
+        if (!uuid_is_valid($uuid)) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        switch ($type) {
+        switch (uuid_type($uuid)) {
             case UuidV1::TYPE: return new UuidV1($uuid);
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);
@@ -114,7 +108,7 @@ class Uuid extends AbstractUid
             return uuid_is_valid($uuid);
         }
 
-        return static::TYPE === uuid_type($uuid);
+        return uuid_is_valid($uuid) && static::TYPE === uuid_type($uuid);
     }
 
     public function toBinary(): string

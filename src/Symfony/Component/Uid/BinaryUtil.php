@@ -40,7 +40,7 @@ class BinaryUtil
     // 0x01b21dd213814000 is the number of 100-ns intervals between the
     // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
     private const TIME_OFFSET_INT = 0x01b21dd213814000;
-    private const TIME_OFFSET_COM = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
+    private const TIME_OFFSET_COM2 = "\xfe\x4d\xe2\x2d\xec\x7e\xc0\x00";
 
     public static function toBase(string $bytes, array $map): string
     {
@@ -121,9 +121,15 @@ class BinaryUtil
         }
 
         $time = str_pad(hex2bin($time), 8, "\0", \STR_PAD_LEFT);
-        $time = self::add($time, self::TIME_OFFSET_COM);
-        $time[0] = $time[0] & "\x7F";
+        $time = self::add($time, self::TIME_OFFSET_COM2);
 
-        return self::toBase($time, self::BASE10) / 10000000;
+        if ($time >= self::TIME_OFFSET_COM2) {
+            $time = -1 * self::toBase($time ^ "\xff\xff\xff\xff\xff\xff\xff\xff", self::BASE10);
+        } else {
+            $time[0] = $time[0] & "\x7F";
+            $time = self::toBase($time, self::BASE10);
+        }
+
+        return $time / 10000000;
     }
 }

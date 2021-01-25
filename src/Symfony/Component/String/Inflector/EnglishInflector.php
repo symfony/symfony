@@ -18,7 +18,7 @@ final class EnglishInflector implements InflectorInterface
      *
      * @see http://english-zone.com/spelling/plurals.html
      */
-    private static $pluralMap = [
+    private const PLURAL_MAP = [
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -335,7 +335,7 @@ final class EnglishInflector implements InflectorInterface
         // The inner loop $j iterates over the characters of the plural suffix
         // in the plural table to compare them with the characters of the actual
         // given plural suffix
-        foreach (self::$pluralMap as $map) {
+        foreach (self::PLURAL_MAP as $map) {
             $suffix = $map[0];
             $suffixLength = $map[1];
             $j = 0;

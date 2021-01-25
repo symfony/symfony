@@ -39,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $serviceKeywords = [
+    private const SERVICE_KEYWORDS = [
         'alias' => 'alias',
         'parent' => 'parent',
         'class' => 'class',
@@ -65,7 +65,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $prototypeKeywords = [
+    private const PROTOTYPE_KEYWORDS = [
         'resource' => 'resource',
         'namespace' => 'namespace',
         'exclude' => 'exclude',
@@ -86,7 +86,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $instanceofKeywords = [
+    private const INSTANCEOF_KEYWORDS = [
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
@@ -98,7 +98,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $defaultsKeywords = [
+    private const DEFAULTS_KEYWORDS = [
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
@@ -251,8 +251,8 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($defaults as $key => $default) {
-            if (!isset(self::$defaultsKeywords[$key])) {
-                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::$defaultsKeywords)));
+            if (!isset(self::DEFAULTS_KEYWORDS[$key])) {
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::DEFAULTS_KEYWORDS)));
             }
         }
 
@@ -919,11 +919,11 @@ class YamlFileLoader extends FileLoader
     private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {
-            $keywords = self::$instanceofKeywords;
+            $keywords = self::INSTANCEOF_KEYWORDS;
         } elseif (isset($definition['resource']) || isset($definition['namespace'])) {
-            $keywords = self::$prototypeKeywords;
+            $keywords = self::PROTOTYPE_KEYWORDS;
         } else {
-            $keywords = self::$serviceKeywords;
+            $keywords = self::SERVICE_KEYWORDS;
         }
 
         foreach ($definition as $key => $value) {

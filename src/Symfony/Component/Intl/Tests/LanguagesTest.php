@@ -21,7 +21,7 @@ class LanguagesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $languages = [
+    private const LANGUAGES = [
         'aa',
         'ab',
         'ace',
@@ -618,7 +618,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zza',
     ];
 
-    private static $alpha3Codes = [
+    private const ALPHA3_CODES = [
         'aar',
         'abk',
         'ace',
@@ -1219,7 +1219,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zza',
     ];
 
-    private static $alpha2ToAlpha3 = [
+    private const ALPHA2_TO_ALPHA3 = [
         'aa' => 'aar',
         'ab' => 'abk',
         'af' => 'afr',
@@ -1402,7 +1402,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zu' => 'zul',
     ];
 
-    private static $alpha3ToAlpha2 = [
+    private const ALPHA3_TO_ALPHA2 = [
         'aar' => 'aa',
         'abk' => 'ab',
         'ave' => 'ae',
@@ -1590,7 +1590,7 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetLanguageCodes()
     {
-        $this->assertEquals(self::$languages, Languages::getLanguageCodes());
+        $this->assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
     }
 
     /**
@@ -1603,10 +1603,10 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::$languages));
+        $this->assertEmpty(array_diff($languages, self::LANGUAGES));
 
         foreach (Languages::getAlpha3Names($displayLocale) as $alpha3Code => $name) {
-            $alpha2Code = self::$alpha3ToAlpha2[$alpha3Code] ?? null;
+            $alpha2Code = self::ALPHA3_TO_ALPHA2[$alpha3Code] ?? null;
             if (null !== $alpha2Code) {
                 $this->assertSame($name, $names[$alpha2Code]);
             }
@@ -1665,7 +1665,7 @@ class LanguagesTest extends ResourceBundleTestCase
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(self::$alpha2ToAlpha3)
+            array_keys(self::ALPHA2_TO_ALPHA3)
         );
     }
 
@@ -1674,14 +1674,14 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha3Code($language)
     {
-        $this->assertSame(self::$alpha2ToAlpha3[$language], Languages::getAlpha3Code($language));
+        $this->assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
     }
 
     public function provideLanguagesWithoutAlpha3Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(self::$languages, array_keys(self::$alpha2ToAlpha3))
+            array_diff(self::LANGUAGES, array_keys(self::ALPHA2_TO_ALPHA3))
         );
     }
 
@@ -1708,14 +1708,14 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetAlpha3Codes()
     {
-        $this->assertSame(self::$alpha3Codes, Languages::getAlpha3Codes());
+        $this->assertSame(self::ALPHA3_CODES, Languages::getAlpha3Codes());
     }
 
     public function provideLanguagesWithAlpha2Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(self::$alpha3ToAlpha2)
+            array_keys(self::ALPHA3_TO_ALPHA2)
         );
     }
 
@@ -1724,14 +1724,14 @@ class LanguagesTest extends ResourceBundleTestCase
      */
     public function testGetAlpha2Code($language)
     {
-        $this->assertSame(self::$alpha3ToAlpha2[$language], Languages::getAlpha2Code($language));
+        $this->assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
     }
 
     public function provideLanguagesWithoutAlpha2Equivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(self::$alpha3Codes, array_keys(self::$alpha3ToAlpha2))
+            array_diff(self::ALPHA3_CODES, array_keys(self::ALPHA3_TO_ALPHA2))
         );
     }
 
@@ -1786,10 +1786,10 @@ class LanguagesTest extends ResourceBundleTestCase
         sort($languages);
 
         $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, self::$alpha3Codes));
+        $this->assertEmpty(array_diff($languages, self::ALPHA3_CODES));
 
         foreach (Languages::getNames($displayLocale) as $alpha2Code => $name) {
-            $alpha3Code = self::$alpha2ToAlpha3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);
+            $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code] ?? (3 === \strlen($alpha2Code) ? $alpha2Code : null);
             if (null !== $alpha3Code) {
                 $this->assertSame($name, $names[$alpha3Code]);
             }

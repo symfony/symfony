@@ -22,7 +22,7 @@ use Psr\Log\LogLevel;
  */
 class Logger extends AbstractLogger
 {
-    private static $levels = [
+    private const LEVELS = [
         LogLevel::DEBUG => 0,
         LogLevel::INFO => 1,
         LogLevel::NOTICE => 2,
@@ -52,11 +52,11 @@ class Logger extends AbstractLogger
             }
         }
 
-        if (!isset(self::$levels[$minLevel])) {
+        if (!isset(self::LEVELS[$minLevel])) {
             throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $minLevel));
         }
 
-        $this->minLevelIndex = self::$levels[$minLevel];
+        $this->minLevelIndex = self::LEVELS[$minLevel];
         $this->formatter = $formatter ?: [$this, 'format'];
         if ($output && false === $this->handle = \is_resource($output) ? $output : @fopen($output, 'a')) {
             throw new InvalidArgumentException(sprintf('Unable to open "%s".', $output));
@@ -70,11 +70,11 @@ class Logger extends AbstractLogger
      */
     public function log($level, $message, array $context = [])
     {
-        if (!isset(self::$levels[$level])) {
+        if (!isset(self::LEVELS[$level])) {
             throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
         }
 
-        if (self::$levels[$level] < $this->minLevelIndex) {
+        if (self::LEVELS[$level] < $this->minLevelIndex) {
             return;
         }
 

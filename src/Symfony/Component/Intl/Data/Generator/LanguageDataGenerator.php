@@ -29,7 +29,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
     /**
      * Source: https://iso639-3.sil.org/code_tables/639/data.
      */
-    private static $preferredAlpha2ToAlpha3Mapping = [
+    private const PREFERRED_ALPHA2_TO_ALPHA3_MAPPING = [
         'ak' => 'aka',
         'ar' => 'ara',
         'ay' => 'aym',
@@ -83,7 +83,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'za' => 'zha',
         'zh' => 'zho',
     ];
-    private static $denylist = [
+    private const DENYLIST = [
         'root' => true, // Absolute root language
         'mul' => true, // Multiple languages
         'mis' => true, // Uncoded language
@@ -182,7 +182,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
     private static function generateLanguageNames(ArrayAccessibleResourceBundle $localeBundle): array
     {
-        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::$denylist);
+        return array_diff_key(iterator_to_array($localeBundle['Languages']), self::DENYLIST);
     }
 
     private function generateAlpha3Codes(array $languageCodes, ArrayAccessibleResourceBundle $metadataBundle): array
@@ -210,13 +210,13 @@ class LanguageDataGenerator extends AbstractDataGenerator
         foreach ($aliases as $alias => $data) {
             $language = $data['replacement'];
             if (2 === \strlen($language) && 3 === \strlen($alias) && 'overlong' === $data['reason']) {
-                if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
+                if (isset(self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language])) {
                     // Validate to prevent typos
-                    if (!isset($aliases[self::$preferredAlpha2ToAlpha3Mapping[$language]])) {
-                        throw new RuntimeException('The statically set three-letter mapping '.self::$preferredAlpha2ToAlpha3Mapping[$language].' for the language code '.$language.' seems to be invalid. Typo?');
+                    if (!isset($aliases[self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language]])) {
+                        throw new RuntimeException('The statically set three-letter mapping '.self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language].' for the language code '.$language.' seems to be invalid. Typo?');
                     }
 
-                    $alpha3 = self::$preferredAlpha2ToAlpha3Mapping[$language];
+                    $alpha3 = self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language];
                     $alpha2 = $aliases[$alpha3]['replacement'];
 
                     if ($language !== $alpha2) {
@@ -225,7 +225,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
                     $alpha2ToAlpha3[$language] = $alpha3;
                 } elseif (isset($alpha2ToAlpha3[$language])) {
-                    throw new RuntimeException('Multiple three-letter mappings exist for the language code '.$language.'. Please add one of them to the property $preferredAlpha2ToAlpha3Mapping.');
+                    throw new RuntimeException('Multiple three-letter mappings exist for the language code '.$language.'. Please add one of them to the const PREFERRED_ALPHA2_TO_ALPHA3_MAPPING.');
                 } else {
                     $alpha2ToAlpha3[$language] = $alias;
                 }

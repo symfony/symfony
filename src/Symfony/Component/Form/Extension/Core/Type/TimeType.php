@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimeType extends AbstractType
 {
-    private static $widgets = [
+    private const WIDGETS = [
         'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
     ];
@@ -170,7 +170,7 @@ class TimeType extends AbstractType
                 }
             }
 
-            $builder->add('hour', self::$widgets[$options['widget']], $hourOptions);
+            $builder->add('hour', self::WIDGETS[$options['widget']], $hourOptions);
 
             if ($options['with_minutes']) {
                 if ($emptyData instanceof \Closure) {
@@ -178,7 +178,7 @@ class TimeType extends AbstractType
                 } elseif (isset($emptyData['minute'])) {
                     $minuteOptions['empty_data'] = $emptyData['minute'];
                 }
-                $builder->add('minute', self::$widgets[$options['widget']], $minuteOptions);
+                $builder->add('minute', self::WIDGETS[$options['widget']], $minuteOptions);
             }
 
             if ($options['with_seconds']) {
@@ -187,7 +187,7 @@ class TimeType extends AbstractType
                 } elseif (isset($emptyData['second'])) {
                     $secondOptions['empty_data'] = $emptyData['second'];
                 }
-                $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
+                $builder->add('second', self::WIDGETS[$options['widget']], $secondOptions);
             }
 
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget'], $options['reference_date']));

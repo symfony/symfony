@@ -604,8 +604,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
 
-        $r = new \ReflectionProperty(NumberFormatter::class, 'enSymbols');
-        $r->setAccessible(true);
+        $r = new \ReflectionClassConstant(NumberFormatter::class, 'EN_SYMBOLS');
         $expected = $r->getValue();
 
         for ($i = 0; $i <= 17; ++$i) {
@@ -621,8 +620,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
 
-        $r = new \ReflectionProperty(NumberFormatter::class, 'enTextAttributes');
-        $r->setAccessible(true);
+        $r = new \ReflectionClassConstant(NumberFormatter::class, 'EN_TEXT_ATTRIBUTES');
         $expected = $r->getValue();
 
         for ($i = 0; $i <= 5; ++$i) {

@@ -101,7 +101,8 @@ class Connection
         ];
 
         if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $redisOptions);
+            parse_str($parsedUrl['query'], $dsnOptions);
+            $redisOptions = array_merge($redisOptions, $dsnOptions);
         }
 
         $autoSetup = null;

@@ -76,6 +76,17 @@ class PhpSerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
+
+    public function testNonUtf8IsBase64Encoded()
+    {
+        $serializer = new PhpSerializer();
+
+        $envelope = new Envelope(new DummyMessage("\xE9"));
+
+        $encoded = $serializer->encode($envelope);
+        $this->assertTrue((bool) preg_match('//u', $encoded['body']), 'Encodes non-UTF8 payloads');
+        $this->assertEquals($envelope, $serializer->decode($encoded));
+    }
 }
 
 class DummyPhpSerializerNonSendableStamp implements NonSendableStampInterface

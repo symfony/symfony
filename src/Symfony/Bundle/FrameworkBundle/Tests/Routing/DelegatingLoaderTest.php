@@ -15,7 +15,7 @@ class DelegatingLoaderTest extends TestCase
     public function testConstructorApi()
     {
         new DelegatingLoader(new LoaderResolver());
-        $this->assertTrue(true, '__construct() takeS a LoaderResolverInterface as its first argument.');
+        $this->assertTrue(true, '__construct() takes a LoaderResolverInterface as its first argument.');
     }
 
     public function testLoadDefaultOptions()

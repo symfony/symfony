@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 
 /**
  * A RouteCollection represents a set of Route instances.
@@ -31,6 +32,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
     private $routes = [];
 
     /**
+     * @var Alias[]
+     */
+    private $aliases = [];
+
+    /**
      * @var array
      */
     private $resources = [];
@@ -44,6 +50,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         foreach ($this->routes as $name => $route) {
             $this->routes[$name] = clone $route;
+        }
+
+        foreach ($this->aliases as $name => $alias) {
+            $this->aliases[$name] = clone $alias;
         }
     }
 
@@ -80,7 +90,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
             trigger_deprecation('symfony/routing', '5.1', 'The "%s()" method will have a new "int $priority = 0" argument in version 6.0, not defining it is deprecated.', __METHOD__);
         }
 
-        unset($this->routes[$name], $this->priorities[$name]);
+        unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
 
         $this->routes[$name] = $route;
 
@@ -114,6 +124,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function get(string $name)
     {
+        while ($this->hasAlias($name)) {
+            $name = $this->getAlias($name)->getId();
+        }
+
         return $this->routes[$name] ?? null;
     }
 
@@ -125,7 +139,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function remove($name)
     {
         foreach ((array) $name as $n) {
-            unset($this->routes[$n], $this->priorities[$n]);
+            unset($this->routes[$n], $this->priorities[$n], $this->aliases[$n]);
         }
     }
 
@@ -138,12 +152,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
         foreach ($collection->all() as $name => $route) {
-            unset($this->routes[$name], $this->priorities[$name]);
+            unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
             $this->routes[$name] = $route;
 
             if (isset($collection->priorities[$name])) {
                 $this->priorities[$name] = $collection->priorities[$name];
             }
+        }
+
+        foreach ($collection->getAliases() as $name => $alias) {
+            unset($this->routes[$name], $this->priorities[$name], $this->aliases[$name]);
+
+            $this->aliases[$name] = $alias;
         }
 
         foreach ($collection->getResources() as $resource) {
@@ -176,6 +196,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         $prefixedRoutes = [];
         $prefixedPriorities = [];
+        $prefixedAliases = [];
 
         foreach ($this->routes as $name => $route) {
             $prefixedRoutes[$prefix.$name] = $route;
@@ -187,8 +208,13 @@ class RouteCollection implements \IteratorAggregate, \Countable
             }
         }
 
+        foreach ($this->aliases as $name => $alias) {
+            $prefixedAliases[$prefix.$name] = $alias->redirect($prefix.$alias->getId());
+        }
+
         $this->routes = $prefixedRoutes;
         $this->priorities = $prefixedPriorities;
+        $this->aliases = $prefixedAliases;
     }
 
     /**
@@ -302,5 +328,50 @@ class RouteCollection implements \IteratorAggregate, \Countable
         if (!isset($this->resources[$key])) {
             $this->resources[$key] = $resource;
         }
+    }
+
+    /**
+     * Sets an alias for an existing route.
+     *
+     * @param string $name  The alias to create
+     * @param string $alias The route to alias
+     *
+     * @throws InvalidArgumentException if the id is not a string or an Alias
+     * @throws InvalidArgumentException if the alias is for itself
+     */
+    public function addAlias(string $name, string $alias): Alias
+    {
+        if ($name === $alias) {
+            throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $name));
+        }
+
+        unset($this->routes[$name], $this->priorities[$name]);
+
+        return $this->aliases[$name] = new Alias($alias);
+    }
+
+    /**
+     * @return array<string, Alias>
+     */
+    public function getAliases(): array
+    {
+        return $this->aliases;
+    }
+
+    public function hasAlias(string $name): bool
+    {
+        return isset($this->aliases[$name]);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function getAlias(string $name): Alias
+    {
+        if (!isset($this->aliases[$name])) {
+            throw new InvalidArgumentException(sprintf('The route alias "%s" does not exist.', $name));
+        }
+
+        return $this->aliases[$name];
     }
 }

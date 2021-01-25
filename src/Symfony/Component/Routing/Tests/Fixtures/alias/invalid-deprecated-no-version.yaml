@@ -1,0 +1,4 @@
+invalid:
+  alias: route
+  deprecated:
+    package: "foo/bar"

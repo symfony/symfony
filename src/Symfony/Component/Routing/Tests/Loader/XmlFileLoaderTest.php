@@ -232,7 +232,16 @@ class XmlFileLoaderTest extends TestCase
 
     public function getPathsToInvalidFiles()
     {
-        return [['nonvalidnode.xml'], ['nonvalidroute.xml'], ['nonvalid.xml'], ['missing_id.xml'], ['missing_path.xml']];
+        return [
+            ['nonvalidnode.xml'],
+            ['nonvalidroute.xml'],
+            ['nonvalid.xml'],
+            ['missing_id.xml'],
+            ['missing_path.xml'],
+            ['nonvalid-deprecated-route.xml'],
+            ['alias/invalid-deprecated-no-package.xml'],
+            ['alias/invalid-deprecated-no-version.xml'],
+        ];
     }
 
     public function testDocTypeIsNotAllowed()
@@ -560,6 +569,16 @@ class XmlFileLoaderTest extends TestCase
         $routes = $loader->load('importer-with-single-host.xml');
 
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
+
+        $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.xml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
 
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }

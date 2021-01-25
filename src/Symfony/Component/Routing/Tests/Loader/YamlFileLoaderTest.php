@@ -62,6 +62,9 @@ class YamlFileLoaderTest extends TestCase
             ['nonesense_resource_plus_path.yml'],
             ['nonesense_type_without_resource.yml'],
             ['bad_format.yml'],
+            ['alias/invalid-alias.yaml'],
+            ['alias/invalid-deprecated-no-package.yaml'],
+            ['alias/invalid-deprecated-no-version.yaml'],
         ];
     }
 
@@ -434,5 +437,15 @@ class YamlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
 
         $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testImportingAliases()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.yaml');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 }

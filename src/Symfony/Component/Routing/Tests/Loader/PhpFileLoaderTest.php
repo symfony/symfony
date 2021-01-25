@@ -284,4 +284,14 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
+
+    public function testImportingAliases()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
+        $routes = $loader->load('alias.php');
+
+        $expectedRoutes = require __DIR__.'/../Fixtures/alias/expected.php';
+
+        $this->assertEquals($expectedRoutes('php'), $routes);
+    }
 }

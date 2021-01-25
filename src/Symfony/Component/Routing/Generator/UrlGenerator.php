@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Generator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -126,6 +127,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
     {
+        $visited = [];
+        while ($this->routes->hasAlias($name)) {
+            $searchKey = array_search($name, $visited);
+            $visited[] = $name;
+
+            if (false !== $searchKey) {
+                throw new RouteCircularReferenceException($name, \array_slice($visited, $searchKey));
+            }
+
+            $alias = $this->routes->getAlias($name);
+
+            if ($alias->isDeprecated()) {
+                $deprecation = $alias->getDeprecation($name);
+
+                trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
+            }
+
+            $name = $alias->getId();
+        }
+
         $route = null;
         $locale = $parameters['_locale']
             ?? $this->context->getParameter('_locale')

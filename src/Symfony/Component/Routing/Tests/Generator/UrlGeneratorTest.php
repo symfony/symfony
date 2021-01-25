@@ -12,6 +12,9 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -20,6 +23,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlGeneratorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testAbsoluteUrlWithPort80()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -709,6 +714,113 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('../../about', $generator->generate('unrelated',
             [], UrlGeneratorInterface::RELATIVE_PATH)
         );
+    }
+
+    public function testAliases()
+    {
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a');
+        $routes->addAlias('c', 'b');
+
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo', $generator->generate('b'));
+        $this->assertSame('/app.php/foo', $generator->generate('c'));
+    }
+
+    public function testAliasWhichTargetRouteDoesntExist()
+    {
+        $this->expectException(RouteNotFoundException::class);
+
+        $routes = new RouteCollection();
+        $routes->addAlias('d', 'non-existent');
+
+        $this->getGenerator($routes)->generate('d');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedAlias()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', '');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedAliasWithCustomMessage()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', 'foo %alias%.');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
+    {
+        $this->expectDeprecation('Since foo/bar 1.0.0: foo b.');
+
+        $routes = new RouteCollection();
+        $routes->add('a', new Route('/foo'));
+        $routes->addAlias('b', 'a')
+            ->setDeprecated('foo/bar', '1.0.0', 'foo %alias%.');
+        $routes->addAlias('c', 'b');
+
+        $this->getGenerator($routes)->generate('c');
+    }
+
+    public function testCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> a -> b".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'a');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    public function testDeepCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "b", path: "b -> c -> b".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'c');
+        $routes->addAlias('c', 'b');
+
+        $this->getGenerator($routes)->generate('b');
+    }
+
+    public function testIndirectCircularReferenceShouldThrowAnException()
+    {
+        $this->expectException(RouteCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for route "a", path: "a -> b -> c -> a".');
+
+        $routes = new RouteCollection();
+        $routes->addAlias('a', 'b');
+        $routes->addAlias('b', 'c');
+        $routes->addAlias('c', 'a');
+
+        $this->getGenerator($routes)->generate('a');
     }
 
     /**

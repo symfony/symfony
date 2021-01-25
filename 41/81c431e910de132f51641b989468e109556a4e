@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-25T09:04:41Z
+
+Can this change be automated? If not, then I'm likely :-1:
+merging in 5.1 or higher won't reduce merge conflicts - it will increase them actually.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-01-25T09:27:12Z
+
+@nicolas-grekas
+> Can this change be automated? If not, then I'm likely 👎
+
+I don't know of any tool providing this as an automation.
+
+> merging in 5.1 or higher won't reduce merge conflicts - it will increase them actually.
+
+What do you exactly mean? Because of merge conflicts I offered to redo all the work on the next branches. I can prepare them already in advance. In a merge you can ignore all conflicts this branch creates. Similar to how fabpot did it with this PR https://github.com/symfony/symfony/pull/39775#issuecomment-757508718
+
+In the previous PR everyone was generally 👍  for the change. As some time has passed and no one of the team did it I repeated the work (It's not that costly; took around 1,5 hours).
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-25T09:28:10Z
+
+Well, this can probably not be automated, because we cannot forbid using `private static` in the project. We might have valid use cases for it. But this should be a one-time conversion anyway.
+Our new code is already using private constant when possible instead of private static arrays.

@@ -33,7 +33,7 @@ This conversation was marked as resolved by lstrojny
 
     protected $maxIdLength = 250;
 
-    private static $defaultClientOptions = [
+    private const DEFAULT_CLIENT_OPTIONS = [
         'persistent_id' => null,
         'username' => null,
         'password' => null,
@@ -108,7 +108,7 @@ This conversation was marked as resolved by lstrojny
         }
         set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {
-            $options += static::$defaultClientOptions;
+            $options += static::DEFAULT_CLIENT_OPTIONS;
             $client = new \Memcached($options['persistent_id']);
             $username = $options['username'];
             $password = $options['password'];

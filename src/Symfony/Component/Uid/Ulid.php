@@ -153,7 +153,7 @@ class Ulid extends AbstractUid
         if (\PHP_INT_SIZE >= 8) {
             $time = base_convert($time, 10, 32);
         } else {
-            $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
+            $time = str_pad(bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10)), 12, '0', \STR_PAD_LEFT);
             $time = sprintf('%s%04s%04s',
                 base_convert(substr($time, 0, 2), 16, 32),
                 base_convert(substr($time, 2, 5), 16, 32),

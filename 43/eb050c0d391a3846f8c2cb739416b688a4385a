@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by rimas-kudelis at 2021-01-25T18:16:49Z
+
+> The drawback of this approach is that the size of eg email attachments is going to increase by 33% because of the extra encoding. I think this drawback is acceptable for 4.4, and that this PR is the most pragmatic way to make attachments just work.
+
+When you wrote this, did you mean it will increase the size of our messages in the storage, or did you refer to emails that are later sent out? From the code it looks like the former, but your comment almost implies the latter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-25T18:58:34Z
+
+> it will increase the size of our messages in the storage
+
+yes, that's what I meant.

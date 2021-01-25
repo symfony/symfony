@@ -21,7 +21,7 @@ class CountriesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $countries = [
+    private const COUNTRIES = [
         'AD',
         'AE',
         'AF',
@@ -273,7 +273,7 @@ class CountriesTest extends ResourceBundleTestCase
         'ZW',
     ];
 
-    private static $alpha2ToAlpha3 = [
+    private const ALPHA2_TO_ALPHA3 = [
         'AW' => 'ABW',
         'AF' => 'AFG',
         'AO' => 'AGO',
@@ -527,7 +527,7 @@ class CountriesTest extends ResourceBundleTestCase
 
     public function testGetCountryCodes()
     {
-        $this->assertSame(self::$countries, Countries::getCountryCodes());
+        $this->assertSame(self::COUNTRIES, Countries::getCountryCodes());
     }
 
     /**
@@ -539,7 +539,7 @@ class CountriesTest extends ResourceBundleTestCase
 
         sort($countries);
 
-        $this->assertSame(self::$countries, $countries);
+        $this->assertSame(self::COUNTRIES, $countries);
     }
 
     public function testGetNamesDefaultLocale()
@@ -604,20 +604,20 @@ class CountriesTest extends ResourceBundleTestCase
 
     public function testGetAlpha3Codes()
     {
-        $this->assertSame(self::$alpha2ToAlpha3, Countries::getAlpha3Codes());
+        $this->assertSame(self::ALPHA2_TO_ALPHA3, Countries::getAlpha3Codes());
     }
 
     public function testGetAlpha3Code()
     {
-        foreach (self::$countries as $country) {
-            $this->assertSame(self::$alpha2ToAlpha3[$country], Countries::getAlpha3Code($country));
+        foreach (self::COUNTRIES as $country) {
+            $this->assertSame(self::ALPHA2_TO_ALPHA3[$country], Countries::getAlpha3Code($country));
         }
     }
 
     public function testGetAlpha2Code()
     {
-        foreach (self::$countries as $alpha2Code) {
-            $alpha3Code = self::$alpha2ToAlpha3[$alpha2Code];
+        foreach (self::COUNTRIES as $alpha2Code) {
+            $alpha3Code = self::ALPHA2_TO_ALPHA3[$alpha2Code];
             $this->assertSame($alpha2Code, Countries::getAlpha2Code($alpha3Code));
         }
     }
@@ -639,7 +639,7 @@ class CountriesTest extends ResourceBundleTestCase
         $names = Countries::getNames($displayLocale);
 
         foreach ($names as $alpha2 => $name) {
-            $alpha3 = self::$alpha2ToAlpha3[$alpha2];
+            $alpha3 = self::ALPHA2_TO_ALPHA3[$alpha2];
             $this->assertSame($name, Countries::getAlpha3Name($alpha3, $displayLocale));
         }
     }
@@ -660,7 +660,7 @@ class CountriesTest extends ResourceBundleTestCase
 
         $alpha3Codes = array_keys($names);
         sort($alpha3Codes);
-        $this->assertSame(array_values(self::$alpha2ToAlpha3), $alpha3Codes);
+        $this->assertSame(array_values(self::ALPHA2_TO_ALPHA3), $alpha3Codes);
 
         $alpha2Names = Countries::getNames($displayLocale);
         $this->assertSame(array_values($alpha2Names), array_values($names));

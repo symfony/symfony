@@ -165,7 +165,7 @@ abstract class NumberFormatter
     /**
      * The supported styles to the constructor $styles argument.
      */
-    private static $supportedStyles = [
+    private const SUPPORTED_STYLES = [
         'CURRENCY' => self::CURRENCY,
         'DECIMAL' => self::DECIMAL,
     ];
@@ -173,7 +173,7 @@ abstract class NumberFormatter
     /**
      * Supported attributes to the setAttribute() $attr argument.
      */
-    private static $supportedAttributes = [
+    private const SUPPORTED_ATTRIBUTES = [
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED' => self::GROUPING_USED,
         'ROUNDING_MODE' => self::ROUNDING_MODE,
@@ -184,7 +184,7 @@ abstract class NumberFormatter
      * NumberFormatter::ROUNDING_MODE. NumberFormatter::ROUND_DOWN
      * and NumberFormatter::ROUND_UP does not have a PHP only equivalent.
      */
-    private static $roundingModes = [
+    private const ROUNDING_MODES = [
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
         'ROUND_HALFUP' => self::ROUND_HALFUP,
@@ -200,7 +200,7 @@ abstract class NumberFormatter
      *
      * @see https://php.net/round
      */
-    private static $phpRoundingMap = [
+    private const PHP_ROUNDING_MAP = [
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
         self::ROUND_HALFUP => \PHP_ROUND_HALF_UP,
@@ -211,7 +211,7 @@ abstract class NumberFormatter
      * PHP's round() function, but there's an equivalent. Keys are rounding
      * modes, values does not matter.
      */
-    private static $customRoundingList = [
+    private const CUSTOM_ROUNDING_LIST = [
         self::ROUND_CEILING => true,
         self::ROUND_FLOOR => true,
         self::ROUND_DOWN => true,
@@ -230,12 +230,12 @@ abstract class NumberFormatter
      */
     private static $int64Max = 9223372036854775807;
 
-    private static $enSymbols = [
+    private const EN_SYMBOLS = [
         self::DECIMAL => ['.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','],
         self::CURRENCY => ['.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','],
     ];
 
-    private static $enTextAttributes = [
+    private const EN_TEXT_ATTRIBUTES = [
         self::DECIMAL => ['', '', '-', '', ' ', 'XXX', ''],
         self::CURRENCY => ['¤', '', '-¤', '', ' ', 'XXX'],
     ];
@@ -263,8 +263,8 @@ abstract class NumberFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
-        if (!\in_array($style, self::$supportedStyles)) {
-            $message = sprintf('The available styles are: %s.', implode(', ', array_keys(self::$supportedStyles)));
+        if (!\in_array($style, self::SUPPORTED_STYLES)) {
+            $message = sprintf('The available styles are: %s.', implode(', ', array_keys(self::SUPPORTED_STYLES)));
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'style', $style, $message);
         }
 
@@ -466,7 +466,7 @@ abstract class NumberFormatter
      */
     public function getSymbol($attr)
     {
-        return \array_key_exists($this->style, self::$enSymbols) && \array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::EN_SYMBOLS) && \array_key_exists($attr, self::EN_SYMBOLS[$this->style]) ? self::EN_SYMBOLS[$this->style][$attr] : false;
     }
 
     /**
@@ -480,7 +480,7 @@ abstract class NumberFormatter
      */
     public function getTextAttribute($attr)
     {
-        return \array_key_exists($this->style, self::$enTextAttributes) && \array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::EN_TEXT_ATTRIBUTES) && \array_key_exists($attr, self::EN_TEXT_ATTRIBUTES[$this->style]) ? self::EN_TEXT_ATTRIBUTES[$this->style][$attr] : false;
     }
 
     /**
@@ -579,29 +579,29 @@ abstract class NumberFormatter
     {
         $attr = (int) $attr;
 
-        if (!\in_array($attr, self::$supportedAttributes)) {
+        if (!\in_array($attr, self::SUPPORTED_ATTRIBUTES)) {
             $message = sprintf(
                 'The available attributes are: %s',
-                implode(', ', array_keys(self::$supportedAttributes))
+                implode(', ', array_keys(self::SUPPORTED_ATTRIBUTES))
             );
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'attr', $value, $message);
         }
 
-        if (self::$supportedAttributes['ROUNDING_MODE'] === $attr && $this->isInvalidRoundingMode($value)) {
+        if (self::SUPPORTED_ATTRIBUTES['ROUNDING_MODE'] === $attr && $this->isInvalidRoundingMode($value)) {
             $message = sprintf(
                 'The supported values for ROUNDING_MODE are: %s',
-                implode(', ', array_keys(self::$roundingModes))
+                implode(', ', array_keys(self::ROUNDING_MODES))
             );
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'attr', $value, $message);
         }
 
-        if (self::$supportedAttributes['GROUPING_USED'] === $attr) {
+        if (self::SUPPORTED_ATTRIBUTES['GROUPING_USED'] === $attr) {
             $value = $this->normalizeGroupingUsedValue($value);
         }
 
-        if (self::$supportedAttributes['FRACTION_DIGITS'] === $attr) {
+        if (self::SUPPORTED_ATTRIBUTES['FRACTION_DIGITS'] === $attr) {
             $value = $this->normalizeFractionDigitsValue($value);
             if ($value < 0) {
                 // ignore negative values but do not raise an error
@@ -718,9 +718,9 @@ abstract class NumberFormatter
         $precision = $this->getUninitializedPrecision($value, $precision);
 
         $roundingModeAttribute = $this->getAttribute(self::ROUNDING_MODE);
-        if (isset(self::$phpRoundingMap[$roundingModeAttribute])) {
-            $value = round($value, $precision, self::$phpRoundingMap[$roundingModeAttribute]);
-        } elseif (isset(self::$customRoundingList[$roundingModeAttribute])) {
+        if (isset(self::PHP_ROUNDING_MAP[$roundingModeAttribute])) {
+            $value = round($value, $precision, self::PHP_ROUNDING_MAP[$roundingModeAttribute]);
+        } elseif (isset(self::CUSTOM_ROUNDING_LIST[$roundingModeAttribute])) {
             $roundingCoef = 10 ** $precision;
             $value *= $roundingCoef;
             $value = (float) (string) $value;
@@ -846,7 +846,7 @@ abstract class NumberFormatter
      */
     private function isInvalidRoundingMode(int $value): bool
     {
-        if (\in_array($value, self::$roundingModes, true)) {
+        if (\in_array($value, self::ROUNDING_MODES, true)) {
             return false;
         }
 

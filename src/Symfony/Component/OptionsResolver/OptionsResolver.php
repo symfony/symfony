@@ -105,7 +105,7 @@ class OptionsResolver implements Options
 
     private $parentsOptions = [];
 
-    private static $typeAliases = [
+    private const TYPE_ALIASES = [
         'boolean' => 'bool',
         'integer' => 'int',
         'double' => 'float',
@@ -926,7 +926,7 @@ class OptionsResolver implements Options
             $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = self::$typeAliases[$type] ?? $type;
+                $type = self::TYPE_ALIASES[$type] ?? $type;
 
                 if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
@@ -938,7 +938,7 @@ class OptionsResolver implements Options
                 $fmtAllowedTypes = implode('" or "', $this->allowedTypes[$option]);
                 $fmtProvidedTypes = implode('|', array_keys($invalidTypes));
                 $allowedContainsArrayType = \count(array_filter($this->allowedTypes[$option], static function ($item) {
-                    return '[]' === substr(self::$typeAliases[$item] ?? $item, -2);
+                    return '[]' === substr(self::TYPE_ALIASES[$item] ?? $item, -2);
                 })) > 0;
 
                 if (\is_array($value) && $allowedContainsArrayType) {

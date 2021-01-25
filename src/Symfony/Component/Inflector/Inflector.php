@@ -23,7 +23,7 @@ final class Inflector
      *
      * @see http://english-zone.com/spelling/plurals.html
      */
-    private static $pluralMap = [
+    private const PLURAL_MAP = [
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -143,7 +143,7 @@ final class Inflector
      *
      * @see http://english-zone.com/spelling/plurals.html
      */
-    private static $singularMap = [
+    private const SINGULAR_MAP = [
         // First entry: singular suffix, reversed
         // Second entry: length of singular suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -309,7 +309,7 @@ final class Inflector
     /**
      * A list of words which should not be inflected, reversed.
      */
-    private static $uninflected = [
+    private const UNINFLECTED = [
         '',
         'atad',
         'reed',
@@ -346,7 +346,7 @@ final class Inflector
         $pluralLength = \strlen($lowerPluralRev);
 
         // Check if the word is one which is not inflected, return early if so
-        if (\in_array($lowerPluralRev, self::$uninflected, true)) {
+        if (\in_array($lowerPluralRev, self::UNINFLECTED, true)) {
             return $plural;
         }
 
@@ -354,7 +354,7 @@ final class Inflector
         // The inner loop $j iterates over the characters of the plural suffix
         // in the plural table to compare them with the characters of the actual
         // given plural suffix
-        foreach (self::$pluralMap as $map) {
+        foreach (self::PLURAL_MAP as $map) {
             $suffix = $map[0];
             $suffixLength = $map[1];
             $j = 0;
@@ -432,7 +432,7 @@ final class Inflector
         $singularLength = \strlen($lowerSingularRev);
 
         // Check if the word is one which is not inflected, return early if so
-        if (\in_array($lowerSingularRev, self::$uninflected, true)) {
+        if (\in_array($lowerSingularRev, self::UNINFLECTED, true)) {
             return $singular;
         }
 
@@ -440,7 +440,7 @@ final class Inflector
         // The inner loop $j iterates over the characters of the singular suffix
         // in the singular table to compare them with the characters of the actual
         // given singular suffix
-        foreach (self::$singularMap as $map) {
+        foreach (self::SINGULAR_MAP as $map) {
             $suffix = $map[0];
             $suffixLength = $map[1];
             $j = 0;

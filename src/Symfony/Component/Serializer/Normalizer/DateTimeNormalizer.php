@@ -30,7 +30,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         self::TIMEZONE_KEY => null,
     ];
 
-    private static $supportedTypes = [
+    private const SUPPORTED_TYPES = [
         \DateTimeInterface::class => true,
         \DateTimeImmutable::class => true,
         \DateTime::class => true,
@@ -113,7 +113,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        return isset(self::$supportedTypes[$type]);
+        return isset(self::SUPPORTED_TYPES[$type]);
     }
 
     /**

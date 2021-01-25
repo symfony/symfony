@@ -30,7 +30,7 @@ class FileValidator extends ConstraintValidator
     public const KIB_BYTES = 1024;
     public const MIB_BYTES = 1048576;
 
-    private static $suffices = [
+    private const SUFFICES = [
         1 => 'bytes',
         self::KB_BYTES => 'kB',
         self::MB_BYTES => 'MB',
@@ -247,6 +247,6 @@ class FileValidator extends ConstraintValidator
             $sizeAsString = (string) round($size / $coef, 2);
         }
 
-        return [$sizeAsString, $limitAsString, self::$suffices[$coef]];
+        return [$sizeAsString, $limitAsString, self::SUFFICES[$coef]];
     }
 }

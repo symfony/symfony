@@ -518,7 +518,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

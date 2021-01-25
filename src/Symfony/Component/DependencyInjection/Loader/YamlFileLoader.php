@@ -356,7 +356,7 @@ class YamlFileLoader extends FileLoader
             $stack = [];
 
             foreach ($service['stack'] as $k => $frame) {
-                if (\is_array($frame) && 1 === \count($frame) && !isset(self::$serviceKeywords[key($frame)])) {
+                if (\is_array($frame) && 1 === \count($frame) && !isset(self::SERVICE_KEYWORDS[key($frame)])) {
                     $frame = [
                         'class' => key($frame),
                         'arguments' => current($frame),

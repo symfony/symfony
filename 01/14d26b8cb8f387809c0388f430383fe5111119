@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-23T06:29:06Z
+
+Ready to merge from my side 👌🏻
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-28T07:22:40Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-18T06:48:23Z
+
+I think I won't change my mind. Message type is way worse than quality. I don't any good reason to change it.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-18T07:01:27Z
+
+Ok, I will rework the PR to validate the allowed types and remove the BC break

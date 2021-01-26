@@ -42,6 +42,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
@@ -663,7 +664,7 @@ class SerializerTest extends TestCase
         $json = json_encode($normalizedData);
 
         $result = $serializer->deserialize($json, $type, 'json', [
-            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);
@@ -717,7 +718,7 @@ class SerializerTest extends TestCase
         $json = json_encode($normalizedData);
 
         $result = $serializer->deserialize($json, $type, 'json', [
-            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);
@@ -779,7 +780,7 @@ class SerializerTest extends TestCase
         ]);
 
         $result = $serializer->deserialize($json, Dto::class, 'json', [
-            Serializer::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
             UnwrappingDenormalizer::UNWRAP_PATH => '[wrapped][data]',
         ]);
 

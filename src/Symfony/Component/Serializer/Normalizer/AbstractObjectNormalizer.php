@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -209,6 +211,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return new \ArrayObject();
         }
 
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($data);
+        }
+
         return $data;
     }
 
@@ -354,7 +360,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
             if (!empty($extraAttributes)) {
                 $message = (new ExtraAttributesException($extraAttributes))->getMessage();
 
@@ -533,7 +539,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     private function denormalizationSuccess($denormalizedValue, array $context)
     {
-        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
             return DenormalizationResult::success($denormalizedValue);
         }
 
@@ -542,7 +548,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     private function denormalizationFailure($normalizedValue, string $message, array $context)
     {
-        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
             $violation = new InvariantViolation($normalizedValue, $message);
 
             return DenormalizationResult::failure(['' => [$violation]]);

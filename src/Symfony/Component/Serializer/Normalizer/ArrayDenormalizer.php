@@ -51,7 +51,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         $type = substr($type, 0, -2);
 
         $invariantViolations = [];
-        $collectInvariantViolations = $context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false;
+        $collectInvariantViolations = $context[SerializerInterface::RETURN_RESULT] ?? false;
 
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {

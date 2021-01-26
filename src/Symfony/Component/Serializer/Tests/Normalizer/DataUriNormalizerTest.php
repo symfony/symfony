@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -177,7 +178,7 @@ class DataUriNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsSuccessResult($uri): void
     {
         $result = $this->normalizer->denormalize($uri, \SplFileObject::class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);
@@ -188,7 +189,7 @@ class DataUriNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsFailureResult(): void
     {
         $result = $this->normalizer->denormalize('not-a-uri', \SplFileObject::class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);

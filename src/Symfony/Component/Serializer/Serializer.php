@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
 
 /**
  * Serializer serializes and deserializes data.
@@ -152,16 +153,19 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
-            return $normalizer->normalize($data, $format, $context);
+            return $this->normalizationSuccess(
+                $normalizer->normalize($data, $format, $context),
+                $context
+            );
         }
 
         if (null === $data || is_scalar($data)) {
-            return $data;
+            return $this->normalizationSuccess($data, $context);
         }
 
         if (\is_array($data) || $data instanceof \Traversable) {
             if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) === true && $data instanceof \Countable && 0 === $data->count()) {
-                return $data;
+                return $this->normalizationSuccess($data, $context);
             }
 
             $normalized = [];
@@ -169,7 +173,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 $normalized[$key] = $this->normalize($val, $format, $context);
             }
 
-            return $normalized;
+            return $this->normalizationSuccess($normalized, $context);
         }
 
         if (\is_object($data)) {
@@ -197,7 +201,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             if (!('is_'.$type)($data)) {
                 $message = sprintf('Data expected to be of type "%s" ("%s" given).', $type, get_debug_type($data));
 
-                if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+                if ($context[self::RETURN_RESULT] ?? false) {
                     $violation = new InvariantViolation($data, $message);
 
                     return DenormalizationResult::failure(['' => [$violation]]);
@@ -206,7 +210,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
                 throw new NotNormalizableValueException($message);
             }
 
-            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            if ($context[self::RETURN_RESULT] ?? false) {
                 return DenormalizationResult::success($data);
             }
 
@@ -313,6 +317,15 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
         }
 
         return null;
+    }
+
+    private function normalizationSuccess($result, array $context)
+    {
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

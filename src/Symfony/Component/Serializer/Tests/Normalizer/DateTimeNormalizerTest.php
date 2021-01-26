@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -265,7 +266,7 @@ class DateTimeNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsSuccessResult(): void
     {
         $result = $this->normalizer->denormalize('2020-01-01', \DateTimeInterface::class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);
@@ -276,7 +277,7 @@ class DateTimeNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsFailureResult(): void
     {
         $result = $this->normalizer->denormalize('not-a-date', \DateTimeInterface::class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);

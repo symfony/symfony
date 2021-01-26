@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -41,8 +43,6 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -103,7 +103,13 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $result['instance'] = $instance;
         }
 
-        return $result + ['violations' => $violations];
+        $result += ['violations' => $violations];
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

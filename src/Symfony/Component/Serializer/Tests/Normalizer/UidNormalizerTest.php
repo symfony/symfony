@@ -7,6 +7,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -177,7 +178,7 @@ class UidNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsSuccessResult(string $uuidString, string $class): void
     {
         $result = $this->normalizer->denormalize($uuidString, $class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);
@@ -194,7 +195,7 @@ class UidNormalizerTest extends TestCase
     public function testItDenormalizesAndReturnsFailureResult(string $class): void
     {
         $result = $this->normalizer->denormalize('not-an-uuid', $class, null, [
-            DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS => true,
+            SerializerInterface::RETURN_RESULT => true,
         ]);
 
         self::assertInstanceOf(DenormalizationResult::class, $result);

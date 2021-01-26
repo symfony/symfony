@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * This normalizer is only used in Debug/Dev/Messenger contexts.
@@ -48,6 +50,10 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Context
         ];
         if (null !== $status = $object->getStatusCode()) {
             $normalized['status'] = $status;
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($normalized);
         }
 
         return $normalized;

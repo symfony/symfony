@@ -18,6 +18,7 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -61,6 +62,10 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
                 $ret[$name] = $this->serializer->normalize($header, $format, $context);
             }
 
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                return NormalizationResult::success($ret);
+            }
+
             return $ret;
         }
 
@@ -68,10 +73,20 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             $ret = $this->normalizer->normalize($object, $format, $context);
             $ret['class'] = \get_class($object);
 
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                return NormalizationResult::success($ret);
+            }
+
             return $ret;
         }
 
-        return $this->normalizer->normalize($object, $format, $context);
+        $ret = $this->normalizer->normalize($object, $format, $context);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($ret);
+        }
+
+        return $ret;
     }
 
     /**
@@ -107,7 +122,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
             $headers = new Headers(...$ret);
 
-            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
                 return DenormalizationResult::success($headers);
             }
 

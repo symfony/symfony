@@ -16,8 +16,14 @@ namespace Symfony\Component\Serializer;
  */
 interface SerializerInterface
 {
+    const RETURN_RESULT = 'return_result';
+
     /**
      * Serializes data in the appropriate format.
+     *
+     * When context option `return_result` is enabled, the serializer must
+     * always return an instance of
+     * {@see \Symfony\Component\Serializer\Result\NormalizationResult}.
      *
      * @param mixed  $data    Any data
      * @param string $format  Format name
@@ -30,8 +36,8 @@ interface SerializerInterface
     /**
      * Deserializes data into the given type.
      *
-     * When context option `collect_invariant_violations` is enabled, the
-     * serializer must always return an instance of
+     * When context option `return_result` is enabled, the serializer must
+     * always return an instance of
      * {@see \Symfony\Component\Serializer\Result\DenormalizationResult}.
      *
      * @param mixed $data

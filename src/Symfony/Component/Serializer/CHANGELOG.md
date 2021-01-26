@@ -15,7 +15,7 @@ CHANGELOG
  * added `FormErrorNormalizer`
  * added `MimeMessageNormalizer`
  * serializer mapping can be configured using php attributes
- * added `DenormalizerInterface::COLLECT_INVARIANT_VIOLATIONS` context option to collect denormalization errors instead of throwing immediately
+ * added `SerializerInterface::RETURN_RESULT` context option to collect (de)normalization errors instead of throwing immediately
 
 5.1.0
 -----

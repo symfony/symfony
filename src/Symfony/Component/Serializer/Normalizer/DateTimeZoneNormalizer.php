@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes a {@see \DateTimeZone} object to a timezone string.
@@ -34,7 +36,13 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new InvalidArgumentException('The object must be an instance of "\DateTimeZone".');
         }
 
-        return $object->getName();
+        $result = $object->getName();
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

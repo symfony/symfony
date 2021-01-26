@@ -15,6 +15,8 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\InvariantViolation;
 use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -43,6 +45,17 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
      * @param AbstractUid $object
      */
     public function normalize($object, string $format = null, array $context = [])
+    {
+        $result = $this->doNormalize($object, $context);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
+    }
+
+    public function doNormalize(AbstractUid $object, array $context): string
     {
         switch ($context[self::NORMALIZATION_FORMAT_KEY] ?? $this->defaultContext[self::NORMALIZATION_FORMAT_KEY]) {
             case self::NORMALIZATION_FORMAT_CANONICAL:
@@ -76,7 +89,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
         } catch (\InvalidArgumentException $exception) {
             $message = sprintf('The data is not a valid "%s" string representation.', $type);
 
-            if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
                 $violation = new InvariantViolation($data, $message, $exception);
 
                 return DenormalizationResult::failure(['' => [$violation]]);
@@ -85,7 +98,7 @@ final class UidNormalizer implements NormalizerInterface, DenormalizerInterface,
             throw new NotNormalizableValueException($message);
         }
 
-        if ($context[self::COLLECT_INVARIANT_VIOLATIONS] ?? false) {
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
             return DenormalizationResult::success($result);
         }
 

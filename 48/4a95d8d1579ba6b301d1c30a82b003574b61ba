@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by BoShurik at 2020-11-03T09:46:26Z
+
+I'm not sure the failed `appveyor` build is related. All tests are `Ok`.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-01-25T17:05:19Z
+
+It looks like we have a similar issue in API Platform: https://github.com/api-platform/core/issues/3974
+I wonder if this shouldn't be fixed once and for all in PropertyAccess (this doesn't prevent to merge this PR first).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-26T20:42:46Z
+
+PR welcome on PropertyAccess if someone is up to having a look there.

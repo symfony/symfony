@@ -69,7 +69,7 @@ class Process implements \IteratorAggregate
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset = 0;
     private $incrementalErrorOutputOffset = 0;
-    private $tty = false;
+    private $tty = true;
     private $pty;
     private $options = ['suppress_errors' => true, 'bypass_shell' => true];
 

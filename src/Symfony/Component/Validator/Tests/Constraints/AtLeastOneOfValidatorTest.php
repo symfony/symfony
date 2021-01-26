@@ -18,15 +18,22 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Constraints\EqualTo;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Negative;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -45,15 +52,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidCombinations($value, $constraints)
     {
-        $i = 0;
-
-        foreach ($constraints as $constraint) {
-            $this->expectViolationsAt($i++, $value, $constraint);
-        }
-
-        $this->validator->validate($value, new AtLeastOneOf($constraints));
-
-        $this->assertNoViolation();
+        $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
     }
 
     public function getValidCombinations()
@@ -96,18 +95,20 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidCombinationsWithDefaultMessage($value, $constraints)
     {
         $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints]);
+        $validator = Validation::createValidator();
 
         $message = [$atLeastOneOf->message];
 
         $i = 0;
 
         foreach ($constraints as $constraint) {
-            $message[] = ' ['.($i + 1).'] '.$this->expectViolationsAt($i++, $value, $constraint)->get(0)->getMessage();
+            $message[] = sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
         }
 
-        $this->validator->validate($value, $atLeastOneOf);
+        $violations = $validator->validate($value, $atLeastOneOf);
 
-        $this->buildViolation(implode('', $message))->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
+        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     /**
@@ -117,15 +118,10 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     {
         $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints, 'message' => 'foo', 'includeInternalMessages' => false]);
 
-        $i = 0;
+        $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
-        foreach ($constraints as $constraint) {
-            $this->expectViolationsAt($i++, $value, $constraint);
-        }
-
-        $this->validator->validate($value, $atLeastOneOf);
-
-        $this->buildViolation('foo')->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)->assertRaised();
+        $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
+        $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     public function getInvalidCombinations()
@@ -183,5 +179,41 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         ]), 'non_default_group');
 
         $this->assertCount(1, $violations);
+    }
+
+    public function testContextIsPropagatedToNestedConstraints()
+    {
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+                public function getMetadataFor($classOrObject): MetadataInterface
+                {
+                    return (new ClassMetadata(ExpressionConstraintNested::class))
+                        ->addPropertyConstraint('foo', new AtLeastOneOf([
+                            new NotNull(),
+                            new Expression('this.getFoobar() in ["bar", "baz"]'),
+                        ]));
+                }
+
+                public function hasMetadataFor($classOrObject): bool
+                {
+                    return ExpressionConstraintNested::class === $classOrObject;
+                }
+            })
+            ->getValidator()
+        ;
+
+        $violations = $validator->validate(new ExpressionConstraintNested(), new Valid());
+
+        $this->assertCount(0, $violations);
+    }
+}
+
+class ExpressionConstraintNested
+{
+    private $foo;
+
+    public function getFoobar(): string
+    {
+        return 'bar';
     }
 }

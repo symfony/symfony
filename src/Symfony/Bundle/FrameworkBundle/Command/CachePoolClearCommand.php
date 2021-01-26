@@ -89,14 +89,25 @@ EOF
             $clearer->clear($kernel->getContainer()->getParameter('kernel.cache_dir'));
         }
 
+        $failure = false;
         foreach ($pools as $id => $pool) {
             $io->comment(sprintf('Clearing cache pool: <info>%s</info>', $id));
 
             if ($pool instanceof CacheItemPoolInterface) {
-                $pool->clear();
+                if (!$pool->clear()) {
+                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $failure = true;
+                }
             } else {
-                $this->poolClearer->clearPool($id);
+                if (false === $this->poolClearer->clearPool($id)) {
+                    $io->warning(sprintf('Cache pool "%s" could not be cleared.', $pool));
+                    $failure = true;
+                }
             }
+        }
+
+        if ($failure) {
+            return 1;
         }
 
         $io->success('Cache was successfully cleared.');

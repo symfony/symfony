@@ -612,6 +612,18 @@ class TranslatorTest extends TestCase
 
             // Override %count% with a custom value
             ['Il y a quelques pommes', 'one: There is one apple|more: There are %count% apples', 'one: Il y a %count% pomme|more: Il y a quelques pommes', 2, ['%count%' => 'quelques'], 'fr', ''],
+
+            // Floating values
+            ['1.5 liters', 'key', '%count% liter|%count% liters', 1.5, ['%count%' => 1.5], 'en', ''],
+            ['1.5 litre', 'key', '%count% litre|%count% litres', 1.5, ['%count%' => 1.5], 'fr', ''],
+
+            // Negative values
+            ['-1 degree', 'key', '%count% degree|%count% degrees', -1, ['%count%' => -1], 'en', ''],
+            ['-1 degré', 'key', '%count% degré|%count% degrés', -1, ['%count%' => -1], 'fr', ''],
+            ['-1.5 degrees', 'key', '%count% degree|%count% degrees', -1.5, ['%count%' => -1.5], 'en', ''],
+            ['-1.5 degré', 'key', '%count% degré|%count% degrés', -1.5, ['%count%' => -1.5], 'fr', ''],
+            ['-2 degrees', 'key', '%count% degree|%count% degrees', -2, ['%count%' => -2], 'en', ''],
+            ['-2 degrés', 'key', '%count% degré|%count% degrés', -2, ['%count%' => -2], 'fr', ''],
         ];
     }
 

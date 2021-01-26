@@ -78,7 +78,7 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new RegisterLdapLocatorPass());
-        $container->addCompilerPass(new RegisterEntryPointPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new RegisterEntryPointPass());
         // must be registered after RegisterListenersPass (in the FrameworkBundle)
         $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);
         // execute after ResolveChildDefinitionsPass optimization pass, to ensure class names are set

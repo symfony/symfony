@@ -170,6 +170,12 @@ class Filesystem
                     throw new IOException(sprintf('Failed to remove symlink "%s": ', $file).self::$lastError);
                 }
             } elseif (is_dir($file)) {
+                // Rename directory before removing it to mitigate the chance of
+                // another process writing to it during the operation.
+                // @see https://github.com/symfony/symfony/issues/27578
+                $orig_file = $file;
+                $file = '.symfony-tmp.' . substr(sha1(rand()), 0, 7);
+                $this->rename($orig_file, $file);
                 $this->remove(new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS));
 
                 if (!self::box('rmdir', $file) && file_exists($file)) {

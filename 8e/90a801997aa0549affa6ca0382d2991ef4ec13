@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-26T10:19:23Z
+
+(failure on Windows)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-26T12:47:23Z
+
+> (failure on Windows)
+
+test refactored to be compatible with windows

@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-18T22:04:52Z
+
+Hey!
+
+I did a quick review of this PR, I think most things looks good.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-01-19T12:26:25Z
+
+If I have time this week, I'll also check negative numbers and add tests for them.
+
+✔️ done
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-01-19T14:05:40Z
+
+Hum, as a first sight, I can't tell how the test output could be different from PHP 7.1 and 8 while 7.4 succeed in between.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-19T14:28:36Z
+
+> Hum, as a first sight, I can't tell how the test output could be different from PHP 7.1 and 8 while 7.4 succeed in between.
+
+The Symfony test suites are very complexe and does not perform the same thing. ie. One of the tests suite tries each component with the minimal requirements version. Another tries the previous version of the component with dependencies patched with your PR.
+That's why some passed and other failed. You have to make all of theme green ;-)
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-01-19T19:36:43Z
+
+Depending on the version we either fall into `PluralizationRules.php` or into `TranslatorTrait.php`, I hope we can soon get rid of this duplicated code 😸 Now both are fixed.
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-01-19T19:53:36Z
+
+AppVeyor failure is clearly unrelated:
+```
+Fatal error: Interface 'Symfony\Contracts\Service\ResetInterface' not found
+```
+
+---------------------------------------------------------------------------
+
+by kylekatarnls at 2021-01-21T13:25:01Z
+
+👋 @nicolas-grekas would you mind to review the new changes `$number = abs($number)` to also handle negative numbers properly.

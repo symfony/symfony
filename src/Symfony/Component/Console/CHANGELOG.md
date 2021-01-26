@@ -9,6 +9,7 @@ CHANGELOG
  * Add the `Command::$defaultDescription` static property and the `description` attribute
    on the `console.command` tag to allow the `list` command to instantiate commands lazily
  * Add option `--short` to the `list` command
+ * Add support for bright colors
 
 5.2.0
 -----

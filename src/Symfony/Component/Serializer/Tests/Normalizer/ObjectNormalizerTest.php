@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
@@ -139,6 +140,15 @@ class ObjectNormalizerTest extends TestCase
         $obj = new Php74DummyPrivate();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeObjectWithPrivatePropertyWithoutGetter()
+    {
+        $obj = new DummyPrivatePropertyWithoutGetter();
+        $this->assertEquals(
+            ['bar' => 'bar'],
             $this->normalizer->normalize($obj, 'any')
         );
     }

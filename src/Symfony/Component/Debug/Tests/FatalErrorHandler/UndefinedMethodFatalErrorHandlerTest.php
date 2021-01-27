@@ -53,6 +53,15 @@ class UndefinedMethodFatalErrorHandlerTest extends TestCase
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
+                    'message' => 'Call to undefined method SplObjectStorage::()',
+                ],
+                'Attempted to call an undefined method named "" of class "SplObjectStorage".',
+            ],
+            [
+                [
+                    'type' => 1,
+                    'line' => 12,
+                    'file' => 'foo.php',
                     'message' => 'Call to undefined method SplObjectStorage::walid()',
                 ],
                 "Attempted to call an undefined method named \"walid\" of class \"SplObjectStorage\".\nDid you mean to call \"valid\"?",

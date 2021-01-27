@@ -57,7 +57,7 @@ class EarlyExpirationDispatcherTest extends TestCase
 
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EarlyExpirationDispatcher($bus, $reverseContainer);
 
@@ -107,7 +107,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
         $msg = EarlyExpirationMessage::create($reverseContainer, $computationService, $item, $pool);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
             ->method('dispatch')
             ->with($msg)

@@ -71,7 +71,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolveWithAttribute()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);

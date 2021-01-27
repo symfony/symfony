@@ -22,9 +22,9 @@ class HttpBasicAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
-        $this->encoderFactory = $this->getMockBuilder(EncoderFactoryInterface::class)->getMock();
-        $this->encoder = $this->getMockBuilder(PasswordEncoderInterface::class)->getMock();
+        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
+        $this->encoder = $this->createMock(PasswordEncoderInterface::class);
         $this->encoderFactory
             ->expects($this->any())
             ->method('getEncoder')

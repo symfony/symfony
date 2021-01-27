@@ -226,7 +226,7 @@ class ConnectionTest extends TestCase
 
     public function testClaimAbandonedMessageWithRaceCondition()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->withConsecutive(
@@ -252,7 +252,7 @@ class ConnectionTest extends TestCase
 
     public function testClaimAbandonedMessage()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(2))->method('xreadgroup')
             ->withConsecutive(
@@ -346,7 +346,7 @@ class ConnectionTest extends TestCase
 
     public function testDeleteAfterAck()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('xack')
             ->with('queue', 'symfony', ['1'])
@@ -361,7 +361,7 @@ class ConnectionTest extends TestCase
 
     public function testDeleteAfterReject()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('xack')
             ->with('queue', 'symfony', ['1'])

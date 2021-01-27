@@ -25,7 +25,7 @@ class SemaphoreFactoryTest extends TestCase
 {
     public function testCreateSemaphore()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
 
         $keys = [];
         $store
@@ -38,7 +38,7 @@ class SemaphoreFactoryTest extends TestCase
             }))
             ->willReturn(true);
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
         $factory->setLogger($logger);
 
@@ -54,7 +54,7 @@ class SemaphoreFactoryTest extends TestCase
 
     public function testCreateSemaphoreFromKey()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
 
         $keys = [];
         $store
@@ -67,7 +67,7 @@ class SemaphoreFactoryTest extends TestCase
             }))
             ->willReturn(true);
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
         $factory->setLogger($logger);
 

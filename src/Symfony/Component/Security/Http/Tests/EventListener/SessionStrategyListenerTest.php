@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -68,7 +69,7 @@ class SessionStrategyListenerTest extends TestCase
 
     private function configurePreviousSession()
     {
-        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->any())
             ->method('getName')
             ->willReturn('test_session_name');

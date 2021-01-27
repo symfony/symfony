@@ -322,7 +322,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForObjectWithBasicProperties()
     {
-        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('bool')],

@@ -1603,7 +1603,7 @@ class ViolationMapperTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['Name', [], null, null, 'Custom Name'],
         ]);
@@ -1630,7 +1630,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['options_label', [], null, null, 'Translated Label'],
         ]);
@@ -1668,7 +1668,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat1()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['form.custom', [], null, null, 'Translated 1st Custom Label'],
         ]);
@@ -1706,7 +1706,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
         ]);
@@ -1793,7 +1793,7 @@ class ViolationMapperTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->never())->method('trans');
         $this->mapper = new ViolationMapper($renderer, $translator);
 

@@ -28,7 +28,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
      */
     public function testTypeGuesser(string $type, $expected)
     {
-        $classMetadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
         $classMetadata->expects($this->once())->method('getTypeOfField')->with('field')->willReturn($type);
 

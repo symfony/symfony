@@ -98,7 +98,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
     {
         $this->createListener([], false, true, false);
         $request = new Request([], [], [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '{"username": "dunglas", "password": "foo"}');
-        $event = new RequestEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
 
         ($this->listener)($event);
         $this->assertSame(['error' => 'An authentication exception occurred.'], json_decode($event->getResponse()->getContent(), true));

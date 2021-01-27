@@ -185,7 +185,7 @@ class DaoAuthenticationProviderTest extends TestCase
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
     {
         $this->expectException(BadCredentialsException::class);
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())
              ->method('getPassword')
              ->willReturn('foo')

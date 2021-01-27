@@ -28,7 +28,7 @@ class SwitchUserTokenProcessorTest extends TestCase
     {
         $originalToken = new UsernamePasswordToken('original_user', 'password', 'provider', ['ROLE_SUPER_ADMIN']);
         $switchUserToken = new SwitchUserToken('user', 'passsword', 'provider', ['ROLE_USER'], $originalToken);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($switchUserToken);
 
         $processor = new SwitchUserTokenProcessor($tokenStorage);

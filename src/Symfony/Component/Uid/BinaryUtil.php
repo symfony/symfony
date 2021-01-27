@@ -124,7 +124,7 @@ class BinaryUtil
         $time = self::add($time, self::TIME_OFFSET_COM2);
 
         if ($time >= self::TIME_OFFSET_COM2) {
-            $time = -1 * self::toBase($time ^ "\xff\xff\xff\xff\xff\xff\xff\xff", self::BASE10);
+            $time = -1 * (self::toBase($time ^ "\xff\xff\xff\xff\xff\xff\xff\xff", self::BASE10) + 1);
         } else {
             $time[0] = $time[0] & "\x7F";
             $time = self::toBase($time, self::BASE10);

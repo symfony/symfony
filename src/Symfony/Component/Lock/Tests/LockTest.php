@@ -63,7 +63,7 @@ class LockTest extends TestCase
     public function testAcquireBlockingWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
@@ -79,7 +79,7 @@ class LockTest extends TestCase
     public function testAcquireBlockingRetryWithPersistingStoreInterface()
     {
         $key = new Key(uniqid(__METHOD__, true));
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store

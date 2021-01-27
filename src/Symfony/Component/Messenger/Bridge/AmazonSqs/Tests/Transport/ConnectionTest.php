@@ -90,7 +90,7 @@ class ConnectionTest extends TestCase
 
     public function testFromDsnAsQueueUrl()
     {
-        $httpClient = $this->getMockBuilder(HttpClientInterface::class)->getMock();
+        $httpClient = $this->createMock(HttpClientInterface::class);
         $this->assertEquals(
             new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'us-east-2', 'endpoint' => 'https://sqs.us-east-2.amazonaws.com', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient), 'https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4'),
             Connection::fromDsn('https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4', [], $httpClient)
@@ -304,7 +304,7 @@ class ConnectionTest extends TestCase
 
     public function testGetQueueUrlNotCalled()
     {
-        $client = $this->getMockBuilder(SqsClient::class)->getMock();
+        $client = $this->createMock(SqsClient::class);
         $connection = new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4');
 
         $client->expects($this->never())->method('getQueueUrl');

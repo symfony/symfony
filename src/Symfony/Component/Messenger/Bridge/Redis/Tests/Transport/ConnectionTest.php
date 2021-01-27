@@ -361,7 +361,7 @@ class ConnectionTest extends TestCase
 
     public function testDeleteAfterReject()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('xack')
             ->with('queue', 'symfony', ['1'])

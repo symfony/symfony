@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-01-26T18:29:43Z
+
+This looks weird to me, because `getKernelExpectingRequest` says it already allows a delta for the `REQUEST_TIME` in its phpdoc.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-26T18:30:28Z
+
+Looks like 1s of delta is too small for AppVeyor
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-26T18:40:38Z
+
+Good catch. In my link the test failed because a delta of 2 seconds.
+Moreover the delta in not applied to the `REQUEST_TIME` header, but everything :/ I think it's better to use `@group time-sensitive` instead.

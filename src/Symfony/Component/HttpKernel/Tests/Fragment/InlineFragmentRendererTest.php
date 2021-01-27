@@ -23,6 +23,9 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @group time-sensitive
+ */
 class InlineFragmentRendererTest extends TestCase
 {
     public function testRender()
@@ -253,8 +256,7 @@ class InlineFragmentRendererTest extends TestCase
     }
 
     /**
-     * Creates a Kernel expecting a request equals to $request
-     * Allows delta in comparison in case REQUEST_TIME changed by 1 second.
+     * Creates a Kernel expecting a request equals to $request.
      */
     private function getKernelExpectingRequest(Request $request, $strict = false)
     {
@@ -262,7 +264,7 @@ class InlineFragmentRendererTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('handle')
-            ->with($this->equalTo($request, 1))
+            ->with($request)
             ->willReturn(new Response('foo'));
 
         return $kernel;

@@ -127,7 +127,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
     public function testCreateFromLoaderFilterPropertyPath()
     {
-        $loader = $this->getMockBuilder(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $filteredChoices = [
             'two' => (object) ['property' => 'value 2', 'filter' => true],
         ];

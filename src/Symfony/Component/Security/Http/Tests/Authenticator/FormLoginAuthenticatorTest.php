@@ -118,7 +118,7 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithToString($postOnly)
     {
-        $usernameObject = $this->getMockBuilder(DummyUserClass::class)->getMock();
+        $usernameObject = $this->createMock(DummyUserClass::class);
         $usernameObject->expects($this->once())->method('__toString')->willReturn('someUsername');
 
         $request = Request::create('/login_check', 'POST', ['_username' => $usernameObject, '_password' => 's$cr$t']);

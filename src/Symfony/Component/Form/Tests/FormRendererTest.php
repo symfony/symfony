@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\FormRendererEngineInterface;
 use Symfony\Component\Form\FormView;
 
 class FormRendererTest extends TestCase
@@ -38,7 +39,7 @@ class FormRendererTest extends TestCase
         $formView->vars['name'] = 'foo';
         $formView->setRendered();
 
-        $engine = $this->getMockBuilder(\Symfony\Component\Form\FormRendererEngineInterface::class)->getMock();
+        $engine = $this->createMock(FormRendererEngineInterface::class);
         $renderer = new FormRenderer($engine);
         $renderer->searchAndRenderBlock($formView, 'row');
     }

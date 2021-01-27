@@ -3,11 +3,6 @@ Uid Component
 
 The UID component provides an object-oriented API to generate and represent UIDs.
 
-**This Component is experimental**.
-[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
-are not covered by Symfony's
-[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
-
 Resources
 ---------
 

@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Result\NormalizationResult;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
@@ -24,11 +25,14 @@ interface NormalizerInterface
     /**
      * Normalizes an object into a set of arrays/scalars.
      *
+     * When context option `return_result` is enabled, the normalizer must
+     * always return an instance of {@see NormalizationResult}.
+     *
      * @param mixed  $object  Object to normalize
      * @param string $format  Format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @return array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
+     * @return NormalizationResult|array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
      *
      * @throws InvalidArgumentException   Occurs when the object given is not a supported type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular

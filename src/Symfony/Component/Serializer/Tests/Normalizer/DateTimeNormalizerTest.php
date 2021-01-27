@@ -13,6 +13,9 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -258,5 +261,30 @@ class DateTimeNormalizerTest extends TestCase
     {
         $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
         $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d|']);
+    }
+
+    public function testItDenormalizesAndReturnsSuccessResult(): void
+    {
+        $result = $this->normalizer->denormalize('2020-01-01', \DateTimeInterface::class, null, [
+            SerializerInterface::RETURN_RESULT => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertTrue($result->isSucessful());
+        self::assertEquals(new \DateTime('2020-01-01'), $result->getDenormalizedValue());
+    }
+
+    public function testItDenormalizesAndReturnsFailureResult(): void
+    {
+        $result = $this->normalizer->denormalize('not-a-date', \DateTimeInterface::class, null, [
+            SerializerInterface::RETURN_RESULT => true,
+        ]);
+
+        self::assertInstanceOf(DenormalizationResult::class, $result);
+        self::assertFalse($result->isSucessful());
+        self::assertSame(
+            ['' => ['DateTimeImmutable::__construct(): Failed to parse time string (not-a-date) at position 0 (n): The timezone could not be found in the database']],
+            $result->getInvariantViolationMessages()
+        );
     }
 }

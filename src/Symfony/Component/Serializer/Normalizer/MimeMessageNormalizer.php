@@ -17,6 +17,8 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -60,6 +62,10 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
                 $ret[$name] = $this->serializer->normalize($header, $format, $context);
             }
 
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                return NormalizationResult::success($ret);
+            }
+
             return $ret;
         }
 
@@ -67,10 +73,20 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             $ret = $this->normalizer->normalize($object, $format, $context);
             $ret['class'] = \get_class($object);
 
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                return NormalizationResult::success($ret);
+            }
+
             return $ret;
         }
 
-        return $this->normalizer->normalize($object, $format, $context);
+        $ret = $this->normalizer->normalize($object, $format, $context);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($ret);
+        }
+
+        return $ret;
     }
 
     /**
@@ -80,13 +96,37 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
     {
         if (Headers::class === $type) {
             $ret = [];
+            $invariantViolations = [];
             foreach ($data as $headers) {
                 foreach ($headers as $header) {
-                    $ret[] = $this->serializer->denormalize($header, $this->headerClassMap[strtolower($header['name'])] ?? UnstructuredHeader::class, $format, $context);
+                    $name = $header['name'];
+                    $result = $this->serializer->denormalize($header, $this->headerClassMap[strtolower($name)] ?? UnstructuredHeader::class, $format, $context);
+
+                    if ($result instanceof DenormalizationResult) {
+                        if (!$result->isSucessful()) {
+                            $invariantViolations += $result->getInvariantViolations();
+
+                            continue;
+                        }
+
+                        $result = $result->getDenormalizedValue();
+                    }
+
+                    $ret[] = $result;
                 }
             }
 
-            return new Headers(...$ret);
+            if ([] !== $invariantViolations) {
+                return DenormalizationResult::failure($invariantViolations);
+            }
+
+            $headers = new Headers(...$ret);
+
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                return DenormalizationResult::success($headers);
+            }
+
+            return $headers;
         }
 
         if (AbstractPart::class === $type) {

@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * A normalizer that uses an objects own JsonSerializable implementation.
@@ -38,7 +40,13 @@ class JsonSerializableNormalizer extends AbstractNormalizer
             throw new LogicException('Cannot normalize object because injected serializer is not a normalizer.');
         }
 
-        return $this->serializer->normalize($object->jsonSerialize(), $format, $context);
+        $result = $this->serializer->normalize($object->jsonSerialize(), $format, $context);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

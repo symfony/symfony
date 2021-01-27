@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes errors according to the API Problem spec (RFC 7807).
@@ -59,6 +61,10 @@ class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodI
         if ($debug) {
             $data['class'] = $object->getClass();
             $data['trace'] = $object->getTrace();
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($data);
         }
 
         return $data;

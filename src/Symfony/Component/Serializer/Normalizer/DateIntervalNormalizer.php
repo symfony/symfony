@@ -13,6 +13,10 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes an instance of {@see \DateInterval} to an interval string.
@@ -46,7 +50,13 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
         }
 
-        return $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
+        $result = $object->format($context[self::FORMAT_KEY] ?? $this->defaultContext[self::FORMAT_KEY]);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**
@@ -74,6 +84,27 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @return \DateInterval
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            $result = $this->doDenormalize($data, $context);
+        } catch (InvalidArgumentException | UnexpectedValueException $exception) {
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                $violation = new InvariantViolation($data, $exception->getMessage(), $exception);
+
+                return DenormalizationResult::failure(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return DenormalizationResult::success($result);
+        }
+
+        return $result;
+    }
+
+    private function doDenormalize($data, array $context = [])
     {
         if (!\is_string($data)) {
             throw new InvalidArgumentException(sprintf('Data expected to be a string, "%s" given.', get_debug_type($data)));

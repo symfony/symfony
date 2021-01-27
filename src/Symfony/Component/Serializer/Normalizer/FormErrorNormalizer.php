@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes invalid Form instances.
@@ -25,7 +27,7 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = [
             'title' => $context[self::TITLE] ?? 'Validation Failed',
@@ -36,6 +38,10 @@ final class FormErrorNormalizer implements NormalizerInterface, CacheableSupport
 
         if (0 !== \count($object->all())) {
             $data['children'] = $this->convertFormChildrenToArray($object);
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($data);
         }
 
         return $data;

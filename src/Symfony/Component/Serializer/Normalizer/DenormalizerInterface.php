@@ -27,6 +27,10 @@ interface DenormalizerInterface
     /**
      * Denormalizes data back into an object of the given class.
      *
+     * When context option `return_result` is enabled, the denormalizer must
+     * always return an instance of
+     * {@see \Symfony\Component\Serializer\Result\DenormalizationResult}.
+     *
      * @param mixed  $data    Data to restore
      * @param string $type    The expected class to instantiate
      * @param string $format  Format the given data was extracted from

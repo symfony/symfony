@@ -13,6 +13,10 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.
@@ -45,8 +49,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * {@inheritdoc}
      *
      * @throws InvalidArgumentException
-     *
-     * @return string
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -62,7 +64,13 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             $object = $object->setTimezone($timezone);
         }
 
-        return $object->format($dateTimeFormat);
+        $result = $object->format($dateTimeFormat);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**
@@ -81,6 +89,27 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      * @return \DateTimeInterface
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            $result = $this->doDenormalize($data, $type, $context);
+        } catch (NotNormalizableValueException $exception) {
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                $violation = new InvariantViolation($data, $exception->getMessage(), $exception);
+
+                return DenormalizationResult::failure(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return DenormalizationResult::success($result);
+        }
+
+        return $result;
+    }
+
+    private function doDenormalize($data, string $type, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);

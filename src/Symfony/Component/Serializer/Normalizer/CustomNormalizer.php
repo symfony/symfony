@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Result\NormalizationResult;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
@@ -27,7 +29,13 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function normalize($object, string $format = null, array $context = [])
     {
-        return $object->normalize($this->serializer, $format, $context);
+        $result = $object->normalize($this->serializer, $format, $context);
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**

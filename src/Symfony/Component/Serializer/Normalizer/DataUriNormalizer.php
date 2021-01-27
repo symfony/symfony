@@ -16,6 +16,10 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\InvariantViolation;
+use Symfony\Component\Serializer\Result\DenormalizationResult;
+use Symfony\Component\Serializer\Result\NormalizationResult;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizes an {@see \SplFileInfo} object to a data URI.
@@ -67,10 +71,16 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         }
 
         if ('text' === explode('/', $mimeType, 2)[0]) {
-            return sprintf('data:%s,%s', $mimeType, rawurlencode($data));
+            $result = sprintf('data:%s,%s', $mimeType, rawurlencode($data));
+        } else {
+            $result = sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
         }
 
-        return sprintf('data:%s;base64,%s', $mimeType, base64_encode($data));
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return NormalizationResult::success($result);
+        }
+
+        return $result;
     }
 
     /**
@@ -94,6 +104,27 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      * @return \SplFileInfo
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
+    {
+        try {
+            $result = $this->doDenormalize($data, $type);
+        } catch (NotNormalizableValueException $exception) {
+            if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+                $violation = new InvariantViolation($data, $exception->getMessage(), $exception);
+
+                return DenormalizationResult::failure(['' => [$violation]]);
+            }
+
+            throw $exception;
+        }
+
+        if ($context[SerializerInterface::RETURN_RESULT] ?? false) {
+            return DenormalizationResult::success($result);
+        }
+
+        return $result;
+    }
+
+    private function doDenormalize($data, string $type)
     {
         if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw new NotNormalizableValueException('The provided "data:" URI is not valid.');

@@ -369,7 +369,7 @@ class ContextListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
 
         $listener = new ContextListener($tokenStorage, [], 'context_key', null, null, null, [$tokenStorage, 'getToken']);
-        $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     protected function runSessionOnKernelResponse($newToken, $original = null)

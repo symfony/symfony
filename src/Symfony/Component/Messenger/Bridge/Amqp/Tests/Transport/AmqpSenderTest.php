@@ -18,10 +18,6 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
-use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**

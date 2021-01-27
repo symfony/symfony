@@ -38,7 +38,7 @@ class RememberMeListenerTest extends TestCase
     {
         $this->rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
         $this->listener = new RememberMeListener($this->rememberMeServices);
-        $this->request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $this->request = $this->createMock(Request::class);
         $this->response = $this->createMock(Response::class);
         $this->token = $this->createMock(TokenInterface::class);
     }

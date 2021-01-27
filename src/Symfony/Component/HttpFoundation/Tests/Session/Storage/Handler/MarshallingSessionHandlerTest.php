@@ -34,8 +34,8 @@ class MarshallingSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->marshaller = $this->getMockBuilder(MarshallerInterface::class)->getMock();
-        $this->handler = $this->getMockBuilder(AbstractSessionHandler::class)->getMock();
+        $this->marshaller = $this->createMock(MarshallerInterface::class);
+        $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
     public function testOpen()

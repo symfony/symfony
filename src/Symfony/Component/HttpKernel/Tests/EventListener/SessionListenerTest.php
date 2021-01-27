@@ -216,14 +216,14 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -235,10 +235,10 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageLogIfStatelessAndSessionUsed()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->disableOriginalConstructor()->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(1))->method('warning');
 
         $container = new Container();
@@ -246,7 +246,7 @@ class SessionListenerTest extends TestCase
         $container->set('logger', $logger);
 
         $listener = new SessionListener($container, false);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -257,7 +257,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
         $session->expects($this->exactly(1))->method('save');
@@ -266,7 +266,7 @@ class SessionListenerTest extends TestCase
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -280,7 +280,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenDebugAndStateless()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(1))->method('save');
 
@@ -303,14 +303,14 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenNoDebug()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(0))->method('save');
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
+        $requestStack = $this->createMock(RequestStack::class);
         $requestStack->expects($this->never())->method('getMasterRequest')->willReturn($request);
 
         $container = new Container();
@@ -322,7 +322,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenNoStateless()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->never())->method('save');
 

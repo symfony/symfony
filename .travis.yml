@@ -14,6 +14,7 @@ addons:
 
 env:
     global:
+        - SYMFONY_VERSION=5.2
         - MIN_PHP=7.2.5
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
@@ -170,8 +171,8 @@ install:
           git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
           git rm -rq src/Symfony/Bridge/PhpUnit
           git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
-          export SYMFONY_VERSION=$(curl -s https://api.github.com/repos/symfony/symfony/pulls/$SYMFONY_PHPUNIT_BRIDGE_PR | jq -r .base.ref)
-          sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_VERSION'.x@dev"/' composer.json
+          SYMFONY_PHPUNIT_BRIDGE_REF=$(curl -s https://api.github.com/repos/symfony/symfony/pulls/$SYMFONY_PHPUNIT_BRIDGE_PR | jq -r .base.ref)
+          sed -i 's/"symfony\/phpunit-bridge": ".*"/"symfony\/phpunit-bridge": "'$SYMFONY_PHPUNIT_BRIDGE_REF'.x@dev"/' composer.json
           rm -rf .phpunit
       fi
 
@@ -180,7 +181,6 @@ install:
       git config --global user.email ""
       git config --global user.name "Symfony"
 
-      export SYMFONY_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*')
       SYMFONY_VERSIONS=$(git ls-remote -q --heads);
 
       if [[ ! $deps ]]; then
@@ -227,6 +227,7 @@ install:
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
       [[ $deps = high && ${SYMFONY_VERSION%.*} != $(echo "$SYMFONY_VERSIONS" | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
 
+      export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi
 
     - |
@@ -265,6 +266,7 @@ install:
                   export FLIP='^'
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
+                  export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
                   export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
                   git fetch --depth=2 origin $SYMFONY_VERSION
                   git checkout -m FETCH_HEAD

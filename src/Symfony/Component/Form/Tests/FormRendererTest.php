@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
 use Symfony\Component\Form\FormView;
@@ -32,7 +33,7 @@ class FormRendererTest extends TestCase
 
     public function testRenderARenderedField()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');
 
         $formView = new FormView();

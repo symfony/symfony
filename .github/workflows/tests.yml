@@ -137,8 +137,9 @@ jobs:
             -   name: Configure composer
                 run: |
                     COMPOSER_HOME="$(composer config home)"
+                    composer self-update
                     ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-                    echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+                    echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory
                 id: composer-cache

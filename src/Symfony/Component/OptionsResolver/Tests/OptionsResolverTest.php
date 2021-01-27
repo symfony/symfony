@@ -2404,7 +2404,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfOptionIsAlreadyDefined()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->expectExceptionMessage('The option "foo" is already defined.');
         $this->resolver->define('foo');
         $this->resolver->define('foo');

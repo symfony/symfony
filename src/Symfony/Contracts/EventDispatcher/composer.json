@@ -27,7 +27,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "2.3",
         "branch-alias": {
             "dev-main": "2.3-dev"
         },

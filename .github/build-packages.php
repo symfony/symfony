@@ -46,7 +46,7 @@ foreach ($dirs as $k => $dir) {
         passthru("cd $dir && git init && git add . && git commit -q -m - && git archive -o package.tar HEAD && rm .git/ -Rf");
     }
 
-    $package->version = (isset($package->extra->{'branch-version'}) ? $package->extra->{'branch-version'} : $version).'.x-dev';
+    $package->version = preg_replace('/(?:\.x)?-dev$/', '', $package->extra->{'branch-alias'}->{'dev-main'} ?? $version).'.x-dev';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 

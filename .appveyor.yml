@@ -50,9 +50,10 @@ install:
     - php composer.phar global require --no-progress --no-scripts --no-plugins symfony/flex
     - git config --global user.email ""
     - git config --global user.name "Symfony"
-    - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep branch-version composer.json | grep -o '[0-9.x]*'"`) DO (SET SYMFONY_VERSION=%%F)
+    - FOR /F "tokens=* USEBACKQ" %%F IN (`bash -c "grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*'"`) DO (SET SYMFONY_VERSION=%%F)
     - php .github/build-packages.php HEAD^ %SYMFONY_VERSION% src\Symfony\Bridge\PhpUnit
     - SET "SYMFONY_REQUIRE=>=%SYMFONY_VERSION%"
+    - SET COMPOSER_ROOT_VERSION=%SYMFONY_VERSION%.x-dev
     - php composer.phar update --no-progress --ansi
     - php phpunit install
 

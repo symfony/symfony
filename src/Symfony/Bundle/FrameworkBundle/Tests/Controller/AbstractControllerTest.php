@@ -160,9 +160,6 @@ class AbstractControllerTest extends TestCase
         $controller->getUser();
     }
 
-    /**
-     * @param $token
-     */
     private function getContainerWithTokenStorage($token = null): Container
     {
         $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::class)->getMock();
@@ -533,10 +530,10 @@ class AbstractControllerTest extends TestCase
     public function testRedirect()
     {
         $controller = $this->createController();
-        $response = $controller->redirect('http://dunglas.fr', 301);
+        $response = $controller->redirect('https://dunglas.fr', 301);
 
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\RedirectResponse::class, $response);
-        $this->assertSame('http://dunglas.fr', $response->getTargetUrl());
+        $this->assertSame('https://dunglas.fr', $response->getTargetUrl());
         $this->assertSame(301, $response->getStatusCode());
     }
 
@@ -581,7 +578,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetDoctrine()
     {
-        $doctrine = $this->getMockBuilder(\Doctrine\Persistence\ManagerRegistry::class)->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $container = new Container();
         $container->set('doctrine', $doctrine);

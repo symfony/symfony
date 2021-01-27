@@ -85,7 +85,7 @@ class RedirectControllerTest extends TestCase
 
         $request->attributes = new ParameterBag($attributes);
 
-        $router = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $router = $this->createMock(UrlGeneratorInterface::class);
         $router
             ->expects($this->exactly(2))
             ->method('generate')
@@ -304,7 +304,7 @@ class RedirectControllerTest extends TestCase
 
         $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza&f[%2525][%26][%3D][p.c]=d');
         $request->attributes = new ParameterBag(['_route_params' => ['base2' => 'zaza']]);
-        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->exactly(2))
              ->method('generate')
              ->willReturn('/test?b.se=zaza&base2=zaza&f[%2525][%26][%3D][p.c]=d')
@@ -326,7 +326,7 @@ class RedirectControllerTest extends TestCase
 
         $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza');
         $request->attributes = new ParameterBag(['_route_params' => ['b.se' => 'zouzou']]);
-        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?b.se=zouzou')->with('/test', ['b.se' => 'zouzou'], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);

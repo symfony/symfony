@@ -22,7 +22,7 @@ class VoterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $this->token = $this->createMock(TokenInterface::class);
     }
 
     public function getTests()

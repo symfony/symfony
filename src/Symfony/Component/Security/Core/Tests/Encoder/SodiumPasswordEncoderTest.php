@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class SodiumPasswordEncoderTest extends TestCase
 {
@@ -49,7 +50,7 @@ class SodiumPasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $encoder = new SodiumPasswordEncoder();
         $encoder->encodePassword(str_repeat('a', 4097), 'salt');
     }

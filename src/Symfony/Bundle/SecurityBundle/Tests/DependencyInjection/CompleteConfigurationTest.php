@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -597,7 +598,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.');
         $this->getContainer('access_decision_manager_service_and_strategy');
     }
@@ -615,14 +616,14 @@ abstract class CompleteConfigurationTest extends TestCase
 
     public function testFirewallUndefinedUserProvider()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('firewall_undefined_provider');
     }
 
     public function testFirewallListenerUndefinedProvider()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('listener_undefined_provider');
     }

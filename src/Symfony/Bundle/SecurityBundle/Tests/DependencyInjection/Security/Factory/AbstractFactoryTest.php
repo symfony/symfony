@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -127,7 +128,7 @@ class AbstractFactoryTest extends TestCase
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
-        $factory = $this->getMockForAbstractClass(\Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory::class, []);
+        $factory = $this->getMockForAbstractClass(AbstractFactory::class);
 
         $factory
             ->expects($this->once())

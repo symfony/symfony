@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
@@ -43,7 +44,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
+        $this->expectException(InvalidTtlException::class);
         new RedisStore($this->getRedisConnection(), -1);
     }
 }

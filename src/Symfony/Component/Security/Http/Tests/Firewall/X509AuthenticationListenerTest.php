@@ -13,6 +13,9 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
 class X509AuthenticationListenerTest extends TestCase
@@ -32,9 +35,9 @@ class X509AuthenticationListenerTest extends TestCase
 
         $request = new Request([], [], [], [], [], $serverVars);
 
-        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -60,9 +63,9 @@ class X509AuthenticationListenerTest extends TestCase
     {
         $request = new Request([], [], [], [], [], ['SSL_CLIENT_S_DN' => $credentials]);
 
-        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -86,12 +89,12 @@ class X509AuthenticationListenerTest extends TestCase
 
     public function testGetPreAuthenticatedDataNoData()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $request = new Request([], [], [], [], [], []);
 
-        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
@@ -109,9 +112,9 @@ class X509AuthenticationListenerTest extends TestCase
             'TheUserKey' => 'TheUser',
             'TheCredentialsKey' => 'TheCredentials',
         ]);
-        $tokenStorage = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $authenticationManager = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface::class)->getMock();
+        $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey', 'TheUserKey', 'TheCredentialsKey');
 

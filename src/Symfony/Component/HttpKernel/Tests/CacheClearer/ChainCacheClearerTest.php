@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 
 class ChainCacheClearerTest extends TestCase
@@ -41,6 +42,6 @@ class ChainCacheClearerTest extends TestCase
 
     protected function getMockClearer()
     {
-        return $this->getMockBuilder(\Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface::class)->getMock();
+        return $this->createMock(CacheClearerInterface::class);
     }
 }

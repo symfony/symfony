@@ -63,7 +63,7 @@ class SerializerTest extends TestCase
     {
         $message = new DummyMessage('Foo');
 
-        $serializer = $this->getMockBuilder(SerializerComponent\SerializerInterface::class)->getMock();
+        $serializer = $this->createMock(SerializerComponent\SerializerInterface::class);
         $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar'])->willReturn('Yay');
         $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar'])->willReturn($message);
 

@@ -13,6 +13,9 @@ namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Image;
+use Symfony\Component\DomCrawler\Link;
 
 abstract class AbstractCrawlerTest extends TestCase
 {
@@ -710,7 +713,7 @@ HTML;
     public function testLink()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Link::class, $crawler->link(), '->link() returns a Link instance');
+        $this->assertInstanceOf(Link::class, $crawler->link(), '->link() returns a Link instance');
 
         $this->assertEquals('POST', $crawler->link('post')->getMethod(), '->link() takes a method as its argument');
 
@@ -744,7 +747,7 @@ HTML;
     public function testImage()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Image::class, $crawler->image(), '->image() returns an Image instance');
+        $this->assertInstanceOf(Image::class, $crawler->image(), '->image() returns an Image instance');
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->image();
@@ -820,8 +823,8 @@ HTML;
         $testCrawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler = $testCrawler->selectButton('FooValue');
         $crawler2 = $testCrawler->selectButton('FooBarValue');
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Form::class, $crawler->form(), '->form() returns a Form instance');
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Form::class, $crawler2->form(), '->form() returns a Form instance');
+        $this->assertInstanceOf(Form::class, $crawler->form(), '->form() returns a Form instance');
+        $this->assertInstanceOf(Form::class, $crawler2->form(), '->form() returns a Form instance');
 
         $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 

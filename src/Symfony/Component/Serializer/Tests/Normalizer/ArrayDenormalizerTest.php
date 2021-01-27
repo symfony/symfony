@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ArrayDenormalizerTest extends TestCase
@@ -30,7 +31,7 @@ class ArrayDenormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->getMockBuilder(\Symfony\Component\Serializer\Serializer::class)->getMock();
+        $this->serializer = $this->createMock(Serializer::class);
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setSerializer($this->serializer);
     }

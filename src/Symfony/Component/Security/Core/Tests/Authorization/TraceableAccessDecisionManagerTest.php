@@ -243,7 +243,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
                 return $vote;
             });
 
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $sut->decide($token, ['attr1'], null);
         $sut->decide($token, ['attr2'], $obj = new \stdClass());
 

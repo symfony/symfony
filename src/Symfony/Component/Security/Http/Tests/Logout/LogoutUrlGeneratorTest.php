@@ -31,8 +31,8 @@ class LogoutUrlGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
-        $request = $this->getMockBuilder(Request::class)->getMock();
+        $requestStack = $this->createMock(RequestStack::class);
+        $request = $this->createMock(Request::class);
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
         $this->tokenStorage = new TokenStorage();

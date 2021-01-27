@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -286,7 +287,7 @@ class CommandTest extends TestCase
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidOptionException::class);
+        $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);

@@ -12,6 +12,8 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PropertyPathTest extends TestCase
@@ -25,13 +27,13 @@ class PropertyPathTest extends TestCase
 
     public function testDotIsRequiredBeforeProperty()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException::class);
+        $this->expectException(InvalidPropertyPathException::class);
         new PropertyPath('[index]property');
     }
 
     public function testDotCannotBePresentAtTheBeginning()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException::class);
+        $this->expectException(InvalidPropertyPathException::class);
         new PropertyPath('.property');
     }
 
@@ -53,25 +55,25 @@ class PropertyPathTest extends TestCase
      */
     public function testUnexpectedCharacters($path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException::class);
+        $this->expectException(InvalidPropertyPathException::class);
         new PropertyPath($path);
     }
 
     public function testPathCannotBeEmpty()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException::class);
+        $this->expectException(InvalidPropertyPathException::class);
         new PropertyPath('');
     }
 
     public function testPathCannotBeNull()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new PropertyPath(null);
     }
 
     public function testPathCannotBeFalse()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new PropertyPath(false);
     }
 

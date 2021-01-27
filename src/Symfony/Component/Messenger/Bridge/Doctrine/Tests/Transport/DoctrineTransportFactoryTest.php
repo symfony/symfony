@@ -19,6 +19,10 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Doctrine\Connection;
+use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
+use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineTransportFactoryTest extends TestCase
@@ -57,7 +61,7 @@ class DoctrineTransportFactoryTest extends TestCase
 
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN "doctrine://default".');
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry->expects($this->once())

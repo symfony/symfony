@@ -131,7 +131,7 @@ class PdoSessionHandlerTest extends TestCase
     public function testReadConvertsStreamToString()
     {
         $pdo = new MockPdo('pgsql');
-        $pdo->prepareResult = $this->getMockBuilder(\PDOStatement::class)->getMock();
+        $pdo->prepareResult = $this->createMock(\PDOStatement::class);
 
         $content = 'foobar';
         $stream = $this->createStream($content);
@@ -152,8 +152,8 @@ class PdoSessionHandlerTest extends TestCase
         }
 
         $pdo = new MockPdo('pgsql');
-        $selectStmt = $this->getMockBuilder(\PDOStatement::class)->getMock();
-        $insertStmt = $this->getMockBuilder(\PDOStatement::class)->getMock();
+        $selectStmt = $this->createMock(\PDOStatement::class);
+        $insertStmt = $this->createMock(\PDOStatement::class);
 
         $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
             return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;

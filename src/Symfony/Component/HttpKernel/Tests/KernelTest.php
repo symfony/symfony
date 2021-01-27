@@ -19,10 +19,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
@@ -113,7 +115,7 @@ class KernelTest extends TestCase
 
     public function testBootSetsTheContainerToTheBundles()
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\Bundle::class)->getMock();
+        $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->once())
             ->method('setContainer');
 
@@ -155,7 +157,7 @@ class KernelTest extends TestCase
 
     public function testShutdownCallsShutdownOnAllBundles()
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\Bundle::class)->getMock();
+        $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->once())
             ->method('shutdown');
 
@@ -167,7 +169,7 @@ class KernelTest extends TestCase
 
     public function testShutdownGivesNullContainerToAllBundles()
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\Bundle::class)->getMock();
+        $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->exactly(2))
             ->method('setContainer')
             ->withConsecutive(
@@ -190,7 +192,7 @@ class KernelTest extends TestCase
         $catch = true;
         $request = new Request();
 
-        $httpKernelMock = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernel::class)
+        $httpKernelMock = $this->getMockBuilder(HttpKernel::class)
             ->disableOriginalConstructor()
             ->getMock();
         $httpKernelMock
@@ -212,7 +214,7 @@ class KernelTest extends TestCase
         $catch = true;
         $request = new Request();
 
-        $httpKernelMock = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernel::class)
+        $httpKernelMock = $this->getMockBuilder(HttpKernel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -435,7 +437,7 @@ EOF
         $this->assertFalse($httpKernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
 
         // implements TerminableInterface
-        $httpKernelMock = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpKernel::class)
+        $httpKernelMock = $this->getMockBuilder(HttpKernel::class)
             ->disableOriginalConstructor()
             ->setMethods(['terminate'])
             ->getMock();

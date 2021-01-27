@@ -12,9 +12,13 @@
 namespace Symfony\Component\Asset\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\Asset\Exception\InvalidArgumentException;
+use Symfony\Component\Asset\Exception\LogicException;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class UrlPackageTest extends TestCase
 {
@@ -86,7 +90,7 @@ class UrlPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->getMockBuilder(\Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface::class)->getMock();
+        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
         $versionStrategy->expects($this->any())
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
@@ -97,7 +101,7 @@ class UrlPackageTest extends TestCase
 
     public function testNoBaseUrls()
     {
-        $this->expectException(\Symfony\Component\Asset\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         new UrlPackage([], new EmptyVersionStrategy());
     }
 
@@ -106,7 +110,7 @@ class UrlPackageTest extends TestCase
      */
     public function testWrongBaseUrl($baseUrls)
     {
-        $this->expectException(\Symfony\Component\Asset\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new UrlPackage($baseUrls, new EmptyVersionStrategy());
     }
 
@@ -120,7 +124,7 @@ class UrlPackageTest extends TestCase
 
     private function getContext($secure)
     {
-        $context = $this->getMockBuilder(\Symfony\Component\Asset\Context\ContextInterface::class)->getMock();
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())->method('isSecure')->willReturn($secure);
 
         return $context;

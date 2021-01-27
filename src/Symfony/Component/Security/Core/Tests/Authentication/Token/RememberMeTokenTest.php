@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class RememberMeTokenTest extends TestCase
 {
@@ -40,7 +41,7 @@ class RememberMeTokenTest extends TestCase
 
     protected function getUser($roles = ['ROLE_FOO'])
     {
-        $user = $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $user
             ->expects($this->any())
             ->method('getRoles')

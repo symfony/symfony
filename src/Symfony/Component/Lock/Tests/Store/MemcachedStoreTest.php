@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MemcachedStore;
@@ -63,7 +64,7 @@ class MemcachedStoreTest extends AbstractStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
+        $this->expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }

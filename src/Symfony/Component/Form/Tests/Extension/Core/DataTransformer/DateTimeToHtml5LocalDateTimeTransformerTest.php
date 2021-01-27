@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
@@ -73,7 +74,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testTransformRequiresValidDateTime()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->transform('2010-01-01');
     }
@@ -94,14 +95,14 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testReverseTransformRequiresString()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer();
         $transformer->reverseTransform(12345);
     }
 
     public function testReverseTransformWithNonExistingDate()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-04-31T04:05');
@@ -109,7 +110,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 
     public function testReverseTransformExpectsValidDateString()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-2010-2010');

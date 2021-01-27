@@ -18,8 +18,10 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\Util\ServerParams;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -42,7 +44,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serverParams = $this->getMockBuilder(\Symfony\Component\Form\Util\ServerParams::class)->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
+        $this->serverParams = $this->getMockBuilder(ServerParams::class)->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
@@ -405,7 +407,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function createBuilder($name, $compound = false, array $options = [])
     {
-        $builder = new FormBuilder($name, null, new EventDispatcher(), $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock(), $options);
+        $builder = new FormBuilder($name, null, new EventDispatcher(), $this->createMock(FormFactoryInterface::class), $options);
         $builder->setCompound($compound);
 
         if ($compound) {

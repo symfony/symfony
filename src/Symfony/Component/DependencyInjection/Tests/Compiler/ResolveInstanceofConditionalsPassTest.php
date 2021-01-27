@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -179,7 +181,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
     public function testBadInterfaceThrowsException()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.');
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -236,7 +238,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
     public function testProcessThrowsExceptionForArguments()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Autoconfigured instanceof for type "PHPUnit[\\\\_]Framework[\\\\_]TestCase" defines arguments but these are not supported and should be removed\./');
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(parent::class)

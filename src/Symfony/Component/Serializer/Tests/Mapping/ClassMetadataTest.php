@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Mapping;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -23,7 +24,7 @@ class ClassMetadataTest extends TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadata('name');
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\ClassMetadataInterface::class, $classMetadata);
+        $this->assertInstanceOf(ClassMetadataInterface::class, $classMetadata);
     }
 
     public function testAttributeMetadata()

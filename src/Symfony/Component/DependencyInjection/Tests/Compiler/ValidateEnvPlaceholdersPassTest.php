@@ -14,6 +14,8 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -43,7 +45,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testDefaultEnvIsValidatedInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "env_extension.string_node": "fail" is not a valid string');
         $container = new ContainerBuilder();
         $container->setParameter('env(STRING)', 'fail');
@@ -72,7 +74,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".');
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -87,7 +89,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testInvalidEnvInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.int_node". Expected "int", but got "array".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
@@ -100,7 +102,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testNulledEnvInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
@@ -152,7 +154,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvIsIncompatibleWithEnumNode()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\EnumNode" node type at path "env_extension.enum_node".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
@@ -165,7 +167,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvIsIncompatibleWithArrayNode()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\ArrayNode" node type at path "env_extension.simple_array_node".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());

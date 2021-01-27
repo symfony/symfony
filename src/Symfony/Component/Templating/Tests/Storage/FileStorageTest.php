@@ -13,13 +13,14 @@ namespace Symfony\Component\Templating\Tests\Storage;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\Storage;
 
 class FileStorageTest extends TestCase
 {
     public function testGetContent()
     {
         $storage = new FileStorage('foo');
-        $this->assertInstanceOf(\Symfony\Component\Templating\Storage\Storage::class, $storage, 'FileStorage is an instance of Storage');
+        $this->assertInstanceOf(Storage::class, $storage, 'FileStorage is an instance of Storage');
         $storage = new FileStorage(__DIR__.'/../Fixtures/templates/foo.php');
         $this->assertEquals('<?php echo $foo ?>'."\n", $storage->getContent(), '->getContent() returns the content of the template');
     }

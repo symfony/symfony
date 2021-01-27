@@ -13,7 +13,9 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Source;
 
@@ -24,8 +26,8 @@ class RoutingExtensionTest extends TestCase
      */
     public function testEscaping($template, $mustBeEscaped)
     {
-        $twig = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
-        $twig->addExtension(new RoutingExtension($this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock()));
+        $twig = new Environment($this->createMock(LoaderInterface::class), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
+        $twig->addExtension(new RoutingExtension($this->createMock(UrlGeneratorInterface::class)));
 
         $nodes = $twig->parse($twig->tokenize(new Source($template, '')));
 

@@ -17,6 +17,11 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
+use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -35,7 +40,7 @@ class AmqpReceiverTest extends TestCase
         );
 
         $amqpEnvelope = $this->createAMQPEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
@@ -47,10 +52,10 @@ class AmqpReceiverTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $serializer = $this->createMock(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
         $connection->method('ack')->with($amqpEnvelope, 'queueName')->willThrowException(new \AMQPException());
@@ -61,10 +66,10 @@ class AmqpReceiverTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $serializer = $this->createMock(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
         $connection->method('nack')->with($amqpEnvelope, 'queueName', \AMQP_NOPARAM)->willThrowException(new \AMQPException());
@@ -75,7 +80,7 @@ class AmqpReceiverTest extends TestCase
 
     private function createAMQPEnvelope(): \AMQPEnvelope
     {
-        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope = $this->createMock(\AMQPEnvelope::class);
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
         $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,

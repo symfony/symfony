@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
@@ -41,7 +42,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testIsAnEventSubscriber()
     {
-        $this->assertInstanceOf(\Symfony\Component\EventDispatcher\EventSubscriberInterface::class, $this->listener);
+        $this->assertInstanceOf(EventSubscriberInterface::class, $this->listener);
     }
 
     public function testRegisteredEvent()
@@ -66,16 +67,12 @@ class AddRequestFormatsListenerTest extends TestCase
 
     protected function getRequestMock()
     {
-        return $this->getMockBuilder(Request::class)->getMock();
+        return $this->createMock(Request::class);
     }
 
     protected function getRequestEventMock(Request $request)
     {
-        $event = $this
-            ->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $event = $this->createMock(RequestEvent::class);
         $event->expects($this->any())
             ->method('getRequest')
             ->willReturn($request);

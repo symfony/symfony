@@ -34,8 +34,12 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\NoSuchMetadataException;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildA;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildB;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
@@ -45,6 +49,7 @@ use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
+use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\LazyProperty;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -540,7 +545,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testFailOnScalarReferences()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\NoSuchMetadataException::class);
+        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = 'string';
 
@@ -795,7 +800,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testMetadataMustExistIfTraversalIsDisabled()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\NoSuchMetadataException::class);
+        $this->expectException(NoSuchMetadataException::class);
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
 
@@ -1663,7 +1668,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testExpectTraversableIfTraversalEnabledOnClass()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $entity = new Entity();
 
         $this->metadata->addConstraint(new Traverse(true));
@@ -1819,7 +1824,7 @@ class RecursiveValidatorTest extends TestCase
 
     public function testValidateFailsIfNoConstraintsAndNoObjectOrArray()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->validate('Foobar');
     }
 
@@ -1850,8 +1855,8 @@ class RecursiveValidatorTest extends TestCase
         $entity->initialized = false;
 
         // prepare initializers that set "initialized" to true
-        $initializer1 = $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock();
-        $initializer2 = $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock();
+        $initializer1 = $this->createMock(ObjectInitializerInterface::class);
+        $initializer2 = $this->createMock(ObjectInitializerInterface::class);
 
         $initializer1->expects($this->once())
             ->method('initialize')
@@ -1993,7 +1998,7 @@ class RecursiveValidatorTest extends TestCase
         $childB->name = 'fake';
         $entity->childA = [$childA];
         $entity->childB = [$childB];
-        $validatorContext = $this->getMockBuilder(\Symfony\Component\Validator\Validator\ContextualValidatorInterface::class)->getMock();
+        $validatorContext = $this->createMock(ContextualValidatorInterface::class);
         $validatorContext
             ->expects($this->once())
             ->method('validate')
@@ -2027,7 +2032,7 @@ class RecursiveValidatorTest extends TestCase
         $entity->childA = [$childA];
         $entity->childB = [$childB];
 
-        $validatorContext = $this->getMockBuilder(\Symfony\Component\Validator\Validator\ContextualValidatorInterface::class)->getMock();
+        $validatorContext = $this->createMock(ContextualValidatorInterface::class);
         $validatorContext
             ->expects($this->once())
             ->method('validate')

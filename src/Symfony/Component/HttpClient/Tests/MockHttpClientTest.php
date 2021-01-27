@@ -258,7 +258,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testDnsError':
-                $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
+                $mock = $this->createMock(ResponseInterface::class);
                 $mock->expects($this->any())
                     ->method('getStatusCode')
                     ->willThrowException(new TransportException('DSN error'));
@@ -281,7 +281,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testTimeoutOnAccess':
-                $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
+                $mock = $this->createMock(ResponseInterface::class);
                 $mock->expects($this->any())
                     ->method('getHeaders')
                     ->willThrowException(new TransportException('Timeout'));
@@ -348,7 +348,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testMaxDuration':
-                $mock = $this->getMockBuilder(ResponseInterface::class)->getMock();
+                $mock = $this->createMock(ResponseInterface::class);
                 $mock->expects($this->any())
                     ->method('getContent')
                     ->willReturnCallback(static function (): void {

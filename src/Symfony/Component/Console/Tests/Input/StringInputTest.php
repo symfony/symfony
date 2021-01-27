@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -24,7 +25,7 @@ class StringInputTest extends TestCase
     public function testTokenize($input, $tokens, $message)
     {
         $input = new StringInput($input);
-        $r = new \ReflectionClass(\Symfony\Component\Console\Input\ArgvInput::class);
+        $r = new \ReflectionClass(ArgvInput::class);
         $p = $r->getProperty('tokens');
         $p->setAccessible(true);
         $this->assertEquals($tokens, $p->getValue($input), $message);

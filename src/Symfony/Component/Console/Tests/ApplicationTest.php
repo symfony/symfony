@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -29,6 +30,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -134,7 +136,7 @@ class ApplicationTest extends TestCase
     {
         $application = new Application();
         $commands = $application->all();
-        $this->assertInstanceOf(\Symfony\Component\Console\Command\HelpCommand::class, $commands['help'], '->all() returns the registered commands');
+        $this->assertInstanceOf(HelpCommand::class, $commands['help'], '->all() returns the registered commands');
 
         $application->add(new \FooCommand());
         $commands = $application->all('foo');
@@ -145,7 +147,7 @@ class ApplicationTest extends TestCase
     {
         $application = new Application();
         $commands = $application->all();
-        $this->assertInstanceOf(\Symfony\Component\Console\Command\HelpCommand::class, $commands['help'], '->all() returns the registered commands');
+        $this->assertInstanceOf(HelpCommand::class, $commands['help'], '->all() returns the registered commands');
 
         $application->add(new \FooCommand());
         $commands = $application->all('foo');
@@ -229,7 +231,7 @@ class ApplicationTest extends TestCase
         $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
-        $this->assertInstanceOf(\Symfony\Component\Console\Command\HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
+        $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
     }
 
     public function testHasGetWithCommandLoader()
@@ -351,7 +353,7 @@ class ApplicationTest extends TestCase
         $application->add(new \FooCommand());
 
         $this->assertInstanceOf(\FooCommand::class, $application->find('foo:bar'), '->find() returns a command if its name exists');
-        $this->assertInstanceOf(\Symfony\Component\Console\Command\HelpCommand::class, $application->find('h'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf(HelpCommand::class, $application->find('h'), '->find() returns a command if its name exists');
         $this->assertInstanceOf(\FooCommand::class, $application->find('f:bar'), '->find() returns a command if the abbreviation for the namespace exists');
         $this->assertInstanceOf(\FooCommand::class, $application->find('f:b'), '->find() returns a command if the abbreviation for the namespace and the command name exist');
         $this->assertInstanceOf(\FooCommand::class, $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
@@ -398,7 +400,7 @@ class ApplicationTest extends TestCase
         ]));
 
         $this->assertInstanceOf(\FooCommand::class, $application->find('foo:bar'), '->find() returns a command if its name exists');
-        $this->assertInstanceOf(\Symfony\Component\Console\Command\HelpCommand::class, $application->find('h'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf(HelpCommand::class, $application->find('h'), '->find() returns a command if its name exists');
         $this->assertInstanceOf(\FooCommand::class, $application->find('f:bar'), '->find() returns a command if the abbreviation for the namespace exists');
         $this->assertInstanceOf(\FooCommand::class, $application->find('f:b'), '->find() returns a command if the abbreviation for the namespace and the command name exist');
         $this->assertInstanceOf(\FooCommand::class, $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
@@ -937,7 +939,7 @@ class ApplicationTest extends TestCase
         ob_end_clean();
 
         $this->assertInstanceOf(ArgvInput::class, $command->input, '->run() creates an ArgvInput by default if none is given');
-        $this->assertInstanceOf(\Symfony\Component\Console\Output\ConsoleOutput::class, $command->output, '->run() creates a ConsoleOutput by default if none is given');
+        $this->assertInstanceOf(ConsoleOutput::class, $command->output, '->run() creates a ConsoleOutput by default if none is given');
 
         $application = new Application();
         $application->setAutoExit(false);

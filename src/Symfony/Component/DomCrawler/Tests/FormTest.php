@@ -12,6 +12,9 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
+use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\FormFieldRegistry;
@@ -682,7 +685,7 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\InputFormField::class, $form->get('bar'), '->get() returns the field object associated with the given name');
+        $this->assertInstanceOf(InputFormField::class, $form->get('bar'), '->get() returns the field object associated with the given name');
 
         try {
             $form->get('foo');
@@ -698,7 +701,7 @@ class FormTest extends TestCase
 
         $fields = $form->all();
         $this->assertCount(1, $fields, '->all() return an array of form field objects');
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\InputFormField::class, $fields['bar'], '->all() return an array of form field objects');
+        $this->assertInstanceOf(InputFormField::class, $fields['bar'], '->all() return an array of form field objects');
     }
 
     public function testSubmitWithoutAFormButton()
@@ -864,13 +867,13 @@ class FormTest extends TestCase
         ');
         $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
 
-        $this->assertInstanceOf(\Symfony\Component\DomCrawler\Field\ChoiceFormField::class, $form->get('option'));
+        $this->assertInstanceOf(ChoiceFormField::class, $form->get('option'));
     }
 
     protected function getFormFieldMock($name, $value = null)
     {
         $field = $this
-            ->getMockBuilder(\Symfony\Component\DomCrawler\Field\FormField::class)
+            ->getMockBuilder(FormField::class)
             ->setMethods(['getName', 'getValue', 'setValue', 'initialize'])
             ->disableOriginalConstructor()
             ->getMock()

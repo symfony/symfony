@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Guard\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -171,12 +172,12 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-        $this->token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->token = $this->createMock(TokenInterface::class);
         $this->request = new Request([], [], [], [], [], []);
-        $this->sessionStrategy = $this->getMockBuilder(SessionAuthenticationStrategyInterface::class)->getMock();
-        $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $this->sessionStrategy = $this->createMock(SessionAuthenticationStrategyInterface::class);
+        $this->guardAuthenticator = $this->createMock(AuthenticatorInterface::class);
     }
 
     protected function tearDown(): void
@@ -190,7 +191,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     private function configurePreviousSession()
     {
-        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->any())
             ->method('getName')
             ->willReturn('test_session_name');

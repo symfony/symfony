@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -1081,7 +1082,7 @@ class RequestTest extends TestCase
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
-        $this->expectException(\Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException::class);
+        $this->expectException(ConflictingHeadersException::class);
         $request = new Request();
 
         $server = [

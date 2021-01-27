@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -375,7 +376,7 @@ class RouterTest extends TestCase
 
     public function testExceptionOnNonExistentParameterWithSfContainer()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException::class);
+        $this->expectException(ParameterNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
         $routes = new RouteCollection();
 
@@ -504,7 +505,7 @@ class RouterTest extends TestCase
 
     private function getServiceContainer(RouteCollection $routes): Container
     {
-        $loader = $this->getMockBuilder(LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
 
         $loader
             ->expects($this->any())
@@ -525,7 +526,7 @@ class RouterTest extends TestCase
 
     private function getPsr11ServiceContainer(RouteCollection $routes): ContainerInterface
     {
-        $loader = $this->getMockBuilder(LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
 
         $loader
             ->expects($this->any())
@@ -533,7 +534,7 @@ class RouterTest extends TestCase
             ->willReturn($routes)
         ;
 
-        $sc = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $sc = $this->createMock(ContainerInterface::class);
 
         $sc
             ->expects($this->once())
@@ -546,7 +547,7 @@ class RouterTest extends TestCase
 
     private function getParameterBag(array $params = []): ContainerInterface
     {
-        $bag = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $bag = $this->createMock(ContainerInterface::class);
         $bag
             ->expects($this->any())
             ->method('get')

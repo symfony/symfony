@@ -13,10 +13,12 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\MissingInputException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -685,7 +687,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             '  [<info>żółw  </info>] bar',
             '  [<info>łabądź</info>] baz',
         ];
-        $output = $this->getMockBuilder(OutputInterface::class)->getMock();
+        $output = $this->createMock(OutputInterface::class);
         $output->method('getFormatter')->willReturn(new OutputFormatter());
 
         $dialog = new QuestionHelper();
@@ -700,7 +702,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInput()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -708,7 +710,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
@@ -716,7 +718,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\MissingInputException::class);
+        $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         $dialog = new QuestionHelper();
 
@@ -897,7 +899,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->getMockBuilder(\Symfony\Component\Console\Input\InputInterface::class)->getMock();
+        $mock = $this->createMock(InputInterface::class);
         $mock->expects($this->any())
             ->method('isInteractive')
             ->willReturn($interactive);

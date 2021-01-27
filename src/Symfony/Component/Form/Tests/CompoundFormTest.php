@@ -12,14 +12,19 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
@@ -273,7 +278,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testAddThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\AlreadySubmittedException::class);
+        $this->expectException(AlreadySubmittedException::class);
         $this->form->submit([]);
         $this->form->add($this->getBuilder('foo')->getForm());
     }
@@ -290,7 +295,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testRemoveThrowsExceptionIfAlreadySubmitted()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\AlreadySubmittedException::class);
+        $this->expectException(AlreadySubmittedException::class);
         $this->form->add($this->getBuilder('foo')->setCompound(false)->getForm());
         $this->form->submit(['foo' => 'bar']);
         $this->form->remove('foo');
@@ -888,7 +893,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertSame($error1, $errorsAsArray[0]);
         $this->assertSame($error2, $errorsAsArray[1]);
-        $this->assertInstanceOf(\Symfony\Component\Form\FormErrorIterator::class, $errorsAsArray[2]);
+        $this->assertInstanceOf(FormErrorIterator::class, $errorsAsArray[2]);
 
         $nestedErrorsAsArray = iterator_to_array($errorsAsArray[2]);
 
@@ -941,9 +946,9 @@ class CompoundFormTest extends AbstractFormTest
     // Basic cases are covered in SimpleFormTest
     public function testCreateViewWithChildren()
     {
-        $type = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
-        $type1 = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
-        $type2 = $this->getMockBuilder(\Symfony\Component\Form\ResolvedFormTypeInterface::class)->getMock();
+        $type = $this->createMock(ResolvedFormTypeInterface::class);
+        $type1 = $this->createMock(ResolvedFormTypeInterface::class);
+        $type2 = $this->createMock(ResolvedFormTypeInterface::class);
         $options = ['a' => 'Foo', 'b' => 'Bar'];
         $field1 = $this->getBuilder('foo')
             ->setType($type1)
@@ -997,7 +1002,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testNoClickedButton()
     {
-        $button = $this->getMockBuilder(\Symfony\Component\Form\SubmitButton::class)
+        $button = $this->getMockBuilder(SubmitButton::class)
             ->setConstructorArgs([new SubmitButtonBuilder('submit')])
             ->setMethods(['isClicked'])
             ->getMock();
@@ -1019,7 +1024,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testClickedButton()
     {
-        $button = $this->getMockBuilder(\Symfony\Component\Form\SubmitButton::class)
+        $button = $this->getMockBuilder(SubmitButton::class)
             ->setConstructorArgs([new SubmitButtonBuilder('submit')])
             ->setMethods(['isClicked'])
             ->getMock();
@@ -1038,7 +1043,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $button = $this->getBuilder('submit')->getForm();
 
-        $nestedForm = $this->getMockBuilder(\Symfony\Component\Form\Form::class)
+        $nestedForm = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$this->getBuilder('nested')])
             ->setMethods(['getClickedButton'])
             ->getMock();
@@ -1057,7 +1062,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $button = $this->getBuilder('submit')->getForm();
 
-        $parentForm = $this->getMockBuilder(\Symfony\Component\Form\Form::class)
+        $parentForm = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$this->getBuilder('parent')])
             ->setMethods(['getClickedButton'])
             ->getMock();

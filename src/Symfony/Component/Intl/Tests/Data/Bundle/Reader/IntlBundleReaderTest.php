@@ -13,6 +13,8 @@ namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
+use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -75,19 +77,19 @@ class IntlBundleReaderTest extends TestCase
 
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
+        $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
 
     public function testReadFailsIfNonExistingFallbackLocale()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\ResourceBundleNotFoundException::class);
+        $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
 
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'ro');
     }
 }

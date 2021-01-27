@@ -26,7 +26,7 @@ class AbstractTokenTest extends TestCase
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())->method('getUsername')->willReturn('fabien');
         $token->setUser($user);
         $this->assertEquals('fabien', $token->getUsername());
@@ -36,7 +36,7 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
 
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())->method('eraseCredentials');
         $token->setUser($user);
 
@@ -106,7 +106,7 @@ class AbstractTokenTest extends TestCase
 
     public function getUsers()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
 
         return [
             [$user],
@@ -133,7 +133,7 @@ class AbstractTokenTest extends TestCase
 
     public function getUserChanges()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
 
         return [
             ['foo', 'bar'],

@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\QtFileLoader;
 
 class QtFileLoaderTest extends TestCase
@@ -34,7 +36,7 @@ class QtFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ts';
         $loader->load($resource, 'en', 'domain1');
@@ -42,7 +44,7 @@ class QtFileLoaderTest extends TestCase
 
     public function testLoadNonLocalResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $loader = new QtFileLoader();
         $resource = 'http://domain1.com/resources.ts';
         $loader->load($resource, 'en', 'domain1');
@@ -50,7 +52,7 @@ class QtFileLoaderTest extends TestCase
 
     public function testLoadInvalidResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
         $loader->load($resource, 'en', 'domain1');
@@ -61,7 +63,7 @@ class QtFileLoaderTest extends TestCase
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/empty.xlf';
 
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $this->expectExceptionMessage(sprintf('Unable to load "%s".', $resource));
 
         $loader->load($resource, 'en', 'domain1');

@@ -20,7 +20,7 @@ class TranslationWriterTest extends TestCase
 {
     public function testWrite()
     {
-        $dumper = $this->getMockBuilder(DumperInterface::class)->getMock();
+        $dumper = $this->createMock(DumperInterface::class);
         $dumper
             ->expects($this->once())
             ->method('dump');

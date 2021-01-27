@@ -12,11 +12,17 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class DefaultAuthenticationFailureHandlerTest extends TestCase
 {
@@ -29,14 +35,14 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $this->httpUtils = $this->getMockBuilder(\Symfony\Component\Security\Http\HttpUtils::class)->getMock();
-        $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $this->httpKernel = $this->createMock(HttpKernelInterface::class);
+        $this->httpUtils = $this->createMock(HttpUtils::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
-        $this->request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $this->session = $this->createMock(SessionInterface::class);
+        $this->request = $this->createMock(Request::class);
         $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
-        $this->exception = $this->getMockBuilder(\Symfony\Component\Security\Core\Exception\AuthenticationException::class)->setMethods(['getMessage'])->getMock();
+        $this->exception = $this->getMockBuilder(AuthenticationException::class)->setMethods(['getMessage'])->getMock();
     }
 
     public function testForward()
@@ -183,8 +189,8 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     private function getRequest()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
-        $request->attributes = $this->getMockBuilder(\Symfony\Component\HttpFoundation\ParameterBag::class)->getMock();
+        $request = $this->createMock(Request::class);
+        $request->attributes = $this->createMock(ParameterBag::class);
 
         return $request;
     }

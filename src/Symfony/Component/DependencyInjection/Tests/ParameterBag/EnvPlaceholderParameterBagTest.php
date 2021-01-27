@@ -12,13 +12,15 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
     public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(%foo%)');
     }
@@ -153,7 +155,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testResolveThrowsOnBadDefaultValue()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
@@ -173,7 +175,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testGetThrowsOnBadDefaultValue()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(ARRAY_VAR)', []);

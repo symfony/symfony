@@ -45,8 +45,8 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     protected function setUp(): void
     {
-        $this->tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $this->tokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         parent::setUp();

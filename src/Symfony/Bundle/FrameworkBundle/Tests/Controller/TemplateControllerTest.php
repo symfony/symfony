@@ -23,7 +23,7 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);

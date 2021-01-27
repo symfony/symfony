@@ -21,6 +21,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity;
@@ -29,10 +30,13 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType;
 use Symfony\Bridge\Doctrine\Tests\TestRepositoryFactory;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -67,7 +71,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $config->setRepositoryFactory($this->repositoryFactory);
 
         if (!Type::hasType('string_wrapper')) {
-            Type::addType('string_wrapper', 'Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType');
+            Type::addType('string_wrapper', StringWrapperType::class);
         }
 
         $this->em = DoctrineTestHelper::createTestEntityManager($config);
@@ -79,7 +83,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRegistryMock($em = null)
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
                  ->method('getManager')
                  ->with($this->equalTo(self::EM_NAME))
@@ -100,15 +104,13 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createEntityManagerMock($repositoryMock)
     {
-        $em = $this->getMockBuilder(ObjectManager::class)
-            ->getMock()
-        ;
+        $em = $this->createMock(ObjectManager::class);
         $em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repositoryMock)
         ;
 
-        $classMetadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
@@ -137,17 +139,17 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNullableNameEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Person'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Employee'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity'),
-            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity'),
+            $em->getClassMetadata(SingleIntIdEntity::class),
+            $em->getClassMetadata(SingleIntIdNoToStringEntity::class),
+            $em->getClassMetadata(DoubleNameEntity::class),
+            $em->getClassMetadata(DoubleNullableNameEntity::class),
+            $em->getClassMetadata(CompositeIntIdEntity::class),
+            $em->getClassMetadata(AssociationEntity::class),
+            $em->getClassMetadata(AssociationEntity2::class),
+            $em->getClassMetadata(Person::class),
+            $em->getClassMetadata(Employee::class),
+            $em->getClassMetadata(CompositeObjectNoToStringIdEntity::class),
+            $em->getClassMetadata(SingleIntIdStringWrapperNameEntity::class),
         ]);
     }
 
@@ -578,7 +580,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     public function testValidateUniquenessWithArrayValue()
     {
         $repository = $this->createRepositoryMock();
-        $this->repositoryFactory->setRepository($this->em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity', $repository);
+        $this->repositoryFactory->setRepository($this->em, SingleIntIdEntity::class, $repository);
 
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -616,7 +618,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testDedicatedEntityManagerNullObject()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Object manager "foo" does not exist.');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -636,7 +638,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testEntityManagerNullObject()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
@@ -688,7 +690,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'message' => 'myMessage',
             'fields' => ['name'],
             'em' => self::EM_NAME,
-            'entityClass' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\Person',
+            'entityClass' => Person::class,
         ]);
 
         $entity1 = new Person(1, 'Foo');
@@ -718,13 +720,13 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidateRepositoryForInheritance()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".');
         $constraint = new UniqueEntity([
             'message' => 'myMessage',
             'fields' => ['name'],
             'em' => self::EM_NAME,
-            'entityClass' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity',
+            'entityClass' => SingleStringIdEntity::class,
         ]);
 
         $entity = new Person(1, 'Foo');

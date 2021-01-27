@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\Form\Form;
@@ -85,7 +86,7 @@ class AbstractControllerTest extends TestCase
 
     public function testMissingParameterBag()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('TestAbstractController::getParameter()" method is missing a parameter bag');
         $container = new Container();
 

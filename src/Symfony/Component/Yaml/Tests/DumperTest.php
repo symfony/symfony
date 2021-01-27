@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Exception\DumpException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
@@ -194,7 +195,7 @@ EOF;
 
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->expectException(\Symfony\Component\Yaml\Exception\DumpException::class);
+        $this->expectException(DumpException::class);
         $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
 

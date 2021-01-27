@@ -12,13 +12,14 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory;
 
 class BlackHoleMetadataFactoryTest extends TestCase
 {
     public function testGetMetadataForThrowsALogicException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $metadataFactory = new BlackHoleMetadataFactory();
         $metadataFactory->getMetadataFor('foo');
     }

@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ChainUserProviderTest extends TestCase
 {
@@ -249,14 +251,14 @@ class ChainUserProviderTest extends TestCase
     {
         $user = new User('user', 'pwd');
 
-        $provider1 = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $provider1 = $this->createMock(PasswordUpgraderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('upgradePassword')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $provider2 = $this->createMock(PasswordUpgraderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('upgradePassword')
@@ -269,11 +271,11 @@ class ChainUserProviderTest extends TestCase
 
     protected function getAccount()
     {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
+        return $this->createMock(UserInterface::class);
     }
 
     protected function getProvider()
     {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
+        return $this->createMock(UserProviderInterface::class);
     }
 }

@@ -29,6 +29,10 @@ use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 
 class ConnectionTest extends TestCase
 {
@@ -93,7 +97,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -108,7 +112,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -257,14 +261,14 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }

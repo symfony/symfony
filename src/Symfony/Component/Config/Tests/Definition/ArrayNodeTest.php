@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
@@ -23,7 +24,7 @@ class ArrayNodeTest extends TestCase
 
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $node = new ArrayNode('root');
         $node->normalize(false);
     }

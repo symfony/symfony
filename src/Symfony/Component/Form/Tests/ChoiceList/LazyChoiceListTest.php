@@ -13,7 +13,9 @@ namespace Symfony\Component\Form\Tests\ChoiceList;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -39,8 +41,8 @@ class LazyChoiceListTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->loadedList = $this->getMockBuilder(\Symfony\Component\Form\ChoiceList\ChoiceListInterface::class)->getMock();
-        $this->loader = $this->getMockBuilder(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class)->getMock();
+        $this->loadedList = $this->createMock(ChoiceListInterface::class);
+        $this->loader = $this->createMock(ChoiceLoaderInterface::class);
         $this->value = function () {};
         $this->list = new LazyChoiceList($this->loader, $this->value);
     }

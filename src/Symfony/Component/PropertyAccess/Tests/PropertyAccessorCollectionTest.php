@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
@@ -121,8 +123,8 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car = $this->getMockBuilder(__CLASS__.'_CompositeCar')->getMock();
-        $structure = $this->getMockBuilder(__CLASS__.'_CarStructure')->getMock();
+        $car = $this->createMock(__CLASS__.'_CompositeCar');
+        $structure = $this->createMock(__CLASS__.'_CarStructure');
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
@@ -148,9 +150,9 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessageMatches('/Could not determine access type for property "axes" in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover_[^"]*"./');
-        $car = $this->getMockBuilder(__CLASS__.'_CarNoAdderAndRemover')->getMock();
+        $car = $this->createMock(__CLASS__.'_CarNoAdderAndRemover');
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
@@ -187,7 +189,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessageMatches('/The property "axes" in class "Symfony\\\Component\\\PropertyAccess\\\Tests\\\PropertyAccessorCollectionTest_Car" can be defined with the methods "addAxis\(\)", "removeAxis\(\)" but the new value must be an array or an instance of \\\Traversable\./');
         $car = new PropertyAccessorCollectionTest_Car();
 

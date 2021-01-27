@@ -14,6 +14,8 @@ namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
 /**
@@ -64,7 +66,7 @@ class BundleEntryReaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->readerImpl = $this->getMockBuilder(\Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface::class)->getMock();
+        $this->readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 
@@ -103,7 +105,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testReadNonExistingEntry()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
@@ -127,7 +129,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
@@ -154,7 +156,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
@@ -279,7 +281,7 @@ class BundleEntryReaderTest extends TestCase
 
     public function testFailIfEntryFoundNeitherInParentNorChild()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         $this->readerImpl
             ->method('read')
             ->withConsecutive(

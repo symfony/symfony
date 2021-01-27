@@ -73,9 +73,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     public function testKnownTagVersionsTtl()
     {
         $itemsPool = new FilesystemAdapter('', 10);
-        $tagsPool = $this
-            ->getMockBuilder(AdapterInterface::class)
-            ->getMock();
+        $tagsPool = $this->createMock(AdapterInterface::class);
 
         $pool = new TagAwareAdapter($itemsPool, $tagsPool, 10);
 
@@ -83,7 +81,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $item->tag(['baz']);
         $item->expiresAfter(100);
 
-        $tag = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $tag = $this->createMock(CacheItemInterface::class);
         $tag->expects(self::exactly(2))->method('get')->willReturn(10);
 
         $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn([

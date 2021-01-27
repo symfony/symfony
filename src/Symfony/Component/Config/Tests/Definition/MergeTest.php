@@ -13,12 +13,14 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class MergeTest extends TestCase
 {
     public function testForbiddenOverwrite()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException::class);
+        $this->expectException(ForbiddenOverwriteException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()
@@ -92,7 +94,7 @@ class MergeTest extends TestCase
 
     public function testDoesNotAllowNewKeysInSubsequentConfigs()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
             ->getRootNode()

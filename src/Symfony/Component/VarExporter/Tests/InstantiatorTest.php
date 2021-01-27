@@ -12,13 +12,15 @@
 namespace Symfony\Component\VarExporter\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Instantiator;
 
 class InstantiatorTest extends TestCase
 {
     public function testNotFoundClass()
     {
-        $this->expectException(\Symfony\Component\VarExporter\Exception\ClassNotFoundException::class);
+        $this->expectException(ClassNotFoundException::class);
         $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
         Instantiator::instantiate('SomeNotExistingClass');
     }
@@ -28,7 +30,7 @@ class InstantiatorTest extends TestCase
      */
     public function testFailingInstantiation(string $class)
     {
-        $this->expectException(\Symfony\Component\VarExporter\Exception\NotInstantiableTypeException::class);
+        $this->expectException(NotInstantiableTypeException::class);
         $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
         Instantiator::instantiate($class);
     }

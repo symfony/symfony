@@ -29,15 +29,12 @@ class TraceableFirewallListenerTest extends TestCase
     public function testOnKernelRequestRecordsListeners()
     {
         $request = new Request();
-        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
         $event->setResponse($response = new Response());
         $listener = function ($e) use ($event, &$listenerCalled) {
             $listenerCalled += $e === $event;
         };
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $firewallMap = $this->createMock(FirewallMap::class);
         $firewallMap
             ->expects($this->once())
             ->method('getFirewallConfig')

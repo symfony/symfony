@@ -24,18 +24,18 @@ class FirewallTest extends TestCase
 {
     public function testOnKernelRequestRegistersExceptionListener()
     {
-        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $listener = $this->getMockBuilder(ExceptionListener::class)->disableOriginalConstructor()->getMock();
+        $listener = $this->createMock(ExceptionListener::class);
         $listener
             ->expects($this->once())
             ->method('register')
             ->with($this->equalTo($dispatcher))
         ;
 
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
+        $request = $this->createMock(Request::class);
 
-        $map = $this->getMockBuilder(FirewallMapInterface::class)->getMock();
+        $map = $this->createMock(FirewallMapInterface::class);
         $map
             ->expects($this->once())
             ->method('getListeners')
@@ -43,7 +43,7 @@ class FirewallTest extends TestCase
             ->willReturn([[], $listener, null])
         ;
 
-        $event = new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $firewall = new Firewall($map, $dispatcher);
         $firewall->onKernelRequest($event);
@@ -61,7 +61,7 @@ class FirewallTest extends TestCase
             $called[] = 2;
         };
 
-        $map = $this->getMockBuilder(FirewallMapInterface::class)->getMock();
+        $map = $this->createMock(FirewallMapInterface::class);
         $map
             ->expects($this->once())
             ->method('getListeners')
@@ -71,8 +71,8 @@ class FirewallTest extends TestCase
         $event = $this->getMockBuilder(RequestEvent::class)
             ->setMethods(['hasResponse'])
             ->setConstructorArgs([
-                $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
-                $this->getMockBuilder(Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock(),
+                $this->createMock(HttpKernelInterface::class),
+                $this->createMock(Request::class),
                 HttpKernelInterface::MASTER_REQUEST,
             ])
             ->getMock()
@@ -83,7 +83,7 @@ class FirewallTest extends TestCase
             ->willReturn(true)
         ;
 
-        $firewall = new Firewall($map, $this->getMockBuilder(EventDispatcherInterface::class)->getMock());
+        $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);
 
         $this->assertSame([1], $called);
@@ -91,19 +91,19 @@ class FirewallTest extends TestCase
 
     public function testOnKernelRequestWithSubRequest()
     {
-        $map = $this->getMockBuilder(FirewallMapInterface::class)->getMock();
+        $map = $this->createMock(FirewallMapInterface::class);
         $map
             ->expects($this->never())
             ->method('getListeners')
         ;
 
         $event = new RequestEvent(
-            $this->getMockBuilder(HttpKernelInterface::class)->getMock(),
-            $this->getMockBuilder(Request::class)->getMock(),
+            $this->createMock(HttpKernelInterface::class),
+            $this->createMock(Request::class),
             HttpKernelInterface::SUB_REQUEST
         );
 
-        $firewall = new Firewall($map, $this->getMockBuilder(EventDispatcherInterface::class)->getMock());
+        $firewall = new Firewall($map, $this->createMock(EventDispatcherInterface::class));
         $firewall->onKernelRequest($event);
 
         $this->assertFalse($event->hasResponse());

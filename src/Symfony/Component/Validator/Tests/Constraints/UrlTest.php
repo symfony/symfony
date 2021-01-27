@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
@@ -30,14 +31,14 @@ class UrlTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Url(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Url(['normalizer' => new \stdClass()]);
     }

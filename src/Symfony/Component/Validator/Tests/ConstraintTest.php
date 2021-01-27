@@ -13,7 +13,10 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
@@ -104,14 +107,14 @@ class ConstraintTest extends TestCase
 
     public function testSetUndefinedDefaultProperty()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
 
         new ConstraintB('foo');
     }
 
     public function testRequiredOptionsMustBeDefined()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
 
         new ConstraintC();
     }
@@ -209,7 +212,7 @@ class ConstraintTest extends TestCase
 
     public function testGetErrorNameForUnknownCode()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         Constraint::getErrorName(1);
     }
 
@@ -244,7 +247,7 @@ class ConstraintTest extends TestCase
 
     public function testAnnotationSetUndefinedDefaultOption()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('No default option is configured for constraint "Symfony\Component\Validator\Tests\Fixtures\ConstraintB".');
         new ConstraintB(['value' => 1]);
     }

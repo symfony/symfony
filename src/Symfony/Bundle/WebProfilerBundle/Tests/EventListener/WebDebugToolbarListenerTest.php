@@ -16,9 +16,12 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class WebDebugToolbarListenerTest extends TestCase
 {
@@ -310,7 +313,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $request->headers = new HeaderBag();
 
         if ($hasSession) {
-            $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\Session::class)->disableOriginalConstructor()->getMock();
+            $session = $this->createMock(Session::class);
             $request->expects($this->any())
                 ->method('getSession')
                 ->willReturn($session);
@@ -321,7 +324,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     protected function getTwigMock($render = 'WDT')
     {
-        $templating = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
+        $templating = $this->createMock(Environment::class);
         $templating->expects($this->any())
             ->method('render')
             ->willReturn($render);
@@ -331,11 +334,11 @@ class WebDebugToolbarListenerTest extends TestCase
 
     protected function getUrlGeneratorMock()
     {
-        return $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        return $this->createMock(UrlGeneratorInterface::class);
     }
 
     protected function getKernelMock()
     {
-        return $this->getMockBuilder(\Symfony\Component\HttpKernel\Kernel::class)->disableOriginalConstructor()->getMock();
+        return $this->createMock(Kernel::class);
     }
 }

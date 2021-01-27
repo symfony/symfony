@@ -14,12 +14,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\NotBoundException;
 
 class EntryManagerTest extends TestCase
 {
     public function testMove()
     {
-        $this->expectException(\Symfony\Component\Ldap\Exception\LdapException::class);
+        $this->expectException(LdapException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
         $connection = $this->createMock(Connection::class);
         $connection
@@ -33,9 +35,9 @@ class EntryManagerTest extends TestCase
 
     public function testGetResources()
     {
-        $this->expectException(\Symfony\Component\Ldap\Exception\NotBoundException::class);
+        $this->expectException(NotBoundException::class);
         $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
-        $connection = $this->getMockBuilder(Connection::class)->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection
             ->expects($this->once())
             ->method('isBound')->willReturn(false);

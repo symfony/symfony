@@ -46,7 +46,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshIfEmpty()
     {
-        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock()
+        $checker = $this->createMock(ResourceCheckerInterface::class)
             ->expects($this->never())->method('supports');
 
         /* If there is nothing in the cache, it needs to be filled (and thus it's not fresh).
@@ -83,7 +83,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testIsFreshWithchecker()
     {
-        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
+        $checker = $this->createMock(ResourceCheckerInterface::class);
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -101,7 +101,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testIsNotFreshWithchecker()
     {
-        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
+        $checker = $this->createMock(ResourceCheckerInterface::class);
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -119,7 +119,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshWhenUnserializeFails()
     {
-        $checker = $this->getMockBuilder(ResourceCheckerInterface::class)->getMock();
+        $checker = $this->createMock(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 
@@ -139,8 +139,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
 
     public function testCacheIsNotFreshIfNotExistsMetaFile()
     {
-        $checker = $this->getMockBuilder(ResourceCheckerInterface::class
-        )->getMock();
+        $checker = $this->createMock(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
         $cache->write('foo', [new FileResource(__FILE__)]);
 

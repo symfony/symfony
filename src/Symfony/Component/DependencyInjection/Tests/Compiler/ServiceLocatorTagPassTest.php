@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
@@ -27,7 +28,7 @@ class ServiceLocatorTagPassTest extends TestCase
 {
     public function testNoServices()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set.');
         $container = new ContainerBuilder();
 
@@ -40,7 +41,7 @@ class ServiceLocatorTagPassTest extends TestCase
 
     public function testInvalidServices()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set, "string" found for key "0".');
         $container = new ContainerBuilder();
 

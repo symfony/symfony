@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+
 class UrlTypeTest extends TextTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
@@ -75,7 +77,7 @@ class UrlTypeTest extends TextTypeTest
 
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => [],
         ]);

@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -40,7 +42,7 @@ class JsonSerializableNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = [])
     {
-        $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
+        $this->serializer = $this->createMock(JsonSerializerNormalizer::class);
         $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -68,7 +70,7 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testCircularNormalize()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
         $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
@@ -86,7 +88,7 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testInvalidDataThrowException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The object must implement "JsonSerializable".');
         $this->normalizer->normalize(new \stdClass());
     }

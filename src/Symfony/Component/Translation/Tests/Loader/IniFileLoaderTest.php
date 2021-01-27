@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
@@ -41,7 +42,7 @@ class IniFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ini';
         $loader->load($resource, 'en', 'domain1');

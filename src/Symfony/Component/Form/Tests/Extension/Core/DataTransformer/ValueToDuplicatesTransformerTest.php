@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 
 class ValueToDuplicatesTransformerTest extends TestCase
@@ -107,7 +108,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyNull()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $input = [
             'a' => 'Foo',
             'b' => 'Foo',
@@ -119,7 +120,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
 
     public function testReverseTransformDifferences()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $input = [
             'a' => 'Foo',
             'b' => 'Bar',
@@ -131,7 +132,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
 
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('12345');
     }
 }

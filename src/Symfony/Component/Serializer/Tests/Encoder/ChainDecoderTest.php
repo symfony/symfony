@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 class ChainDecoderTest extends TestCase
 {
@@ -26,10 +28,7 @@ class ChainDecoderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->decoder1 = $this
-            ->getMockBuilder(\Symfony\Component\Serializer\Encoder\DecoderInterface::class)
-            ->getMock();
-
+        $this->decoder1 = $this->createMock(DecoderInterface::class);
         $this->decoder1
             ->method('supportsDecoding')
             ->willReturnMap([
@@ -39,10 +38,7 @@ class ChainDecoderTest extends TestCase
                 [self::FORMAT_3, ['foo' => 'bar'], true],
             ]);
 
-        $this->decoder2 = $this
-            ->getMockBuilder(\Symfony\Component\Serializer\Encoder\DecoderInterface::class)
-            ->getMock();
-
+        $this->decoder2 = $this->createMock(DecoderInterface::class);
         $this->decoder2
             ->method('supportsDecoding')
             ->willReturnMap([
@@ -72,7 +68,7 @@ class ChainDecoderTest extends TestCase
 
     public function testDecodeUnsupportedFormat()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->chainDecoder->decode('string_to_decode', self::FORMAT_3);
     }
 }

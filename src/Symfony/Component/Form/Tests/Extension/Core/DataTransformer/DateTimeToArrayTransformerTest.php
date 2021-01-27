@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 
 class DateTimeToArrayTransformerTest extends TestCase
@@ -139,7 +140,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testTransformRequiresDateTime()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform('12345');
     }
@@ -211,7 +212,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptyYear()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'month' => '2',
@@ -224,7 +225,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptyMonth()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -237,7 +238,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptyDay()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -250,7 +251,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptyHour()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -263,7 +264,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptyMinute()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -276,7 +277,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyEmptySecond()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -334,14 +335,14 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform('12345');
     }
 
     public function testReverseTransformWithNegativeYear()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '-1',
@@ -355,7 +356,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithNegativeMonth()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -369,7 +370,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithNegativeDay()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -383,7 +384,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithNegativeHour()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -397,7 +398,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithNegativeMinute()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -411,7 +412,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithNegativeSecond()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -425,7 +426,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithInvalidMonth()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -439,7 +440,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithInvalidDay()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -453,7 +454,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithStringDay()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -467,7 +468,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithStringMonth()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -481,7 +482,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithStringYear()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => 'bazinga',
@@ -495,7 +496,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithEmptyStringHour()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -509,7 +510,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithEmptyStringMinute()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',
@@ -523,7 +524,7 @@ class DateTimeToArrayTransformerTest extends TestCase
 
     public function testReverseTransformWithEmptyStringSecond()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToArrayTransformer();
         $transformer->reverseTransform([
             'year' => '2010',

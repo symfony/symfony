@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Translator;
 
@@ -19,7 +20,7 @@ class LoggingTranslatorTest extends TestCase
 {
     public function testTransWithNoTranslationIsLogged()
     {
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(1))
             ->method('warning')
             ->with('Translation not found.')

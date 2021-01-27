@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class MergeDoctrineCollectionListenerTest extends TestCase
 {
@@ -32,7 +33,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
     {
         $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
-        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
+        $this->factory = $this->createMock(FormFactoryInterface::class);
         $this->form = $this->getBuilder()
             ->getForm();
     }

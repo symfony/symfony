@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -35,7 +36,7 @@ abstract class AnnotationLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\Loader\LoaderInterface::class, $this->loader);
+        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()

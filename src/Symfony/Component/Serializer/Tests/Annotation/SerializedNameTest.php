@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -21,7 +22,7 @@ class SerializedNameTest extends TestCase
 {
     public function testNotSetSerializedNameParameter()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" should be set.');
         new SerializedName([]);
     }
@@ -39,7 +40,7 @@ class SerializedNameTest extends TestCase
      */
     public function testNotAStringSerializedNameParameter($value)
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\SerializedName" must be a non-empty string.');
         new SerializedName(['value' => $value]);
     }

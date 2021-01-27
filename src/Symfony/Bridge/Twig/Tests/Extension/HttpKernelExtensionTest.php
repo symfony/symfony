@@ -15,10 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class HttpKernelExtensionTest extends TestCase
 {
@@ -41,10 +44,7 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testUnknownFragmentRenderer()
     {
-        $context = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $context = $this->createMock(RequestStack::class);
         $renderer = new FragmentHandler($context);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -55,14 +55,11 @@ class HttpKernelExtensionTest extends TestCase
 
     protected function getFragmentHandler($return)
     {
-        $strategy = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface::class)->getMock();
+        $strategy = $this->createMock(FragmentRendererInterface::class);
         $strategy->expects($this->once())->method('getName')->willReturn('inline');
         $strategy->expects($this->once())->method('render')->will($return);
 
-        $context = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $context = $this->createMock(RequestStack::class);
 
         $context->expects($this->any())->method('getCurrentRequest')->willReturn(Request::create('/'));
 
@@ -75,7 +72,7 @@ class HttpKernelExtensionTest extends TestCase
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->getMockBuilder(\Twig\RuntimeLoader\RuntimeLoaderInterface::class)->getMock();
+        $loader = $this->createMock(RuntimeLoaderInterface::class);
         $loader->expects($this->any())->method('load')->willReturnMap([
             ['Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)],
         ]);

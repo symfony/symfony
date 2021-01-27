@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\RememberMe;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 class InMemoryTokenProviderTest extends TestCase
 {
@@ -29,7 +30,7 @@ class InMemoryTokenProviderTest extends TestCase
 
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\TokenNotFoundException::class);
+        $this->expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
         $provider->loadTokenBySeries('foo');
     }
@@ -49,7 +50,7 @@ class InMemoryTokenProviderTest extends TestCase
 
     public function testDeleteToken()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\TokenNotFoundException::class);
+        $this->expectException(TokenNotFoundException::class);
         $provider = new InMemoryTokenProvider();
 
         $token = new PersistentToken('foo', 'foo', 'foo', 'foo', new \DateTime());

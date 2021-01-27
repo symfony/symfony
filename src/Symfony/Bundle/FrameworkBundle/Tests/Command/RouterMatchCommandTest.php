@@ -16,10 +16,12 @@ use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class RouterMatchCommandTest extends TestCase
 {
@@ -55,7 +57,7 @@ class RouterMatchCommandTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
         $requestContext = new RequestContext();
-        $router = $this->getMockBuilder(\Symfony\Component\Routing\RouterInterface::class)->getMock();
+        $router = $this->createMock(RouterInterface::class);
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
@@ -70,7 +72,7 @@ class RouterMatchCommandTest extends TestCase
 
     private function getKernel()
     {
-        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
+        $container = $this->createMock(ContainerInterface::class);
         $container
             ->expects($this->atLeastOnce())
             ->method('has')
@@ -85,7 +87,7 @@ class RouterMatchCommandTest extends TestCase
             ->willReturn($this->getRouter())
         ;
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getContainer')

@@ -19,8 +19,11 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
@@ -28,7 +31,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $tmpProviders = [];
 
-        $extension = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Extension\ExtensionInterface::class)->getMock();
+        $extension = $this->createMock(ExtensionInterface::class);
         $extension->expects($this->any())
             ->method('getXsdValidationBasePath')
             ->willReturn(false);
@@ -44,7 +47,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
                 $tmpProviders = $container->getExpressionLanguageProviders();
             });
 
-        $provider = $this->getMockBuilder(\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface::class)->getMock();
+        $provider = $this->createMock(ExpressionFunctionProviderInterface::class);
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
         $container->prependExtensionConfig('foo', ['bar' => true]);
@@ -105,7 +108,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testProcessedEnvsAreIncompatibleWithResolve()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.');
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());

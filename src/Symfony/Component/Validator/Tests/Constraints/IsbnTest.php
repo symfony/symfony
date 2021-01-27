@@ -46,7 +46,7 @@ class IsbnDummy
     #[Isbn]
     private $a;
 
-    #[Isbn(message: "myMessage", type: Isbn::ISBN_13)]
+    #[Isbn(message: 'myMessage', type: Isbn::ISBN_13)]
     private $b;
 
     #[Isbn(groups: ['my_group'], payload: 'some attached data')]

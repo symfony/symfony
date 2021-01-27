@@ -60,7 +60,7 @@ class RoleVoterTest extends TestCase
 
     protected function getTokenWithRoleNames(array $roles)
     {
-        $token = $this->getMockBuilder(AbstractToken::class)->getMock();
+        $token = $this->createMock(AbstractToken::class);
         $token->expects($this->once())
               ->method('getRoleNames')
               ->willReturn($roles);

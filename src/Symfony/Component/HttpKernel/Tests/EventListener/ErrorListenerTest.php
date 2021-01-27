@@ -115,9 +115,9 @@ class ErrorListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ErrorListener('foo', $this->getMockBuilder(LoggerInterface::class)->getMock());
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
@@ -135,12 +135,12 @@ class ErrorListenerTest extends TestCase
     public function testCSPHeaderIsRemoved()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         });
 
-        $listener = new ErrorListener('foo', $this->getMockBuilder(LoggerInterface::class)->getMock(), true);
+        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
 
         $dispatcher->addSubscriber($listener);
 

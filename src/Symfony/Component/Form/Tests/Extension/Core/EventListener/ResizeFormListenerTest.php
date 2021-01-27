@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -68,7 +69,7 @@ class ResizeFormListenerTest extends TestCase
 
     public function testPreSetDataRequiresArrayOrTraversable()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', [], false, false);
@@ -201,7 +202,7 @@ class ResizeFormListenerTest extends TestCase
 
     public function testOnSubmitNormDataRequiresArrayOrTraversable()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', [], false, false);

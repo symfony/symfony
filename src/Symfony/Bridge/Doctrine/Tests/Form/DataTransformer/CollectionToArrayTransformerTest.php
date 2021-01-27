@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -64,7 +65,7 @@ class CollectionToArrayTransformerTest extends TestCase
 
     public function testTransformExpectsArrayOrCollection()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('Foo');
     }
 

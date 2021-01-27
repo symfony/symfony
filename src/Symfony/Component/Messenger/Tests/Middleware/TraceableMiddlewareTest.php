@@ -70,7 +70,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $this->expectExceptionMessage('Thrown from next middleware.');
         $busId = 'command_bus';
 
-        $middleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
+        $middleware = $this->createMock(MiddlewareInterface::class);
         $middleware->expects($this->once())
             ->method('handle')
             ->willThrowException(new \RuntimeException('Thrown from next middleware.'))

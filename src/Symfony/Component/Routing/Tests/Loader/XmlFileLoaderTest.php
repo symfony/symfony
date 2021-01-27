@@ -23,7 +23,7 @@ class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new XmlFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
+        $loader = new XmlFileLoader($this->createMock(FileLocator::class));
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

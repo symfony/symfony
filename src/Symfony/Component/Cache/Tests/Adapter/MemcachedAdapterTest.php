@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @group integration
@@ -106,7 +107,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testOptionSerializer()
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\CacheException::class);
+        $this->expectException(CacheException::class);
         $this->expectExceptionMessage('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');

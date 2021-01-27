@@ -95,7 +95,7 @@ class AnnotationFileLoader extends FileLoader
 
         $nsTokens = [\T_NS_SEPARATOR => true, \T_STRING => true];
         if (\defined('T_NAME_QUALIFIED')) {
-            $nsTokens[T_NAME_QUALIFIED] = true;
+            $nsTokens[\T_NAME_QUALIFIED] = true;
         }
 
         for ($i = 0; isset($tokens[$i]); ++$i) {

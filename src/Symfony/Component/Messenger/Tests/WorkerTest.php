@@ -45,7 +45,7 @@ class WorkerTest extends TestCase
             [new Envelope($apiMessage), new Envelope($ipaMessage)],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $bus->expects($this->exactly(2))
             ->method('dispatch')
@@ -73,7 +73,7 @@ class WorkerTest extends TestCase
             [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willThrowException(new \InvalidArgumentException('Why not'));
 
         $dispatcher = new EventDispatcher();
@@ -92,7 +92,7 @@ class WorkerTest extends TestCase
             null,
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->never())->method('dispatch');
 
         $dispatcher = new EventDispatcher();
@@ -109,10 +109,10 @@ class WorkerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
         $receiver = new DummyReceiver([[$envelope]]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn($envelope);
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
@@ -139,11 +139,11 @@ class WorkerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
         $receiver = new DummyReceiver([[$envelope]]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $exception = new \InvalidArgumentException('Oh no!');
         $bus->method('dispatch')->willThrowException($exception);
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
@@ -178,7 +178,7 @@ class WorkerTest extends TestCase
             [new Envelope($apiMessage)],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(5));
@@ -230,7 +230,7 @@ class WorkerTest extends TestCase
             [$envelope6],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $processedEnvelopes = [];
         $dispatcher = new EventDispatcher();

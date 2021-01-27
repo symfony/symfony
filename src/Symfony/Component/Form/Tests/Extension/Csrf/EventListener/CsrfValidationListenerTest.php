@@ -76,12 +76,7 @@ class CsrfValidationListenerTest extends TestCase
 
     public function testMaxPostSizeExceeded()
     {
-        $serverParams = $this
-            ->getMockBuilder(ServerParams::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
+        $serverParams = $this->createMock(ServerParams::class);
         $serverParams
             ->expects($this->once())
             ->method('hasPostMaxSizeBeenExceeded')

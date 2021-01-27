@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
+use Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactory;
@@ -77,7 +78,7 @@ class FormDataCollectorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dataExtractor = $this->getMockBuilder(\Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface::class)->getMock();
+        $this->dataExtractor = $this->createMock(FormDataExtractorInterface::class);
         $this->dataCollector = new FormDataCollector($this->dataExtractor);
         $this->dispatcher = new EventDispatcher();
         $this->factory = new FormFactory(new FormRegistry([new CoreExtension()], new ResolvedFormTypeFactory()));

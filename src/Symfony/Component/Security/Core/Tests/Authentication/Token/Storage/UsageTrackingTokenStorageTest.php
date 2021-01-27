@@ -39,7 +39,7 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
         $this->assertNull($trackingStorage->getToken());
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
 
         $trackingStorage->setToken($token);
         $this->assertSame($token, $trackingStorage->getToken());

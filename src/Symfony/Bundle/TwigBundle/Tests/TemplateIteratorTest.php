@@ -12,16 +12,18 @@
 namespace Symfony\Bundle\TwigBundle\Tests;
 
 use Symfony\Bundle\TwigBundle\TemplateIterator;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 class TemplateIteratorTest extends TestCase
 {
     public function testGetIterator()
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
+        $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
         $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
 
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\Kernel::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(Kernel::class);
         $kernel->expects($this->any())->method('getBundles')->willReturn([
             $bundle,
         ]);

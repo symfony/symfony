@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -37,7 +39,7 @@ class TranslatorTest extends TestCase
      */
     public function testConstructorInvalidLocale($locale)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new Translator($locale);
     }
 
@@ -66,7 +68,7 @@ class TranslatorTest extends TestCase
      */
     public function testSetInvalidLocale($locale)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
         $translator->setLocale($locale);
     }
@@ -149,7 +151,7 @@ class TranslatorTest extends TestCase
      */
     public function testSetFallbackInvalidLocales($locale)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
         $translator->setFallbackLocales(['fr', $locale]);
     }
@@ -181,7 +183,7 @@ class TranslatorTest extends TestCase
      */
     public function testAddResourceInvalidLocales($locale)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
     }
@@ -216,7 +218,7 @@ class TranslatorTest extends TestCase
      */
     public function testTransWithoutFallbackLocaleFile($format, $loader)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en');
         $translator->addLoader($format, new $loaderClass());
@@ -398,7 +400,7 @@ class TranslatorTest extends TestCase
      */
     public function testTransInvalidLocale($locale)
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');

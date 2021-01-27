@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 abstract class FileValidatorTest extends ConstraintValidatorTestCase
@@ -68,7 +70,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleTypeOrFile()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new File());
     }
 
@@ -224,7 +226,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMaxSize()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         $constraint = new File([
             'maxSize' => '1abc',
         ]);

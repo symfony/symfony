@@ -13,7 +13,10 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,8 +39,8 @@ class DataUriNormalizerTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Normalizer\NormalizerInterface::class, $this->normalizer);
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Normalizer\DenormalizerInterface::class, $this->normalizer);
+        $this->assertInstanceOf(NormalizerInterface::class, $this->normalizer);
+        $this->assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
     }
 
     public function testSupportNormalization()
@@ -113,7 +116,7 @@ class DataUriNormalizerTest extends TestCase
 
     public function testGiveNotAccessToLocalFiles()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The provided "data:" URI is not valid.');
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
@@ -123,7 +126,7 @@ class DataUriNormalizerTest extends TestCase
      */
     public function testInvalidData($uri)
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize($uri, 'SplFileObject');
     }
 

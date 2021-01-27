@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\NotMappedType;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
@@ -116,7 +117,7 @@ class RepeatedTypeTest extends BaseTypeTest
 
     public function testSetInvalidOptions()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'options' => 'bad value',
@@ -125,7 +126,7 @@ class RepeatedTypeTest extends BaseTypeTest
 
     public function testSetInvalidFirstOptions()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'first_options' => 'bad value',
@@ -134,7 +135,7 @@ class RepeatedTypeTest extends BaseTypeTest
 
     public function testSetInvalidSecondOptions()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
             'second_options' => 'bad value',

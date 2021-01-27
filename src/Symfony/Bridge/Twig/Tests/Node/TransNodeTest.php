@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Compiler;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\TextNode;
 
@@ -29,7 +30,7 @@ class TransNodeTest extends TestCase
         $vars = new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), ['strict_variables' => true]);
+        $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true]);
         $compiler = new Compiler($env);
 
         $this->assertEquals(

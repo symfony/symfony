@@ -14,12 +14,14 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AutoAliasServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class AutoAliasServicePassTest extends TestCase
 {
     public function testProcessWithMissingParameter()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException::class);
+        $this->expectException(ParameterNotFoundException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')
@@ -31,7 +33,7 @@ class AutoAliasServicePassTest extends TestCase
 
     public function testProcessWithMissingFormat()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $container = new ContainerBuilder();
 
         $container->register('example')

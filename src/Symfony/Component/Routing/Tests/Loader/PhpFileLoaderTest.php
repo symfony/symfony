@@ -22,7 +22,7 @@ class PhpFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new PhpFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
+        $loader = new PhpFileLoader($this->createMock(FileLocator::class));
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

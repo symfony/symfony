@@ -39,11 +39,11 @@ class GuardListenerTest extends TestCase
         ];
         $expressionLanguage = new ExpressionLanguage();
         $token = new UsernamePasswordToken('username', 'credentials', 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
-        $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
-        $trustResolver = $this->getMockBuilder(AuthenticationTrustResolverInterface::class)->getMock();
-        $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
+        $this->authenticationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
+        $this->validator = $this->createMock(ValidatorInterface::class);
         $roleHierarchy = new RoleHierarchy([]);
         $this->listener = new GuardListener($this->configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, $roleHierarchy, $this->validator);
     }
@@ -138,7 +138,7 @@ class GuardListenerTest extends TestCase
         $subject = new Subject();
         $transition = $transition ?: new Transition('name', 'from', 'to');
 
-        $workflow = $this->getMockBuilder(WorkflowInterface::class)->getMock();
+        $workflow = $this->createMock(WorkflowInterface::class);
 
         return new GuardEvent($subject, new Marking($subject->getMarking() ?? []), $transition, $workflow);
     }

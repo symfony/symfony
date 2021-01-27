@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase
@@ -922,7 +923,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testInWithNonExistentDirectory()
     {
-        $this->expectException(\Symfony\Component\Finder\Exception\DirectoryNotFoundException::class);
+        $this->expectException(DirectoryNotFoundException::class);
         $finder = new Finder();
         $finder->in('foobar');
     }

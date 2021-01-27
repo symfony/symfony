@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
@@ -30,7 +32,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loader = new PhpFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.php';
         $loader->load($resource, 'en', 'domain1');
@@ -38,7 +40,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $loader = new PhpFileLoader();
         $resource = 'http://example.com/resources.php';
         $loader->load($resource, 'en', 'domain1');

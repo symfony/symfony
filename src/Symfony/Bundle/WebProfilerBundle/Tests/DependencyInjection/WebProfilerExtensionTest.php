@@ -52,7 +52,7 @@ class WebProfilerExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $this->kernel = $this->createMock(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);

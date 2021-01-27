@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\BlockPrefixedFooTextType;
@@ -38,8 +40,8 @@ class CollectionTypeTest extends BaseTypeTest
         ]);
         $form->setData(['foo@foo.com', 'foo@bar.com']);
 
-        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $form[0]);
-        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $form[1]);
+        $this->assertInstanceOf(Form::class, $form[0]);
+        $this->assertInstanceOf(Form::class, $form[1]);
         $this->assertCount(2, $form);
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
@@ -49,7 +51,7 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertEquals(20, $formAttrs1['maxlength']);
 
         $form->setData(['foo@baz.com']);
-        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $form[0]);
+        $this->assertInstanceOf(Form::class, $form[0]);
         $this->assertArrayNotHasKey(1, $form);
         $this->assertCount(1, $form);
         $this->assertEquals('foo@baz.com', $form[0]->getData());
@@ -62,7 +64,7 @@ class CollectionTypeTest extends BaseTypeTest
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
         ]);
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $form->setData(new \stdClass());
     }
 

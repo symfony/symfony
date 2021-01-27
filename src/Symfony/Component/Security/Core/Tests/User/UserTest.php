@@ -130,6 +130,6 @@ class UserTest extends TestCase
     public function testIsEqualToWithDifferentUser()
     {
         $user = new User('username', 'password');
-        $this->assertFalse($user->isEqualTo($this->getMockBuilder(UserInterface::class)->getMock()));
+        $this->assertFalse($user->isEqualTo($this->createMock(UserInterface::class)));
     }
 }

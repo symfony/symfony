@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Ip;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
@@ -30,14 +31,14 @@ class IpTest extends TestCase
 
     public function testInvalidNormalizerThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
         new Ip(['normalizer' => 'Unknown Callable']);
     }
 
     public function testInvalidNormalizerObjectThrowsException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
         new Ip(['normalizer' => new \stdClass()]);
     }
@@ -71,7 +72,7 @@ class IpDummy
     #[Ip]
     private $a;
 
-    #[Ip(version: Ip::V6, message: "myMessage", normalizer: 'trim')]
+    #[Ip(version: Ip::V6, message: 'myMessage', normalizer: 'trim')]
     private $b;
 
     #[Ip(groups: ['my_group'], payload: 'some attached data')]

@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 /**
  * @group time-sensitive
@@ -26,10 +28,7 @@ class FragmentHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->requestStack
             ->expects($this->any())
             ->method('getCurrentRequest')
@@ -79,7 +78,7 @@ class FragmentHandlerTest extends TestCase
 
     protected function getHandler($returnValue, $arguments = [])
     {
-        $renderer = $this->getMockBuilder(\Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface::class)->getMock();
+        $renderer = $this->createMock(FragmentRendererInterface::class);
         $renderer
             ->expects($this->any())
             ->method('getName')

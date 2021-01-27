@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\SubmitButton;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -20,7 +22,7 @@ class SubmitTypeTest extends ButtonTypeTest
 
     public function testCreateSubmitButtonInstances()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
+        $this->assertInstanceOf(SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
     }
 
     public function testNotClickedByDefault()

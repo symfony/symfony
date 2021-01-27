@@ -18,6 +18,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
+use Twig\Loader\LoaderInterface;
 
 class DumpExtensionTest extends TestCase
 {
@@ -67,7 +68,7 @@ class DumpExtensionTest extends TestCase
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), [
+        $twig = new Environment($this->createMock(LoaderInterface::class), [
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
@@ -124,7 +125,7 @@ class DumpExtensionTest extends TestCase
             '</pre><script>Sfdump("%s")</script>'
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
-        $twig = new Environment($this->getMockBuilder(\Twig\Loader\LoaderInterface::class)->getMock(), [
+        $twig = new Environment($this->createMock(LoaderInterface::class), [
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,

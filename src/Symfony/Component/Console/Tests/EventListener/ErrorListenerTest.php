@@ -117,7 +117,7 @@ class ErrorListenerTest extends TestCase
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleTerminate($this->getConsoleTerminateEvent($this->getMockBuilder(InputInterface::class)->getMock(), 255));
+        $listener->onConsoleTerminate($this->getConsoleTerminateEvent($this->createMock(InputInterface::class), 255));
     }
 
     private function getLogger()
@@ -132,7 +132,7 @@ class ErrorListenerTest extends TestCase
 
     private function getOutput()
     {
-        return $this->getMockBuilder(OutputInterface::class)->getMock();
+        return $this->createMock(OutputInterface::class);
     }
 }
 

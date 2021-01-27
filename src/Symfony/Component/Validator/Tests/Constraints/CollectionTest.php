@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -25,7 +26,7 @@ class CollectionTest extends TestCase
 {
     public function testRejectInvalidFieldsOption()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Collection([
             'fields' => 'foo',
         ]);
@@ -33,7 +34,7 @@ class CollectionTest extends TestCase
 
     public function testRejectNonConstraints()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Collection([
             'foo' => 'bar',
         ]);
@@ -41,7 +42,7 @@ class CollectionTest extends TestCase
 
     public function testRejectValidConstraint()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Collection([
             'foo' => new Valid(),
         ]);
@@ -49,7 +50,7 @@ class CollectionTest extends TestCase
 
     public function testRejectValidConstraintWithinOptional()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Collection([
             'foo' => new Optional(new Valid()),
         ]);
@@ -57,7 +58,7 @@ class CollectionTest extends TestCase
 
     public function testRejectValidConstraintWithinRequired()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Collection([
             'foo' => new Required(new Valid()),
         ]);

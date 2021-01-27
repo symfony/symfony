@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyCommand;
@@ -155,7 +156,7 @@ TXT
 
     public function testExceptionOnUnknownBusArgument()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are "command_bus", "query_bus".');
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 

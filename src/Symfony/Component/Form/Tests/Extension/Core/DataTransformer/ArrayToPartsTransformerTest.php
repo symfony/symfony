@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 
 class ArrayToPartsTransformerTest extends TestCase
@@ -70,7 +71,7 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testTransformRequiresArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('12345');
     }
 
@@ -123,7 +124,7 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testReverseTransformPartiallyNull()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $input = [
             'first' => [
                 'a' => '1',
@@ -138,7 +139,7 @@ class ArrayToPartsTransformerTest extends TestCase
 
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('12345');
     }
 }

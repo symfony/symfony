@@ -73,20 +73,14 @@ EOF;
 
     private function getKernelAwareApplicationMock()
     {
-        $kernel = $this->getMockBuilder(KernelInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->once())
             ->method('locateResource')
             ->with('@AppBundle/Resources')
             ->willReturn(sys_get_temp_dir().'/xliff-lint-test');
 
-        $application = $this->getMockBuilder(Application::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $application = $this->createMock(Application::class);
         $application
             ->expects($this->once())
             ->method('getKernel')

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class AliasTest extends TestCase
 {
@@ -90,7 +91,7 @@ class AliasTest extends TestCase
      */
     public function testCannotDeprecateWithAnInvalidTemplate($message)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $def = new Alias('foo');
         $def->setDeprecated(true, $message);
     }

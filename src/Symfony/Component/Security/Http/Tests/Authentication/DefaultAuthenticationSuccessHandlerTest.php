@@ -13,6 +13,9 @@ namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\HttpUtils;
 
@@ -23,10 +26,10 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
      */
     public function testRequestRedirections(Request $request, $options, $redirectedUrl)
     {
-        $urlGenerator = $this->getMockBuilder(\Symfony\Component\Routing\Generator\UrlGeneratorInterface::class)->getMock();
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->any())->method('generate')->willReturn('http://localhost/login');
         $httpUtils = new HttpUtils($urlGenerator);
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $handler = new DefaultAuthenticationSuccessHandler($httpUtils, $options);
         if ($request->hasSession()) {
             $handler->setProviderKey('admin');
@@ -36,7 +39,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
 
     public function getRequestRedirections()
     {
-        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('get')->with('_security.admin.target_path')->willReturn('/admin/dashboard');
         $session->expects($this->once())->method('remove')->with('_security.admin.target_path');
         $requestWithSession = Request::create('/');

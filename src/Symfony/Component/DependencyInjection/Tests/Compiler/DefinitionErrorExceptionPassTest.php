@@ -15,12 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class DefinitionErrorExceptionPassTest extends TestCase
 {
     public function testThrowsException()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Things went wrong!');
         $container = new ContainerBuilder();
         $def = new Definition();

@@ -12,8 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\Role;
@@ -59,7 +63,7 @@ class ExpressionVoterTest extends TestCase
         foreach ($roles as $i => $role) {
             $roles[$i] = new Role($role);
         }
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
 
         if ($tokenExpectsGetRoles) {
             $token->expects($this->once())
@@ -72,7 +76,7 @@ class ExpressionVoterTest extends TestCase
 
     protected function getTokenWithRoleNames(array $roles, $tokenExpectsGetRoles = true)
     {
-        $token = $this->getMockBuilder(AbstractToken::class)->getMock();
+        $token = $this->createMock(AbstractToken::class);
 
         if ($tokenExpectsGetRoles) {
             $token->expects($this->once())
@@ -85,7 +89,7 @@ class ExpressionVoterTest extends TestCase
 
     protected function createExpressionLanguage($expressionLanguageExpectsEvaluate = true)
     {
-        $mock = $this->getMockBuilder(\Symfony\Component\Security\Core\Authorization\ExpressionLanguage::class)->getMock();
+        $mock = $this->createMock(ExpressionLanguage::class);
 
         if ($expressionLanguageExpectsEvaluate) {
             $mock->expects($this->once())
@@ -98,18 +102,16 @@ class ExpressionVoterTest extends TestCase
 
     protected function createTrustResolver()
     {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface::class)->getMock();
+        return $this->createMock(AuthenticationTrustResolverInterface::class);
     }
 
     protected function createAuthorizationChecker()
     {
-        return $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
+        return $this->createMock(AuthorizationCheckerInterface::class);
     }
 
     protected function createExpression()
     {
-        return $this->getMockBuilder(\Symfony\Component\ExpressionLanguage\Expression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(Expression::class);
     }
 }

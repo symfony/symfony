@@ -14,7 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Composer\Autoload\ClassLoader;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @group legacy
@@ -151,7 +153,7 @@ class ControllerNameParserTest extends TestCase
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
         ];
 
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->expects($this->any())
             ->method('getBundle')
@@ -180,7 +182,7 @@ class ControllerNameParserTest extends TestCase
 
     private function getBundle($namespace, $name)
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
+        $bundle = $this->createMock(BundleInterface::class);
         $bundle->expects($this->any())->method('getName')->willReturn($name);
         $bundle->expects($this->any())->method('getNamespace')->willReturn($namespace);
 

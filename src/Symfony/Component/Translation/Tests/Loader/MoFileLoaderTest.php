@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\MoFileLoader;
 
 class MoFileLoaderTest extends TestCase
@@ -44,7 +46,7 @@ class MoFileLoaderTest extends TestCase
 
     public function testLoadNonExistingResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\NotFoundResourceException::class);
+        $this->expectException(NotFoundResourceException::class);
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.mo';
         $loader->load($resource, 'en', 'domain1');
@@ -52,7 +54,7 @@ class MoFileLoaderTest extends TestCase
 
     public function testLoadInvalidResource()
     {
-        $this->expectException(\Symfony\Component\Translation\Exception\InvalidResourceException::class);
+        $this->expectException(InvalidResourceException::class);
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../fixtures/empty.mo';
         $loader->load($resource, 'en', 'domain1');

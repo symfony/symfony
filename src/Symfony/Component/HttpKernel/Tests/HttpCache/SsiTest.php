@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
 class SsiTest extends TestCase
@@ -189,7 +190,7 @@ class SsiTest extends TestCase
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMockBuilder(\Symfony\Component\HttpKernel\HttpCache\HttpCache::class)->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
+        $cache = $this->getMockBuilder(HttpCache::class)->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())
               ->method('getRequest')
               ->willReturn($request)

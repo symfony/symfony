@@ -100,7 +100,7 @@ class ConnectionTest extends TestCase
 
     public function testKeepGettingPendingMessages()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(3))->method('xreadgroup')
             ->with('symfony', 'consumer', ['queue' => 0], 1, null)
@@ -114,7 +114,7 @@ class ConnectionTest extends TestCase
 
     public function testAuth()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
             ->with('password')
@@ -125,7 +125,7 @@ class ConnectionTest extends TestCase
 
     public function testNoAuthWithEmptyPassword()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(0))->method('auth')
             ->with('')
@@ -136,7 +136,7 @@ class ConnectionTest extends TestCase
 
     public function testAuthZeroPassword()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
             ->with('0')
@@ -149,7 +149,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Redis connection ');
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('auth')
             ->with('password')
@@ -169,7 +169,7 @@ class ConnectionTest extends TestCase
 
     public function testFirstGetPendingMessagesThenNewMessages()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $count = 0;
 
@@ -193,7 +193,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Redis error happens');
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
         $redis->expects($this->once())->method('xreadgroup')->willReturn(false);
         $redis->expects($this->once())->method('getLastError')->willReturn('Redis error happens');
 
@@ -245,7 +245,7 @@ class ConnectionTest extends TestCase
 
     public function testMaxEntries()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->exactly(1))->method('xadd')
             ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
@@ -257,7 +257,7 @@ class ConnectionTest extends TestCase
 
     public function testLastErrorGetsCleared()
     {
-        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+        $redis = $this->createMock(\Redis::class);
 
         $redis->expects($this->once())->method('xadd')->willReturn(0);
         $redis->expects($this->once())->method('xack')->willReturn(0);

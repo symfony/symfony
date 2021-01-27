@@ -36,7 +36,7 @@ class ExpressionLanguageTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $accessDecisionManager = new AccessDecisionManager([new RoleVoter()]);
-        $authChecker = new AuthorizationChecker($tokenStorage, $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock(), $accessDecisionManager);
+        $authChecker = new AuthorizationChecker($tokenStorage, $this->createMock(AuthenticationManagerInterface::class), $accessDecisionManager);
 
         $context = [];
         $context['trust_resolver'] = $trustResolver;

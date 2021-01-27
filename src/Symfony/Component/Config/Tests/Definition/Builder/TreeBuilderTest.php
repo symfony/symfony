@@ -12,8 +12,14 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\BooleanNode;
+use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Tests\Fixtures\BarNode;
+use Symfony\Component\Config\Tests\Fixtures\Builder\BarNodeDefinition;
 use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
+use Symfony\Component\Config\Tests\Fixtures\Builder\VariableNodeDefinition;
 
 class TreeBuilderTest extends TestCase
 {
@@ -23,11 +29,11 @@ class TreeBuilderTest extends TestCase
 
         $nodeBuilder = $builder->getRootNode()->children();
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder::class, $nodeBuilder);
+        $this->assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
 
         $nodeBuilder = $nodeBuilder->arrayNode('deeper')->children();
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder::class, $nodeBuilder);
+        $this->assertInstanceOf(CustomNodeBuilder::class, $nodeBuilder);
     }
 
     public function testOverrideABuiltInNodeType()
@@ -36,7 +42,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->variableNode('variable');
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Tests\Fixtures\Builder\VariableNodeDefinition::class, $definition);
+        $this->assertInstanceOf(VariableNodeDefinition::class, $definition);
     }
 
     public function testAddANodeType()
@@ -45,7 +51,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->barNode('variable');
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Tests\Fixtures\Builder\BarNodeDefinition::class, $definition);
+        $this->assertInstanceOf(BarNodeDefinition::class, $definition);
     }
 
     public function testCreateABuiltInNodeTypeWithACustomNodeBuilder()
@@ -54,7 +60,7 @@ class TreeBuilderTest extends TestCase
 
         $definition = $builder->getRootNode()->children()->booleanNode('boolean');
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition::class, $definition);
+        $this->assertInstanceOf(BooleanNodeDefinition::class, $definition);
     }
 
     public function testPrototypedArrayNodeUseTheCustomNodeBuilder()
@@ -64,7 +70,7 @@ class TreeBuilderTest extends TestCase
         $root = $builder->getRootNode();
         $root->prototype('bar')->end();
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Tests\Fixtures\BarNode::class, $root->getNode(true)->getPrototype());
+        $this->assertInstanceOf(BarNode::class, $root->getNode(true)->getPrototype());
     }
 
     public function testAnExtendedNodeBuilderGetsPropagatedToTheChildren()
@@ -86,11 +92,11 @@ class TreeBuilderTest extends TestCase
         $node = $builder->buildTree();
         $children = $node->getChildren();
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BooleanNode::class, $children['foo']);
+        $this->assertInstanceOf(BooleanNode::class, $children['foo']);
 
         $childChildren = $children['child']->getChildren();
 
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BooleanNode::class, $childChildren['foo']);
+        $this->assertInstanceOf(BooleanNode::class, $childChildren['foo']);
     }
 
     public function testDefinitionInfoGetsTransferredToNode()
@@ -147,14 +153,14 @@ class TreeBuilderTest extends TestCase
         $children = $node->getChildren();
 
         $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BaseNode::class, $children['foo']);
+        $this->assertInstanceOf(BaseNode::class, $children['foo']);
         $this->assertSame('propagation.foo', $children['foo']->getPath());
 
         $this->assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
         $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BaseNode::class, $childChildren['foo']);
+        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
         $this->assertSame('propagation.child.foo', $childChildren['foo']->getPath());
     }
 
@@ -178,14 +184,14 @@ class TreeBuilderTest extends TestCase
         $children = $node->getChildren();
 
         $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BaseNode::class, $children['foo']);
+        $this->assertInstanceOf(BaseNode::class, $children['foo']);
         $this->assertSame('propagation/foo', $children['foo']->getPath());
 
         $this->assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
         $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\BaseNode::class, $childChildren['foo']);
+        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
         $this->assertSame('propagation/child/foo', $childChildren['foo']->getPath());
     }
 

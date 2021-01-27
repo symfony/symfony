@@ -147,7 +147,7 @@ class ConsoleSectionOutputTest extends TestCase
         fwrite($inputStream, "Batman & Robin\n");
         rewind($inputStream);
 
-        $input = $this->getMockBuilder(StreamableInputInterface::class)->getMock();
+        $input = $this->createMock(StreamableInputInterface::class);
         $input->expects($this->once())->method('isInteractive')->willReturn(true);
         $input->expects($this->once())->method('getStream')->willReturn($inputStream);
 

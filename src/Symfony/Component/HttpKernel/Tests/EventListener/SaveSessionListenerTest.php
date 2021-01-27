@@ -27,7 +27,7 @@ class SaveSessionListenerTest extends TestCase
     public function testOnlyTriggeredOnMasterRequest()
     {
         $listener = new SaveSessionListener();
-        $event = $this->getMockBuilder(ResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(ResponseEvent::class);
         $event->expects($this->once())->method('isMasterRequest')->willReturn(false);
         $event->expects($this->never())->method('getRequest');
 
@@ -38,9 +38,9 @@ class SaveSessionListenerTest extends TestCase
     public function testSessionSaved()
     {
         $listener = new SaveSessionListener();
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
-        $session = $this->getMockBuilder(SessionInterface::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('isStarted')->willReturn(true);
         $session->expects($this->once())->method('save');
 

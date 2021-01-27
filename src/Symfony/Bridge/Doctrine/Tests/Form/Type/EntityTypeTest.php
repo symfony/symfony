@@ -29,11 +29,16 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class EntityTypeTest extends BaseTypeTest
 {
@@ -118,13 +123,13 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testClassOptionIsRequired()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE);
     }
 
     public function testInvalidClassOption()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => 'foo',
         ]);
@@ -219,7 +224,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -229,7 +234,7 @@ class EntityTypeTest extends BaseTypeTest
 
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -1242,7 +1247,7 @@ class EntityTypeTest extends BaseTypeTest
         $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
         $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class, $choiceLoader1);
+        $this->assertInstanceOf(ChoiceLoaderInterface::class, $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }
@@ -1302,14 +1307,14 @@ class EntityTypeTest extends BaseTypeTest
         $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
         $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf(\Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface::class, $choiceLoader1);
+        $this->assertInstanceOf(ChoiceLoaderInterface::class, $choiceLoader1);
         $this->assertSame($choiceLoader1, $choiceLoader2);
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))

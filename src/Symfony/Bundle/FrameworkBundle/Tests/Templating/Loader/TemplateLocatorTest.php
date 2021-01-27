@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Loader;
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Config\FileLocator;
 
 /**
  * @group legacy
@@ -90,7 +91,7 @@ class TemplateLocatorTest extends TestCase
     protected function getFileLocator()
     {
         return $this
-            ->getMockBuilder(\Symfony\Component\Config\FileLocator::class)
+            ->getMockBuilder(FileLocator::class)
             ->setMethods(['locate'])
             ->setConstructorArgs(['/path/to/fallback'])
             ->getMock()

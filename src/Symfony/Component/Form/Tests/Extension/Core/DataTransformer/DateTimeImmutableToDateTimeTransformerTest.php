@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 
 class DateTimeImmutableToDateTimeTransformerTest extends TestCase
@@ -54,7 +55,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 
     public function testTransformFail()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a \DateTimeImmutable.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->transform(new \DateTime());
@@ -82,7 +83,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 
     public function testReverseTransformFail()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a \DateTime.');
         $transformer = new DateTimeImmutableToDateTimeTransformer();
         $transformer->reverseTransform(new \DateTimeImmutable());

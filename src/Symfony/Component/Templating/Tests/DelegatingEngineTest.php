@@ -121,7 +121,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getEngineMock($template, $supports)
     {
-        $engine = $this->getMockBuilder(EngineInterface::class)->getMock();
+        $engine = $this->createMock(EngineInterface::class);
 
         $engine->expects($this->once())
             ->method('supports')
@@ -133,7 +133,7 @@ class DelegatingEngineTest extends TestCase
 
     private function getStreamingEngineMock($template, $supports)
     {
-        $engine = $this->getMockForAbstractClass(\Symfony\Component\Templating\Tests\MyStreamingEngine::class);
+        $engine = $this->getMockForAbstractClass(MyStreamingEngine::class);
 
         $engine->expects($this->once())
             ->method('supports')

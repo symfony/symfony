@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Http\Tests\Session;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class SessionAuthenticationStrategyTest extends TestCase
@@ -38,7 +41,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsMigrated()
     {
-        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
@@ -47,7 +50,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsInvalidated()
     {
-        $session = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Session\SessionInterface::class)->getMock();
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('invalidate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::INVALIDATE);
@@ -56,7 +59,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     private function getRequest($session = null)
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $request = $this->createMock(Request::class);
 
         if (null !== $session) {
             $request->expects($this->any())->method('getSession')->willReturn($session);
@@ -67,6 +70,6 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     private function getToken()
     {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        return $this->createMock(TokenInterface::class);
     }
 }

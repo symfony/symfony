@@ -44,7 +44,7 @@ class ServerLogHandlerTest extends TestCase
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999');
         $this->assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter(),
-            '-getFormatter returns VarDumperFormatter by default'
+            '->getFormatter returns VarDumperFormatter by default'
         );
     }
 

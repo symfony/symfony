@@ -14,6 +14,7 @@ namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
@@ -67,7 +68,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
             array_map('spl_autoload_register', $autoloaders);
         }
 
-        $this->assertInstanceOf(\Symfony\Component\Debug\Exception\ClassNotFoundException::class, $exception);
+        $this->assertInstanceOf(ClassNotFoundException::class, $exception);
         $this->assertMatchesRegularExpression($translatedMessage, $exception->getMessage());
         $this->assertSame($error['type'], $exception->getSeverity());
         $this->assertSame($error['file'], $exception->getFile());
@@ -218,6 +219,6 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
         $handler = new ClassNotFoundFatalErrorHandler();
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
 
-        $this->assertInstanceOf(\Symfony\Component\Debug\Exception\ClassNotFoundException::class, $exception);
+        $this->assertInstanceOf(ClassNotFoundException::class, $exception);
     }
 }

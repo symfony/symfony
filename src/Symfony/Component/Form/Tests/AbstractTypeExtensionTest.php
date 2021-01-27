@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class AbstractTypeExtensionTest extends TestCase
@@ -21,7 +22,7 @@ class AbstractTypeExtensionTest extends TestCase
      */
     public function testImplementingNeitherGetExtendedTypeNorExtendsTypeThrowsException()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You need to implement the static getExtendedTypes() method when implementing the "Symfony\Component\Form\FormTypeExtensionInterface" in "Symfony\Component\Form\Tests\TypeExtensionWithoutExtendedTypes".');
         $extension = new TypeExtensionWithoutExtendedTypes();
         $extension->getExtendedType();

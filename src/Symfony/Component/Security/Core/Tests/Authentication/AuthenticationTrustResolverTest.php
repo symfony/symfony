@@ -124,7 +124,7 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getToken()
     {
-        return $this->getMockBuilder(TokenInterface::class)->getMock();
+        return $this->createMock(TokenInterface::class);
     }
 
     protected function getAnonymousToken()

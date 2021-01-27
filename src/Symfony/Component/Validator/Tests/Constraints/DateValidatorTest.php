@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DateValidatorTest extends ConstraintValidatorTestCase
@@ -60,7 +61,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Date());
     }
 

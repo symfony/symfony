@@ -13,6 +13,7 @@ namespace Symfony\Component\Process\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Sebastian Marek <proofek@gmail.com>
@@ -24,7 +25,7 @@ class ProcessFailedExceptionTest extends TestCase
      */
     public function testProcessFailedExceptionThrowsException()
     {
-        $process = $this->getMockBuilder(\Symfony\Component\Process\Process::class)->setMethods(['isSuccessful'])->setConstructorArgs([['php']])->getMock();
+        $process = $this->getMockBuilder(Process::class)->setMethods(['isSuccessful'])->setConstructorArgs([['php']])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
             ->willReturn(true);
@@ -48,7 +49,7 @@ class ProcessFailedExceptionTest extends TestCase
         $errorOutput = 'FATAL: Unexpected error';
         $workingDirectory = getcwd();
 
-        $process = $this->getMockBuilder(\Symfony\Component\Process\Process::class)->setMethods(['isSuccessful', 'getOutput', 'getErrorOutput', 'getExitCode', 'getExitCodeText', 'isOutputDisabled', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
+        $process = $this->getMockBuilder(Process::class)->setMethods(['isSuccessful', 'getOutput', 'getErrorOutput', 'getExitCode', 'getExitCodeText', 'isOutputDisabled', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
             ->willReturn(false);
@@ -96,7 +97,7 @@ class ProcessFailedExceptionTest extends TestCase
         $exitText = 'General error';
         $workingDirectory = getcwd();
 
-        $process = $this->getMockBuilder(\Symfony\Component\Process\Process::class)->setMethods(['isSuccessful', 'isOutputDisabled', 'getExitCode', 'getExitCodeText', 'getOutput', 'getErrorOutput', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
+        $process = $this->getMockBuilder(Process::class)->setMethods(['isSuccessful', 'isOutputDisabled', 'getExitCode', 'getExitCodeText', 'getOutput', 'getErrorOutput', 'getWorkingDirectory'])->setConstructorArgs([[$cmd]])->getMock();
         $process->expects($this->once())
             ->method('isSuccessful')
             ->willReturn(false);

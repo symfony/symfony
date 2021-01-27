@@ -153,7 +153,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
-        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container = $this->createMock(Container::class);
         $container->expects($this->once())
             ->method('has')
             ->with(ControllerTestService::class)
@@ -177,7 +177,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
-        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container = $this->createMock(Container::class);
         $container->expects($this->once())
             ->method('has')
             ->with('app.my_controller')
@@ -232,7 +232,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 
     protected function createMockContainer()
     {
-        return $this->getMockBuilder(ContainerInterface::class)->getMock();
+        return $this->createMock(ContainerInterface::class);
     }
 }
 

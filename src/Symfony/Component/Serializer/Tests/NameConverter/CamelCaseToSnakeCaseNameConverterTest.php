@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\NameConverter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -22,7 +23,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     public function testInterface()
     {
         $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
-        $this->assertInstanceOf(\Symfony\Component\Serializer\NameConverter\NameConverterInterface::class, $attributeMetadata);
+        $this->assertInstanceOf(NameConverterInterface::class, $attributeMetadata);
     }
 
     /**

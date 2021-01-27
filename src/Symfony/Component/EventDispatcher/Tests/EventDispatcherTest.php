@@ -228,7 +228,7 @@ class EventDispatcherTest extends TestCase
         $listeners = $this->dispatcher->getListeners('pre.foo');
         $this->assertTrue($this->dispatcher->hasListeners(self::preFoo));
         $this->assertCount(2, $listeners);
-        $this->assertInstanceOf(\Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithPriorities::class, $listeners[0][0]);
+        $this->assertInstanceOf(TestEventSubscriberWithPriorities::class, $listeners[0][0]);
     }
 
     public function testAddSubscriberWithMultipleListeners()

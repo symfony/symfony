@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -138,7 +139,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $constraint = new Isbn(true);
 
         $this->validator->validate(new \stdClass(), $constraint);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Timezone;
 use Symfony\Component\Validator\Constraints\TimezoneValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -42,7 +43,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Timezone());
     }
 

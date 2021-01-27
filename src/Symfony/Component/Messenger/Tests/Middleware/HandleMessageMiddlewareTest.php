@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -115,7 +116,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testThrowsNoHandlerException()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\NoHandlerForMessageException::class);
+        $this->expectException(NoHandlerForMessageException::class);
         $this->expectExceptionMessage('No handler for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage"');
         $middleware = new HandleMessageMiddleware(new HandlersLocator([]));
 

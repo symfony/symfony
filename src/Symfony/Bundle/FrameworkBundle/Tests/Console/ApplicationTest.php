@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -23,14 +24,18 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
     public function testBundleInterfaceImplementation()
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\BundleInterface::class)->getMock();
+        $bundle = $this->createMock(BundleInterface::class);
 
         $kernel = $this->getKernel([$bundle], true);
 
@@ -110,7 +115,7 @@ class ApplicationTest extends TestCase
      */
     public function testBundleCommandsHaveRightContainer()
     {
-        $command = $this->getMockForAbstractClass(\Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand::class, ['foo'], '', true, true, true, ['setContainer']);
+        $command = $this->getMockForAbstractClass(ContainerAwareCommand::class, ['foo'], '', true, true, true, ['setContainer']);
         $command->setCode(function () {});
         $command->expects($this->exactly(2))->method('setContainer');
 
@@ -149,7 +154,7 @@ class ApplicationTest extends TestCase
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
         $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
@@ -177,7 +182,7 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
@@ -206,7 +211,7 @@ class ApplicationTest extends TestCase
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
         $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');
         $kernel
             ->method('getBundles')
@@ -259,10 +264,10 @@ class ApplicationTest extends TestCase
 
     private function getKernel(array $bundles, $useDispatcher = false)
     {
-        $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerInterface::class)->getMock();
+        $container = $this->createMock(ContainerInterface::class);
 
         if ($useDispatcher) {
-            $dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
+            $dispatcher = $this->createMock(EventDispatcherInterface::class);
             $dispatcher
                 ->expects($this->atLeastOnce())
                 ->method('dispatch')
@@ -287,7 +292,7 @@ class ApplicationTest extends TestCase
             ->willReturnOnConsecutiveCalls([], [])
         ;
 
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');
         $kernel
             ->expects($this->any())
@@ -305,7 +310,7 @@ class ApplicationTest extends TestCase
 
     private function createBundleMock(array $commands)
     {
-        $bundle = $this->getMockBuilder(\Symfony\Component\HttpKernel\Bundle\Bundle::class)->getMock();
+        $bundle = $this->createMock(Bundle::class);
         $bundle
             ->expects($this->once())
             ->method('registerCommands')

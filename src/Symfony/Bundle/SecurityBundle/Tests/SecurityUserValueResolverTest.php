@@ -37,8 +37,8 @@ class SecurityUserValueResolverTest extends TestCase
 
     public function testResolveNoUser()
     {
-        $mock = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $mock = $this->createMock(UserInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -59,8 +59,8 @@ class SecurityUserValueResolverTest extends TestCase
 
     public function testResolve()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())->method('getUser')->willReturn($user);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -74,8 +74,8 @@ class SecurityUserValueResolverTest extends TestCase
 
     public function testIntegration()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())->method('getUser')->willReturn($user);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -86,7 +86,7 @@ class SecurityUserValueResolverTest extends TestCase
 
     public function testIntegrationNoUser()
     {
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BooleanNode;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 class BooleanNodeTest extends TestCase
 {
@@ -51,7 +52,7 @@ class BooleanNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $node = new BooleanNode('test');
         $node->normalize($value);
     }

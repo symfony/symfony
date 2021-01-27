@@ -26,6 +26,8 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Statement;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 
@@ -92,7 +94,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -107,7 +109,7 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnectionMock();
 
         if (class_exists(Exception::class)) {
@@ -256,13 +258,13 @@ class ConnectionTest extends TestCase
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 

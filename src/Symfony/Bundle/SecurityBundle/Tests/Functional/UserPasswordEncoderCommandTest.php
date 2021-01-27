@@ -301,7 +301,7 @@ EOTXT
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured encoders for the "security" extension.');
         $application = new ConsoleApplication();
-        $application->add(new UserPasswordEncoderCommand($this->getMockBuilder(EncoderFactoryInterface::class)->getMock(), []));
+        $application->add(new UserPasswordEncoderCommand($this->createMock(EncoderFactoryInterface::class), []));
 
         $passwordEncoderCommand = $application->find('security:encode-password');
 

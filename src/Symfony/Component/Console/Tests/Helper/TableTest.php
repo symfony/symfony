@@ -12,6 +12,8 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -808,7 +810,7 @@ TABLE;
 
     public function testThrowsWhenTheCellInAnArray()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -983,7 +985,7 @@ TABLE;
 
     public function testAppendRowWithoutSectionOutput()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput" when calling "Symfony\Component\Console\Helper\Table::appendRow".');
         $table = new Table($this->getOutputStream());
 
@@ -1024,7 +1026,7 @@ TABLE;
 
     public function testIsNotDefinedStyleException()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Style "absent" is not defined.');
         $table = new Table($this->getOutputStream());
         $table->setStyle('absent');
@@ -1032,7 +1034,7 @@ TABLE;
 
     public function testGetStyleDefinition()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Style "absent" is not defined.');
         Table::getStyleDefinition('absent');
     }

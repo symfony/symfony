@@ -13,7 +13,10 @@ namespace Symfony\Component\Form\Tests\Extension\DataCollector\Type;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener;
+use Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface;
 use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
+use Symfony\Component\Form\Test\FormBuilderInterface;
 
 class DataCollectorTypeExtensionTest extends TestCase
 {
@@ -29,7 +32,7 @@ class DataCollectorTypeExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dataCollector = $this->getMockBuilder(\Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface::class)->getMock();
+        $this->dataCollector = $this->createMock(FormDataCollectorInterface::class);
         $this->extension = new DataCollectorTypeExtension($this->dataCollector);
     }
 
@@ -43,10 +46,10 @@ class DataCollectorTypeExtensionTest extends TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder(\Symfony\Component\Form\Test\FormBuilderInterface::class)->getMock();
+        $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->atLeastOnce())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf(\Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener::class));
+            ->with($this->isInstanceOf(DataCollectorListener::class));
 
         $this->extension->buildForm($builder, []);
     }

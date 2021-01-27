@@ -20,6 +20,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * @group legacy
@@ -49,13 +50,13 @@ class TimedPhpEngineTest extends TestCase
 
     private function getContainer(): Container
     {
-        return $this->getMockBuilder(Container::class)->getMock();
+        return $this->createMock(Container::class);
     }
 
     private function getTemplateNameParser(): TemplateNameParserInterface
     {
-        $templateReference = $this->getMockBuilder(\Symfony\Component\Templating\TemplateReferenceInterface::class)->getMock();
-        $templateNameParser = $this->getMockBuilder(TemplateNameParserInterface::class)->getMock();
+        $templateReference = $this->createMock(TemplateReferenceInterface::class);
+        $templateNameParser = $this->createMock(TemplateNameParserInterface::class);
         $templateNameParser->expects($this->any())
             ->method('parse')
             ->willReturn($templateReference);
@@ -65,9 +66,7 @@ class TimedPhpEngineTest extends TestCase
 
     private function getGlobalVariables(): GlobalVariables
     {
-        return $this->getMockBuilder(GlobalVariables::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(GlobalVariables::class);
     }
 
     private function getStorage(): StringStorage
@@ -92,13 +91,11 @@ class TimedPhpEngineTest extends TestCase
 
     private function getStopwatchEvent(): StopwatchEvent
     {
-        return $this->getMockBuilder(StopwatchEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(StopwatchEvent::class);
     }
 
     private function getStopwatch(): Stopwatch
     {
-        return $this->getMockBuilder(Stopwatch::class)->getMock();
+        return $this->createMock(Stopwatch::class);
     }
 }

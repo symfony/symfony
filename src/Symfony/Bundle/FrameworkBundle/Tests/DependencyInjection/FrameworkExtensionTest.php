@@ -27,6 +27,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -37,10 +38,12 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -54,7 +57,10 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -331,28 +337,28 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testWorkflowAreValidated()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
+        $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" were found on StateMachine "my_workflow".');
         $this->createContainerFromFile('workflow_not_valid');
     }
 
     public function testWorkflowCannotHaveBothTypeAndService()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"type" and "service" cannot be used together.');
         $this->createContainerFromFile('workflow_legacy_with_type_and_service');
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" and "support_strategy" cannot be used together.');
         $this->createContainerFromFile('workflow_with_support_and_support_strategy');
     }
 
     public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" or "support_strategy" should be configured.');
         $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
@@ -362,7 +368,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testWorkflowCannotHaveBothArgumentsAndService()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"arguments" and "service" cannot be used together.');
         $this->createContainerFromFile('workflow_legacy_with_arguments_and_service');
     }
@@ -524,7 +530,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testRouterRequiresResourceOption()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['router' => true]], $container);
@@ -838,19 +844,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
 
         $files = array_map('realpath', $options['resource_files']['en']);
-        $ref = new \ReflectionClass(\Symfony\Component\Validator\Validation::class);
+        $ref = new \ReflectionClass(Validation::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
-        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
+        $ref = new \ReflectionClass(Form::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass(\Symfony\Component\Security\Core\Security::class);
+        $ref = new \ReflectionClass(Security::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
@@ -921,7 +927,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testTemplatingRequiresAtLeastOneEngine()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['templating' => null]], $container);
@@ -932,7 +938,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
         $projectDir = $container->getParameter('kernel.project_dir');
 
-        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
+        $ref = new \ReflectionClass(Form::class);
         $xmlMappings = [
             \dirname($ref->getFileName()).'/Resources/config/validation.xml',
             strtr($projectDir.'/config/validator/foo.xml', '/', \DIRECTORY_SEPARATOR),
@@ -969,7 +975,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('validation_annotations', ['kernel.charset' => 'UTF-8'], false);
 
-        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\ValidatorInterface::class, $container->get('validator'));
+        $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator'));
     }
 
     public function testAnnotations()
@@ -1097,7 +1103,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testCannotConfigureStrictEmailAndEmailValidationModeAtTheSameTime()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"strict_email" and "email_validation_mode" cannot be used together.');
         $this->createContainerFromFile('validation_strict_email_and_validation_mode');
     }

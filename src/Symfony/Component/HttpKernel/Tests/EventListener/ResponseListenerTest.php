@@ -32,7 +32,7 @@ class ResponseListenerTest extends TestCase
         $listener = new ResponseListener('UTF-8');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
 
-        $this->kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $this->kernel = $this->createMock(HttpKernelInterface::class);
     }
 
     protected function tearDown(): void

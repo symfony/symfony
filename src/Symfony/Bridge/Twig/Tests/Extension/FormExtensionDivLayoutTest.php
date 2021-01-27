@@ -20,6 +20,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
@@ -53,7 +54,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(\Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class)->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -181,7 +182,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(\Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class)->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory

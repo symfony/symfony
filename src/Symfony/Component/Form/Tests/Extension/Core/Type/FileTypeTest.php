@@ -25,7 +25,7 @@ class FileTypeTest extends BaseTypeTest
 
     protected function getExtensions()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);

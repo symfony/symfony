@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
@@ -34,7 +35,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         \Locale::setDefault('en');
 
-        $this->csrfTokenManager = $this->getMockBuilder(\Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class)->getMock();
+        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
         parent::setUp();
     }

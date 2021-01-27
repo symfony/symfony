@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\IntegerNode;
 
 class IntegerNodeTest extends TestCase
@@ -52,7 +53,7 @@ class IntegerNodeTest extends TestCase
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $node = new IntegerNode('test');
         $node->normalize($value);
     }

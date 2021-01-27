@@ -25,7 +25,7 @@ class ServerDumperTest extends TestCase
 
     public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable()
     {
-        $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
+        $wrappedDumper = $this->createMock(DataDumperInterface::class);
 
         $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper);
 
@@ -39,7 +39,7 @@ class ServerDumperTest extends TestCase
 
     public function testDump()
     {
-        $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
+        $wrappedDumper = $this->createMock(DataDumperInterface::class);
         $wrappedDumper->expects($this->never())->method('dump'); // test wrapped dumper is not used
 
         $cloner = new VarCloner();

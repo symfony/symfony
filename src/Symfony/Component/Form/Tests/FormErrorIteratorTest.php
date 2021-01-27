@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 class FormErrorIteratorTest extends TestCase
@@ -33,7 +34,7 @@ class FormErrorIteratorTest extends TestCase
             'form',
             null,
             new EventDispatcher(),
-            $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock(),
+            $this->createMock(FormFactoryInterface::class),
             []
         );
 

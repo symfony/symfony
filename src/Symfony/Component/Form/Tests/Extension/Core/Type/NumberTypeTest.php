@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberTypeTest extends BaseTypeTest
@@ -200,7 +201,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testGroupingNotAllowedWithHtml5Widget()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'grouping' => true,
             'html5' => true,

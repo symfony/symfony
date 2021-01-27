@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\Caster\ConstStub;
+use Symfony\Component\VarDumper\Caster\EnumStub;
 use Symfony\Component\VarDumper\Caster\PdoCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -34,10 +36,10 @@ class PdoCasterTest extends TestCase
 
         $cast = PdoCaster::castPdo($pdo, [], new Stub(), false);
 
-        $this->assertInstanceOf(\Symfony\Component\VarDumper\Caster\EnumStub::class, $cast["\0~\0attributes"]);
+        $this->assertInstanceOf(EnumStub::class, $cast["\0~\0attributes"]);
 
         $attr = $cast["\0~\0attributes"] = $cast["\0~\0attributes"]->value;
-        $this->assertInstanceOf(\Symfony\Component\VarDumper\Caster\ConstStub::class, $attr['CASE']);
+        $this->assertInstanceOf(ConstStub::class, $attr['CASE']);
         $this->assertSame('NATURAL', $attr['CASE']->class);
         $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 

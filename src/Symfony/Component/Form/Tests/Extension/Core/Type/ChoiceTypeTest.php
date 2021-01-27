@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
@@ -82,7 +84,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => new \stdClass(),
         ]);
@@ -90,7 +92,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_loader' => new \stdClass(),
         ]);
@@ -98,7 +100,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
@@ -1802,7 +1804,8 @@ class ChoiceTypeTest extends BaseTypeTest
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(
+            FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'choices' => [],
         ]));
     }

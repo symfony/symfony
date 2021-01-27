@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
@@ -62,14 +63,14 @@ class PdoStoreTest extends AbstractStoreTest
 
     public function testInvalidTtl()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
+        $this->expectException(InvalidTtlException::class);
         $store = $this->getStore();
         $store->putOffExpiration(new Key('toto'), 0.1);
     }
 
     public function testInvalidTtlConstruct()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidTtlException::class);
+        $this->expectException(InvalidTtlException::class);
 
         return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
     }

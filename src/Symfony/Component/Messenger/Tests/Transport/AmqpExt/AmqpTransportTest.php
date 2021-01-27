@@ -34,13 +34,13 @@ class AmqpTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock(),
-            $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock()
+            $serializer = $this->createMock(SerializerInterface::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
 
-        $amqpEnvelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(['my' => 'header']);
 
@@ -54,8 +54,8 @@ class AmqpTransportTest extends TestCase
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null): AmqpTransport
     {
-        $serializer = $serializer ?: $this->getMockBuilder(SerializerInterface::class)->getMock();
-        $connection = $connection ?: $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $serializer = $serializer ?: $this->createMock(SerializerInterface::class);
+        $connection = $connection ?: $this->createMock(Connection::class);
 
         return new AmqpTransport($connection, $serializer);
     }

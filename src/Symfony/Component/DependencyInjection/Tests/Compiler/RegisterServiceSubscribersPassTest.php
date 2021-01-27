@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
@@ -39,7 +40,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 {
     public function testInvalidClass()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service "foo" must implement interface "Symfony\Contracts\Service\ServiceSubscriberInterface".');
         $container = new ContainerBuilder();
 
@@ -53,7 +54,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
     public function testInvalidAttributes()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "bar" given for service "foo".');
         $container = new ContainerBuilder();
 
@@ -127,7 +128,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
     public function testExtraServiceSubscriber()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service key "test" does not exist in the map returned by "Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber::getSubscribedServices()" for service "foo_service".');
         $container = new ContainerBuilder();
         $container->register('foo_service', TestServiceSubscriber::class)

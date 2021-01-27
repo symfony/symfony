@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Parser\Parser;
@@ -37,7 +38,7 @@ class TranslatorTest extends TestCase
 
     public function testCssToXPathPseudoElement()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->cssToXPath('e::first-line');
@@ -45,7 +46,7 @@ class TranslatorTest extends TestCase
 
     public function testGetExtensionNotExistsExtension()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $translator->getExtension('fake');
@@ -53,7 +54,7 @@ class TranslatorTest extends TestCase
 
     public function testAddCombinationNotExistsExtension()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $parser = new Parser();
@@ -64,7 +65,7 @@ class TranslatorTest extends TestCase
 
     public function testAddFunctionNotExistsFunction()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -74,7 +75,7 @@ class TranslatorTest extends TestCase
 
     public function testAddPseudoClassNotExistsClass()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
@@ -83,7 +84,7 @@ class TranslatorTest extends TestCase
 
     public function testAddAttributeMatchingClassNotExistsClass()
     {
-        $this->expectException(\Symfony\Component\CssSelector\Exception\ExpressionErrorException::class);
+        $this->expectException(ExpressionErrorException::class);
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();

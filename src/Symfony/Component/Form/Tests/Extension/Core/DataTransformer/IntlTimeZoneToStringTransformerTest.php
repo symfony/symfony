@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTransformer;
 
 /**
@@ -43,13 +44,13 @@ class IntlTimeZoneToStringTransformerTest extends TestCase
 
     public function testInvalidTimezone()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer())->transform(1);
     }
 
     public function testUnknownTimezone()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
 }

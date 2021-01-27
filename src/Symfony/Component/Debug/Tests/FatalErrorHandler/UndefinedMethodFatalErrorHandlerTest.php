@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\UndefinedMethodException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 
 /**
@@ -28,7 +29,7 @@ class UndefinedMethodFatalErrorHandlerTest extends TestCase
         $handler = new UndefinedMethodFatalErrorHandler();
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
 
-        $this->assertInstanceOf(\Symfony\Component\Debug\Exception\UndefinedMethodException::class, $exception);
+        $this->assertInstanceOf(UndefinedMethodException::class, $exception);
         $this->assertSame($translatedMessage, $exception->getMessage());
         $this->assertSame($error['type'], $exception->getSeverity());
         $this->assertSame($error['file'], $exception->getFile());

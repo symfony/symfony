@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ExtensionTest extends TestCase
@@ -36,7 +37,7 @@ class ExtensionTest extends TestCase
 
     public function testIsConfigEnabledOnNonEnableableConfig()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The config array has no \'enabled\' key.');
         $extension = new EnableableExtension();
 

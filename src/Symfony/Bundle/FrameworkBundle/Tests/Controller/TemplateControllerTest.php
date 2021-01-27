@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Twig\Environment;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -22,7 +23,7 @@ class TemplateControllerTest extends TestCase
 {
     public function testTwig()
     {
-        $twig = $this->getMockBuilder(\Twig\Environment::class)->disableOriginalConstructor()->getMock();
+        $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
@@ -36,7 +37,7 @@ class TemplateControllerTest extends TestCase
      */
     public function testTemplating()
     {
-        $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
+        $templating = $this->createMock(EngineInterface::class);
         $templating->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController(null, $templating);

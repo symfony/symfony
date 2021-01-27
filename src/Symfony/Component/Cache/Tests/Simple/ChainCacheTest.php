@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Simple;
 
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Cache\Simple\ChainCache;
 use Symfony\Component\Cache\Simple\FilesystemCache;
@@ -30,14 +31,14 @@ class ChainCacheTest extends CacheTestCase
 
     public function testEmptyCachesException()
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one cache must be specified.');
         new ChainCache([]);
     }
 
     public function testInvalidCacheException()
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" does not implement');
         new ChainCache([new \stdClass()]);
     }

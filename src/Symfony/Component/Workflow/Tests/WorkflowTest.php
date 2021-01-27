@@ -8,7 +8,9 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
+use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
+use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
@@ -22,17 +24,17 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithInvalidStoreReturn()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".');
         $subject = new Subject();
-        $workflow = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
+        $workflow = new Workflow(new Definition([], []), $this->createMock(MarkingStoreInterface::class));
 
         $workflow->getMarking($subject);
     }
 
     public function testGetMarkingWithEmptyDefinition()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The Marking is empty and there is no initial place for workflow "unnamed".');
         $subject = new Subject();
         $workflow = new Workflow(new Definition([], []), new MethodMarkingStore());
@@ -42,7 +44,7 @@ class WorkflowTest extends TestCase
 
     public function testGetMarkingWithImpossiblePlace()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "nope" is not valid for workflow "unnamed".');
         $subject = new Subject();
         $subject->setMarking(['nope' => 1]);
@@ -169,7 +171,7 @@ class WorkflowTest extends TestCase
 
     public function testBuildTransitionBlockerListReturnsUndefinedTransition()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\UndefinedTransitionException::class);
+        $this->expectException(UndefinedTransitionException::class);
         $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createSimpleWorkflowDefinition();
         $subject = new Subject();
@@ -249,7 +251,7 @@ class WorkflowTest extends TestCase
 
     public function testApplyWithNotExisingTransition()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\UndefinedTransitionException::class);
+        $this->expectException(UndefinedTransitionException::class);
         $this->expectExceptionMessage('Transition "404 Not Found" is not defined for workflow "unnamed".');
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();

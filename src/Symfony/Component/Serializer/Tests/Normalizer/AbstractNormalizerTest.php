@@ -8,7 +8,9 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -39,8 +41,8 @@ class AbstractNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader = $this->getMockBuilder(\Symfony\Component\Serializer\Mapping\Loader\LoaderChain::class)->setConstructorArgs([[]])->getMock();
-        $this->classMetadata = $this->getMockBuilder(\Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory::class)->setConstructorArgs([$loader])->getMock();
+        $loader = $this->getMockBuilder(LoaderChain::class)->setConstructorArgs([[]])->getMock();
+        $this->classMetadata = $this->getMockBuilder(ClassMetadataFactory::class)->setConstructorArgs([$loader])->getMock();
         $this->normalizer = new AbstractNormalizerDummy($this->classMetadata);
     }
 

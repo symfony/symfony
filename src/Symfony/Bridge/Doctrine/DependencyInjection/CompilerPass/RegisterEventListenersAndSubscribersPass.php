@@ -85,7 +85,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
                 if (!isset($managerDefs[$con])) {
                     $managerDef = $parentDef = $this->getEventManagerDef($container, $con);
-                    while ($parentDef instanceof ChildDefinition) {
+                    while (!$parentDef->getClass() && $parentDef instanceof ChildDefinition) {
                         $parentDef = $container->findDefinition($parentDef->getParent());
                     }
                     $managerClass = $container->getParameterBag()->resolveValue($parentDef->getClass());

@@ -121,6 +121,19 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithMixDsnQueryOptions()
+    {
+        $this->assertEquals(
+            Connection::fromDsn('redis://localhost/queue/group1?serializer=2', ['consumer' => 'specific-consumer']),
+            Connection::fromDsn('redis://localhost/queue/group1/specific-consumer?serializer=2')
+        );
+
+        $this->assertEquals(
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['consumer' => 'specific-consumer']),
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1')
+        );
+    }
+
     /**
      * @group legacy
      */

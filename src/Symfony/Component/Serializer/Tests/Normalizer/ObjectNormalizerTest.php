@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\AttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
@@ -118,6 +119,18 @@ class ObjectNormalizerTest extends TestCase
     public function testNormalizeObjectWithUninitializedProperties()
     {
         $obj = new Php74Dummy();
+        $this->assertEquals(
+            ['initializedProperty' => 'defaultValue'],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testNormalizeObjectWithUninitializedPrivateProperties()
+    {
+        $obj = new Php74DummyPrivate();
         $this->assertEquals(
             ['initializedProperty' => 'defaultValue'],
             $this->normalizer->normalize($obj, 'any')

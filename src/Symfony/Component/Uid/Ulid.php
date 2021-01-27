@@ -104,24 +104,26 @@ class Ulid extends AbstractUid
         return $this->uid;
     }
 
-    /**
-     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
-     */
-    public function getTime(): float
+    public function getDateTime(): \DateTimeImmutable
     {
         $time = strtr(substr($this->uid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
         if (\PHP_INT_SIZE >= 8) {
-            return hexdec(base_convert($time, 32, 16)) / 1000;
+            $time = (string) hexdec(base_convert($time, 32, 16));
+        } else {
+            $time = sprintf('%02s%05s%05s',
+                base_convert(substr($time, 0, 2), 32, 16),
+                base_convert(substr($time, 2, 4), 32, 16),
+                base_convert(substr($time, 6, 4), 32, 16)
+            );
+            $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
         }
 
-        $time = sprintf('%02s%05s%05s',
-            base_convert(substr($time, 0, 2), 32, 16),
-            base_convert(substr($time, 2, 4), 32, 16),
-            base_convert(substr($time, 6, 4), 32, 16)
-        );
+        if (4 > \strlen($time)) {
+            $time = str_pad($time, 4, '0', \STR_PAD_LEFT);
+        }
 
-        return BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10) / 1000;
+        return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
     private static function generate(): string

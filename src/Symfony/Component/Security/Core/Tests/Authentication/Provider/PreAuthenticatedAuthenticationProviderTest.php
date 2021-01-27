@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -30,7 +31,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $this->assertTrue($provider->supports($this->getSupportedToken()));
         $this->assertFalse($provider->supports($this->createMock(TokenInterface::class)));
 
-        $token = $this->createMock(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class);
+        $token = $this->createMock(PreAuthenticatedToken::class);
         $token
             ->expects($this->once())
             ->method('getProviderKey')
@@ -66,7 +67,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider($user);
 
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
-        $this->assertInstanceOf(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class, $token);
+        $this->assertInstanceOf(PreAuthenticatedToken::class, $token);
         $this->assertEquals('pass', $token->getCredentials());
         $this->assertEquals('key', $token->getProviderKey());
         $this->assertEquals([], $token->getRoleNames());
@@ -92,7 +93,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getProviderKey'])->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder(PreAuthenticatedToken::class)->setMethods(['getUser', 'getCredentials', 'getProviderKey'])->disableOriginalConstructor()->getMock();
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')

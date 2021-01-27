@@ -50,14 +50,9 @@ class UuidV6 extends Uuid
         }
     }
 
-    /**
-     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
-     */
-    public function getTime(): float
+    public function getDateTime(): \DateTimeImmutable
     {
-        $time = '0'.substr($this->uid, 0, 8).substr($this->uid, 9, 4).substr($this->uid, 15, 3);
-
-        return BinaryUtil::timeToFloat($time);
+        return BinaryUtil::timeToDateTime('0'.substr($this->uid, 0, 8).substr($this->uid, 9, 4).substr($this->uid, 15, 3));
     }
 
     public function getNode(): string

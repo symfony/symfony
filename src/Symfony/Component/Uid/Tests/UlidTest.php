@@ -76,13 +76,18 @@ class UlidTest extends TestCase
     /**
      * @group time-sensitive
      */
-    public function testGetTime()
+    public function testGetDateTime()
     {
         $time = microtime(false);
         $ulid = new Ulid();
         $time = substr($time, 11).substr($time, 1, 4);
 
-        $this->assertSame((float) $time, $ulid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
+
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new Ulid('000000000079KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.001'), (new Ulid('000000000179KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.654'), (new Ulid('7ZZZZZZZZY79KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.655'), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
     }
 
     public function testIsValid()

@@ -113,7 +113,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testResolveEnvRequiresStrings()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
 
         $bag = new EnvPlaceholderParameterBag();
@@ -124,7 +124,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
 
     public function testGetDefaultScalarEnv()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
 
         $bag = new EnvPlaceholderParameterBag();

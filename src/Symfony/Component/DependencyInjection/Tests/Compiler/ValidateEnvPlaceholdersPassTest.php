@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
@@ -59,7 +60,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "float" given to "env(FLOATISH)".');
 
         $container = new ContainerBuilder();
@@ -219,7 +220,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.');
 
         $container = new ContainerBuilder();

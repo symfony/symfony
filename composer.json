@@ -165,11 +165,13 @@
     "repositories": [
         {
             "type": "path",
-            "url": "src/Symfony/Contracts"
+            "url": "src/Symfony/Contracts",
+            "options": {
+                "versions": {
+                    "symfony/contracts": "2.1.x-dev"
+                }
+            }
         }
     ],
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.1"
-    }
+    "minimum-stability": "dev"
 }

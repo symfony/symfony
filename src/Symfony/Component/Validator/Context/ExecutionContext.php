@@ -364,4 +364,9 @@ class ExecutionContext implements ExecutionContextInterface
 
         return $this->cachedObjectsRefs[$object];
     }
+
+    public function __clone()
+    {
+        $this->violations = clone $this->violations;
+    }
 }

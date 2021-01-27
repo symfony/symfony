@@ -74,7 +74,7 @@ class ArrayDenormalizerTest extends TestCase
      */
     public function testDenormalizeLegacy()
     {
-        $serializer = $this->getMockBuilder(Serializer::class)->getMock();
+        $serializer = $this->createMock(Serializer::class);
 
         $serializer->expects($this->exactly(2))
             ->method('denormalize')

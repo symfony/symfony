@@ -49,7 +49,7 @@ final class AmazonSnsTransport extends AbstractTransport
 
     protected function doSend(MessageInterface $message): SentMessage
     {
-        if (!$message instanceof SmsMessage && !$message instanceof ChatMessage) {
+        if (!$message instanceof SmsMessage && !($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions)) {
             throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" and "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, ChatMessage::class, get_debug_type($message)));
         }
 

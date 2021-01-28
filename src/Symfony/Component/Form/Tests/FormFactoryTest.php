@@ -76,7 +76,7 @@ class FormFactoryTest extends TestCase
     {
         $options = ['a' => '1', 'b' => '2'];
         $resolvedOptions = ['a' => '2', 'b' => '3'];
-        $resolvedType = $this->getMockResolvedType();
+        $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getType')
@@ -104,7 +104,7 @@ class FormFactoryTest extends TestCase
         $givenOptions = ['a' => '1', 'b' => '2'];
         $expectedOptions = array_merge($givenOptions, ['data' => 'DATA']);
         $resolvedOptions = ['a' => '2', 'b' => '3', 'data' => 'DATA'];
-        $resolvedType = $this->getMockResolvedType();
+        $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getType')
@@ -131,7 +131,7 @@ class FormFactoryTest extends TestCase
     {
         $options = ['a' => '1', 'b' => '2', 'data' => 'CUSTOM'];
         $resolvedOptions = ['a' => '2', 'b' => '3', 'data' => 'CUSTOM'];
-        $resolvedType = $this->getMockResolvedType();
+        $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getType')
@@ -196,7 +196,7 @@ class FormFactoryTest extends TestCase
     {
         $options = ['a' => '1', 'b' => '2'];
         $resolvedOptions = ['a' => '2', 'b' => '3'];
-        $resolvedType = $this->getMockResolvedType();
+        $resolvedType = $this->createMock(ResolvedFormTypeInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getType')
@@ -469,10 +469,5 @@ class FormFactoryTest extends TestCase
             ->setMethods($methods)
             ->setConstructorArgs([$this->registry])
             ->getMock();
-    }
-
-    private function getMockResolvedType()
-    {
-        return $this->createMock(ResolvedFormTypeInterface::class);
     }
 }

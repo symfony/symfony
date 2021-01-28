@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-18T21:03:16Z
+
+hmmm what's about renaming service `session` into `.sesion`, and create a deprecated alias `sesion` pointing to `.session`
+
+In that way `session` is deprecated. but still overridable or injectable without drawback.
+
+internal services will inject the `.session` service to not trigger deprecation.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-10-19T06:49:32Z
+
+internal services should be refactored IMHO to use the new approach :) if the session service itself is deprecated, no need for an alias id say.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-19T08:08:40Z
+
+>  if the session service itself is deprecated, no need for an alias id say.
+
+issue is, we can't register 2 `Session` instances at the same time.
+If we deprecate `session`, it can't be used internally (otherwise we'll trigger deprecation). That's why I setup the new `FactorySessionListener`.
+BUT if people still use the session service (ie. injecting in the app's services) the application will break (because 2 distinguished instance of sessions are created by both the App and Symfony Internally).
+
+A solution would be to check if the service is used to decide if the application should keep the old deprecated `session` service or if symfony internal's services should use the new mechanism. But checking if a service is used sounds very complex.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-10-19T08:11:38Z
+
+> it can't be used internally
+
+and shouldnt also :)
+
+cant we create a deprecated service factory instead? `session: { factory: ['@request_stack', 'getSession'] }`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2020-10-19T08:18:10Z
+
+Ah, i figured. If the user created an overridden/independent `session` service, we need to account for it still.
+
+Sounds like we need a check  a la `if ($this->sessionService !== $requestStack->getSession()) { /* deprecated case */ }`, but im not sure this will trigger a depraction for the deprecated service, if so we need an intermediary `.session` service i agree.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-10-20T19:08:46Z
+
+Ready for review :-)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-11T20:29:37Z
+
+friendly ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-03T17:30:54Z
+
+last CI failure is about 5.x tests running with this PR. The test fail because the FrameworkBundle, now inject a RequestStack into the `SessionTokenStorage` class (which is fine). But nothing in the test-case initialize the RequestStack.
+
+When this PR will be merged, the tests should be updated in 4.4 branch (and probably many other tests/codes in lowers branch that will trigger deprecation)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-05T09:10:57Z
+
+SecurityBundle is failing and that looks related: deps=high here means 5.2 with the patched 5.x components as deps.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-05T09:25:43Z
+
+> SecurityBundle is failing and that looks related: deps=high here means 5.2 with the patched 5.x components as deps.
+
+The code is OK, but the test have to be updated in lower branches after merging this PR (See my comment. https://github.com/symfony/symfony/pull/38616#issuecomment-753650138)
+
+TL;DR the 5.x components injects a RequestStack (instead of SessionInterface), but the test does not simulate a living request (it results: the RequestStack does not contains a Session) but the tests calls method to ask CSRF to read the session.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-05T12:14:20Z
+
+> The code is OK, but the test have to be updated in lower branches after merging this PR
+
+This looks suspicious to me. If we need to update tests on lower branches, that means that we will break existing applications, doesn't it?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-05T12:58:05Z
+
+> > The code is OK, but the test have to be updated in lower branches after merging this PR
+>
+> This looks suspicious to me. If we need to update tests on lower branches, that means that we will break existing applications, doesn't it?
+
+mmh..., technically yes, if an application that run without request context (ie. a cli script) tries to set a token in the CSRF SessionTokenStorage, it now throws an exception telling there is no session. while the previous implementation used an empty session initialized by the DIC.
+
+Which IMHO does not make sens in a CLI script.
+I'm not sure we should provide a fallback to create a new Session.
+
+The failing test is this one: https://github.com/symfony/symfony/blob/3e376a1d8751f835d8290ea57bb9eff0bb1cf64e/src/Symfony/Bundle/SecurityBundle/Tests/Functional/LogoutTest.php#L47
+
+In this PR I fixed the test by simulating a request (in that case, the framework inject a session in the RequestStack)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-05T16:34:00Z
+
+please wait for a green CI before merging this PR. I changed a lot of things in deps, and I may impact the lower/higher builds.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-06T00:01:14Z
+
+CI green (remains the test that need to be updated mentioned here https://github.com/symfony/symfony/pull/38616#issuecomment-754620011)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-07T16:19:38Z
+
+> if an application that run without request context (ie. a cli script) tries to set a token in the CSRF SessionTokenStorage, it now throws an exception telling there is no session. while the previous implementation used an empty session initialized by the DIC.
+
+I'd prefer keeping the current way to be safe on the BC side.
+We could trigger a deprecation if you want instead for now.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-07T22:59:05Z
+
+> > if an application that run without request context (ie. a cli script) tries to set a token in the CSRF SessionTokenStorage, it now throws an exception telling there is no session. while the previous implementation used an empty session initialized by the DIC.
+>
+> I'd prefer keeping the current way to be safe on the BC side.
+> We could trigger a deprecation if you want instead for now.
+
+done

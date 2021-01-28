@@ -12,8 +12,6 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @experimental in 5.3
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
  * @see https://tools.ietf.org/html/rfc4122#appendix-C for details about namespaces

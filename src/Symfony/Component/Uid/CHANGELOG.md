@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * The component is not marked as `@experimental` anymore
  * Add `AbstractUid::fromBinary()`, `AbstractUid::fromBase58()`, `AbstractUid::fromBase32()` and `AbstractUid::fromRfc4122()`
  * [BC BREAK] Replace `UuidV1::getTime()`, `UuidV6::getTime()` and `Ulid::getTime()` by `UuidV1::getDateTime()`, `UuidV6::getDateTime()` and `Ulid::getDateTime()`
  * Add `Uuid::NAMESPACE_*` constants from RFC4122

@@ -11,49 +11,32 @@
 
 namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
-use Symfony\Component\Notifier\Transport\Dsn;
+use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-class AmazonSnsTransportFactoryTest extends TestCase
+class AmazonSnsTransportFactoryTest extends TransportFactoryTestCase
 {
-    public function testCreateWithDsn()
+    public function createFactory(): TransportFactoryInterface
     {
-        $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://auth@test.host?region=eu-west-3&profile=myProfile'));
-
-        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
+        return new AmazonSnsTransportFactory();
     }
 
-    public function testCreateWithoutCredentialDsn()
+    public function createProvider(): iterable
     {
-        $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://test.host?region=eu-west-3'));
-
-        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
+        yield ['sns://host.test?region=eu-west-1', 'sns://host.test'];
+        yield ['sns://host.test?region=eu-west-1', 'sns://accessId:accessKey@host.test'];
+        yield ['sns://host.test?region=eu-west-3', 'sns://host.test?region=eu-west-3'];
     }
 
-    public function testDefaultRegionIsCorrectlySet()
+    public function supportsProvider(): iterable
     {
-        $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://test.host'));
-
-        $this->assertSame('sns://test.host?region=eu-west-1', (string) $transport);
+        yield [true, 'sns://default'];
+        yield [false, 'not-sns://default'];
     }
 
-    public function testDsnWithRegionOption()
+    public function unsupportedSchemeProvider(): iterable
     {
-        $factory = new AmazonSnsTransportFactory();
-        $transport = $factory->create(Dsn::fromString('sns://test.host?region=eu-west-3'));
-
-        $this->assertSame('sns://test.host?region=eu-west-3', (string) $transport);
-    }
-
-    public function testSupportsSnsScheme()
-    {
-        $factory = new AmazonSnsTransportFactory();
-
-        $this->assertTrue($factory->supports(Dsn::fromString('sns://default')));
-        $this->assertFalse($factory->supports(Dsn::fromString('not-sns://default')));
+        yield ['not-sns://default'];
     }
 }

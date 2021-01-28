@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\AmazonSns;
 
 use AsyncAws\Sns\SnsClient;
 use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
@@ -50,7 +51,7 @@ final class AmazonSnsTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage && !($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions)) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" and "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, ChatMessage::class, get_debug_type($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, sprintf('%s or %s', SmsMessage::class, ChatMessage::class), $message);
         }
 
         if ($message instanceof ChatMessage) {

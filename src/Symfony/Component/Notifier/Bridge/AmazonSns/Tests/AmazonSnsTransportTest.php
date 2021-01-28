@@ -13,41 +13,38 @@ namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
 use AsyncAws\Sns\Result\PublishResponse;
 use AsyncAws\Sns\SnsClient;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsOptions;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransport;
-use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\TransportTestCase;
+use Symfony\Component\Notifier\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AmazonSnsTransportTest extends TestCase
+class AmazonSnsTransportTest extends TransportTestCase
 {
-    public function testSupportsMessageInterface()
+    public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
-
-        $this->assertTrue($transport->supports(new SmsMessage('0611223344', 'Hello!')));
-        $this->assertTrue($transport->supports(new ChatMessage('arn:topic', new AmazonSnsOptions())));
-        $this->assertFalse($transport->supports(new ChatMessage('arn:topic')));
-        $this->assertFalse($transport->supports($this->createMock(MessageInterface::class)));
+        return (new AmazonSnsTransport(new SnsClient(['region' => 'eu-west-3']), $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
-    public function testSendMessageWithUnsupportedMessageThrows()
+    public function toStringProvider(): iterable
     {
-        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
-
-        $this->expectException(LogicException::class);
-        $transport->send($this->createMock(MessageInterface::class));
+        yield ['sns://host.test?region=eu-west-3', $this->createTransport()];
     }
 
-    public function testChatMessageWithInvalidOptionsThrows()
+    public function supportedMessagesProvider(): iterable
     {
-        $transport = new AmazonSnsTransport($this->createMock(SnsClient::class));
+        yield [new SmsMessage('0601020304', 'Hello!')];
+        yield [new ChatMessage('Hello', new AmazonSnsOptions())];
+    }
 
-        $this->expectException(LogicException::class);
-        $transport->send(new ChatMessage('topic', $this->createMock(MessageOptionsInterface::class)));
+    public function unsupportedMessagesProvider(): iterable
+    {
+        yield [$this->createMock(MessageInterface::class)];
+        yield [new ChatMessage('hello', $this->createMock(MessageOptionsInterface::class))];
     }
 
     public function testSmsMessageOptions()

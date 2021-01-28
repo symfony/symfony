@@ -33,7 +33,7 @@ class ErrorListenerTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->once())
-            ->method('error')
+            ->method('critical')
             ->with('Error thrown while running command "{command}". Message: "{message}"', ['exception' => $error, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'])
         ;
 
@@ -48,7 +48,7 @@ class ErrorListenerTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger
             ->expects($this->once())
-            ->method('error')
+            ->method('critical')
             ->with('An error occurred while using the console. Message: "{message}"', ['exception' => $error, 'message' => 'An error occurred'])
         ;
 

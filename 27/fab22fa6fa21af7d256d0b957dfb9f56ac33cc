@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-28T14:02:37Z
+
+Oh, can you also please fix https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Debug/FatalErrorHandler/UndefinedMethodFatalErrorHandler.php?

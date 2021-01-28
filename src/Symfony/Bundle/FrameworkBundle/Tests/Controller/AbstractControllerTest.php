@@ -497,8 +497,14 @@ class AbstractControllerTest extends TestCase
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
 
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $container = new Container();
         $container->set('session', $session);
+        $container->set('request_stack', $requestStack);
 
         $controller = $this->createController();
         $controller->setContainer($container);

@@ -18,6 +18,7 @@ use Symfony\Component\BrowserKit\History;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
@@ -122,7 +123,7 @@ class KernelBrowser extends HttpKernelBrowser
 
         $token = new TestBrowserToken($user->getRoles(), $user);
         $token->setAuthenticated(true);
-        $session = $this->getContainer()->get('session');
+        $session = new Session($this->getContainer()->get('test.service_container')->get('session.storage'));
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 

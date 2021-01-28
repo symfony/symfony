@@ -20,10 +20,10 @@
         "symfony/security-core": "^4.4|^5.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "^4.4|^5.0"
+        "symfony/http-foundation": "^5.3"
     },
     "conflict": {
-        "symfony/http-foundation": "<4.4"
+        "symfony/http-foundation": "<5.3"
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."

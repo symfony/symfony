@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
@@ -37,7 +39,11 @@ class SessionTokenStorageTest extends TestCase
     protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
-        $this->storage = new SessionTokenStorage($this->session, self::SESSION_NAMESPACE);
+        $request = new Request();
+        $request->setSession($this->session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $this->storage = new SessionTokenStorage($requestStack, self::SESSION_NAMESPACE);
     }
 
     public function testStoreTokenInNotStartedSessionStartsTheSession()

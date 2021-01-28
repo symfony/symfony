@@ -12,12 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -66,7 +68,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $this->currentId, ServiceSubscriberInterface::class));
         }
         $class = $r->name;
-
+        $replaceDeprecatedSession = $this->container->has('.session.deprecated') && $r->isSubclassOf(AbstractController::class);
         $subscriberMap = [];
 
         foreach ($class::getSubscribedServices() as $key => $type) {
@@ -84,6 +86,11 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             if (!isset($serviceMap[$key])) {
                 if (!$autowire) {
                     throw new InvalidArgumentException(sprintf('Service "%s" misses a "container.service_subscriber" tag with "key"/"id" attributes corresponding to entry "%s" as returned by "%s::getSubscribedServices()".', $this->currentId, $key, $class));
+                }
+                if ($replaceDeprecatedSession && SessionInterface::class === $type) {
+                    // This prevents triggering the deprecation when building the container
+                    // Should be removed in Symfony 6.0
+                    $type = '.session.deprecated';
                 }
                 $serviceMap[$key] = new Reference($type);
             }

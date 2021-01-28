@@ -1119,6 +1119,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator(iterator_to_array($finder->getIterator()), $finder1->getIterator());
     }
 
+    public function testMultipleAppendCallsWithSorting()
+    {
+        $finder = $this->buildFinder()
+            ->sortByName()
+            ->append([self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_1000_1.php'])
+            ->append([self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_1002_0.php'])
+        ;
+
+        $this->assertOrderedIterator($this->toAbsolute(['qux_1000_1.php', 'qux_1002_0.php']), $finder->getIterator());
+    }
+
     public function testCountDirectories()
     {
         $directory = Finder::create()->directories()->in(self::$tmpDir);

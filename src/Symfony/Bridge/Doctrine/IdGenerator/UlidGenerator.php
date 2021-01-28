@@ -15,6 +15,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 use Symfony\Component\Uid\Ulid;
 
+/**
+ * @experimental in 5.2
+ */
 final class UlidGenerator extends AbstractIdGenerator
 {
     public function generate(EntityManager $em, $entity): Ulid

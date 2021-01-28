@@ -4,7 +4,8 @@ CHANGELOG
 5.3
 ---
 
- * deprecated `DoctrineTestHelper` and `TestRepositoryFactory`
+ * Deprecate `DoctrineTestHelper` and `TestRepositoryFactory`
+ * [BC BREAK] Remove `UuidV*Generator` classes
 
 5.2.0
 -----

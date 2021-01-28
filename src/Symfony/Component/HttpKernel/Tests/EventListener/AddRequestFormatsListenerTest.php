@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Test AddRequestFormatsListener class.
- *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  */
 class AddRequestFormatsListenerTest extends TestCase
@@ -47,7 +45,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testRegisteredEvent()
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 100]],
             AddRequestFormatsListener::getSubscribedEvents()
         );
@@ -55,7 +53,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testSetAdditionalFormats()
     {
-        $request = $this->getRequestMock();
+        $request = $this->createMock(Request::class);
         $event = $this->getRequestEventMock($request);
 
         $request->expects($this->once())
@@ -63,11 +61,6 @@ class AddRequestFormatsListenerTest extends TestCase
             ->with('csv', ['text/csv', 'text/plain']);
 
         $this->listener->onKernelRequest($event);
-    }
-
-    protected function getRequestMock()
-    {
-        return $this->createMock(Request::class);
     }
 
     protected function getRequestEventMock(Request $request)

@@ -29,7 +29,7 @@ class TimedPhpEngineTest extends TestCase
 {
     public function testThatRenderLogsTime()
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(Container::class);
         $templateNameParser = $this->getTemplateNameParser();
         $globalVariables = $this->getGlobalVariables();
         $loader = $this->getLoader($this->getStorage());
@@ -46,11 +46,6 @@ class TimedPhpEngineTest extends TestCase
 
         $engine = new TimedPhpEngine($templateNameParser, $container, $loader, $stopwatch, $globalVariables);
         $engine->render('index.php');
-    }
-
-    private function getContainer(): Container
-    {
-        return $this->createMock(Container::class);
     }
 
     private function getTemplateNameParser(): TemplateNameParserInterface

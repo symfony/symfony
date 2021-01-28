@@ -54,7 +54,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $user = $this->createUser();
         $this->tokenStorage = $this->createTokenStorage($user);
-        $this->encoder = $this->createPasswordEncoder();
+        $this->encoder = $this->createMock(PasswordEncoderInterface::class);
         $this->encoderFactory = $this->createEncoderFactory($this->encoder);
 
         parent::setUp();
@@ -145,11 +145,6 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         ;
 
         return $mock;
-    }
-
-    protected function createPasswordEncoder($isPasswordValid = true)
-    {
-        return $this->createMock(PasswordEncoderInterface::class);
     }
 
     protected function createEncoderFactory($encoder = null)

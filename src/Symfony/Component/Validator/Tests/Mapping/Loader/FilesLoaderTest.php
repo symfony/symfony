@@ -20,13 +20,13 @@ class FilesLoaderTest extends TestCase
 {
     public function testCallsGetFileLoaderInstanceForeachPath()
     {
-        $loader = $this->getFilesLoader($this->getFileLoader());
+        $loader = $this->getFilesLoader($this->createMock(LoaderInterface::class));
         $this->assertEquals(4, $loader->getTimesCalled());
     }
 
     public function testCallsActualFileLoaderForMetadata()
     {
-        $fileLoader = $this->getFileLoader();
+        $fileLoader = $this->createMock(LoaderInterface::class);
         $fileLoader->expects($this->exactly(4))
             ->method('loadClassMetadata');
         $loader = $this->getFilesLoader($fileLoader);
@@ -41,10 +41,5 @@ class FilesLoaderTest extends TestCase
             __DIR__.'/constraint-mapping.test',
             __DIR__.'/constraint-mapping.txt',
         ], $loader]);
-    }
-
-    public function getFileLoader()
-    {
-        return $this->createMock(LoaderInterface::class);
     }
 }

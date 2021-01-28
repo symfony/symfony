@@ -24,8 +24,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Adrien Chinour <github@chinour.fr>
- *
- * @experimental in 5.3
  */
 final class AmazonSnsTransport extends AbstractTransport
 {

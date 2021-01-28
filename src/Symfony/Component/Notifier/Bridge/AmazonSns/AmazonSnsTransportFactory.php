@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Adrien Chinour <github@chinour.fr>
- *
- * @experimental in 5.3
  */
 final class AmazonSnsTransportFactory extends AbstractTransportFactory
 {

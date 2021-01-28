@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Adrien Chinour <github@chinour.fr>
- *
- * @experimental in 5.3
  */
 final class AmazonSnsOptions implements MessageOptionsInterface
 {

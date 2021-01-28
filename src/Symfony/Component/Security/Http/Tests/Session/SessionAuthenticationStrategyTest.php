@@ -25,7 +25,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $request->expects($this->never())->method('getSession');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::NONE);
-        $strategy->onAuthentication($request, $this->getToken());
+        $strategy->onAuthentication($request, $this->createMock(TokenInterface::class));
     }
 
     public function testUnsupportedStrategy()
@@ -36,7 +36,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $request->expects($this->never())->method('getSession');
 
         $strategy = new SessionAuthenticationStrategy('foo');
-        $strategy->onAuthentication($request, $this->getToken());
+        $strategy->onAuthentication($request, $this->createMock(TokenInterface::class));
     }
 
     public function testSessionIsMigrated()
@@ -45,7 +45,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
-        $strategy->onAuthentication($this->getRequest($session), $this->getToken());
+        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
     }
 
     public function testSessionIsInvalidated()
@@ -54,7 +54,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $session->expects($this->once())->method('invalidate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::INVALIDATE);
-        $strategy->onAuthentication($this->getRequest($session), $this->getToken());
+        $strategy->onAuthentication($this->getRequest($session), $this->createMock(TokenInterface::class));
     }
 
     private function getRequest($session = null)
@@ -66,10 +66,5 @@ class SessionAuthenticationStrategyTest extends TestCase
         }
 
         return $request;
-    }
-
-    private function getToken()
-    {
-        return $this->createMock(TokenInterface::class);
     }
 }

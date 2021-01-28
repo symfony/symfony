@@ -31,17 +31,12 @@ class ChainCacheClearerTest extends TestCase
 
     public function testInjectClearersInConstructor()
     {
-        $clearer = $this->getMockClearer();
+        $clearer = $this->createMock(CacheClearerInterface::class);
         $clearer
             ->expects($this->once())
             ->method('clear');
 
         $chainClearer = new ChainCacheClearer([$clearer]);
         $chainClearer->clear(self::$cacheDir);
-    }
-
-    protected function getMockClearer()
-    {
-        return $this->createMock(CacheClearerInterface::class);
     }
 }

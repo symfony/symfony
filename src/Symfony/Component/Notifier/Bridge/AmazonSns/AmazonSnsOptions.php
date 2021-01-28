@@ -70,34 +70,4 @@ final class AmazonSnsOptions implements MessageOptionsInterface
 
         return $this;
     }
-
-    /**
-     * @see PublishInput::$MessageAttributes
-     */
-    public function messageAttributes(array $messageAttributes): self
-    {
-        $this->options['MessageAttributes'] = $messageAttributes;
-
-        return $this;
-    }
-
-    /**
-     * @see PublishInput::$MessageDeduplicationId
-     */
-    public function messageDeduplicationId(string $messageDeduplicationId): self
-    {
-        $this->options['MessageDeduplicationId'] = $messageDeduplicationId;
-
-        return $this;
-    }
-
-    /**
-     * @see PublishInput::$MessageGroupId
-     */
-    public function messageGroupId(string $messageGroupId): self
-    {
-        $this->options['MessageGroupId'] = $messageGroupId;
-
-        return $this;
-    }
 }

@@ -24,9 +24,13 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -215,6 +219,59 @@ class RouterListenerTest extends TestCase
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
+        $listener->onKernelRequest($event);
+    }
+
+    public function testResourceNotFoundException()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path" (from "https://www.google.com")');
+
+        $context = new RequestContext();
+
+        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+
+        $urlMatcher->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $urlMatcher->expects($this->any())
+            ->method('match')
+            ->willThrowException(new ResourceNotFoundException());
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('https://www.symfony.com/path');
+        $request->headers->set('referer', 'https://www.google.com');
+
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
+        $listener->onKernelRequest($event);
+    }
+
+    public function testMethodNotAllowedException()
+    {
+        $this->expectException(MethodNotAllowedHttpException::class);
+        $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path": Method Not Allowed (Allow: POST)');
+
+        $context = new RequestContext();
+
+        $urlMatcher = $this->createMock(UrlMatcherInterface::class);
+
+        $urlMatcher->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $urlMatcher->expects($this->any())
+            ->method('match')
+            ->willThrowException(new MethodNotAllowedException(['POST']));
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $request = Request::create('https://www.symfony.com/path');
+
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
         $listener->onKernelRequest($event);
     }
 }

@@ -39,6 +39,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::OPTIONAL, 'Specific message id to show'),
                 new InputOption('max', null, InputOption::VALUE_REQUIRED, 'Maximum number of messages to list', 50),
+                new InputOption('stats', null, InputOption::VALUE_NONE, 'Display the message count by class'),
+                new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
             ])
             ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
@@ -68,8 +70,10 @@ EOF
             throw new RuntimeException(sprintf('The "%s" receiver does not support listing or showing specific messages.', $this->getReceiverName()));
         }
 
-        if (null === $id = $input->getArgument('id')) {
-            $this->listMessages($io, $input->getOption('max'));
+        if ($input->getOption('stats')) {
+            $this->listMessagesPerClass($io, $input->getOption('max'));
+        } elseif (null === $id = $input->getArgument('id')) {
+            $this->listMessages($io, $input->getOption('max'), $input->getOption('class-filter'));
         } else {
             $this->showMessage($id, $io);
         }
@@ -77,7 +81,7 @@ EOF
         return 0;
     }
 
-    private function listMessages(SymfonyStyle $io, int $max)
+    private function listMessages(SymfonyStyle $io, int $max, ?string $classFilter)
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver();
@@ -85,6 +89,12 @@ EOF
 
         $rows = [];
         foreach ($envelopes as $envelope) {
+            $currentClassName = \get_class($envelope->getMessage());
+
+            if ($classFilter && $classFilter !== $currentClassName) {
+                continue;
+            }
+
             /** @var RedeliveryStamp|null $lastRedeliveryStamp */
             $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
             /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
@@ -101,7 +111,7 @@ EOF
 
             $rows[] = [
                 $this->getMessageId($envelope),
-                \get_class($envelope->getMessage()),
+                $currentClassName,
                 null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
                 $errorMessage,
             ];
@@ -120,6 +130,31 @@ EOF
         }
 
         $io->comment('Run <comment>messenger:failed:show {id} -vv</comment> to see message details.');
+    }
+
+    private function listMessagesPerClass(SymfonyStyle $io, int $max)
+    {
+        /** @var ListableReceiverInterface $receiver */
+        $receiver = $this->getReceiver();
+        $envelopes = $receiver->all($max);
+
+        $countPerClass = [];
+
+        foreach ($envelopes as $envelope) {
+            if (!isset($countPerClass[\get_class($envelope->getMessage())])) {
+                $countPerClass[$c = \get_class($envelope->getMessage())] = [$c, 0];
+            }
+
+            ++$countPerClass[\get_class($envelope->getMessage())][1];
+        }
+
+        if (0 === \count($countPerClass)) {
+            $io->success('No failed messages were found.');
+
+            return;
+        }
+
+        $io->table(['Class', 'Count'], $countPerClass);
     }
 
     private function showMessage(string $id, SymfonyStyle $io)

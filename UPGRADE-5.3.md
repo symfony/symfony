@@ -6,6 +6,11 @@ Asset
 
  * Deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead
 
+DoctrineBridge
+--------------
+
+ * Remove `UuidV*Generator` classes
+
 DomCrawler
 ----------
 

@@ -35,6 +35,10 @@ class InMemoryUserProvider implements UserProviderInterface
     public function __construct(array $users = [])
     {
         foreach ($users as $username => $attributes) {
+            if (isset($attributes['enabled'])) {
+                trigger_deprecation('symfony/security-core', '5.3', 'The "enabled" attribute is deprecated and will be removed in version 6.0. Remove it or implement a custom InMemoryUserProvider.');
+            }
+
             $password = $attributes['password'] ?? null;
             $enabled = $attributes['enabled'] ?? true;
             $roles = $attributes['roles'] ?? [];
@@ -55,6 +59,10 @@ class InMemoryUserProvider implements UserProviderInterface
             throw new \LogicException('Another user with the same username already exists.');
         }
 
+        if ($user instanceof User) {
+            trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated and will be removed in version 6.0. Use "%s" instead or implement a custom User class.', User::class, InMemoryUser::class);
+        }
+
         $this->users[strtolower($user->getUsername())] = $user;
     }
 
@@ -73,13 +81,19 @@ class InMemoryUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof User && !$user instanceof InMemoryUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         $storedUser = $this->getUser($user->getUsername());
 
-        return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked());
+        if ($user instanceof User) {
+            trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated and will be removed in version 6.0. Use "%s" instead or implement a custom User class.', User::class, InMemoryUser::class);
+
+            return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked());
+        }
+
+        return new InMemoryUser($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->getExtraFields());
     }
 
     /**
@@ -87,7 +101,7 @@ class InMemoryUserProvider implements UserProviderInterface
      */
     public function supportsClass(string $class)
     {
-        return 'Symfony\Component\Security\Core\User\User' === $class;
+        return 'Symfony\Component\Security\Core\User\User' === $class || 'Symfony\Component\Security\Core\User\InMemoryUser' === $class;
     }
 
     /**

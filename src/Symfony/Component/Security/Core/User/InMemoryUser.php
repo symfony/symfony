@@ -11,27 +11,14 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead or implement a custom User class.', User::class, InMemoryUser::class);
-
-/**
- * User is the user implementation used by the in-memory user provider.
- *
- * This should not be used for anything else.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-final class User implements UserInterface, EquatableInterface
+class InMemoryUser implements UserInterface, EquatableInterface
 {
     private $username;
     private $password;
-    private $enabled;
-    private $accountNonExpired;
-    private $credentialsNonExpired;
-    private $accountNonLocked;
     private $roles;
     private $extraFields;
 
-    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true, bool $userNonExpired = true, bool $credentialsNonExpired = true, bool $userNonLocked = true, array $extraFields = [])
+    public function __construct(?string $username, ?string $password, array $roles = [], array $extraFields = [])
     {
         if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
@@ -39,10 +26,6 @@ final class User implements UserInterface, EquatableInterface
 
         $this->username = $username;
         $this->password = $password;
-        $this->enabled = $enabled;
-        $this->accountNonExpired = $userNonExpired;
-        $this->credentialsNonExpired = $credentialsNonExpired;
-        $this->accountNonLocked = $userNonLocked;
         $this->roles = $roles;
         $this->extraFields = $extraFields;
     }
@@ -87,38 +70,6 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired(): bool
-    {
-        return $this->accountNonExpired;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAccountNonLocked(): bool
-    {
-        return $this->accountNonLocked;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCredentialsNonExpired(): bool
-    {
-        return $this->credentialsNonExpired;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
     }
@@ -153,22 +104,6 @@ final class User implements UserInterface, EquatableInterface
         }
 
         if ($this->getUsername() !== $user->getUsername()) {
-            return false;
-        }
-
-        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
-            return false;
-        }
-
-        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
-            return false;
-        }
-
-        if ($this->isEnabled() !== $user->isEnabled()) {
             return false;
         }
 

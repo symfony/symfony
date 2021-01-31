@@ -31,7 +31,7 @@ class InlineFragmentRendererTest extends TestCase
 {
     protected function setUp(): void
     {
-        ClockMock::register(Request::class);
+        ClockMock::withClockMock(true);
     }
 
     public function testRender()

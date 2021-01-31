@@ -422,6 +422,10 @@ trait HttpClientTrait
             $url['path'] = '/';
         }
 
+        if ('?' === ($url['query'] ?? '')) {
+            $url['query'] = null;
+        }
+
         return $url;
     }
 

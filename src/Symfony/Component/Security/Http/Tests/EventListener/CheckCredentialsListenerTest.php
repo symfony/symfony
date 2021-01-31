@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -36,7 +36,7 @@ class CheckCredentialsListenerTest extends TestCase
     {
         $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
         $this->listener = new CheckCredentialsListener($this->encoderFactory);
-        $this->user = new User('wouter', 'encoded-password');
+        $this->user = new InMemoryUser('wouter', 'encoded-password');
     }
 
     /**

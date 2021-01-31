@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LogicException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -59,7 +59,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $this->expectExceptionMessage('Method "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken::getUser()" must return a "Symfony\Component\Security\Core\User\UserInterface" instance, "string" returned.');
 
         $provider = $this->getProvider();
-        $token = new RememberMeToken(new User('dummyuser', null), 'foo', 'test');
+        $token = new RememberMeToken(new InMemoryUser('dummyuser', null), 'foo', 'test');
         $token->setUser('stringish-user');
         $provider->authenticate($token);
     }

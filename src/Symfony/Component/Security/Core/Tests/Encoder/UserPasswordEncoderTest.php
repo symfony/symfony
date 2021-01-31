@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserPasswordEncoderTest extends TestCase
@@ -76,7 +76,7 @@ class UserPasswordEncoderTest extends TestCase
 
     public function testNeedsRehash()
     {
-        $user = new User('username', null);
+        $user = new InMemoryUser('username', null);
         $encoder = new NativePasswordEncoder(4, 20000, 4);
 
         $mockEncoderFactory = $this->createMock(EncoderFactoryInterface::class);

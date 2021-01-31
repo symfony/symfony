@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\MigratingPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class EncoderFactoryTest extends TestCase
@@ -46,7 +46,7 @@ class EncoderFactoryTest extends TestCase
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
         $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
 
-        $encoder = $factory->getEncoder(new User('user', 'pass'));
+        $encoder = $factory->getEncoder(new InMemoryUser('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
         $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }
@@ -65,10 +65,10 @@ class EncoderFactoryTest extends TestCase
     public function testGetEncoderConfiguredForConcreteClassWithService()
     {
         $factory = new EncoderFactory([
-            'Symfony\Component\Security\Core\User\User' => new MessageDigestPasswordEncoder('sha1'),
+            'Symfony\Component\Security\Core\User\InMemoryUser' => new MessageDigestPasswordEncoder('sha1'),
         ]);
 
-        $encoder = $factory->getEncoder(new User('user', 'pass'));
+        $encoder = $factory->getEncoder(new InMemoryUser('user', 'pass'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');
         $this->assertEquals($expectedEncoder->encodePassword('foo', ''), $encoder->encodePassword('foo', ''));
     }

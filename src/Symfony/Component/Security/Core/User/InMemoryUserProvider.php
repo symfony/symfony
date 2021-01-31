@@ -118,6 +118,12 @@ class InMemoryUserProvider implements UserProviderInterface
             throw $ex;
         }
 
-        return $this->users[strtolower($username)];
+        $user = $this->users[strtolower($username)];
+
+        if ($user instanceof InMemoryUser) {
+            return new User($user->getUsername(), $user->getPassword(), $user->getRoles());
+        }
+
+        return $user;
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -41,7 +41,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', '', 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', '', 'key'));
     }
 
     public function testNullPasswordShouldThrowAnException()
@@ -56,7 +56,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', null, 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', null, 'key'));
     }
 
     public function testBindFailureShouldThrowAnException()
@@ -76,7 +76,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
     public function testRetrieveUser()
@@ -136,7 +136,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
     public function testQueryWithUserForDn()
@@ -178,7 +178,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
     public function testEmptyQueryResultShouldThrowAnException()
@@ -214,6 +214,6 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
+        $reflection->invoke($provider, new InMemoryUser('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 }

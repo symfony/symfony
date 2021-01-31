@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
@@ -297,7 +297,7 @@ class AccessListenerTest extends TestCase
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
     {
-        $token = new UsernamePasswordToken(new User('Wouter', null, ['ROLE_USER']), null, 'main', ['ROLE_USER']);
+        $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), null, 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
         $request = new Request();

@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class ExpressionLanguageTest extends TestCase
 {
@@ -49,7 +49,7 @@ class ExpressionLanguageTest extends TestCase
     public function provider()
     {
         $roles = ['ROLE_USER', 'ROLE_ADMIN'];
-        $user = new User('username', 'password', $roles);
+        $user = new InMemoryUser('username', 'password', $roles);
 
         $noToken = null;
         $anonymousToken = new AnonymousToken('firewall', 'anon.');

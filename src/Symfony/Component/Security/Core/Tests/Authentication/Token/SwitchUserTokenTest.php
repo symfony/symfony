@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SwitchUserTokenTest extends TestCase
@@ -88,7 +89,7 @@ class SwitchUserTokenTest extends TestCase
     public function testUnserializeOldToken()
     {
         /** @var SwitchUserToken $token */
-        $token = unserialize(file_get_contents(__DIR__.'/Fixtures/switch-user-token-4.4.txt'));
+        $token = unserialize(file_get_contents(__DIR__.'/Fixtures/switch-user-token.txt'));
 
         self::assertInstanceOf(SwitchUserToken::class, $token);
         self::assertInstanceOf(UsernamePasswordToken::class, $token->getOriginalToken());

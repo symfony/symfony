@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Tests\Encoder\TestPasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -155,7 +155,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
         $method->invoke(
             $provider,
-            new User('username', 'password'),
+            new InMemoryUser('username', 'password'),
             $token
         );
     }
@@ -179,7 +179,7 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, new User('username', 'password'), $token);
+        $method->invoke($provider, new InMemoryUser('username', 'password'), $token);
     }
 
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
@@ -251,12 +251,12 @@ class DaoAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
-        $method->invoke($provider, new User('username', 'password'), $token);
+        $method->invoke($provider, new InMemoryUser('username', 'password'), $token);
     }
 
     public function testPasswordUpgrades()
     {
-        $user = new User('user', 'pwd');
+        $user = new InMemoryUser('user', 'pwd');
 
         $encoder = $this->createMock(TestPasswordEncoderInterface::class);
         $encoder->expects($this->once())

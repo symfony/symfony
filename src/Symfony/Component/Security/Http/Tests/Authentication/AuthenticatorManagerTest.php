@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -42,7 +42,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->eventDispatcher = new EventDispatcher();
         $this->request = new Request();
-        $this->user = new User('wouter', null);
+        $this->user = new InMemoryUser('wouter', null);
         $this->token = $this->createMock(TokenInterface::class);
         $this->response = $this->createMock(Response::class);
     }

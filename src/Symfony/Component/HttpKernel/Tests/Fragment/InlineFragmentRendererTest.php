@@ -23,6 +23,9 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @group time-sensitive
+ */
 class InlineFragmentRendererTest extends TestCase
 {
     public function testRender()

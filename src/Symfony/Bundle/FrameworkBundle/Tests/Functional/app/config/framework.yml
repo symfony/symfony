@@ -9,7 +9,7 @@ framework:
     test: true
     default_locale: en
     session:
-        storage_id:     session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
 
 services:
     logger: { class: Psr\Log\NullLogger }

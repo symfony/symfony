@@ -70,6 +70,7 @@ use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -1028,7 +1029,20 @@ class FrameworkExtension extends Extension
         $loader->load('session.php');
 
         // session storage
-        $container->setAlias('session.storage', $config['storage_id']);
+        if (null === $config['storage_factory_id']) {
+            trigger_deprecation('symfony/framework-bundle', '5.3', 'Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+            $container->setAlias('session.storage', $config['storage_id']);
+            $container->setAlias('session.storage.factory', 'session.storage.factory.service');
+        } else {
+            $container->setAlias('session.storage.factory', $config['storage_factory_id']);
+
+            $container->removeAlias(SessionStorageInterface::class);
+            $container->removeDefinition('session.storage.metadata_bag');
+            $container->removeDefinition('session.storage.native');
+            $container->removeDefinition('session.storage.php_bridge');
+            $container->removeAlias('session.storage.filesystem');
+        }
+
         $options = ['cache_limiter' => '0'];
         foreach (['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'cookie_samesite', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'sid_length', 'sid_bits_per_character'] as $key) {
             if (isset($config[$key])) {
@@ -1037,11 +1051,16 @@ class FrameworkExtension extends Extension
         }
 
         if ('auto' === ($options['cookie_secure'] ?? null)) {
-            $locator = $container->getDefinition('session_listener')->getArgument(0);
-            $locator->setValues($locator->getValues() + [
-                'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-                'request_stack' => new Reference('request_stack'),
-            ]);
+            if (null === $config['storage_factory_id']) {
+                $locator = $container->getDefinition('session_listener')->getArgument(0);
+                $locator->setValues($locator->getValues() + [
+                    'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                    'request_stack' => new Reference('request_stack'),
+                ]);
+            } else {
+                $container->getDefinition('session.storage.factory.native')->replaceArgument(3, true);
+                $container->getDefinition('session.storage.factory.php_bridge')->replaceArgument(2, true);
+            }
         }
 
         $container->setParameter('session.storage.options', $options);
@@ -1049,8 +1068,14 @@ class FrameworkExtension extends Extension
         // session handler (the internal callback registered with PHP session management)
         if (null === $config['handler_id']) {
             // Set the handler class to be null
-            $container->getDefinition('session.storage.native')->replaceArgument(1, null);
-            $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+            if ($container->hasDefinition('session.storage.native')) {
+                $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+                $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+            } else {
+                $container->getDefinition('session.storage.factory.native')->replaceArgument(1, null);
+                $container->getDefinition('session.storage.factory.php_bridge')->replaceArgument(0, null);
+            }
+
             $container->setAlias('session.handler', 'session.handler.native_file');
         } else {
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);

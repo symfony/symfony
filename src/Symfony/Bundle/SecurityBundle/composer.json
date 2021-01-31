@@ -39,7 +39,7 @@
         "symfony/dom-crawler": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
-        "symfony/framework-bundle": "^5.2",
+        "symfony/framework-bundle": "^5.3",
         "symfony/process": "^4.4|^5.0",
         "symfony/rate-limiter": "^5.2",
         "symfony/serializer": "^4.4|^5.0",

@@ -544,7 +544,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
-        $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
+        $this->assertEquals('session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
+        $this->assertFalse($container->has('session.storage'));
+        $this->assertFalse($container->has('session.storage.native'));
+        $this->assertFalse($container->has('session.storage.php_bridge'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $options = $container->getParameter('session.storage.options');
@@ -569,12 +572,32 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('session');
 
         $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
+        $this->assertNull($container->getDefinition('session.storage.factory.native')->getArgument(1));
+        $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
+        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
+
+        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNullSessionHandlerLegacy()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+
+        $container = $this->createContainerFromFile('session_legacy');
+
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
 
     public function testRequest()
@@ -1478,6 +1501,19 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testSessionCookieSecureAuto()
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
+
+        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSessionCookieSecureAutoLegacy()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+
+        $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));

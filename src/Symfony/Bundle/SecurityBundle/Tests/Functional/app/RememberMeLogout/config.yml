@@ -3,6 +3,7 @@ imports:
 
 framework:
     session:
+        storage_factory_id: session.storage.factory.mock_file
         cookie_secure: auto
         cookie_samesite: lax
 

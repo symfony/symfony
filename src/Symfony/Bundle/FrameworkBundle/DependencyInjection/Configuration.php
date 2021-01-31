@@ -600,8 +600,15 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->info('session configuration')
                     ->canBeEnabled()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) {
+                            return \is_array($v) && isset($v['storage_id']) && isset($v['storage_factory_id']);
+                        })
+                        ->thenInvalid('You cannot use both "storage_id" and "storage_factory_id" at the same time under "framework.session"')
+                    ->end()
                     ->children()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
+                        ->scalarNode('storage_factory_id')->defaultNull()->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
                         ->scalarNode('name')
                             ->validate()

@@ -398,6 +398,7 @@ class SecurityExtensionTest extends TestCase
             ],
             [
                 [
+                    'storage_factory_id' => 'session.storage.factory.native',
                     'cookie_secure' => true,
                     'cookie_samesite' => 'lax',
                     'save_path' => null,

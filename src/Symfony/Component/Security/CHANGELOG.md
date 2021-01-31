@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate using `SessionTokenStorage` outside a request context, it will throw a `SessionNotFoundException` in Symfony 6.0
  * Randomize CSRF tokens to harden BREACH attacks
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
+ * Deprecate usages of the `User` class in `InMemoryUserProvider`, use `InMemoryUser` instead.
 
 5.2.0
 -----

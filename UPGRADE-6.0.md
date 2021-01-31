@@ -178,6 +178,7 @@ Security
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
  * `AccessDecisionManager` now throw an exception when a voter does not return a valid decision.
+ * Remove usages of the `User` class in `InMemoryUserProvider`, use `InMemoryUser` instead.
 
 Serializer
 ----------

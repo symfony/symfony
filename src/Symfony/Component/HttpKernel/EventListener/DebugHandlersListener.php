@@ -15,7 +15,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Debug\ErrorHandler as LegacyErrorHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -26,15 +29,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final
- *
- * @internal since Symfony 5.3
+ * @final since Symfony 4.4
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {
+    private $earlyHandler;
     private $exceptionHandler;
     private $logger;
-    private $deprecationLogger;
     private $levels;
     private $throwAt;
     private $scream;
@@ -51,8 +52,12 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param string|FileLinkFormatter|null $fileLinkFormat   The format for links to source files
      * @param bool                          $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, LoggerInterface $deprecationLogger = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = \E_ALL, ?int $throwAt = \E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true)
     {
+        $handler = set_exception_handler('var_dump');
+        $this->earlyHandler = \is_array($handler) ? $handler[0] : null;
+        restore_exception_handler();
+
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
         $this->levels = null === $levels ? \E_ALL : $levels;
@@ -60,13 +65,12 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->scream = $scream;
         $this->fileLinkFormat = $fileLinkFormat;
         $this->scope = $scope;
-        $this->deprecationLogger = $deprecationLogger;
     }
 
     /**
      * Configures the error handler.
      */
-    public function configure(object $event = null)
+    public function configure(Event $event = null)
     {
         if ($event instanceof ConsoleEvent && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             return;
@@ -80,30 +84,35 @@ class DebugHandlersListener implements EventSubscriberInterface
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
-        if ($handler instanceof ErrorHandler) {
-            if ($this->logger || $this->deprecationLogger) {
-                $this->setDefaultLoggers($handler);
-                if (\is_array($this->levels)) {
-                    $levels = 0;
-                    foreach ($this->levels as $type => $log) {
-                        $levels |= $type;
-                    }
-                } else {
-                    $levels = $this->levels;
-                }
+        if (!$handler instanceof ErrorHandler && !$handler instanceof LegacyErrorHandler) {
+            $handler = $this->earlyHandler;
+        }
 
-                if ($this->scream) {
-                    $handler->screamAt($levels);
+        if ($this->logger || null !== $this->throwAt) {
+            if ($handler instanceof ErrorHandler || $handler instanceof LegacyErrorHandler) {
+                if ($this->logger) {
+                    $handler->setDefaultLogger($this->logger, $this->levels);
+                    if (\is_array($this->levels)) {
+                        $levels = 0;
+                        foreach ($this->levels as $type => $log) {
+                            $levels |= $type;
+                        }
+                    } else {
+                        $levels = $this->levels;
+                    }
+                    if ($this->scream) {
+                        $handler->screamAt($levels);
+                    }
+                    if ($this->scope) {
+                        $handler->scopeAt($levels & ~\E_USER_DEPRECATED & ~\E_DEPRECATED);
+                    } else {
+                        $handler->scopeAt(0, true);
+                    }
+                    $this->logger = $this->levels = null;
                 }
-                if ($this->scope) {
-                    $handler->scopeAt($levels & ~\E_USER_DEPRECATED & ~\E_DEPRECATED);
-                } else {
-                    $handler->scopeAt(0, true);
+                if (null !== $this->throwAt) {
+                    $handler->throwAt($this->throwAt, true);
                 }
-                $this->logger = $this->deprecationLogger = $this->levels = null;
-            }
-            if (null !== $this->throwAt) {
-                $handler->throwAt($this->throwAt, true);
             }
         }
         if (!$this->exceptionHandler) {
@@ -126,47 +135,27 @@ class DebugHandlersListener implements EventSubscriberInterface
                     $output = $output->getErrorOutput();
                 }
                 $this->exceptionHandler = static function (\Throwable $e) use ($app, $output) {
-                    $app->renderThrowable($e, $output);
+                    if (method_exists($app, 'renderThrowable')) {
+                        $app->renderThrowable($e, $output);
+                    } else {
+                        if (!$e instanceof \Exception) {
+                            $e = new FatalThrowableError($e);
+                        }
+
+                        $app->renderException($e, $output);
+                    }
                 };
             }
         }
         if ($this->exceptionHandler) {
-            if ($handler instanceof ErrorHandler) {
+            if ($handler instanceof ErrorHandler || $handler instanceof LegacyErrorHandler) {
                 $handler->setExceptionHandler($this->exceptionHandler);
             }
             $this->exceptionHandler = null;
         }
     }
 
-    private function setDefaultLoggers(ErrorHandler $handler): void
-    {
-        if (\is_array($this->levels)) {
-            $levelsDeprecatedOnly = [];
-            $levelsWithoutDeprecated = [];
-            foreach ($this->levels as $type => $log) {
-                if (\E_DEPRECATED == $type || \E_USER_DEPRECATED == $type) {
-                    $levelsDeprecatedOnly[$type] = $log;
-                } else {
-                    $levelsWithoutDeprecated[$type] = $log;
-                }
-            }
-        } else {
-            $levelsDeprecatedOnly = $this->levels & (\E_DEPRECATED | \E_USER_DEPRECATED);
-            $levelsWithoutDeprecated = $this->levels & ~\E_DEPRECATED & ~\E_USER_DEPRECATED;
-        }
-
-        $defaultLoggerLevels = $this->levels;
-        if ($this->deprecationLogger && $levelsDeprecatedOnly) {
-            $handler->setDefaultLogger($this->deprecationLogger, $levelsDeprecatedOnly);
-            $defaultLoggerLevels = $levelsWithoutDeprecated;
-        }
-
-        if ($this->logger && $defaultLoggerLevels) {
-            $handler->setDefaultLogger($this->logger, $defaultLoggerLevels);
-        }
-    }
-
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
 

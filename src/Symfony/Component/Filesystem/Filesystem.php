@@ -479,10 +479,11 @@ class Filesystem
 
         $startPathArr = $splitPath($startPath);
         $endPathArr = $splitPath($endPath);
+        $pathEnd = str_ends_with($endPath, '/') ? '/' : '';
 
         if ($endDriveLetter && $startDriveLetter && $endDriveLetter != $startDriveLetter) {
             // End path is on another drive, so no relative path exists
-            return $endDriveLetter.':/'.($endPathArr ? implode('/', $endPathArr).'/' : '');
+            return $endDriveLetter.':/'.($endPathArr ? implode('/', $endPathArr).$pathEnd : '');
         }
 
         // Find for which directory the common path stops
@@ -504,7 +505,7 @@ class Filesystem
         $endPathRemainder = implode('/', \array_slice($endPathArr, $index));
 
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
-        $relativePath = $traverser.('' !== $endPathRemainder ? $endPathRemainder.'/' : '');
+        $relativePath = $traverser.('' !== $endPathRemainder ? $endPathRemainder.$pathEnd : '');
 
         return '' === $relativePath ? './' : $relativePath;
     }

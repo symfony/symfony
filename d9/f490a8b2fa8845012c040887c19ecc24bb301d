@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-01T07:56:41Z
+
+I would consider this a new feature against `5.x` because this is not a real bug
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2021-02-01T08:09:12Z
+
+Yes, you have a right, this is not real bug but still not BC break changes too.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-01T10:58:21Z
+
+> Yes, you have a right, this is not real bug but still not BC break changes too.
+
+Sure but we don't know if someone already fixed this in his project and do some string operations on the url etc. In this case the behavior would change and maybe break sth. Stability is king, more over `4.4` is not just stable but an LTS release 👍
+
+Thanks for targeting `5.x` now 👍

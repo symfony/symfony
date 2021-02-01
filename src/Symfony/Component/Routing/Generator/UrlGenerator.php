@@ -231,11 +231,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $host = $this->context->getHost();
         $scheme = $this->context->getScheme();
 
-        if ($requiredSchemes) {
-            if (!\in_array($scheme, $requiredSchemes, true)) {
-                $referenceType = self::ABSOLUTE_URL;
-                $scheme = current($requiredSchemes);
-            }
+        if ($requiredSchemes && !\in_array($scheme, $requiredSchemes, true)) {
+            $referenceType = self::ABSOLUTE_URL;
+            $scheme = current($requiredSchemes);
         }
 
         if ($hostTokens) {

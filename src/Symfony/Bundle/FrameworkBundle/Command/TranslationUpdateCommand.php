@@ -369,6 +369,11 @@ EOF
         foreach ($catalogue->getResources() as $resource) {
             $filteredCatalogue->addResource($resource);
         }
+        if ($metadata = $catalogue->getMetadata('', $intlDomain)) {
+            foreach ($metadata as $k => $v) {
+                $filteredCatalogue->setMetadata($k, $v, $intlDomain);
+            }
+        }
         if ($metadata = $catalogue->getMetadata('', $domain)) {
             foreach ($metadata as $k => $v) {
                 $filteredCatalogue->setMetadata($k, $v, $domain);

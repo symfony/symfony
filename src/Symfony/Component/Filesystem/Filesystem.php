@@ -479,7 +479,7 @@ class Filesystem
 
         $startPathArr = $splitPath($startPath);
         $endPathArr = $splitPath($endPath);
-        $pathEnd = str_ends_with($endPath, '/') ? '/' : '';
+        $pathEnd = '/' === substr($endPath, -1) ? '/' : '';
 
         if ($endDriveLetter && $startDriveLetter && $endDriveLetter != $startDriveLetter) {
             // End path is on another drive, so no relative path exists

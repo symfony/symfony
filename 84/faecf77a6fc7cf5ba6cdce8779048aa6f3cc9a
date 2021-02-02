@@ -1,0 +1,125 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-03T21:24:04Z
+
+Thank you.
+
+I like the idea and I think your scenario makes a lot of sense. What bothers me a little is that an object implementing the `QueueAwareInterface` will be stateful.
+
+---------------------------------------------------------------------------
+
+by dbu at 2020-11-04T08:06:48Z
+
+thanks for the feedback. glad that you agree on the use case.
+
+> What bothers me a little is that an object implementing the QueueAwareInterface will be stateful.
+
+me too. but the alternative would be to add an optional parameter to the `ReceiverInterface::get`, but that is a BC break: https://3v4l.org/54WYq . what would work would be a marker interface and then handle the parameter in `get` even when it is not part of the interface: https://3v4l.org/pkVNp but that seems quite ugly. and we would need to also make the Worker aware of the queue option.
+
+what do you think about the other approach of extend the configuration to allow configuring receivers for just some queues? i don't know how complicated this will get to implement with the configuration...
+
+---------------------------------------------------------------------------
+
+by dbu at 2020-11-11T09:07:43Z
+
+just thought of another solution where we could pass the queue names as an option to the worker but without BC breaks or ugly hacks: the QueueAwareInterface could provide a getFromQueues method that has the queues parameter and the worker would call that other method when the queues option is set... that would probably be the cleanest solution if we want to allow specifying the queues.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-11T09:16:04Z
+
+I've been thinking of this issue time to time. I find it really hard =)
+
+I like you last suggestion. It sounds clean and simple.. I would kindly ask you to move towards that direction and it may be easier to think/discuss when we can look and point at code?
+
+---------------------------------------------------------------------------
+
+by dbu at 2020-11-12T15:46:07Z
+
+@Nyholm @sroze what do you think of this approach? if you are happy with the direction, i will look at the test failures, add some tests for it and tweak the details and do a documentation pull request. (but first i'd like to know if you agree with the approach in general)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2020-11-12T15:52:14Z
+
+I like it.
+
+This looks way more simple.
+👍
+
+---------------------------------------------------------------------------
+
+by dbu at 2020-11-16T09:32:24Z
+
+ok, this is now ready imho.
+
+the build error is confusing to me, it claims that the interface i am adding is not found. not sure what is happening here.
+
+---------------------------------------------------------------------------
+
+by dbu at 2020-12-07T07:31:19Z
+
+@Nyholm how do we proceed here? i would love to get this merged in the next couple of weeks if possible ;-)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-01-12T09:41:42Z
+
+Thank you. Could you update composer.json for the AMQP messenger bridge? The deps=low tests are failing. It should require 5.3
+
+https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Messenger/Bridge/Amqp/composer.json#L21
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-01-12T11:17:12Z
+
+> Could you update composer.json for the AMQP messenger bridge? The deps=low tests are failing. It should require 5.3
+
+oh, indeed. cool that the build system detects this. should be fixed now.
+
+shall i squash commits, or do you do that while merging?
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-01-13T15:31:51Z
+
+hm, why does only the PHP 7.3 build fail, but the others work? i fixed the composer.json as you said, tobias and it seems to work for the other builds.
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-01-22T10:02:18Z
+
+@Nyholm do you have an idea why the php 7.3 specifically failed and not the others?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-01-22T10:08:13Z
+
+I think that is fine. 7.3 tests "deps=high".
+@derrabus could you confirm that it is safe to merge this even though one travis job is failing?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-24T18:02:45Z
+
+@Nyholm Yes, I would expect that job to pass once this PR is merged and picked up by the monorepo split.
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-02-01T12:26:48Z
+
+> @Nyholm Yes, I would expect that job to pass once this PR is merged and picked up by the monorepo split.
+
+@Nyholm ok to merge then, or should i still change something?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-02T11:35:22Z
+
+I think we can make it work by adding `source` here: https://github.com/symfony/symfony/blob/5.x/.github/composer-config.json
+
+---------------------------------------------------------------------------
+
+by dbu at 2021-02-02T13:40:56Z
+
+@Nyholm the idea by @OskarStark worked, the build is now green :smile:

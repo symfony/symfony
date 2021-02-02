@@ -69,6 +69,7 @@ PropertyInfo
 Security
 --------
 
+ * [BC break] Renamed the `LoginThrottlingListener` class and `login_throttling` option to `LoginLimitingListener` and `login_limiting`
  * Deprecated voters that do not return a valid decision when calling the `vote` method
 
 Serializer

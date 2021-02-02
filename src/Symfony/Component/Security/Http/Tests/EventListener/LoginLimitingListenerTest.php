@@ -23,10 +23,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
+use Symfony\Component\Security\Http\EventListener\LoginLimitingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
-class LoginThrottlingListenerTest extends TestCase
+class LoginLimitingListenerTest extends TestCase
 {
     private $requestStack;
     private $listener;
@@ -49,7 +49,7 @@ class LoginThrottlingListenerTest extends TestCase
         ], new InMemoryStorage());
         $limiter = new DefaultLoginRateLimiter($globalLimiter, $localLimiter);
 
-        $this->listener = new LoginThrottlingListener($this->requestStack, $limiter);
+        $this->listener = new LoginLimitingListener($this->requestStack, $limiter);
     }
 
     public function testPreventsLoginWhenOverLocalThreshold()

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
+use Symfony\Component\Security\Http\EventListener\LoginLimitingListener;
 
 class FormLoginTest extends AbstractWebTestCase
 {
@@ -112,13 +112,13 @@ class FormLoginTest extends AbstractWebTestCase
      * @dataProvider provideInvalidCredentials
      * @group time-sensitive
      */
-    public function testLoginThrottling($username, $password)
+    public function testLoginLimiting($username, $password)
     {
-        if (!class_exists(LoginThrottlingListener::class)) {
-            $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
+        if (!class_exists(LoginLimitingListener::class)) {
+            $this->markTestSkipped('Login limiting requires symfony/security-http:^5.3');
         }
 
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml', 'enable_authenticator_manager' => true]);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_limiting.yml', 'enable_authenticator_manager' => true]);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = $username;

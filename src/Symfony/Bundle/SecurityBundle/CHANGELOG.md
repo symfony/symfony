@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * [BC break] Renamed `login_throttling` to `login_limiting`
+
 5.2.0
 -----
 

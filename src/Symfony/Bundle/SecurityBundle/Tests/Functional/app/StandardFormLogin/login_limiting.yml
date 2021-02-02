@@ -8,5 +8,5 @@ framework:
 security:
     firewalls:
         default:
-            login_throttling:
+            login_limiting:
                 max_attempts: 1

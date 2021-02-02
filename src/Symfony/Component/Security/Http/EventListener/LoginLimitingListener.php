@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  *
  * @experimental in 5.3
  */
-final class LoginThrottlingListener implements EventSubscriberInterface
+final class LoginLimitingListener implements EventSubscriberInterface
 {
     private $requestStack;
     private $limiter;

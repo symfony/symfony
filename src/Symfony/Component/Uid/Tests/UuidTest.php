@@ -318,4 +318,12 @@ class UuidTest extends TestCase
         $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), ((new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime()));
         $this->assertEquals(new \DateTimeImmutable('@-12219292800'), ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime()));
     }
+
+    public function testShorten()
+    {
+        $uuid = Uuid::fromString('4629407a-d57e-4df8-97ea-3ba98b802a22');
+
+        $this->assertSame('265507NNBY9QW9FTHVN65R0AH2', $uuid->shortened());
+        $this->assertTrue($uuid->equals(Uuid::fromString('265507NNBY9QW9FTHVN65R0AH2')));
+    }
 }

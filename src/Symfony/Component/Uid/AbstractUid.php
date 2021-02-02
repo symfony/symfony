@@ -163,4 +163,9 @@ abstract class AbstractUid implements \JsonSerializable
     {
         return $this->uid;
     }
+
+    public function shortened(): string
+    {
+        return $this->toBase32();
+    }
 }

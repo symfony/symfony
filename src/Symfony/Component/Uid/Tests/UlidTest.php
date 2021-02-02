@@ -237,4 +237,12 @@ class UlidTest extends TestCase
     {
         $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
+
+    public function testShorten()
+    {
+        $ulid = Ulid::fromString('265507NNBY9QW9FTHVN65R0AH2');
+
+        $this->assertSame('265507NNBY9QW9FTHVN65R0AH2', $ulid->shortened());
+        $this->assertTrue($ulid->equals(Ulid::fromString('265507NNBY9QW9FTHVN65R0AH2')));
+    }
 }

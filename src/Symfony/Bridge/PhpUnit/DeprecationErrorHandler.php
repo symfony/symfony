@@ -132,44 +132,48 @@ class DeprecationErrorHandler
             return \call_user_func(self::getPhpUnitErrorHandler(), $type, $msg, $file, $line, $context);
         }
 
-        $deprecation = new Deprecation($msg, debug_backtrace(), $file);
+        $trace = debug_backtrace();
+
+        if (isset($trace[1]['function'], $trace[1]['args'][0]) && ('trigger_error' === $trace[1]['function'] || 'user_error' === $trace[1]['function'])) {
+            $msg = $trace[1]['args'][0];
+        }
+
+        $deprecation = new Deprecation($msg, $trace, $file);
         if ($deprecation->isMuted()) {
             return null;
         }
-        $group = 'other';
 
-        if ($deprecation->originatesFromAnObject()) {
-            $class = $deprecation->originatingClass();
-            $method = $deprecation->originatingMethod();
-            $msg = $deprecation->getMessage();
+        $msg = $deprecation->getMessage();
 
-            if (error_reporting() & $type) {
-                $group = 'unsilenced';
-            } elseif ($deprecation->isLegacy()) {
-                $group = 'legacy';
-            } else {
-                $group = [
-                    Deprecation::TYPE_SELF => 'remaining self',
-                    Deprecation::TYPE_DIRECT => 'remaining direct',
-                    Deprecation::TYPE_INDIRECT => 'remaining indirect',
-                    Deprecation::TYPE_UNDETERMINED => 'other',
-                ][$deprecation->getType()];
-            }
+        if (error_reporting() & $type) {
+            $group = 'unsilenced';
+        } elseif ($deprecation->isLegacy()) {
+            $group = 'legacy';
+        } else {
+            $group = [
+                Deprecation::TYPE_SELF => 'remaining self',
+                Deprecation::TYPE_DIRECT => 'remaining direct',
+                Deprecation::TYPE_INDIRECT => 'remaining indirect',
+                Deprecation::TYPE_UNDETERMINED => 'other',
+            ][$deprecation->getType()];
+        }
 
-            if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {
-                echo "\n".ucfirst($group).' '.$deprecation->toString();
+        if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {
+            echo "\n".ucfirst($group).' '.$deprecation->toString();
 
-                exit(1);
-            }
-            if ('legacy' !== $group) {
-                $ref = &$this->deprecations[$group][$msg]['count'];
-                ++$ref;
+            exit(1);
+        }
+
+        if ('legacy' !== $group) {
+            $ref = &$this->deprecations[$group][$msg]['count'];
+            ++$ref;
+
+            if ($deprecation->originatesFromAnObject()) {
+                $class = $deprecation->originatingClass();
+                $method = $deprecation->originatingMethod();
                 $ref = &$this->deprecations[$group][$msg][$class.'::'.$method];
                 ++$ref;
             }
-        } else {
-            $ref = &$this->deprecations[$group][$msg]['count'];
-            ++$ref;
         }
 
         ++$this->deprecations[$group.'Count'];

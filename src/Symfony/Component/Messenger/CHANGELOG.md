@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
+ * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.
 
 5.2.0
 -----

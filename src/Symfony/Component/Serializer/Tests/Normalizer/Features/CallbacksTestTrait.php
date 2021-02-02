@@ -29,7 +29,7 @@ trait CallbacksTestTrait
     }
 
     /**
-     * @dataProvider provideInvalidCallbacks()
+     * @dataProvider provideInvalidCallbacks
      */
     public function testUncallableCallbacks($callbacks)
     {

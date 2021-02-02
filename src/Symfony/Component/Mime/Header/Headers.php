@@ -201,7 +201,7 @@ final class Headers
 
     public static function isUniqueHeader(string $name): bool
     {
-        return \in_array($name, self::UNIQUE_HEADERS, true);
+        return \in_array(strtolower($name), self::UNIQUE_HEADERS, true);
     }
 
     public function toString(): string

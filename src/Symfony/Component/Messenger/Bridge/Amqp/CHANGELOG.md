@@ -4,7 +4,8 @@ CHANGELOG
 5.3
 ---
 
-* Deprecated the `prefetch_count` parameter, it has no effect and will be removed in Symfony 6.0.
+ * Deprecated the `prefetch_count` parameter, it has no effect and will be removed in Symfony 6.0.
+ * `AmqpReceiver` implements `QueueReceiverInterface` to fetch messages from a specific set of queues.
 
 5.2.0
 -----

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-24T13:35:59Z
+
+Hey!
+
+Nice work here, I this makes me happy.
+
+I think @scuben has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by piku235 at 2021-02-01T17:09:22Z
+
+The commits f1bceceb172fdc12ae11e0d3610af66da2d66429 and 70f703dd9a62670d31051ad62834986cfd95956e depend on the v5.2, they relate to https://github.com/symfony/symfony/pull/36736.
+
+The commit 0a91e7f5f209196efdfd73302e90651d3838372e fixes `Headers::isUnique()` which exists since the very beginning of the `symfony/mime` component (introduced in v4.3), so it exists also for v4.4. I guess there's no need to do it for v4.3 as it's not maintained anymore.
+I think we can create a separate PR targeting v4.4 and cherry-pick this commit (with small update), what do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-02-01T17:55:58Z
+
+Let's create a PR for 4.4.
+
+---------------------------------------------------------------------------
+
+by piku235 at 2021-02-01T19:13:46Z
+
+Ok, done https://github.com/symfony/symfony/pull/40062.

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by FabienSalles at 2021-02-01T17:41:17Z
+
+@xabbuh my tests failed because of deprecation notices with my anonymous classes.
+
+Why is it not possible ?
+What changes should I made ?
+
+Thanks in advance :).
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-01T18:25:00Z
+
+something looks weird in these deprecations. they look truncated.
+@nicolas-grekas could it be caused by the NUL byte in the anonymous class name ? And if yes, is it in our code, in PHPUnit or in PHP ?

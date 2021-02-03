@@ -126,6 +126,7 @@ use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as S
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
+use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
@@ -2236,6 +2237,7 @@ class FrameworkExtension extends Extension
             AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
+            SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',

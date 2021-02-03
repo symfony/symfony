@@ -831,4 +831,85 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
+
+    /**
+     * @dataProvider resultWithEmptyIterator
+     */
+    public function testValidateUniquenessWithEmptyIterator($entity, $result)
+    {
+        $constraint = new UniqueEntity([
+            'message' => 'myMessage',
+            'fields' => ['name'],
+            'em' => self::EM_NAME,
+            'repositoryMethod' => 'findByCustom',
+        ]);
+
+        $repository = $this->createRepositoryMock();
+        $repository->expects($this->once())
+            ->method('findByCustom')
+            ->willReturn($result)
+        ;
+        $this->em = $this->createEntityManagerMock($repository);
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function resultWithEmptyIterator(): array
+    {
+        $entity = new SingleIntIdEntity(1, 'foo');
+
+        return [
+            [$entity, new class() implements \Iterator {
+                public function current()
+                {
+                    return null;
+                }
+
+                public function valid(): bool
+                {
+                    return false;
+                }
+
+                public function next()
+                {
+                }
+
+                public function key()
+                {
+                }
+
+                public function rewind()
+                {
+                }
+            }],
+            [$entity, new class() implements \Iterator {
+                public function current()
+                {
+                    return false;
+                }
+
+                public function valid(): bool
+                {
+                    return false;
+                }
+
+                public function next()
+                {
+                }
+
+                public function key()
+                {
+                }
+
+                public function rewind()
+                {
+                }
+            }],
+        ];
+    }
 }

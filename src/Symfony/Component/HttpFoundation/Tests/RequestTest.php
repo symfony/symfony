@@ -727,7 +727,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider getRelativeUriForPathData()
+     * @dataProvider getRelativeUriForPathData
      */
     public function testGetRelativeUriForPath($expected, $pathinfo, $path)
     {

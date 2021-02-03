@@ -147,8 +147,7 @@ class UniqueEntityValidator extends ConstraintValidator
             if ($result instanceof \Countable && 1 < \count($result)) {
                 $result = [$result->current(), $result->current()];
             } else {
-                $result = $result->current();
-                $result = null === $result ? [] : [$result];
+                $result = $result->valid() && null !== $result->current() ? [$result->current()] : [];
             }
         } elseif (\is_array($result)) {
             reset($result);

@@ -239,6 +239,20 @@ class HeadersTest extends TestCase
         $this->assertFalse($headers->has('Message-ID'));
     }
 
+    public function testAddHeaderIsNotCaseSensitive()
+    {
+        $headers = new Headers();
+        $headers->addHeader('From', ['from@example.com']);
+
+        $this->assertInstanceOf(MailboxListHeader::class, $headers->get('from'));
+        $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
+    }
+
+    public function testIsUniqueHeaderIsNotCaseSensitive()
+    {
+        $this->assertTrue(Headers::isUniqueHeader('From'));
+    }
+
     public function testToStringJoinsHeadersTogether()
     {
         $headers = new Headers();

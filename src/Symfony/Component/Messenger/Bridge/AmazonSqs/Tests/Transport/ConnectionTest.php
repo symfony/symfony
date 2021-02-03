@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\Core\Test\ResultMockFactory;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
+use AsyncAws\Sqs\Result\QueueExistsWaiter;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
@@ -22,6 +23,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ConnectionTest extends TestCase
@@ -338,6 +340,54 @@ class ConnectionTest extends TestCase
         $logger->expects($this->exactly(4))->method('debug');
         $connection = Connection::fromDsn('sqs://default?debug=true', ['access_key' => 'foo', 'secret_key' => 'bar', 'auto_setup' => false], $client, $logger);
         $connection->get();
+    }
+
+    public function testSetupWithDefaultQueueAttributes()
+    {
+        $this->expectException(TransportException::class);
+
+        $client = $this->createMock(SqsClient::class);
+        $connection = new Connection(['queue_name' => 'queue'], $client);
+
+        $client->expects($this->any())
+            ->method('queueExists')
+            ->willReturn(ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE));
+
+        $client->expects($this->any())
+            ->method('createQueue')
+            ->with([
+                'QueueName' => 'queue',
+                'Attributes' => [
+                    'ReceiveMessageWaitTimeSeconds' => 20,
+                ],
+            ]);
+
+        $connection->setup();
+    }
+
+    public function testSetupWithQueueAttributes()
+    {
+        $this->expectException(TransportException::class);
+
+        $client = $this->createMock(SqsClient::class);
+        $connection = new Connection(['queue_name' => 'queue', 'retention_period' => 1000, 'visibility_timeout' => 300, 'wait_time' => 20], $client);
+
+        $client->expects($this->any())
+            ->method('queueExists')
+            ->willReturn(ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE));
+
+        $client->expects($this->any())
+            ->method('createQueue')
+            ->with([
+                'QueueName' => 'queue',
+                'Attributes' => [
+                    'ReceiveMessageWaitTimeSeconds' => 20,
+                    'VisibilityTimeout' => 300,
+                    'MessageRetentionPeriod' => 1000,
+                ],
+            ]);
+
+        $connection->setup();
     }
 
     private function getMockedQueueUrlResponse(): MockResponse

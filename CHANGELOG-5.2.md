@@ -7,6 +7,17 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.3 (2021-02-03)
+
+ * bug #39954 [Mailer][Mime] Fix case-sensitive handling of header names (piku235)
+ * bug #40055 [Messenger] Fix Doctrine setup when using a migration (fabpot)
+ * bug #40018 [TwigBridge] take into account all label related options (xabbuh)
+ * bug #40023 [Finder]  use proper keys to not override appended files (xabbuh)
+ * bug #40019 [ErrorHandler] Fix strpos error when trying to call a method without a name (Deuchnord)
+ * bug #40027 [DoctrineBridge] add missing `@experimental` annotation on Uid generators (nicolas-grekas)
+ * bug #40004 [Serializer] Prevent access to private properties without getters (julienfalque)
+ * bug #40003 [Uid] Fix time to float conversion (fancyweb)
+
 * 5.2.2 (2021-01-27)
 
  * bug #38900 [Serializer] Exclude non-initialized properties accessed with getters (BoShurik)

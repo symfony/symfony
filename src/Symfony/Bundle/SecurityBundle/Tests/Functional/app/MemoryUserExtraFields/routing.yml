@@ -1,0 +1,7 @@
+login:
+    path: /login
+
+memory-user-extra-fields:
+    path: /memory-user-extra-fields
+    defaults:
+        _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\MemoryUserExtraFieldsController

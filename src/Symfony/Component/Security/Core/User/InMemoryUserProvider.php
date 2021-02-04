@@ -28,7 +28,7 @@ class InMemoryUserProvider implements UserProviderInterface
 
     /**
      * The user array is a hash where the keys are usernames and the values are
-     * an array of attributes: 'password', 'enabled', and 'roles'.
+     * an array of attributes: 'password', 'enabled', 'roles' and 'extra_fields'.
      *
      * @param array $users An array of users
      */
@@ -38,7 +38,8 @@ class InMemoryUserProvider implements UserProviderInterface
             $password = $attributes['password'] ?? null;
             $enabled = $attributes['enabled'] ?? true;
             $roles = $attributes['roles'] ?? [];
-            $user = new User($username, $password, $roles, $enabled, true, true, true);
+            $extraFields = $attributes['extra_fields'] ?? [];
+            $user = new User($username, $password, $roles, $enabled, true, true, true, $extraFields);
 
             $this->createUser($user);
         }
@@ -65,7 +66,7 @@ class InMemoryUserProvider implements UserProviderInterface
     {
         $user = $this->getUser($username);
 
-        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(), $user->isCredentialsNonExpired(), $user->isAccountNonLocked());
+        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(), $user->isCredentialsNonExpired(), $user->isAccountNonLocked(), $user->getExtraFields());
     }
 
     /**
@@ -79,7 +80,7 @@ class InMemoryUserProvider implements UserProviderInterface
 
         $storedUser = $this->getUser($user->getUsername());
 
-        return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked());
+        return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked(), $storedUser->getExtraFields());
     }
 
     /**

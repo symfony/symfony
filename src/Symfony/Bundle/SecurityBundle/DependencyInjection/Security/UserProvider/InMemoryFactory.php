@@ -31,7 +31,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $users = [];
 
         foreach ($config['users'] as $username => $user) {
-            $users[$username] = ['password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']];
+            $users[$username] = ['password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles'], 'extra_fields' => $user['extra_fields']];
         }
 
         $definition->addArgument($users);
@@ -55,6 +55,9 @@ class InMemoryFactory implements UserProviderFactoryInterface
                             ->scalarNode('password')->defaultNull()->end()
                             ->arrayNode('roles')
                                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->prototype('scalar')->end()
+                            ->end()
+                            ->arrayNode('extra_fields')
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()

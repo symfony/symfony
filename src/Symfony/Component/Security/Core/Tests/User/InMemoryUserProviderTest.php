@@ -25,6 +25,7 @@ class InMemoryUserProviderTest extends TestCase
         $user = $provider->loadUserByUsername('fabien');
         $this->assertEquals('foo', $user->getPassword());
         $this->assertEquals(['ROLE_USER'], $user->getRoles());
+        $this->assertEquals(['name' => 'John', 'age' => 77, 'salary' => 1234.56], $user->getExtraFields());
         $this->assertFalse($user->isEnabled());
     }
 
@@ -37,6 +38,7 @@ class InMemoryUserProviderTest extends TestCase
         $refreshedUser = $provider->refreshUser($user);
         $this->assertEquals('foo', $refreshedUser->getPassword());
         $this->assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
+        $this->assertEquals(['name' => 'John', 'age' => 77, 'salary' => 1234.56], $refreshedUser->getExtraFields());
         $this->assertFalse($refreshedUser->isEnabled());
         $this->assertFalse($refreshedUser->isCredentialsNonExpired());
     }
@@ -48,6 +50,7 @@ class InMemoryUserProviderTest extends TestCase
                 'password' => 'foo',
                 'enabled' => false,
                 'roles' => ['ROLE_USER'],
+                'extra_fields' => ['name' => 'John', 'age' => 77, 'salary' => 1234.56],
             ],
         ]);
     }

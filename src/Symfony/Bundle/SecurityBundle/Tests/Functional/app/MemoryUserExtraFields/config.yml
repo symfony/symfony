@@ -1,0 +1,20 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    foo: { password: bar, roles: [ROLE_USER], extra_fields: {'age': 77} }
+
+    firewalls:
+        default:
+            form_login:
+                check_path: login
+
+    access_control:
+        - { path: ^/memory-user-extra-fields, roles: ROLE_USER }

@@ -146,11 +146,14 @@ class ContainerAwareEventManagerTest extends TestCase
 
     public function testGetListenersForEvent()
     {
+        $this->evm = new ContainerAwareEventManager($this->container, ['lazy2']);
+
         $this->container->set('lazy', $listener1 = new MyListener());
+        $this->container->set('lazy2', $subscriber1 = new MySubscriber(['foo']));
         $this->evm->addEventListener('foo', 'lazy');
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
-        $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
+        $this->assertSame([$subscriber1, $listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
     public function testGetListeners()

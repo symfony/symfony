@@ -368,11 +368,12 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleErrorWithAnonymousClass()
     {
+        $anonymousObject = new class() extends \stdClass {
+        };
+
         $handler = ErrorHandler::register();
-        $handler->throwAt(3, true);
         try {
-            $handler->handleError(3, 'foo '.\get_class(new class() extends \stdClass {
-            }).' bar', 'foo.php', 12);
+            trigger_error('foo '.\get_class($anonymousObject).' bar', \E_USER_WARNING);
             $this->fail('Exception expected.');
         } catch (\ErrorException $e) {
         } finally {
@@ -380,10 +381,7 @@ class ErrorHandlerTest extends TestCase
             restore_exception_handler();
         }
 
-        $this->assertSame('foo stdClass@anonymous bar', $e->getMessage());
-        $this->assertSame(3, $e->getSeverity());
-        $this->assertSame('foo.php', $e->getFile());
-        $this->assertSame(12, $e->getLine());
+        $this->assertSame('User Warning: foo stdClass@anonymous bar', $e->getMessage());
     }
 
     public function testHandleDeprecation()

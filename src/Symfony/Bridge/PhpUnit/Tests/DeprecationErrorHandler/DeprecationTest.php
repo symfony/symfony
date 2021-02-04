@@ -174,6 +174,8 @@ class DeprecationTest extends TestCase
     {
         $trace = [
             ['class' => 'MyClass1', 'function' => 'myMethod'],
+            ['function' => 'trigger_error'],
+            ['class' => SymfonyTestsListenerTrait::class, 'function' => 'endTest'],
             ['class' => $traceClass, 'function' => 'myMethod'],
         ];
         $deprecation = new Deprecation($message, $trace, $file);

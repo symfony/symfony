@@ -154,6 +154,9 @@
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
+        "files": [
+            "src/Symfony/Component/String/Resources/functions.php"
+        ],
         "classmap": [
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
@@ -163,7 +166,6 @@
     },
     "autoload-dev": {
         "files": [
-            "src/Symfony/Component/String/Resources/functions.php",
             "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
         ]
     },

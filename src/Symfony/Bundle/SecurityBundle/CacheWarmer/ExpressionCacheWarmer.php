@@ -37,7 +37,7 @@ class ExpressionCacheWarmer implements CacheWarmerInterface
     public function warmUp($cacheDir)
     {
         foreach ($this->expressions as $expression) {
-            $this->expressionLanguage->parse($expression, ['token', 'user', 'object', 'subject', 'roles', 'request', 'trust_resolver']);
+            $this->expressionLanguage->parse($expression, ['token', 'user', 'object', 'subject', 'roles', 'role_names', 'request', 'trust_resolver']);
         }
     }
 }

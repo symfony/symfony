@@ -320,12 +320,12 @@ class SerializableUser implements UserInterface, \Serializable
         return null;
     }
 
-    public function serialize()
+    public function serialize(): string
     {
         return serialize($this->name);
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->name = unserialize($serialized);
     }

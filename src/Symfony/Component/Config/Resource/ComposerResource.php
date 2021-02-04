@@ -61,6 +61,14 @@ class ComposerResource implements SelfCheckingResourceInterface
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $v = \dirname($r->getFileName(), 2);
+                // When using `symfony/phpunit-bridge` package, it installs a new
+                // package in `vendor/bin/.phpunit`. This package comes with its
+                // own autoloader. When booting symfony with `simple-phpunit`, the
+                // autoloader is used and discovered here. But we do not want to
+                // affect the container freshness for this package.
+                if (false !== strpos($v, 'vendor/bin/.phpunit/phpunit')) {
+                    continue;
+                }
                 if (file_exists($v.'/composer/installed.json')) {
                     self::$runtimeVendors[$v] = @filemtime($v.'/composer/installed.json');
                 }

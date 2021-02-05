@@ -17,4 +17,5 @@ Additionally (see https://symfony.com/releases):
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
  - Features and deprecations must be submitted against branch 5.x.
+ - Changelog entry should follow https://symfony.com/doc/current/contributing/code/conventions.html#writing-a-changelog-entry
 -->

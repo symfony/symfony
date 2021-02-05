@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by acasademont at 2021-02-01T16:04:50Z
+
+The fabbot seems to be complaining about an unrelated line. Can fix it if necessary!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-02T11:15:34Z
+
+So if I understand this right, I can also require a specific version?
+
+```xml
+<server name="SYMFONY_PHPUNIT_REQUIRE" value="phpspec/prophecy-phpunit:^1.0"/>
+```
+
+---------------------------------------------------------------------------
+
+by acasademont at 2021-02-02T11:37:54Z
+
+> So if I understand this right, I can also require a specific version?
+>
+> ```
+> <server name="SYMFONY_PHPUNIT_REQUIRE" value="phpspec/prophecy-phpunit:^1.0"/>
+> ```
+
+Yes exactly!

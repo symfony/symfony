@@ -32,7 +32,7 @@ class GlobFileLoaderTest extends TestCase
         $loader = new GlobFileLoaderWithoutImport($container = new ContainerBuilder(), new FileLocator());
         $loader->load(__DIR__.'/../Fixtures/config/*');
 
-        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/config', '/*', false), $container->getResources()[1]);
+        $this->assertEquals(new GlobResource(__DIR__.'/../Fixtures/config', '/*', false), $container->getResources()[0]);
     }
 }
 

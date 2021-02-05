@@ -18,7 +18,6 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -952,7 +951,7 @@ class ContainerBuilderTest extends TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(2, $resources, '2 resources were registered');
+        $this->assertCount(1, $resources);
 
         /* @var $resource \Symfony\Component\Config\Resource\FileResource */
         $resource = end($resources);
@@ -981,9 +980,9 @@ class ContainerBuilderTest extends TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(3, $resources, '3 resources were registered');
+        $this->assertCount(2, $resources);
 
-        $this->assertSame('reflection.BarClass', (string) $resources[1]);
+        $this->assertSame('reflection.BarClass', (string) $resources[0]);
         $this->assertSame('BarMissingClass', (string) end($resources));
     }
 
@@ -1044,7 +1043,6 @@ class ContainerBuilderTest extends TestCase
     public function testFileExists()
     {
         $container = new ContainerBuilder();
-        $A = new ComposerResource();
         $a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml');
         $b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml');
         $c = new DirectoryResource($dir = \dirname($b));
@@ -1058,7 +1056,7 @@ class ContainerBuilderTest extends TestCase
             }
         }
 
-        $this->assertEquals([$A, $a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
+        $this->assertEquals([$a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
     }
 
     public function testExtension()

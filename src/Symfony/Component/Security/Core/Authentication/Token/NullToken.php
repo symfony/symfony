@@ -94,11 +94,17 @@ class NullToken implements TokenInterface
     {
     }
 
+    /**
+     * @return string
+     */
     public function serialize()
     {
         return '';
     }
 
+    /**
+     * @return void
+     */
     public function unserialize($serialized)
     {
     }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+dev
+---
+
+ * Added a `login_throttling.interval` (in `security.firewalls`) to permits easily to change the throttling interval.
+
 5.2.0
 -----
 

@@ -49,6 +49,7 @@
         "symfony/messenger": "^4.4|^5.0",
         "symfony/mime": "^4.4|^5.0",
         "symfony/process": "^3.4|^4.0|^5.0",
+        "symfony/security-core": "^3.4|^4.4|^5.2",
         "symfony/security-csrf": "^3.4|^4.0|^5.0",
         "symfony/security-http": "^3.4|^4.0|^5.0",
         "symfony/serializer": "^4.4|^5.0",

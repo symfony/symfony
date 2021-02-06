@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-04T14:12:29Z
+
+Similar to https://github.com/symfony/symfony/pull/40086
+This was done on purpose, to encourage ppl to use standalone components.
+Don't use symfony/symfony :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-04T14:17:32Z
+
+Going from symfony/symfony to components is part of upgrading.  I don't think such hard to debug errors encourage people to opt-out, it just makes it harder
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-05T04:41:39Z
+
+A library might require `symfony/string` in order to gain access to the string functions. If that library is used in an application that depends on `symfony/symfony` (which replaces `symfony/string`), our library will break because the functions are not available.

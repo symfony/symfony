@@ -54,7 +54,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
             ->children()
                 ->scalarNode('limiter')->info(sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
-                ->scalarNode('interval')->defaultValue('1 minute')->end() 
+                ->scalarNode('interval')->defaultValue('1 minute')->end()
             ->end();
     }
 

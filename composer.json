@@ -28,7 +28,7 @@
         "symfony/cache-implementation": "1.0|2.0",
         "symfony/event-dispatcher-implementation": "2.0",
         "symfony/http-client-implementation": "2.2",
-        "symfony/service-implementation": "1.0",
+        "symfony/service-implementation": "1.0|2.0",
         "symfony/translation-implementation": "2.3"
     },
     "require": {

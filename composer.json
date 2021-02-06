@@ -15,6 +15,22 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "provide": {
+        "php-http/async-client-implementation": "*",
+        "php-http/client-implementation": "*",
+        "psr/cache-implementation": "1.0|2.0",
+        "psr/container-implementation": "1.0",
+        "psr/event-dispatcher-implementation": "1.0",
+        "psr/http-client-implementation": "1.0",
+        "psr/link-implementation": "1.0",
+        "psr/log-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0",
+        "symfony/cache-implementation": "1.0|2.0",
+        "symfony/event-dispatcher-implementation": "2.0",
+        "symfony/http-client-implementation": "2.2",
+        "symfony/service-implementation": "1.0",
+        "symfony/translation-implementation": "2.3"
+    },
     "require": {
         "php": ">=7.2.5",
         "ext-xml": "*",

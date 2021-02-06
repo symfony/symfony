@@ -27,9 +27,9 @@
         "psr/simple-cache-implementation": "1.0",
         "symfony/cache-implementation": "1.0|2.0",
         "symfony/event-dispatcher-implementation": "1.1",
-        "symfony/http-client-implementation": "1.1",
-        "symfony/service-implementation": "1.0",
-        "symfony/translation-implementation": "1.0"
+        "symfony/http-client-implementation": "1.1|2.0",
+        "symfony/service-implementation": "1.0|2.0",
+        "symfony/translation-implementation": "1.0|2.0"
     },
     "require": {
         "php": ">=7.1.3",

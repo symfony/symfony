@@ -38,7 +38,7 @@
         "symfony/yaml": "<3.4"
     },
     "provide": {
-        "symfony/translation-implementation": "1.0"
+        "symfony/translation-implementation": "1.0|2.0"
     },
     "suggest": {
         "symfony/config": "",

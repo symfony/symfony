@@ -40,7 +40,7 @@
     },
     "provide": {
         "psr/container-implementation": "1.0",
-        "symfony/service-implementation": "1.0"
+        "symfony/service-implementation": "1.0|2.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },

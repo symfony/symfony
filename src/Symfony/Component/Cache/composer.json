@@ -18,7 +18,7 @@
     "provide": {
         "psr/cache-implementation": "1.0|2.0",
         "psr/simple-cache-implementation": "1.0",
-        "symfony/cache-implementation": "1.0"
+        "symfony/cache-implementation": "1.0|2.0"
     },
     "require": {
         "php": ">=7.1.3",

@@ -10,3 +10,4 @@ security:
         default:
             login_throttling:
                 max_attempts: 1
+                interval: '8 minutes'

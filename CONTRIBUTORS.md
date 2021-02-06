@@ -1598,7 +1598,7 @@ Symfony is the result of the work of many people who made the code better
  - ConneXNL
  - Aharon Perkel
  - matze
- - Justin Reherman (jreherman)
+ - Justin (j4nr6n)
  - Rubén Calvo (rubencm)
  - Paweł Niedzielski (steveb)
  - Abdul.Mohsen B. A. A

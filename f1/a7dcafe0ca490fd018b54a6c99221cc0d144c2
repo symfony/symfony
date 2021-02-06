@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by simonberger at 2021-02-04T00:01:36Z
+
+Failing PHP 7.1 travis job probably related but I don't really get it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-04T09:00:59Z
+
+Thanks for the PR. I'm going to close it because we want to discourage ppl from using `symfony/symfony` as a dependency. This might even not be possible anymore with v6. As such, we don't want to advertise this.
+
+---------------------------------------------------------------------------
+
+by simonberger at 2021-02-04T10:35:23Z
+
+@nicolas-grekas there are multiple reasons why projects have to rely on symfony/symfony at least for some time.
+I hope to change your mind to fix problems like this. Using symfony/symfony is supported and the support on the latest V5 version will still last a couple of years.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-04T10:42:23Z
+
+> there are multiple reasons why projects have to rely on symfony/symfony at least for some time.
+
+We worked quite hard to actually remove any reasons to do so. Which ones remain to you?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-04T11:53:47Z
+
+@nicolas-grekas in v5, it is discouraged, but not forbidden. So I think we should still make sure we have the proper `provide` metadata in the fullstack repo to avoid such weird issues.

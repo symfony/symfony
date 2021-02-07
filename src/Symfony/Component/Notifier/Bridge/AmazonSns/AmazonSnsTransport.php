@@ -51,7 +51,7 @@ final class AmazonSnsTransport extends AbstractTransport
     protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage && !($message instanceof ChatMessage && $message->getOptions() instanceof AmazonSnsOptions)) {
-            throw new UnsupportedMessageTypeException(__CLASS__, sprintf('%s or %s', SmsMessage::class, ChatMessage::class), $message);
+            throw new UnsupportedMessageTypeException(__CLASS__, sprintf('"%s" or "%s"', SmsMessage::class, ChatMessage::class), $message);
         }
 
         if ($message instanceof ChatMessage) {

@@ -51,7 +51,7 @@
         "symfony/messenger": "^5.2",
         "symfony/mime": "^4.4|^5.0",
         "symfony/process": "^4.4|^5.0",
-        "symfony/security-bundle": "^5.1",
+        "symfony/security-bundle": "^5.2",
         "symfony/serializer": "^5.2",
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/string": "^5.0",

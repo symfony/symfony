@@ -1786,6 +1786,44 @@ class ViolationMapperTest extends TestCase
         $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
     }
 
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ])
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_translation_parameters' => [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child parent value',
+            ],
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+            'label_translation_parameters' => [
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ],
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
     public function testTranslatorNotCalledWithoutLabel()
     {
         $renderer = $this->getMockBuilder(FormRenderer::class)

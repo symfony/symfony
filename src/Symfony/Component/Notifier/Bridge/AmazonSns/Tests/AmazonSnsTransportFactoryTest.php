@@ -24,8 +24,8 @@ class AmazonSnsTransportFactoryTest extends TransportFactoryTestCase
 
     public function createProvider(): iterable
     {
-        yield ['sns://host.test?region=eu-west-1', 'sns://host.test'];
-        yield ['sns://host.test?region=eu-west-1', 'sns://accessId:accessKey@host.test'];
+        yield ['sns://host.test?region=us-east-1', 'sns://host.test'];
+        yield ['sns://host.test?region=us-east-1', 'sns://accessId:accessKey@host.test'];
         yield ['sns://host.test?region=eu-west-3', 'sns://host.test?region=eu-west-3'];
     }
 

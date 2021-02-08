@@ -33,14 +33,22 @@ final class AmazonSnsTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        $options = [
-                'region' => $dsn->getOption('region') ?: 'eu-west-1',
-                'profile' => $dsn->getOption('profile'),
+        $options = null === $host ? [] : ['endpoint' => 'https://' . $host . ($port ? ':' . $port : '')];
+
+        if ($dsn->getUser()) {
+            $options += [
                 'accessKeyId' => $dsn->getUser(),
                 'accessKeySecret' => $dsn->getPassword(),
-            ] + (
-            null === $host ? [] : ['endpoint' => 'https://'.$host.($port ? ':'.$port : '')]
-            );
+            ];
+        }
+
+        if ($dsn->getOption('region')) {
+            $options['region'] = $dsn->getOption('region');
+        }
+
+        if ($dsn->getOption('profile')) {
+            $options['profile'] = $dsn->getOption('profile');
+        }
 
         return (new AmazonSnsTransport(new SnsClient($options, null, $this->client), $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }

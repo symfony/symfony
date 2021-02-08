@@ -29,6 +29,6 @@ class AmazonSnsOptionsTest extends TestCase
         $options
             ->recipient('my-topic')
             ->subject('value');
-        $this->assertEquals(['Subject' => 'value'], $options->toArray());
+        $this->assertSame(['Subject' => 'value'], $options->toArray());
     }
 }

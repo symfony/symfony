@@ -19,8 +19,8 @@
         "php": ">=7.2.5",
         "symfony/http-client": "^4.3|^5.0",
         "symfony/notifier": "^5.3",
-        "async-aws/sns": "^1.0",
-        "async-aws/core": "^1.7"
+        "async-aws/sns": "^1.2",
+        "async-aws/core": "^1.9"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\AmazonSns\\": "" },

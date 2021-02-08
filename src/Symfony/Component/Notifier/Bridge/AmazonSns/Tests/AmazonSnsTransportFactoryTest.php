@@ -32,7 +32,7 @@ class AmazonSnsTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [true, 'sns://default'];
-        yield [false, 'not-sns://default'];
+        yield [false, 'somethingElse://default'];
     }
 
     public function unsupportedSchemeProvider(): iterable

@@ -836,6 +836,19 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds translation resources with dots in domain'
         );
+        $this->assertContains(strtr(__DIR__.'/translations/security.en.yaml', '/', \DIRECTORY_SEPARATOR), $files);
+
+        $positionOverridingTranslationFile = array_search(strtr(realpath(__DIR__.'/translations/security.en.yaml'), '/', \DIRECTORY_SEPARATOR), $files);
+
+        if (false !== $positionCoreTranslationFile = array_search(strtr(realpath(__DIR__.'/../../../../Component/Security/Core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files)) {
+            $this->assertContains(strtr(realpath(__DIR__.'/../../../../Component/Security/Core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+        } else {
+            $this->assertContains(strtr(realpath(__DIR__.'/../../vendor/symfony/security-core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+
+            $positionCoreTranslationFile = array_search(strtr(realpath(__DIR__.'/../../vendor/symfony/security-core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+        }
+
+        $this->assertGreaterThan($positionCoreTranslationFile, $positionOverridingTranslationFile);
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['fr'], $calls[1][1][0]);

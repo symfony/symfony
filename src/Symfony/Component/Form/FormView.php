@@ -79,11 +79,13 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Marks the view as rendered.
      *
+     * @param bool $rendered
+     *
      * @return $this
      */
-    public function setRendered()
+    public function setRendered(bool $rendered = true)
     {
-        $this->rendered = true;
+        $this->rendered = $rendered;
 
         return $this;
     }

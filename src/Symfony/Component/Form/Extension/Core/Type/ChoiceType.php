@@ -395,6 +395,7 @@ class ChoiceType extends AbstractType
         $choiceOpts = [
             'value' => $choiceView->value,
             'label' => $choiceView->label,
+            'label_html' => $options['label_html'],
             'attr' => $choiceView->attr,
             'translation_domain' => $options['choice_translation_domain'],
             'block_name' => 'entry',

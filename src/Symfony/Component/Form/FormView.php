@@ -77,9 +77,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Marks the view as rendered.
-     *
-     * @param bool $rendered default true
+     * Marks the view as rendered
      *
      * @return $this
      */

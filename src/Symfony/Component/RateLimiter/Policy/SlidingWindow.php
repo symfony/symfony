@@ -63,8 +63,12 @@ final class SlidingWindow implements LimiterStateInterface
     public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
     {
         $new = new self($window->id, $intervalInSeconds);
-        $new->hitCountForLastWindow = $window->hitCount;
-        $new->windowEndAt = $window->windowEndAt + $intervalInSeconds;
+        $windowEndAt = $window->windowEndAt + $intervalInSeconds;
+
+        if (time() < $windowEndAt) {
+            $new->hitCountForLastWindow = $window->hitCount;
+            $new->windowEndAt = $windowEndAt;
+        }
 
         return $new;
     }
@@ -112,7 +116,7 @@ final class SlidingWindow implements LimiterStateInterface
     public function getHitCount(): int
     {
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $percentOfCurrentTimeFrame = (time() - $startOfWindow) / $this->intervalInSeconds;
+        $percentOfCurrentTimeFrame = min((time() - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }

@@ -1,8 +1,11 @@
 CONTRIBUTORS
 ============
 
-Symfony is the result of the work of many people who made the code better
-(see https://symfony.com/contributors for more information):
+Symfony is the result of the work of many people who made the code better.
+
+The Symfony Connect username in parenthesis allows to get more information
+about contributors (like https://connect.symfony.com/profile/fabpot). See
+https://symfony.com/contributors for more information.
 
  - Fabien Potencier (fabpot)
  - Nicolas Grekas (nicolas-grekas)

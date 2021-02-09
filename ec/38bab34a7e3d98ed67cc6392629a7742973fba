@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-09T09:44:36Z
+
+In some app I had to create a simple in-template form theme to make the choice labels display their HTML contents properly. So, a big 👍  from me to this proposal. Thanks Christian!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-09T13:53:09Z
+
+@javiereguiluz I think this place was simply forgotten to be updated when the `label_html` option was introduced in 5.1.

@@ -48,6 +48,7 @@
                     <argument type="service" id="cache.annotations" />
                 </service>
             </argument>
+            <tag name="container.hot_path" />
         </service>
 
         <service id="annotation_reader" alias="annotations.reader" />

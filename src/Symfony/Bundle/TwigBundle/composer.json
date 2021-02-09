@@ -27,7 +27,7 @@
     "require-dev": {
         "symfony/asset": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
-        "symfony/dependency-injection": "^5.2",
+        "symfony/dependency-injection": "^5.3",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
@@ -40,7 +40,7 @@
         "doctrine/cache": "~1.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<5.2",
+        "symfony/dependency-injection": "<5.3",
         "symfony/framework-bundle": "<5.0",
         "symfony/translation": "<5.0"
     },

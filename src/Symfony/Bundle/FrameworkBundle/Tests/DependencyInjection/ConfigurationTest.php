@@ -443,6 +443,7 @@ class ConfigurationTest extends TestCase
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
+                'enabled' => true,
                 'magic_call' => false,
                 'magic_get' => true,
                 'magic_set' => true,
@@ -566,7 +567,7 @@ class ConfigurationTest extends TestCase
                 'limiters' => [],
             ],
             'uid' => [
-                'enabled' => class_exists(UuidFactory::class),
+                'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
                 'default_uuid_version' => 6,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,

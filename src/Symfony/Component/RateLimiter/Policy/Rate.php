@@ -68,9 +68,9 @@ final class Rate
      */
     public function calculateTimeForTokens(int $tokens): int
     {
-        $cyclesRequired = ceil($tokens / $this->refillAmount);
+        $cyclesRequired = $tokens / $this->refillAmount;
 
-        return TimeUtil::dateIntervalToSeconds($this->refillTime) * $cyclesRequired;
+        return ceil(TimeUtil::dateIntervalToSeconds($this->refillTime) * $cyclesRequired);
     }
 
     /**

@@ -16,6 +16,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,8 +36,10 @@ class KernelTest extends TestCase
 {
     protected function tearDown(): void
     {
-        $fs = new Filesystem();
-        $fs->remove(__DIR__.'/Fixtures/var');
+        try {
+            (new Filesystem())->remove(__DIR__.'/Fixtures/var');
+        } catch (IOException $e) {
+        }
     }
 
     public function testConstructor()
@@ -586,7 +589,7 @@ EOF
 
     public function testKernelReset()
     {
-        (new Filesystem())->remove(__DIR__.'/Fixtures/var/cache');
+        $this->tearDown();
 
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();

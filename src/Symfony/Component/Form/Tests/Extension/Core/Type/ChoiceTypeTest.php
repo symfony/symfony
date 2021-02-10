@@ -392,6 +392,20 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
+    public function testExpandedCheckboxesInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => true,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
+        }
+    }
+
     public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -417,6 +431,20 @@ class ChoiceTypeTest extends BaseTypeTest
 
         foreach ($form as $child) {
             $this->assertFalse($child->isRequired());
+        }
+    }
+
+    public function testExpandedRadiosInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => false,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
         }
     }
 

@@ -61,6 +61,7 @@ return static function (ContainerConfigurator $container) {
                         service('cache.annotations'),
                     ]),
             ])
+            ->tag('container.hot_path')
 
         ->alias('annotation_reader', 'annotations.reader')
         ->alias(Reader::class, 'annotation_reader');

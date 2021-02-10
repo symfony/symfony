@@ -511,7 +511,7 @@ class RouterTest extends TestCase
     /**
      * @dataProvider getContainerParameterForRoute
      */
-    public function testCacheValiditiyWithContainerParameters($parameter)
+    public function testCacheValidityWithContainerParameters($parameter)
     {
         $cacheDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('router_', true);
 
@@ -534,7 +534,7 @@ class RouterTest extends TestCase
 
             $router->getMatcher(); // trigger cache build
 
-            $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'UrlMatcher.php', $resourceCheckers);
+            $cache = new ResourceCheckerConfigCache($cacheDir.\DIRECTORY_SEPARATOR.'url_matching_routes.php', $resourceCheckers);
 
             $this->assertTrue($cache->isFresh());
         } finally {

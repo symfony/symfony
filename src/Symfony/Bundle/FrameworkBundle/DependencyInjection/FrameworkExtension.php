@@ -97,6 +97,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -944,8 +945,12 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
+            $container->removeDefinition('messenger.middleware.router_context');
 
             return;
+        }
+        if (!class_exists(RouterContextMiddleware::class)) {
+            $container->removeDefinition('messenger.middleware.router_context');
         }
 
         $loader->load('routing.php');

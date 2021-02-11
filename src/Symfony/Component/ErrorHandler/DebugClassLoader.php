@@ -612,7 +612,7 @@ class DebugClassLoader
                     $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                 }
 
-                if (false === strpos($doc, '@deprecated') && strncmp($ns, $declaringClass, $len)) {
+                if (false === strpos($doc, '* @deprecated') && strncmp($ns, $declaringClass, $len)) {
                     if ($canAddReturnType && 'docblock' === $this->patchTypes['force'] && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {

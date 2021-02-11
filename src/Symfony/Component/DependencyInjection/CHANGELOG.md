@@ -7,6 +7,7 @@ CHANGELOG
  * Add `ServicesConfigurator::remove()` in the PHP-DSL
  * Add `%env(not:...)%` processor to negate boolean values
  * Add support for loading autoconfiguration rules via the `#[Autoconfigure]` and `#[AutoconfigureTag]` attributes on PHP 8
+ * Add autoconfigurable attributes
 
 5.2.0
 -----

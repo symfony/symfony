@@ -123,6 +123,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $autoconfiguredInstanceof = [];
 
+    /**
+     * @var callable[]
+     */
+    private $autoconfiguredAttributes = [];
+
     private $removedIds = [];
 
     private $removedBindingIds = [];
@@ -670,6 +675,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             $this->autoconfiguredInstanceof[$interface] = $childDefinition;
+        }
+
+        foreach ($container->getAutoconfiguredAttributes() as $attribute => $configurator) {
+            if (isset($this->autoconfiguredAttributes[$attribute])) {
+                throw new InvalidArgumentException(sprintf('"%s" has already been autoconfigured and merge() does not support merging autoconfiguration for the same attribute.', $attribute));
+            }
+
+            $this->autoconfiguredAttributes[$attribute] = $configurator;
         }
     }
 
@@ -1310,6 +1323,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Registers an attribute that will be used for autoconfiguring annotated classes.
+     *
+     * The configurator will receive a Definition instance and an instance of the attribute, in that order.
+     */
+    public function registerAttributeForAutoconfiguration(string $attributeClass, callable $configurator): void
+    {
+        $this->autoconfiguredAttributes[$attributeClass] = $configurator;
+    }
+
+    /**
      * Registers an autowiring alias that only binds to a specific argument name.
      *
      * The argument name is derived from $name if provided (from $id otherwise)
@@ -1336,6 +1359,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredInstanceof()
     {
         return $this->autoconfiguredInstanceof;
+    }
+
+    /**
+     * @return callable[]
+     */
+    public function getAutoconfiguredAttributes(): array
+    {
+        return $this->autoconfiguredAttributes;
     }
 
     /**

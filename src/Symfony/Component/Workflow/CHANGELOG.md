@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate `InvalidTokenConfigurationException`
+ * Added `MermaidDumper` to dump Workflow graphs in the Mermaid.js flowchart format
 
 5.2.0
 -----

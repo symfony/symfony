@@ -40,6 +40,15 @@ class ConnectionTest extends TestCase
         }
     }
 
+    private function skipIfRedisClusterUnavailable()
+    {
+        try {
+            new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        } catch (\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
+    }
+
     public function testFromInvalidDsn()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -57,6 +66,20 @@ class ConnectionTest extends TestCase
             ]),
             Connection::fromDsn('redis://localhost/queue')
         );
+    }
+
+    public function testFromDsnWithMultipleHosts()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $hosts = explode(' ', getenv('REDIS_CLUSTER_HOSTS'));
+
+        $dsn = array_map(function ($host) {
+            return 'redis://'.$host;
+        }, $hosts);
+        $dsn = implode(',', $dsn);
+
+        $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn));
     }
 
     public function testFromDsnOnUnixSocket()
@@ -158,6 +181,14 @@ class ConnectionTest extends TestCase
     {
         $this->expectDeprecation('Since symfony/messenger 5.1: Invalid option(s) "foo" passed to the Redis Messenger transport. Passing invalid options is deprecated.');
         Connection::fromDsn('redis://localhost/queue?foo=bar');
+    }
+
+    public function testRedisClusterInstanceIsSupported()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $redis = new \RedisCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        $this->assertInstanceOf(Connection::class, new Connection([], [], [], $redis));
     }
 
     public function testKeepGettingPendingMessages()
@@ -428,5 +459,21 @@ class ConnectionTest extends TestCase
         $this->assertSame('1', $message['body']);
         $connection->reject($message['id']);
         $redis->del('messenger-lazy');
+    }
+
+    public function testLazyCluster()
+    {
+        $this->skipIfRedisClusterUnavailable();
+
+        $connection = new Connection(
+            ['lazy' => true],
+            ['host' => explode(' ', getenv('REDIS_CLUSTER_HOSTS'))]
+        );
+
+        $connection->add('1', []);
+        $this->assertNotEmpty($message = $connection->get());
+        $this->assertSame('1', $message['body']);
+        $connection->reject($message['id']);
+        $connection->cleanup();
     }
 }

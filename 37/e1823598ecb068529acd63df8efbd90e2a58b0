@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-06T17:36:44Z
+
+> Error: Call to undefined method Symfony\Component\Routing\RequestContext::fromUri()
+
+on deps=low

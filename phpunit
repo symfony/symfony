@@ -14,7 +14,7 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
         putenv('SYMFONY_PHPUNIT_VERSION=9.5');
     }
 }
-if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {
+if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS') && \PHP_VERSION_ID >= 70300) {
     putenv('SYMFONY_PATCH_TYPE_DECLARATIONS=deprecations=1');
 }
 if (getcwd() === realpath(__DIR__.'/src/Symfony/Bridge/PhpUnit')) {

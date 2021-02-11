@@ -65,7 +65,6 @@ final class FirebaseTransport extends AbstractTransport
         }
         $options['notification'] = $options['notification'] ?? [];
         $options['notification']['body'] = $message->getSubject();
-
         $options['data'] = $options['data'] ?? [];
 
         $response = $this->client->request('POST', $endpoint, [

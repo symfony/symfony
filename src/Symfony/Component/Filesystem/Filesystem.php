@@ -50,13 +50,13 @@ class Filesystem
 
         if ($doCopy) {
             // https://bugs.php.net/64634
-            if (false === $source = @fopen($originFile, 'r')) {
-                throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading.', $originFile, $targetFile), 0, null, $originFile);
+            if (!$source = self::box('fopen', $originFile, 'r')) {
+                throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
             }
 
             // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-            if (false === $target = @fopen($targetFile, 'w', null, stream_context_create(['ftp' => ['overwrite' => true]]))) {
-                throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing.', $originFile, $targetFile), 0, null, $originFile);
+            if (!$target = self::box('fopen', $targetFile, 'w', null, stream_context_create(['ftp' => ['overwrite' => true]]))) {
+                throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing: ', $originFile, $targetFile).self::$lastError, 0, null, $originFile);
             }
 
             $bytesCopied = stream_copy_to_stream($source, $target);
@@ -70,7 +70,7 @@ class Filesystem
 
             if ($originIsLocal) {
                 // Like `cp`, preserve executable permission bits
-                @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+                self::box('chmod', $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
 
                 if ($bytesCopied !== $bytesOrigin = filesize($originFile)) {
                     throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
@@ -93,14 +93,8 @@ class Filesystem
                 continue;
             }
 
-            if (!self::box('mkdir', $dir, $mode, true)) {
-                if (!is_dir($dir)) {
-                    // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message if we have one
-                    if (self::$lastError) {
-                        throw new IOException(sprintf('Failed to create "%s": ', $dir).self::$lastError, 0, null, $dir);
-                    }
-                    throw new IOException(sprintf('Failed to create "%s".', $dir), 0, null, $dir);
-                }
+            if (!self::box('mkdir', $dir, $mode, true) && !is_dir($dir)) {
+                throw new IOException(sprintf('Failed to create "%s": ', $dir).self::$lastError, 0, null, $dir);
             }
         }
     }
@@ -141,9 +135,8 @@ class Filesystem
     public function touch($files, int $time = null, int $atime = null)
     {
         foreach ($this->toIterable($files) as $file) {
-            $touch = $time ? @touch($file, $time, $atime) : @touch($file);
-            if (true !== $touch) {
-                throw new IOException(sprintf('Failed to touch "%s".', $file), 0, null, $file);
+            if (!($time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
+                throw new IOException(sprintf('Failed to touch "%s": ', $file).self::$lastError, 0, null, $file);
             }
         }
     }
@@ -225,8 +218,8 @@ class Filesystem
     public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false)
     {
         foreach ($this->toIterable($files) as $file) {
-            if ((\PHP_VERSION_ID < 80000 || \is_int($mode)) && true !== @chmod($file, $mode & ~$umask)) {
-                throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
+            if ((\PHP_VERSION_ID < 80000 || \is_int($mode)) && !self::box('chmod', $file, $mode & ~$umask)) {
+                throw new IOException(sprintf('Failed to chmod file "%s": ', $file).self::$lastError, 0, null, $file);
             }
             if ($recursive && is_dir($file) && !is_link($file)) {
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
@@ -250,12 +243,12 @@ class Filesystem
                 $this->chown(new \FilesystemIterator($file), $user, true);
             }
             if (is_link($file) && \function_exists('lchown')) {
-                if (true !== @lchown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file "%s".', $file), 0, null, $file);
+                if (!self::box('lchown', $file, $user)) {
+                    throw new IOException(sprintf('Failed to chown file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             } else {
-                if (true !== @chown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file "%s".', $file), 0, null, $file);
+                if (!self::box('chown', $file, $user)) {
+                    throw new IOException(sprintf('Failed to chown file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             }
         }
@@ -277,12 +270,12 @@ class Filesystem
                 $this->chgrp(new \FilesystemIterator($file), $group, true);
             }
             if (is_link($file) && \function_exists('lchgrp')) {
-                if (true !== @lchgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file "%s".', $file), 0, null, $file);
+                if (!self::box('lchgrp', $file, $group)) {
+                    throw new IOException(sprintf('Failed to chgrp file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             } else {
-                if (true !== @chgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file "%s".', $file), 0, null, $file);
+                if (!self::box('chgrp', $file, $group)) {
+                    throw new IOException(sprintf('Failed to chgrp file "%s": ', $file).self::$lastError, 0, null, $file);
                 }
             }
         }
@@ -301,7 +294,7 @@ class Filesystem
             throw new IOException(sprintf('Cannot rename because the target "%s" already exists.', $target), 0, null, $target);
         }
 
-        if (true !== @rename($origin, $target)) {
+        if (!self::box('rename', $origin, $target)) {
             if (is_dir($origin)) {
                 // See https://bugs.php.net/54097 & https://php.net/rename#113943
                 $this->mirror($origin, $target, null, ['override' => $overwrite, 'delete' => $overwrite]);
@@ -309,7 +302,7 @@ class Filesystem
 
                 return;
             }
-            throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target), 0, null, $target);
+            throw new IOException(sprintf('Cannot rename "%s" to "%s": ', $origin, $target).self::$lastError, 0, null, $target);
         }
     }
 
@@ -403,7 +396,7 @@ class Filesystem
                 throw new IOException(sprintf('Unable to create "%s" link due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', $linkType), 0, null, $target);
             }
         }
-        throw new IOException(sprintf('Failed to create "%s" link from "%s" to "%s".', $linkType, $origin, $target), 0, null, $target);
+        throw new IOException(sprintf('Failed to create "%s" link from "%s" to "%s": ', $linkType, $origin, $target).self::$lastError, 0, null, $target);
     }
 
     /**
@@ -625,10 +618,8 @@ class Filesystem
 
         // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
         if ((null === $scheme || 'file' === $scheme || 'gs' === $scheme) && '' === $suffix) {
-            $tmpFile = @tempnam($hierarchy, $prefix);
-
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
-            if (false !== $tmpFile) {
+            if ($tmpFile = self::box('tempnam', $hierarchy, $prefix)) {
                 if (null !== $scheme && 'gs' !== $scheme) {
                     return $scheme.'://'.$tmpFile;
                 }
@@ -636,7 +627,7 @@ class Filesystem
                 return $tmpFile;
             }
 
-            throw new IOException('A temporary file could not be created.');
+            throw new IOException('A temporary file could not be created: '.self::$lastError);
         }
 
         // Loop until we create a valid temp file or have reached 10 attempts
@@ -646,20 +637,17 @@ class Filesystem
 
             // Use fopen instead of file_exists as some streams do not support stat
             // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability
-            $handle = @fopen($tmpFile, 'x+');
-
-            // If unsuccessful restart the loop
-            if (false === $handle) {
+            if (!$handle = self::box('fopen', $tmpFile, 'x+')) {
                 continue;
             }
 
             // Close the file if it was successfully opened
-            @fclose($handle);
+            self::box('fclose', $handle);
 
             return $tmpFile;
         }
 
-        throw new IOException('A temporary file could not be created.');
+        throw new IOException('A temporary file could not be created: '.self::$lastError);
     }
 
     /**
@@ -690,16 +678,16 @@ class Filesystem
         $tmpFile = $this->tempnam($dir, basename($filename));
 
         try {
-            if (false === @file_put_contents($tmpFile, $content)) {
-                throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+            if (false === self::box('file_put_contents', $tmpFile, $content)) {
+                throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
             }
 
-            @chmod($tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
+            self::box('chmod', $tmpFile, file_exists($filename) ? fileperms($filename) : 0666 & ~umask());
 
             $this->rename($tmpFile, $filename, true);
         } finally {
             if (file_exists($tmpFile)) {
-                @unlink($tmpFile);
+                self::box('unlink', $tmpFile);
             }
         }
     }
@@ -727,8 +715,8 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
-        if (false === @file_put_contents($filename, $content, \FILE_APPEND)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        if (false === self::box('file_put_contents', $filename, $content, \FILE_APPEND)) {
+            throw new IOException(sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
         }
     }
 

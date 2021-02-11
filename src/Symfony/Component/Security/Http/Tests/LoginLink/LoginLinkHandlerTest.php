@@ -48,7 +48,7 @@ class LoginLinkHandlerTest extends TestCase
      * @dataProvider provideCreateLoginLinkData
      * @group time-sensitive
      */
-    public function testCreateLoginLink($user, array $extraProperties)
+    public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
     {
         $this->router->expects($this->once())
             ->method('generate')
@@ -65,12 +65,23 @@ class LoginLinkHandlerTest extends TestCase
             )
             ->willReturn('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000');
 
-        $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user);
+        $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
     }
 
     public function provideCreateLoginLinkData()
     {
+        yield [
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
+            ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
+            Request::create('https://example.com'),
+        ];
+
+        yield [
+            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
+            ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
+        ];
+
         yield [
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
             ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],

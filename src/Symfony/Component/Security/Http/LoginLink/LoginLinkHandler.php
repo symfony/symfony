@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\LoginLink;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -49,7 +50,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $this->expiredStorage = $expiredStorage;
     }
 
-    public function createLoginLink(UserInterface $user): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
     {
         $expiresAt = new \DateTimeImmutable(sprintf('+%d seconds', $this->options['lifetime']));
 
@@ -60,11 +61,22 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
 
-        $url = $this->urlGenerator->generate(
-            $this->options['route_name'],
-            $parameters,
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        if ($request) {
+            $currentRequestContext = $this->urlGenerator->getContext();
+            $this->urlGenerator->setContext((new RequestContext())->fromRequest($request));
+        }
+
+        try {
+            $url = $this->urlGenerator->generate(
+                $this->options['route_name'],
+                $parameters,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        } finally {
+            if ($request) {
+                $this->urlGenerator->setContext($currentRequestContext);
+            }
+        }
 
         return new LoginLinkDetails($url, $expiresAt);
     }

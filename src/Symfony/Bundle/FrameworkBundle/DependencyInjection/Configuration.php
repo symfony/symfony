@@ -34,6 +34,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -136,6 +137,7 @@ class Configuration implements ConfigurationInterface
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode);
         $this->addRateLimiterSection($rootNode);
+        $this->addUidSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1885,6 +1887,39 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addUidSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('uid')
+                    ->info('Uid configuration')
+                    ->{class_exists(UuidFactory::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->enumNode('default_uuid_version')
+                            ->defaultValue(6)
+                            ->values([6, 4, 1])
+                        ->end()
+                        ->enumNode('name_based_uuid_version')
+                            ->defaultValue(5)
+                            ->values([5, 3])
+                        ->end()
+                        ->scalarNode('name_based_uuid_namespace')
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->enumNode('time_based_uuid_version')
+                            ->defaultValue(6)
+                            ->values([6, 1])
+                        ->end()
+                        ->scalarNode('time_based_uuid_node')
+                            ->cannotBeEmpty()
                         ->end()
                     ->end()
                 ->end()

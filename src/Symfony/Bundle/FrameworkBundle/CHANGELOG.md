@@ -10,6 +10,7 @@ CHANGELOG
  * Added the `dispatcher` option to `debug:event-dispatcher`
  * Added the `event_dispatcher.dispatcher` tag
  * Added `assertResponseFormatSame()` in `BrowserKitAssertionsTrait`
+ * Add support for configuring UUID factory services
 
 5.2.0
 -----

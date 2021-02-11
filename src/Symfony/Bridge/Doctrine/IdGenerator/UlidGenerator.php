@@ -13,12 +13,24 @@ namespace Symfony\Bridge\Doctrine\IdGenerator;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Id\AbstractIdGenerator;
+use Symfony\Component\Uid\Factory\UlidFactory;
 use Symfony\Component\Uid\Ulid;
 
 final class UlidGenerator extends AbstractIdGenerator
 {
+    private $factory;
+
+    public function __construct(UlidFactory $factory = null)
+    {
+        $this->factory = $factory;
+    }
+
     public function generate(EntityManager $em, $entity): Ulid
     {
+        if ($this->factory) {
+            return $this->factory->create();
+        }
+
         return new Ulid();
     }
 }

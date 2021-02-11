@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -735,7 +736,7 @@ class Request
         }
 
         if (null === $session) {
-            throw new \BadMethodCallException('Session has not been set.');
+            throw new SessionNotFoundException('Session has not been set.');
         }
 
         return $session;

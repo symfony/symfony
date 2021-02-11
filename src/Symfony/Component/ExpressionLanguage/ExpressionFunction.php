@@ -85,12 +85,12 @@ class ExpressionFunction
             throw new \InvalidArgumentException(sprintf('An expression function name must be defined when PHP function "%s" is namespaced.', $phpFunctionName));
         }
 
-        $compiler = function () use ($phpFunctionName) {
-            return sprintf('\%s(%s)', $phpFunctionName, implode(', ', \func_get_args()));
+        $compiler = function (...$args) use ($phpFunctionName) {
+            return sprintf('\%s(%s)', $phpFunctionName, implode(', ', $args));
         };
 
-        $evaluator = function () use ($phpFunctionName) {
-            return $phpFunctionName(...\array_slice(\func_get_args(), 1));
+        $evaluator = function ($p, ...$args) use ($phpFunctionName) {
+            return $phpFunctionName(...$args);
         };
 
         return new self($expressionFunctionName ?: end($parts), $compiler, $evaluator);

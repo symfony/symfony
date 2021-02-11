@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by stof at 2020-12-16T10:12:27Z
+
+> I guess it can also be useful to choose the randomness of the Ulid
+
+Choosing randomness does not make sense. It is not random anymore then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-12-16T16:35:34Z
+
+> I think this class is going to be useful as a service (it should NOT be final btw as that kills extensibility).
+
+What about adding the $time and $node arg to `Uuid::v1()`? That could be done in a separate smaller PR.
+
+> But to be useful as a service, I think the class should have a constructor, with the following arguments:
+>
+>  - the node id (MAC-address-like) to generate UUIDv1 & UUIDv6
+>  - the default namespace to generate UUIDv3 & UUIDv5
+
+Thinking about this, we could merge the two arguments in one: passing a single UUID to the constructor is enough to derive both a node id for v1&6 and a namespace for v3&5, WDYT?
+
+About Ulid, I think we should remove the $randomness argument.
+About V4, I don't think we should allow any arguments at all.
+
+> And maybe also as I proposed in #36097:
+>
+>  - the time source as a callable
+>  - the entropy source as a callable
+>
+> Unlike what I did in #36097, these callables should be provided only as constructor arguments - not on the methods themselves.
+
+About this part, maybe leave it for a later PR. No need to do it unless one has the need for it.
+This would be the way to take control of values for V4 and ULIDs' randomness btw.
+
+Also, I'm wondering, what about giving meaningful names to the factory methods?
+- `createNamed($name, $ns = null, $version = null)` => defaults to v3/5 depending on a constructor arg, which itself defaults to v5
+- `createTimed($time = null, $version = null)` => defaults to v1/6 depending on a constructor arg, which itself defaults to v1 to keep max portability? or to v6 to help with DB indexes by default? (portability is an additional and uncommon concern, isn't it?) - would allow generating ULID also?
+- `createRandom()` => v4
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2020-12-24T11:51:39Z
+
+I pushed a new version taking into account the various comments. Tell me what you think.
+
+I prefer to split UidFactory and UlidFactory since the timestamp meaning is not the same.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-27T21:10:48Z
+
+Let's rebase on top of #40008 now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-27T21:59:59Z
+
+> Let's rebase on top of #40008 now
+
+Done :)
+
+I've replaced all `float` arguments by `DateTimeInterface|null`.
+Please take over :)

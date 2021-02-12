@@ -23,7 +23,7 @@ class LazyIterator implements \IteratorAggregate
         $this->iteratorFactory = $iteratorFactory;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         yield from ($this->iteratorFactory)();
     }

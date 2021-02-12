@@ -1,0 +1,171 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-12T18:40:12Z
+
+I like the idea of moving password hasing out of security-core. Would it make sense to create a contracts package for the new hasher interfaces?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-12T18:44:42Z
+
+I don't think these interfaces need to be in contracts. HasherInterface is not something you would typehint anyway most of the time (you need the factory to get the right hasher for that user class).
+And HasherFactoryInterface is not really a contract that make sense to reimplement outside `symfony/security-*` as it depends on other concepts there. So to me, there is no reason to use the interfaces without also using the component itself.
+
+---------------------------------------------------------------------------
+
+by goetas at 2021-01-13T19:57:41Z
+
+A note on the interface implementation, it happened multiple times that the neeed for a re hashing of a password was something depended on the user/token holding it, not just the password itself. Would it be possible to talke that into consideration somehow?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2021-01-18T15:39:15Z
+
+> I don't think these interfaces need to be in contracts. HasherInterface is not something you would typehint anyway most of the time (you need the factory to get the right hasher for that user class).
+
+But you could use it in your library that provides a new hasher? And then you would ideally only need to implement the interface from the contract, instead of tying it to the whole package?
+
+But OTOH it's simple enough for your bundle to just allow "both" versions (in case of a BC), so... probably not worth the effort.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-18T18:37:14Z
+
+> A note on the interface implementation, it happened multiple times that the neeed for a re hashing of a password was something depended on the user/token holding it, not just the password itself. Would it be possible to talke that into consideration somehow?
+
+@goetas If you are talking about the way built-in opportunistic password migrations happen, yes, PasswordUpgraderInterface requires a user in order to work, and it's is usually implemented by UserProviders.
+However, `PasswordHasherInterface::needsRehash()` does not know about the user, nor `MigratingPasswordHasher` does: hashing options are set on the implementation (usually via constructor). As such, changing the values of those options (or using a different implementation) should make `needsRehash()` return true, so you can handle rehashing on your own.
+
+> But you could use it in your library that provides a new hasher? And then you would ideally only need to implement the interface from the contract, instead of tying it to the whole package?
+
+Yes, I can imagine this component being used as a simple hashing library outside of the framework, in which case one could perfectly rely on this interface rather than the factory. Might be useful for interop also.
+I'll let others decide on this one :)
+
+@stof Thanks for the great review. I addressed your comments.
+
+This is ready for review.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-19T10:05:43Z
+
+> Yes, I can imagine this component being used as a simple hashing library outside of the framework, in which case one could perfectly rely on this interface rather than the factory. Might be useful for interop also.
+
+but if you use the component as hashing library, you need the component implementation anyway, not only the interface.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2021-01-19T11:36:24Z
+
+> but if you use the component as hashing library, you need the component implementation anyway, not only the interface.
+
+As a **user** of the hashing library: yes
+
+However as somebody, who just wants to write a package that provides eg. three hashing algorithms for usage with this library: nope 😉
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-19T12:48:17Z
+
+Thanks @chalasr, this is much more than I could have imagined when you said you would do the renaming. I like it! ;-)
+
+I've had a quick look and I have 2 global questions about these changes:
+
+- I believe the security sub-components are a mistake, I would prefer if we make this a root level component instead (see #36423 for some background on this);
+- I think hashers are useful in a broader area than just user passwords, and I feel like splitting this logic in a separate component opens up our hashers for this broader area. I think the name is a bit unfortunate here and maybe "Hash" is better than "Password".
+  <s>I think we can even consider merging this effort with @Nyholm's PR introducing the Encryption component (ref #39344) and call it e.g. the "Cryptography" component, providing encryption and hashing.</s>
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-19T13:18:01Z
+
+@wouterj given that hashing and encrypting have totally different use cases (that should not be mixed), I suggest to keep them separate. We don't want to reuse the same interfaces for those (that would not be possible anyway AFAICT as the possibilities are different), so putting them in the same component would be similar to creating 2 subcomponents in `symfony/cryptography`
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-19T13:26:19Z
+
+Alright, makes sense. It makes some sense as a "grouping" method, but you indeed wouldn't ever want to switch the implementations.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-01-19T13:30:10Z
+
+@wouterj I would even vote for keeping `password` in the name. This component is meant to provide password hashing features, which are only a subset of crypto hashing. Not all crypto hashing algorithms are suitable for password hashing (as they need to protect against brute force attacks and so they need to be slow)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-19T13:42:46Z
+
+Thank you very much for this PR, @chalasr! I see @wouterj's point that we shouldn't create new Security sub-components and agree with @stof that we shouldn't mix the concern of password hashing with encryption. A top-level PasswordHasher oder PasswordHashing component would be my personal preference here.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-01-19T13:58:33Z
+
+Hmm, if this component is so specific that it can only work with user passwords, I'm unsure if it makes sense to split it out of the Security Core component. From a usage point of view, it means developers have to do an extra step when using passwords (install a package), which we also have to document. I feel like, although APIs are not protected by passwords, almost any online service is still password protected in some way (even Slack has passwords next to their magic links).
+
+The goal of making Security less dependent on passwords is a different topic from extracting it imho. E.g. the `getPassword()` method in `UserInterface` and the requirement to specify a password hasher for all user FQCNs returned by your user provider are the most coupling here I think, not necessarily a few classes that were installed.
+
+So now I'm leaning more towards having a `Symfony\Component\Security\Core\Password` namespace (and keep the `Encoder` namespace deprecated). But I would love to hear any advantages of splitting that I've missed :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-20T09:26:10Z
+
+Well, splitting makes sense because the moved logic is just useful on its own.
+security-core don't need hashers to work, nor hashers need security-core to work.
+This is enough to make the move legit :)
+
+The fact we don't put it in a broader crypto package doesn't make it less useful as a standalone component...
+Encryption is another topic and it should be in its own component as well, if we decide to have such logic in core.
+
+We have some powerful logic for password hashing, it does deserve more visibility.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-20T14:19:49Z
+
+Component moved to the root namespace and renamed to `PasswordHash` / `symfony/password-hash`.
+Let me know if you still prefer `password-hashing`/`password-hasher`, I have no strong preference here.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-01-28T14:31:36Z
+
+Component renamed to `password-hasher` according to feedbacks.
+
+PR rebased also, now looking for votes :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-10T15:26:04Z
+
+Based on https://twitter.com/TerahashCorp/status/1155129705034653698, I wonder if we shouldn't default to `bcrypt` in 5.3. That's also still PHP's default.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-10T16:45:55Z
+
+@nicolas-grekas I agree!  As it means revisiting NativePasswordHasher' internals and its documentation, I think it deserves its own PR (which I can do). Works for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-10T17:19:25Z
+
+Works for me!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-11T11:48:19Z
+
+Oh and please add a few lines in changelog / upgrade files (and add one in the new component)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-12T15:12:54Z
+
+@javiereguiluz @nicolas-grekas @wouterj Thank you very much for the reviews.
+All comments have been addressed

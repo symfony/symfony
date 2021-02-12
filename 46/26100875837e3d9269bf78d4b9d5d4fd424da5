@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2021-02-12T10:56:57Z
+
+Thanks for taking care of this. Could you please also take https://github.com/symfony/symfony/pull/40040#discussion_r575127730 into account?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-02-12T11:05:45Z
+
+why not keep support for `Finder::append(new LazyIterator($callable))`?
+
+`appendFromCallable` for 5.x maybe, then it can become internal IMHO
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-12T11:17:05Z
+
+@ro0NL this can was merged 4 hours ago. so there is no support to keep. `Finder::append(new LazyIterator($callable))` is not supported in any released version of Symfony, because `LazyIterator` does not exist there.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-02-12T11:30:03Z
+
+right, i meant introducing the feature in 4.x as a bonus side effect yes
+
+unless we have other plans for 5.x, or we conclude it's not useful for users at all

@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-31T12:30:10Z
+
+Hey!
+
+This is.. this is amazing. Thank you!
+
+I think @hurricane-voronin has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-02-05T19:25:50Z
+
+im wondering if `IteratorAggregate` would be more simple to implement
+
+eg. `append(LazyIterator::create($callable))`
+
+```
+class LazyIterator implements IteratorAggregate {
+   getIterator() {
+     yield from ($this->callback)();
+   }
+  static create($callback) {
+     return new IteratorIterator(new self($callback));
+  }
+}
+```
+
+roughly :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-02-05T19:56:28Z
+
+> im wondering if `IteratorAggregate` would be more simple to implement
+
+That's not possible, `AppendIterator::append` expect a instance of `Iterator` (in fact, everything in Finder is based on `Iterator`)
+
+edit: I missed the trick with `IteratorIterator`... let me give a try
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-02-05T20:11:29Z
+
+Refactored to use IteratorAggregate .
+Thank you for the good idea @ro0NL

@@ -64,6 +64,22 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame($processed, $result);
     }
 
+    /**
+     * @dataProvider validBools
+     */
+    public function testGetEnvNot($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('not', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame(!$processed, $result);
+    }
+
     public function validBools()
     {
         return [

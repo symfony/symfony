@@ -392,7 +392,6 @@ class Definition
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
                 unset($this->calls[$i]);
-                break;
             }
         }
 

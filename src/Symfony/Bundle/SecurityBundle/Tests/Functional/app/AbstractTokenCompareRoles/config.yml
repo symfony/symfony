@@ -9,7 +9,7 @@ services:
 
 security:
 
-  encoders:
+  password_hashers:
     \Symfony\Component\Security\Core\User\UserInterface: plaintext
 
   providers:

@@ -86,6 +86,7 @@
         "symfony/monolog-bridge": "self.version",
         "symfony/notifier": "self.version",
         "symfony/options-resolver": "self.version",
+        "symfony/password-hasher": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",

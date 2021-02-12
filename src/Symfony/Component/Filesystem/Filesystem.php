@@ -746,14 +746,16 @@ class Filesystem
     }
 
     /**
+     * @param mixed ...$args
+     *
      * @return mixed
      */
-    private static function box(callable $func)
+    private static function box(callable $func, ...$args)
     {
         self::$lastError = null;
         set_error_handler(__CLASS__.'::handleError');
         try {
-            $result = $func(...\array_slice(\func_get_args(), 1));
+            $result = $func(...$args);
             restore_error_handler();
 
             return $result;

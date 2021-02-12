@@ -139,10 +139,8 @@ class LocaleTest extends AbstractLocaleTest
         $this->assertSame('en', $this->call('getDefault'));
     }
 
-    protected function call($methodName)
+    protected function call(string $methodName, ...$args)
     {
-        $args = \array_slice(\func_get_args(), 1);
-
         return Locale::{$methodName}(...$args);
     }
 }

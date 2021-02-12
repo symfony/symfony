@@ -1260,7 +1260,7 @@ class RequestTest extends TestCase
     {
         $req = new Request();
         $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Response body is empty.');
+        $this->expectExceptionMessage('Request body is empty.');
         $req->toArray();
     }
 

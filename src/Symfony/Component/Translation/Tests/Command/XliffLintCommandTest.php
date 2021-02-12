@@ -105,6 +105,17 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
+    public function testLintSucceedsWhenLocaleInFileAndInTargetLanguageNameUsesDashesInsteadOfUnderscores()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('note', 'en-GB', 'messages.en-GB.xlf');
+
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
+    }
+
     public function testLintFileNotReadable()
     {
         $this->expectException(\RuntimeException::class);

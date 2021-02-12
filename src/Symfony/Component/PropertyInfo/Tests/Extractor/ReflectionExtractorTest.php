@@ -239,6 +239,7 @@ class ReflectionExtractorTest extends TestCase
             ['string', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Stringable'), new Type(Type::BUILTIN_TYPE_STRING)]],
             ['payload', null],
             ['data', null],
+            ['mixedProperty', null],
         ];
     }
 

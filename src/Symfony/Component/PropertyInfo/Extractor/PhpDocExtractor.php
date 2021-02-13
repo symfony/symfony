@@ -201,7 +201,17 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         try {
-            return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflectionProperty->getDeclaringClass()));
+            $reflector = $reflectionProperty->getDeclaringClass();
+
+            foreach ($reflector->getTraits() as $trait) {
+                if ($trait->hasProperty($property)) {
+                    $reflector = $trait;
+
+                    break;
+                }
+            }
+
+            return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector));
         } catch (\InvalidArgumentException $e) {
             return null;
         } catch (\RuntimeException $e) {

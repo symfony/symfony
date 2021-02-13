@@ -16,6 +16,9 @@ use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
 use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -271,6 +274,23 @@ class PhpDocExtractorTest extends TestCase
     public function testDocBlockFallback($property, $types)
     {
         $this->assertEquals($types, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback', $property));
+    }
+
+    /**
+     * @dataProvider propertiesDefinedByTraitsProvider
+     */
+    public function testPropertiesDefinedByTraits(string $property, Type $type)
+    {
+        $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
+    }
+
+    public function propertiesDefinedByTraitsProvider(): array
+    {
+        return [
+            ['propertyInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
+            ['propertyInTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
+            ['propertyInTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+        ];
     }
 
     protected function isPhpDocumentorV5()

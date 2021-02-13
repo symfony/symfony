@@ -70,6 +70,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
             $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);
             $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $content['FromEmailAddressIdentityArn']);
             $this->assertSame('bounces@example.com', $content['FeedbackForwardingEmailAddress']);
 
             $json = '{"MessageId": "foobar"}';
@@ -91,6 +92,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
             ->returnPath(new Address('bounces@example.com'));
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+        $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
 
         $message = $transport->send($mail);
 

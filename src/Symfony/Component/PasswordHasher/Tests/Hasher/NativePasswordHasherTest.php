@@ -21,13 +21,13 @@ class NativePasswordHasherTest extends TestCase
 {
     public function testCostBelowRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new NativePasswordHasher(null, null, 3);
     }
 
     public function testCostAboveRange()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         new NativePasswordHasher(null, null, 32);
     }
 
@@ -70,6 +70,14 @@ class NativePasswordHasherTest extends TestCase
         $hasher = new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT);
         $result = $hasher->hash('password', null);
         $this->assertTrue($hasher->verify($result, 'password', null));
+        $this->assertStringStartsWith('$2', $result);
+    }
+
+    public function testDefaultAlgorithm()
+    {
+        $hasher = new NativePasswordHasher();
+        $result = $hasher->hash('password');
+        $this->assertTrue($hasher->verify($result, 'password'));
         $this->assertStringStartsWith('$2', $result);
     }
 

@@ -412,7 +412,7 @@ class QuestionHelper extends Helper
                 $exe = $tmpExe;
             }
 
-            $sExec = shell_exec($exe);
+            $sExec = shell_exec('"'.$exe.'"');
             $value = $trimmable ? rtrim($sExec) : $sExec;
             $output->writeln('');
 

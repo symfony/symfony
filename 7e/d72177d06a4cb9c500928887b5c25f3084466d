@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by bpolaszek at 2021-02-12T21:46:43Z
+
+Travis seems unhappy, doesn't look related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-13T21:11:54Z
+
+( but see  CI )
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2021-02-14T09:51:13Z
+
+Changelog updated, doc PR submitted [here](https://github.com/symfony/symfony-docs/pull/14976).

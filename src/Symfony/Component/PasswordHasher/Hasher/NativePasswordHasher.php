@@ -25,13 +25,13 @@ final class NativePasswordHasher implements PasswordHasherInterface
 {
     use CheckPasswordLengthTrait;
 
-    private $algo = \PASSWORD_BCRYPT;
+    private $algorithm = \PASSWORD_BCRYPT;
     private $options;
 
     /**
-     * @param string|null $algo An algorithm supported by password_hash() or null to use the best available algorithm
+     * @param string|null $algorithm An algorithm supported by password_hash() or null to use the best available algorithm
      */
-    public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, ?string $algo = null)
+    public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, ?string $algorithm = null)
     {
         $cost = $cost ?? 13;
         $opsLimit = $opsLimit ?? max(4, \defined('SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE') ? \SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE : 4);
@@ -49,18 +49,18 @@ final class NativePasswordHasher implements PasswordHasherInterface
             throw new \InvalidArgumentException('$cost must be in the range of 4-31.');
         }
 
-        $algos = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
+        $algorithms = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
 
         if (\defined('PASSWORD_ARGON2I')) {
-            $algos[2] = $algos['argon2i'] = (string) \PASSWORD_ARGON2I;
+            $algorithms[2] = $algorithms['argon2i'] = (string) \PASSWORD_ARGON2I;
         }
 
         if (\defined('PASSWORD_ARGON2ID')) {
-            $algos[3] = $algos['argon2id'] = (string) \PASSWORD_ARGON2ID;
+            $algorithms[3] = $algorithms['argon2id'] = (string) \PASSWORD_ARGON2ID;
         }
 
-        if (null !== $algo) {
-            $this->algo = $algos[$algo] ?? $algo;
+        if (null !== $algorithm) {
+            $this->algorithm = $algorithms[$algorithm] ?? $algorithm;
         }
 
         $this->options = [
@@ -73,11 +73,11 @@ final class NativePasswordHasher implements PasswordHasherInterface
 
     public function hash(string $plainPassword): string
     {
-        if ($this->isPasswordTooLong($plainPassword) || ((string) \PASSWORD_BCRYPT === $this->algo && 72 < \strlen($plainPassword))) {
+        if ($this->isPasswordTooLong($plainPassword) || ((string) \PASSWORD_BCRYPT === $this->algorithm && 72 < \strlen($plainPassword))) {
             throw new InvalidPasswordException();
         }
 
-        return password_hash($plainPassword, $this->algo, $this->options);
+        return password_hash($plainPassword, $this->algorithm, $this->options);
     }
 
     public function verify(string $hashedPassword, string $plainPassword): bool
@@ -107,6 +107,6 @@ final class NativePasswordHasher implements PasswordHasherInterface
      */
     public function needsRehash(string $hashedPassword): bool
     {
-        return password_needs_rehash($hashedPassword, $this->algo, $this->options);
+        return password_needs_rehash($hashedPassword, $this->algorithm, $this->options);
     }
 }

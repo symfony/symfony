@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-
+<!-- To be removed in Symfony 6.0 -->
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:framework="http://symfony.com/schema/dic/symfony"
@@ -7,8 +7,6 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:csrf-protection field-name="_custom_form" />
-        <framework:form legacy-error-messages="false" />
-        <framework:session storage-factory-id="session.storage.factory.native" />
+        <framework:session handler-id="null" cookie-secure="auto" />
     </framework:config>
 </container>

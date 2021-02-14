@@ -27,7 +27,7 @@ $container->loadFromExtension('framework', [
         'utf8' => true,
     ],
     'session' => [
-        'storage_id' => 'session.storage.native',
+        'storage_factory_id' => 'session.storage.factory.native',
         'handler_id' => 'session.handler.native_file',
         'name' => '_SYMFONY',
         'cookie_lifetime' => 86400,

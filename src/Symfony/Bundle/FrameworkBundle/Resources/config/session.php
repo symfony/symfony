@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
@@ -25,8 +26,12 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\SessionHandlerFacto
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorageFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\ServiceSessionFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
@@ -35,17 +40,57 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('.session.do-not-use', Session::class) // to be removed in 6.0
+            ->factory([service('session.factory'), 'createSession'])
+        ->set('session.factory', SessionFactory::class)
             ->args([
-                service('session.storage'),
-                null, // AttributeBagInterface
-                null, // FlashBagInterface
+                service('request_stack'),
+                service('session.storage.factory'),
                 [service('session_listener'), 'onSessionUsage'],
             ])
+
+        ->set('session.storage.factory.native', NativeSessionStorageFactory::class)
+            ->args([
+                param('session.storage.options'),
+                service('session.handler'),
+                inline_service(MetadataBag::class)
+                    ->args([
+                        param('session.metadata.storage_key'),
+                        param('session.metadata.update_threshold'),
+                    ]),
+                false,
+            ])
+        ->set('session.storage.factory.php_bridge', PhpBridgeSessionStorageFactory::class)
+            ->args([
+                service('session.handler'),
+                inline_service(MetadataBag::class)
+                    ->args([
+                        param('session.metadata.storage_key'),
+                        param('session.metadata.update_threshold'),
+                    ]),
+                false,
+            ])
+        ->set('session.storage.factory.mock_file', MockFileSessionStorageFactory::class)
+            ->args([
+                param('kernel.cache_dir').'/sessions',
+                'MOCKSESSID',
+                inline_service(MetadataBag::class)
+                    ->args([
+                        param('session.metadata.storage_key'),
+                        param('session.metadata.update_threshold'),
+                    ]),
+            ])
+        ->set('session.storage.factory.service', ServiceSessionFactory::class)
+            ->args([
+                service('session.storage'),
+            ])
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "session.storage.factory.native", "session.storage.factory.php_bridge" or "session.storage.factory.mock_file" instead.')
+
         ->set('.session.deprecated', SessionInterface::class) // to be removed in 6.0
             ->factory([inline_service(DeprecatedSessionFactory::class)->args([service('request_stack')]), 'getSession'])
         ->alias(SessionInterface::class, '.session.do-not-use')
             ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "$requestStack->getSession()" instead.')
         ->alias(SessionStorageInterface::class, 'session.storage')
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "session.storage.factory" instead.')
         ->alias(\SessionHandlerInterface::class, 'session.handler')
 
         ->set('session.storage.metadata_bag', MetadataBag::class)
@@ -53,6 +98,7 @@ return static function (ContainerConfigurator $container) {
                 param('session.metadata.storage_key'),
                 param('session.metadata.update_threshold'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, create your own "session.storage.factory" instead.')
 
         ->set('session.storage.native', NativeSessionStorage::class)
             ->args([
@@ -60,12 +106,14 @@ return static function (ContainerConfigurator $container) {
                 service('session.handler'),
                 service('session.storage.metadata_bag'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "session.storage.factory.native" instead.')
 
         ->set('session.storage.php_bridge', PhpBridgeSessionStorage::class)
             ->args([
                 service('session.handler'),
                 service('session.storage.metadata_bag'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "session.storage.factory.php_bridge" instead.')
 
         ->set('session.flash_bag', FlashBag::class)
             ->factory([service('.session.do-not-use'), 'getFlashBag'])
@@ -83,6 +131,7 @@ return static function (ContainerConfigurator $container) {
                 'MOCKSESSID',
                 service('session.storage.metadata_bag'),
             ])
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "session.storage.factory.mock_file" instead.')
 
         ->set('session.handler.native_file', StrictSessionHandler::class)
             ->args([
@@ -108,6 +157,7 @@ return static function (ContainerConfigurator $container) {
 
         // for BC
         ->alias('session.storage.filesystem', 'session.storage.mock_file')
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "session.storage.factory.mock_file" instead.')
 
         ->set('session.marshaller', IdentityMarshaller::class)
 

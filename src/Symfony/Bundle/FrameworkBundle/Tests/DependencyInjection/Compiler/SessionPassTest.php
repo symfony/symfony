@@ -22,7 +22,7 @@ class SessionPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container
-            ->register('session.storage'); // marker service
+            ->register('session.factory'); // marker service
         $container
             ->register('.session.do-not-use');
 
@@ -41,7 +41,7 @@ class SessionPassTest extends TestCase
         ];
         $container = new ContainerBuilder();
         $container
-            ->register('session.storage'); // marker service
+            ->register('session.factory'); // marker service
         $container
             ->register('session')
             ->setArguments($arguments);
@@ -70,7 +70,7 @@ class SessionPassTest extends TestCase
         ];
         $container = new ContainerBuilder();
         $container
-            ->register('session.storage'); // marker service
+            ->register('session.factory'); // marker service
         $container
             ->register('trueSession')
             ->setArguments($arguments);

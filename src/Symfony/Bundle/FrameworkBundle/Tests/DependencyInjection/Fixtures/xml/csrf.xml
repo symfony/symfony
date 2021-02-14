@@ -9,6 +9,6 @@
     <framework:config>
         <framework:csrf-protection />
         <framework:form legacy-error-messages="false" />
-        <framework:session />
+        <framework:session storage-factory-id="session.storage.factory.native" />
     </framework:config>
 </container>

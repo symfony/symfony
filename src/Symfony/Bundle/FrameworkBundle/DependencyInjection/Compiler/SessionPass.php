@@ -22,7 +22,7 @@ class SessionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('session.storage')) {
+        if (!$container->has('session.factory')) {
             return;
         }
 

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\PasswordHasher\Hasher;
 
-use Symfony\Component\PasswordHasher\Exception\LogicException;
 use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
+use Symfony\Component\PasswordHasher\Exception\LogicException;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**

@@ -12,7 +12,6 @@
 namespace Symfony\Component\PasswordHasher\Hasher;
 
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 
 /**
  * Hashes passwords using the best available hasher.

@@ -38,7 +38,7 @@ class Pbkdf2PasswordHasherTest extends TestCase
 
     public function testHashAlgorithmDoesNotExist()
     {
-        $this->expectException('LogicException');
+        $this->expectException(\LogicException::class);
         $hasher = new Pbkdf2PasswordHasher('foobar');
         $hasher->hash('password', '');
     }

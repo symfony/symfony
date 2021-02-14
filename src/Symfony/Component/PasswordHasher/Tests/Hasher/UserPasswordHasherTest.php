@@ -12,12 +12,12 @@
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserPasswordHasherTest extends TestCase
 {

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\PasswordHasher\Hasher;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * PasswordHasherFactoryInterface to support different password hashers for different user accounts.

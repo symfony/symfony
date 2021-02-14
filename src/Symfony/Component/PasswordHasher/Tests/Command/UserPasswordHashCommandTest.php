@@ -12,15 +12,14 @@
 namespace Symfony\Component\PasswordHasher\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Command\UserPasswordHasherCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Security\Core\User\User;
 
 class UserPasswordHashCommandTest extends TestCase
 {
@@ -240,7 +239,7 @@ class UserPasswordHashCommandTest extends TestCase
 
     public function testEncodePasswordNoConfigForGivenUserClass()
     {
-        $this->expectException('\RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No password hasher has been configured for account "Foo\Bar\User".');
 
         $this->passwordHasherCommandTester->execute([
@@ -277,7 +276,7 @@ EOTXT
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
 
         $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));

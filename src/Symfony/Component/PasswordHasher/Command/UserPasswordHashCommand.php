@@ -61,7 +61,7 @@ class UserPasswordHashCommand extends Command
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the hasher generate one.')
             ->setHelp(<<<EOF
 
-The <info>%command.name%</info> command hashs passwords according to your
+The <info>%command.name%</info> command hashes passwords according to your
 security configuration. This command is mainly used to generate passwords for
 the <comment>in_memory</comment> user provider type and for changing passwords
 in the database while developing the application.

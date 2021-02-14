@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * added the `mailer` monolog channel and set it on all transport definitions
+ * Add support for `SESSION_TOKEN` for Async AWS Mailer transport
 
 5.2.0
 -----

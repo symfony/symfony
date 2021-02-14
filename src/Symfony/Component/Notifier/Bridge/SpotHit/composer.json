@@ -1,5 +1,5 @@
 {
-    "name": "symfony/spothit-notifier",
+    "name": "symfony/spot-hit-notifier",
     "type": "symfony-bridge",
     "description": "Symfony Spot-Hit Notifier Bridge",
     "keywords": ["sms", "spot-hit", "notifier", "symfony"],

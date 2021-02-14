@@ -70,7 +70,7 @@ class UnsupportedSchemeException extends LogicException
         ],
         'spothit' => [
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
-            'package' => 'symfony/spothit-notifier',
+            'package' => 'symfony/spot-hit-notifier',
         ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,

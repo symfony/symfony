@@ -29,7 +29,7 @@ final class NativePasswordHasher implements PasswordHasherInterface
     private $options;
 
     /**
-     * @param string|null $algo An algorithm supported by password_hash() or null to use the stronger available algorithm
+     * @param string|null $algo An algorithm supported by password_hash() or null to use the best available algorithm
      */
     public function __construct(int $opsLimit = null, int $memLimit = null, int $cost = null, ?string $algo = null)
     {
@@ -52,11 +52,11 @@ final class NativePasswordHasher implements PasswordHasherInterface
         $algos = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
 
         if (\defined('PASSWORD_ARGON2I')) {
-            $this->algo = $algos[2] = $algos['argon2i'] = (string) \PASSWORD_ARGON2I;
+            $algos[2] = $algos['argon2i'] = (string) \PASSWORD_ARGON2I;
         }
 
         if (\defined('PASSWORD_ARGON2ID')) {
-            $this->algo = $algos[3] = $algos['argon2id'] = (string) \PASSWORD_ARGON2ID;
+            $algos[3] = $algos['argon2id'] = (string) \PASSWORD_ARGON2ID;
         }
 
         if (null !== $algo) {

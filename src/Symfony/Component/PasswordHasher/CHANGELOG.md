@@ -2,3 +2,4 @@
 ---
 
  * Add the component
+ * Use `bcrypt` as default algorithm in `NativePasswordHasher`

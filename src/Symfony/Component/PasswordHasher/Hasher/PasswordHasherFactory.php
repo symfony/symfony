@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\PasswordHasher\Hasher;
 
-use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\PasswordHasher\Exception\LogicException;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 
 /**
  * A generic hasher factory implementation.
@@ -103,9 +103,15 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
     private function getHasherConfigFromAlgorithm(array $config): array
     {
         if ('auto' === $config['algorithm']) {
-            $hasherChain = [];
             // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
-            foreach ([SodiumPasswordHasher::isSupported() ? 'sodium' : 'native', 'pbkdf2', $config['hash_algorithm']] as $algo) {
+            if (SodiumPasswordHasher::isSupported()) {
+                $algos = ['native', 'sodium', 'pbkdf2', $config['hash_algorithm']];
+            } else {
+                $algos = ['native', 'pbkdf2', $config['hash_algorithm']];
+            }
+
+            $hasherChain = [];
+            foreach ($algos as $algo) {
                 $config['algorithm'] = $algo;
                 $hasherChain[] = $this->createHasher($config, true);
             }
@@ -186,7 +192,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     $config['algorithm'] = 'native';
                     $config['native_algorithm'] = \PASSWORD_ARGON2I;
                 } else {
-                    throw new LogicException(sprintf('Algorithm "argon2i" is not available. Either use %s"auto" or upgrade to PHP 7.2+ instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? '"argon2id", ' : ''));
+                    throw new LogicException(sprintf('Algorithm "argon2i" is not available. Use "%s" instead.', \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13') ? 'argon2id" or "auto' : 'auto'));
                 }
 
                 return $this->getHasherConfigFromAlgorithm($config);
@@ -198,7 +204,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
                     $config['algorithm'] = 'native';
                     $config['native_algorithm'] = \PASSWORD_ARGON2ID;
                 } else {
-                    throw new LogicException(sprintf('Algorithm "argon2id" is not available. Either use %s"auto", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? '"argon2i", ' : ''));
+                    throw new LogicException(sprintf('Algorithm "argon2id" is not available. Either use "%s", upgrade to PHP 7.3+ or use libsodium 1.0.15+ instead.', \defined('PASSWORD_ARGON2I') || $hasSodium ? 'argon2i", "auto' : 'auto'));
                 }
 
                 return $this->getHasherConfigFromAlgorithm($config);

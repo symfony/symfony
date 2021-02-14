@@ -65,11 +65,16 @@ final class SesTransportFactory extends AbstractTransportFactory
                 case 'ses':
                 case 'ses+https':
                     $class = $class ?? SesHttpAsyncAwsTransport::class;
+
+                    $sessionToken = $dsn->getOption('sessionToken');
+
                     $options = [
                         'region' => $dsn->getOption('region') ?: 'eu-west-1',
                         'accessKeyId' => $dsn->getUser(),
                         'accessKeySecret' => $dsn->getPassword(),
                     ] + (
+                        $sessionToken ? ['sessionToken' => $sessionToken] : []
+                    ) + (
                         'default' === $dsn->getHost() ? [] : ['endpoint' => 'https://'.$dsn->getHost().($dsn->getPort() ? ':'.$dsn->getPort() : '')]
                     );
 

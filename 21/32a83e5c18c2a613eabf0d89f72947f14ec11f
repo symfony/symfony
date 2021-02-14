@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-14T14:11:51Z
+
+@localheinz Can you please rebase on the current 5.x branch? That should fix the remaining fabbot issues
+
+---------------------------------------------------------------------------
+
+by localheinz at 2021-02-14T14:14:31Z
+
+@chalasr
+
+What is the usual policy here in regard to coding standard issues?
+
+Looks like `fabbot.io`
+
+- does not report all issues that can be observed when running `php-cs-fixer` locally
+- reports additional issues that can not be observed when running `php-cs-fixer` locally
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-14T14:23:51Z
+
+Honestly, I'm not sure to know how it works exactly :/
+I guess fabbot does more than just running php-cs-fixer (or adds some additional custom logic/rules)

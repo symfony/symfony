@@ -33,6 +33,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'foo' => ['string'],
             'base64' => ['string'],
             'bool' => ['bool'],
+            'not' => ['bool'],
             'const' => ['bool', 'int', 'float', 'string', 'array'],
             'csv' => ['array'],
             'file' => ['string'],

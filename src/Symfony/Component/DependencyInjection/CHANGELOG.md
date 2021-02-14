@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `ServicesConfigurator::remove()` in the PHP-DSL
+ * added `%env(not:...)%` processor to negate boolean values
 
 5.2.0
 -----

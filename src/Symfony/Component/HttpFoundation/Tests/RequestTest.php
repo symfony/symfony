@@ -806,7 +806,7 @@ class RequestTest extends TestCase
             ['bar=&foo=bar', 'bar=&foo=bar', '->works with empty parameters'],
             ['foo=bar&bar=', 'bar=&foo=bar', 'sorts keys alphabetically'],
 
-            // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
+            // GET parameters, that are submitted from an HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
             ['baz=Foo%20Baz&bar=Foo+Bar', 'bar=Foo%20Bar&baz=Foo%20Baz', 'normalizes spaces in both encodings "%20" and "+"'],
 

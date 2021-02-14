@@ -386,7 +386,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML file to a \DOMDocument.
+     * Parses an XML file to a \DOMDocument.
      *
      * @throws InvalidArgumentException When loading of XML file returns error
      */

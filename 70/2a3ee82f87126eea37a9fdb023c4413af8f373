@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-13T14:43:16Z
+
+Fabbot failures look like false positives
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-14T12:33:34Z
+
+> Fabbot failures look like false positives
+
+The `'\LogicException'` seems correct. The exception message false positives are fixed by using concatenation instead (which is done in many places where this caused an issue).
+
+Status: Reviewed :+1:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-14T13:26:06Z
+
+Fabbot fixed. Thanks for your reviews Wouter!

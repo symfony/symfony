@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PasswordHasher\Command;
 
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -36,7 +35,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 class UserPasswordHashCommand extends Command
 {
     protected static $defaultName = 'security:hash-password';
-    protected static $defaultDescription = "Hashes a user password";
+    protected static $defaultDescription = 'Hashes a user password';
 
     private $hasherFactory;
     private $userClasses;

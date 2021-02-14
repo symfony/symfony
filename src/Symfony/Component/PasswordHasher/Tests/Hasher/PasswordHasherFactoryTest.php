@@ -12,11 +12,11 @@
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -112,7 +112,7 @@ class PasswordHasherFactoryTest extends TestCase
 
     public function testGetInvalidNamedHasherForHasherAware()
     {
-        $this->expectException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
             'hasher_name' => new MessageDigestPasswordHasher('sha256'),

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
@@ -32,6 +33,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\ServiceSessionFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
@@ -47,6 +49,7 @@ return static function (ContainerConfigurator $container) {
                 service('session.storage.factory'),
                 [service('session_listener'), 'onSessionUsage'],
             ])
+        ->alias(SessionFactoryInterface::class, 'session.factory')
 
         ->set('session.storage.factory.native', NativeSessionStorageFactory::class)
             ->args([
@@ -84,6 +87,7 @@ return static function (ContainerConfigurator $container) {
                 service('session.storage'),
             ])
             ->deprecate('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "session.storage.factory.native", "session.storage.factory.php_bridge" or "session.storage.factory.mock_file" instead.')
+        ->alias(SessionStorageFactoryInterface::class, 'session.storage.factory')
 
         ->set('.session.deprecated', SessionInterface::class) // to be removed in 6.0
             ->factory([inline_service(DeprecatedSessionFactory::class)->args([service('request_stack')]), 'getSession'])

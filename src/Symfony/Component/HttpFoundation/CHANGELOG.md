@@ -4,7 +4,7 @@ CHANGELOG
 5.3
 ---
 
- * Add the `SessionFactory`, `NativeSessionStorageFactory`, `PhpBridgeSessionStorageFactory` and `MockFileSessionStorageFactory` classes
+ * Add the `SessionFactoryInterface` and `SessionStorageFactoryInterface`, and add the `SessionFactory`, `NativeSessionStorageFactory`, `PhpBridgeSessionStorageFactory` and `MockFileSessionStorageFactory` classes that implements these interfaces
  * Calling `Request::getSession()` when there is no available session throws a `SessionNotFoundException`
  * Add the `RequestStack::getSession` method
  * Deprecate the `NamespacedAttributeBag` class

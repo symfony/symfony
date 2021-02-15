@@ -66,7 +66,7 @@ interface RememberMeServicesInterface
      * although this is not recommended.
      *
      * Instead, implementations should typically look for a request parameter
-     * (such as a HTTP POST parameter) that indicates the browser has explicitly
+     * (such as an HTTP POST parameter) that indicates the browser has explicitly
      * requested for the authentication to be remembered.
      */
     public function loginSuccess(Request $request, Response $response, TokenInterface $token);

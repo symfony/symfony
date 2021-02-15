@@ -150,7 +150,7 @@ class Query extends AbstractQuery
     }
 
     /**
-     * Returns a LDAP search resource. If this query resulted in multiple searches, only the first
+     * Returns an LDAP search resource. If this query resulted in multiple searches, only the first
      * page will be returned.
      *
      * @return resource

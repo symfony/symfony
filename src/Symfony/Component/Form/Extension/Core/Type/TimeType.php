@@ -220,7 +220,7 @@ class TimeType extends AbstractType
             'with_seconds' => $options['with_seconds'],
         ]);
 
-        // Change the input to a HTML5 time input if
+        // Change the input to an HTML5 time input if
         //  * the widget is set to "single_text"
         //  * the html5 is set to true
         if ($options['html5'] && 'single_text' === $options['widget']) {

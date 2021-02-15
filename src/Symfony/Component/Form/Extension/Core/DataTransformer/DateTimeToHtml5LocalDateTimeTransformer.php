@@ -26,7 +26,7 @@ class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
      * Transforms a \DateTime into a local date and time string.
      *
      * According to the HTML standard, the input string of a datetime-local
-     * input is a RFC3339 date followed by 'T', followed by a RFC3339 time.
+     * input is an RFC3339 date followed by 'T', followed by an RFC3339 time.
      * https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-local-date-and-time-string
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object

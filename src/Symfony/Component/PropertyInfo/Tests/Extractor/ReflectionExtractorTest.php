@@ -20,6 +20,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
@@ -580,5 +581,57 @@ class ReflectionExtractorTest extends TestCase
             ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
             ['ddd', null],
         ];
+    }
+
+    public function testGetWriteInfoForSettersWithNullableParameter()
+    {
+        $extractor = new ReflectionExtractor(['set']);
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'optionalDate', [
+            'value' => new \DateTime(),
+        ]);
+        $this->assertSame('method', $writeInfo->getType());
+        $this->assertEmpty($writeInfo->getErrors());
+
+        // If the key "value" exists and is null, we should still get the method
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'optionalDate', [
+            'value' => null,
+        ]);
+        $this->assertSame('method', $writeInfo->getType());
+        $this->assertEmpty($writeInfo->getErrors());
+
+        // If we dont pass a key "value", we should behave as if the value exists.
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'optionalDate', []);
+        $this->assertSame('method', $writeInfo->getType());
+        $this->assertEmpty($writeInfo->getErrors());
+    }
+
+    public function testGetWriteInfoForSettersWithNonNullableParameter()
+    {
+        $extractor = new ReflectionExtractor(['set']);
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'date', [
+            'value' => new \DateTime(),
+        ]);
+        $this->assertSame('method', $writeInfo->getType());
+        $this->assertEmpty($writeInfo->getErrors());
+
+        // If the key "value" exists and is null, then make sure there is an error when parameter is required
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'date', [
+            'value' => null,
+        ]);
+        $this->assertSame('none', $writeInfo->getType());
+        $this->assertTrue(in_array('The method "setDate" in class "Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy" was found but does not allow null.', $writeInfo->getErrors()));
+
+        // If we dont pass a key "value", we should behave as if the value exists.
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'date', []);
+        $this->assertSame('method', $writeInfo->getType());
+        $this->assertEmpty($writeInfo->getErrors());
+    }
+
+    public function testGetWriteInfoForSettersWithNoParameter()
+    {
+        $extractor = new ReflectionExtractor(['add']);
+        $writeInfo = $extractor->getWriteInfo(Dummy::class, 'nothing');
+        $this->assertSame('none', $writeInfo->getType());
+        $this->assertNotEmpty($writeInfo->getErrors());
     }
 }

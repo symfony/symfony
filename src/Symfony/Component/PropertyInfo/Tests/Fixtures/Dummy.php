@@ -237,4 +237,12 @@ class Dummy extends ParentDummy
     public function hasElement(string $element): bool
     {
     }
+
+    public function setOptionalDate(\DateTime $date = null)
+    {
+    }
+
+    public function addNothing()
+    {
+    }
 }

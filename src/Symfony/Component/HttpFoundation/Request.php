@@ -1574,7 +1574,7 @@ class Request
     public function toArray()
     {
         if ('' === $content = $this->getContent()) {
-            throw new JsonException('Response body is empty.');
+            throw new JsonException('Request body is empty.');
         }
 
         try {
@@ -1753,7 +1753,7 @@ class Request
     }
 
     /**
-     * Returns true if the request is a XMLHttpRequest.
+     * Returns true if the request is an XMLHttpRequest.
      *
      * It works if your JavaScript library sets an X-Requested-With HTTP header.
      * It is known to work with common JavaScript frameworks:

@@ -58,7 +58,7 @@ class XliffLintCommand extends Command
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
+The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
 the first encountered syntax error.
 
 You can validates XLIFF contents passed from STDIN:

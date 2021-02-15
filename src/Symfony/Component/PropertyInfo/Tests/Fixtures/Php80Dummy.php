@@ -4,6 +4,8 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 class Php80Dummy
 {
+    public mixed $mixedProperty;
+
     public function getFoo(): array|null
     {
     }

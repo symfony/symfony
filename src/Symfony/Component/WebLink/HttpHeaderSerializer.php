@@ -14,7 +14,7 @@ namespace Symfony\Component\WebLink;
 use Psr\Link\LinkInterface;
 
 /**
- * Serializes a list of Link instances to a HTTP Link header.
+ * Serializes a list of Link instances to an HTTP Link header.
  *
  * @see https://tools.ietf.org/html/rfc5988
  *

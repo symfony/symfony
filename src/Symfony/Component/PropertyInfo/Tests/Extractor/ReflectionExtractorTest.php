@@ -20,7 +20,6 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
-use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
@@ -619,7 +618,7 @@ class ReflectionExtractorTest extends TestCase
             'value' => null,
         ]);
         $this->assertSame('none', $writeInfo->getType());
-        $this->assertTrue(in_array('The method "setDate" in class "Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy" was found but does not allow null.', $writeInfo->getErrors()));
+        $this->assertTrue(\in_array('The method "setDate" in class "Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy" was found but does not allow null.', $writeInfo->getErrors()));
 
         // If we dont pass a key "value", we should behave as if the value exists.
         $writeInfo = $extractor->getWriteInfo(Dummy::class, 'date', []);

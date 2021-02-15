@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Deprecate `InvalidTokenConfigurationException`
+
 5.2.0
 -----
 

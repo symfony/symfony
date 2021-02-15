@@ -93,3 +93,8 @@ Uid
 ---
 
  * Replaced `UuidV1::getTime()`, `UuidV6::getTime()` and `Ulid::getTime()` by `UuidV1::getDateTime()`, `UuidV6::getDateTime()` and `Ulid::getDateTime()`
+
+Workflow
+--------
+
+ * Deprecate `InvalidTokenConfigurationException`

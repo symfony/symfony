@@ -501,12 +501,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
+
+  There are no commands defined in the "foos" namespace.
+
+  Did you mean this?
+      foo
+
 
 ', $tester->getDisplay(true));
     }

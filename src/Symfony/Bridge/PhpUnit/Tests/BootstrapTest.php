@@ -21,19 +21,19 @@ class BootstrapTest extends TestCase
     public function testAliasingOfErrorClasses()
     {
         $this->assertInstanceOf(
-            \PHPUnit_Framework_Error::class,
+            \PHPUnit\Framework\Error\Error::class,
             new \PHPUnit\Framework\Error\Error('message', 0, __FILE__, __LINE__)
         );
         $this->assertInstanceOf(
-            \PHPUnit_Framework_Error_Deprecated::class,
+            \PHPUnit\Framework\Error\Deprecated::class,
             new \PHPUnit\Framework\Error\Deprecated('message', 0, __FILE__, __LINE__)
         );
         $this->assertInstanceOf(
-            \PHPUnit_Framework_Error_Notice::class,
+            \PHPUnit\Framework\Error\Notice::class,
             new \PHPUnit\Framework\Error\Notice('message', 0, __FILE__, __LINE__)
         );
         $this->assertInstanceOf(
-            \PHPUnit_Framework_Error_Warning::class,
+            \PHPUnit\Framework\Error\Warning::class,
             new \PHPUnit\Framework\Error\Warning('message', 0, __FILE__, __LINE__)
         );
     }

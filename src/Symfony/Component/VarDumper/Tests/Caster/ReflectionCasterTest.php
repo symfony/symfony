@@ -65,7 +65,7 @@ EOTXT
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) {};
+        $var = function ($x) use (&$b) {};
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -348,7 +348,7 @@ array:2 [
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         ›     yield 1;
         › }
-        › 
+        ›
       }
     }
     closed: false

@@ -457,7 +457,7 @@ abstract class Client
             foreach ($deprecations ? unserialize($deprecations) : [] as $deprecation) {
                 if ($deprecation[0]) {
                     // unsilenced on purpose
-                    trigger_error($deprecation[1], \E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], \E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], \E_USER_DEPRECATED);
                 }

@@ -15,8 +15,8 @@
 error_reporting(-1);
 
 global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$argv = $_SERVER['argv'] ?? [];
+$argc = $_SERVER['argc'] ?? 0;
 $getEnvVar = function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
@@ -151,9 +151,9 @@ if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
 }
 
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
-    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
-    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer`) : `which composer 2> /dev/null`))
-    || file_exists($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? `git rev-parse --show-toplevel 2> NUL` : `git rev-parse --show-toplevel 2> /dev/null`).\DIRECTORY_SEPARATOR.'composer.phar')
+    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer.phar')) : shell_exec('which composer.phar 2> /dev/null')))
+    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', shell_exec('where.exe composer')) : shell_exec('which composer 2> /dev/null')))
+    || file_exists($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? shell_exec('git rev-parse --show-toplevel 2> NUL') : shell_exec('git rev-parse --show-toplevel 2> /dev/null')).\DIRECTORY_SEPARATOR.'composer.phar')
     ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
     : 'composer';
 
@@ -360,7 +360,7 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
 }
 
 if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = [];
 
     foreach ($components as $component) {

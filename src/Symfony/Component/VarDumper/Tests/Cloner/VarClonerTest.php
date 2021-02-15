@@ -81,7 +81,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -100,7 +100,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -115,7 +115,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -420,7 +420,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => %s
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -478,7 +478,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php74
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0
@@ -500,7 +500,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                         (
                             [type] => 4
                             [class] => stdClass
-                            [value] => 
+                            [value] =>
                             [cut] => 0
                             [handle] => %i
                             [refCount] => 0

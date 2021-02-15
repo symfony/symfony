@@ -63,24 +63,24 @@ command_bus
 
  The following messages can be dispatched:
 
- ----------------------------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand                                                    
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler (when option1=1, option2=2)  
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                                            
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler                      
- ----------------------------------------------------------------------------------------------------------- 
+ -----------------------------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyCommand
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler (when option1=1, option2=2)
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+ -----------------------------------------------------------------------------------------------------------
 
 query_bus
 ---------
 
  The following messages can be dispatched:
 
- --------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
- --------------------------------------------------------------------------------------- 
+ ---------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+ ---------------------------------------------------------------------------------------
 
 
 TXT
@@ -99,12 +99,12 @@ query_bus
 
  The following messages can be dispatched:
 
- --------------------------------------------------------------------------------------- 
-  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
- --------------------------------------------------------------------------------------- 
+ ---------------------------------------------------------------------------------------
+  Symfony\Component\Messenger\Tests\Fixtures\DummyQuery
+      handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler
+  Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage
+      handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler
+ ---------------------------------------------------------------------------------------
 
 
 TXT
@@ -127,12 +127,12 @@ Messenger
 command_bus
 -----------
 
- [WARNING] No handled message found in bus "command_bus".                                                               
+ [WARNING] No handled message found in bus "command_bus".
 
 query_bus
 ---------
 
- [WARNING] No handled message found in bus "query_bus".                                                                 
+ [WARNING] No handled message found in bus "query_bus".
 
 
 TXT

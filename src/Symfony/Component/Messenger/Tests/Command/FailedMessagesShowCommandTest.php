@@ -47,12 +47,12 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['id' => 15]);
 
         $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Class   (unknown)            
+ ------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Class   (unknown)
   Transport     async
 EOF
             ,
@@ -83,12 +83,12 @@ EOF
         $tester->execute(['id' => 15]);
 
         $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Class   (unknown)            
+ ------------- ---------------------
+  Class         stdClass
+  Message Id    15
+  Failed at     %s
+  Error         Things are bad!
+  Error Class   (unknown)
   Transport     async
 EOF
             ,
@@ -130,7 +130,7 @@ EOF
         $tester = new CommandTester($command);
         $tester->execute([]);
         $this->assertStringContainsString(sprintf(<<<EOF
-15   stdClass   %s   Things are bad!  
+15   stdClass   %s   Things are bad!
 EOF
             ,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),

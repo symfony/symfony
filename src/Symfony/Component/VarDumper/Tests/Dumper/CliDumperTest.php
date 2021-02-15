@@ -145,9 +145,9 @@ RuntimeException {
   trace: {
     %ACliDumperTest.php:%d {
       Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest->testDumpWithCommaFlagsAndExceptionCodeExcerpt()
-      › 
+      ›
       › $ex = new \RuntimeException('foo');
-      › 
+      ›
     }
     %A
   }
@@ -388,7 +388,7 @@ stream resource {@{$ref}
         __TwigTemplate_VarDumperFixture_u75a09->doDisplay(array \$context, array \$blocks = [])
         › foo bar
         ›   twig source
-        › 
+        ›
       }
       %s%eTemplate.php:%d { …}
       %s%eTemplate.php:%d { …}

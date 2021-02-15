@@ -163,7 +163,7 @@ Configured Paths
   (None)      templates%e%A
   %A
   @Twig       templates/bundles/TwigBundle%e%A
-              vendors/twig-bundle/Resources/views%e%A 
+              vendors/twig-bundle/Resources/views%e%A
  ----------- -------------------------------------%A
 
 
@@ -213,12 +213,12 @@ Overridden Files
 Configured Paths
 ----------------
 
- ----------- -------------------------------------- 
+ ----------- --------------------------------------
   Namespace   Paths%A
- ----------- -------------------------------------- 
+ ----------- --------------------------------------
   @Twig       templates/bundles/TwigBundle%e%A
               vendors/twig-bundle/Resources/views%e%A
- ----------- -------------------------------------- 
+ ----------- --------------------------------------
 
 
 TXT
@@ -265,12 +265,12 @@ Matched File
 Configured Paths
 ----------------
 
- ----------- -------------------------------------- 
-  Namespace   Paths                                 
- ----------- -------------------------------------- 
+ ----------- --------------------------------------
+  Namespace   Paths
+ ----------- --------------------------------------
   @Twig       templates/bundles/TwigBundle%e%A
               vendors/twig-bundle/Resources/views%e%A
- ----------- -------------------------------------- 
+ ----------- --------------------------------------
 
 
 TXT

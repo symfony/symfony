@@ -12,7 +12,7 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
-if (class_exists(\PHPUnit_Runner_Version::class) && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+if (class_exists(\PHPUnit\Runner\Version::class) && version_compare(\PHPUnit\Runner\Version::id(), '6.0.0', '<')) {
     $classes = [
         'PHPUnit_Framework_Assert', // override PhpUnit's ForwardCompat child class
         'PHPUnit_Framework_AssertionFailedError', // override PhpUnit's ForwardCompat child class
@@ -110,7 +110,7 @@ if ($file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
 }
 
 // Detect if we're loaded by an actual run of phpunit
-if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit_TextUI_Command::class, false) && !class_exists(\PHPUnit\TextUI\Command::class, false)) {
+if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists(\PHPUnit\TextUI\Command::class, false) && !class_exists(\PHPUnit\TextUI\Command::class, false)) {
     return;
 }
 

@@ -808,9 +808,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertNull($form->getData());
-        $this->assertEquals(['a', 'foobar'], $form->getViewData());
-        $this->assertFalse($form->isSynchronized());
+        $this->assertEquals(['a'], $form->getData());
+        $this->assertEquals(['a'], $form->getViewData());
+        $this->assertFalse($form->isValid());
     }
 
     public function testSubmitMultipleNonExpandedObjectChoices()
@@ -1351,17 +1351,17 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertNull($form->getData());
-        $this->assertSame(['a', 'foobar'], $form->getViewData());
+        $this->assertSame(['a'], $form->getData());
+        $this->assertSame(['a'], $form->getViewData());
         $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isSynchronized());
+        $this->assertFalse($form->isValid());
 
-        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertFalse($form[2]->getData());
         $this->assertFalse($form[3]->getData());
         $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
+        $this->assertSame('a', $form[0]->getViewData());
         $this->assertNull($form[1]->getViewData());
         $this->assertNull($form[2]->getViewData());
         $this->assertNull($form[3]->getViewData());
@@ -2036,8 +2036,13 @@ class ChoiceTypeTest extends BaseTypeTest
         $form->submit($multiple ? (array) $submittedData : $submittedData);
 
         // When the choice does not exist the transformation fails
-        $this->assertFalse($form->isSynchronized());
-        $this->assertNull($form->getData());
+        $this->assertFalse($form->isValid());
+
+        if ($multiple) {
+            $this->assertSame([], $form->getData());
+        } else {
+            $this->assertNull($form->getData());
+        }
     }
 
     /**

@@ -263,6 +263,11 @@ Validator
       ->addDefaultDoctrineAnnotationReader();
   ```
 
+Workflow
+--------
+
+ * Remove `InvalidTokenConfigurationException`
+
 Yaml
 ----
 

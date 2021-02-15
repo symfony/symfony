@@ -97,7 +97,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('form.type')
 
         ->set('form.type.choice', ChoiceType::class)
-            ->args([service('form.choice_list_factory')])
+            ->args([
+                service('form.choice_list_factory'),
+                service('translator')->ignoreOnInvalid(),
+            ])
             ->tag('form.type')
 
         ->set('form.type.file', FileType::class)

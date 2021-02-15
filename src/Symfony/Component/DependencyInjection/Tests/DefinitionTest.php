@@ -411,4 +411,20 @@ class DefinitionTest extends TestCase
         $def->addError('Second error');
         $this->assertSame(['First error', 'Second error'], $def->getErrors());
     }
+
+    public function testMultipleMethodCalls()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addMethodCall('configure', ['arg1']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(1, $def->getMethodCalls());
+
+        $def->addMethodCall('configure', ['arg2']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(2, $def->getMethodCalls());
+
+        $def->removeMethodCall('configure');
+        $this->assertFalse($def->hasMethodCall('configure'));
+    }
 }

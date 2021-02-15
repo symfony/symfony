@@ -53,11 +53,11 @@ class XliffLintCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lints a XLIFF file and outputs encountered errors')
+            ->setDescription('Lints an XLIFF file and outputs encountered errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
+The <info>%command.name%</info> command lints an XLIFF file and outputs to STDOUT
 the first encountered syntax error.
 
 You can validates XLIFF contents passed from STDIN:

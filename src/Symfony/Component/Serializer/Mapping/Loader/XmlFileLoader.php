@@ -110,7 +110,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML File.
+     * Parses an XML File.
      *
      * @throws MappingException
      */

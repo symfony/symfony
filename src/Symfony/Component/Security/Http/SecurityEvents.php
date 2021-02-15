@@ -21,7 +21,7 @@ final class SecurityEvents
      * into your website. It is important to distinguish this action from
      * non-interactive authentication methods, such as:
      *   - authentication based on your session.
-     *   - authentication using a HTTP basic or HTTP digest header.
+     *   - authentication using an HTTP basic or HTTP digest header.
      *
      * @Event("Symfony\Component\Security\Http\Event\InteractiveLoginEvent")
      */

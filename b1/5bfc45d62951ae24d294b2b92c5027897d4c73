@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-02-04T21:30:43Z
+
+I choose a totally different approach, like suggested by Wouter [there](https://github.com/symfony/symfony/issues/39505#issuecomment-753328926)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-02-05T08:42:38Z
+
+@wouterj Can you review this one please?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-05T09:16:31Z
+
+I'm not so sure about the 5.2 target for this PR:
+
+* It's changing behavior, so it does need a CHANGELOG entry
+* It's remove an (exception) class, I don't think we are allowed to do so in any 5.x release?
+
+We may be able to work around (1) by only doing this in the new system. Maybe we should set a parameter (e.g. `security.exception_on_no_token`) that is true when the new system is used and false otherwise. We [already have some services depending on this knowledge](https://github.com/symfony/symfony/blob/5.x/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php#L118-L123), by using a parameter we can also depend on it in the `GuardListener`.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-02-06T12:10:35Z
+
+I'm not sure we must do something more about the BC. We open a door here, we don't close one.
+Previously, a user MUST put a token in the token storage to make it work.
+So we can be 100% sure a token is present.
+So removing this check is dead code for current code. We only allow new security system to work
+
+But maybe, I should let the removed exception, and deprecate it...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-07T16:45:42Z
+
+> We open a door here, we don't close one.
+
+Looking at the code, I agree here. This stops throwing an undocumented exception, which is fine for me as a bugfix.
+
+> But maybe, I should let the removed exception, and deprecate it...
+
+I think so :) it's a hard break, we can do it smoothly on 5.x.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-07T19:29:32Z
+
+What I was meaning is that expressions now need to handle `token` and `user` being `null`, whereas it always was `TokenInterface` and `UserInterface` before the changes in this PR, right? <s>I haven't used Workflow at all, so I can't judge whether this is a blocker.</s> On a second thought, as it only happens when using the experimental system (and it doesn't work at all for the new system), it's probably OK for a patch release.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-02-07T21:09:04Z
+
+yes and yes :) an anyway, without talking about the new security system, I think the patch is valid anyway.
+When we look at [why](https://github.com/symfony/symfony/pull/23906) this exception has been added, when understand that this exception is not really required, and the new code seems more natural

@@ -31,7 +31,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
 
     abstract protected function buildHttpMessageFactory(): HttpMessageFactoryInterface;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->factory = $this->buildHttpMessageFactory();
         $this->tmpDir = sys_get_temp_dir();
@@ -61,8 +61,8 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
                 'c2' => ['c3' => 'bar'],
             ],
             [
-                'f1' => $this->createUploadedFile('F1', 'f1.txt', 'text/plain', UPLOAD_ERR_OK),
-                'foo' => ['f2' => $this->createUploadedFile('F2', 'f2.txt', 'text/plain', UPLOAD_ERR_OK)],
+                'f1' => $this->createUploadedFile('F1', 'f1.txt', 'text/plain', \UPLOAD_ERR_OK),
+                'foo' => ['f2' => $this->createUploadedFile('F2', 'f2.txt', 'text/plain', \UPLOAD_ERR_OK)],
             ],
             [
                 'REQUEST_METHOD' => 'POST',
@@ -102,12 +102,12 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $this->assertEquals('F1', $uploadedFiles['f1']->getStream()->__toString());
         $this->assertEquals('f1.txt', $uploadedFiles['f1']->getClientFilename());
         $this->assertEquals('text/plain', $uploadedFiles['f1']->getClientMediaType());
-        $this->assertEquals(UPLOAD_ERR_OK, $uploadedFiles['f1']->getError());
+        $this->assertEquals(\UPLOAD_ERR_OK, $uploadedFiles['f1']->getError());
 
         $this->assertEquals('F2', $uploadedFiles['foo']['f2']->getStream()->__toString());
         $this->assertEquals('f2.txt', $uploadedFiles['foo']['f2']->getClientFilename());
         $this->assertEquals('text/plain', $uploadedFiles['foo']['f2']->getClientMediaType());
-        $this->assertEquals(UPLOAD_ERR_OK, $uploadedFiles['foo']['f2']->getError());
+        $this->assertEquals(\UPLOAD_ERR_OK, $uploadedFiles['foo']['f2']->getError());
 
         $serverParams = $psrRequest->getServerParams();
         $this->assertEquals('POST', $serverParams['REQUEST_METHOD']);
@@ -201,10 +201,10 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
 
     public function testUploadErrNoFile()
     {
-        $file = new UploadedFile('', '', null, UPLOAD_ERR_NO_FILE, true);
+        $file = new UploadedFile('', '', null, \UPLOAD_ERR_NO_FILE, true);
 
         $this->assertEquals(0, $file->getSize());
-        $this->assertEquals(UPLOAD_ERR_NO_FILE, $file->getError());
+        $this->assertEquals(\UPLOAD_ERR_NO_FILE, $file->getError());
         $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');
 
         $request = new Request(
@@ -214,7 +214,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
             [],
             [
             'f1' => $file,
-            'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0],
+            'f2' => ['name' => null, 'type' => null, 'tmp_name' => null, 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0],
           ],
             [
             'REQUEST_METHOD' => 'POST',
@@ -228,7 +228,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
 
         $uploadedFiles = $psrRequest->getUploadedFiles();
 
-        $this->assertEquals(UPLOAD_ERR_NO_FILE, $uploadedFiles['f1']->getError());
-        $this->assertEquals(UPLOAD_ERR_NO_FILE, $uploadedFiles['f2']->getError());
+        $this->assertEquals(\UPLOAD_ERR_NO_FILE, $uploadedFiles['f1']->getError());
+        $this->assertEquals(\UPLOAD_ERR_NO_FILE, $uploadedFiles['f2']->getError());
     }
 }

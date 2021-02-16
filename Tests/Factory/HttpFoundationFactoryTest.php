@@ -34,7 +34,7 @@ class HttpFoundationFactoryTest extends TestCase
     /** @var string */
     private $tmpDir;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->factory = new HttpFoundationFactory();
         $this->tmpDir = sys_get_temp_dir();
@@ -57,11 +57,11 @@ class HttpFoundationFactoryTest extends TestCase
             ['city' => 'Lille'],
             ['url' => 'http://les-tilleuls.coop'],
             [
-                'doc1' => $this->createUploadedFile('Doc 1', UPLOAD_ERR_OK, 'doc1.txt', 'text/plain'),
+                'doc1' => $this->createUploadedFile('Doc 1', \UPLOAD_ERR_OK, 'doc1.txt', 'text/plain'),
                 'nested' => [
                     'docs' => [
-                        $this->createUploadedFile('Doc 2', UPLOAD_ERR_OK, 'doc2.txt', 'text/plain'),
-                        $this->createUploadedFile('Doc 3', UPLOAD_ERR_OK, 'doc3.txt', 'text/plain'),
+                        $this->createUploadedFile('Doc 2', \UPLOAD_ERR_OK, 'doc2.txt', 'text/plain'),
+                        $this->createUploadedFile('Doc 3', \UPLOAD_ERR_OK, 'doc3.txt', 'text/plain'),
                     ],
                 ],
             ],
@@ -168,7 +168,7 @@ class HttpFoundationFactoryTest extends TestCase
 
     public function testCreateUploadedFile()
     {
-        $uploadedFile = $this->createUploadedFile('An uploaded file.', UPLOAD_ERR_OK, 'myfile.txt', 'text/plain');
+        $uploadedFile = $this->createUploadedFile('An uploaded file.', \UPLOAD_ERR_OK, 'myfile.txt', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
         $size = $symfonyUploadedFile->getSize();
 
@@ -176,7 +176,7 @@ class HttpFoundationFactoryTest extends TestCase
         $symfonyUploadedFile->move($this->tmpDir, $uniqid);
 
         $this->assertEquals($uploadedFile->getSize(), $size);
-        $this->assertEquals(UPLOAD_ERR_OK, $symfonyUploadedFile->getError());
+        $this->assertEquals(\UPLOAD_ERR_OK, $symfonyUploadedFile->getError());
         $this->assertEquals('myfile.txt', $symfonyUploadedFile->getClientOriginalName());
         $this->assertEquals('txt', $symfonyUploadedFile->getClientOriginalExtension());
         $this->assertEquals('text/plain', $symfonyUploadedFile->getClientMimeType());
@@ -188,10 +188,10 @@ class HttpFoundationFactoryTest extends TestCase
         $this->expectException(FileException::class);
         $this->expectExceptionMessage('The file "e" could not be written on disk.');
 
-        $uploadedFile = $this->createUploadedFile('Error.', UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
+        $uploadedFile = $this->createUploadedFile('Error.', \UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
 
-        $this->assertEquals(UPLOAD_ERR_CANT_WRITE, $symfonyUploadedFile->getError());
+        $this->assertEquals(\UPLOAD_ERR_CANT_WRITE, $symfonyUploadedFile->getError());
 
         $symfonyUploadedFile->move($this->tmpDir, 'shouldFail.txt');
     }

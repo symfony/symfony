@@ -389,6 +389,9 @@ class YamlFileLoader extends FileLoader
             ];
         }
 
+        $definition = isset($service[0]) && $service[0] instanceof Definition ? array_shift($service) : null;
+        $return = null === $definition ? $return : true;
+
         $this->checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
@@ -423,7 +426,9 @@ class YamlFileLoader extends FileLoader
             return $return ? $alias : $this->container->setAlias($id, $alias);
         }
 
-        if ($this->isLoadingInstanceof) {
+        if (null !== $definition) {
+            // no-op
+        } elseif ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
             if ('' !== $service['parent'] && '@' === $service['parent'][0]) {
@@ -627,7 +632,8 @@ class YamlFileLoader extends FileLoader
 
         if (isset($defaults['bind']) || isset($service['bind'])) {
             // deep clone, to avoid multiple process of the same instance in the passes
-            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
+            $bindings = $definition->getBindings();
+            $bindings += isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
 
             if (isset($service['bind'])) {
                 if (!\is_array($service['bind'])) {

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2020-12-09T11:25:46Z
+
+I haven't reviewed the code yet but I like the idea! Could we also allow to set this annotation on classes? In this case, the context will be applied to the class and all its properties.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2020-12-09T11:36:47Z
+
+> I haven't reviewed the code yet but I like the idea! Could we also allow to set this annotation on classes? In this case, the context will be applied to the class and all its properties.
+
+Indeed, I also had this case in mind. I'd say let's polish this one first and iterate over. I don't think it would bring any compatibility issue (anyway we have time until 5.3 release).
+
+Note that applying a context on an object property should already do it right now. But we miss a way to add it on class-level, for the root object for instance.

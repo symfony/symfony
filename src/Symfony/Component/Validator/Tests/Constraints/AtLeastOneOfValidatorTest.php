@@ -206,6 +206,35 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertCount(0, $violations);
     }
+
+    public function testEmbeddedMessageTakenFromFailingConstraint()
+    {
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory(new class() implements MetadataFactoryInterface {
+                public function getMetadataFor($classOrObject): MetadataInterface
+                {
+                    return (new ClassMetadata(Data::class))
+                        ->addPropertyConstraint('foo', new NotNull(['message' => 'custom message foo']))
+                        ->addPropertyConstraint('bar', new AtLeastOneOf([
+                            new NotNull(['message' => 'custom message bar']),
+                        ]))
+                    ;
+                }
+
+                public function hasMetadataFor($classOrObject): bool
+                {
+                    return Data::class === $classOrObject;
+                }
+            })
+            ->getValidator()
+        ;
+
+        $violations = $validator->validate(new Data(), new Valid());
+
+        $this->assertCount(2, $violations);
+        $this->assertSame('custom message foo', $violations->get(0)->getMessage());
+        $this->assertSame('This value should satisfy at least one of the following constraints: [1] custom message bar', $violations->get(1)->getMessage());
+    }
 }
 
 class ExpressionConstraintNested
@@ -216,4 +245,10 @@ class ExpressionConstraintNested
     {
         return 'bar';
     }
+}
+
+class Data
+{
+    public $foo;
+    public $bar;
 }

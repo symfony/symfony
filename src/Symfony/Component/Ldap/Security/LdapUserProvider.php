@@ -122,6 +122,8 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @final
      */
     public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
     {

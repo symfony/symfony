@@ -11,16 +11,18 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user
@@ -67,11 +69,20 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
+            if (!$user instanceof PasswordAuthenticatedUserInterface) {
+                trigger_deprecation('symfony/security-core', '5.3', 'Using password-based authentication listeners while not implementing "%s" interface from class "%s" is deprecated.', PasswordAuthenticatedUserInterface::class, get_debug_type($user));
+            }
+
+            $salt = $user->getSalt();
+            if ($salt && !$user instanceof LegacyPasswordAuthenticatedUserInterface) {
+                trigger_deprecation('symfony/security-core', '5.3', 'Returning a string from "getSalt()" without implementing the "%s" interface is deprecated, the "%s" class should implement it.', LegacyPasswordAuthenticatedUserInterface::class, get_debug_type($user));
+            }
+
             // deprecated since Symfony 5.3
             if ($this->hasherFactory instanceof EncoderFactoryInterface) {
                 $encoder = $this->hasherFactory->getEncoder($user);
 
-                if (!$encoder->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
+                if (!$encoder->isPasswordValid($user->getPassword(), $presentedPassword, $salt)) {
                     throw new BadCredentialsException('The presented password is invalid.');
                 }
 
@@ -84,12 +95,12 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
 
             $hasher = $this->hasherFactory->getPasswordHasher($user);
 
-            if (!$hasher->verify($user->getPassword(), $presentedPassword, $user->getSalt())) {
+            if (!$hasher->verify($user->getPassword(), $presentedPassword, $salt)) {
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
             if ($this->userProvider instanceof PasswordUpgraderInterface && $hasher->needsRehash($user->getPassword())) {
-                $this->userProvider->upgradePassword($user, $hasher->hash($presentedPassword, $user->getSalt()));
+                $this->userProvider->upgradePassword($user, $hasher->hash($presentedPassword, $salt));
             }
         }
     }

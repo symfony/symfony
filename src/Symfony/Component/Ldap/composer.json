@@ -22,11 +22,11 @@
         "ext-ldap": "*"
     },
     "require-dev": {
-        "symfony/security-core": "^5.0"
+        "symfony/security-core": "^5.3"
     },
     "conflict": {
         "symfony/options-resolver": "<4.4",
-        "symfony/security-core": "<5"
+        "symfony/security-core": "<5.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },

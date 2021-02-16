@@ -12,18 +12,52 @@
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserPasswordHasherTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
+    public function testHashWithNonPasswordAuthenticatedUser()
+    {
+        $this->expectDeprecation('Since symfony/password-hasher 5.3: Returning a string from "getSalt()" without implementing the "Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface" interface is deprecated, the "%s" class should implement it.');
+
+        $userMock = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock->expects($this->any())
+            ->method('getSalt')
+            ->willReturn('userSalt');
+
+        $mockHasher = $this->createMock(PasswordHasherInterface::class);
+        $mockHasher->expects($this->any())
+            ->method('hash')
+            ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
+            ->willReturn('hash');
+
+        $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $mockPasswordHasherFactory->expects($this->any())
+            ->method('getPasswordHasher')
+            ->with($this->equalTo($userMock))
+            ->willReturn($mockHasher);
+
+        $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
+
+        $encoded = $passwordHasher->hashPassword($userMock, 'plainPassword');
+        $this->assertEquals('hash', $encoded);
+    }
+
     public function testHash()
     {
-        $userMock = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock = $this->createMock(TestPasswordAuthenticatedUser::class);
         $userMock->expects($this->any())
             ->method('getSalt')
             ->willReturn('userSalt');
@@ -48,7 +82,7 @@ class UserPasswordHasherTest extends TestCase
 
     public function testVerify()
     {
-        $userMock = $this->createMock(UserInterface::class);
+        $userMock = $this->createMock(TestPasswordAuthenticatedUser::class);
         $userMock->expects($this->any())
             ->method('getSalt')
             ->willReturn('userSalt');
@@ -92,4 +126,8 @@ class UserPasswordHasherTest extends TestCase
         $this->assertTrue($passwordHasher->needsRehash($user));
         $this->assertFalse($passwordHasher->needsRehash($user));
     }
+}
+
+abstract class TestPasswordAuthenticatedUser implements LegacyPasswordAuthenticatedUserInterface, UserInterface
+{
 }

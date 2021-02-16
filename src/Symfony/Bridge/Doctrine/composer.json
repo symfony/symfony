@@ -38,7 +38,7 @@
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^5.0",
         "symfony/proxy-manager-bridge": "^4.4|^5.0",
-        "symfony/security-core": "^5.0",
+        "symfony/security-core": "^5.3",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/uid": "^5.1",
         "symfony/validator": "^5.2",
@@ -60,7 +60,7 @@
         "symfony/messenger": "<4.4",
         "symfony/property-info": "<5",
         "symfony/security-bundle": "<5",
-        "symfony/security-core": "<5",
+        "symfony/security-core": "<5.3",
         "symfony/validator": "<5.2"
     },
     "suggest": {

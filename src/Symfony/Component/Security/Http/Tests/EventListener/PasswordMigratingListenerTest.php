@@ -13,7 +13,10 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -25,8 +28,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\PasswordMigratingListener;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class PasswordMigratingListenerTest extends TestCase
 {
@@ -36,7 +37,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->user = $this->createMock(UserInterface::class);
+        $this->user = $this->createMock(TestPasswordAuthenticatedUser::class);
         $this->user->expects($this->any())->method('getPassword')->willReturn('old-hash');
         $encoder = $this->createMock(PasswordHasherInterface::class);
         $encoder->expects($this->any())->method('needsRehash')->willReturn(true);
@@ -62,7 +63,7 @@ class PasswordMigratingListenerTest extends TestCase
         yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); })))];
 
         // blank password
-        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(UserInterface::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
+        yield [$this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->createMock(TestPasswordAuthenticatedUser::class); }), [new PasswordUpgradeBadge('', $this->createPasswordUpgrader())]))];
 
         // no user
         yield [$this->createEvent($this->createMock(PassportInterface::class))];
@@ -96,7 +97,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithoutUpgrader()
     {
-        $userLoader = $this->createMock(MigratingUserProvider::class);
+        $userLoader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
         $userLoader->expects($this->any())->method('loadUserByUsername')->willReturn($this->user);
 
         $userLoader->expects($this->once())
@@ -110,7 +111,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     private function createPasswordUpgrader()
     {
-        return $this->createMock(PasswordUpgraderInterface::class);
+        return $this->getMockForAbstractClass(TestMigratingUserProvider::class);
     }
 
     private function createEvent(PassportInterface $passport)
@@ -119,6 +120,12 @@ class PasswordMigratingListenerTest extends TestCase
     }
 }
 
-abstract class MigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
+abstract class TestMigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
+    abstract public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
+}
+
+abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface
+{
+    abstract public function getPassword(): ?string;
 }

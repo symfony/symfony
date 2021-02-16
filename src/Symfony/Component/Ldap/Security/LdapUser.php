@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class LdapUser implements UserInterface, EquatableInterface
+class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     private $entry;
     private $username;

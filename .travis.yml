@@ -8,22 +8,27 @@ cache:
 env:
     global:
         - PHPUNIT_FLAGS="-v"
+        - SYMFONY_PHPUNIT_VERSION=9.5
         - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
 
 matrix:
     fast_finish: true
     include:
           # Minimum supported dependencies with the latest and oldest PHP version
-        - php: 7.3
+        - php: 7.4
           env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" SYMFONY_DEPRECATIONS_HELPER="weak_vendors"
 
         - php: 7.1
+          env: SYMFONY_PHPUNIT_VERSION=7.5
         - php: 7.2
+          env: SYMFONY_PHPUNIT_VERSION=8.5
         - php: 7.3
-          env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-text"
+        - php: 7.4
+          env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-text" XDEBUG_MODE=coverage
+        - php: 8.0
 
           # Latest commit to master
-        - php: 7.3
+        - php: 7.4
           env: STABILITY="dev"
 
     allow_failures:

@@ -120,4 +120,13 @@ class IniFileLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
         $this->assertTrue($loader->supports('with_wrong_ext.yml', 'ini'), '->supports() returns true if the resource with forced type is loadable');
     }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new IniFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/').'/ini'), 'some-env');
+        $loader->load('when-env.ini');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+    }
 }

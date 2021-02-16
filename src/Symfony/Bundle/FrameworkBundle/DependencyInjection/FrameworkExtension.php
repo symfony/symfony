@@ -1011,7 +1011,10 @@ class FrameworkExtension extends Extension
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', ['priority' => -10])
-                ->addArgument(new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+                ->setArguments([
+                    new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    '%kernel.environment%',
+                ]);
 
             $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)

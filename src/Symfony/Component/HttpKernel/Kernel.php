@@ -751,15 +751,16 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
+        $env = $this->getEnvironment();
         $locator = new FileLocator($this);
         $resolver = new LoaderResolver([
-            new XmlFileLoader($container, $locator),
-            new YamlFileLoader($container, $locator),
-            new IniFileLoader($container, $locator),
-            new PhpFileLoader($container, $locator),
-            new GlobFileLoader($container, $locator),
-            new DirectoryLoader($container, $locator),
-            new ClosureLoader($container),
+            new XmlFileLoader($container, $locator, $env),
+            new YamlFileLoader($container, $locator, $env),
+            new IniFileLoader($container, $locator, $env),
+            new PhpFileLoader($container, $locator, $env),
+            new GlobFileLoader($container, $locator, $env),
+            new DirectoryLoader($container, $locator, $env),
+            new ClosureLoader($container, $env),
         ]);
 
         return new DelegatingLoader($resolver);

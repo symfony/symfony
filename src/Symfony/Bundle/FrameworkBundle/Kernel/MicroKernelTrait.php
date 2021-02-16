@@ -152,7 +152,7 @@ trait MicroKernelTrait
             };
 
             try {
-                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file), $loader);
+                $this->configureContainer(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file, $this->getEnvironment()), $loader);
             } finally {
                 $instanceof = [];
                 $kernelLoader->registerAliasesForSinglyImplementedInterfaces();
@@ -193,7 +193,7 @@ trait MicroKernelTrait
             return $routes->build();
         }
 
-        $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file));
+        $this->configureRoutes(new RoutingConfigurator($collection, $kernelLoader, $file, $file, $this->getEnvironment()));
 
         foreach ($collection as $route) {
             $controller = $route->getDefault('_controller');

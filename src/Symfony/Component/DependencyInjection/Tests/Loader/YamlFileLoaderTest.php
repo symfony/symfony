@@ -1002,4 +1002,13 @@ class YamlFileLoaderTest extends TestCase
         ];
         $this->assertEquals($expected, $container->get('stack_e'));
     }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'some-env');
+        $loader->load('when-env.yaml');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+    }
 }

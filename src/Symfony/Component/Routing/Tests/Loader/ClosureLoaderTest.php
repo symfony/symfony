@@ -33,10 +33,12 @@ class ClosureLoaderTest extends TestCase
 
     public function testLoad()
     {
-        $loader = new ClosureLoader();
+        $loader = new ClosureLoader('some-env');
 
         $route = new Route('/');
-        $routes = $loader->load(function () use ($route) {
+        $routes = $loader->load(function (string $env = null) use ($route) {
+            $this->assertSame('some-env', $env);
+
             $routes = new RouteCollection();
 
             $routes->add('foo', $route);

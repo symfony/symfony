@@ -34,6 +34,7 @@ class Route
     private $schemes = [];
     private $condition;
     private $priority;
+    private $env;
 
     /**
      * @param array|string      $data         data array managed by the Doctrine Annotations library or the path
@@ -59,7 +60,8 @@ class Route
         string $locale = null,
         string $format = null,
         bool $utf8 = null,
-        bool $stateless = null
+        bool $stateless = null,
+        string $env = null
     ) {
         if (\is_string($data)) {
             $data = ['path' => $data];
@@ -84,6 +86,7 @@ class Route
         $data['format'] = $data['format'] ?? $format;
         $data['utf8'] = $data['utf8'] ?? $utf8;
         $data['stateless'] = $data['stateless'] ?? $stateless;
+        $data['env'] = $data['env'] ?? $env;
 
         $data = array_filter($data, static function ($value): bool {
             return null !== $value;
@@ -240,5 +243,15 @@ class Route
     public function getPriority(): ?int
     {
         return $this->priority;
+    }
+
+    public function setEnv(?string $env): void
+    {
+        $this->env = $env;
+    }
+
+    public function getEnv(): ?string
+    {
+        return $this->env;
     }
 }

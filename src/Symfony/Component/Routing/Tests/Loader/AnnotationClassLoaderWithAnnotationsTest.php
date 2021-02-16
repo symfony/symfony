@@ -9,10 +9,10 @@ use Symfony\Component\Routing\Route;
 
 class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
 {
-    protected function setUp(): void
+    protected function setUp(string $env = null): void
     {
         $reader = new AnnotationReader();
-        $this->loader = new class($reader) extends AnnotationClassLoader {
+        $this->loader = new class($reader, $env) extends AnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
             {
             }

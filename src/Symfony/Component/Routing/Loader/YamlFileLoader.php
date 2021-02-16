@@ -84,6 +84,24 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($parsedConfig as $name => $config) {
+            if (0 === strpos($name, 'when@')) {
+                if (!$this->env || 'when@'.$this->env !== $name) {
+                    continue;
+                }
+
+                foreach ($config as $name => $config) {
+                    $this->validate($config, $name.'" when "@'.$this->env, $path);
+
+                    if (isset($config['resource'])) {
+                        $this->parseImport($collection, $config, $path, $file);
+                    } else {
+                        $this->parseRoute($collection, $name, $config, $path);
+                    }
+                }
+
+                continue;
+            }
+
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {

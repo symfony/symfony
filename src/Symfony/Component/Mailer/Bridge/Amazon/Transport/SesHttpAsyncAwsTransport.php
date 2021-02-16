@@ -83,6 +83,10 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
             $request['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
         }
+        if (($message->getOriginalMessage() instanceof Message)
+            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
+        }
 
         return new SendEmailRequest($request);
     }

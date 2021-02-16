@@ -99,6 +99,10 @@ class SesApiTransport extends AbstractApiTransport
                 $payload['ConfigurationSetName'] = $header->getBodyAsString();
             }
 
+            if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
+                $payload['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
+            }
+
             return $payload;
         }
 
@@ -126,6 +130,9 @@ class SesApiTransport extends AbstractApiTransport
         }
         if ($header = $email->getHeaders()->get('X-SES-CONFIGURATION-SET')) {
             $payload['ConfigurationSetName'] = $header->getBodyAsString();
+        }
+        if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $payload['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
         }
 
         return $payload;

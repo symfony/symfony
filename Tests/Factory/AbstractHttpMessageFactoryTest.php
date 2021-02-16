@@ -152,7 +152,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $cookieHeader = $psrResponse->getHeader('Set-Cookie');
         $this->assertIsArray($cookieHeader);
         $this->assertCount(1, $cookieHeader);
-        $this->assertRegExp('{city=Lille; expires=Wed, 13-Jan-2021 22:23:01 GMT;( max-age=\d+;)? path=/; httponly}i', $cookieHeader[0]);
+        $this->assertMatchesRegularExpression('{city=Lille; expires=Wed, 13-Jan-2021 22:23:01 GMT;( max-age=\d+;)? path=/; httponly}i', $cookieHeader[0]);
     }
 
     public function testCreateResponseFromStreamed()

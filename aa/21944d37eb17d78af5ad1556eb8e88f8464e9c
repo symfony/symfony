@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-12T19:11:57Z
+
+Hey!
+
+I see that more good work is coming your way.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by localheinz at 2021-02-12T20:05:46Z
+
+@OskarStark
+
+A bug fix would be great, since the corresponding application can not yet upgrade to `symfony/translation:^5`.
+
+🤓
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-12T20:22:18Z
+
+I know, from my perspective it can be considered a bugfix, as you explained it is conform with the spec 👍🏻

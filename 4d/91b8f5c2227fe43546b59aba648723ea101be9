@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-01-12T19:39:20Z
+
+is there any reason for the "auto discovered services only" actually?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2021-01-13T16:07:31Z
+
+Quick nitpick question: should the attribute be named `#[Autoconfigure]` or `#[Autoconfigured]`? Because the class is autoconfigured, it does not do any configuring itself.
+
+The recently proposed `#[Deprecated]` attribute in PHP itself is in passive voice as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-13T16:09:00Z
+
+> Because the class is autoconfigured, it does not do any configuring itself.
+
+I feel like I missed explaining correctly how this works. *Yes*, this attribute declares a configuration rule for autoconfiguration.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-15T19:58:43Z
+
+PR updated: registration happens in a new compiler pass and doesn't need autodiscovery anymore.
+I also added a new `container.ignore_attributes` tag to disable processing `Autoconfigure` attributes when needed, for more flexibility.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-20T10:44:48Z
+
+PR is now tested, green and ready! (fabbot's failure is a false positive)
+
+Be careful, it's not anymore a replacement for #39776, but more like a sidekick of #39897.
+
+Unlike the previous version, there is nothing in contracts anymore, but a single `Autoconfigure` attribute in the DI component.
+
+This attribute is meant to target one use case: defining autoconfiguration rules bound to interfaces, as in e.g.:
+```php
+#[Autoconfigure(tags: ['my_tag'])]
+interface MyInterface {...}
+```
+
+Of course, all auto-configurable settings are handled (calls, bindings, etc.)
+
+/cc @derrabus, vote pending ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-25T18:55:45Z
+
+I pushed a new idea: a new `#[AutoconfigureTag()]` attribute.
+
+It extends `#[Autoconfigure]` but allows for specifically defining tags to attach by autoconfiguration.
+
+The name of the tag is optional and defaults to the name of the tagged type (typically the FQCN of an interface). This should ease with writing locators/iterators of tagged services.
+
+```php
+#[AutoconfigureTag()]
+interface MyInterface {...}
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-04T13:49:38Z
+
+IIUC, we now have 2 competing PRs here. As far as I know, it was decided that progress continues in #39897? Please correct me if I'm wrong, but otherwise this one should be closed I think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-04T13:56:46Z
+
+@wouterj this one provides something else. Both should be merged to me in the end. This one before #39897 since it's ready and might be used by #39897 as explained in https://github.com/symfony/symfony/pull/39897#discussion_r561029679
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-07T08:35:49Z
+
+/cc @symfony/mergers anyone?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-11T13:21:17Z
+
+As requested, I'll post some of my comment in the other PR (ref: https://github.com/symfony/symfony/pull/39897#discussion_r571675897 ) here:
+
+:smiley: What I like about this PR is that it reuses the autoconfigure system (using the Yaml file loader seems a bit hacky, but I'm surely not the one to make a decision about that).
+:neutral_face: What I'm not so sure about is why there is a need to have a userland `Autoconfigure` attribute. I personally don't see this need (especially if #39897 will make it, as that implements more specialized and nice userland attributes for this purpose).
+I think such a generic attribute opens up a lot of misuse (e.g. in the other PR, it was shown that you can misuse attributes instead of implementing the `ResetInterface` contract).
+I feel like it couples attributes directly to DI (which e.g. a `@required` annotation explicitly avoids).
+At last, by having both a generic attribute and more specific attributes (from #39897), we provide more than 1 solution for the same problem. How should we document this? What are the advantages of one over the other?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-11T16:18:58Z
+
+> (using the Yaml file loader seems a bit hacky, but I'm surely not the one to make a decision about that).
+
+What matters here is how one can describe something using an array data structure. YamlLoader does exactly this: turn arrays (from yaml) into actual calls. Here, we just reuse that logic, so that the same array-structures can also be used in attributes. E.g.:
+```
+#[Autoconfigure(
+    calls: [
+		'setFoo' => ['the-args']
+	]
+)]
+```
+
+> What I'm not so sure about is why there is a need to have a userland Autoconfigure attribute. I personally don't see this need
+
+All ppl that use `_instanceof` or `$container->registerForAutoconfiguration()` have a need for this.
+It allows telling to the DI engine how a definition should be autoconfigured, depending on the base types of the class it describes.
+
+> especially if #39897 will make it, as that implements more specialized and nice userland attributes for this purpose.
+
+There is a critical difference with #39897: the attribute in this PR allows defining rules that are *inherited*. #39897 defines attributes that are *not* inherited.
+
+That's *THE* critical difference between both PRs, and why they fill a different need.
+
+> I think such a generic attribute opens up a lot of misuse (e.g. in the other PR, it was shown that you can misuse attributes instead of implementing the ResetInterface contract).
+
+Can you clarify? To me, it looks like you're arguing against empowering ppl, which I'm sure you aren't.
+I must miss something, or I just don't agree :)
+
+> I feel like it couples attributes directly to DI (which e.g. a @required annotation explicitly avoids).
+
+I do not understand this "coupling" argument. To me, as I explained in https://github.com/symfony/symfony/pull/39776#issuecomment-762326163, there is zero difference between this PR, #39776 or #39897 in this regard.
+
+Maybe you can help me understand what you mean with actual examples of when this "coupling" would happen?
+
+> At last, by having both a generic attribute and more specific attributes (from #39897), we provide more than 1 solution for the same problem. How should we document this? What are the advantages of one over the other?
+
+See "the critical difference" I mention above.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-11T16:25:44Z
+
+> How should we document this?
+
+TL;DR of my previous comment:
+- use `#[Autoconfigure]` on interfaces
+- use #39897 on specific class-services
+
+Note that these two lines are orthogonal.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T10:05:56Z
+
+@derrabus you've got it right. I agree about the doc.

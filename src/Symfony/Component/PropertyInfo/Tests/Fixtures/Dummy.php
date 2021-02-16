@@ -130,6 +130,11 @@ class Dummy extends ParentDummy
      */
     public $nestedIterators;
 
+    /**
+     * @var parent
+     */
+    public $parentAnnotation;
+
     public static function getStatic()
     {
     }

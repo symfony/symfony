@@ -1,0 +1,97 @@
+name: Static analysis
+
+on:
+  pull_request: ~
+
+jobs:
+  psalm:
+    name: Psalm
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          ini-values: "memory_limit=-1"
+          coverage: none
+
+      - name: Checkout PR
+        uses: actions/checkout@v2
+        with:
+          path: pr
+
+      - name: Checkout base
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Configure composer
+        run: |
+            cd base
+            COMPOSER_HOME="$(composer config home)"
+            ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+            echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+      - name: Determine composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ github.base_ref }}
+          restore-keys: composer-
+
+      - name: Install Psalm
+        run: |
+          composer require psalm/phar
+          cp ./vendor/bin/psalm.phar base/psalm.phar
+          cp ./vendor/bin/psalm.phar pr/psalm.phar
+
+      - name: Install dependencies for base
+        run: |
+            cd base
+            echo "::group::modify composer.json"
+            sed -i -re 's/"replace": \{/"replace": \{"symfony\/phpunit-bridge": "self.version",/' composer.json
+            composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
+            echo "::endgroup::"
+            echo "::group::composer update"
+            composer update --no-progress --ansi
+            echo "::endgroup::"
+
+      - name: Generate Psalm baseline
+        run: |
+          cd base
+          ./psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+
+      - name: Copy baseline
+        run: |
+          cp base/.github/psalm/psalm.baseline.xml pr/.github/psalm/psalm.baseline.xml
+
+      - name: Install dependencies for PR
+        run: |
+            cd pr
+            echo "::group::modify composer.json"
+            sed -i -re 's/"replace": \{/"replace": \{"symfony\/phpunit-bridge": "self.version",/' composer.json
+            composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
+            echo "::endgroup::"
+            echo "::group::composer update"
+            composer update --no-progress --ansi
+            echo "::endgroup::"
+
+      - name: Cache Psalm
+        uses: actions/cache@v2
+        with:
+          path: pr/.github/psalm/cache/
+          key: psalm-${{ github.base_ref }}
+          restore-keys: psalm-
+
+      - name: Psalm
+        run: |
+          cd pr
+          ./psalm.phar --version
+          ./psalm.phar --output-format=github --no-progress

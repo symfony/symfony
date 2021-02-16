@@ -13,6 +13,7 @@ CHANGELOG
  * Added the `event_dispatcher.dispatcher` tag
  * Added `assertResponseFormatSame()` in `BrowserKitAssertionsTrait`
  * Add support for configuring UUID factory services
+ * Add tag `assets.package` to register asset packages
 
 5.2.0
 -----

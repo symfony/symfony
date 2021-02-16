@@ -30,8 +30,8 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('assets.packages', Packages::class)
             ->args([
-                service('assets.empty_package'),
-                [],
+                service('assets._default_package'),
+                tagged_iterator('assets.package', 'package'),
             ])
 
         ->alias(Packages::class, 'assets.packages')
@@ -40,6 +40,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('assets.empty_version_strategy'),
             ])
+
+        ->alias('assets._default_package', 'assets.empty_package')
 
         ->set('assets.context', RequestStackContext::class)
             ->args([

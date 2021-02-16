@@ -59,7 +59,7 @@ class Stream implements StreamInterface
         return true;
     }
 
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = \SEEK_SET)
     {
     }
 

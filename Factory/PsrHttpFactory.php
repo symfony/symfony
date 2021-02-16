@@ -89,7 +89,7 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
 
         foreach ($uploadedFiles as $key => $value) {
             if (null === $value) {
-                $files[$key] = $this->uploadedFileFactory->createUploadedFile($this->streamFactory->createStream(), 0, UPLOAD_ERR_NO_FILE);
+                $files[$key] = $this->uploadedFileFactory->createUploadedFile($this->streamFactory->createStream(), 0, \UPLOAD_ERR_NO_FILE);
                 continue;
             }
             if ($value instanceof UploadedFile) {

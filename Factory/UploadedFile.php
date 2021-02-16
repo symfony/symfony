@@ -29,7 +29,7 @@ class UploadedFile extends BaseUploadedFile
         $error = $psrUploadedFile->getError();
         $path = '';
 
-        if (UPLOAD_ERR_NO_FILE !== $error) {
+        if (\UPLOAD_ERR_NO_FILE !== $error) {
             $path = $psrUploadedFile->getStream()->getMetadata('uri') ?? '';
 
             if ($this->test = !\is_string($path) || !is_uploaded_file($path)) {

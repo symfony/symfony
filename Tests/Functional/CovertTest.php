@@ -36,9 +36,9 @@ class CovertTest extends TestCase
 {
     private $tmpDir;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        if (!class_exists('Nyholm\Psr7\ServerRequest')) {
+        if (!class_exists(Psr7Request::class)) {
             $this->markTestSkipped('nyholm/psr7 is not installed.');
         }
 
@@ -124,8 +124,8 @@ class CovertTest extends TestCase
                 'c2' => ['c3' => 'bar'],
             ],
             [
-                'f1' => $this->createUploadedFile('F1', 'f1.txt', 'text/plain', UPLOAD_ERR_OK),
-                'foo' => ['f2' => $this->createUploadedFile('F2', 'f2.txt', 'text/plain', UPLOAD_ERR_OK)],
+                'f1' => $this->createUploadedFile('F1', 'f1.txt', 'text/plain', \UPLOAD_ERR_OK),
+                'foo' => ['f2' => $this->createUploadedFile('F2', 'f2.txt', 'text/plain', \UPLOAD_ERR_OK)],
             ],
             [
                 'REQUEST_METHOD' => 'POST',

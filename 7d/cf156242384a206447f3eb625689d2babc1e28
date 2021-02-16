@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-16T10:17:50Z
+
+I've updated the code to use `::class`, I've also fixed the same issue in Translation component

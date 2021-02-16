@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-16T08:25:13Z
+
+Do you think it is possible to add a test for this feature? That would make sure we never reintroduce this bug again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T10:12:36Z
+
+@Nyholm Adding a test case is going to be tricky as this means installing the package in a directory with a space before launching the tests. We cannot isolate this in a simple test case...

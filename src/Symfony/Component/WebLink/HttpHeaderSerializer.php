@@ -39,14 +39,14 @@ final class HttpHeaderSerializer
             foreach ($link->getAttributes() as $key => $value) {
                 if (\is_array($value)) {
                     foreach ($value as $v) {
-                        $attributesParts[] = sprintf('%s="%s"', $key, $v);
+                        $attributesParts[] = sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $v));
                     }
 
                     continue;
                 }
 
                 if (!\is_bool($value)) {
-                    $attributesParts[] = sprintf('%s="%s"', $key, $value);
+                    $attributesParts[] = sprintf('%s="%s"', $key, preg_replace('/(?<!\\\\)"/', '\"', $value));
 
                     continue;
                 }

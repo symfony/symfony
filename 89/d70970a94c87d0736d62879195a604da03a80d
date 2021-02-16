@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-13T06:38:53Z
+
+Hey!
+
+I had a quick look at this PR, I think it is alright.
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by azatyan at 2021-01-13T07:06:43Z
+
+Hey @carsonbot thank you for your advice.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-27T15:39:03Z
+
+Friendly ping @Nyholm, how to proceed here?
+
+---------------------------------------------------------------------------
+
+by azatyan at 2021-01-28T10:38:43Z
+
+I don't sure, I can help in this days, as too much busy with learning.
+But I hope, after Feb Q2 maybe will have a enough energy to help community.
+
+---------------------------------------------------------------------------
+
+by azatyan at 2021-02-16T06:59:49Z
+
+Who can assist me, which translations are not translated? And in which branch of Symfony we need to work.
+ping @Nyholm
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-16T07:03:10Z
+
+I think we covered all translations here.
+
+I suggest merging this PR in its current state.

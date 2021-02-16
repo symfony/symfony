@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T11:10:00Z
+
+shouldn't this be escaped with `htmlspecialchars()` instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T11:12:58Z
+
+> shouldn't this be escaped with htmlspecialchars() instead?
+
+or maybe not if this is for HTTP headers? any link to the relevant part of the spec?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-02-16T11:14:03Z
+
+https://tools.ietf.org/html/rfc5988 says `quoted-string` from https://tools.ietf.org/html/rfc2616
+
+quoted-string:
+> A string of text is parsed as a single word if it is quoted using
+   double-quote marks.
+
+       quoted-string  = ( <"> *(qdtext | quoted-pair ) <"> )
+       qdtext         = <any TEXT except <">>
+
+>   The backslash character ("\") MAY be used as a single-character
+   quoting mechanism only within quoted-string and comment constructs.

@@ -19,7 +19,6 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -119,12 +118,12 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.user_password_encoder.generic', UserPasswordEncoder::class)
             ->args([service('security.encoder_factory')])
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use "security.user_password_hasher" instead.')
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use "security.password_hasher_factory" instead.')
         ->alias('security.password_encoder', 'security.user_password_encoder.generic')
             ->public()
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "security.password_hasher"" instead.')
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "security.password_hasher_factory" instead.')
         ->alias(UserPasswordEncoderInterface::class, 'security.password_encoder')
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.UserPasswordHasherInterface::class.'" instead.')
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.PasswordHasherFactoryInterface::class.'" instead.')
 
         ->set('security.user_checker', UserChecker::class)
 

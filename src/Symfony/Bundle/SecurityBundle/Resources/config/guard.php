@@ -34,7 +34,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('User Provider'),
                 abstract_arg('Provider-shared Key'),
                 abstract_arg('User Checker'),
-                service('security.password_hasher'),
+                service('security.password_hasher_factory'),
             ])
 
         ->set('security.authentication.listener.guard', GuardAuthenticationListener::class)

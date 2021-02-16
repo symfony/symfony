@@ -12,15 +12,14 @@
 namespace Symfony\Component\Security\Http\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -82,7 +81,7 @@ class PasswordMigratingListener implements EventSubscriberInterface
             }
         }
 
-        $passwordUpgrader->upgradePassword($user, $passwordHasher->hash($plaintextPassword, $user->getSalt()));
+        $passwordUpgrader->upgradePassword($user, $passwordHasher instanceof PasswordHasherInterface ? $passwordHasher->hash($plaintextPassword, $user->getSalt()) : $passwordHasher->encodePassword($plaintextPassword, $user->getSalt()));
     }
 
     public static function getSubscribedEvents(): array

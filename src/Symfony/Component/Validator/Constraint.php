@@ -77,6 +77,16 @@ abstract class Constraint
     }
 
     /**
+     * Returning entire list of available errors.
+     *
+     * @return array
+     */
+    public static function getErrorNames()
+    {
+        return static::$errorNames;
+    }
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of

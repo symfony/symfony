@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Արժեքը պետք է լինի սխալ։</target>
+                <target>Արժեքը պետք է լինի կեղծ։</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>Արժեքը պետք է լինի ճիշտ։</target>
+                <target>Արժեքը պետք է լինի իրական։</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
@@ -204,15 +204,15 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>Այս հավաքածուն պետք է պաուրակի {{ limit }} կամ ավելի տարրեր։|Այս հավելվածը պետք է պարունակի limit }} տարր կամ ավելին։|Այս հավաքածուն պետք է պարունակի {{ limit }} տարրերին կամ ավելի։</target>
+                <target>Այս համախումբը պետք է պաուրակի {{ limit }} կամ ավելի տարրեր։|Այս հավելվածը պետք է պարունակի limit }} տարր կամ ավելին։|Այս համախումբը պետք է պարունակի {{ limit }} տարրերին կամ ավելի։</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>Այս հավաքածուն պետք է պաուրակի {{ limit }} տարրեր կամ քիչ։|Այս հավաքածուն պետք է պաուրակի {{ limit }} տարր կամ քիչ։|Այս հավաքածուն պետք է պաուրակի {{ limit }} տարրեր կամ քիչ։</target>
+                <target>Այս համախումբը պետք է պաուրակի {{ limit }} տարրեր կամ քիչ։|Այս համախումբը պետք է պաուրակի {{ limit }} տարր կամ քիչ։|Այս համախումբը պետք է պաուրակի {{ limit }} տարրեր կամ քիչ։</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
-                <target>Այս հավաքածուն պետք է պաուրակի ուղիղ {{ limit }} տարր։|Այս հավաքածուն պետք է պաուրակի ուղիղ {{ limit }} տարրեր։|Այս հավաքածուն պետք է պաուրակի {{ limit }} տարրեր։</target>
+                <target>Այս համախումբը պետք է պաուրակի ուղիղ {{ limit }} տարր։|Այս համախումբը պետք է պաուրակի ուղիղ {{ limit }} տարրեր։|Այս համախումբը պետք է պաուրակի {{ limit }} տարրեր։</target>
             </trans-unit>
             <trans-unit id="57">
                 <source>Invalid card number.</source>
@@ -304,11 +304,11 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Հոսթի անունը հնարավոր չի պարզել:</target>
+                <target>Հոսթի անունը հնարավոր չի պարզել։</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>Արժեքը չի համընկնում {{ charset }} կոդավորման հետ:</target>
+                <target>Արժեքը չի համընկնում {{ charset }} կոդավորման հետ։</target>
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
@@ -320,51 +320,71 @@
             </trans-unit>
             <trans-unit id="83">
                 <source>This is not a valid UUID.</source>
-                <target>Սա վավեր UUID չէ:</target>
+                <target>Սա վավեր UUID չէ։</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Այս արժեքը պետք է լինի բազմակի {{ compared_value }}.</target>
+                <target>Այս արժեքը պետք է լինի բազմակի {{ compared_value }}։</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Բիզնեսի նույնականացման կոդը (BIC) կապված չէ IBAN- ի հետ {{ iban }}.</target>
+                <target>Բիզնեսի նույնականացման կոդը (BIC) կապված չէ IBAN- ի հետ {{ iban }}։</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Այս արժեքը պետք է լինի վավեր JSON:</target>
+                <target>Այս արժեքը պետք է լինի վավեր JSON։</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Այս հավաքածուն պետք է պարունակի միայն եզակի տարրեր:</target>
+                <target>Այս համախումբը պետք է պարունակի միայն եզակի տարրեր։</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>Այս արժեքը պետք է լինի դրական:</target>
+                <target>Այս արժեքը պետք է լինի դրական։</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Այս արժեքը պետք է լինի դրական կամ զրոյական:</target>
+                <target>Այս արժեքը պետք է լինի դրական կամ զրոյական։</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>Այս արժեքը պետք է լինի բացասական:</target>
+                <target>Այս արժեքը պետք է լինի բացասական։</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Այս արժեքը պետք է լինի բացասական կամ զրոյական:</target>
+                <target>Այս արժեքը պետք է լինի բացասական կամ զրոյական։</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Այս արժեքը վավեր ժամանակի գոտի չէ:</target>
+                <target>Այս արժեքը վավեր ժամային գոտի չէ։</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Այս գաղտնաբառն արտահոսվել է տվյալների խախտման մեջ, այն չպետք է օգտագործվի: Խնդրում ենք օգտագործել մեկ այլ գաղտնաբառ:</target>
+                <target>Գաղտնաբառը գտնվել է տվյալների արտահոսքում. այն չպետք է օգտագործվի: Խնդրում ենք օգտագործել մեկ այլ գաղտնաբառ։</target>
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>Այս արժեքը պետք է լինի միջև {{ min }} և {{ max }}.</target>
+                <target>Այս արժեքը պետք է լինի  {{ min }}-ի և {{ max }}-ի միջև։</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Այս հոստի անունը վավեր չէ։</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}․</source>
+                <target>Այս համախմբի տարրերի քանակը պետք է հավասար լինի {{ compared_value }}-ի բազմապատիկներին։</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Այս արժեքը պետք է բավարարի հետևյալ սահմանափակումներից առնվազն մեկը։</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Այս համախմբի յուրաքանչյուր տարր պետք է բավարարի իր սեփական սահմանափակումները։</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Այս արժեքը արժեթղթերի նույնականացման միջազգային համարը վավեր չէ(ISIN)։</target>
             </trans-unit>
         </body>
     </file>

@@ -54,6 +54,7 @@ before_install:
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
+      export SYMFONY_DEPRECATIONS_HELPER=max[indirect]=170
 
       nanoseconds () {
           local cmd="date"

@@ -12,11 +12,13 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -24,6 +26,8 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 abstract class AnnotationLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var AnnotationLoader
      */
@@ -114,7 +118,31 @@ abstract class AnnotationLoaderTest extends TestCase
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
     }
 
+    public function testLoadContexts()
+    {
+        $this->assertLoadedContexts($this->getNamespace().'\ContextDummy', $this->getNamespace().'\ContextDummyParent');
+    }
+
+    public function testThrowsOnContextOnInvalidMethod()
+    {
+        $class = $this->getNamespace().'\BadMethodContextDummy';
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage(sprintf('Context on "%s::badMethod()" cannot be added', $class));
+
+        $loader = $this->getLoaderForContextMapping();
+
+        $classMetadata = new ClassMetadata($class);
+
+        $loader->loadClassMetadata($classMetadata);
+    }
+
     abstract protected function createLoader(): AnnotationLoader;
 
     abstract protected function getNamespace(): string;
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
+    }
 }

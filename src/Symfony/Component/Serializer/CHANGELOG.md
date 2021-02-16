@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Add the ability to provide (de)normalization context using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Context`)
  * deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.
  * added normalization formats to `UidNormalizer`
 

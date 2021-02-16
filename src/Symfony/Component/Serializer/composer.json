@@ -37,6 +37,7 @@
         "symfony/property-info": "^5.3",
         "symfony/uid": "^5.1",
         "symfony/validator": "^4.4|^5.0",
+        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/var-exporter": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0"
     },

@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -29,6 +30,8 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class YamlFileLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var YamlFileLoader
      */
@@ -125,5 +128,10 @@ class YamlFileLoaderTest extends TestCase
         $this->expectExceptionMessage('The "ignore" value must be a boolean');
 
         (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
+    }
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
     }
 }

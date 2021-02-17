@@ -21,8 +21,14 @@
         "symfony/http-foundation": "^4.4 || ^5.0"
     },
     "require-dev": {
+        "symfony/browser-kit": "^4.4 || ^5.0",
+        "symfony/config": "^4.4 || ^5.0",
+        "symfony/event-dispatcher": "^4.4 || ^5.0",
+        "symfony/framework-bundle": "^4.4 || ^5.0",
+        "symfony/http-kernel": "^4.4 || ^5.0",
         "symfony/phpunit-bridge": "^4.4.19 || ^5.2",
-        "nyholm/psr7": "^1.1"
+        "nyholm/psr7": "^1.1",
+        "psr/log": "^1.1"
     },
     "suggest": {
         "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
@@ -35,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "2.0-dev"
+            "dev-main": "2.1-dev"
         }
     }
 }

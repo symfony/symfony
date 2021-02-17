@@ -145,6 +145,11 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    /**
+     * @var parent
+     */
+    public $parentAnnotation;
+
     public static function getStatic()
     {
     }

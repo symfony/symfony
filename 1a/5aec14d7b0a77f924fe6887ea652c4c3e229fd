@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-17T13:23:29Z
+
+I'm confused. PECL tells me that 1.9.0 is the most recent release.
+
+![Bildschirmfoto am 2021-02-17 um 14 17 59](https://user-images.githubusercontent.com/1506493/108209779-fa7d1a80-712a-11eb-8c82-93ee882d5fc0.png)
+
+There is no tag `1.10.0` on https://github.com/mongodb/mongo-php-driver either.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-17T13:30:11Z
+
+So the latest version of the PHP package is 1.8. See https://packagist.org/packages/mongodb/mongodb
+
+The PHP extension's latest version is 1.9.
+
+Why do you want to update this in the first place?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-17T13:35:08Z
+
+Installing `mongodb/mongodb` 1.9 used to work before. It's now failing since mongodb/mongo-php-library#809 as in that PR the requirement for ext-mongodb was bumped to 1.10.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-17T14:00:08Z
+
+@xabbuh the PR you linked is not part of mongodb/mongodb 1.9 though.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-17T14:02:59Z
+
+ah sorry, there is non 1.9.0 release of `mongodb/mongodb` yet. so the previous code was forcing to use an in-progress dev version of the library.
+
+I would still use `^1.8.0` as the requirement, and change the title of the PR. The issue we have is not that we should forbid installing 1.9 of the library, but that we should allow installing a released version (then, composer will take care of selecting the version compatible with the extension, for which we use a released version too)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-17T14:24:37Z
+
+I have removed the version constraint completely. I think that should be enough then.

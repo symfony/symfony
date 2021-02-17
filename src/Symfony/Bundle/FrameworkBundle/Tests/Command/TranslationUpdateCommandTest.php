@@ -148,7 +148,7 @@ class TranslationUpdateCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $viewsPaths = [])
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [])
     {
         $translator = $this->createMock(Translator::class);
         $translator
@@ -209,7 +209,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $viewsPaths);
+        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths);
 
         $application = new Application($kernel);
         $application->add($command);

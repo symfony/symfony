@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-12T10:49:42Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-12T19:53:13Z
+
+Thanks for your contribution, could you please add a testcase to avails a regression in the future?
+
+Also it looks like your commit/email is not associated with your github account 🧐
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-12T19:54:23Z
+
+Friendly ping @ro0NL
+
+---------------------------------------------------------------------------
+
+by AmirHo3ein13 at 2021-02-13T09:13:12Z
+
+> Thanks for your contribution, could you please add a testcase to avails a regression in the future?
+>
+> Also it looks like your commit/email is not associated with your GitHub account
+
+@OskarStark thanks for your review. At first, I added a test case for my change but seems like in CI (appveyor) the `\function_exists('locale_parse')` returns false and it does not reach my change. As you can see, it is in my first commit, can you help me?
+
+Also thank you for informing me about the email. I'll fix it and commit with the right email.
+
+---------------------------------------------------------------------------
+
+by AmirHo3ein13 at 2021-02-14T08:29:42Z
+
+@OskarStark @ro0NL seems like there is a problem with Doctrine, you can see it [here](https://travis-ci.com/github/symfony/symfony/jobs/482844823). Please check it, thanks in advance.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-14T08:31:07Z
+
+The Doctrine failure isn't related. We can ignore it here.
+
+---------------------------------------------------------------------------
+
+by AmirHo3ein13 at 2021-02-16T11:12:23Z
+
+> Can you please add a test case?
+
+@nicolas-grekas as I wrote here, I have a problem testing my change and I need some help. Can you help me?
+
+> > Thanks for your contribution, could you please add a testcase to avails a regression in the future?
+> > Also it looks like your commit/email is not associated with your GitHub account
+>
+> @OskarStark thanks for your review. At first, I added a test case for my change but seems like in CI (appveyor) the `\function_exists('locale_parse')` returns false and it does not reach my change. Can you help me?
+>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T11:15:18Z
+
+Can you add the test to the PR?
+The test case should have the `@requires function locale_parse` annotation on it.
+
+---------------------------------------------------------------------------
+
+by AmirHo3ein13 at 2021-02-16T16:04:59Z
+
+> Can you add the test to the PR?
+> The test case should have the `@requires function locale_parse` annotation on it.
+
+@nicolas-grekas thank you very much. I added the test successfully.

@@ -7,7 +7,6 @@ Resources
 ---------
 
   * [Documentation](https://symfony.com/doc/current/components/psr7.html)
-  * [SensioFrameworkExtraBundle](https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/index.html#psr-7-support)
 
 Running the tests
 -----------------

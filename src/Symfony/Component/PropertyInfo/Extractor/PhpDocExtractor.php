@@ -165,7 +165,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
                             continue 2;
                     }
 
-                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyType(), $type->getCollectionValueType());
+                    $types[] = new Type(Type::BUILTIN_TYPE_OBJECT, $type->isNullable(), $resolvedClass, $type->isCollection(), $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
                 }
             }
         }

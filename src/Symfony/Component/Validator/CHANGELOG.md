@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `Validation::createIsValidCallable()` that returns true/false instead of throwing exceptions
+
 5.2.0
 -----
 

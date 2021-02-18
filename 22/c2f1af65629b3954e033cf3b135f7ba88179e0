@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-19T21:27:08Z
+
+Thanks for giving this a try. I can't have a look immediately, but I'm just thinking that we should make this ready to support all kind of attributes, eg on params, methods, etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-21T16:11:49Z
+
+A wish from Twitter ;)
+```php
+public function __construct(
+    #[Tagged('my.tag')] ContainerInterface/iterable $tagged,
+)
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-21T23:59:56Z
+
+> A wish from Twitter ;)
+
+I want to have this as well, but maybe as a follow-up to this PR.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-11T18:27:32Z
+
+Sorry for stalling so long. I've had some rough weeks juggeling day job and homeschooling. 😞
+
+I have updated the PR to address the comments:
+
+* The `Reset` attribute is gone, so this PR only ships `EventListener` as a POC.
+* We can set a tag to disable attribute inspection for a definition, as suggested by @nicolas-grekas.
+* I'm using `ContainerBuiler::getReflectionClass()` now.
+* I'm passing the reflector to the autoconfigurator now.
+
+Most importantly, the autoconfigurator now receives an empty `ChildDefinition` that will eventually be merged with the original definition. Most of the merging logic is missing; so far, only tags work. I'm working on getting the other autoconfiguration features to work now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T08:16:22Z
+
+> public function __construct(
+>     #[Tagged('my.tag')] ContainerInterface/iterable $tagged,
+> )
+
+I'm now wondering if supporting this will require many changes on top or not.
+I think we can merge this PR first, but we should resolve this question before releasing 5.3 to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-16T08:54:13Z
+
+> > public function __construct(
+> > #[Tagged('my.tag')] ContainerInterface/iterable $tagged,
+> > )
+>
+> I'm now wondering if supporting this will require many changes on top or not.
+
+I don't think it does.
+
+> I think we can merge this PR first, but we should resolve this question before releasing 5.3 to me.
+
+Yes. Shall I look into this next? Or do you want to do this yourself?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T09:10:34Z
+
+Please proceed next if you're up to!
+But before, please vote on #39804 :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-16T10:16:49Z
+
+(small rebase needed)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-16T10:44:49Z
+
+✅
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-17T12:18:26Z
+
+Regarding @javiereguiluz's comment: I wonder how autocompletion works here. That's not a reason to block merging this PR, but something to keep an eye out for. E.g. even though it has this special `#[Attribute]` marking, it can be used as a normal PHP class: https://3v4l.org/W0hq5
+Given the confusion around "event listeners vs event subscribers" for people new to Symfony, I wonder if this doesn't cause confusion if the autocompletion pop-up includes `EventListener` when doing `... extends Event<TAB>`.
+
+Btw, I quite like the more action oriented `#[ListenTo]` used in https://stitcher.io/blog/attributes-in-php-8 . We may can take inspiration from that, if we find that `EventListener` is confusing.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2021-02-17T13:58:11Z
+
+I really love this PR - congrats @derrabus!
+
+> Btw, I quite like the more action oriented #[ListenTo] used in https://stitcher.io/blog/attributes-in-php-8 . We may can take inspiration from that, if we find that EventListener is confusing.
+
+This is a good catch... and it may be a perfect opportunity to use a different naming convention for these attributes. `ListenTo` only sounds strange because it's missing the "what". Listen to... what? ... since the event name itself won't always be included (and I like the invokable version where it's not included). We could use `#[ListenToEvent]`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-17T16:39:35Z
+
+On my side, I'd vote for keeping `EventListener`. That's what makes most sense. The autosuggestion issue should be solved by IDEs, which could skip suggesting attributes in a non-attribute context.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-17T19:47:24Z
+
+I mean, we could also `final`ize the `EventListener` class, if we fear that people will extend it for the wrong reasons. Apart from that, I don't have strong opinions whether we class the class `EventListener` or `ListenToEvent`. Both would work for me.

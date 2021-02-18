@@ -15,7 +15,10 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\DoctrineProvider;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -197,11 +200,15 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         if (null === $annotationReader) {
-            if (!class_exists(AnnotationReader::class) || !class_exists(ArrayCache::class)) {
+            if (!class_exists(AnnotationReader::class) || !class_exists(CacheProvider::class)) {
                 throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.');
             }
 
-            $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
+            if (class_exists(ArrayAdapter::class)) {
+                $annotationReader = new CachedReader(new AnnotationReader(), new DoctrineProvider(new ArrayAdapter()));
+            } else {
+                $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
+            }
         }
 
         $this->annotationReader = $annotationReader;

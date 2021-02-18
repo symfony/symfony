@@ -352,7 +352,7 @@ class HtmlErrorRenderer implements ErrorRendererInterface
         extract($context, \EXTR_SKIP);
         ob_start();
 
-        include file_exists($name) ? $name : __DIR__.'/../Resources/'.$name;
+        include is_file(\dirname(__DIR__).'/Resources/'.$name) ? \dirname(__DIR__).'/Resources/'.$name : $name;
 
         return trim(ob_get_clean());
     }

@@ -4,7 +4,7 @@ CHANGELOG
 5.3
 ---
 
- * Add `EventListener` attribute for declaring listeners on PHP 8.
+ * Add `EventListener` attribute for declaring listeners on PHP 8
 
 5.1.0
 -----

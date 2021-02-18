@@ -114,7 +114,7 @@ EODUMP;
 
         $expectedDump = <<<EODUMP
 RdKafka\TopicConf {
-  request.required.acks: "1"
+  request.required.acks: "%d"
   request.timeout.ms: "5000"
   message.timeout.ms: "300000"
 %A

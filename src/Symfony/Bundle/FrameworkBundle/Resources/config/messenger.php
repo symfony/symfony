@@ -25,7 +25,6 @@ use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
-use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
@@ -90,8 +89,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('validator'),
             ])
-
-        ->set('messenger.middleware.reject_redelivered_message_middleware', RejectRedeliveredMessageMiddleware::class)
 
         ->set('messenger.middleware.failed_message_processing_middleware', FailedMessageProcessingMiddleware::class)
 

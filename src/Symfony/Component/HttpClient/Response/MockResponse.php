@@ -211,8 +211,8 @@ class MockResponse implements ResponseInterface
             $response->info['size_upload'] = 0.0;
         }
 
-        // simulate "total_time" if it is set
-        if (isset($response->info['total_time'])) {
+        // simulate "total_time" if it is not set
+        if (!isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];
         }
 
@@ -260,7 +260,7 @@ class MockResponse implements ResponseInterface
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
 
-        if (isset($response->info['total_time'])) {
+        if (!isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];
         }
 
@@ -287,7 +287,7 @@ class MockResponse implements ResponseInterface
             $offset = \strlen($body);
         }
 
-        if (isset($response->info['total_time'])) {
+        if (!isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];
         }
 

@@ -22,7 +22,8 @@ class EventListener
     public function __construct(
         public ?string $event = null,
         public ?string $method = null,
-        public int $priority = 0
+        public int $priority = 0,
+        public ?string $dispatcher = null,
     ) {
     }
 }

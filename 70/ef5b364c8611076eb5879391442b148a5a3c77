@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by TimoBakx at 2021-01-20T12:25:37Z
+
+@wouterj Thanks for your last suggestion. I'll check if I can make that work and finish up this PR this weekend.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2021-02-14T16:13:24Z
+
+Made some changes for the last review comments. Added help text and documentation. I think this PR is ready to be reviewed.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2021-02-17T16:30:29Z
+
+Yeah, I've been thinking about tests, but right now it's kinda hard to test command output. Especially when my IDE keeps trying to remove trailing spaces from the expected table output.
+
+---------------------------------------------------------------------------
+
+by TimoBakx at 2021-02-19T17:02:56Z
+
+@chalasr Thank you for your CS pointers. It's much appreciated. I addressed all points except for the code-move that I can't do.

@@ -74,7 +74,8 @@ To include all events and event listeners for a specific firewall, use the
 
   <info>php %command.full_name% --events $exampleName</info>
 
-EOF)
+EOF
+            )
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, sprintf('A firewall name (for example "%s")', $exampleName)),
                 new InputOption('events', null, InputOption::VALUE_NONE, 'Include a list of event listeners (only available in combination with the "name" argument)'),

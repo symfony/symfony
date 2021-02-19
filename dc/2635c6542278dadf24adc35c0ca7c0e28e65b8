@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-18T11:47:57Z
+
+This is nice! Thanks!
+
+Minor comment about naming: what if we rename `#[ConsoleCommand]` as `#[Command]` ? I think "command" is a pretty "universal" and standard way of calling "console commands".
+
+Also, if we create attributes for other "commands" in the future (`CommandHandler`, `CommandBus`, etc.) their names will always contain more than just "command" because that's commonly reserve for CLI/console.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-18T11:49:47Z
+
+> at if we rename #[ConsoleCommand] as #[Command]
+
+that's what I did at first, until I realized that all command class extend... `Command`. The name is already in use in the same file 99% of the time.

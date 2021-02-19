@@ -10,6 +10,7 @@ CHANGELOG
    on the `console.command` tag to allow the `list` command to instantiate commands lazily
  * Add option `--short` to the `list` command
  * Add support for bright colors
+ * Add `ConsoleCommand` attribute for declaring commands on PHP 8
 
 5.2.0
 -----

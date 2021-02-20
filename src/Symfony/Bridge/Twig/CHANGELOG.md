@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+ * added `setStrictVariables(true|false)` method for `AppVariable`, all `getXXX` methods should returns `null` if `AppVariable::$strictVariables === false`
+
 5.2.0
 -----
 

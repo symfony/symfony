@@ -124,10 +124,29 @@ class AppVariableTest extends TestCase
         $this->appVariable->getEnvironment();
     }
 
+    public function testEnvironmentNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getEnvironment());
+    }
+
     public function testDebugNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getDebug();
+    }
+
+    public function testDebugNotSetStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getDebug();
+    }
+
+    public function testDebugNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getDebug());
     }
 
     public function testGetTokenWithTokenStorageNotSet()
@@ -136,10 +155,36 @@ class AppVariableTest extends TestCase
         $this->appVariable->getToken();
     }
 
+    public function testGetTokenWithTokenStorageNotSetStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getToken();
+    }
+
+    public function testGetTokenWithTokenStorageNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getToken());
+    }
+
     public function testGetUserWithTokenStorageNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getUser();
+    }
+
+    public function testGetUserWithTokenStorageNotSetStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getUser();
+    }
+
+    public function testGetUserWithTokenStorageNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getUser());
     }
 
     public function testGetRequestWithRequestStackNotSet()
@@ -148,10 +193,36 @@ class AppVariableTest extends TestCase
         $this->appVariable->getRequest();
     }
 
+    public function testGetRequestWithRequestStackNotSetStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getRequest();
+    }
+
+    public function testGetRequestWithRequestStackNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getRequest());
+    }
+
     public function testGetSessionWithRequestStackNotSet()
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
+    }
+
+    public function testGetSessionWithRequestStackNotSetStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(true);
+        $this->expectException('RuntimeException');
+        $this->appVariable->getSession();
+    }
+
+    public function testGetSessionWithRequestStackNotSetNotStrictVariables()
+    {
+        $this->appVariable->setStrictVariables(false);
+        $this->assertNull($this->appVariable->getSession());
     }
 
     public function testGetFlashesWithNoRequest()

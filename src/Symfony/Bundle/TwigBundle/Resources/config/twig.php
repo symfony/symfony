@@ -73,6 +73,7 @@ return static function (ContainerConfigurator $container) {
             ->call('setDebug', [param('kernel.debug')])
             ->call('setTokenStorage', [service('security.token_storage')->ignoreOnInvalid()])
             ->call('setRequestStack', [service('request_stack')->ignoreOnInvalid()])
+            ->call('setStrictVariables', [param('twig.strict_variables')])
 
         ->set('twig.template_iterator', TemplateIterator::class)
             ->args([service('kernel'), abstract_arg('Twig paths'), param('twig.default_path')])

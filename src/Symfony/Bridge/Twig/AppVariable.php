@@ -28,6 +28,7 @@ class AppVariable
     private $requestStack;
     private $environment;
     private $debug;
+    private $strictVariables = true;
 
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
@@ -49,6 +50,11 @@ class AppVariable
         $this->debug = $debug;
     }
 
+    public function setStrictVariables(bool $strictVariables)
+    {
+        $this->strictVariables = $strictVariables;
+    }
+
     /**
      * Returns the current token.
      *
@@ -59,7 +65,11 @@ class AppVariable
     public function getToken()
     {
         if (null === $tokenStorage = $this->tokenStorage) {
-            throw new \RuntimeException('The "app.token" variable is not available.');
+            if ($this->strictVariables) {
+                throw new \RuntimeException('The "app.token" variable is not available.');
+            }
+
+            return null;
         }
 
         return $tokenStorage->getToken();
@@ -75,7 +85,11 @@ class AppVariable
     public function getUser()
     {
         if (null === $tokenStorage = $this->tokenStorage) {
-            throw new \RuntimeException('The "app.user" variable is not available.');
+            if ($this->strictVariables) {
+                throw new \RuntimeException('The "app.user" variable is not available.');
+            }
+
+            return null;
         }
 
         if (!$token = $tokenStorage->getToken()) {
@@ -95,7 +109,11 @@ class AppVariable
     public function getRequest()
     {
         if (null === $this->requestStack) {
-            throw new \RuntimeException('The "app.request" variable is not available.');
+            if ($this->strictVariables) {
+                throw new \RuntimeException('The "app.request" variable is not available.');
+            }
+
+            return null;
         }
 
         return $this->requestStack->getCurrentRequest();
@@ -109,7 +127,11 @@ class AppVariable
     public function getSession()
     {
         if (null === $this->requestStack) {
-            throw new \RuntimeException('The "app.session" variable is not available.');
+            if ($this->strictVariables) {
+                throw new \RuntimeException('The "app.session" variable is not available.');
+            }
+
+            return null;
         }
         $request = $this->getRequest();
 
@@ -123,7 +145,7 @@ class AppVariable
      */
     public function getEnvironment()
     {
-        if (null === $this->environment) {
+        if (null === $this->environment && $this->strictVariables) {
             throw new \RuntimeException('The "app.environment" variable is not available.');
         }
 
@@ -137,7 +159,7 @@ class AppVariable
      */
     public function getDebug()
     {
-        if (null === $this->debug) {
+        if (null === $this->debug && $this->strictVariables) {
             throw new \RuntimeException('The "app.debug" variable is not available.');
         }
 

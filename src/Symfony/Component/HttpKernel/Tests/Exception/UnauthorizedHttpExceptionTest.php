@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Exception;
 
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class UnauthorizedHttpExceptionTest extends HttpExceptionTest
@@ -18,7 +19,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
             'Cache-Control' => 'public, s-maxage=1200',
         ];
 
-        $exception = new UnauthorizedHttpException('Challenge', null, null, null, $headers);
+        $exception = new UnauthorizedHttpException('Challenge', '', null, 0, $headers);
 
         $headers['WWW-Authenticate'] = 'Challenge';
 
@@ -35,7 +36,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    protected function createException(string $message = '', \Throwable $previous = null, int $code = 0, array $headers = []): HttpException
     {
         return new UnauthorizedHttpException('Challenge', $message, $previous, $code, $headers);
     }

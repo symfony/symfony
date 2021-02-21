@@ -24,13 +24,13 @@ class LoaderLoadExceptionTest extends TestCase
 
     public function testMessageCannotLoadResourceWithType()
     {
-        $exception = new LoaderLoadException('resource', null, null, null, 'foobar');
+        $exception = new LoaderLoadException('resource', null, 0, null, 'foobar');
         $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
     }
 
     public function testMessageCannotLoadResourceWithAnnotationType()
     {
-        $exception = new LoaderLoadException('resource', null, null, null, 'annotation');
+        $exception = new LoaderLoadException('resource', null, 0, null, 'annotation');
         $this->assertEquals('Cannot load resource "resource". Make sure annotations are installed and enabled.', $exception->getMessage());
     }
 
@@ -56,7 +56,7 @@ class LoaderLoadExceptionTest extends TestCase
         $exception = new LoaderLoadException(
             'resource',
             null,
-            null,
+            0,
             new \Exception('There was a previous error with an ending dot.')
         );
         $this->assertEquals(
@@ -70,7 +70,7 @@ class LoaderLoadExceptionTest extends TestCase
         $exception = new LoaderLoadException(
             'resource',
             null,
-            null,
+            0,
             new \Exception('There was a previous error with no ending dot')
         );
         $this->assertEquals(
@@ -84,7 +84,7 @@ class LoaderLoadExceptionTest extends TestCase
         $exception = new LoaderLoadException(
             '@resource',
             null,
-            null,
+            0,
             new \Exception('There was a previous error with an ending dot.')
         );
         $this->assertEquals(

@@ -15,6 +15,7 @@ namespace Symfony\Component\Routing\Annotation;
  * Annotation class for @Route().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -67,6 +68,8 @@ class Route
             $data = ['path' => $data];
         } elseif (!\is_array($data)) {
             throw new \TypeError(sprintf('"%s": Argument $data is expected to be a string or array, got "%s".', __METHOD__, get_debug_type($data)));
+        } elseif ([] !== $data) {
+            trigger_deprecation('symfony/routing', '5.3', 'Passing an array as first argument to "%s" is deprecated. Use named arguments instead.', __METHOD__);
         }
         if (null !== $path && !\is_string($path) && !\is_array($path)) {
             throw new \TypeError(sprintf('"%s": Argument $path is expected to be a string, array or null, got "%s".', __METHOD__, get_debug_type($path)));

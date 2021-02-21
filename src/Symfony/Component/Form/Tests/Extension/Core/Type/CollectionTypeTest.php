@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
@@ -209,6 +210,28 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertFalse($form->has('1'));
         $this->assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
         $this->assertEquals([new Author('s_first', 's_last')], $form->getData());
+    }
+
+    public function testNotDeleteEmptyIfInvalid()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'entry_type' => ChoiceType::class,
+            'entry_options' => [
+                'choices' => ['a', 'b'],
+            ],
+            'allow_add' => true,
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ]);
+
+        $form->submit(['a', 'x', '']);
+
+        $this->assertSame(['a'], $form->getData());
+        $this->assertCount(2, $form);
+        $this->assertTrue($form->has('1'));
+        $this->assertFalse($form[1]->isValid());
+        $this->assertNull($form[1]->getData());
+        $this->assertSame('x', $form[1]->getViewData());
     }
 
     public function testNotResizedIfSubmittedWithExtraData()

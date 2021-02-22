@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Couchbase\Collection;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Couchbase\Collection;
 use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
 
 /**

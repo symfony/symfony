@@ -14,7 +14,6 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
@@ -26,13 +25,12 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
+    use AbstractAdapterTrait;
+    use ContractsTrait;
     /**
      * @internal
      */
     protected const NS_SEPARATOR = ':';
-
-    use AbstractAdapterTrait;
-    use ContractsTrait;
 
     private static $apcuSupported;
     private static $phpFilesSupported;
@@ -139,7 +137,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             }
 
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
-
         }
 
         throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));

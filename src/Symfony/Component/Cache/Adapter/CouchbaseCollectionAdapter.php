@@ -13,15 +13,14 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Couchbase\Bucket;
 use Couchbase\Cluster;
-use Couchbase\Collection;
 use Couchbase\ClusterOptions;
-use Couchbase\UpsertOptions;
+use Couchbase\Collection;
 use Couchbase\DocumentNotFoundException;
+use Couchbase\UpsertOptions;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
@@ -35,9 +34,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
     private $connection;
     private $marshaller;
 
-    /**
-     * @param Collection $connection
-     */
     public function __construct(Collection $connection, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
@@ -107,7 +103,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             $option = isset($matches['options']) ? '?'.$matches['options'] : '';
             $connectionString = $protocol.'://'.implode(',', $newServers).$option;
 
-
             $clusterOptions = new ClusterOptions();
             $clusterOptions->credentials($username, $password);
 
@@ -121,8 +116,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             }
 
             return $collection;
-
-
         } finally {
             restore_error_handler();
         }
@@ -171,7 +164,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             }
 
             $content = $resultCouchbase->value ?? $resultCouchbase->content();
-
 
             $results[$id] = $this->marshaller->unmarshall($content);
         }
@@ -236,7 +228,6 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
             } catch (\Exception $exception) {
                 $ko[$key] = '';
             }
-
         }
 
         return [] === $ko ? true : $ko;

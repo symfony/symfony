@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Traits;
+namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Symfony\Component\Cache\CacheItem;
 
@@ -150,7 +150,9 @@ trait TagAwareTestTrait
         $pool = $this->createCachePool();
 
         $i = $pool->getItem('k');
+        $this->assertSame([], $i->getMetadata());
         $pool->save($i->tag('foo'));
+        $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);
 
         $i = $pool->getItem('k');
         $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);

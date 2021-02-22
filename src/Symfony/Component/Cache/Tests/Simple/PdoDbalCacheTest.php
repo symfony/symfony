@@ -14,7 +14,7 @@ namespace Symfony\Component\Cache\Tests\Simple;
 use Doctrine\DBAL\DriverManager;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\PdoCache;
-use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
+use Symfony\Component\Cache\Tests\Adapter\PdoPruneableTrait;
 
 /**
  * @group time-sensitive

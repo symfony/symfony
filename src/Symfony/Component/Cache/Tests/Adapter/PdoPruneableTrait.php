@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Traits;
+namespace Symfony\Component\Cache\Tests\Adapter;
 
 trait PdoPruneableTrait
 {

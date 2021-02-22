@@ -19,7 +19,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
-use Symfony\Component\Cache\Tests\Traits\TagAwareTestTrait;
 
 /**
  * @group time-sensitive

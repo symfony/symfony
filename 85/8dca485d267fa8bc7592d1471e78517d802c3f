@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-17T10:55:12Z
+
+Hey!
+
+Well done!, Im impressed by this PR.
+
+I think @jschaedl has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-17T23:36:49Z
+
+I'm wondering how this works with `@` being reserved for future use in Yaml?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-17T23:40:59Z
+
+>I'm wondering how this works with @ being reserved for future use in Yaml?
+
+:facepalm:
+
+Then we might do `when@dev`, or `when-env@dev`, or `env@dev`, etc. Any preference?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-17T23:51:09Z
+
+Maybe we can use Yaml tags as key:
+```yaml
+!when test:
+  framework:
+    test: true
+```
+
+(Not sure if this requires the `?` complex mapping key indicator:
+```yaml
+? !when test:
+  framework:
+    test: true
+```
+)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-17T23:53:32Z
+
+We (PHP) don't support tagged (complex) keys :'(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-18T10:19:00Z
+
+PR is ready, with tests (failures are false positives).
+
+All types of loaders now handle the `$env`: annotations, object loaders, the various file loaders, etc.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-18T11:52:29Z
+
+> I'm wondering how this works with `@` being reserved for future use in Yaml?
+
+it would require quoting the key
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2021-02-20T18:20:03Z
+
+Great! What about debug (`APP_DEBUG`) as well?
+
+```php
+$container
+    ->when(debug: true)
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-20T20:32:12Z
+
+I've thought about that, and I figured out that no recipes vary by "debug", and I never felt the need to do so.
+That's why I'm not proposing it.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2021-02-21T18:35:09Z
+
+That's true for recipes indeed, since bundles usually handle this logic in their extension / already have configuration keys for specific debug features, which can be easily toggled using `%kernel.debug%`.
+
+Yet, it happens from times to times to have debug services & decorators in userland code that could benefit from this.
+Not much a blocker here, but we should just anticipate this need regarding the YAML format which might be a bit limiting as-is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-22T08:44:38Z
+
+> Not much a blocker here, but we should just anticipate this need regarding the YAML format which might be a bit limiting as-is.
+
+I think there will always be a way, eg `when@debug` or `when+debug`, etc. But given that the debug flag is auto-set in dev and auto unset in prod, the env is almost always enough. Ppl that really need to vary by debug could either use a bundle, or use some logic in their Kernel, or contribute a PR here ;)

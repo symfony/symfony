@@ -63,6 +63,18 @@ class HttpBrowserTest extends AbstractBrowserTest
             ['POST', 'http://example.com/', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
             ['POST', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
         ];
+        yield 'custom header with HTTP_ prefix' => [
+            ['PUT', 'http://example.com/', [], [], ['HTTP_CONTENT_TYPE' => 'application/json'], '["content"]'],
+            ['PUT', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
+        yield 'modify notation of custom header with HTTP_ prefix' => [
+            ['PUT', 'http://example.com/', [], [], ['HTTP_Content-Type' => 'application/json'], '["content"]'],
+            ['PUT', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
+        yield 'modify notation of custom header' => [
+            ['PUT', 'http://example.com/', [], [], ['Content-Type' => 'application/json'], '["content"]'],
+            ['PUT', 'http://example.com/', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],
+        ];
         yield 'GET JSON' => [
             ['GET', 'http://example.com/jsonrpc', [], [], ['CONTENT_TYPE' => 'application/json'], '["content"]'],
             ['GET', 'http://example.com/jsonrpc', ['headers' => $defaultHeaders + ['content-type' => 'application/json'], 'body' => '["content"]', 'max_redirects' => 0]],

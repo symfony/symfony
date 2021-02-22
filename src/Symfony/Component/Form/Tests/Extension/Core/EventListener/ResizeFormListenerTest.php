@@ -255,7 +255,7 @@ class ResizeFormListenerTest extends TestCase
 
         $data = [0 => 'first', 1 => ''];
         foreach ($data as $child => $dat) {
-            $this->form->get($child)->setData($dat);
+            $this->form->get($child)->submit($dat);
         }
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', [], false, true, true);
@@ -282,11 +282,11 @@ class ResizeFormListenerTest extends TestCase
 
         $data = ['0' => ['name' => 'John'], '1' => ['name' => '']];
         foreach ($data as $child => $dat) {
-            $this->form->get($child)->setData($dat);
+            $this->form->get($child)->submit($dat);
         }
         $event = new FormEvent($this->form, $data);
         $callback = function ($data) {
-            return '' === $data['name'];
+            return null === $data['name'];
         };
         $listener = new ResizeFormListener('text', [], false, true, $callback);
         $listener->onSubmit($event);

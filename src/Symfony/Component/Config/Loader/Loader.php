@@ -21,6 +21,12 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
 abstract class Loader implements LoaderInterface
 {
     protected $resolver;
+    protected $env;
+
+    public function __construct(string $env = null)
+    {
+        $this->env = $env;
+    }
 
     /**
      * {@inheritdoc}

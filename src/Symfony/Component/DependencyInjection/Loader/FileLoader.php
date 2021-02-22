@@ -39,11 +39,11 @@ abstract class FileLoader extends BaseFileLoader
     protected $singlyImplemented = [];
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = true;
 
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null)
     {
         $this->container = $container;
 
-        parent::__construct($locator);
+        parent::__construct($locator, $env);
     }
 
     /**

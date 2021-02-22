@@ -1083,4 +1083,13 @@ class XmlFileLoaderTest extends TestCase
         $expected->label = 'Z';
         $this->assertEquals($expected, $container->get('stack_d'));
     }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'), 'some-env');
+        $loader->load('when-env.xml');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
+    }
 }

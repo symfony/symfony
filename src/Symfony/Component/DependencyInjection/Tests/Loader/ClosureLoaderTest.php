@@ -27,12 +27,13 @@ class ClosureLoaderTest extends TestCase
 
     public function testLoad()
     {
-        $loader = new ClosureLoader($container = new ContainerBuilder());
+        $loader = new ClosureLoader($container = new ContainerBuilder(), 'some-env');
 
-        $loader->load(function ($container) {
+        $loader->load(function ($container, $env) {
             $container->setParameter('foo', 'foo');
+            $container->setParameter('env', $env);
         });
 
-        $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a \Closure resource');
+        $this->assertSame(['foo' => 'foo', 'env' => 'some-env'], $container->getParameterBag()->all());
     }
 }

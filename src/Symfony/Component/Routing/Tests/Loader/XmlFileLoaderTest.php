@@ -563,4 +563,14 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedRoutes('xml'), $routes);
     }
+
+    public function testWhenEnv()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
+        $routes = $loader->load('when-env.xml');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame('/a1', $routes->get('a')->getPath());
+    }
 }

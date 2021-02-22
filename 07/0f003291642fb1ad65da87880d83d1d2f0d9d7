@@ -1,0 +1,175 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-18T16:24:49Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-18T16:52:22Z
+
+Can you please rebase+retarget on 5.2 if that's really the target?
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2021-02-18T17:33:01Z
+
+Sorry it's my first PR, can you tell me how to correct my PR to be on 5.2?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-18T23:20:34Z
+
+I force-pushed on your fork.
+FYI, I used `git rebase -i` to do the rebase on 5.2.
+Do you think you could add a test case, please?
+(don't miss fetching your remote branch first of course)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-18T23:48:59Z
+
+Are we sure that 4.4 is not affected?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-19T07:30:37Z
+
+(now targetting 4.4)
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2021-02-19T07:59:08Z
+
+Tx for the help.
+This impacts all branches compatible with PHP8 Attributes.
+I set up tests today.
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2021-02-19T09:53:45Z
+
+I need to understand why it does not work in PHP7.1 on multiline Attributes
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2021-02-19T10:20:24Z
+
+I think there are tests that can only be done in PHP8.
+Because an Attributes multiline like this
+```
+#[FooAttributes(
+    class: User::class,
+    foo: [
+        'bar' => ['foo','bar'],
+        'foo'
+    ]
+)]
+```
+is not recognized as a valid instruction in PHP7.X.
+
+With `#[FooAttributes(class: User::class,foo: ['bar' => ['foo','bar'],'foo'])]`, the Attribute is recognized as comment in PHP7.X and therefore poses no problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-19T10:30:22Z
+
+> I think there are tests that can only be done in PHP8.
+
+correct. You can add the `@requires PHP 8` annotation on top of those tests.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-21T14:23:17Z
+
+Thank you for working on this. However, I'm not convinced that bracket counting is the way we should fix this. We already have a piece of code in that file that handles incorrect `T_CLASS` tokens and I think we can extend that logic.
+
+```patch
+diff --git a/src/Symfony/Component/Routing/Loader/AnnotationFileLoader.php b/src/Symfony/Component/Routing/Loader/AnnotationFileLoader.php
+--- a/src/Symfony/Component/Routing/Loader/AnnotationFileLoader.php	(revision eeed8c8e847b81ea5d16685395e85a1df9077449)
++++ b/src/Symfony/Component/Routing/Loader/AnnotationFileLoader.php	(date 1613917175487)
+@@ -100,20 +100,8 @@
+             $nsTokens[T_NAME_QUALIFIED] = true;
+         }
+
+-        $openBrackets = 0;
+         for ($i = 0; isset($tokens[$i]); ++$i) {
+             $token = $tokens[$i];
+-            if (80000 <= \PHP_VERSION_ID) {
+-                if (\T_ATTRIBUTE === ($token[0] ?? 0) || ($openBrackets > 0 && '[' === $token)) {
+-                    ++$openBrackets;
+-                }
+-                if ($openBrackets > 0 && ']' === $token) {
+-                    --$openBrackets;
+-                }
+-                if ($openBrackets > 0) {
+-                    continue;
+-                }
+-            }
+
+             if (!isset($token[1])) {
+                 continue;
+@@ -146,6 +134,15 @@
+                         break;
+                     }
+                 }
++                for ($j = $i + 1; isset($tokens[$j]); ++$j) {
++                    if (':' === $tokens[$j]) {
++                        $skipClassToken = true;
++                        break;
++                    }
++                    if (!\in_array($tokens[$j][0], [\T_WHITESPACE, \T_DOC_COMMENT, \T_COMMENT])) {
++                        break;
++                    }
++                }
+
+                 if (!$skipClassToken) {
+                     $class = true;
+```
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2021-02-22T09:49:39Z
+
+With this test I check if the `T_CLASS` token is after a comma or a parenthesis
+This covers these 2 scenarios :
+```
+#[FooAttributes(
+    foo: [
+        'bar' => ['foo','bar'],
+        'foo'
+    ],
+    class: User::class
+)]
+```
+```
+#[FooAttributes(
+    class: User::class,
+    foo: [
+        'bar' => ['foo','bar'],
+        'foo'
+    ]
+)]
+```
+Normally it shouldn't have side effects

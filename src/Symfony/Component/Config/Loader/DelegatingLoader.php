@@ -34,7 +34,7 @@ class DelegatingLoader extends Loader
     public function load($resource, $type = null)
     {
         if (false === $loader = $this->resolver->resolve($resource, $type)) {
-            throw new LoaderLoadException($resource, null, null, null, $type);
+            throw new LoaderLoadException($resource, null, 0, null, $type);
         }
 
         return $loader->load($resource, $type);

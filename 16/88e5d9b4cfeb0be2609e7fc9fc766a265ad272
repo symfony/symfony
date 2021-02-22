@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-12-21T19:32:38Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T00:38:08Z
+
+Tested the code, and it's working.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-22T08:33:57Z
+
+If we add a new parameter `tls` in query string, what is the purpose of `rediss://`? /cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T09:07:09Z
+
+There really is no difference between `redis` and `rediss` at the moment, they're acting in exactly the same way. So you're right, using `rediss://` would be a better option.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-22T09:17:24Z
+
+From the [predis Readme](https://github.com/predis/predis):
+
+> Same set of parameters, but using an URI string:
+> $client = new Predis\Client('tls://127.0.0.1?ssl[cafile]=private.pem&ssl[verify_peer]=1');
+> The connection schemes redis (alias of tcp) and rediss (alias of tls) are also supported, with the difference that URI strings containing these schemes are parsed following the rules described on their respective IANA provisional registration documents.
+
+IMHO the fix should be about keeping the scheme defined here: https://github.com/symfony/symfony/blob/6dc5fea773ecea0259fdf92590320ce606524d1e/src/Symfony/Component/Cache/Traits/RedisTrait.php#L93-L97
+
+And use that scheme in the relevant places:
+- https://github.com/symfony/symfony/blob/6dc5fea773ecea0259fdf92590320ce606524d1e/src/Symfony/Component/Cache/Traits/RedisTrait.php#L135
+- https://github.com/symfony/symfony/blob/6dc5fea773ecea0259fdf92590320ce606524d1e/src/Symfony/Component/Cache/Traits/RedisTrait.php#L153
+- https://github.com/symfony/symfony/blob/6dc5fea773ecea0259fdf92590320ce606524d1e/src/Symfony/Component/Cache/Traits/RedisTrait.php#L204
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T09:47:37Z
+
+For `phpredis` to work, it requires the use of `tls://127.0.0.1`. However, for `predis`, you can use `tls://` or `rediss://` (which is an alias for `tls://` as it's said in the Predis README you mentioned). So we can't actually use the scheme for connecting with `phpredis`, but it can be used for `predis` though.
+
+---------------------------------------------------------------------------
+
+by misaert at 2020-12-22T09:49:41Z
+
+> For `phpredis` to work, it requires the use of `tls://127.0.0.1`. However, for `predis`, you can use `tls://` or `rediss://` (which is an alias for `tls://` as it's said in the Predis README you mentioned). So we can't actually use the scheme for connecting with `phpredis`, but it can be used for `predis` though.
+
+And it doesn't work with the same DSN on Symfony Messenger because of https://github.com/symfony/messenger/blob/5.x/Transport/TransportFactory.php#L46:
+```
+  [Symfony\Component\Messenger\Exception\InvalidArgumentException]
+  No transport supports the given Messenger DSN "rediss://<...>"
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2020-12-22T10:43:31Z
+
+I don't have strong opinion about `rediss://` vs `?tls=` but IMHO this should be consistent across all components:
+I suggest to:
+- deprecates either `?tls` in messenger or `rediss://` in cache, lock, session
+- in all cases fix RedisTrait
+
+Given The RedisTrait didn't work, maybe it's easier to deprecate the `rediss://` scheme? @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T11:16:47Z
+
+I've created a PR to add `rediss://` support to the Messenger (which is really going to be an alias to `tls=1`), without deprecating the `tls` option (yet). Either way, it should definitely be standardized one way or another (or to support both).
+
+---------------------------------------------------------------------------
+
+by derrabus at 2020-12-22T13:09:03Z
+
+For reference, a codebase I took over recently uses this bundle to configure their redis connections: https://github.com/snc/SncRedisBundle
+
+The developers told me that they in favor of that bundle mainly because it allowed them to configure TLS connections, which is a requirement when using the managed Redis services of our current hoster Digital Ocean. Our DSNs are all configured with the `rediss` scheme, ~~but if I understood the bundle corectly, it mainly passes the DSN down to Predis.~~ I got that wrong, thanks @njutn95 for the correction.
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T13:20:10Z
+
+SncRedisBundle is indeed reading the TLS configuration from the [`rediss://` scheme](https://github.com/snc/SncRedisBundle/blob/master/DependencyInjection/Configuration/RedisDsn.php#L212)
+
+---------------------------------------------------------------------------
+
+by misaert at 2020-12-24T11:04:47Z
+
+> I've created a PR to add `rediss://` support to the Messenger (which is really going to be an alias to `tls=1`), without deprecating the `tls` option (yet). Either way, it should definitely be standardized one way or another (or to support both).
+
+For now, I changed the code to support both. `rediss` DSN sheme changes Redis scheme by `tls` (for Predis particularly) and adds the prefix `tls://` in host for Redis extension.
+
+---------------------------------------------------------------------------
+
+by misaert at 2020-12-25T11:54:24Z
+
+> Either `tls` option should not be added here, `rediss` scheme should be deprecated.
+>
+> We should not support both.
+
+To be consistent with https://github.com/symfony/symfony/pull/39607, I keep the `rediss` scheme for TLS and removed the option.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-17T16:26:24Z
+
+@nicolas-grekas I would vote for merging that in 4.4 as a bugfix, as symfony/cache claims to support `rediss` in 4.4 already. Supporting `rediss` without actually enabling TLS qualifies as a bug to me.

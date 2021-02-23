@@ -45,6 +45,8 @@ abstract class Helper implements HelperInterface
      */
     public static function strlen(?string $string)
     {
+        $string = (string) $string;
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return \strlen($string);
         }
@@ -59,6 +61,8 @@ abstract class Helper implements HelperInterface
      */
     public static function substr(string $string, int $from, int $length = null)
     {
+        $string = (string) $string;
+
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
         }

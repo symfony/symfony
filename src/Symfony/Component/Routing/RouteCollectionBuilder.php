@@ -350,11 +350,11 @@ class RouteCollectionBuilder
         }
 
         if (null === $resolver = $this->loader->getResolver()) {
-            throw new LoaderLoadException($resource, null, null, null, $type);
+            throw new LoaderLoadException($resource, null, 0, null, $type);
         }
 
         if (false === $loader = $resolver->resolve($resource, $type)) {
-            throw new LoaderLoadException($resource, null, null, null, $type);
+            throw new LoaderLoadException($resource, null, 0, null, $type);
         }
 
         $collections = $loader->load($resource, $type);

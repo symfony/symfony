@@ -2,7 +2,7 @@
 name: 🐛 Bug Report
 about: Report errors and problems
 labels: Bug
-<!-- If this is an security issue, please read https://symfony.com/doc/current/contributing/code/security.html -->
+<!-- If this is an security issue, please read https://symfony.com/security -->
 ---
 
 **Symfony version(s) affected**: x.y.z

@@ -205,7 +205,7 @@ class FrameworkExtension extends Extension
     private $httpClientConfigEnabled = false;
     private $notifierConfigEnabled = false;
     private $propertyAccessConfigEnabled = false;
-    private $lockConfigEnabled = false;
+    private static $lockConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -438,7 +438,7 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($container, $loader);
         }
 
-        if ($this->lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
+        if (self::$lockConfigEnabled = $this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
@@ -2344,10 +2344,6 @@ class FrameworkExtension extends Extension
 
     private function registerRateLimiterConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!$this->lockConfigEnabled) {
-            throw new LogicException('Rate limiter support cannot be enabled without enabling the Lock component.');
-        }
-
         $loader->load('rate_limiter.php');
 
         foreach ($config['limiters'] as $name => $limiterConfig) {
@@ -2362,7 +2358,13 @@ class FrameworkExtension extends Extension
 
         $limiter = $container->setDefinition($limiterId = 'limiter.'.$name, new ChildDefinition('limiter'));
 
-        $limiter->addArgument(new Reference($limiterConfig['lock_factory']));
+        if (null !== $limiterConfig['lock_factory']) {
+            if (!self::$lockConfigEnabled) {
+                throw new LogicException(sprintf('Rate limiter "%s" requires the Lock component to be installed and configured.', $name));
+            }
+
+            $limiter->replaceArgument(2, new Reference($limiterConfig['lock_factory']));
+        }
         unset($limiterConfig['lock_factory']);
 
         $storageId = $limiterConfig['storage_service'] ?? null;

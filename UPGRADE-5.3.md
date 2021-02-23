@@ -83,6 +83,8 @@ Security
 SecurityBundle
 --------------
 
+ * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null`. Set this option
+   to `lock.factory` if you need precise login rate limiting with synchronous requests.
  * Deprecate `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Deprecate the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

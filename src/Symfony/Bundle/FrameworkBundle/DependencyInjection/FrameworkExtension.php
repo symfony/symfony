@@ -1050,6 +1050,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('session.storage.metadata_bag');
             $container->removeDefinition('session.storage.native');
             $container->removeDefinition('session.storage.php_bridge');
+            $container->removeDefinition('session.storage.mock_file');
             $container->removeAlias('session.storage.filesystem');
         }
 

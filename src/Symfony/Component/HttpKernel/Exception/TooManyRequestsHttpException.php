@@ -26,6 +26,17 @@ class TooManyRequestsHttpException extends HttpException
      */
     public function __construct($retryAfter = null, ?string $message = '', \Throwable $previous = null, ?int $code = 0, array $headers = [])
     {
+        if (null === $message) {
+            trigger_deprecation('symfony/http-kernel', '5.3', 'Passing null as $message to "%s()" is deprecated, pass an empty string instead.', __METHOD__);
+
+            $message = '';
+        }
+        if (null === $code) {
+            trigger_deprecation('symfony/http-kernel', '5.3', 'Passing null as $code to "%s()" is deprecated, pass 0 instead.', __METHOD__);
+
+            $code = 0;
+        }
+
         if ($retryAfter) {
             $headers['Retry-After'] = $retryAfter;
         }

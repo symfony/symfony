@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>Too many failed login attempts, please try again later.</source>
-                <target>Too many failed login attempts, please try again later.</target>
+                <target>Зашмат няўдалых спроб уваходу, калі ласка, паспрабуйце пазней.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>Invalid or expired login link.</source>
-                <target>Invalid or expired login link.</target>
+                <target>Спасылка для ўваходу несапраўдная або пратэрмінаваная.</target>
             </trans-unit>
         </body>
     </file>

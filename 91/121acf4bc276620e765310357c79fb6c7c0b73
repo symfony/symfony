@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T09:41:02Z
+
+This feature was added in https://github.com/symfony/symfony/pull/26149, I am very sparse on details **why** this was added. But it is added according to the XLIFF specification. I assume it was to be compatible with parsers and external systems.
+
+@Taluu updated the loader in #35373. He is equally short on details **why**. Maybe you could elaborate?
+
+To fix this issue, we should either revert parts of #35373 or merge this PR in its current state.
+
+For future reference: The [name](http://docs.oasis-open.org/xliff/xliff-core/v2.0/os/xliff-core-v2.0-os.html#name) is [optional on the unit](http://docs.oasis-open.org/xliff/xliff-core/v2.0/os/xliff-core-v2.0-os.html#unit).
+
+---------------------------------------------------------------------------
+
+by MarieMinasyan at 2021-02-24T10:01:44Z
+
+Hi @nicolas-grekas! No problem, I can move it to branch 4.4, just let me know.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2021-02-24T11:52:32Z
+
+> @Taluu updated the loader in #35373. He is equally short on details **why**. Maybe you could elaborate?
+
+From what I can remember, translation tools such as memsource, phrase app and probably others are *not* technical, but aimed for translation teams.
+
+As such, `<source>` elements should *not* contain "keys" such as `foo.bar.baz` but the original sentence such as `The foo is also bar or baz` : the tool then helps to translate this into the targeted language. It **can't** proceed with "keys".
+
+From what I saw in the xliff1 loader and bits from the spec, it seems this is the role of the `name` attribute on the `<unit>` element.
+
+> To fix this issue, we should either revert parts of #35373 or merge this PR in its current state.
+>
+> For future reference: The [name](http://docs.oasis-open.org/xliff/xliff-core/v2.0/os/xliff-core-v2.0-os.html#name) is [optional on the unit](http://docs.oasis-open.org/xliff/xliff-core/v2.0/os/xliff-core-v2.0-os.html#unit).
+
+That is why I set the priority on the name _then_ the source. We could probably change this so there's a key duality (element accessible on both name and source value) ? But this could be heavy imo...
+
+I think this is mergeable as is. Or another way to look at it would be to *not* try to write a `name` attribute.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T15:57:59Z
+
+So, `source` should be "My original string". The `name` should be the "foo.bar.baz" translation key. The `name` is optional in the specification.
+
+We don't know if the end users is using translation keys or original stings in their source code. So what we say is:
+
+**Loader**: If `name` exists, we think it is a translation key, if not, we treat the `source` as translation key.
+**Dumper**: If the `$source` is short (<80 chars), we think it is a translation key and add it to `name`.
+
+As pointed out before `$source` could be any kind of complex string. That is why we added the 80 char limit. Why 80 and not 60 or 100? I dont know...
+
+------
+
+For the record: The `Loader` and `Dumper` must be compatible, but you cannot assume that a `.xlf` file was written with our Dumper.
+
+-------
+
+Im happy with this PR.
+
+:+1:

@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RejectRedeliveredMessageException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -129,6 +130,13 @@ class Worker
         try {
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName), new ConsumedByWorkerStamp()));
         } catch (\Throwable $throwable) {
+            $rejectFirst = $throwable instanceof RejectRedeliveredMessageException;
+            if ($rejectFirst) {
+                // redelivered messages are rejected first so that continuous failures in an event listener or while
+                // publishing for retry does not cause infinite redelivery loops
+                $receiver->reject($envelope);
+            }
+
             if ($throwable instanceof HandlerFailedException) {
                 $envelope = $throwable->getEnvelope();
             }
@@ -136,7 +144,10 @@ class Worker
             $failedEvent = new WorkerMessageFailedEvent($envelope, $transportName, $throwable);
             $this->dispatchEvent($failedEvent);
             $envelope = $failedEvent->getEnvelope();
-            $receiver->reject($envelope);
+
+            if (!$rejectFirst) {
+                $receiver->reject($envelope);
+            }
 
             return;
         }

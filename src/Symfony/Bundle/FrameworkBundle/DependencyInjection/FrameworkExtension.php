@@ -1803,6 +1803,7 @@ class FrameworkExtension extends Extension
         $defaultMiddleware = [
             'before' => [
                 ['id' => 'add_bus_name_stamp_middleware'],
+                ['id' => 'reject_redelivered_message_middleware'],
                 ['id' => 'dispatch_after_current_bus'],
                 ['id' => 'failed_message_processing_middleware'],
             ],

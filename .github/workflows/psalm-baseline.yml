@@ -1,0 +1,88 @@
+name: Update psalm baseline
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'
+
+jobs:
+  psalm:
+    name: Psalm baselne
+    runs-on: Ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ['4.4', '5.x']
+
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          ini-values: "memory_limit=-1"
+          coverage: none
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Configure composer
+        run: |
+            COMPOSER_HOME="$(composer config home)"
+            ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+            echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+      - name: Determine composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ github.base_ref }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: |
+            echo "::group::modify composer.json"
+            cp composer.json composer.json.backup
+            composer remove symfony/phpunit-bridge --no-interaction --no-update
+            composer require psalm/phar --no-update
+            composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
+            echo "::endgroup::"
+            echo "::group::composer update"
+            composer update --no-progress --ansi
+            echo "::endgroup::"
+            echo "::group::restore composer.json"
+            rm composer.json
+            cp composer.json.backup composer.json
+            echo "::endgroup::"
+
+      - name: Generate Psalm baseline
+        run: /vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.CARSONBOT_GITHUB_TOKEN }}
+          push-to-fork: carsonbot/symfony
+          author: carsonbot <noreply@github.com>
+          committer: carsonbot <noreply@github.com>
+          commit-message: Update psalm baseline
+          title: Update psalm baseline - ${{ matrix.branch }}
+          body: |
+            | Q             | A
+            | ------------- | ---
+            | Branch?       | ${{ matrix.branch }}
+            | Bug fix?      | no
+            | New feature?  | no
+            | Deprecations? | no
+            | Tickets       |
+            | License       | MIT
+            | Doc PR        |
+
+            The psalm baseline have changed for branch ${{ matrix.branch }}.
+          branch: psalm-baseline-${{ matrix.branch }}
+          base: ${{ matrix.branch }}

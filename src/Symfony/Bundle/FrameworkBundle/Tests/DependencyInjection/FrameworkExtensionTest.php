@@ -760,6 +760,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('messenger.transport.failed'), $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0));
     }
 
+    public function testMessengerRedeliveryFailureTransportDisabled()
+    {
+        $container = $this->createContainerFromFile('messenger_redelivery_failure_disabled');
+        $this->assertContains(['id' => 'reject_redelivered_message_middleware'], $container->getParameter('messenger.bus.default.middleware'));
+    }
+
+    public function testMessengerRedeliveryFailureTransportEnabled()
+    {
+        $container = $this->createContainerFromFile('messenger_redelivery_failure_enabled');
+        $this->assertNotContains(['id' => 'reject_redelivered_message_middleware'], $container->getParameter('messenger.bus.default.middleware'));
+    }
+
     public function testMessengerRouting()
     {
         $container = $this->createContainerFromFile('messenger_routing');

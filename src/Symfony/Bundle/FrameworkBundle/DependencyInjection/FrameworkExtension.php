@@ -1801,17 +1801,18 @@ class FrameworkExtension extends Extension
         }
 
         $defaultMiddleware = [
-            'before' => [
-                ['id' => 'add_bus_name_stamp_middleware'],
-                ['id' => 'reject_redelivered_message_middleware'],
-                ['id' => 'dispatch_after_current_bus'],
-                ['id' => 'failed_message_processing_middleware'],
-            ],
+            'before' => [],
             'after' => [
                 ['id' => 'send_message'],
                 ['id' => 'handle_message'],
             ],
         ];
+        $defaultMiddleware['before'][] = ['id' => 'add_bus_name_stamp_middleware'];
+        if (!$config['failure_transport']) {
+            $defaultMiddleware['before'][] = ['id' => 'reject_redelivered_message_middleware'];
+        }
+        $defaultMiddleware['before'][] = ['id' => 'dispatch_after_current_bus'];
+        $defaultMiddleware['before'][] = ['id' => 'failed_message_processing_middleware'];
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
 

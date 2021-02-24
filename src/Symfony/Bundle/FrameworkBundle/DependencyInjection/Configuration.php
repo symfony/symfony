@@ -98,7 +98,7 @@ class Configuration implements ConfigurationInterface
                     ->enumPrototype()
                         ->values([
                             'forwarded',
-                            'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port',
+                            'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix',
                         ])
                     ->end()
                 ->end()

@@ -25,13 +25,14 @@
         "symfony/redis-messenger": "^5.1"
     },
     "require-dev": {
-        "psr/cache": "~1.0",
+        "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/console": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/process": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
+        "symfony/routing": "^4.4|^5.0",
         "symfony/serializer": "^4.4|^5.0",
         "symfony/service-contracts": "^1.1|^2",
         "symfony/stopwatch": "^4.4|^5.0",

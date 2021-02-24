@@ -16,7 +16,9 @@ use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceList\DeprecatedChoiceListFactory;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class ChoiceTypeTest extends BaseTypeTest
 {
@@ -88,7 +90,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choices' => new \stdClass(),
         ]);
@@ -96,7 +98,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
             'choice_loader' => new \stdClass(),
         ]);
@@ -104,7 +106,7 @@ class ChoiceTypeTest extends BaseTypeTest
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
+        $this->assertInstanceOf(FormInterface::class, $this->factory->create(static::TESTED_TYPE, null, []));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
@@ -390,6 +392,20 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
+    public function testExpandedCheckboxesInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => true,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
+        }
+    }
+
     public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -415,6 +431,20 @@ class ChoiceTypeTest extends BaseTypeTest
 
         foreach ($form as $child) {
             $this->assertFalse($child->isRequired());
+        }
+    }
+
+    public function testExpandedRadiosInhertLabelHtmlOption()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => $this->choices,
+            'expanded' => true,
+            'label_html' => true,
+            'multiple' => false,
+        ]);
+
+        foreach ($form as $child) {
+            $this->assertTrue($child->getConfig()->getOption('label_html'));
         }
     }
 
@@ -812,9 +842,9 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertNull($form->getData());
-        $this->assertEquals(['a', 'foobar'], $form->getViewData());
-        $this->assertFalse($form->isSynchronized());
+        $this->assertEquals(['a'], $form->getData());
+        $this->assertEquals(['a'], $form->getViewData());
+        $this->assertFalse($form->isValid());
     }
 
     public function testSubmitMultipleNonExpandedObjectChoices()
@@ -1355,17 +1385,17 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit(['a', 'foobar']);
 
-        $this->assertNull($form->getData());
-        $this->assertSame(['a', 'foobar'], $form->getViewData());
+        $this->assertSame(['a'], $form->getData());
+        $this->assertSame(['a'], $form->getViewData());
         $this->assertEmpty($form->getExtraData());
-        $this->assertFalse($form->isSynchronized());
+        $this->assertFalse($form->isValid());
 
-        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertFalse($form[2]->getData());
         $this->assertFalse($form[3]->getData());
         $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
+        $this->assertSame('a', $form[0]->getViewData());
         $this->assertNull($form[1]->getViewData());
         $this->assertNull($form[2]->getViewData());
         $this->assertNull($form[3]->getViewData());
@@ -1820,7 +1850,8 @@ class ChoiceTypeTest extends BaseTypeTest
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(
+            FormInterface::class, $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'choices' => [],
         ]));
     }
@@ -2051,8 +2082,13 @@ class ChoiceTypeTest extends BaseTypeTest
         $form->submit($multiple ? (array) $submittedData : $submittedData);
 
         // When the choice does not exist the transformation fails
-        $this->assertFalse($form->isSynchronized());
-        $this->assertNull($form->getData());
+        $this->assertFalse($form->isValid());
+
+        if ($multiple) {
+            $this->assertSame([], $form->getData());
+        } else {
+            $this->assertNull($form->getData());
+        }
     }
 
     /**

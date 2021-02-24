@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DecoratorServicePassTest extends TestCase
@@ -152,7 +153,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_service')
         ;
 
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->process($container);
     }
 
@@ -176,7 +177,7 @@ class DecoratorServicePassTest extends TestCase
             ->setDecoratedService('unknown_decorated', null, 0, 12)
         ;
 
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->process($container);
     }
 

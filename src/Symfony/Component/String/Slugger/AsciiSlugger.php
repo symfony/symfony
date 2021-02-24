@@ -111,6 +111,8 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         }
 
         if ($this->symbolsMap instanceof \Closure) {
+            // If the symbols map is passed as a closure, there is no need to fallback to the parent locale
+            // as the closure can just provide substitutions for all locales of interest.
             $symbolsMap = $this->symbolsMap;
             array_unshift($transliterator, static function ($s) use ($symbolsMap, $locale) {
                 return $symbolsMap($s, $locale);
@@ -119,9 +121,20 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
         $unicodeString = (new UnicodeString($string))->ascii($transliterator);
 
-        if (\is_array($this->symbolsMap) && isset($this->symbolsMap[$locale])) {
-            foreach ($this->symbolsMap[$locale] as $char => $replace) {
-                $unicodeString = $unicodeString->replace($char, ' '.$replace.' ');
+        if (\is_array($this->symbolsMap)) {
+            $map = null;
+            if (isset($this->symbolsMap[$locale])) {
+                $map = $this->symbolsMap[$locale];
+            } else {
+                $parent = self::getParentLocale($locale);
+                if ($parent && isset($this->symbolsMap[$parent])) {
+                    $map = $this->symbolsMap[$parent];
+                }
+            }
+            if ($map) {
+                foreach ($map as $char => $replace) {
+                    $unicodeString = $unicodeString->replace($char, ' '.$replace.' ');
+                }
             }
         }
 
@@ -143,17 +156,28 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
         }
 
         // Locale not supported and no parent, fallback to any-latin
-        if (false === $str = strrchr($locale, '_')) {
+        if (!$parent = self::getParentLocale($locale)) {
             return $this->transliterators[$locale] = null;
         }
 
         // Try to use the parent locale (ie. try "de" for "de_AT") and cache both locales
-        $parent = substr($locale, 0, -\strlen($str));
-
         if ($id = self::LOCALE_TO_TRANSLITERATOR_ID[$parent] ?? null) {
             $transliterator = \Transliterator::create($id.'/BGN') ?? \Transliterator::create($id);
         }
 
         return $this->transliterators[$locale] = $this->transliterators[$parent] = $transliterator ?? null;
+    }
+
+    private static function getParentLocale(?string $locale): ?string
+    {
+        if (!$locale) {
+            return null;
+        }
+        if (false === $str = strrchr($locale, '_')) {
+            // no parent locale
+            return null;
+        }
+
+        return substr($locale, 0, -\strlen($str));
     }
 }

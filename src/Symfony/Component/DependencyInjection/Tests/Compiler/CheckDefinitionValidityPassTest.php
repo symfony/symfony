@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class CheckDefinitionValidityPassTest extends TestCase
@@ -86,7 +87,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicServiceName()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
+        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->register("foo.$env", 'class')->setPublic(true);
@@ -96,7 +97,7 @@ class CheckDefinitionValidityPassTest extends TestCase
 
     public function testDynamicPublicAliasName()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvParameterException::class);
+        $this->expectException(EnvParameterException::class);
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
         $container->setAlias("foo.$env", 'class')->setPublic(true);

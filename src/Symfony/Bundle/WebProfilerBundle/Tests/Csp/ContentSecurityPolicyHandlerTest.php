@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Csp;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -210,7 +211,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->getMockBuilder(\Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator::class)->getMock();
+        $generator = $this->createMock(NonceGenerator::class);
 
         $generator->expects($this->any())
             ->method('generate')

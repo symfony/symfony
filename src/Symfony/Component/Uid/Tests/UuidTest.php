@@ -13,6 +13,7 @@ namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\NilUuid;
+use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
@@ -59,7 +60,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV1(self::A_UUID_V1);
 
-        $this->assertSame(1583245966.746458, $uuid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '1583245966.746458'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -94,7 +95,7 @@ class UuidTest extends TestCase
 
         $uuid = new UuidV6(substr_replace(self::A_UUID_V1, '6', 14, 1));
 
-        $this->assertSame(85916308548.27832, $uuid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '85916308548.278321'), $uuid->getDateTime());
         $this->assertSame('3499710062d0', $uuid->getNode());
     }
 
@@ -300,5 +301,21 @@ class UuidTest extends TestCase
             ['0YPNRV8560D29VYW1D9J1WYXAT'],
             ['4nwTLZ2TdMtTVDE5AwVjaR'],
         ];
+    }
+
+    public function testFromStringOnExtendedClassReturnsStatic()
+    {
+        $this->assertInstanceOf(CustomUuid::class, CustomUuid::fromString(self::A_UUID_V4));
+    }
+
+    public function testGetDateTime()
+    {
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '103072857660.684697'), ((new UuidV1('ffffffff-ffff-1fff-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.000001'), ((new UuidV1('1381400a-1dd2-11b2-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814001-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13814000-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new UuidV1('13813fff-1dd2-11b2-a456-426655440000'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '-0.000001'), ((new UuidV1('13813ff6-1dd2-11b2-a456-426655440000'))->getDateTime()));
+        $this->assertEquals(new \DateTimeImmutable('@-12219292800'), ((new UuidV1('00000000-0000-1000-a456-426655440000'))->getDateTime()));
     }
 }

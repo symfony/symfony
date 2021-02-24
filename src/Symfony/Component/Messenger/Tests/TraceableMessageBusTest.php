@@ -28,7 +28,7 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $stamp = new DelayStamp(5);
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($message, [$stamp])->willReturn(new Envelope($message, [$stamp]));
 
         $traceableBus = new TraceableMessageBus($bus);
@@ -53,7 +53,7 @@ class TraceableMessageBusTest extends TestCase
     {
         $message = new DummyMessage('Hello');
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($message)->willReturn((new Envelope($message))->with($stamp = new HandledStamp('result', 'handlerName')));
 
         $traceableBus = new TraceableMessageBus($bus);
@@ -78,7 +78,7 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope);
 
         $traceableBus = new TraceableMessageBus($bus);
@@ -104,7 +104,7 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($envelope->with($anotherStamp = new AnEnvelopeStamp()));
 
         $traceableBus = new TraceableMessageBus($bus);
@@ -129,7 +129,7 @@ class TraceableMessageBusTest extends TestCase
     {
         $message = new DummyMessage('Hello');
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($message)->willThrowException($exception = new \RuntimeException('Meh.'));
 
         $traceableBus = new TraceableMessageBus($bus);

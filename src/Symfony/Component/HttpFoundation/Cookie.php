@@ -35,8 +35,8 @@ class Cookie
     private $secureDefault = false;
 
     private static $reservedCharsList = "=,; \t\r\n\v\f";
-    private static $reservedCharsFrom = ['=', ',', ';', ' ', "\t", "\r", "\n", "\v", "\f"];
-    private static $reservedCharsTo = ['%3D', '%2C', '%3B', '%20', '%09', '%0D', '%0A', '%0B', '%0C'];
+    private const RESERVED_CHARS_FROM = ['=', ',', ';', ' ', "\t", "\r", "\n", "\v", "\f"];
+    private const RESERVED_CHARS_TO = ['%3D', '%2C', '%3B', '%20', '%09', '%0D', '%0A', '%0B', '%0C'];
 
     /**
      * Creates cookie from raw header string.
@@ -264,7 +264,7 @@ class Cookie
         if ($this->isRaw()) {
             $str = $this->getName();
         } else {
-            $str = str_replace(self::$reservedCharsFrom, self::$reservedCharsTo, $this->getName());
+            $str = str_replace(self::RESERVED_CHARS_FROM, self::RESERVED_CHARS_TO, $this->getName());
         }
 
         $str .= '=';

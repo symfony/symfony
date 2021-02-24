@@ -42,6 +42,8 @@ class PassConfig
         $this->beforeOptimizationPasses = [
             100 => [
                 new ResolveClassPass(),
+                new RegisterAutoconfigureAttributesPass(),
+                new AttributeAutoconfigurationPass(),
                 new ResolveInstanceofConditionalsPass(),
                 new RegisterEnvVarProcessorsPass(),
             ],

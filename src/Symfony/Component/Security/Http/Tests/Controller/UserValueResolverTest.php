@@ -35,7 +35,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolveNoUser()
     {
-        $mock = $this->getMockBuilder(UserInterface::class)->getMock();
+        $mock = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -57,7 +57,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolve()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -71,7 +71,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolveWithAttribute()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -85,7 +85,7 @@ class UserValueResolverTest extends TestCase
 
     public function testIntegration()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);

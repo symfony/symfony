@@ -172,6 +172,10 @@ final class PhpDocTypeHelper
             return [$docType, null];
         }
 
+        if (\in_array($docType, ['parent', 'self', 'static'], true)) {
+            return ['object', $docType];
+        }
+
         return ['object', substr($docType, 1)]; // substr to strip the namespace's `\`-prefix
     }
 }

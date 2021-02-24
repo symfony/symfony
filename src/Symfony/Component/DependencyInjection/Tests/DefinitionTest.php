@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
@@ -120,7 +121,7 @@ class DefinitionTest extends TestCase
 
     public function testExceptionOnEmptyMethodCall()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Method name cannot be empty.');
         $def = new Definition('stdClass');
         $def->addMethodCall('');
@@ -207,7 +208,7 @@ class DefinitionTest extends TestCase
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $def = new Definition('stdClass');
         $def->setDeprecated('vendor/package', '1.1', $message);
     }
@@ -409,5 +410,21 @@ class DefinitionTest extends TestCase
         $def->addError('First error');
         $def->addError('Second error');
         $this->assertSame(['First error', 'Second error'], $def->getErrors());
+    }
+
+    public function testMultipleMethodCalls()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addMethodCall('configure', ['arg1']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(1, $def->getMethodCalls());
+
+        $def->addMethodCall('configure', ['arg2']);
+        $this->assertTrue($def->hasMethodCall('configure'));
+        $this->assertCount(2, $def->getMethodCalls());
+
+        $def->removeMethodCall('configure');
+        $this->assertFalse($def->hasMethodCall('configure'));
     }
 }

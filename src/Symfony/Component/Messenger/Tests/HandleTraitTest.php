@@ -4,6 +4,7 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -14,7 +15,7 @@ class HandleTraitTest extends TestCase
 {
     public function testItThrowsOnNoMessageBusInstance()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, "null" given.');
         $queryBus = new TestQueryBus(null);
         $query = new DummyMessage('Hello');
@@ -48,7 +49,7 @@ class HandleTraitTest extends TestCase
 
     public function testHandleThrowsOnNoHandledStamp()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -61,7 +62,7 @@ class HandleTraitTest extends TestCase
 
     public function testHandleThrowsOnMultipleHandledStamps()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * added the `mailer` monolog channel and set it on all transport definitions
+ * Add support for `X-SES-SOURCE-ARN` in `symfony/amazon-mailer`
 
 5.2.0
 -----

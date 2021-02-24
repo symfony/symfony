@@ -16,8 +16,6 @@ use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 
 /**
- * @experimental in 5.3
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */

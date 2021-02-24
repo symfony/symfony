@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -51,7 +52,7 @@ class WebProfilerExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $this->kernel = $this->createMock(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
         $this->container->register('error_handler.error_renderer.html', HtmlErrorRenderer::class)->setPublic(true);

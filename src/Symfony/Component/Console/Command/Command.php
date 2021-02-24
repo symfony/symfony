@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\ConsoleCommand;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -65,6 +66,11 @@ class Command
     public static function getDefaultName()
     {
         $class = static::class;
+
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(ConsoleCommand::class)) {
+            return $attribute[0]->newInstance()->name;
+        }
+
         $r = new \ReflectionProperty($class, 'defaultName');
 
         return $class === $r->class ? static::$defaultName : null;
@@ -76,6 +82,11 @@ class Command
     public static function getDefaultDescription(): ?string
     {
         $class = static::class;
+
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(ConsoleCommand::class)) {
+            return $attribute[0]->newInstance()->description;
+        }
+
         $r = new \ReflectionProperty($class, 'defaultDescription');
 
         return $class === $r->class ? static::$defaultDescription : null;
@@ -303,7 +314,14 @@ class Command
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                $code = \Closure::bind($code, $this);
+                set_error_handler(static function () {});
+                try {
+                    if ($c = \Closure::bind($code, $this)) {
+                        $code = $c;
+                    }
+                } finally {
+                    restore_error_handler();
+                }
             }
         }
 

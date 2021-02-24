@@ -12,6 +12,8 @@
 namespace Symfony\Component\Notifier\Bridge\Mercure\Tests;
 
 use LogicException;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
@@ -60,6 +62,27 @@ final class MercureTransportFactoryTest extends TransportFactoryTestCase
     public function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://publisherId?topic=topic'];
+    }
+
+    public function testCreateWithEmptyServiceProviderAndWithoutMercureBundleThrows()
+    {
+        ClassExistsMock::register(MercureTransportFactory::class);
+        ClassExistsMock::withMockedClasses([MercureBundle::class => false]);
+
+        $publisherLocator = $this->createMock(ServiceProviderInterface::class);
+        $publisherLocator->method('has')->willReturn(false);
+        $publisherLocator->method('getProvidedServices')->willReturn([]);
+
+        $factory = new MercureTransportFactory($publisherLocator);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No publishers found. Did you forget to install the MercureBundle? Try running "composer require symfony/mercure-bundle".');
+
+        try {
+            $factory->create(new Dsn('mercure://publisherId'));
+        } finally {
+            ClassExistsMock::withMockedClasses([MercureBundle::class => true]);
+        }
     }
 
     public function testNotFoundPublisherThrows()

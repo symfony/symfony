@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 class TwigLoaderPassTest extends TestCase
 {
@@ -89,7 +90,7 @@ class TwigLoaderPassTest extends TestCase
 
     public function testMapperPassWithZeroTaggedLoaders()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->pass->process($this->builder);
     }
 }

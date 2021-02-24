@@ -15,11 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -27,10 +29,13 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class XmlFileLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var XmlFileLoader
      */
     private $loader;
+
     /**
      * @var ClassMetadata
      */
@@ -44,7 +49,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\Loader\LoaderInterface::class, $this->loader);
+        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
@@ -102,5 +107,10 @@ class XmlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertTrue($attributesMetadata['ignored1']->isIgnored());
         $this->assertTrue($attributesMetadata['ignored2']->isIgnored());
+    }
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
     }
 }

@@ -35,14 +35,16 @@ class ContainerConfigurator extends AbstractConfigurator
     private $path;
     private $file;
     private $anonymousCount = 0;
+    private $env;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file)
+    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file, string $env = null)
     {
         $this->container = $container;
         $this->loader = $loader;
         $this->instanceof = &$instanceof;
         $this->path = $path;
         $this->file = $file;
+        $this->env = $env;
     }
 
     final public function extension(string $namespace, array $config)
@@ -69,6 +71,23 @@ class ContainerConfigurator extends AbstractConfigurator
     final public function services(): ServicesConfigurator
     {
         return new ServicesConfigurator($this->container, $this->loader, $this->instanceof, $this->path, $this->anonymousCount);
+    }
+
+    /**
+     * @return static
+     */
+    final public function when(string $env): self
+    {
+        if ($env === $this->env) {
+            return clone $this;
+        }
+
+        $instanceof = $this->instanceof;
+        $clone = clone $this;
+        $clone->container = new ContainerBuilder(clone $this->container->getParameterBag());
+        $clone->instanceof = &$instanceof;
+
+        return $clone;
     }
 
     /**

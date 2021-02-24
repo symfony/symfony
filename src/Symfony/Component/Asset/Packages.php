@@ -28,7 +28,7 @@ class Packages
     /**
      * @param PackageInterface[] $packages Additional packages indexed by name
      */
-    public function __construct(PackageInterface $defaultPackage = null, array $packages = [])
+    public function __construct(PackageInterface $defaultPackage = null, iterable $packages = [])
     {
         $this->defaultPackage = $defaultPackage;
 

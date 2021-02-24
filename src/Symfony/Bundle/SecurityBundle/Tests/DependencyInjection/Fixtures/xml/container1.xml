@@ -9,19 +9,19 @@
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
     <config>
-        <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
+        <password_hasher class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
-        <encoder class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
+        <password_hasher class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
 
-        <encoder class="JMS\FooBundle\Entity\User3" algorithm="md5" />
+        <password_hasher class="JMS\FooBundle\Entity\User3" algorithm="md5" />
 
-        <encoder class="JMS\FooBundle\Entity\User4" id="security.encoder.foo" />
+        <password_hasher class="JMS\FooBundle\Entity\User4" id="security.hasher.foo" />
 
-        <encoder class="JMS\FooBundle\Entity\User5" algorithm="pbkdf2" hash-algorithm="sha1" encode-as-base64="false" iterations="5" key-length="30" />
+        <password_hasher class="JMS\FooBundle\Entity\User5" algorithm="pbkdf2" hash-algorithm="sha1" encode-as-base64="false" iterations="5" key-length="30" />
 
-        <encoder class="JMS\FooBundle\Entity\User6" algorithm="native" time-cost="8" memory-cost="100" cost="15" />
+        <password_hasher class="JMS\FooBundle\Entity\User6" algorithm="native" time-cost="8" memory-cost="100" cost="15" />
 
-        <encoder class="JMS\FooBundle\Entity\User7" algorithm="auto" />
+        <password_hasher class="JMS\FooBundle\Entity\User7" algorithm="auto" />
 
         <provider name="default">
             <memory>

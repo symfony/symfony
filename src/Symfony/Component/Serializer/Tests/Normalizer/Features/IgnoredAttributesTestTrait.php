@@ -38,8 +38,6 @@ trait IgnoredAttributesTestTrait
             $normalizer->normalize($objectOuter, null, $context)
         );
 
-        $this->markTestIncomplete('AbstractObjectNormalizer::getAttributes caches attributes by class instead of by class+context, reusing the normalizer with different config therefore fails. This is being fixed in https://github.com/symfony/symfony/pull/30907');
-
         $context = ['ignored_attributes' => ['foo', 'inner']];
         $this->assertEquals(
             [

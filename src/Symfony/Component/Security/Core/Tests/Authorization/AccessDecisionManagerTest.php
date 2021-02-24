@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -31,7 +32,7 @@ class AccessDecisionManagerTest extends TestCase
      */
     public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
     {
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
 
         $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
@@ -43,7 +44,7 @@ class AccessDecisionManagerTest extends TestCase
      */
     public function testDeprecatedVoter($strategy)
     {
-        $token = $this->getMockBuilder(\Symfony\Component\Security\Core\Authentication\Token\TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
         $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
 
         $this->expectDeprecation('Since symfony/security-core 5.3: Returning "3" in "%s::vote()" is deprecated, return one of "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".');
@@ -137,7 +138,7 @@ class AccessDecisionManagerTest extends TestCase
 
     protected function getVoter($vote)
     {
-        $voter = $this->getMockBuilder(VoterInterface::class)->getMock();
+        $voter = $this->createMock(VoterInterface::class);
         $voter->expects($this->any())
               ->method('vote')
               ->willReturn($vote);

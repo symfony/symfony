@@ -34,9 +34,11 @@ class AtLeastOneOfValidator extends ConstraintValidator
         $messages = [$constraint->message];
 
         foreach ($constraint->constraints as $key => $item) {
-            $violations = $validator->validate($value, $item, $this->context->getGroup());
+            $executionContext = clone $this->context;
+            $executionContext->setNode($value, $this->context->getObject(), $this->context->getMetadata(), $this->context->getPropertyPath());
+            $violations = $validator->inContext($executionContext)->validate($value, $item, $this->context->getGroup())->getViolations();
 
-            if (0 === \count($violations)) {
+            if (\count($this->context->getViolations()) === \count($violations)) {
                 return;
             }
 
@@ -46,7 +48,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
                 if ($item instanceof All || $item instanceof Collection) {
                     $message .= $constraint->messageCollection;
                 } else {
-                    $message .= $violations->get(0)->getMessage();
+                    $message .= $violations->get(\count($violations) - 1)->getMessage();
                 }
 
                 $messages[] = $message;

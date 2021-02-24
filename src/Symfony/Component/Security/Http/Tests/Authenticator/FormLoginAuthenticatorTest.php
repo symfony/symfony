@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
@@ -117,7 +118,7 @@ class FormLoginAuthenticatorTest extends TestCase
      */
     public function testHandleNonStringUsernameWithToString($postOnly)
     {
-        $usernameObject = $this->getMockBuilder(DummyUserClass::class)->getMock();
+        $usernameObject = $this->createMock(DummyUserClass::class);
         $usernameObject->expects($this->once())->method('__toString')->willReturn('someUsername');
 
         $request = Request::create('/login_check', 'POST', ['_username' => $usernameObject, '_password' => 's$cr$t']);
@@ -165,7 +166,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     private function createSession()
     {
-        return $this->createMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        return $this->createMock(SessionInterface::class);
     }
 }
 

@@ -38,9 +38,10 @@ class MergeOperation extends AbstractOperation
 
         foreach ($this->source->all($domain) as $id => $message) {
             $this->messages[$domain]['all'][$id] = $message;
-            $this->result->add([$id => $message], $this->source->defines($id, $intlDomain) ? $intlDomain : $domain);
-            if (null !== $keyMetadata = $this->source->getMetadata($id, $domain)) {
-                $this->result->setMetadata($id, $keyMetadata, $domain);
+            $d = $this->source->defines($id, $intlDomain) ? $intlDomain : $domain;
+            $this->result->add([$id => $message], $d);
+            if (null !== $keyMetadata = $this->source->getMetadata($id, $d)) {
+                $this->result->setMetadata($id, $keyMetadata, $d);
             }
         }
 
@@ -48,9 +49,10 @@ class MergeOperation extends AbstractOperation
             if (!$this->source->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->messages[$domain]['new'][$id] = $message;
-                $this->result->add([$id => $message], $this->target->defines($id, $intlDomain) ? $intlDomain : $domain);
-                if (null !== $keyMetadata = $this->target->getMetadata($id, $domain)) {
-                    $this->result->setMetadata($id, $keyMetadata, $domain);
+                $d = $this->target->defines($id, $intlDomain) ? $intlDomain : $domain;
+                $this->result->add([$id => $message], $d);
+                if (null !== $keyMetadata = $this->target->getMetadata($id, $d)) {
+                    $this->result->setMetadata($id, $keyMetadata, $d);
                 }
             }
         }

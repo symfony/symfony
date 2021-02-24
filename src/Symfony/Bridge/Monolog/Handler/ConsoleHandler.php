@@ -51,7 +51,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
     ];
-    private $consoleFormaterOptions;
+    private $consoleFormatterOptions;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -60,7 +60,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */
-    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormaterOptions = [])
+    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormatterOptions = [])
     {
         parent::__construct(Logger::DEBUG, $bubble);
         $this->output = $output;
@@ -69,7 +69,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
 
-        $this->consoleFormaterOptions = $consoleFormaterOptions;
+        $this->consoleFormatterOptions = $consoleFormatterOptions;
     }
 
     /**
@@ -159,13 +159,13 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
             return new LineFormatter();
         }
         if (!$this->output) {
-            return new ConsoleFormatter($this->consoleFormaterOptions);
+            return new ConsoleFormatter($this->consoleFormatterOptions);
         }
 
         return new ConsoleFormatter(array_replace([
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
-        ], $this->consoleFormaterOptions));
+        ], $this->consoleFormatterOptions));
     }
 
     /**

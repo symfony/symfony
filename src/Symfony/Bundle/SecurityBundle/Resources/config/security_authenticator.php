@@ -72,7 +72,7 @@ return static function (ContainerConfigurator $container) {
         // Listeners
         ->set('security.listener.check_authenticator_credentials', CheckCredentialsListener::class)
             ->args([
-               service('security.encoder_factory'),
+               service('security.password_hasher_factory'),
             ])
             ->tag('kernel.event_subscriber')
 
@@ -90,7 +90,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.listener.password_migrating', PasswordMigratingListener::class)
             ->args([
-                service('security.encoder_factory'),
+                service('security.password_hasher_factory'),
             ])
             ->tag('kernel.event_subscriber')
 

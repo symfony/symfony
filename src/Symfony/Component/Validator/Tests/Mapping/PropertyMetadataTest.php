@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Annotation\EntityParent;
@@ -27,7 +28,7 @@ class PropertyMetadataTest extends TestCase
 
     public function testInvalidPropertyName()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ValidatorException::class);
+        $this->expectException(ValidatorException::class);
 
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
@@ -55,7 +56,7 @@ class PropertyMetadataTest extends TestCase
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
         $metadata->name = 'test';
 
-        $this->expectException(\Symfony\Component\Validator\Exception\ValidatorException::class);
+        $this->expectException(ValidatorException::class);
         $metadata->getPropertyValue($entity);
     }
 

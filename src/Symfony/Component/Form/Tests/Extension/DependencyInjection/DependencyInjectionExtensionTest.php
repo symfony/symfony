@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
@@ -43,7 +44,7 @@ class DependencyInjectionExtensionTest extends TestCase
 
     public function testThrowExceptionForInvalidExtendedType()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The extended type "unmatched" specified for the type extension class "%s" does not match any of the actual extended types (["test"]).', TestTypeExtension::class));
 
         $extensions = [
@@ -57,7 +58,7 @@ class DependencyInjectionExtensionTest extends TestCase
 
     public function testGetTypeGuesser()
     {
-        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [$this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()]);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [$this->createMock(FormTypeGuesserInterface::class)]);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }

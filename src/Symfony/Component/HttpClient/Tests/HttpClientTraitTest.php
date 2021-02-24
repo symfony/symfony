@@ -44,6 +44,9 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?a=2&b=b', '.?a=2'];
         yield ['http://example.com/?a=3&b=b', '.', ['a' => 3]];
         yield ['http://example.com/?a=3&b=b', '.?a=0', ['a' => 3]];
+        yield ['http://example.com/', 'http://example.com/', ['a' => null]];
+        yield ['http://example.com/?b=', 'http://example.com/', ['b' => '']];
+        yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
     /**

@@ -148,7 +148,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         $collection = new \ArrayIterator([new Entry('')]);
 
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
+        $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
         $this->ldap
@@ -168,9 +168,9 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented username is invalid.');
 
-        $collection = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $collection = $this->createMock(CollectionInterface::class);
 
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
+        $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
         $this->ldap

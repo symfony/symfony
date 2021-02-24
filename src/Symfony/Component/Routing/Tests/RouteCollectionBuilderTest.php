@@ -13,6 +13,8 @@ namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
@@ -26,8 +28,8 @@ class RouteCollectionBuilderTest extends TestCase
 {
     public function testImport()
     {
-        $resolvedLoader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
-        $resolver = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderResolverInterface::class)->getMock();
+        $resolvedLoader = $this->createMock(LoaderInterface::class);
+        $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('admin_routing.yml', 'yaml')
@@ -44,7 +46,7 @@ class RouteCollectionBuilderTest extends TestCase
             ->with('admin_routing.yml', 'yaml')
             ->willReturn($expectedCollection);
 
-        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
             ->method('getResolver')
             ->willReturn($resolver);
@@ -104,7 +106,7 @@ class RouteCollectionBuilderTest extends TestCase
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
-        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
@@ -267,7 +269,7 @@ class RouteCollectionBuilderTest extends TestCase
 
     public function testFlushSetsPrefixedWithMultipleLevels()
     {
-        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $routes = new RouteCollectionBuilder($loader);
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
@@ -345,7 +347,7 @@ class RouteCollectionBuilderTest extends TestCase
         $secondCollection = new RouteCollection();
         $secondCollection->add('b', new Route('/b'));
 
-        $loader = $this->getMockBuilder(\Symfony\Component\Config\Loader\LoaderInterface::class)->getMock();
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
             ->method('supports')
             ->willReturn(true);

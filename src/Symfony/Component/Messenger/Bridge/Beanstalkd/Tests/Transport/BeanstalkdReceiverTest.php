@@ -32,7 +32,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $tube = 'foo bar';
 
         $beanstalkdEnvelope = $this->createBeanstalkdEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
         $connection->expects($this->once())->method('getTube')->willReturn($tube);
 
@@ -53,7 +53,7 @@ final class BeanstalkdReceiverTest extends TestCase
     {
         $serializer = $this->createSerializer();
 
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('get')->willReturn(null);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
@@ -70,7 +70,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $serializer->expects($this->once())->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $beanstalkdEnvelope = $this->createBeanstalkdEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
         $connection->expects($this->once())->method('reject');
 

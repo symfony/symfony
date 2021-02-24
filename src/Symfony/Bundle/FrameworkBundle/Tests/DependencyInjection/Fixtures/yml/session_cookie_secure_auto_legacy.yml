@@ -1,0 +1,5 @@
+# to be removed in Symfony 6.0
+framework:
+    session:
+        handler_id: ~
+        cookie_secure: auto

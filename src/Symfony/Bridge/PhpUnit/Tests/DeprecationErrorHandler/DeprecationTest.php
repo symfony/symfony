@@ -174,6 +174,8 @@ class DeprecationTest extends TestCase
     {
         $trace = [
             ['class' => 'MyClass1', 'function' => 'myMethod'],
+            ['function' => 'trigger_error'],
+            ['class' => SymfonyTestsListenerTrait::class, 'function' => 'endTest'],
             ['class' => $traceClass, 'function' => 'myMethod'],
         ];
         $deprecation = new Deprecation($message, $trace, $file);
@@ -183,6 +185,11 @@ class DeprecationTest extends TestCase
     public function providerGetTypeUsesRightTrace()
     {
         $vendorDir = self::getVendorDir();
+        $fakeTrace = [
+            ['function' => 'trigger_error'],
+            ['class' => SymfonyTestsListenerTrait::class, 'function' => 'endTest'],
+            ['class' => SymfonyTestsListenerForV7::class, 'function' => 'endTest'],
+        ];
 
         return [
             'no_file_in_stack' => [Deprecation::TYPE_DIRECT, '', [['function' => 'myfunc1'], ['function' => 'myfunc2']]],
@@ -205,7 +212,7 @@ class DeprecationTest extends TestCase
                         $vendorDir.'/myfakevendor/myfakepackage1/MyFakeFile2.php',
                     ],
                 ]),
-                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV7::class, 'method' => 'mymethod']],
+                $fakeTrace,
             ],
             'serialized_stack_files_from_various_packages' => [
                 Deprecation::TYPE_INDIRECT,
@@ -218,7 +225,7 @@ class DeprecationTest extends TestCase
                         $vendorDir.'/myfakevendor/myfakepackage2/MyFakeFile.php',
                     ],
                 ]),
-                [['function' => 'myfunc1'], ['class' => SymfonyTestsListenerForV7::class, 'method' => 'mymethod']],
+                $fakeTrace,
             ],
         ];
     }

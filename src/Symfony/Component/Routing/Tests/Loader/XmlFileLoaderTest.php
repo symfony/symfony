@@ -23,7 +23,7 @@ class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new XmlFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
+        $loader = new XmlFileLoader($this->createMock(FileLocator::class));
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -562,5 +562,15 @@ class XmlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
 
         $this->assertEquals($expectedRoutes('xml'), $routes);
+    }
+
+    public function testWhenEnv()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
+        $routes = $loader->load('when-env.xml');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame('/a1', $routes->get('a')->getPath());
     }
 }

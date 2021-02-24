@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs
+ * Add support for per-env configuration in loaders
+
 5.2.0
 -----
 

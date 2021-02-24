@@ -101,6 +101,23 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setIgnore($data['ignore']);
                 }
+
+                foreach ($data['contexts'] ?? [] as $line) {
+                    $groups = $line['groups'] ?? [];
+
+                    if ($context = $line['context'] ?? false) {
+                        $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                        $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                    }
+
+                    if ($context = $line['normalization_context'] ?? false) {
+                        $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                    }
+
+                    if ($context = $line['denormalization_context'] ?? false) {
+                        $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                    }
+                }
             }
         }
 

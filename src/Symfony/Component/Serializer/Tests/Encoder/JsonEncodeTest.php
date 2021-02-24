@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class JsonEncodeTest extends TestCase
 {
@@ -53,7 +54,7 @@ class JsonEncodeTest extends TestCase
 
     public function testEncodeWithError()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->encode->encode("\xB1\x31", JsonEncoder::FORMAT);
     }
 }

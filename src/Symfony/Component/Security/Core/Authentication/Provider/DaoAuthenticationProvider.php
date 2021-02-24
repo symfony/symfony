@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user
@@ -29,14 +30,21 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider
 {
-    private $encoderFactory;
+    private $hasherFactory;
     private $userProvider;
 
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, EncoderFactoryInterface $encoderFactory, bool $hideUserNotFoundExceptions = true)
+    /**
+     * @param PasswordHasherFactoryInterface $hasherFactory
+     */
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey, $hasherFactory, bool $hideUserNotFoundExceptions = true)
     {
         parent::__construct($userChecker, $providerKey, $hideUserNotFoundExceptions);
 
-        $this->encoderFactory = $encoderFactory;
+        if ($hasherFactory instanceof EncoderFactoryInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
+        }
+
+        $this->hasherFactory = $hasherFactory;
         $this->userProvider = $userProvider;
     }
 
@@ -59,14 +67,29 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            $encoder = $this->encoderFactory->getEncoder($user);
+            // deprecated since Symfony 5.3
+            if ($this->hasherFactory instanceof EncoderFactoryInterface) {
+                $encoder = $this->hasherFactory->getEncoder($user);
 
-            if (!$encoder->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
+                if (!$encoder->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
+                    throw new BadCredentialsException('The presented password is invalid.');
+                }
+
+                if ($this->userProvider instanceof PasswordUpgraderInterface && method_exists($encoder, 'needsRehash') && $encoder->needsRehash($user->getPassword())) {
+                    $this->userProvider->upgradePassword($user, $encoder->encodePassword($presentedPassword, $user->getSalt()));
+                }
+
+                return;
+            }
+
+            $hasher = $this->hasherFactory->getPasswordHasher($user);
+
+            if (!$hasher->verify($user->getPassword(), $presentedPassword, $user->getSalt())) {
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            if ($this->userProvider instanceof PasswordUpgraderInterface && method_exists($encoder, 'needsRehash') && $encoder->needsRehash($user->getPassword())) {
-                $this->userProvider->upgradePassword($user, $encoder->encodePassword($presentedPassword, $user->getSalt()));
+            if ($this->userProvider instanceof PasswordUpgraderInterface && $hasher->needsRehash($user->getPassword())) {
+                $this->userProvider->upgradePassword($user, $hasher->hash($presentedPassword, $user->getSalt()));
             }
         }
     }

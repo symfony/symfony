@@ -39,7 +39,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $serviceKeywords = [
+    private const SERVICE_KEYWORDS = [
         'alias' => 'alias',
         'parent' => 'parent',
         'class' => 'class',
@@ -65,7 +65,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $prototypeKeywords = [
+    private const PROTOTYPE_KEYWORDS = [
         'resource' => 'resource',
         'namespace' => 'namespace',
         'exclude' => 'exclude',
@@ -86,7 +86,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $instanceofKeywords = [
+    private const INSTANCEOF_KEYWORDS = [
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
@@ -98,7 +98,7 @@ class YamlFileLoader extends FileLoader
         'bind' => 'bind',
     ];
 
-    private static $defaultsKeywords = [
+    private const DEFAULTS_KEYWORDS = [
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
@@ -129,6 +129,20 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
+        $this->loadContent($content, $path);
+
+        // per-env configuration
+        if ($this->env && isset($content['when@'.$this->env])) {
+            if (!\is_array($content['when@'.$this->env])) {
+                throw new InvalidArgumentException(sprintf('The "when@%s" key should contain an array in "%s". Check your YAML syntax.', $this->env, $path));
+            }
+
+            $this->loadContent($content['when@'.$this->env], $path);
+        }
+    }
+
+    private function loadContent($content, $path)
+    {
         // imports
         $this->parseImports($content, $path);
 
@@ -251,8 +265,8 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($defaults as $key => $default) {
-            if (!isset(self::$defaultsKeywords[$key])) {
-                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::$defaultsKeywords)));
+            if (!isset(self::DEFAULTS_KEYWORDS[$key])) {
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::DEFAULTS_KEYWORDS)));
             }
         }
 
@@ -356,7 +370,7 @@ class YamlFileLoader extends FileLoader
             $stack = [];
 
             foreach ($service['stack'] as $k => $frame) {
-                if (\is_array($frame) && 1 === \count($frame) && !isset(self::$serviceKeywords[key($frame)])) {
+                if (\is_array($frame) && 1 === \count($frame) && !isset(self::SERVICE_KEYWORDS[key($frame)])) {
                     $frame = [
                         'class' => key($frame),
                         'arguments' => current($frame),
@@ -388,6 +402,9 @@ class YamlFileLoader extends FileLoader
                 'deprecated' => $service['deprecated'] ?? null,
             ];
         }
+
+        $definition = isset($service[0]) && $service[0] instanceof Definition ? array_shift($service) : null;
+        $return = null === $definition ? $return : true;
 
         $this->checkDefinition($id, $service, $file);
 
@@ -423,7 +440,9 @@ class YamlFileLoader extends FileLoader
             return $return ? $alias : $this->container->setAlias($id, $alias);
         }
 
-        if ($this->isLoadingInstanceof) {
+        if (null !== $definition) {
+            // no-op
+        } elseif ($this->isLoadingInstanceof) {
             $definition = new ChildDefinition('');
         } elseif (isset($service['parent'])) {
             if ('' !== $service['parent'] && '@' === $service['parent'][0]) {
@@ -627,7 +646,8 @@ class YamlFileLoader extends FileLoader
 
         if (isset($defaults['bind']) || isset($service['bind'])) {
             // deep clone, to avoid multiple process of the same instance in the passes
-            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
+            $bindings = $definition->getBindings();
+            $bindings += isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
 
             if (isset($service['bind'])) {
                 if (!\is_array($service['bind'])) {
@@ -764,7 +784,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content as $namespace => $data) {
-            if (\in_array($namespace, ['imports', 'parameters', 'services'])) {
+            if (\in_array($namespace, ['imports', 'parameters', 'services']) || 0 === strpos($namespace, 'when@')) {
                 continue;
             }
 
@@ -901,7 +921,7 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions(array $content)
     {
         foreach ($content as $namespace => $values) {
-            if (\in_array($namespace, ['imports', 'parameters', 'services'])) {
+            if (\in_array($namespace, ['imports', 'parameters', 'services']) || 0 === strpos($namespace, 'when@')) {
                 continue;
             }
 
@@ -919,11 +939,11 @@ class YamlFileLoader extends FileLoader
     private function checkDefinition(string $id, array $definition, string $file)
     {
         if ($this->isLoadingInstanceof) {
-            $keywords = self::$instanceofKeywords;
+            $keywords = self::INSTANCEOF_KEYWORDS;
         } elseif (isset($definition['resource']) || isset($definition['namespace'])) {
-            $keywords = self::$prototypeKeywords;
+            $keywords = self::PROTOTYPE_KEYWORDS;
         } else {
-            $keywords = self::$serviceKeywords;
+            $keywords = self::SERVICE_KEYWORDS;
         }
 
         foreach ($definition as $key => $value) {

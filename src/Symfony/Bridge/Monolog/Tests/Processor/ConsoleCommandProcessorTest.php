@@ -61,12 +61,12 @@ class ConsoleCommandProcessorTest extends TestCase
 
     private function getConsoleEvent(): ConsoleEvent
     {
-        $input = $this->getMockBuilder(InputInterface::class)->getMock();
+        $input = $this->createMock(InputInterface::class);
         $input->method('getArguments')->willReturn(self::TEST_ARGUMENTS);
         $input->method('getOptions')->willReturn(self::TEST_OPTIONS);
-        $command = $this->getMockBuilder(Command::class)->disableOriginalConstructor()->getMock();
+        $command = $this->createMock(Command::class);
         $command->method('getName')->willReturn(self::TEST_NAME);
-        $consoleEvent = $this->getMockBuilder(ConsoleEvent::class)->disableOriginalConstructor()->getMock();
+        $consoleEvent = $this->createMock(ConsoleEvent::class);
         $consoleEvent->method('getCommand')->willReturn($command);
         $consoleEvent->method('getInput')->willReturn($input);
 

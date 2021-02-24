@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -61,6 +62,22 @@ class EnvVarProcessorTest extends TestCase
         });
 
         $this->assertSame($processed, $result);
+    }
+
+    /**
+     * @dataProvider validBools
+     */
+    public function testGetEnvNot($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('not', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame(!$processed, $result);
     }
 
     public function validBools()
@@ -376,7 +393,7 @@ class EnvVarProcessorTest extends TestCase
      */
     public function testGetEnvKeyArrayKeyNotFound($value)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException::class);
+        $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('Key "index" not found in');
         $processor = new EnvVarProcessor(new Container());
 
@@ -465,7 +482,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testRequireMissingFile()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException::class);
+        $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('missing-file');
         $processor = new EnvVarProcessor(new Container());
 

@@ -12,10 +12,15 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\ButtonBuilder;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\SubmitButtonBuilder;
 
 class FormBuilderTest extends TestCase
@@ -26,8 +31,8 @@ class FormBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
-        $this->factory = $this->getMockBuilder(\Symfony\Component\Form\FormFactoryInterface::class)->getMock();
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->factory = $this->createMock(FormFactoryInterface::class);
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
@@ -51,7 +56,7 @@ class FormBuilderTest extends TestCase
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->builder->add(true);
     }
 
@@ -133,7 +138,7 @@ class FormBuilderTest extends TestCase
         $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
-        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $form);
+        $this->assertInstanceOf(Form::class, $form);
     }
 
     public function testCreateNoTypeNo()
@@ -156,7 +161,7 @@ class FormBuilderTest extends TestCase
 
     public function testGetUnknown()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The child with the name "foo" does not exist.');
 
         $this->builder->get('foo');
@@ -223,10 +228,7 @@ class FormBuilderTest extends TestCase
 
     private function getFormBuilder($name = 'name')
     {
-        $mock = $this->getMockBuilder(FormBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $mock = $this->createMock(FormBuilder::class);
         $mock->expects($this->any())
             ->method('getName')
             ->willReturn($name);

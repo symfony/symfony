@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RequestContext;
 class UrlHelperTest extends TestCase
 {
     /**
-     * @dataProvider getGenerateAbsoluteUrlData()
+     * @dataProvider getGenerateAbsoluteUrlData
      */
     public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
     {
@@ -113,7 +113,7 @@ class UrlHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider getGenerateRelativePathData()
+     * @dataProvider getGenerateRelativePathData
      */
     public function testGenerateRelativePath($expected, $path, $pathinfo)
     {

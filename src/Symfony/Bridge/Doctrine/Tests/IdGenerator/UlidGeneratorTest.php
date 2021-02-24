@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\IdGenerator;
 use Doctrine\ORM\Mapping\Entity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
-use Symfony\Component\Uid\AbstractUid;
+use Symfony\Component\Uid\Factory\UlidFactory;
 use Symfony\Component\Uid\Ulid;
 
 class UlidGeneratorTest extends TestCase
@@ -25,8 +25,23 @@ class UlidGeneratorTest extends TestCase
         $generator = new UlidGenerator();
         $ulid = $generator->generate($em, new Entity());
 
-        $this->assertInstanceOf(AbstractUid::class, $ulid);
         $this->assertInstanceOf(Ulid::class, $ulid);
         $this->assertTrue(Ulid::isValid($ulid));
+    }
+
+    /**
+     * @requires function \Symfony\Component\Uid\Factory\UlidFactory::create
+     */
+    public function testUlidFactory()
+    {
+        $ulid = new Ulid('00000000000000000000000000');
+        $em = new EntityManager();
+        $factory = $this->createMock(UlidFactory::class);
+        $factory->expects($this->any())
+            ->method('create')
+            ->willReturn($ulid);
+        $generator = new UlidGenerator($factory);
+
+        $this->assertSame($ulid, $generator->generate($em, new Entity()));
     }
 }

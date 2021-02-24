@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class InlineServiceDefinitionsPassTest extends TestCase
@@ -113,7 +114,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
 
     public function testProcessThrowsOnNonSharedLoops()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException::class);
+        $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> foo -> bar".');
         $container = new ContainerBuilder();
         $container

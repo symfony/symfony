@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "psr/cache": "^1.0"
+        "psr/cache": "^1.0|^2.0|^3.0"
     },
     "suggest": {
         "symfony/cache-implementation": ""
@@ -27,7 +27,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "branch-version": "2.3",
         "branch-alias": {
             "dev-main": "2.3-dev"
         },

@@ -12,8 +12,13 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserChecker;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCheckerTest extends TestCase
 {
@@ -21,7 +26,7 @@ class UserCheckerTest extends TestCase
     {
         $checker = new UserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock()));
+        $this->assertNull($checker->checkPostAuth($this->createMock(UserInterface::class)));
     }
 
     public function testCheckPostAuthPass()
@@ -32,28 +37,28 @@ class UserCheckerTest extends TestCase
 
     public function testCheckPostAuthCredentialsExpired()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\CredentialsExpiredException::class);
+        $this->expectException(CredentialsExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPostAuth(new User('John', 'password', [], true, true, false, true));
     }
 
     public function testCheckPreAuthAccountLocked()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\LockedException::class);
+        $this->expectException(LockedException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, true, false, false));
     }
 
     public function testCheckPreAuthDisabled()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\DisabledException::class);
+        $this->expectException(DisabledException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], false, true, false, true));
     }
 
     public function testCheckPreAuthAccountExpired()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccountExpiredException::class);
+        $this->expectException(AccountExpiredException::class);
         $checker = new UserChecker();
         $checker->checkPreAuth(new User('John', 'password', [], true, false, true, true));
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CheckArgumentsValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -45,7 +46,7 @@ class CheckArgumentsValidityPassTest extends TestCase
      */
     public function testException(array $arguments, array $methodCalls)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
         $definition->setArguments($arguments);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\DataCollector;
 
+use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Version;
 use Doctrine\Persistence\ManagerRegistry;
@@ -236,7 +237,7 @@ EOTXT
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
 
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry
             ->expects($this->any())
             ->method('getConnectionNames')
@@ -249,7 +250,7 @@ EOTXT
             ->method('getConnection')
             ->willReturn($connection);
 
-        $logger = $this->getMockBuilder(\Doctrine\DBAL\Logging\DebugStack::class)->getMock();
+        $logger = $this->createMock(DebugStack::class);
         $logger->queries = $queries;
 
         $collector = new DoctrineDataCollector($registry);

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -43,8 +44,13 @@ class RegisterEntryPointPass implements CompilerPassInterface
                     continue;
                 }
 
+                // because this pass runs before ResolveChildDefinitionPass, child definitions didn't inherit the parent class yet
                 $definition = $container->findDefinition($authenticatorId);
-                if (is_a($definition->getClass(), AuthenticationEntryPointInterface::class, true)) {
+                while (!($authenticatorClass = $definition->getClass()) && $definition instanceof ChildDefinition) {
+                    $definition = $container->findDefinition($definition->getParent());
+                }
+
+                if (is_a($authenticatorClass, AuthenticationEntryPointInterface::class, true)) {
                     $entryPoints[$key] = $authenticatorId;
                 }
             }

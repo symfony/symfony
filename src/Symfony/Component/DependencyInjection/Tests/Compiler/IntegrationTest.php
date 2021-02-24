@@ -16,14 +16,22 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Attribute\CustomAutoconfiguration;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -506,6 +514,109 @@ class IntegrationTest extends TestCase
         ];
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTagsViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomAutoconfiguration::class,
+            static function (ChildDefinition $definition, CustomAutoconfiguration $attribute, \ReflectionClass $reflector) {
+                $definition->addTag('app.custom_tag', get_object_vars($attribute) + ['class' => $reflector->getName()]);
+            }
+        );
+
+        $container->register('one', TaggedService1::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->register('two', TaggedService2::class)
+            ->addTag('app.custom_tag', ['info' => 'This tag is not autoconfigured'])
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            'one' => [
+                ['someAttribute' => 'one', 'priority' => 0, 'class' => TaggedService1::class],
+                ['someAttribute' => 'two', 'priority' => 0, 'class' => TaggedService1::class],
+            ],
+            'two' => [
+                ['info' => 'This tag is not autoconfigured'],
+                ['someAttribute' => 'prio 100', 'priority' => 100, 'class' => TaggedService2::class],
+            ],
+        ], $collector->collectedTags);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAttributesAreIgnored()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomAutoconfiguration::class,
+            static function (Definition $definition, CustomAutoconfiguration $attribute) {
+                $definition->addTag('app.custom_tag', get_object_vars($attribute));
+            }
+        );
+
+        $container->register('one', TaggedService1::class)
+            ->setPublic(true)
+            ->addTag('container.ignore_attributes')
+            ->setAutoconfigured(true);
+        $container->register('two', TaggedService2::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame([
+            'two' => [
+                ['someAttribute' => 'prio 100', 'priority' => 100],
+            ],
+        ], $collector->collectedTags);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAutoconfigureViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomAutoconfiguration::class,
+            static function (ChildDefinition $definition) {
+                $definition
+                    ->addMethodCall('doSomething', [1, 2, 3])
+                    ->setBindings(['string $foo' => 'bar'])
+                    ->setConfigurator(new Reference('my_configurator'))
+                ;
+            }
+        );
+
+        $container->register('my_configurator', TaggedService3Configurator::class);
+        $container->register('three', TaggedService3::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+
+        $container->compile();
+
+        /** @var TaggedService3 $service */
+        $service = $container->get('three');
+
+        self::assertSame('bar', $service->foo);
+        self::assertSame(6, $service->sum);
+        self::assertTrue($service->hasBeenConfigured);
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface
@@ -564,5 +675,15 @@ class IntegrationTestStubParent
 
     public function setSunshine($type)
     {
+    }
+}
+
+final class TagCollector implements CompilerPassInterface
+{
+    public $collectedTags;
+
+    public function process(ContainerBuilder $container): void
+    {
+        $this->collectedTags = $container->findTaggedServiceIds('app.custom_tag');
     }
 }

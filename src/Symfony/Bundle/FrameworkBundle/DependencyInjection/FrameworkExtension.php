@@ -25,7 +25,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface;
 use Symfony\Bundle\FullStack;
-use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -59,6 +58,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\EventDispatcher\Attribute\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -71,6 +71,7 @@ use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -98,6 +99,7 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -105,6 +107,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -126,6 +129,7 @@ use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as S
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
+use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
@@ -158,6 +162,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -447,6 +453,14 @@ class FrameworkExtension extends Extension
             $loader->load('web_link.php');
         }
 
+        if ($this->isConfigEnabled($container, $config['uid'])) {
+            if (!class_exists(UuidFactory::class)) {
+                throw new LogicException('Uid support cannot be enabled as the Uid component is not installed. Try running "composer require symfony/uid".');
+            }
+
+            $this->registerUidConfiguration($config['uid'], $container, $loader);
+        }
+
         $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',
             '**\\Entity\\',
@@ -459,6 +473,8 @@ class FrameworkExtension extends Extension
             $loader->load('mime_type.php');
         }
 
+        $container->registerForAutoconfiguration(PackageInterface::class)
+            ->addTag('assets.package');
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
@@ -533,6 +549,10 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
+
+        $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
+            $definition->addTag('kernel.event_listener', get_object_vars($attribute));
+        });
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
@@ -943,8 +963,12 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
+            $container->removeDefinition('messenger.middleware.router_context');
 
             return;
+        }
+        if (!class_exists(RouterContextMiddleware::class)) {
+            $container->removeDefinition('messenger.middleware.router_context');
         }
 
         $loader->load('routing.php');
@@ -987,7 +1011,10 @@ class FrameworkExtension extends Extension
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)
                 ->addTag('routing.loader', ['priority' => -10])
-                ->addArgument(new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+                ->setArguments([
+                    new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                    '%kernel.environment%',
+                ]);
 
             $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)
@@ -1012,7 +1039,21 @@ class FrameworkExtension extends Extension
         $loader->load('session.php');
 
         // session storage
-        $container->setAlias('session.storage', $config['storage_id']);
+        if (null === $config['storage_factory_id']) {
+            trigger_deprecation('symfony/framework-bundle', '5.3', 'Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+            $container->setAlias('session.storage', $config['storage_id']);
+            $container->setAlias('session.storage.factory', 'session.storage.factory.service');
+        } else {
+            $container->setAlias('session.storage.factory', $config['storage_factory_id']);
+
+            $container->removeAlias(SessionStorageInterface::class);
+            $container->removeDefinition('session.storage.metadata_bag');
+            $container->removeDefinition('session.storage.native');
+            $container->removeDefinition('session.storage.php_bridge');
+            $container->removeDefinition('session.storage.mock_file');
+            $container->removeAlias('session.storage.filesystem');
+        }
+
         $options = ['cache_limiter' => '0'];
         foreach (['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'cookie_samesite', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'sid_length', 'sid_bits_per_character'] as $key) {
             if (isset($config[$key])) {
@@ -1021,11 +1062,16 @@ class FrameworkExtension extends Extension
         }
 
         if ('auto' === ($options['cookie_secure'] ?? null)) {
-            $locator = $container->getDefinition('session_listener')->getArgument(0);
-            $locator->setValues($locator->getValues() + [
-                'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-                'request_stack' => new Reference('request_stack'),
-            ]);
+            if (null === $config['storage_factory_id']) {
+                $locator = $container->getDefinition('session_listener')->getArgument(0);
+                $locator->setValues($locator->getValues() + [
+                    'session_storage' => new Reference('session.storage', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                    'request_stack' => new Reference('request_stack'),
+                ]);
+            } else {
+                $container->getDefinition('session.storage.factory.native')->replaceArgument(3, true);
+                $container->getDefinition('session.storage.factory.php_bridge')->replaceArgument(2, true);
+            }
         }
 
         $container->setParameter('session.storage.options', $options);
@@ -1033,8 +1079,14 @@ class FrameworkExtension extends Extension
         // session handler (the internal callback registered with PHP session management)
         if (null === $config['handler_id']) {
             // Set the handler class to be null
-            $container->getDefinition('session.storage.native')->replaceArgument(1, null);
-            $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+            if ($container->hasDefinition('session.storage.native')) {
+                $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+                $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
+            } else {
+                $container->getDefinition('session.storage.factory.native')->replaceArgument(1, null);
+                $container->getDefinition('session.storage.factory.php_bridge')->replaceArgument(0, null);
+            }
+
             $container->setAlias('session.handler', 'session.handler.native_file');
         } else {
             $container->resolveEnvPlaceholders($config['handler_id'], null, $usedEnvs);
@@ -1079,7 +1131,6 @@ class FrameworkExtension extends Extension
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
-        $namedPackages = [];
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
@@ -1093,15 +1144,11 @@ class FrameworkExtension extends Extension
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 
-            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
+            $packageDefinition = $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version)
+                ->addTag('assets.package', ['package' => $name]);
+            $container->setDefinition('assets._package_'.$name, $packageDefinition);
             $container->registerAliasForArgument('assets._package_'.$name, PackageInterface::class, $name.'.package');
-            $namedPackages[$name] = new Reference('assets._package_'.$name);
         }
-
-        $container->getDefinition('assets.packages')
-            ->replaceArgument(0, new Reference('assets._default_package'))
-            ->replaceArgument(1, $namedPackages)
-        ;
     }
 
     /**
@@ -1227,24 +1274,26 @@ class FrameworkExtension extends Extension
         // Register translation resources
         if ($dirs) {
             $files = [];
-            $finder = Finder::create()
-                ->followLinks()
-                ->files()
-                ->filter(function (\SplFileInfo $file) {
-                    return 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                })
-                ->in($dirs)
-                ->sortByName()
-            ;
 
-            foreach ($finder as $file) {
-                $fileNameParts = explode('.', basename($file));
-                $locale = $fileNameParts[\count($fileNameParts) - 2];
-                if (!isset($files[$locale])) {
-                    $files[$locale] = [];
+            foreach ($dirs as $dir) {
+                $finder = Finder::create()
+                    ->followLinks()
+                    ->files()
+                    ->filter(function (\SplFileInfo $file) {
+                        return 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                    })
+                    ->in($dir)
+                    ->sortByName()
+                ;
+                foreach ($finder as $file) {
+                    $fileNameParts = explode('.', basename($file));
+                    $locale = $fileNameParts[\count($fileNameParts) - 2];
+                    if (!isset($files[$locale])) {
+                        $files[$locale] = [];
+                    }
+
+                    $files[$locale][] = (string) $file;
                 }
-
-                $files[$locale][] = (string) $file;
             }
 
             $projectDir = $container->getParameter('kernel.project_dir');
@@ -1448,8 +1497,8 @@ class FrameworkExtension extends Extension
                 }
 
                 $container
-                    ->getDefinition('annotations.filesystem_cache')
-                    ->replaceArgument(0, $cacheDir)
+                    ->getDefinition('annotations.filesystem_cache_adapter')
+                    ->replaceArgument(2, $cacheDir)
                 ;
 
                 $cacheService = 'annotations.filesystem_cache';
@@ -2236,6 +2285,7 @@ class FrameworkExtension extends Extension
             AllMySmsTransportFactory::class => 'notifier.transport_factory.allmysms',
             FirebaseTransportFactory::class => 'notifier.transport_factory.firebase',
             FreeMobileTransportFactory::class => 'notifier.transport_factory.freemobile',
+            SpotHitTransportFactory::class => 'notifier.transport_factory.spothit',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             SinchTransportFactory::class => 'notifier.transport_factory.sinch',
             ZulipTransportFactory::class => 'notifier.transport_factory.zulip',
@@ -2249,6 +2299,7 @@ class FrameworkExtension extends Extension
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             GitterTransportFactory::class => 'notifier.transport_factory.gitter',
+            ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
         ];
 
         foreach ($classToServices as $class => $service) {
@@ -2312,6 +2363,27 @@ class FrameworkExtension extends Extension
         $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
     }
 
+    private function registerUidConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
+    {
+        $loader->load('uid.php');
+
+        $container->getDefinition('uuid.factory')
+            ->setArguments([
+                $config['default_uuid_version'],
+                $config['time_based_uuid_version'],
+                $config['name_based_uuid_version'],
+                UuidV4::class,
+                $config['time_based_uuid_node'] ?? null,
+                $config['name_based_uuid_namespace'] ?? null,
+            ])
+        ;
+
+        if (isset($config['name_based_uuid_namespace'])) {
+            $container->getDefinition('name_based_uuid.factory')
+                ->setArguments([$config['name_based_uuid_namespace']]);
+        }
+    }
+
     private function resolveTrustedHeaders(array $headers): int
     {
         $trustedHeaders = 0;
@@ -2323,6 +2395,7 @@ class FrameworkExtension extends Extension
                 case 'x-forwarded-host': $trustedHeaders |= Request::HEADER_X_FORWARDED_HOST; break;
                 case 'x-forwarded-proto': $trustedHeaders |= Request::HEADER_X_FORWARDED_PROTO; break;
                 case 'x-forwarded-port': $trustedHeaders |= Request::HEADER_X_FORWARDED_PORT; break;
+                case 'x-forwarded-prefix': $trustedHeaders |= Request::HEADER_X_FORWARDED_PREFIX; break;
             }
         }
 

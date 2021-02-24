@@ -4,13 +4,15 @@ CHANGELOG
 5.3
 ---
 
- * deprecated `DoctrineTestHelper` and `TestRepositoryFactory`
+ * Deprecate `DoctrineTestHelper` and `TestRepositoryFactory`
+ * [BC BREAK] Remove `UuidV*Generator` classes
+ * Add `UuidGenerator`
 
 5.2.0
 -----
 
  * added support for symfony/uid as `UlidType` and `UuidType` as Doctrine types
- * added `UlidGenerator`, `UUidV1Generator`, `UuidV4Generator` and `UuidV6Generator`
+ * added `UlidGenerator`, `UuidV1Generator`, `UuidV4Generator` and `UuidV6Generator`
 
 5.0.0
 -----

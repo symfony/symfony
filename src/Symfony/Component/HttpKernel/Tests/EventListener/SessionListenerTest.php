@@ -35,7 +35,7 @@ class SessionListenerTest extends TestCase
     public function testOnlyTriggeredOnMasterRequest()
     {
         $listener = $this->getMockForAbstractClass(AbstractSessionListener::class);
-        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(RequestEvent::class);
         $event->expects($this->once())->method('isMasterRequest')->willReturn(false);
         $event->expects($this->never())->method('getRequest');
 
@@ -45,12 +45,12 @@ class SessionListenerTest extends TestCase
 
     public function testSessionIsSet()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
+        $requestStack = $this->createMock(RequestStack::class);
         $requestStack->expects($this->once())->method('getMasterRequest')->willReturn(null);
 
-        $sessionStorage = $this->getMockBuilder(NativeSessionStorage::class)->getMock();
+        $sessionStorage = $this->createMock(NativeSessionStorage::class);
         $sessionStorage->expects($this->never())->method('setOptions')->with(['cookie_secure' => true]);
 
         $container = new Container();
@@ -61,7 +61,7 @@ class SessionListenerTest extends TestCase
         $request = new Request();
         $listener = new SessionListener($container);
 
-        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(RequestEvent::class);
         $event->expects($this->once())->method('isMasterRequest')->willReturn(true);
         $event->expects($this->once())->method('getRequest')->willReturn($request);
 
@@ -73,14 +73,14 @@ class SessionListenerTest extends TestCase
 
     public function testResponseIsPrivateIfSessionStarted()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
@@ -98,14 +98,14 @@ class SessionListenerTest extends TestCase
 
     public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
@@ -125,7 +125,7 @@ class SessionListenerTest extends TestCase
 
     public function testUninitializedSession()
     {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
         $response = new Response();
         $response->setSharedMaxAge(60);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
@@ -146,7 +146,7 @@ class SessionListenerTest extends TestCase
 
     public function testSurrogateMasterRequestIsPublic()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(4))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1, 1, 1));
 
         $container = new Container();
@@ -154,7 +154,7 @@ class SessionListenerTest extends TestCase
         $container->set('session', $session);
 
         $listener = new SessionListener($container);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $response = new Response();
@@ -185,9 +185,9 @@ class SessionListenerTest extends TestCase
 
     public function testGetSessionIsCalledOnce()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
-        $sessionStorage = $this->getMockBuilder(NativeSessionStorage::class)->getMock();
-        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $session = $this->createMock(Session::class);
+        $sessionStorage = $this->createMock(NativeSessionStorage::class);
+        $kernel = $this->createMock(KernelInterface::class);
 
         $sessionStorage->expects($this->once())
             ->method('setOptions')
@@ -217,14 +217,14 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageExceptionIfStatelessAndSessionUsed()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
         $container = new Container();
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -236,10 +236,10 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageLogIfStatelessAndSessionUsed()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->disableOriginalConstructor()->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(1))->method('warning');
 
         $container = new Container();
@@ -247,7 +247,7 @@ class SessionListenerTest extends TestCase
         $container->set('logger', $logger);
 
         $listener = new SessionListener($container, false);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -258,7 +258,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(2))->method('getUsageIndex')->will($this->onConsecutiveCalls(0, 1));
         $session->expects($this->exactly(1))->method('save');
@@ -267,7 +267,7 @@ class SessionListenerTest extends TestCase
         $container->set('initialized_session', $session);
 
         $listener = new SessionListener($container, true);
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $request = new Request();
         $request->attributes->set('_stateless', true);
@@ -281,7 +281,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenDebugAndStateless()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(1))->method('save');
 
@@ -308,7 +308,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenNoDebug()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->exactly(0))->method('save');
 
@@ -331,7 +331,7 @@ class SessionListenerTest extends TestCase
 
     public function testSessionUsageCallbackWhenNoStateless()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
         $session->expects($this->never())->method('save');
 

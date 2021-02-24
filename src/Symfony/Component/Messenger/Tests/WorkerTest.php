@@ -21,12 +21,14 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -45,7 +47,7 @@ class WorkerTest extends TestCase
             [new Envelope($apiMessage), new Envelope($ipaMessage)],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $bus->expects($this->exactly(2))
             ->method('dispatch')
@@ -73,7 +75,7 @@ class WorkerTest extends TestCase
             [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willThrowException(new \InvalidArgumentException('Why not'));
 
         $dispatcher = new EventDispatcher();
@@ -92,7 +94,7 @@ class WorkerTest extends TestCase
             null,
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->never())->method('dispatch');
 
         $dispatcher = new EventDispatcher();
@@ -109,10 +111,10 @@ class WorkerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
         $receiver = new DummyReceiver([[$envelope]]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturn($envelope);
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
@@ -139,11 +141,11 @@ class WorkerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('Hello'));
         $receiver = new DummyReceiver([[$envelope]]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $exception = new \InvalidArgumentException('Oh no!');
         $bus->method('dispatch')->willThrowException($exception);
 
-        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $eventDispatcher->expects($this->exactly(5))
             ->method('dispatch')
@@ -178,7 +180,7 @@ class WorkerTest extends TestCase
             [new Envelope($apiMessage)],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(5));
@@ -230,7 +232,7 @@ class WorkerTest extends TestCase
             [$envelope6],
         ]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
 
         $processedEnvelopes = [];
         $dispatcher = new EventDispatcher();
@@ -245,12 +247,47 @@ class WorkerTest extends TestCase
         $this->assertSame([$envelope1, $envelope2, $envelope3, $envelope4, $envelope5, $envelope6], $processedEnvelopes);
     }
 
+    public function testWorkerLimitQueues()
+    {
+        $envelope = [new Envelope(new DummyMessage('message1'))];
+        $receiver = $this->createMock(QueueReceiverInterface::class);
+        $receiver->expects($this->once())
+            ->method('getFromQueues')
+            ->with(['foo'])
+            ->willReturn($envelope)
+        ;
+        $receiver->expects($this->never())
+            ->method('get')
+        ;
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher);
+        $worker->run(['queues' => ['foo']]);
+    }
+
+    public function testWorkerLimitQueuesUnsupported()
+    {
+        $receiver1 = $this->createMock(QueueReceiverInterface::class);
+        $receiver2 = $this->createMock(ReceiverInterface::class);
+
+        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+
+        $worker = new Worker(['transport1' => $receiver1, 'transport2' => $receiver2], $bus);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Receiver for "transport2" does not implement "%s".', QueueReceiverInterface::class));
+        $worker->run(['queues' => ['foo']]);
+    }
+
     public function testWorkerMessageReceivedEventMutability()
     {
         $envelope = new Envelope(new DummyMessage('Hello'));
         $receiver = new DummyReceiver([[$envelope]]);
 
-        $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
+        $bus = $this->createMock(MessageBusInterface::class);
         $bus->method('dispatch')->willReturnArgument(0);
 
         $eventDispatcher = new EventDispatcher();

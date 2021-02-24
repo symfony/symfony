@@ -221,7 +221,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('User Provider'),
                 abstract_arg('User Checker'),
                 abstract_arg('Provider-shared Key'),
-                service('security.encoder_factory'),
+                service('security.password_hasher_factory'),
                 param('security.authentication.hide_user_not_found'),
             ])
 

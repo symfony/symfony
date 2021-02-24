@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCre
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * This listeners uses the interfaces of authenticators to
@@ -31,18 +32,25 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 class CheckCredentialsListener implements EventSubscriberInterface
 {
-    private $encoderFactory;
+    private $hasherFactory;
 
-    public function __construct(EncoderFactoryInterface $encoderFactory)
+    /**
+     * @param PasswordHasherFactoryInterface $hasherFactory
+     */
+    public function __construct($hasherFactory)
     {
-        $this->encoderFactory = $encoderFactory;
+        if ($hasherFactory instanceof EncoderFactoryInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', EncoderFactoryInterface::class, __CLASS__, PasswordHasherFactoryInterface::class);
+        }
+
+        $this->hasherFactory = $hasherFactory;
     }
 
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
         if ($passport instanceof UserPassportInterface && $passport->hasBadge(PasswordCredentials::class)) {
-            // Use the password encoder to validate the credentials
+            // Use the password hasher to validate the credentials
             $user = $passport->getUser();
             /** @var PasswordCredentials $badge */
             $badge = $passport->getBadge(PasswordCredentials::class);
@@ -60,8 +68,15 @@ class CheckCredentialsListener implements EventSubscriberInterface
                 throw new BadCredentialsException('The presented password is invalid.');
             }
 
-            if (!$this->encoderFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
-                throw new BadCredentialsException('The presented password is invalid.');
+            // @deprecated since Symfony 5.3
+            if ($this->hasherFactory instanceof EncoderFactoryInterface) {
+                if (!$this->hasherFactory->getEncoder($user)->isPasswordValid($user->getPassword(), $presentedPassword, $user->getSalt())) {
+                    throw new BadCredentialsException('The presented password is invalid.');
+                }
+            } else {
+                if (!$this->hasherFactory->getPasswordHasher($user)->verify($user->getPassword(), $presentedPassword, $user->getSalt())) {
+                    throw new BadCredentialsException('The presented password is invalid.');
+                }
             }
 
             $badge->markResolved();

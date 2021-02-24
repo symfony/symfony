@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
@@ -65,7 +66,7 @@ class DebugCommandTest extends TestCase
 
     public function testMalformedTemplateName()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Malformed namespaced template name "@foo" (expecting "@namespace/template_name").');
         $this->createCommandTester()->execute(['name' => '@foo']);
     }

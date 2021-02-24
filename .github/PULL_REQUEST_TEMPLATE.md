@@ -1,6 +1,6 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | 5.x for features / 4.4, 5.1 or 5.2 for bug fixes <!-- see below -->
+| Branch?       | 5.x for features / 4.4 or 5.2 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
 | New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
@@ -17,4 +17,5 @@ Additionally (see https://symfony.com/releases):
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
  - Features and deprecations must be submitted against branch 5.x.
+ - Changelog entry should follow https://symfony.com/doc/current/contributing/code/conventions.html#writing-a-changelog-entry
 -->

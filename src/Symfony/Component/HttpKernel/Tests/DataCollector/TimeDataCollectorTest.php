@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -43,7 +44,7 @@ class TimeDataCollectorTest extends TestCase
         $c->collect($request, new Response());
         $this->assertEquals(0, $c->getStartTime());
 
-        $kernel = $this->getMockBuilder(\Symfony\Component\HttpKernel\KernelInterface::class)->getMock();
+        $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('getStartTime')->willReturn(123456.0);
 
         $c = new TimeDataCollector($kernel);

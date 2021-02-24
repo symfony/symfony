@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests;
 
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase
@@ -922,7 +923,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testInWithNonExistentDirectory()
     {
-        $this->expectException(\Symfony\Component\Finder\Exception\DirectoryNotFoundException::class);
+        $this->expectException(DirectoryNotFoundException::class);
         $finder = new Finder();
         $finder->in('foobar');
     }
@@ -1115,6 +1116,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder1 = Finder::create()->append($finder);
 
         $this->assertIterator(iterator_to_array($finder->getIterator()), $finder1->getIterator());
+    }
+
+    public function testMultipleAppendCallsWithSorting()
+    {
+        $finder = $this->buildFinder()
+            ->sortByName()
+            ->append([self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_1000_1.php'])
+            ->append([self::$tmpDir.\DIRECTORY_SEPARATOR.'qux_1002_0.php'])
+        ;
+
+        $this->assertOrderedIterator($this->toAbsolute(['qux_1000_1.php', 'qux_1002_0.php']), $finder->getIterator());
     }
 
     public function testCountDirectories()

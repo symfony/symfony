@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard\Provider;
 
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -42,19 +43,24 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private $userProvider;
     private $providerKey;
     private $userChecker;
-    private $passwordEncoder;
+    private $passwordHasher;
 
     /**
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
      * @param string                            $providerKey         The provider (i.e. firewall) key
+     * @param UserPasswordHasherInterface       $passwordHasher
      */
-    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, UserPasswordEncoderInterface $passwordEncoder = null)
+    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker, $passwordHasher = null)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
         $this->userChecker = $userChecker;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
+
+        if ($passwordHasher instanceof UserPasswordEncoderInterface) {
+            trigger_deprecation('symfony/security-core', '5.3', sprintf('Passing a "%s" instance to the "%s" constructor is deprecated, use "%s" instead.', UserPasswordEncoderInterface::class, __CLASS__, UserPasswordHasherInterface::class));
+        }
     }
 
     /**
@@ -123,8 +129,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
             throw new BadCredentialsException(sprintf('Authentication failed because "%s::checkCredentials()" did not return true.', get_debug_type($guardAuthenticator)));
         }
-        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordEncoder && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && method_exists($this->passwordEncoder, 'needsRehash') && $this->passwordEncoder->needsRehash($user)) {
-            $this->userProvider->upgradePassword($user, $this->passwordEncoder->encodePassword($user, $password));
+        if ($this->userProvider instanceof PasswordUpgraderInterface && $guardAuthenticator instanceof PasswordAuthenticatedInterface && null !== $this->passwordHasher && (null !== $password = $guardAuthenticator->getPassword($token->getCredentials())) && $this->passwordHasher->needsRehash($user)) {
+            if ($this->passwordHasher instanceof UserPasswordEncoderInterface) {
+                // @deprecated since Symfony 5.3
+                $this->userProvider->upgradePassword($user, $this->passwordHasher->encodePassword($user, $password));
+            } else {
+                $this->userProvider->upgradePassword($user, $this->passwordHasher->hashPassword($user, $password));
+            }
         }
         $this->userChecker->checkPostAuth($user);
 

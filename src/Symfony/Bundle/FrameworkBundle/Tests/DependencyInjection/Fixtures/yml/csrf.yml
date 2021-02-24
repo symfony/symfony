@@ -3,4 +3,5 @@ framework:
     csrf_protection: ~
     form:
         legacy_error_messages: false
-    session: ~
+    session:
+        storage_factory_id: session.storage.factory.native

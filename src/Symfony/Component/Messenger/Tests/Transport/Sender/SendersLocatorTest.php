@@ -23,7 +23,7 @@ class SendersLocatorTest extends TestCase
 {
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'my_sender' => $sender,
         ]);

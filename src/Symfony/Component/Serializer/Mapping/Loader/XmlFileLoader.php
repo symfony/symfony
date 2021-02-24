@@ -74,6 +74,25 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['ignore'])) {
                     $attributeMetadata->setIgnore((bool) $attribute['ignore']);
                 }
+
+                foreach ($attribute->context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->normalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setNormalizationContextForGroups($context, $groups);
+                }
+
+                foreach ($attribute->denormalization_context as $node) {
+                    $groups = (array) $node->group;
+                    $context = $this->parseContext($node->entry);
+                    $attributeMetadata->setDenormalizationContextForGroups($context, $groups);
+                }
             }
 
             if (isset($xml->{'discriminator-map'})) {
@@ -110,7 +129,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML File.
+     * Parses an XML File.
      *
      * @throws MappingException
      */
@@ -135,5 +154,30 @@ class XmlFileLoader extends FileLoader
         }
 
         return $classes;
+    }
+
+    private function parseContext(\SimpleXMLElement $nodes): array
+    {
+        $context = [];
+
+        foreach ($nodes as $node) {
+            if (\count($node) > 0) {
+                if (\count($node->entry) > 0) {
+                    $value = $this->parseContext($node->entry);
+                } else {
+                    $value = [];
+                }
+            } else {
+                $value = XmlUtils::phpize($node);
+            }
+
+            if (isset($node['name'])) {
+                $context[(string) $node['name']] = $value;
+            } else {
+                $context[] = $value;
+            }
+        }
+
+        return $context;
     }
 }

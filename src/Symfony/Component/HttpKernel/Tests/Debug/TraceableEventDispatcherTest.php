@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -110,9 +112,9 @@ class TraceableEventDispatcherTest extends TestCase
 
     protected function getHttpKernel($dispatcher, $controller)
     {
-        $controllerResolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ControllerResolverInterface::class)->getMock();
+        $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         $controllerResolver->expects($this->once())->method('getController')->willReturn($controller);
-        $argumentResolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class)->getMock();
+        $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 
         return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);

@@ -20,13 +20,14 @@
         "symfony/event-dispatcher-contracts": "^1.1|^2",
         "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.1.6|^2",
-        "symfony/deprecation-contracts": "^2.1"
+        "symfony/deprecation-contracts": "^2.1",
+        "symfony/password-hasher": "^5.3"
     },
     "require-dev": {
         "psr/container": "^1.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
-        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/http-foundation": "^5.3",
         "symfony/ldap": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/validator": "^5.2",
@@ -34,6 +35,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.4",
+        "symfony/http-foundation": "<5.3",
         "symfony/security-guard": "<4.4",
         "symfony/ldap": "<4.4",
         "symfony/validator": "<5.2"

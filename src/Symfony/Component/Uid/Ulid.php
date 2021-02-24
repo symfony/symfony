@@ -16,8 +16,6 @@ namespace Symfony\Component\Uid;
  *
  * @see https://github.com/ulid/spec
  *
- * @experimental in 5.3
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class Ulid extends AbstractUid
@@ -28,7 +26,7 @@ class Ulid extends AbstractUid
     public function __construct(string $ulid = null)
     {
         if (null === $ulid) {
-            $this->uid = self::generate();
+            $this->uid = static::generate();
 
             return;
         }
@@ -79,7 +77,7 @@ class Ulid extends AbstractUid
             base_convert(substr($ulid, 27, 5), 16, 32)
         );
 
-        return new self(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
+        return new static(strtr($ulid, 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ'));
     }
 
     public function toBinary(): string
@@ -104,30 +102,47 @@ class Ulid extends AbstractUid
         return $this->uid;
     }
 
-    /**
-     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
-     */
-    public function getTime(): float
+    public function getDateTime(): \DateTimeImmutable
     {
         $time = strtr(substr($this->uid, 0, 10), 'ABCDEFGHJKMNPQRSTVWXYZ', 'abcdefghijklmnopqrstuv');
 
         if (\PHP_INT_SIZE >= 8) {
-            return hexdec(base_convert($time, 32, 16)) / 1000;
+            $time = (string) hexdec(base_convert($time, 32, 16));
+        } else {
+            $time = sprintf('%02s%05s%05s',
+                base_convert(substr($time, 0, 2), 32, 16),
+                base_convert(substr($time, 2, 4), 32, 16),
+                base_convert(substr($time, 6, 4), 32, 16)
+            );
+            $time = BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10);
         }
 
-        $time = sprintf('%02s%05s%05s',
-            base_convert(substr($time, 0, 2), 32, 16),
-            base_convert(substr($time, 2, 4), 32, 16),
-            base_convert(substr($time, 6, 4), 32, 16)
-        );
+        if (4 > \strlen($time)) {
+            $time = str_pad($time, 4, '0', \STR_PAD_LEFT);
+        }
 
-        return BinaryUtil::toBase(hex2bin($time), BinaryUtil::BASE10) / 1000;
+        return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
-    private static function generate(): string
+    public static function generate(\DateTimeInterface $time = null): string
     {
-        $time = microtime(false);
-        $time = substr($time, 11).substr($time, 2, 3);
+        if (null === $time) {
+            return self::doGenerate();
+        }
+
+        if (0 > $time = substr($time->format('Uu'), 0, -3)) {
+            throw new \InvalidArgumentException('The timestamp must be positive.');
+        }
+
+        return self::doGenerate($time);
+    }
+
+    private static function doGenerate(string $mtime = null): string
+    {
+        if (null === $time = $mtime) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        }
 
         if ($time !== self::$time) {
             $r = unpack('nr1/nr2/nr3/nr4/nr', random_bytes(10));
@@ -139,9 +154,13 @@ class Ulid extends AbstractUid
             self::$rand = array_values($r);
             self::$time = $time;
         } elseif ([0xFFFFF, 0xFFFFF, 0xFFFFF, 0xFFFFF] === self::$rand) {
-            usleep(100);
+            if (null === $mtime) {
+                usleep(100);
+            } else {
+                self::$rand = [0, 0, 0, 0];
+            }
 
-            return self::generate();
+            return self::doGenerate($mtime);
         } else {
             for ($i = 3; $i >= 0 && 0xFFFFF === self::$rand[$i]; --$i) {
                 self::$rand[$i] = 0;
@@ -153,7 +172,7 @@ class Ulid extends AbstractUid
         if (\PHP_INT_SIZE >= 8) {
             $time = base_convert($time, 10, 32);
         } else {
-            $time = bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10));
+            $time = str_pad(bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10)), 12, '0', \STR_PAD_LEFT);
             $time = sprintf('%s%04s%04s',
                 base_convert(substr($time, 0, 2), 16, 32),
                 base_convert(substr($time, 2, 5), 16, 32),

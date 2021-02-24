@@ -534,7 +534,7 @@ class DebugClassLoader
             if (null !== (self::INTERNAL_TYPES[$use] ?? null)) {
                 foreach (self::INTERNAL_TYPES[$use] as $method => $returnType) {
                     if ('void' !== $returnType) {
-                        self::$returnTypes[$class] += [$method => [$returnType, $returnType, $class, '']];
+                        self::$returnTypes[$class] += [$method => [$returnType, $returnType, $use, '']];
                     }
                 }
             }
@@ -611,7 +611,7 @@ class DebugClassLoader
                     $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                 }
 
-                if (strncmp($ns, $declaringClass, $len)) {
+                if (false === strpos($doc, '* @deprecated') && strncmp($ns, $declaringClass, $len)) {
                     if ($canAddReturnType && 'docblock' === $this->patchTypes['force'] && false === strpos($method->getFileName(), \DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR)) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {

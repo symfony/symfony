@@ -17,6 +17,7 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\FormTypeInterface;
@@ -38,7 +39,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->decoratedFactory = $this->getMockBuilder(\Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface::class)->getMock();
+        $this->decoratedFactory = $this->createMock(ChoiceListFactoryInterface::class);
         $this->factory = new CachingFactoryDecorator($this->decoratedFactory);
     }
 
@@ -238,7 +239,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderSameLoader()
     {
-        $loader = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $list = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
 
@@ -269,8 +270,8 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderDifferentLoader()
     {
-        $loader1 = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
-        $loader2 = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader1 = $this->createMock(ChoiceLoaderInterface::class);
+        $loader2 = $this->createMock(ChoiceLoaderInterface::class);
         $list1 = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
 
@@ -288,7 +289,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderSameValueClosure()
     {
-        $loader = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $type = $this->createMock(FormTypeInterface::class);
         $list = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
@@ -328,7 +329,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderDifferentValueClosure()
     {
-        $loader = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $type = $this->createMock(FormTypeInterface::class);
         $list1 = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
@@ -349,7 +350,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderSameFilterClosure()
     {
-        $loader = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $type = $this->createMock(FormTypeInterface::class);
         $list = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
@@ -391,7 +392,7 @@ class CachingFactoryDecoratorTest extends TestCase
 
     public function testCreateFromLoaderDifferentFilterClosure()
     {
-        $loader = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
         $type = $this->createMock(FormTypeInterface::class);
         $list1 = new ArrayChoiceList([]);
         $list2 = new ArrayChoiceList([]);
@@ -413,7 +414,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSamePreferredChoices()
     {
         $preferred = ['a'];
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -447,7 +448,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $preferred1 = ['a'];
         $preferred2 = ['b'];
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -466,7 +467,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSamePreferredChoicesClosure()
     {
         $preferred = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -500,7 +501,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $preferred1 = function () {};
         $preferred2 = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -519,7 +520,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSameLabelClosure()
     {
         $labels = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -553,7 +554,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $labels1 = function () {};
         $labels2 = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -572,7 +573,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSameIndexClosure()
     {
         $index = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -606,7 +607,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $index1 = function () {};
         $index2 = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -625,7 +626,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSameGroupByClosure()
     {
         $groupBy = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -659,7 +660,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $groupBy1 = function () {};
         $groupBy2 = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -678,7 +679,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSameAttributes()
     {
         $attr = ['class' => 'foobar'];
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -711,7 +712,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $attr1 = ['class' => 'foobar1'];
         $attr2 = ['class' => 'foobar2'];
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -730,7 +731,7 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateViewSameAttributesClosure()
     {
         $attr = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view = new ChoiceListView();
         $view2 = new ChoiceListView();
 
@@ -763,7 +764,7 @@ class CachingFactoryDecoratorTest extends TestCase
     {
         $attr1 = function () {};
         $attr2 = function () {};
-        $list = $this->getMockBuilder(ChoiceListInterface::class)->getMock();
+        $list = $this->createMock(ChoiceListInterface::class);
         $view1 = new ChoiceListView();
         $view2 = new ChoiceListView();
 

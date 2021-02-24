@@ -13,7 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @group legacy
+ */
 class Pbkdf2PasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()
@@ -44,7 +48,7 @@ class Pbkdf2PasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $encoder = new Pbkdf2PasswordEncoder('foobar');
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

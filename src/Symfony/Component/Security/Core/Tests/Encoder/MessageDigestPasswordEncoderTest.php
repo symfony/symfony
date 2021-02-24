@@ -13,7 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @group legacy
+ */
 class MessageDigestPasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()
@@ -44,7 +48,7 @@ class MessageDigestPasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $encoder = new MessageDigestPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

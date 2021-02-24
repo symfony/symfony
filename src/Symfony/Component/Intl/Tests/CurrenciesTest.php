@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests;
 
 use Symfony\Component\Intl\Currencies;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 
 /**
  * @group intl-data
@@ -20,7 +21,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $currencies = [
+    private const CURRENCIES = [
         'ADP',
         'AED',
         'AFA',
@@ -313,7 +314,7 @@ class CurrenciesTest extends ResourceBundleTestCase
         'ZWR',
     ];
 
-    private static $alpha3ToNumeric = [
+    private const ALPHA3_TO_NUMERIC = [
         'AFA' => 4,
         'ALK' => 8,
         'ALL' => 8,
@@ -586,7 +587,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testGetCurrencyCodes()
     {
-        $this->assertSame(self::$currencies, Currencies::getCurrencyCodes());
+        $this->assertSame(self::CURRENCIES, Currencies::getCurrencyCodes());
     }
 
     /**
@@ -600,7 +601,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
         sort($keys);
 
-        $this->assertSame(self::$currencies, $keys);
+        $this->assertSame(self::CURRENCIES, $keys);
 
         // Names should be sorted
         $sortedNames = $names;
@@ -673,7 +674,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         return array_map(
             function ($currency) { return [$currency]; },
-            self::$currencies
+            self::CURRENCIES
         );
     }
 
@@ -700,7 +701,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_keys(self::$alpha3ToNumeric)
+            array_keys(self::ALPHA3_TO_NUMERIC)
         );
     }
 
@@ -709,14 +710,14 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNumericCode($currency)
     {
-        $this->assertSame(self::$alpha3ToNumeric[$currency], Currencies::getNumericCode($currency));
+        $this->assertSame(self::ALPHA3_TO_NUMERIC[$currency], Currencies::getNumericCode($currency));
     }
 
     public function provideCurrenciesWithoutNumericEquivalent()
     {
         return array_map(
             function ($value) { return [$value]; },
-            array_diff(self::$currencies, array_keys(self::$alpha3ToNumeric))
+            array_diff(self::CURRENCIES, array_keys(self::ALPHA3_TO_NUMERIC))
         );
     }
 
@@ -725,7 +726,7 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         Currencies::getNumericCode($currency);
     }
 
@@ -770,13 +771,13 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testForNumericCodeFailsIfInvalidNumericCode($currency)
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         Currencies::forNumericCode($currency);
     }
 
     public function testGetNameWithInvalidCurrencyCode()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         Currencies::getName('foo');
     }
 
@@ -790,7 +791,7 @@ class CurrenciesTest extends ResourceBundleTestCase
     {
         $numericToAlpha3 = [];
 
-        foreach (self::$alpha3ToNumeric as $alpha3 => $numeric) {
+        foreach (self::ALPHA3_TO_NUMERIC as $alpha3 => $numeric) {
             if (!isset($numericToAlpha3[$numeric])) {
                 $numericToAlpha3[$numeric] = [];
             }

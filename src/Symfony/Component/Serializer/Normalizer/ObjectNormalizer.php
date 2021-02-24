@@ -110,8 +110,20 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $checkPropertyInitialization = \PHP_VERSION_ID >= 70400;
 
         // properties
-        foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-            if ($checkPropertyInitialization && !$reflProperty->isInitialized($object)) {
+        foreach ($reflClass->getProperties() as $reflProperty) {
+            $isPublic = $reflProperty->isPublic();
+
+            if ($checkPropertyInitialization) {
+                if (!$isPublic) {
+                    $reflProperty->setAccessible(true);
+                }
+                if (!$reflProperty->isInitialized($object)) {
+                    unset($attributes[$reflProperty->name]);
+                    continue;
+                }
+            }
+
+            if (!$isPublic) {
                 continue;
             }
 

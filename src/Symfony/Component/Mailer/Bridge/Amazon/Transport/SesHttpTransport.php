@@ -77,6 +77,11 @@ class SesHttpTransport extends AbstractHttpTransport
             $request['body']['ConfigurationSetName'] = $configurationSetHeader->getBodyAsString();
         }
 
+        if ($message->getOriginalMessage() instanceof Message
+            && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
+            $request['body']['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
+        }
+
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint(), $request);
 
         $result = new \SimpleXMLElement($response->getContent(false));

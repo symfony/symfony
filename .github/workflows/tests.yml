@@ -89,7 +89,7 @@ jobs:
                 env:
                     KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
                     KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
-                    KAFKA_ADVERTISED_HOST_NAME: localhost
+                    KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
                     KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
                     KAFKA_ADVERTISED_PORT: 9092
 
@@ -137,8 +137,9 @@ jobs:
             -   name: Configure composer
                 run: |
                     COMPOSER_HOME="$(composer config home)"
+                    composer self-update
                     ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-                    echo "COMPOSER_ROOT_VERSION=$(grep branch-version composer.json | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+                    echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
             -   name: Determine composer cache directory
                 id: composer-cache
@@ -176,7 +177,7 @@ jobs:
                     LDAP_HOST: localhost
                     LDAP_PORT: 3389
                     MONGODB_HOST: localhost
-                    KAFKA_BROKER: localhost:9092
+                    KAFKA_BROKER: 127.0.0.1:9092
                     POSTGRES_HOST: localhost
 
             -   name: Run HTTP push tests

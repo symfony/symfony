@@ -4,31 +4,31 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class HttpBasicAuthenticatorTest extends TestCase
 {
     private $userProvider;
-    private $encoderFactory;
-    private $encoder;
+    private $hasherFactory;
+    private $hasher;
     private $authenticator;
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
-        $this->encoderFactory = $this->getMockBuilder(EncoderFactoryInterface::class)->getMock();
-        $this->encoder = $this->getMockBuilder(PasswordEncoderInterface::class)->getMock();
-        $this->encoderFactory
+        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $this->hasher = $this->createMock(PasswordHasherInterface::class);
+        $this->hasherFactory
             ->expects($this->any())
-            ->method('getEncoder')
-            ->willReturn($this->encoder);
+            ->method('getPasswordHasher')
+            ->willReturn($this->hasher);
 
         $this->authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
     }

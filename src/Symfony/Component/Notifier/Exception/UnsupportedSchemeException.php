@@ -68,6 +68,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
             'package' => 'symfony/free-mobile-notifier',
         ],
+        'spothit' => [
+            'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
+            'package' => 'symfony/spot-hit-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',
@@ -107,6 +111,10 @@ class UnsupportedSchemeException extends LogicException
         'gitter' => [
             'class' => Bridge\Gitter\GitterTransportFactory::class,
             'package' => 'symfony/gitter-notifier',
+        ],
+        'clickatell' => [
+            'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
+            'package' => 'symfony/clickatell-notifier',
         ],
     ];
 

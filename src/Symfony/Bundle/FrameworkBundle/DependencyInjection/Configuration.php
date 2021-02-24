@@ -34,6 +34,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow\WorkflowEvents;
@@ -97,7 +98,7 @@ class Configuration implements ConfigurationInterface
                     ->enumPrototype()
                         ->values([
                             'forwarded',
-                            'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port',
+                            'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix',
                         ])
                     ->end()
                 ->end()
@@ -136,6 +137,7 @@ class Configuration implements ConfigurationInterface
         $this->addSecretsSection($rootNode);
         $this->addNotifierSection($rootNode);
         $this->addRateLimiterSection($rootNode);
+        $this->addUidSection($rootNode);
 
         return $treeBuilder;
     }
@@ -598,8 +600,15 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('session')
                     ->info('session configuration')
                     ->canBeEnabled()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) {
+                            return \is_array($v) && isset($v['storage_id']) && isset($v['storage_factory_id']);
+                        })
+                        ->thenInvalid('You cannot use both "storage_id" and "storage_factory_id" at the same time under "framework.session"')
+                    ->end()
                     ->children()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
+                        ->scalarNode('storage_factory_id')->defaultNull()->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
                         ->scalarNode('name')
                             ->validate()
@@ -1463,7 +1472,7 @@ class Configuration implements ConfigurationInterface
                                     ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')
                                 ->end()
                                 ->booleanNode('verify_peer')
-                                    ->info('Indicates if the peer should be verified in a SSL/TLS context.')
+                                    ->info('Indicates if the peer should be verified in an SSL/TLS context.')
                                 ->end()
                                 ->booleanNode('verify_host')
                                     ->info('Indicates if the host should exist as a certificate common name.')
@@ -1606,7 +1615,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')
                                     ->end()
                                     ->booleanNode('verify_peer')
-                                        ->info('Indicates if the peer should be verified in a SSL/TLS context.')
+                                        ->info('Indicates if the peer should be verified in an SSL/TLS context.')
                                     ->end()
                                     ->booleanNode('verify_host')
                                         ->info('Indicates if the host should exist as a certificate common name.')
@@ -1885,6 +1894,39 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addUidSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('uid')
+                    ->info('Uid configuration')
+                    ->{class_exists(UuidFactory::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->enumNode('default_uuid_version')
+                            ->defaultValue(6)
+                            ->values([6, 4, 1])
+                        ->end()
+                        ->enumNode('name_based_uuid_version')
+                            ->defaultValue(5)
+                            ->values([5, 3])
+                        ->end()
+                        ->scalarNode('name_based_uuid_namespace')
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->enumNode('time_based_uuid_version')
+                            ->defaultValue(6)
+                            ->values([6, 1])
+                        ->end()
+                        ->scalarNode('time_based_uuid_node')
+                            ->cannotBeEmpty()
                         ->end()
                     ->end()
                 ->end()

@@ -143,7 +143,7 @@ final class Headers
      */
     public function addHeader(string $name, $argument, array $more = []): self
     {
-        $parts = explode('\\', self::HEADER_CLASS_MAP[$name] ?? UnstructuredHeader::class);
+        $parts = explode('\\', self::HEADER_CLASS_MAP[strtolower($name)] ?? UnstructuredHeader::class);
         $method = 'add'.ucfirst(array_pop($parts));
         if ('addUnstructuredHeader' === $method) {
             $method = 'addTextHeader';
@@ -217,7 +217,7 @@ final class Headers
 
     public static function isUniqueHeader(string $name): bool
     {
-        return \in_array($name, self::UNIQUE_HEADERS, true);
+        return \in_array(strtolower($name), self::UNIQUE_HEADERS, true);
     }
 
     /**

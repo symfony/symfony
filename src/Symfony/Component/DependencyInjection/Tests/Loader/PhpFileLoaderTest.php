@@ -17,6 +17,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
@@ -96,7 +97,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testFactoryShortNotationNotAllowed()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'factory\'), \'method\']" instead.');
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -135,6 +136,15 @@ class PhpFileLoaderTest extends TestCase
         $expected = $expected->inner;
         $expected->label = 'Z';
         $this->assertEquals($expected, $container->get('stack_d'));
+    }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
+        $loader->load('when-env.php');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 
     /**

@@ -35,7 +35,7 @@ final class MobytTransportFactory extends AbstractTransportFactory
         $accountSid = $this->getUser($dsn);
         $authToken = $this->getPassword($dsn);
         $from = $dsn->getRequiredOption('from');
-        $typeQuality = $dsn->getOption('type_quality', MobytOptions::MESSAGE_TYPE_QUALITY_LOW);
+        $typeQuality = $dsn->getOption('type_quality');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

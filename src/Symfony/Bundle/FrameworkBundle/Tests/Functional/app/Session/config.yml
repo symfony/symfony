@@ -9,3 +9,7 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\InjectedFlashbagSessionController:
         autowire: true
         tags: ['controller.service_arguments']
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\DeprecatedSessionController:
+        autowire: true
+        autoconfigure: true

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Tests\AbstractRequestHandlerTest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -23,13 +24,13 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {
     public function testRequestShouldNotBeNull()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'));
     }
 
     public function testRequestShouldBeInstanceOfRequest()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
     }
 

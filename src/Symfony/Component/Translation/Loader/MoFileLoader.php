@@ -19,19 +19,19 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 class MoFileLoader extends FileLoader
 {
     /**
-     * Magic used for validating the format of a MO file as well as
+     * Magic used for validating the format of an MO file as well as
      * detecting if the machine used to create that file was little endian.
      */
     public const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
 
     /**
-     * Magic used for validating the format of a MO file as well as
+     * Magic used for validating the format of an MO file as well as
      * detecting if the machine used to create that file was big endian.
      */
     public const MO_BIG_ENDIAN_MAGIC = 0xde120495;
 
     /**
-     * The size of the header of a MO file in bytes.
+     * The size of the header of an MO file in bytes.
      */
     public const MO_HEADER_SIZE = 28;
 

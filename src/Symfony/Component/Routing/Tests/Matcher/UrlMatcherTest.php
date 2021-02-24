@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -687,7 +688,7 @@ class UrlMatcherTest extends TestCase
 
     public function testNoConfiguration()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\NoConfigurationException::class);
+        $this->expectException(NoConfigurationException::class);
         $coll = new RouteCollection();
 
         $matcher = $this->getUrlMatcher($coll);

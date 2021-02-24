@@ -112,7 +112,7 @@ class FormLoginTest extends AbstractWebTestCase
      * @dataProvider provideInvalidCredentials
      * @group time-sensitive
      */
-    public function testLoginThrottling(string $username, string $password, int $attempt_index)
+    public function testLoginThrottling(string $username, string $password, int $attemptIndex)
     {
         if (!class_exists(LoginThrottlingListener::class)) {
             $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
@@ -126,16 +126,16 @@ class FormLoginTest extends AbstractWebTestCase
         $client->submit($form);
 
         $text = $client->followRedirect()->text(null, true);
-        if (1 === $attempt_index) {
+        if (1 === $attemptIndex) {
             // First attempt : Invalid credentials (OK)
             $this->assertStringMatchesFormat('%sInvalid credentials%s', $text);
-        } elseif (2 === $attempt_index) {
+        } elseif (2 === $attemptIndex) {
             // Second attempt : login throttling !
             $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in 8 minutes%s', $text);
-        } elseif (3 === $attempt_index) {
+        } elseif (3 === $attemptIndex) {
             // Third attempt with unexisting username
             $this->assertStringMatchesFormat('%sUsername could not be found.%s', $text);
-        } elseif (4 === $attempt_index) {
+        } elseif (4 === $attemptIndex) {
             // Fourth attempt : still login throttling !
             $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in 8 minutes%s', $text);
         }

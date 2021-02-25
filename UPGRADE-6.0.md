@@ -92,6 +92,8 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Remove `ArgumentInterface`
+ * Remove `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
 

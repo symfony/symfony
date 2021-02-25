@@ -43,6 +43,7 @@ class XliffFileDumperTest extends TestCase
             'foo' => 'bar',
             'key' => '',
             'key.with.cdata' => '<source> & <target>',
+            'translation.key.that.is.longer.than.eighty.characters.should.not.have.name.attribute' => 'value',
         ]);
         $catalogue->setMetadata('key', ['target-attributes' => ['order' => 1]]);
 

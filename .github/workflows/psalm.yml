@@ -68,9 +68,9 @@ jobs:
           cd base
           ./psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
 
-      - name: Copy baseline
+      - name: Copy baseline and cache
         run: |
-          cp base/.github/psalm/psalm.baseline.xml pr/.github/psalm/psalm.baseline.xml
+          cp -R base/.github/psalm pr/.github/psalm
 
       - name: Install dependencies for PR
         run: |
@@ -82,13 +82,6 @@ jobs:
             echo "::group::composer update"
             composer update --no-progress --ansi
             echo "::endgroup::"
-
-      - name: Cache Psalm
-        uses: actions/cache@v2
-        with:
-          path: pr/.github/psalm/cache/
-          key: psalm-${{ github.base_ref }}
-          restore-keys: psalm-
 
       - name: Psalm
         run: |

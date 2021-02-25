@@ -68,9 +68,8 @@ jobs:
           cd base
           ./psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
 
-      - name: Copy baseline and cache
-        run: |
-          cp -R base/.github/psalm pr/.github/psalm
+      - name: Copy baseline
+        run: cp base/.github/psalm/psalm.baseline.xml pr/.github/psalm/psalm.baseline.xml
 
       - name: Install dependencies for PR
         run: |

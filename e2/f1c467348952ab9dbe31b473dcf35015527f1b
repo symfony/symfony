@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-01-18T18:03:48Z
+
+See https://github.com/symfony/symfony/pull/36405 for previous discussion about that topic.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-19T08:47:15Z
+
+Still :-1: for me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-19T09:51:46Z
+
+The commands could be provided as a third party bundle.
+
+Alternatively, we could provide them in the source, but not register them as commands, so that ppl could enable them by adding a line in their `services.yaml` file:
+
+```yaml
+services:
+    Symfony\Component\Uid\Command\GenerateUlidCommand: ~
+```
+
+This approach could enable us to provide commands without cluttering the `list` command by default.
+
+WDYT @fabpot?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-19T10:50:04Z
+
+Sure, if they are hidden by default, no problems for me.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-01-19T12:28:36Z
+
+Unfortunately I did not know there was already another PR for that feature in the past. I still think it's an useful feature to offer. I have removed the commands registration in the FWB and fixed the other comments. I also changed the timestamp display to be in milliseconds. I still need to fix the tests.
+
+---------------------------------------------------------------------------
+
+by maxhelias at 2021-01-22T14:24:28Z
+
+Is it possible to have a format option (rfc, binary..) ?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-02-17T13:00:29Z
+
+I pushed a new implementation that leverages the new factories.
+
+@maxhelias I added a --format option to the generate commands.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-02-23T15:50:23Z
+
+> Sure, if they are hidden by default, no problems for me.
+
+arent we registering them as hidden? being able to default advertise `bin/console ..` seems reasonable
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-23T16:02:11Z
+
+> arent we registering them as hidden?
+
+Nope: we're *not registering* them by default, so that we'll ask ppl to opt-in to list them.

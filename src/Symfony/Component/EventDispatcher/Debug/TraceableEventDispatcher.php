@@ -150,8 +150,8 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $event = $eventName ?? new Event();
             $eventName = $swap;
 
-            if (!$event instanceof Event) {
-                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of "%s", "%s" given.', EventDispatcherInterface::class, Event::class, \is_object($event) ? \get_class($event) : \gettype($event)));
+            if (!$event instanceof Event && !$event instanceof ContractsEvent) {
+                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of "%s" or "%s", "%s" given.', EventDispatcherInterface::class, Event::class, ContractsEvent::class, \is_object($event) ? \get_class($event) : \gettype($event)));
             }
         }
 

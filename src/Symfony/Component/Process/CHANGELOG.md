@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+-----
+
+* Add `Process::getProcessPipes()` to be able to work with the pipes of a `Process`
+
 5.2.0
 -----
 

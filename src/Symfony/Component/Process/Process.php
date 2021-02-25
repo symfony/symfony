@@ -1194,6 +1194,16 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Gets the Process pipes.
+     *
+     * @return PipesInterface|null The Process pipes
+     */
+    public function getProcessPipes()
+    {
+        return $this->processPipes;
+    }
+
+    /**
      * Performs a check between the timeout definition and the time the process started.
      *
      * In case you run a background process (with the start method), you should

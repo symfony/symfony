@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-09T16:23:09Z
+
+I renamed the method `willBeAvailable()` to hint that this is for checking the availability of symbols at runtime, not compile time.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-09T16:27:37Z
+
+that's indeed a good idea. But then, please check my review even if it is on an outdated diff due to the renaming.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-10T11:06:11Z
+
+@stof comments addressed. The method now takes a new argument that defines the parent dep of a dep, so that we can consider that a package installed to satisfy a dev-mode dep is available even if it is in dev-mode.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-24T14:30:04Z
+
+Rebase needed

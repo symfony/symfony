@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', SodiumPasswordEncoder::class, SodiumPasswordHasher::class));
-
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', SodiumPasswordEncoder::class, SodiumPasswordHasher::class));
 
 /**
  * Hashes passwords using libsodium.

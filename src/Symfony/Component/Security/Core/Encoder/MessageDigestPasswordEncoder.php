@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', MessageDigestPasswordEncoder::class, MessageDigestPasswordHasher::class));
-
 use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', MessageDigestPasswordEncoder::class, MessageDigestPasswordHasher::class));
 
 /**
  * MessageDigestPasswordEncoder uses a message digest algorithm.

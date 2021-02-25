@@ -21,6 +21,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\HttpClient;
@@ -30,6 +31,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Serializer\Serializer;
@@ -108,8 +110,19 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+        $willBeAvailable = static function (string $package, string $class, string $parentPackage = null) {
+            $parentPackages = (array) $parentPackage;
+            $parentPackages[] = 'symfony/framework-bundle';
+
+            return ContainerBuilder::willBeAvailable($package, $class, $parentPackages);
+        };
+
+        $enableIfStandalone = static function (string $package, string $class) use ($willBeAvailable) {
+            return !class_exists(FullStack::class) && $willBeAvailable($package, $class) ? 'canBeDisabled' : 'canBeEnabled';
+        };
+
         $this->addCsrfSection($rootNode);
-        $this->addFormSection($rootNode);
+        $this->addFormSection($rootNode, $enableIfStandalone);
         $this->addHttpCacheSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
@@ -119,25 +132,25 @@ class Configuration implements ConfigurationInterface
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
-        $this->addAssetsSection($rootNode);
-        $this->addTranslatorSection($rootNode);
-        $this->addValidationSection($rootNode);
-        $this->addAnnotationsSection($rootNode);
-        $this->addSerializerSection($rootNode);
-        $this->addPropertyAccessSection($rootNode);
-        $this->addPropertyInfoSection($rootNode);
-        $this->addCacheSection($rootNode);
+        $this->addAssetsSection($rootNode, $enableIfStandalone);
+        $this->addTranslatorSection($rootNode, $enableIfStandalone);
+        $this->addValidationSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addAnnotationsSection($rootNode, $willBeAvailable);
+        $this->addSerializerSection($rootNode, $enableIfStandalone, $willBeAvailable);
+        $this->addPropertyAccessSection($rootNode, $willBeAvailable);
+        $this->addPropertyInfoSection($rootNode, $enableIfStandalone);
+        $this->addCacheSection($rootNode, $willBeAvailable);
         $this->addPhpErrorsSection($rootNode);
-        $this->addWebLinkSection($rootNode);
-        $this->addLockSection($rootNode);
-        $this->addMessengerSection($rootNode);
+        $this->addWebLinkSection($rootNode, $enableIfStandalone);
+        $this->addLockSection($rootNode, $enableIfStandalone);
+        $this->addMessengerSection($rootNode, $enableIfStandalone);
         $this->addRobotsIndexSection($rootNode);
-        $this->addHttpClientSection($rootNode);
-        $this->addMailerSection($rootNode);
+        $this->addHttpClientSection($rootNode, $enableIfStandalone);
+        $this->addMailerSection($rootNode, $enableIfStandalone);
         $this->addSecretsSection($rootNode);
-        $this->addNotifierSection($rootNode);
-        $this->addRateLimiterSection($rootNode);
-        $this->addUidSection($rootNode);
+        $this->addNotifierSection($rootNode, $enableIfStandalone);
+        $this->addRateLimiterSection($rootNode, $enableIfStandalone);
+        $this->addUidSection($rootNode, $enableIfStandalone);
 
         return $treeBuilder;
     }
@@ -176,13 +189,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addFormSection(ArrayNodeDefinition $rootNode)
+    private function addFormSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('form')
                     ->info('form configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Form::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/form', Form::class)}()
                     ->children()
                         ->arrayNode('csrf_protection')
                             ->treatFalseLike(['enabled' => false])
@@ -675,13 +688,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAssetsSection(ArrayNodeDefinition $rootNode)
+    private function addAssetsSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('assets')
                     ->info('assets configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Package::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/asset', Package::class)}()
                     ->fixXmlConfig('base_url')
                     ->children()
                         ->scalarNode('version_strategy')->defaultNull()->end()
@@ -763,13 +776,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTranslatorSection(ArrayNodeDefinition $rootNode)
+    private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('translator')
                     ->info('translator configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Translator::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/translation', Translator::class)}()
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
                     ->fixXmlConfig('enabled_locale')
@@ -816,16 +829,16 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addValidationSection(ArrayNodeDefinition $rootNode)
+    private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, callable $willBeAvailable)
     {
         $rootNode
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/validator') ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(['loadValidatorMetadata'])
                             ->prototype('scalar')->end()
@@ -906,15 +919,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
         $rootNode
             ->children()
                 ->arrayNode('annotations')
                     ->info('annotation configuration')
-                    ->{class_exists(Annotation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$willBeAvailable('doctrine/annotations', Annotation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
-                        ->scalarNode('cache')->defaultValue(interface_exists(Cache::class) ? 'php_array' : 'none')->end()
+                        ->scalarNode('cache')->defaultValue($willBeAvailable('doctrine/cache', Cache::class, 'doctrine/annotation') ? 'php_array' : 'none')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()
@@ -923,15 +936,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone, $willBeAvailable)
     {
         $rootNode
             ->children()
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/serializer', Serializer::class)}()
                     ->children()
-                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && $willBeAvailable('doctrine/annotations', Annotation::class, 'symfony/serializer') ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()
                         ->scalarNode('max_depth_handler')->end()
@@ -950,13 +963,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode)
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
         $rootNode
             ->children()
                 ->arrayNode('property_access')
                     ->addDefaultsIfNotSet()
                     ->info('Property access configuration')
+                    ->{$willBeAvailable('symfony/property-access', PropertyAccessor::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('magic_get')->defaultTrue()->end()
@@ -969,19 +983,19 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode)
+    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
-                    ->{!class_exists(FullStack::class) && interface_exists(PropertyInfoExtractorInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/property-info', PropertyInfoExtractorInterface::class)}()
                 ->end()
             ->end()
         ;
     }
 
-    private function addCacheSection(ArrayNodeDefinition $rootNode)
+    private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable)
     {
         $rootNode
             ->children()
@@ -1008,7 +1022,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
-                        ->scalarNode('default_pdo_provider')->defaultValue(class_exists(Connection::class) ? 'database_connection' : null)->end()
+                        ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) ? 'database_connection' : null)->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
@@ -1117,13 +1131,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addLockSection(ArrayNodeDefinition $rootNode)
+    private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('lock')
                     ->info('Lock configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Lock::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/lock', Lock::class)}()
                     ->beforeNormalization()
                         ->ifString()->then(function ($v) { return ['enabled' => true, 'resources' => $v]; })
                     ->end()
@@ -1179,25 +1193,25 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode)
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('web_link')
                     ->info('web links configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(HttpHeaderSerializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/weblink', HttpHeaderSerializer::class)}()
                 ->end()
             ->end()
         ;
     }
 
-    private function addMessengerSection(ArrayNodeDefinition $rootNode)
+    private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('messenger')
                     ->info('Messenger configuration')
-                    ->{!class_exists(FullStack::class) && interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/messenger', MessageBusInterface::class)}()
                     ->fixXmlConfig('transport')
                     ->fixXmlConfig('bus', 'buses')
                     ->validate()
@@ -1392,13 +1406,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addHttpClientSection(ArrayNodeDefinition $rootNode)
+    private function addHttpClientSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('http_client')
                     ->info('HTTP Client configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(HttpClient::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/http-client', HttpClient::class)}()
                     ->fixXmlConfig('scoped_client')
                     ->beforeNormalization()
                         ->always(function ($config) {
@@ -1728,13 +1742,13 @@ class Configuration implements ConfigurationInterface
             ;
     }
 
-    private function addMailerSection(ArrayNodeDefinition $rootNode)
+    private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('mailer')
                     ->info('Mailer configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Mailer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/mailer', Mailer::class)}()
                     ->validate()
                         ->ifTrue(function ($v) { return isset($v['dsn']) && \count($v['transports']); })
                         ->thenInvalid('"dsn" and "transports" cannot be used together.')
@@ -1784,13 +1798,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addNotifierSection(ArrayNodeDefinition $rootNode)
+    private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('notifier')
                     ->info('Notifier configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(Notifier::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/notifier', Notifier::class)}()
                     ->fixXmlConfig('chatter_transport')
                     ->children()
                         ->arrayNode('chatter_transports')
@@ -1833,13 +1847,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRateLimiterSection(ArrayNodeDefinition $rootNode)
+    private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('rate_limiter')
                     ->info('Rate limiter configuration')
-                    ->{!class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/rate-limiter', TokenBucketLimiter::class)}()
                     ->fixXmlConfig('limiter')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) { return \is_array($v) && !isset($v['limiters']) && !isset($v['limiter']); })
@@ -1901,13 +1915,13 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addUidSection(ArrayNodeDefinition $rootNode)
+    private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone)
     {
         $rootNode
             ->children()
                 ->arrayNode('uid')
                     ->info('Uid configuration')
-                    ->{class_exists(UuidFactory::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{$enableIfStandalone('symfony/uid', UuidFactory::class)}()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('default_uuid_version')

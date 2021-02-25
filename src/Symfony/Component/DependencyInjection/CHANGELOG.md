@@ -9,6 +9,7 @@ CHANGELOG
  * Add support for loading autoconfiguration rules via the `#[Autoconfigure]` and `#[AutoconfigureTag]` attributes on PHP 8
  * Add autoconfigurable attributes
  * Add support for per-env configuration in loaders
+ * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
 
 5.2.0
 -----

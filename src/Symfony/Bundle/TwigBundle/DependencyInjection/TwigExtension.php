@@ -17,6 +17,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
@@ -37,19 +38,19 @@ class TwigExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
-        if (class_exists(\Symfony\Component\Form\Form::class)) {
+        if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
         }
 
-        if (class_exists(Application::class)) {
+        if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
             $loader->load('console.php');
         }
 
-        if (class_exists(Mailer::class)) {
+        if ($container::willBeAvailable('symfony/mailer', Mailer::class, ['symfony/twig-bundle'])) {
             $loader->load('mailer.php');
         }
 
-        if (!class_exists(Translator::class)) {
+        if (!$container::willBeAvailable('symfony/translation', Translator::class, ['symfony/twig-bundle'])) {
             $container->removeDefinition('twig.translation.extractor');
         }
 

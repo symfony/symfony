@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
@@ -63,6 +64,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -149,6 +151,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -167,6 +170,7 @@ use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -200,6 +204,7 @@ class FrameworkExtension extends Extension
     private $mailerConfigEnabled = false;
     private $httpClientConfigEnabled = false;
     private $notifierConfigEnabled = false;
+    private $propertyAccessConfigEnabled = false;
     private $lockConfigEnabled = false;
 
     /**
@@ -216,7 +221,7 @@ class FrameworkExtension extends Extension
         $loader->load('fragment_renderer.php');
         $loader->load('error_renderer.php');
 
-        if (interface_exists(PsrEventDispatcherInterface::class)) {
+        if (ContainerBuilder::willBeAvailable('psr/event-dispatcher', PsrEventDispatcherInterface::class, ['symfony/framework-bundle'])) {
             $container->setAlias(PsrEventDispatcherInterface::class, 'event_dispatcher');
         }
 
@@ -256,11 +261,11 @@ class FrameworkExtension extends Extension
         }
 
         // If the slugger is used but the String component is not available, we should throw an error
-        if (!interface_exists(SluggerInterface::class)) {
+        if (!ContainerBuilder::willBeAvailable('symfony/string', SluggerInterface::class, ['symfony/framework-bundle'])) {
             $container->register('slugger', 'stdClass')
                 ->addError('You cannot use the "slugger" service since the String component is not installed. Try running "composer require symfony/string".');
         } else {
-            if (!interface_exists(LocaleAwareInterface::class)) {
+            if (!ContainerBuilder::willBeAvailable('symfony/translation', LocaleAwareInterface::class, ['symfony/framework-bundle'])) {
                 $container->register('slugger', 'stdClass')
                     ->addError('You cannot use the "slugger" service since the Translation contracts are not installed. Try running "composer require symfony/translation".');
             }
@@ -329,19 +334,19 @@ class FrameworkExtension extends Extension
         }
 
         if (null === $config['csrf_protection']['enabled']) {
-            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && ContainerBuilder::willBeAvailable('symfony/security-csrf', CsrfTokenManagerInterface::class, ['symfony/framework-bundle']);
         }
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
-            if (!class_exists(\Symfony\Component\Form\Form::class)) {
+            if (!class_exists(Form::class)) {
                 throw new LogicException('Form support cannot be enabled as the Form component is not installed. Try running "composer require symfony/form".');
             }
 
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
 
-            if (class_exists(\Symfony\Component\Validator\Validation::class)) {
+            if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/form'])) {
                 $config['validation']['enabled'] = true;
             } else {
                 $container->setParameter('validator.translation_domain', 'validators');
@@ -469,7 +474,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
         ]);
 
-        if (class_exists(MimeTypes::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/mime', MimeTypes::class, ['symfony/framework-bundle'])) {
             $loader->load('mime_type.php');
         }
 
@@ -602,7 +607,7 @@ class FrameworkExtension extends Extension
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
 
-        if (!class_exists(Translator::class)) {
+        if (!ContainerBuilder::willBeAvailable('symfony/translation', Translator::class, ['symfony/framework-bundle', 'symfony/form'])) {
             $container->removeDefinition('form.type_extension.upload.validator');
         }
         if (!method_exists(CachingFactoryDecorator::class, 'reset')) {
@@ -986,7 +991,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('routing.loader')->replaceArgument(2, ['_locale' => $enabledLocales]);
         }
 
-        if (!class_exists(ExpressionLanguage::class)) {
+        if (!ContainerBuilder::willBeAvailable('symfony/expression-language', ExpressionLanguage::class, ['symfony/framework-bundle', 'symfony/routing'])) {
             $container->removeDefinition('router.expression_language_provider');
         }
 
@@ -1225,18 +1230,18 @@ class FrameworkExtension extends Extension
         $dirs = [];
         $transPaths = [];
         $nonExistingDirs = [];
-        if (class_exists(\Symfony\Component\Validator\Validation::class)) {
-            $r = new \ReflectionClass(\Symfony\Component\Validator\Validation::class);
+        if (ContainerBuilder::willBeAvailable('symfony/validator', Validation::class, ['symfony/framework-bundle', 'symfony/translation'])) {
+            $r = new \ReflectionClass(Validation::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists(\Symfony\Component\Form\Form::class)) {
-            $r = new \ReflectionClass(\Symfony\Component\Form\Form::class);
+        if (ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/translation'])) {
+            $r = new \ReflectionClass(Form::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists(\Symfony\Component\Security\Core\Exception\AuthenticationException::class)) {
-            $r = new \ReflectionClass(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        if (ContainerBuilder::willBeAvailable('symfony/security-core', AuthenticationException::class, ['symfony/framework-bundle', 'symfony/translation'])) {
+            $r = new \ReflectionClass(AuthenticationException::class);
 
             $dirs[] = $transPaths[] = \dirname($r->getFileName(), 2).'/Resources/translations';
         }
@@ -1336,7 +1341,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists(\Symfony\Component\Validator\Validation::class)) {
+        if (!class_exists(Validation::class)) {
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require symfony/validator".');
         }
 
@@ -1403,8 +1408,8 @@ class FrameworkExtension extends Extension
             $files['yaml' === $extension ? 'yml' : $extension][] = $path;
         };
 
-        if (interface_exists(\Symfony\Component\Form\FormInterface::class)) {
-            $reflClass = new \ReflectionClass(\Symfony\Component\Form\FormInterface::class);
+        if (ContainerBuilder::willBeAvailable('symfony/form', Form::class, ['symfony/framework-bundle', 'symfony/validator'])) {
+            $reflClass = new \ReflectionClass(Form::class);
             $fileRecorder('xml', \dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         }
 
@@ -1466,7 +1471,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!class_exists(\Doctrine\Common\Annotations\Annotation::class)) {
-            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
+            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed. Try running "composer require doctrine/annotations".');
         }
 
         $loader->load('annotations.php');
@@ -1478,7 +1483,7 @@ class FrameworkExtension extends Extension
 
         if ('none' !== $config['cache']) {
             if (!class_exists(\Doctrine\Common\Cache\CacheProvider::class)) {
-                throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
+                throw new LogicException('Annotations cannot be cached as the Doctrine Cache library is not installed. Try running "composer require doctrine/cache".');
             }
 
             $cacheService = $config['cache'];
@@ -1521,7 +1526,7 @@ class FrameworkExtension extends Extension
 
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)
     {
-        if (!class_exists(PropertyAccessor::class)) {
+        if (!$this->propertyAccessConfigEnabled = $this->isConfigEnabled($container, $config)) {
             return;
         }
 
@@ -1570,7 +1575,7 @@ class FrameworkExtension extends Extension
                 throw new InvalidArgumentException(sprintf('Invalid value "%s" set as "decryption_env_var": only "word" characters are allowed.', $config['decryption_env_var']));
             }
 
-            if (class_exists(LazyString::class)) {
+            if (ContainerBuilder::willBeAvailable('symfony/string', LazyString::class, ['symfony/framework-bundle'])) {
                 $container->getDefinition('secrets.decryption_key')->replaceArgument(1, $config['decryption_env_var']);
             } else {
                 $container->getDefinition('secrets.vault')->replaceArgument(1, "%env({$config['decryption_env_var']})%");
@@ -1610,7 +1615,7 @@ class FrameworkExtension extends Extension
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
-        if (!class_exists(PropertyAccessor::class)) {
+        if (!$this->propertyAccessConfigEnabled) {
             $container->removeAlias('serializer.property_accessor');
             $container->removeDefinition('serializer.normalizer.object');
         }
@@ -1619,7 +1624,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        if (!class_exists(UnwrappingDenormalizer::class) || !class_exists(PropertyAccessor::class)) {
+        if (!class_exists(UnwrappingDenormalizer::class) || !$this->propertyAccessConfigEnabled) {
             $container->removeDefinition('serializer.denormalizer.unwrapping');
         }
 
@@ -1703,7 +1708,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_info.php');
 
-        if (interface_exists(\phpDocumentor\Reflection\DocBlockFactoryInterface::class)) {
+        if (ContainerBuilder::willBeAvailable('phpdocumentor/reflection-docblock', DocBlockFactoryInterface::class, ['symfony/framework-bundle', 'symfony/property-info'])) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
@@ -1784,19 +1789,19 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.php');
 
-        if (class_exists(AmqpTransportFactory::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/amqp-messenger', AmqpTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
         }
 
-        if (class_exists(RedisTransportFactory::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', RedisTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
         }
 
-        if (class_exists(AmazonSqsTransportFactory::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/amazon-sqs-messenger', AmazonSqsTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.sqs.factory')->addTag('messenger.transport_factory');
         }
 
-        if (class_exists(BeanstalkdTransportFactory::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/beanstalkd-messenger', BeanstalkdTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
@@ -2070,12 +2075,12 @@ class FrameworkExtension extends Extension
         unset($options['retry_failed']);
         $container->getDefinition('http_client')->setArguments([$options, $config['max_host_connections'] ?? 6]);
 
-        if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
+        if (!$hasPsr18 = ContainerBuilder::willBeAvailable('psr/http-client', ClientInterface::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
             $container->removeDefinition('psr18.http_client');
             $container->removeAlias(ClientInterface::class);
         }
 
-        if (!interface_exists(HttpClient::class)) {
+        if (!ContainerBuilder::willBeAvailable('php-http/httplug', HttpClient::class, ['symfony/framework-bundle', 'symfony/http-client'])) {
             $container->removeDefinition(HttpClient::class);
         }
 
@@ -2205,7 +2210,9 @@ class FrameworkExtension extends Extension
         ];
 
         foreach ($classToServices as $class => $service) {
-            if (!class_exists($class)) {
+            $package = substr($service, \strlen('mailer.transport_factory.'));
+
+            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-mailer', 'gmail' === $package ? 'google' : $package), $class, ['symfony/framework-bundle', 'symfony/mailer'])) {
                 $container->removeDefinition($service);
             }
         }
@@ -2302,16 +2309,26 @@ class FrameworkExtension extends Extension
             ClickatellTransportFactory::class => 'notifier.transport_factory.clickatell',
         ];
 
+        $parentPackages = ['symfony/framework-bundle', 'symfony/notifier'];
+
         foreach ($classToServices as $class => $service) {
-            if (!class_exists($class)) {
+            switch ($package = substr($service, \strlen('notifier.transport_factory.'))) {
+                case 'freemobile': $package = 'free-mobile'; break;
+                case 'googlechat': $package = 'google-chat'; break;
+                case 'linkedin': $package = 'linked-in'; break;
+                case 'ovhcloud': $package = 'ovh-cloud'; break;
+                case 'rocketchat': $package = 'rocket-chat'; break;
+            }
+
+            if (!ContainerBuilder::willBeAvailable(sprintf('symfony/%s-notifier', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);
             }
         }
 
-        if (class_exists(MercureTransportFactory::class) && class_exists(MercureBundle::class)) {
+        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages)) {
             $container->getDefinition($classToServices[MercureTransportFactory::class])
                 ->replaceArgument('$publisherLocator', new ServiceLocatorArgument(new TaggedIteratorArgument('mercure.publisher', null, null, true)));
-        } elseif (class_exists(MercureTransportFactory::class)) {
+        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages)) {
             $container->removeDefinition($classToServices[MercureTransportFactory::class]);
         }
 

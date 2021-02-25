@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', EncoderFactoryInterface::class, PasswordHasherFactoryInterface::class));
-
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', EncoderFactoryInterface::class, PasswordHasherFactoryInterface::class));
 
 /**
  * EncoderFactoryInterface to support different encoders for different accounts.

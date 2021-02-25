@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" interface is deprecated, use "%s" instead.', UserPasswordEncoderInterface::class, UserPasswordHasherInterface::class));
-
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" interface is deprecated, use "%s" instead.', UserPasswordEncoderInterface::class, UserPasswordHasherInterface::class));
 
 /**
  * UserPasswordEncoderInterface is the interface for the password encoder service.

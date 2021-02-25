@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', PasswordEncoderInterface::class, PasswordHasherInterface::class));
-
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', PasswordEncoderInterface::class, PasswordHasherInterface::class));
 
 /**
  * PasswordEncoderInterface is the interface for all encoders.

@@ -3,6 +3,10 @@ name: Static analysis
 on:
   pull_request: ~
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   psalm:
     name: Psalm
@@ -17,81 +21,38 @@ jobs:
           ini-values: "memory_limit=-1"
           coverage: none
 
-      - name: Checkout PR
-        uses: actions/checkout@v2
-        with:
-          path: pr
-
-      - name: Checkout base
+      - name: Checkout target branch
         uses: actions/checkout@v2
         with:
           ref: ${{ github.base_ref }}
-          path: base
+
+      - name: Checkout PR
+        uses: actions/checkout@v2
 
       - name: Configure composer
         run: |
-            cd base
-            COMPOSER_HOME="$(composer config home)"
-            ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-            echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
-
-      - name: Determine composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ github.base_ref }}
-          restore-keys: composer-
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
       - name: Install Psalm
         run: |
-          composer require psalm/phar
-          cp ./vendor/bin/psalm.phar base/psalm.phar
-          cp ./vendor/bin/psalm.phar pr/psalm.phar
-
-      - name: Install dependencies for base
-        run: |
-            cd base
-            echo "::group::modify composer.json"
-            composer remove symfony/phpunit-bridge --no-interaction --no-update
-            composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
-            echo "::endgroup::"
-            echo "::group::composer update"
-            composer update --no-progress --ansi
-            echo "::endgroup::"
+          echo "::group::modify composer.json"
+          composer remove --no-update --no-interaction symfony/phpunit-bridge
+          composer require --no-update psalm/phar phpunit/phpunit php-http/discovery psr/event-dispatcher
+          echo "::endgroup::"
+          echo "::group::composer update"
+          composer update --no-progress --ansi
+          git checkout composer.json
+          echo "::endgroup::"
+          ./vendor/bin/psalm.phar --version
 
       - name: Generate Psalm baseline
         run: |
-          cd base
-          ./psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
-
-      - name: Copy baseline
-        run: |
-          cp base/.github/psalm/psalm.baseline.xml pr/.github/psalm/psalm.baseline.xml
-
-      - name: Install dependencies for PR
-        run: |
-            cd pr
-            echo "::group::modify composer.json"
-            composer remove symfony/phpunit-bridge --no-interaction --no-update
-            composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
-            echo "::endgroup::"
-            echo "::group::composer update"
-            composer update --no-progress --ansi
-            echo "::endgroup::"
-
-      - name: Cache Psalm
-        uses: actions/cache@v2
-        with:
-          path: pr/.github/psalm/cache/
-          key: psalm-${{ github.base_ref }}
-          restore-keys: psalm-
+          git checkout -m ${{ github.base_ref }}
+          ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+          git checkout -m FETCH_HEAD
 
       - name: Psalm
         run: |
-          cd pr
-          ./psalm.phar --version
-          ./psalm.phar --output-format=github --no-progress
+          ./vendor/bin/psalm.phar --output-format=github --no-progress

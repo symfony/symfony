@@ -29,6 +29,7 @@
         "symfony/form": "^4.4.17",
         "symfony/http-foundation": "^4.3|^5.0",
         "symfony/http-kernel": "^4.4",
+        "symfony/intl": "^4.4|^5.0",
         "symfony/mime": "^4.3|^5.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "^3.4|^4.0|^5.0",

@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-18T04:04:17Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by tamcy at 2021-02-18T09:44:47Z
+
+> I think this PR works in your case because your php.ini file has `cookie_secure=on` and this PR prevent overriding the .ini value with `"auto"`.
+
+But 'auto' is not a valid value for this ini setting. Yes, setting `cookie_secure=auto` via ini_set does have the same effect as setting it to false/off/0, but the question is whether this is an intended behavior. For this I agree with @stof that the value 'auto' shouldn't be passed as-is to the session storage.
+
+> But what if your .ini is set to `on` and you call the page with `http` does it removes the `cookie_secure` flag? Or what if the .ini is set to `off` and the page is called with `https` is it re-added?
+
+You are correct that this PR missed the scenario when the page is accessed through http, not https. The code only sets cookie_secure to `true` for https, but didn't set it to `false` for http traffic. In this case the `onKernelRequest` callback could be changed to something like this:
+
+```php
+        if ($this->container->has('session_storage')
+            && ($storage = $this->container->get('session_storage')) instanceof NativeSessionStorage
+            && ($masterRequest = $this->container->get('request_stack')->getMasterRequest())
+        ) {
+            $storage->setOptions(['cookie_secure' => $masterRequest->isSecure()]);
+        }
+```
+
+> I believe we should disable the .ini setting when value is auto then the SessionListener will re-enabled it if the request is secured.
+
+Personally I don't have preference on whether the setting is set in one place, or is first disabled then enabled if the traffic in https. But again, I think the value passed to ini_set shouldn't be 'auto'.
+
+> Are you sure that your Code/EventListener has a lower priority than the SessionListener and you are not reading the session before the flag is correctly sets?
+> Note: In Symfony 5.3, injecting the session in your service will be deprecated and you'll have to use the RequestStack to get a session. So this will not be an issue anymore, as you won't be able to manipulate the session before the SessionListener initialize the storage and inject the session in the request.
+
+I need to confess that my experience with Symfony internals isn't deep enough for me to guarantee that people will be immune from similar situations. They may still able to register an event listener which accesses the session before SessionListener is called, causing it to fail to properly set the `cookie_secure` flag (actually there might even be a need to tell the developer that the service cannot set the flag properly, given this is a security related thing). But, for my case, what I did was just registering a guard authenticator which accesses session data in the `supports()` method. I didn't change the priority of any of the involved services. And by default the authenticator's `supports()` is called before `SessionListener`.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-18T11:47:29Z
+
+> And by default the authenticator's `supports()` is called before `SessionListener`.
+
+no it is not. And that's precisely why this PR will fix the issue by making sure that the `auto` value is resolved by the time `SessionListener` is called (rather than by the time the session is retrieved from the Request object for the first time)
+
+---------------------------------------------------------------------------
+
+by tamcy at 2021-02-19T12:42:13Z
+
+@stof is right. I forgot to update my mind when writing the reply.
+
+The PR has been updated. In this PR,
+
+1. Instead of letting `NativeSessionStorage` to check for this `auto` value in the `cookie_secure` key and act differently, the framework will create another set of options that does not contain the `secure_cookie` option if it is set to `auto`, and the `NativeSessionStorage` will receive this special set of options in the constructor.
+
+2. The `SessionListener` class is updated to set the `cookie_secure` value properly in `onKernelRequest`, no matter the request is secure or not. This fixes the issue in the previous PR that `cookie_secure` won't be set if the request is not secure.
+
+Two related notes:
+
+1. The scope of the issue is actually larger then I anticipated. Just create a new application, [add a simple controller action that accesses the session](https://github.com/tamcy/symfony-secure-cookie-test-4.4/blob/master/src/Controller/MainController.php). The auto secure cookie won't work because of the reason explained by @stof.
+
+2. I have also verifitied that after the PR, user can still "invalidate" the `SessionListener` by creating an event listener that accesses the session with priority equal to or higher than that of `SessionListener` [like this](https://github.com/tamcy/symfony-secure-cookie-test-4.4/blob/master/src/EventListener/NullifyAutoCookieSecureEventListener.php).

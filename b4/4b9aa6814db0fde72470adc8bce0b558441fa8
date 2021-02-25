@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-02-24T01:20:30Z
+
+shouldn't we apply the code turning `null` into `0` to the 4.4 branch already to avoid the PHP deprecation ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-24T08:23:05Z
+
+@stof see reasoning in https://github.com/symfony/symfony/pull/40271#discussion_r580314687

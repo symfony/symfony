@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Implement `HttpClientInterface::withOptions()` from `symfony/contracts` v2.4
+
 5.2.0
 -----
 

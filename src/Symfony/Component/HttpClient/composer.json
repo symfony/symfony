@@ -18,12 +18,12 @@
         "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
-        "symfony/http-client-implementation": "2.2"
+        "symfony/http-client-implementation": "2.4"
     },
     "require": {
         "php": ">=7.2.5",
         "psr/log": "^1.0",
-        "symfony/http-client-contracts": "^2.2",
+        "symfony/http-client-contracts": "^2.4",
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.0|^2"

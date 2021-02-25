@@ -1038,4 +1038,20 @@ abstract class HttpClientTestCase extends TestCase
 
         $this->assertLessThan(10, $duration);
     }
+
+    public function testWithOptions()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        if (!method_exists($client, 'withOptions')) {
+            $this->markTestSkipped(sprintf('Not implementing "%s::withOptions()" is deprecated.', get_debug_type($client)));
+        }
+
+        $client2 = $client->withOptions(['base_uri' => 'http://localhost:8057/']);
+
+        $this->assertNotSame($client, $client2);
+        $this->assertSame(\get_class($client), \get_class($client2));
+
+        $response = $client2->request('GET', '/');
+        $this->assertSame(200, $response->getStatusCode());
+    }
 }

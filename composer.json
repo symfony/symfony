@@ -188,7 +188,7 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "2.3.x-dev"
+                    "symfony/contracts": "2.4.x-dev"
                 }
             }
         }

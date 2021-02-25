@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-24T10:40:01Z
+
+Given the most forgiving level already gives us 1000 baseline errors, I think we should at least add some text in the contributing guide about adding new baseline errors (as it's very likely that new BC layers will result in new false positive errors).
+
+It would also be good to see whether this doesn't add more work load (dealing with false positives) rather than reducing it (by catching a few mistakes that are fixed before stable releases). This doesn't mean I'm against this PR btw, the only way to test this is by trying it out in real life.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T11:01:31Z
+
+> Given the most forgiving level already gives us 1000 baseline errors, I think we should at least add some text in the contributing guide about adding new baseline errors (as it's very likely that new BC layers will result in new false positive errors).
+
+Yes, thank you. Just a note: "BC layer" means when we try to support both doctrine 2 and doctrine 3 etc. Since this job will install doctrine 3, it will complain about missing doctrine 2 classes.
+
+> only way to test this is by trying it out in real life.
+
+Exactly. Let's do a 6 month experiment if this is a good thing or not.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-24T11:05:12Z
+
+> Given the most forgiving level already gives us 1000 baseline errors, I think we should at least add some text in the contributing guide about adding new baseline errors (as it's very likely that new BC layers will result in new false positive errors).
+
+The way I see the baseline, it is **not** the right place to deal with known false positives. The baseline is a big TODO list and, once introduced to the codebase, should hardly see any additions. We need to agree on a way to document WONTFIX errors like false positives, compat code for old PHP/dependency versions, Psalm bugs etc. This could be done inline via annotation or using dedicated configuration files.
+
+So, the general rule for PRs would be: `sizeof(<baseline of the target branch>) >= sizeof(<PR baseline>)`. You are welcome to resolve baseline entries, but don't create new ones.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-24T11:16:57Z
+
+We could maybe run psalm twice: once with deps=high, twice with deps=low,
+then we would exclude failures that don't happen on both runs.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-24T11:25:41Z
+
+From my experience with introducing PHPStan and Psalm to existing codebases in the past: The errors reported by the starter levels (8 in Psalm, 0 in PHPStan) are mainly problems that need to be fixed so that the tool is able to understand the codebase. The tool won't be helpful at that level.
+
+The project I'm using PHPStan in has reached Level 5 now and here PHPStan finds actual bugs and started to become really helpful when changing the codebase. The project I'm using Psalm in is way smaller. Here, we've reached Level 4 with a similar effect.
+
+If we use Psalm, we should start on level 8, but not remain there:
+* iteratively kill entries from the baseline
+* lower the level by one and generate a new baseline
+* repeat
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-24T11:55:54Z
+
+As discussed on Slack, we could consider the codebase itself as the baseline.
+
+In practice, that'd mean that we would run psalm only on PRs, and for each PR, we would first run psalm on the fork point from the target branch to generate the baseline, then run psalm again with the patch from the PR applied.
+
+Doing this, we could try a higher level than 8.
+
+Increasing the level of the codebase itself could be done separately, running psalm manually from time to spot things.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-24T12:07:45Z
+
+We can also try suppressing some known errors (e.g. class X only exists with low deps, so let's suppress "class X doesn't exists" in `psalm.xml`).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T12:24:05Z
+
+I've update the PR to run twice. First on the base to generate a baseline, then on the patch.
+The job currently fails because there is no `psalm.xml` on the 5.x branch. See a job on my fork: https://github.com/Nyholm/symfony/runs/1969878925
+
+This solution is great because we dont have to generate/maintain the baseline. However, you cannot run `psalm` locally... or you can, but you have no baseline so you will get plenty of errors.
+
+... but that is also true for PHPUnit and php-cs-fixer. I get errors when I run them on the full project too.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-24T12:28:40Z
+
+> In practice, that'd mean that we would run psalm only on PRs, and for each PR, we would first run psalm on the fork point from the target branch to generate the baseline, then run psalm again with the patch from the PR applied.
+
+Or we could just dump the baseline into a file that we commit because that's how the tool is designed to work.
+
+I fear that we unnecessarily create our own special way of using a standard tool here, a way that only works in our CI. This will make it incredibly hard for contributors to understand and fix problems before creating a PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-24T12:55:25Z
+
+> Or we could just dump the baseline into a file that we commit because that's how the tool is designed to work.
+
+I think this could be useful for making the codebase more psalm-readable. But this PR is trying to achieve another goal, which is to spot trivial bugs that are hard to catch by human review (e.g. missing `use` or `\`).
+
+> I fear that we unnecessarily create our own special way of using a standard tool here, a way that only works in our CI. This will make it incredibly hard for contributors to understand and fix problems before creating a PR.
+
+I don't anticipate this hardness at all. Ppl will just see reports about things they just contributed to.
+
+About "the standard way to use psalm", this relates to my previous sentence: psalm-readability is not the goal of this PR.
+
+Baby steps FTW.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T13:07:48Z
+
+I think Im done with this PR. Baby steps.
+
+I will work on a way to help contributors to run psalm locally, but that will go in a separate PR. This PR is to add some more automated review comments.
+
+If we dont like the experience or if it will be too many false positives, we have to reconfigure or reconsider.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-24T13:10:19Z
+
+> Baby steps FTW.
+
+The baby step for me would be: Introduce and use the tool as documented, plain and simple. Don't invent anything around it. If we see that this does not work for us, iterate.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T13:22:46Z
+
+Here is an example PR: https://github.com/Nyholm/symfony/pull/16
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-24T14:50:02Z
+
+For the record, I ran psalm on the `String` component, all reports are false-positives to me.
+
+I'm fearing a bit that adding these checks to our review process might end up with more noise than signal, forcing eg contributors to write code in special ways just to please psalm, or ending up with a stream of "please ignore" comments from core-team members.
+
+But I'm still :+1: to give it a try.
+
+About making the codebase psalm-compliant: if we take the String component as an example, I do understand the theory, but in practice, this is not ready. I feel like achieving this target should be a joint effort with the authors of psalm, because at least some of those false positives should be fixed into psalm - aka we should *not* work around them.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T14:56:21Z
+
+I think it will find issues like this:
+
+https://github.com/symfony/symfony/blob/89fedfa9e97313443232f9f1ff56ef89d1c921be/src/Symfony/Component/Mime/Test/Constraint/EmailAddressContains.php#L65-L73
+
+The is no `RawMessage::getHeaders()`. Either the doc block is wrong or this is a bug.

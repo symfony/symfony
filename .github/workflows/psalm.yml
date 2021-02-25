@@ -71,9 +71,15 @@ jobs:
       - name: Copy baseline
         run: cp base/.github/psalm/psalm.baseline.xml pr/.github/psalm/psalm.baseline.xml
 
+      # Move the "pr" project to "base" to make use of the psalm cache
+      - name: Move directories
+        run: |
+          rm -rf base
+          mv pr base
+
       - name: Install dependencies for PR
         run: |
-            cd pr
+            cd base
             echo "::group::modify composer.json"
             composer remove symfony/phpunit-bridge --no-interaction --no-update
             composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
@@ -84,6 +90,6 @@ jobs:
 
       - name: Psalm
         run: |
-          cd pr
+          cd base
           ./psalm.phar --version
           ./psalm.phar --output-format=github --no-progress

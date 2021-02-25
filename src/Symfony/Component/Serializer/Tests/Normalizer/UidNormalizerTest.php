@@ -39,7 +39,7 @@ class UidNormalizerTest extends TestCase
 
     public function normalizeProvider()
     {
-        $uidFormats = [null, 'canonical', 'base_58', 'base_32', 'rfc_4122'];
+        $uidFormats = [null, 'canonical', 'base58', 'base32', 'rfc4122'];
         $data = [
              [
                  UuidV1::fromString('9b7541de-6f87-11ea-ab3c-9da9a81562fc'),
@@ -149,7 +149,7 @@ class UidNormalizerTest extends TestCase
     public function testNormalizeWithNormalizationFormatPassedInConstructor()
     {
         $uidNormalizer = new UidNormalizer([
-            'uid_normalization_format' => 'rfc_4122',
+            'uid_normalization_format' => 'rfc4122',
         ]);
         $ulid = Ulid::fromString('01ETWV01C0GYQ5N92ZK7QRGB10');
 

@@ -69,6 +69,11 @@ PropertyInfo
 
  * Deprecated the `Type::getCollectionKeyType()` and `Type::getCollectionValueType()` methods, use `Type::getCollectionKeyTypes()` and `Type::getCollectionValueTypes()` instead
 
+Routing
+-------
+
+ * Deprecated creating instances of the `Route` annotation class by passing an array of parameters, use named arguments instead
+
 Security
 --------
 

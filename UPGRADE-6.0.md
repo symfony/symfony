@@ -164,6 +164,7 @@ Routing
  * Removed `RouteCollectionBuilder`.
  * Added argument `$priority` to `RouteCollection::add()`
  * Removed the `RouteCompiler::REGEX_DELIMITER` constant
+ * Removed the `$data` parameter from the constructor of the `Route` annotation class
 
 Security
 --------

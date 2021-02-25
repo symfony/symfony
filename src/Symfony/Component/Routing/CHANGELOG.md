@@ -6,6 +6,7 @@ CHANGELOG
 
  * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs
  * Add support for per-env configuration in loaders
+ * Deprecate creating instances of the `Route` annotation class by passing an array of parameters
 
 5.2.0
 -----

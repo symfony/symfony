@@ -46,7 +46,7 @@ class RememberMeListenerTest extends TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($listener($this->getGetResponseEvent()));
+        $this->assertNull($listener($this->getRequestEvent()));
     }
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
@@ -65,7 +65,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn(null)
         ;
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
 
         $this->assertNull($listener($event));
     }
@@ -100,7 +100,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $event = $this->getGetResponseEvent($request);
+        $event = $this->getRequestEvent($request);
 
         $listener($event);
     }
@@ -135,7 +135,7 @@ class RememberMeListenerTest extends TestCase
             ->willThrowException($exception)
         ;
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
 
         $listener($event);
     }
@@ -167,7 +167,7 @@ class RememberMeListenerTest extends TestCase
             ->method('authenticate')
         ;
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
 
         $listener($event);
     }
@@ -201,7 +201,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
 
         $listener($event);
     }
@@ -245,7 +245,7 @@ class RememberMeListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
 
-        $event = $this->getGetResponseEvent($request);
+        $event = $this->getRequestEvent($request);
 
         $sessionStrategy
             ->expects($this->once())
@@ -299,7 +299,7 @@ class RememberMeListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
 
-        $event = $this->getGetResponseEvent($request);
+        $event = $this->getRequestEvent($request);
 
         $listener($event);
     }
@@ -333,7 +333,7 @@ class RememberMeListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        $event = $this->getGetResponseEvent();
+        $event = $this->getRequestEvent();
 
         $dispatcher
             ->expects($this->once())
@@ -347,7 +347,7 @@ class RememberMeListenerTest extends TestCase
         $listener($event);
     }
 
-    protected function getGetResponseEvent(Request $request = null): RequestEvent
+    protected function getRequestEvent(Request $request = null): RequestEvent
     {
         $request = $request ?? new Request();
 

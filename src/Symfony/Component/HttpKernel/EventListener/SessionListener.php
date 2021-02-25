@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Sets the session in the request.
@@ -34,7 +34,7 @@ class SessionListener extends AbstractSessionListener
         parent::__construct($container, $debug);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         parent::onKernelRequest($event);
 

@@ -56,7 +56,7 @@ jobs:
         run: |
             cd base
             echo "::group::modify composer.json"
-            sed -i -re 's/"replace": \{/"replace": \{"symfony\/phpunit-bridge": "self.version",/' composer.json
+            composer remove symfony/phpunit-bridge --no-interaction --no-update
             composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
             echo "::endgroup::"
             echo "::group::composer update"
@@ -76,7 +76,7 @@ jobs:
         run: |
             cd pr
             echo "::group::modify composer.json"
-            sed -i -re 's/"replace": \{/"replace": \{"symfony\/phpunit-bridge": "self.version",/' composer.json
+            composer remove symfony/phpunit-bridge --no-interaction --no-update
             composer require --no-update phpunit/phpunit php-http/discovery psr/event-dispatcher
             echo "::endgroup::"
             echo "::group::composer update"

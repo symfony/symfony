@@ -62,7 +62,7 @@ class SessionListenerTest extends TestCase
         $listener = new SessionListener($container);
 
         $event = $this->createMock(RequestEvent::class);
-        $event->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $event->expects($this->exactly(2))->method('isMasterRequest')->willReturn(true);
         $event->expects($this->once())->method('getRequest')->willReturn($request);
 
         $listener->onKernelRequest($event);
@@ -206,12 +206,16 @@ class SessionListenerTest extends TestCase
         $listener = new SessionListener($container);
         $listener->onKernelRequest($event);
 
+        // storage->setOptions() should have been called already
+        $container->set('session_storage', null);
+        $sessionStorage = null;
+
         $subRequest = $masterRequest->duplicate();
         // at this point both master and subrequest have a closure to build the session
 
         $masterRequest->getSession();
 
-        // calling the factory on the subRequest should not trigger a second call to storage->sesOptions()
+        // calling the factory on the subRequest should not trigger a second call to storage->setOptions()
         $subRequest->getSession();
     }
 

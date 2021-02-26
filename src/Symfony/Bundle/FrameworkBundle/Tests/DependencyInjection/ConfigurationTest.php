@@ -22,6 +22,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
@@ -563,7 +564,7 @@ class ConfigurationTest extends TestCase
                 'private_headers' => [],
             ],
             'rate_limiter' => [
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
                 'limiters' => [],
             ],
             'uid' => [

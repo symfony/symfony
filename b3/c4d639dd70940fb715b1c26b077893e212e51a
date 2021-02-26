@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-26T11:27:02Z
+
+In the issue, @javiereguiluz says "The real solution is that you must set the `framework.csrf_protection` config option to `true` or `null`". This PR changed it to "install `symfony/security-csrf`". Can we confirm that installing will always fix it, or do we need to add the config option to the message?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-02-26T12:05:07Z
+
+The option is enabled by default as soon as the `symfony/security-csrf` package is enabled. So I am not sure if it's worth adding the option too.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-26T12:26:07Z
+
+I agree with Christian ... installing the missing package is probably enough to solve this issue (I can't test it myself now). Thanks!

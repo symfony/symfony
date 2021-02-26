@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by njutn95 at 2020-12-22T11:49:02Z
+
+I agree. Lets see first which should be considered a "primary" one, so that the other one can be deprecated/removed. However, both `rediss://` and `tls://` are used somewhat equally, `rediss://` being somewhat a better choice in case of Redis Cache Adapter where the adapter is actually being recognized [based on the DSN](https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Cache/Adapter/AbstractAdapter.php#L129).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-01T07:33:06Z
+
+Can you please rebase to get rid of the conflicts? Thanks
+
+---------------------------------------------------------------------------
+
+by njutn95 at 2021-02-01T09:02:21Z
+
+@OskarStark Done

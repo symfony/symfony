@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-19T09:50:18Z
+
+Hey!
+
+Two days ago, I was sitting at my usual spot at the top of Big Ben, I was thinking that we really needed this. And now, here you are with a PR. =)
+
+I think @javespi has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-25T17:19:44Z
+
+This should target 4.4, since the bug exists there, isn't it?
+Can you please rebase, and maybe add a test case?
+
+---------------------------------------------------------------------------
+
+by pvgnd at 2021-02-25T18:01:36Z
+
+> This should target 4.4, since the bug exists there, isn't it?
+> Can you please rebase, and maybe add a test case?
+
+Done

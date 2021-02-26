@@ -11,6 +11,24 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 class MockResponseTest extends TestCase
 {
+    public function testTotalTimeShouldBeSimulatedWhenNotProvided()
+    {
+        $response = new MockResponse('body');
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
+
+        $this->assertNotNull($response->getInfo('total_time'));
+        $this->assertGreaterThan(0.0, $response->getInfo('total_time'));
+    }
+
+    public function testTotalTimeShouldNotBeSimulatedWhenProvided()
+    {
+        $totalTime = 4.2;
+        $response = new MockResponse('body', ['total_time' => $totalTime]);
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
+
+        $this->assertEquals($totalTime, $response->getInfo('total_time'));
+    }
+
     public function testToArray()
     {
         $data = ['color' => 'orange', 'size' => 42];

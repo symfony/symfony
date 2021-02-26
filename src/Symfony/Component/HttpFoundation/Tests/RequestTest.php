@@ -1287,11 +1287,6 @@ class RequestTest extends TestCase
     {
         $normalizedMethod = strtoupper($method);
 
-        $_POST = [];
-        $request = Request::createFromGlobals();
-        $this->assertNotInstanceOf(InputBag::class, $request->request);
-        $this->assertInstanceOf(ParameterBag::class, $request->request);
-
         $_GET['foo1'] = 'bar1';
         $_POST['foo2'] = 'bar2';
         $_COOKIE['foo3'] = 'bar3';

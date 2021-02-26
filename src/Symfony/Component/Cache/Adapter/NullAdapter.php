@@ -20,19 +20,19 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class NullAdapter implements AdapterInterface, CacheInterface
 {
-    private $createCacheItem;
+    private static $createCacheItem;
 
     public function __construct()
     {
-        $this->createCacheItem = \Closure::bind(
-            function ($key) {
+        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
+            static function ($key) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->isHit = false;
 
                 return $item;
             },
-            $this,
+            null,
             CacheItem::class
         );
     }
@@ -44,7 +44,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     {
         $save = true;
 
-        return $callback(($this->createCacheItem)($key), $save);
+        return $callback((self::$createCacheItem)($key), $save);
     }
 
     /**
@@ -52,9 +52,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      */
     public function getItem($key)
     {
-        $f = $this->createCacheItem;
-
-        return $f($key);
+        return (self::$createCacheItem)($key);
     }
 
     /**
@@ -145,7 +143,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
 
     private function generateItems(array $keys)
     {
-        $f = $this->createCacheItem;
+        $f = self::$createCacheItem;
 
         foreach ($keys as $key) {
             yield $key => $f($key);

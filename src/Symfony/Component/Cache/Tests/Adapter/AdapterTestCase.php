@@ -28,6 +28,16 @@ abstract class AdapterTestCase extends CachePoolTest
         if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
+
+        try {
+            \assert(false === true, new \Exception());
+            $this->skippedTests['testGetItemInvalidKeys'] =
+            $this->skippedTests['testGetItemsInvalidKeys'] =
+            $this->skippedTests['testHasItemInvalidKeys'] =
+            $this->skippedTests['testDeleteItemInvalidKeys'] =
+            $this->skippedTests['testDeleteItemsInvalidKeys'] = 'Keys are checked only when assert() is enabled.';
+        } catch (\Exception $e) {
+        }
     }
 
     public function testGet()

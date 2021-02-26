@@ -35,7 +35,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
     private $adapters = [];
     private $adapterCount;
-    private $syncItem;
+    private $defaultLifetime;
+
+    private static $syncItem;
 
     /**
      * @param CacheItemPoolInterface[] $adapters        The ordered list of adapters used to fetch cached items
@@ -62,9 +64,10 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             }
         }
         $this->adapterCount = \count($this->adapters);
+        $this->defaultLifetime = $defaultLifetime;
 
-        $this->syncItem = \Closure::bind(
-            static function ($sourceItem, $item, $sourceMetadata = null) use ($defaultLifetime) {
+        self::$syncItem ?? self::$syncItem = \Closure::bind(
+            static function ($sourceItem, $item, $defaultLifetime, $sourceMetadata = null) {
                 $sourceItem->isTaggable = false;
                 $sourceMetadata = $sourceMetadata ?? $sourceItem->metadata;
                 unset($sourceMetadata[CacheItem::METADATA_TAGS]);
@@ -105,7 +108,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);
             }
             if (null !== $item) {
-                ($this->syncItem)($lastItem = $lastItem ?? $item, $item, $metadata);
+                (self::$syncItem)($lastItem = $lastItem ?? $item, $item, $this->defaultLifetime, $metadata);
             }
 
             return $value;
@@ -119,7 +122,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      */
     public function getItem($key)
     {
-        $syncItem = $this->syncItem;
+        $syncItem = self::$syncItem;
         $misses = [];
 
         foreach ($this->adapters as $i => $adapter) {
@@ -127,7 +130,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
             if ($item->isHit()) {
                 while (0 <= --$i) {
-                    $this->adapters[$i]->save($syncItem($item, $misses[$i]));
+                    $this->adapters[$i]->save($syncItem($item, $misses[$i], $this->defaultLifetime));
                 }
 
                 return $item;
@@ -164,13 +167,13 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
 
         if ($missing) {
-            $syncItem = $this->syncItem;
+            $syncItem = self::$syncItem;
             $adapter = $this->adapters[$adapterIndex];
             $items = $this->generateItems($nextAdapter->getItems($missing), $nextAdapterIndex);
 
             foreach ($items as $k => $item) {
                 if ($item->isHit()) {
-                    $adapter->save($syncItem($item, $misses[$k]));
+                    $adapter->save($syncItem($item, $misses[$k], $this->defaultLifetime));
                 }
 
                 yield $k => $item;

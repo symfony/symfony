@@ -72,6 +72,6 @@ jobs:
             | License       | MIT
             | Doc PR        |
 
-            The psalm baseline have changed for branch ${{ matrix.branch }}.
+            The psalm baseline has changed for branch ${{ matrix.branch }}.
           branch: psalm-baseline-${{ matrix.branch }}
           base: ${{ matrix.branch }}

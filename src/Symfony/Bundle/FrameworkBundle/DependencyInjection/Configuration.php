@@ -1874,7 +1874,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('lock_factory')
-                                        ->info('The service ID of the lock factory used by this limiter')
+                                        ->info('The service ID of the lock factory used by this limiter (or null to disable locking)')
                                         ->defaultValue('lock.factory')
                                     ->end()
                                     ->scalarNode('cache_pool')

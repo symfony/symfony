@@ -124,6 +124,14 @@ class DateIntervalNormalizerTest extends TestCase
         $this->doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, true);
     }
 
+    public function testDenormalizeIntervalsWithOmittedPartsBeingZero()
+    {
+        $normalizer = new DateIntervalNormalizer();
+
+        $this->assertDateIntervalEquals($this->getInterval('P3Y2M4DT0H0M0S'), $normalizer->denormalize('P3Y2M4D', \DateInterval::class));
+        $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
+    }
+
     private function doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, bool $legacy = false)
     {
         $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);

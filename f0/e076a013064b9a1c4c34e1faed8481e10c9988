@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-25T16:33:43Z
+
+This PR improves on #37829
+/cc @jvasseur
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2021-02-25T19:13:16Z
+
+I though of allowing multiple attributes when originally designing it but couldn't see the use-case. I see this feature as a potential replacement for the `ParamConvertor` annotation and as a result the use case is to define a unique attribute that completely define how the argument will be resolved leaving no space for another attribute.
+
+It's true that allowing multiple attributes doesn't limit the feature while allowing a potential new use case. The only things we will lose are:
+ - No more error when defining multiple attributes : this could  worsen the DX of the feature
+ - Controllers attributes will always be instantiated even if not related to argument resolving as spotted by @nicolas-grekas (not sure how much of a problem this could be)
+
+Overall I would say I am slightly in disfavor of this PR since I see no use case for it while it has a few drawbacks but that's not a strong opinion.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2021-02-25T19:16:16Z
+
+BTW, this PR is missing the update to the [UserValueResolver](https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Security/Http/Controller/UserValueResolver.php) to no longer use the deprecated API.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-25T22:48:27Z
+
+Thank you for reviewing.
+
+> No more error when defining multiple attributes : this could worsen the DX of the feature
+
+I can imagine use cases other than value resolution (e.g. decoration, introspection, validation...). Making the assumption that only one attribute will be needed feels wrong to me.
+
+> Controllers attributes will always be instantiated even if not related to argument resolving as spotted by @nicolas-grekas (not sure how much of a problem this could be)
+
+Fixed ~via `hasAttribute()` and `getAttributes()` now returning attribute reflectors.~  now by ignoring attributes with undefined class.

@@ -15,7 +15,6 @@ use Fake\ImportedAndFake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
-use Symfony\Component\HttpKernel\Exception\InvalidMetadataException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Foo;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\AttributeController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
@@ -128,18 +127,17 @@ class ArgumentMetadataFactoryTest extends TestCase
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
 
         $this->assertEquals([
-            new ArgumentMetadata('baz', 'string', false, false, null, false, new Foo('bar')),
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
         ], $arguments);
     }
 
     /**
      * @requires PHP 8
      */
-    public function testAttributeSignatureError()
+    public function testMultipleAttributes()
     {
-        $this->expectException(InvalidMetadataException::class);
-
-        $this->factory->createArgumentMetadata([new AttributeController(), 'invalidAction']);
+        $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg']);
+        $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
     }
 
     private function signature1(self $foo, array $bar, callable $baz)

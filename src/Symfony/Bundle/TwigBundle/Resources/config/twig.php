@@ -23,6 +23,8 @@ use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Bridge\Twig\Extension\ProfilerExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
+use Symfony\Bridge\Twig\Extension\SerializerExtension;
+use Symfony\Bridge\Twig\Extension\SerializerRuntime;
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Extension\WebLinkExtension;
@@ -160,5 +162,10 @@ return static function (ContainerConfigurator $container) {
                     ->factory([TwigErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),
             ])
+
+        ->set('twig.runtime.serializer', SerializerRuntime::class)
+            ->args([service('serializer')])
+
+        ->set('twig.extension.serializer', SerializerExtension::class)
     ;
 };

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3.0
+-----
+
+* Added a new `serialize` filter to serialize objects using the Serializer component
+
 5.2.0
 -----
 

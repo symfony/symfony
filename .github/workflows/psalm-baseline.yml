@@ -10,7 +10,7 @@ defaults:
 
 jobs:
   psalm:
-    name: Psalm baselne
+    name: Psalm baseline
     runs-on: Ubuntu-20.04
     strategy:
       fail-fast: false

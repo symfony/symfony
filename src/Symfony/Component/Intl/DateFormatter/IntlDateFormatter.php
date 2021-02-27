@@ -253,7 +253,7 @@ abstract class IntlDateFormatter
      *
      * @see https://php.net/intldateformatter.getcalendar
      */
-    public function getCalendar()
+    public function getCalendar(): int
     {
         return self::GREGORIAN;
     }

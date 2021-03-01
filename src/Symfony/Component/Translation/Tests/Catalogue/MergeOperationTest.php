@@ -90,6 +90,29 @@ class MergeOperationTest extends AbstractOperationTest
         );
     }
 
+    public function testGetResultWithMetadataFromIntlDomain()
+    {
+        $leftCatalogue = new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a', 'b' => 'old_b']]);
+        $leftCatalogue->setMetadata('a', 'foo', 'messages+intl-icu');
+        $leftCatalogue->setMetadata('b', 'bar', 'messages+intl-icu');
+        $rightCatalogue = new MessageCatalogue('en', ['messages+intl-icu' => ['b' => 'new_b', 'c' => 'new_c']]);
+        $rightCatalogue->setMetadata('b', 'baz', 'messages+intl-icu');
+        $rightCatalogue->setMetadata('c', 'qux', 'messages+intl-icu');
+
+        $mergedCatalogue = new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c']]);
+        $mergedCatalogue->setMetadata('a', 'foo', 'messages+intl-icu');
+        $mergedCatalogue->setMetadata('b', 'bar', 'messages+intl-icu');
+        $mergedCatalogue->setMetadata('c', 'qux', 'messages+intl-icu');
+
+        $this->assertEquals(
+            $mergedCatalogue,
+            $this->createOperation(
+                $leftCatalogue,
+                $rightCatalogue
+            )->getResult()
+        );
+    }
+
     protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
     {
         return new MergeOperation($source, $target);

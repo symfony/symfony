@@ -18,7 +18,6 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -28,12 +27,18 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -155,7 +160,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testGetThrowsCircularReferenceExceptionIfServiceHasReferenceToItself()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException::class);
+        $this->expectException(ServiceCircularReferenceException::class);
         $builder = new ContainerBuilder();
         $builder->register('baz', 'stdClass')->setArguments([new Reference('baz')]);
         $builder->get('baz');
@@ -207,7 +212,7 @@ class ContainerBuilderTest extends TestCase
      */
     public function testBadAliasId($id)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->setAlias($id, 'foo');
     }
@@ -217,7 +222,7 @@ class ContainerBuilderTest extends TestCase
      */
     public function testBadDefinitionId($id)
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $builder = new ContainerBuilder();
         $builder->setDefinition($id, new Definition('Foo'));
     }
@@ -383,8 +388,8 @@ class ContainerBuilderTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->setResourceTracking(false);
         $defaultPasses = $builder->getCompiler()->getPassConfig()->getPasses();
-        $builder->addCompilerPass($pass1 = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface::class)->getMock(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
-        $builder->addCompilerPass($pass2 = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface::class)->getMock(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $builder->addCompilerPass($pass1 = $this->createMock(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
+        $builder->addCompilerPass($pass2 = $this->createMock(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
 
         $passes = $builder->getCompiler()->getPassConfig()->getPasses();
         $this->assertCount(\count($passes) - 2, $defaultPasses);
@@ -655,7 +660,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testMergeThrowsExceptionForDuplicateAutomaticInstanceofDefinitions()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"AInterface" has already been autoconfigured and merge() does not support merging autoconfiguration for the same class/interface.');
         $container = new ContainerBuilder();
         $config = new ContainerBuilder();
@@ -773,7 +778,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testCompileWithResolveMissingEnv()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException::class);
+        $this->expectException(EnvNotFoundException::class);
         $this->expectExceptionMessage('Environment variable not found: "FOO".');
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%env(FOO)%');
@@ -869,7 +874,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testCircularDynamicEnv()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException::class);
+        $this->expectException(ParameterCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").');
         putenv('DUMMY_ENV_VAR=some%foo%');
 
@@ -946,7 +951,7 @@ class ContainerBuilderTest extends TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(2, $resources, '2 resources were registered');
+        $this->assertCount(1, $resources);
 
         /* @var $resource \Symfony\Component\Config\Resource\FileResource */
         $resource = end($resources);
@@ -975,9 +980,9 @@ class ContainerBuilderTest extends TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(3, $resources, '3 resources were registered');
+        $this->assertCount(2, $resources);
 
-        $this->assertSame('reflection.BarClass', (string) $resources[1]);
+        $this->assertSame('reflection.BarClass', (string) $resources[0]);
         $this->assertSame('BarMissingClass', (string) end($resources));
     }
 
@@ -1038,7 +1043,6 @@ class ContainerBuilderTest extends TestCase
     public function testFileExists()
     {
         $container = new ContainerBuilder();
-        $A = new ComposerResource();
         $a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml');
         $b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml');
         $c = new DirectoryResource($dir = \dirname($b));
@@ -1052,7 +1056,7 @@ class ContainerBuilderTest extends TestCase
             }
         }
 
-        $this->assertEquals([$A, $a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
+        $this->assertEquals([$a, $b, $c], $resources, '->getResources() returns an array of resources read for the current configuration');
     }
 
     public function testExtension()
@@ -1069,7 +1073,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testRegisteredButNotLoadedExtension()
     {
-        $extension = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Extension\ExtensionInterface::class)->getMock();
+        $extension = $this->createMock(ExtensionInterface::class);
         $extension->expects($this->once())->method('getAlias')->willReturn('project');
         $extension->expects($this->never())->method('load');
 
@@ -1081,7 +1085,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testRegisteredAndLoadedExtension()
     {
-        $extension = $this->getMockBuilder(\Symfony\Component\DependencyInjection\Extension\ExtensionInterface::class)->getMock();
+        $extension = $this->createMock(ExtensionInterface::class);
         $extension->expects($this->exactly(2))->method('getAlias')->willReturn('project');
         $extension->expects($this->once())->method('load')->with([['foo' => 'bar']]);
 
@@ -1233,7 +1237,7 @@ class ContainerBuilderTest extends TestCase
 
     public function testThrowsCircularExceptionForCircularAliases()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException::class);
+        $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for service "app.test_class", path: "app.test_class -> App\TestClass -> app.test_class".');
         $builder = new ContainerBuilder();
 

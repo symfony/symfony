@@ -22,7 +22,7 @@ class YamlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new YamlFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
+        $loader = new YamlFileLoader($this->createMock(FileLocator::class));
 
         $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
@@ -434,5 +434,15 @@ class YamlFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
 
         $this->assertEquals($expectedRoutes('yml'), $routes);
+    }
+
+    public function testWhenEnv()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
+        $routes = $loader->load('when-env.yml');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame('/a1', $routes->get('a')->getPath());
     }
 }

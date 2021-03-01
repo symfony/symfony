@@ -12,21 +12,22 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @experimental in 5.3
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @see https://tools.ietf.org/html/rfc4122#appendix-C for details about namespaces
  */
 class Uuid extends AbstractUid
 {
+    public const NAMESPACE_DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+    public const NAMESPACE_URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
+    public const NAMESPACE_OID = '6ba7b812-9dad-11d1-80b4-00c04fd430c8';
+    public const NAMESPACE_X500 = '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
+
     protected const TYPE = 0;
 
     public function __construct(string $uuid)
     {
-        try {
-            $type = uuid_type($uuid);
-        } catch (\ValueError $e) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
-        }
+        $type = uuid_is_valid($uuid) ? uuid_type($uuid) : false;
 
         if (false === $type || \UUID_TYPE_INVALID === $type || (static::TYPE ?: $type) !== $type) {
             throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
@@ -59,13 +60,11 @@ class Uuid extends AbstractUid
             return new static($uuid);
         }
 
-        try {
-            $type = uuid_type($uuid);
-        } catch (\ValueError $e) {
-            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid), 0, $e);
+        if (!uuid_is_valid($uuid)) {
+            throw new \InvalidArgumentException(sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
         }
 
-        switch ($type) {
+        switch (uuid_type($uuid)) {
             case UuidV1::TYPE: return new UuidV1($uuid);
             case UuidV3::TYPE: return new UuidV3($uuid);
             case UuidV4::TYPE: return new UuidV4($uuid);
@@ -114,7 +113,7 @@ class Uuid extends AbstractUid
             return uuid_is_valid($uuid);
         }
 
-        return static::TYPE === uuid_type($uuid);
+        return uuid_is_valid($uuid) && static::TYPE === uuid_type($uuid);
     }
 
     public function toBinary(): string

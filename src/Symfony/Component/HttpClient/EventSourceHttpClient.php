@@ -26,8 +26,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class EventSourceHttpClient implements HttpClientInterface
 {
-    use AsyncDecoratorTrait;
-    use HttpClientTrait;
+    use AsyncDecoratorTrait, HttpClientTrait {
+        AsyncDecoratorTrait::withOptions insteadof HttpClientTrait;
+    }
 
     private $reconnectionTime;
 

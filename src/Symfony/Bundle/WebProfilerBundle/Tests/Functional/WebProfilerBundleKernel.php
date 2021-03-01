@@ -43,7 +43,7 @@ class WebProfilerBundleKernel extends Kernel
         $containerBuilder->loadFromExtension('framework', [
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false],
-            'session' => ['storage_id' => 'session.storage.mock_file'],
+            'session' => ['storage_factory_id' => 'session.storage.factory.mock_file'],
             'router' => ['utf8' => true],
         ]);
 

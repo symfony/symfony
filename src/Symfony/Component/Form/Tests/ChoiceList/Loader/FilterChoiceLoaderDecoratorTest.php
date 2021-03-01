@@ -11,7 +11,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 {
     public function testLoadChoiceList()
     {
-        $decorated = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $decorated = $this->createMock(ChoiceLoaderInterface::class);
         $decorated->expects($this->once())
             ->method('loadChoiceList')
             ->willReturn(new ArrayChoiceList(range(1, 4)))
@@ -28,7 +28,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
     public function testLoadChoiceListWithGroupedChoices()
     {
-        $decorated = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $decorated = $this->createMock(ChoiceLoaderInterface::class);
         $decorated->expects($this->once())
             ->method('loadChoiceList')
             ->willReturn(new ArrayChoiceList(['units' => range(1, 9), 'tens' => range(10, 90, 10)]))
@@ -54,7 +54,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
     {
         $evenValues = [1 => '2', 3 => '4'];
 
-        $decorated = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $decorated = $this->createMock(ChoiceLoaderInterface::class);
         $decorated->expects($this->never())
             ->method('loadChoiceList')
         ;
@@ -78,7 +78,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         $evenChoices = [1 => 2, 3 => 4];
         $values = array_map('strval', range(1, 4));
 
-        $decorated = $this->getMockBuilder(ChoiceLoaderInterface::class)->getMock();
+        $decorated = $this->createMock(ChoiceLoaderInterface::class);
         $decorated->expects($this->never())
             ->method('loadChoiceList')
         ;

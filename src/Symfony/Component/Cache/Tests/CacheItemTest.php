@@ -13,6 +13,8 @@ namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Tests\Fixtures\StringableTag;
 
 class CacheItemTest extends TestCase
@@ -27,7 +29,7 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidKey($key)
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache key');
         CacheItem::validateKey($key);
     }
@@ -75,7 +77,7 @@ class CacheItemTest extends TestCase
      */
     public function testInvalidTag($tag)
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache tag');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
@@ -87,7 +89,7 @@ class CacheItemTest extends TestCase
 
     public function testNonTaggableItem()
     {
-        $this->expectException(\Symfony\Component\Cache\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cache item "foo" comes from a non tag-aware pool: you cannot tag it.');
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');

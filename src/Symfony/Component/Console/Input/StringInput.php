@@ -48,12 +48,12 @@ class StringInput extends ArgvInput
         $length = \strlen($input);
         $cursor = 0;
         while ($cursor < $length) {
-            if (preg_match('/\s+/A', $input, $match, null, $cursor)) {
-            } elseif (preg_match('/([^="\'\s]+?)(=?)('.self::REGEX_QUOTED_STRING.'+)/A', $input, $match, null, $cursor)) {
+            if (preg_match('/\s+/A', $input, $match, 0, $cursor)) {
+            } elseif (preg_match('/([^="\'\s]+?)(=?)('.self::REGEX_QUOTED_STRING.'+)/A', $input, $match, 0, $cursor)) {
                 $tokens[] = $match[1].$match[2].stripcslashes(str_replace(['"\'', '\'"', '\'\'', '""'], '', substr($match[3], 1, \strlen($match[3]) - 2)));
-            } elseif (preg_match('/'.self::REGEX_QUOTED_STRING.'/A', $input, $match, null, $cursor)) {
+            } elseif (preg_match('/'.self::REGEX_QUOTED_STRING.'/A', $input, $match, 0, $cursor)) {
                 $tokens[] = stripcslashes(substr($match[0], 1, \strlen($match[0]) - 2));
-            } elseif (preg_match('/'.self::REGEX_STRING.'/A', $input, $match, null, $cursor)) {
+            } elseif (preg_match('/'.self::REGEX_STRING.'/A', $input, $match, 0, $cursor)) {
                 $tokens[] = stripcslashes($match[1]);
             } else {
                 // should never happen

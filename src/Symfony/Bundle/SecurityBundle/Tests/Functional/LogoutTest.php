@@ -11,7 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class LogoutTest extends AbstractWebTestCase
 {
@@ -44,19 +49,26 @@ class LogoutTest extends AbstractWebTestCase
     public function testCsrfTokensAreClearedOnLogout(array $options)
     {
         $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
-        static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
+        $client->disableReboot();
+        $this->callInRequestContext($client, function () {
+            static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
+        });
 
         $client->request('POST', '/login', [
             '_username' => 'johannes',
             '_password' => 'test',
         ]);
 
-        $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
-        $this->assertSame('bar', static::$container->get('security.csrf.token_storage')->getToken('foo'));
+        $this->callInRequestContext($client, function () {
+            $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
+            $this->assertSame('bar', static::$container->get('security.csrf.token_storage')->getToken('foo'));
+        });
 
         $client->request('GET', '/logout');
 
-        $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
+        $this->callInRequestContext($client, function () {
+            $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
+        });
     }
 
     /**
@@ -84,5 +96,23 @@ class LogoutTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/');
         $this->assertNull($cookieJar->get('flavor'));
+    }
+
+    private function callInRequestContext(KernelBrowser $client, callable $callable): void
+    {
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = static::$container->get(EventDispatcherInterface::class);
+        $wrappedCallable = function (RequestEvent $event) use (&$callable) {
+            $callable();
+            $event->setResponse(new Response(''));
+            $event->stopPropagation();
+        };
+
+        $eventDispatcher->addListener(KernelEvents::REQUEST, $wrappedCallable);
+        try {
+            $client->request('GET', '/'.uniqid('', true));
+        } finally {
+            $eventDispatcher->removeListener(KernelEvents::REQUEST, $wrappedCallable);
+        }
     }
 }

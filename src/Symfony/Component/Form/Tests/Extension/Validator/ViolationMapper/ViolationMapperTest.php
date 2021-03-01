@@ -1603,7 +1603,7 @@ class ViolationMapperTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['Name', [], null, null, 'Custom Name'],
         ]);
@@ -1630,7 +1630,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabel2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['options_label', [], null, null, 'Translated Label'],
         ]);
@@ -1668,7 +1668,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat1()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['form.custom', [], null, null, 'Translated 1st Custom Label'],
         ]);
@@ -1706,7 +1706,7 @@ class ViolationMapperTest extends TestCase
 
     public function testMessageWithLabelFormat2()
     {
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())->method('trans')->willReturnMap([
             ['form_custom-id', [], null, null, 'Translated 2nd Custom Label'],
         ]);
@@ -1742,6 +1742,88 @@ class ViolationMapperTest extends TestCase
         }
     }
 
+    public function testLabelFormatDefinedByParentType()
+    {
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_format' => 'form.%name%',
+        ]);
+        $child = $this->getForm('foo', 'foo');
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "form.foo"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationDomainDefinedByParentType()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [], 'domain')
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'translation_domain' => 'domain',
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with('foo', [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ])
+            ->willReturn('translated foo label')
+        ;
+        $this->mapper = new ViolationMapper(null, $translator);
+
+        $form = $this->getForm('', null, null, [], false, true, [
+            'label_translation_parameters' => [
+                '{{ param_defined_in_parent }}' => 'param defined in parent value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child parent value',
+            ],
+        ]);
+        $child = $this->getForm('foo', 'foo', null, [], false, true, [
+            'label' => 'foo',
+            'label_translation_parameters' => [
+                '{{ param_defined_in_child }}' => 'param defined in child value',
+                '{{ param_defined_in_parent_overridden_in_child }}' => 'param defined in parent overridden in child child value',
+            ],
+        ]);
+        $form->add($child);
+
+        $violation = new ConstraintViolation('Message "{{ label }}"', null, [], null, 'data.foo', null);
+        $this->mapper->mapViolation($violation, $form);
+
+        $errors = iterator_to_array($child->getErrors());
+
+        $this->assertCount(1, $errors, $child->getName().' should have an error, but has none');
+        $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
+    }
+
     public function testTranslatorNotCalledWithoutLabel()
     {
         $renderer = $this->getMockBuilder(FormRenderer::class)
@@ -1749,7 +1831,7 @@ class ViolationMapperTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
         ;
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->never())->method('trans');
         $this->mapper = new ViolationMapper($renderer, $translator);
 

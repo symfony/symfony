@@ -35,7 +35,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolveNoUser()
     {
-        $mock = $this->getMockBuilder(UserInterface::class)->getMock();
+        $mock = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken('username', 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -57,7 +57,7 @@ class UserValueResolverTest extends TestCase
 
     public function testResolve()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -71,21 +71,33 @@ class UserValueResolverTest extends TestCase
 
     public function testResolveWithAttribute()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, new CurrentUser());
+        $metadata = $this->createMock(ArgumentMetadata::class);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
+    public function testResolveWithAttributeAndNoUser()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('username', 'password', 'provider'));
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
+    }
+
     public function testIntegration()
     {
-        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);

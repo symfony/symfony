@@ -73,7 +73,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         $parent = $definition instanceof ChildDefinition ? $definition->getParent() : null;
 
         foreach ($conditionals as $interface => $instanceofDefs) {
-            if ($interface !== $class && !(null === $reflectionClass ? $reflectionClass = ($container->getReflectionClass($class, false) ?: false) : $reflectionClass)) {
+            if ($interface !== $class && !($reflectionClass ?? $reflectionClass = $container->getReflectionClass($class, false) ?: false)) {
                 continue;
             }
 

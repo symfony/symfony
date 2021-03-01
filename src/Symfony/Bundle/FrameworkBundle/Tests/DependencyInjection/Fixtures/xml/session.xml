@@ -7,6 +7,6 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:session handler-id="null"/>
+        <framework:session storage-factory-id="session.storage.factory.native" handler-id="null"/>
     </framework:config>
 </container>

@@ -23,7 +23,7 @@ class CacheTraitTest extends TestCase
 {
     public function testSave()
     {
-        $item = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $item = $this->createMock(CacheItemInterface::class);
         $item->method('set')
             ->willReturn($item);
         $item->method('isHit')
@@ -52,7 +52,7 @@ class CacheTraitTest extends TestCase
 
     public function testNoCallbackCallOnHit()
     {
-        $item = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $item = $this->createMock(CacheItemInterface::class);
         $item->method('isHit')
             ->willReturn(true);
 
@@ -79,7 +79,7 @@ class CacheTraitTest extends TestCase
 
     public function testRecomputeOnBetaInf()
     {
-        $item = $this->getMockBuilder(CacheItemInterface::class)->getMock();
+        $item = $this->createMock(CacheItemInterface::class);
         $item->method('set')
             ->willReturn($item);
         $item->method('isHit')

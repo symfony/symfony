@@ -13,8 +13,11 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -159,7 +162,7 @@ class PropertyAccessorTest extends TestCase
      */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\AccessException::class);
+        $this->expectException(AccessException::class);
         $this->expectExceptionMessage('The method "class@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
         $object = eval('return new class() {
@@ -179,7 +182,7 @@ class PropertyAccessorTest extends TestCase
      */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\AccessException::class);
+        $this->expectException(AccessException::class);
         $this->expectExceptionMessage('The method "stdClass@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
         $object = eval('return new class() extends \stdClass {
@@ -199,7 +202,7 @@ class PropertyAccessorTest extends TestCase
      */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\AccessException::class);
+        $this->expectException(AccessException::class);
         $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty@anonymous::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
 
         $object = eval('return new class() extends \Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty {};');
@@ -302,7 +305,7 @@ class PropertyAccessorTest extends TestCase
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
@@ -421,7 +424,7 @@ class PropertyAccessorTest extends TestCase
      */
     public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
         $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
     }
@@ -679,7 +682,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testThrowTypeError()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "DateTime", "string" given at property path "date"');
         $object = new TypeHinted();
 
@@ -688,7 +691,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testThrowTypeErrorWithNullArgument()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "DateTime", "null" given');
         $object = new TypeHinted();
 
@@ -740,7 +743,7 @@ class PropertyAccessorTest extends TestCase
 
     public function testThrowTypeErrorWithInterface()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "Countable", "string" given');
         $object = new TypeHinted();
 

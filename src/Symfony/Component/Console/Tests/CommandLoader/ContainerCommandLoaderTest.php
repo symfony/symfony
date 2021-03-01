@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\CommandLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContainerCommandLoaderTest extends TestCase
@@ -43,7 +44,7 @@ class ContainerCommandLoaderTest extends TestCase
 
     public function testGetUnknownCommandThrows()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\CommandNotFoundException::class);
+        $this->expectException(CommandNotFoundException::class);
         (new ContainerCommandLoader(new ServiceLocator([]), []))->get('unknown');
     }
 

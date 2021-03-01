@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class MainConfigurationTest extends TestCase
@@ -34,7 +35,7 @@ class MainConfigurationTest extends TestCase
 
     public function testNoConfigForProvider()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [],
@@ -48,7 +49,7 @@ class MainConfigurationTest extends TestCase
 
     public function testManyConfigForProvider()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [

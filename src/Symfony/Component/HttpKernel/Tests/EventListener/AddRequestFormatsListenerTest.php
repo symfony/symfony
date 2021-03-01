@@ -12,14 +12,13 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Test AddRequestFormatsListener class.
- *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  */
 class AddRequestFormatsListenerTest extends TestCase
@@ -41,12 +40,12 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testIsAnEventSubscriber()
     {
-        $this->assertInstanceOf(\Symfony\Component\EventDispatcher\EventSubscriberInterface::class, $this->listener);
+        $this->assertInstanceOf(EventSubscriberInterface::class, $this->listener);
     }
 
     public function testRegisteredEvent()
     {
-        $this->assertEquals(
+        $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 100]],
             AddRequestFormatsListener::getSubscribedEvents()
         );
@@ -54,7 +53,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     public function testSetAdditionalFormats()
     {
-        $request = $this->getRequestMock();
+        $request = $this->createMock(Request::class);
         $event = $this->getRequestEventMock($request);
 
         $request->expects($this->once())
@@ -64,18 +63,9 @@ class AddRequestFormatsListenerTest extends TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    protected function getRequestMock()
-    {
-        return $this->getMockBuilder(Request::class)->getMock();
-    }
-
     protected function getRequestEventMock(Request $request)
     {
-        $event = $this
-            ->getMockBuilder(RequestEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $event = $this->createMock(RequestEvent::class);
         $event->expects($this->any())
             ->method('getRequest')
             ->willReturn($request);

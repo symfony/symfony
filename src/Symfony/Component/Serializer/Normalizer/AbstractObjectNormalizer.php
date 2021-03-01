@@ -175,9 +175,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
+            $attributeValue = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
             if ($maxDepthReached) {
-                $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
+                $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $attributeContext);
             }
 
             /**
@@ -185,14 +186,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
              */
             $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
             if ($callback) {
-                $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
+                $attributeValue = $callback($attributeValue, $object, $attribute, $format, $attributeContext);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
                 $stack[$attribute] = $attributeValue;
             }
 
-            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context);
+            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
@@ -200,7 +201,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute, $format)), $class, $format, $context);
+            $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
+            $childContext = $this->createChildContext($attributeContext, $attribute, $format);
+
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext);
         }
 
         if (isset($context[self::PRESERVE_EMPTY_OBJECTS]) && !\count($data)) {
@@ -208,6 +212,39 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
+     */
+    private function getAttributeNormalizationContext($object, string $attribute, array $context): array
+    {
+        if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
+            return $context;
+        }
+
+        return array_merge($context, $metadata->getNormalizationContextForGroups($this->getGroups($context)));
+    }
+
+    /**
+     * Computes the denormalization context merged with current one. Metadata always wins over global context, as more specific.
+     */
+    private function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
+    {
+        if (null === $metadata = $this->getAttributeMetadata($class, $attribute)) {
+            return $context;
+        }
+
+        return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
+    }
+
+    private function getAttributeMetadata($objectOrClass, string $attribute): ?AttributeMetadataInterface
+    {
+        if (!$this->classMetadataFactory) {
+            return null;
+        }
+
+        return $this->classMetadataFactory->getMetadataFor($objectOrClass)->getAttributesMetadata()[$attribute] ?? null;
     }
 
     /**
@@ -312,8 +349,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         foreach ($normalizedData as $attribute => $value) {
+            $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
+
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
+                $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $attributeContext);
             }
 
             if ((false !== $allowedAttributes && !\in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($resolvedClass, $attribute, $format, $context)) {
@@ -324,16 +363,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            if ($context[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+            if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
                 try {
-                    $context[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $context);
+                    $attributeContext[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
                 } catch (NoSuchPropertyException $e) {
                 }
             }
 
-            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $context);
+            $value = $this->validateAndDenormalize($resolvedClass, $attribute, $value, $format, $attributeContext);
             try {
-                $this->setAttributeValue($object, $attribute, $value, $format, $context);
+                $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
             } catch (InvalidArgumentException $e) {
                 throw new NotNormalizableValueException(sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $type), $e->getCode(), $e);
             }

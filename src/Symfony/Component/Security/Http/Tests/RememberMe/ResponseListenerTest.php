@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -83,7 +84,7 @@ class ResponseListenerTest extends TestCase
     private function getResponse()
     {
         $response = new Response();
-        $response->headers = $this->getMockBuilder(\Symfony\Component\HttpFoundation\ResponseHeaderBag::class)->getMock();
+        $response->headers = $this->createMock(ResponseHeaderBag::class);
 
         return $response;
     }

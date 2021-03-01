@@ -15,6 +15,22 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "provide": {
+        "php-http/async-client-implementation": "*",
+        "php-http/client-implementation": "*",
+        "psr/cache-implementation": "1.0|2.0",
+        "psr/container-implementation": "1.0",
+        "psr/event-dispatcher-implementation": "1.0",
+        "psr/http-client-implementation": "1.0",
+        "psr/link-implementation": "1.0",
+        "psr/log-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0",
+        "symfony/cache-implementation": "1.0|2.0",
+        "symfony/event-dispatcher-implementation": "2.0",
+        "symfony/http-client-implementation": "2.2",
+        "symfony/service-implementation": "1.0|2.0",
+        "symfony/translation-implementation": "2.3"
+    },
     "require": {
         "php": ">=7.2.5",
         "ext-xml": "*",
@@ -22,7 +38,7 @@
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "^2",
         "twig/twig": "^2.13|^3.0.4",
-        "psr/cache": "~1.0",
+        "psr/cache": "^1.0|^2.0",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "^1.0",
         "psr/link": "^1.0",
@@ -40,7 +56,6 @@
     },
     "replace": {
         "symfony/asset": "self.version",
-        "symfony/amazon-mailer": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/cache": "self.version",
         "symfony/config": "self.version",
@@ -58,7 +73,6 @@
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/framework-bundle": "self.version",
-        "symfony/google-mailer": "self.version",
         "symfony/http-client": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
@@ -66,15 +80,13 @@
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
         "symfony/lock": "self.version",
-        "symfony/mailchimp-mailer": "self.version",
         "symfony/mailer": "self.version",
-        "symfony/mailgun-mailer": "self.version",
         "symfony/messenger": "self.version",
         "symfony/mime": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/notifier": "self.version",
         "symfony/options-resolver": "self.version",
-        "symfony/postmark-mailer": "self.version",
+        "symfony/password-hasher": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
@@ -87,7 +99,6 @@
         "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
         "symfony/semaphore": "self.version",
-        "symfony/sendgrid-mailer": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/string": "self.version",
@@ -112,7 +123,7 @@
         "async-aws/sqs": "^1.0",
         "cache/integration-tests": "dev-master",
         "composer/package-versions-deprecated": "^1.8",
-        "doctrine/annotations": "^1.10.4",
+        "doctrine/annotations": "^1.12",
         "doctrine/cache": "~1.6",
         "doctrine/collections": "~1.0",
         "doctrine/data-fixtures": "^1.1",
@@ -140,6 +151,7 @@
     },
     "conflict": {
         "async-aws/core": "<1.5",
+        "doctrine/annotations": "<1.12",
         "doctrine/dbal": "<2.10",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",
@@ -156,6 +168,9 @@
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
+        "files": [
+            "src/Symfony/Component/String/Resources/functions.php"
+        ],
         "classmap": [
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
@@ -165,18 +180,19 @@
     },
     "autoload-dev": {
         "files": [
-            "src/Symfony/Component/String/Resources/functions.php",
             "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
         ]
     },
     "repositories": [
         {
             "type": "path",
-            "url": "src/Symfony/Contracts"
+            "url": "src/Symfony/Contracts",
+            "options": {
+                "versions": {
+                    "symfony/contracts": "2.4.x-dev"
+                }
+            }
         }
     ],
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-version": "5.x"
-    }
+    "minimum-stability": "dev"
 }

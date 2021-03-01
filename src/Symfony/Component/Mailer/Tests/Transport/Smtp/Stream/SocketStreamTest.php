@@ -12,13 +12,14 @@
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp\Stream;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 class SocketStreamTest extends TestCase
 {
     public function testSocketErrorNoConnection()
     {
-        $this->expectException(\Symfony\Component\Mailer\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/Connection refused|unable to connect/');
         $s = new SocketStream();
         $s->setTimeout(0.1);
@@ -28,7 +29,7 @@ class SocketStreamTest extends TestCase
 
     public function testSocketErrorBeforeConnectError()
     {
-        $this->expectException(\Symfony\Component\Mailer\Exception\TransportException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/no valid certs found cafile stream|Unable to find the socket transport "ssl"/');
         $s = new SocketStream();
         $s->setStreamOptions([

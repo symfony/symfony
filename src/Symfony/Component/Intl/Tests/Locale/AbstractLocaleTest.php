@@ -27,5 +27,10 @@ abstract class AbstractLocaleTest extends TestCase
         $this->assertSame('en_GB', $this->call('getDefault'));
     }
 
-    abstract protected function call($methodName);
+    /**
+     * @param mixed ...$args
+     *
+     * @return mixed
+     */
+    abstract protected function call(string $methodName, ...$args);
 }

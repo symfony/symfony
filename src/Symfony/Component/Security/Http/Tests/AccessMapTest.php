@@ -12,13 +12,15 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Http\AccessMap;
 
 class AccessMapTest extends TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $request = $this->createMock(Request::class);
         $requestMatcher1 = $this->getRequestMatcher($request, false);
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
@@ -31,7 +33,7 @@ class AccessMapTest extends TestCase
 
     public function testReturnsEmptyPatternIfNoneMatched()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->getMock();
+        $request = $this->createMock(Request::class);
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();
@@ -42,7 +44,7 @@ class AccessMapTest extends TestCase
 
     private function getRequestMatcher($request, $matches)
     {
-        $requestMatcher = $this->getMockBuilder(\Symfony\Component\HttpFoundation\RequestMatcherInterface::class)->getMock();
+        $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->once())
             ->method('matches')->with($request)
             ->willReturn($matches);

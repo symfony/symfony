@@ -1,7 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
-    'encoders' => [
+    'password_hashers' => [
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => [
             'algorithm' => 'sha1',
@@ -12,7 +12,7 @@ $container->loadFromExtension('security', [
             'algorithm' => 'md5',
         ],
         'JMS\FooBundle\Entity\User4' => [
-            'id' => 'security.encoder.foo',
+            'id' => 'security.hasher.foo',
         ],
         'JMS\FooBundle\Entity\User5' => [
             'algorithm' => 'pbkdf2',

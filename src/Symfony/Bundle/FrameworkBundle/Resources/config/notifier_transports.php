@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
 use Symfony\Component\Notifier\Bridge\Discord\DiscordTransportFactory;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransportFactory;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
@@ -33,6 +34,7 @@ use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sinch\SinchTransportFactory;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
+use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
@@ -86,6 +88,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.freemobile', FreeMobileTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.spothit', SpotHitTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 
@@ -144,6 +150,10 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.gitter', GitterTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.clickatell', ClickatellTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.null', NullTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')

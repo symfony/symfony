@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Resource\ComposerResource;
@@ -123,11 +124,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $autoconfiguredInstanceof = [];
 
+    /**
+     * @var callable[]
+     */
+    private $autoconfiguredAttributes = [];
+
     private $removedIds = [];
 
     private $removedBindingIds = [];
 
-    private static $internalTypes = [
+    private const INTERNAL_TYPES = [
         'int' => true,
         'float' => true,
         'string' => true,
@@ -334,7 +340,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return null;
         }
 
-        if (isset(self::$internalTypes[$class])) {
+        if (isset(self::INTERNAL_TYPES[$class])) {
             return null;
         }
 
@@ -670,6 +676,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             $this->autoconfiguredInstanceof[$interface] = $childDefinition;
+        }
+
+        foreach ($container->getAutoconfiguredAttributes() as $attribute => $configurator) {
+            if (isset($this->autoconfiguredAttributes[$attribute])) {
+                throw new InvalidArgumentException(sprintf('"%s" has already been autoconfigured and merge() does not support merging autoconfiguration for the same attribute.', $attribute));
+            }
+
+            $this->autoconfiguredAttributes[$attribute] = $configurator;
         }
     }
 
@@ -1310,6 +1324,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Registers an attribute that will be used for autoconfiguring annotated classes.
+     *
+     * The configurator will receive a Definition instance and an instance of the attribute, in that order.
+     */
+    public function registerAttributeForAutoconfiguration(string $attributeClass, callable $configurator): void
+    {
+        $this->autoconfiguredAttributes[$attributeClass] = $configurator;
+    }
+
+    /**
      * Registers an autowiring alias that only binds to a specific argument name.
      *
      * The argument name is derived from $name if provided (from $id otherwise)
@@ -1336,6 +1360,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredInstanceof()
     {
         return $this->autoconfiguredInstanceof;
+    }
+
+    /**
+     * @return callable[]
+     */
+    public function getAutoconfiguredAttributes(): array
+    {
+        return $this->autoconfiguredAttributes;
     }
 
     /**
@@ -1434,6 +1466,34 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function log(CompilerPassInterface $pass, string $message)
     {
         $this->getCompiler()->log($pass, $this->resolveEnvPlaceholders($message));
+    }
+
+    /**
+     * Checks whether a class is available and will remain available in the "no-dev" mode of Composer.
+     *
+     * When parent packages are provided and if any of them is in dev-only mode,
+     * the class will be considered available even if it is also in dev-only mode.
+     */
+    final public static function willBeAvailable(string $package, string $class, array $parentPackages): bool
+    {
+        if (!class_exists($class) && !interface_exists($class, false) && !trait_exists($class, false)) {
+            return false;
+        }
+
+        if (!class_exists(InstalledVersions::class) || !InstalledVersions::isInstalled($package) || InstalledVersions::isInstalled($package, false)) {
+            return true;
+        }
+
+        // the package is installed but in dev-mode only, check if this applies to one of the parent packages too
+
+        $rootPackage = InstalledVersions::getRootPackage()['name'] ?? '';
+        foreach ($parentPackages as $parentPackage) {
+            if ($rootPackage === $parentPackage || (InstalledVersions::isInstalled($parentPackage) && !InstalledVersions::isInstalled($parentPackage, false))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1599,14 +1659,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function inVendors(string $path): bool
     {
         if (null === $this->vendors) {
-            $resource = new ComposerResource();
-            $this->vendors = $resource->getVendors();
-            $this->addResource($resource);
+            $this->vendors = (new ComposerResource())->getVendors();
         }
         $path = realpath($path) ?: $path;
 
         foreach ($this->vendors as $vendor) {
             if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
+                $this->addResource(new FileResource($vendor.'/composer/installed.json'));
+
                 return true;
             }
         }

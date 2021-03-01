@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
@@ -1194,14 +1195,14 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testMakePathRelativeWithRelativeStartPath()
     {
-        $this->expectException(\Symfony\Component\Filesystem\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The start path "var/lib/symfony/src/Symfony/Component" is not absolute.');
         $this->assertSame('../../../', $this->filesystem->makePathRelative('/var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component'));
     }
 
     public function testMakePathRelativeWithRelativeEndPath()
     {
-        $this->expectException(\Symfony\Component\Filesystem\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The end path "var/lib/symfony/" is not absolute.');
         $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
     }

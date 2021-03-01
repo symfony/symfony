@@ -83,9 +83,9 @@ class SymfonyStyleTest extends TestCase
 
     public function testGetErrorStyle()
     {
-        $input = $this->getMockBuilder(InputInterface::class)->getMock();
+        $input = $this->createMock(InputInterface::class);
 
-        $errorOutput = $this->getMockBuilder(OutputInterface::class)->getMock();
+        $errorOutput = $this->createMock(OutputInterface::class);
         $errorOutput
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
@@ -93,7 +93,7 @@ class SymfonyStyleTest extends TestCase
             ->expects($this->once())
             ->method('write');
 
-        $output = $this->getMockBuilder(ConsoleOutputInterface::class)->getMock();
+        $output = $this->createMock(ConsoleOutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
@@ -108,12 +108,12 @@ class SymfonyStyleTest extends TestCase
 
     public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
     {
-        $output = $this->getMockBuilder(OutputInterface::class)->getMock();
+        $output = $this->createMock(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
 
-        $style = new SymfonyStyle($this->getMockBuilder(InputInterface::class)->getMock(), $output);
+        $style = new SymfonyStyle($this->createMock(InputInterface::class), $output);
 
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }

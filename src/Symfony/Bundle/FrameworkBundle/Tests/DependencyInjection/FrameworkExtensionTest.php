@@ -30,6 +30,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -41,12 +42,15 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -60,7 +64,10 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -317,21 +324,21 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testWorkflowAreValidated()
     {
-        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidDefinitionException::class);
+        $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" were found on StateMachine "my_workflow".');
         $this->createContainerFromFile('workflow_not_valid');
     }
 
     public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" and "support_strategy" cannot be used together.');
         $this->createContainerFromFile('workflow_with_support_and_support_strategy');
     }
 
     public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('"supports" or "support_strategy" should be configured.');
         $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
@@ -525,7 +532,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testRouterRequiresResourceOption()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
         $loader->load([['router' => true]], $container);
@@ -535,9 +542,12 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
-        $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
+        $this->assertEquals('session.storage.factory.native', (string) $container->getAlias('session.storage.factory'));
+        $this->assertFalse($container->has('session.storage'));
+        $this->assertFalse($container->has('session.storage.native'));
+        $this->assertFalse($container->has('session.storage.php_bridge'));
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $options = $container->getParameter('session.storage.options');
@@ -561,13 +571,33 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('session');
 
-        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
+        $this->assertNull($container->getDefinition('session.storage.factory.native')->getArgument(1));
+        $this->assertNull($container->getDefinition('session.storage.factory.php_bridge')->getArgument(0));
+        $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
+
+        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testNullSessionHandlerLegacy()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+
+        $container = $this->createContainerFromFile('session_legacy');
+
+        $this->assertTrue($container->hasAlias(SessionInterface::class), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
         $this->assertSame('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
 
     public function testRequest()
@@ -596,8 +626,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertUrlPackage($container, $defaultPackage, ['http://cdn.example.com'], 'SomeVersionScheme', '%%s?version=%%s');
 
         // packages
-        $packages = $packages->getArgument(1);
-        $this->assertCount(9, $packages);
+        $packageTags = $container->findTaggedServiceIds('assets.package');
+        $this->assertCount(9, $packageTags);
+
+        $packages = [];
+        foreach ($packageTags as $serviceId => $tagAttributes) {
+            $packages[$tagAttributes[0]['package']] = $serviceId;
+        }
 
         $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
@@ -819,19 +854,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame($container->getParameter('kernel.cache_dir').'/translations', $options['cache_dir']);
 
         $files = array_map('realpath', $options['resource_files']['en']);
-        $ref = new \ReflectionClass(\Symfony\Component\Validator\Validation::class);
+        $ref = new \ReflectionClass(Validation::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
-        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
+        $ref = new \ReflectionClass(Form::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass(\Symfony\Component\Security\Core\Security::class);
+        $ref = new \ReflectionClass(Security::class);
         $this->assertContains(
             strtr(\dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', \DIRECTORY_SEPARATOR),
             $files,
@@ -852,6 +887,19 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds translation resources with dots in domain'
         );
+        $this->assertContains(strtr(__DIR__.'/translations/security.en.yaml', '/', \DIRECTORY_SEPARATOR), $files);
+
+        $positionOverridingTranslationFile = array_search(strtr(realpath(__DIR__.'/translations/security.en.yaml'), '/', \DIRECTORY_SEPARATOR), $files);
+
+        if (false !== $positionCoreTranslationFile = array_search(strtr(realpath(__DIR__.'/../../../../Component/Security/Core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files)) {
+            $this->assertContains(strtr(realpath(__DIR__.'/../../../../Component/Security/Core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+        } else {
+            $this->assertContains(strtr(realpath(__DIR__.'/../../vendor/symfony/security-core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+
+            $positionCoreTranslationFile = array_search(strtr(realpath(__DIR__.'/../../vendor/symfony/security-core/Resources/translations/security.en.xlf'), '/', \DIRECTORY_SEPARATOR), $files);
+        }
+
+        $this->assertGreaterThan($positionCoreTranslationFile, $positionOverridingTranslationFile);
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['fr'], $calls[1][1][0]);
@@ -888,7 +936,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
         $projectDir = $container->getParameter('kernel.project_dir');
 
-        $ref = new \ReflectionClass(\Symfony\Component\Form\Form::class);
+        $ref = new \ReflectionClass(Form::class);
         $xmlMappings = [
             \dirname($ref->getFileName()).'/Resources/config/validation.xml',
             strtr($projectDir.'/config/validator/foo.xml', '/', \DIRECTORY_SEPARATOR),
@@ -922,7 +970,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('validation_annotations', ['kernel.charset' => 'UTF-8'], false);
 
-        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\ValidatorInterface::class, $container->get('validator.alias'));
+        $this->assertInstanceOf(ValidatorInterface::class, $container->get('validator.alias'));
     }
 
     public function testAnnotations()
@@ -931,7 +979,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->addCompilerPass(new TestAnnotationsPass());
         $container->compile();
 
-        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache')->getArgument(0));
+        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache_adapter')->getArgument(2));
         $this->assertSame('annotations.filesystem_cache', (string) $container->getDefinition('annotation_reader')->getArgument(1));
     }
 
@@ -1458,6 +1506,19 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testSessionCookieSecureAuto()
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
+
+        $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
+        $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testSessionCookieSecureAutoLegacy()
+    {
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: Not setting the "framework.session.storage_factory_id" configuration option is deprecated, it will default to "session.storage.factory.native" and will replace the "framework.session.storage_id" configuration option in version 6.0.');
+
+        $container = $this->createContainerFromFile('session_cookie_secure_auto_legacy');
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector', 'session_storage', 'request_stack'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));

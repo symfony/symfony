@@ -58,7 +58,7 @@ class MessageListener implements EventSubscriberInterface
             throw new InvalidArgumentException(sprintf('The "%d" rule is not supported.', $rule));
         }
 
-        $this->headerRules[$headerName] = $rule;
+        $this->headerRules[strtolower($headerName)] = $rule;
     }
 
     public function onMessage(MessageEvent $event): void

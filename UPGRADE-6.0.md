@@ -69,6 +69,9 @@ Form
 FrameworkBundle
 ---------------
 
+ * Remove the `session.storage` alias and `session.storage.*` services, use the `session.storage.factory` alias and `session.storage.factory.*` services instead
+ * Remove `framework.session.storage_id` configuration option, use the `framework.session.storage_factory_id` configuration option instead
+ * Remove the `session` service and the `SessionInterface` alias, use the `\Symfony\Component\HttpFoundation\Request::getSession()` or the new `\Symfony\Component\HttpFoundation\RequestStack::getSession()` methods instead
  * `MicroKernelTrait::configureRoutes()` is now always called with a `RoutingConfigurator`
  * The "framework.router.utf8" configuration option defaults to `true`
  * Removed `session.attribute_bag` service and `session.flash_bag` service.
@@ -89,6 +92,8 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Remove `ArgumentInterface`
+ * Remove `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
 
@@ -119,6 +124,7 @@ Messenger
  * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
  * Removed the `prefetch_count` parameter in the AMQP bridge.
+ * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
 
 Mime
 ----
@@ -161,10 +167,15 @@ Routing
  * Removed `RouteCollectionBuilder`.
  * Added argument `$priority` to `RouteCollection::add()`
  * Removed the `RouteCompiler::REGEX_DELIMITER` constant
+ * Removed the `$data` parameter from the constructor of the `Route` annotation class
 
 Security
 --------
 
+ * Drop all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
+ * Drop support for `SessionInterface $session` as constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
+ * Drop support for `session` provided by the ServiceLocator injected in `UsageTrackingTokenStorage`, provide a `request_stack` service instead
+ * Make `SessionTokenStorage` throw a `SessionNotFoundException` when called outside a request context
  * Removed `ROLE_PREVIOUS_ADMIN` role in favor of `IS_IMPERSONATOR` attribute
  * Removed `LogoutSuccessHandlerInterface` and `LogoutHandlerInterface`, register a listener on the `LogoutEvent` event instead.
  * Removed `DefaultLogoutSuccessHandler` in favor of `DefaultLogoutListener`.
@@ -174,6 +185,16 @@ Security
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
  * `AccessDecisionManager` now throw an exception when a voter does not return a valid decision.
+
+SecurityBundle
+--------------
+
+ * Remove the `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
+   use `UserPasswordHashCommand` and `user:hash-password` instead
+ * Remove the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,
+   use `security.password_hasher_factory` and `Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface` instead
+ * Remove the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
+   use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
 
 Serializer
 ----------
@@ -245,6 +266,11 @@ Validator
   $builder->enableAnnotationMapping(true)
       ->addDefaultDoctrineAnnotationReader();
   ```
+
+Workflow
+--------
+
+ * Remove `InvalidTokenConfigurationException`
 
 Yaml
 ----

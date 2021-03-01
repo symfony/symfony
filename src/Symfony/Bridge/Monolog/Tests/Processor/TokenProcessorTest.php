@@ -26,7 +26,7 @@ class TokenProcessorTest extends TestCase
     public function testProcessor()
     {
         $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);

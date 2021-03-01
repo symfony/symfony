@@ -22,7 +22,7 @@ class PhpFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
-        $loader = new PhpFileLoader($this->getMockBuilder(FileLocator::class)->getMock());
+        $loader = new PhpFileLoader($this->createMock(FileLocator::class));
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -283,5 +283,15 @@ class PhpFileLoaderTest extends TestCase
         $expectedRoutes = require __DIR__.'/../Fixtures/locale_and_host/import-with-single-host-expected-collection.php';
 
         $this->assertEquals($expectedRoutes('php'), $routes);
+    }
+
+    public function testWhenEnv()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
+        $routes = $loader->load('when-env.php');
+
+        $this->assertSame(['b', 'a'], array_keys($routes->all()));
+        $this->assertSame('/b', $routes->get('b')->getPath());
+        $this->assertSame('/a1', $routes->get('a')->getPath());
     }
 }

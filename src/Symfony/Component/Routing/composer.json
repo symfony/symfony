@@ -21,16 +21,17 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "symfony/config": "^5.0",
+        "symfony/config": "^5.3",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "doctrine/annotations": "^1.10.4",
+        "doctrine/annotations": "^1.12",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/config": "<5.0",
+        "doctrine/annotations": "<1.12",
+        "symfony/config": "<5.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/yaml": "<4.4"
     },

@@ -14,8 +14,6 @@ namespace Symfony\Component\Uid;
 /**
  * A v1 UUID contains a 60-bit timestamp and 62 extra unique bits.
  *
- * @experimental in 5.3
- *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class UuidV1 extends Uuid
@@ -31,18 +29,29 @@ class UuidV1 extends Uuid
         }
     }
 
-    /**
-     * @return float Seconds since the Unix epoch 1970-01-01 00:00:00
-     */
-    public function getTime(): float
+    public function getDateTime(): \DateTimeImmutable
     {
-        $time = '0'.substr($this->uid, 15, 3).substr($this->uid, 9, 4).substr($this->uid, 0, 8);
-
-        return BinaryUtil::timeToFloat($time);
+        return BinaryUtil::hexToDateTime('0'.substr($this->uid, 15, 3).substr($this->uid, 9, 4).substr($this->uid, 0, 8));
     }
 
     public function getNode(): string
     {
         return uuid_mac($this->uid);
+    }
+
+    public static function generate(\DateTimeInterface $time = null, Uuid $node = null): string
+    {
+        $uuid = uuid_create(static::TYPE);
+
+        if (null !== $time) {
+            $time = BinaryUtil::dateTimeToHex($time);
+            $uuid = substr($time, 8).'-'.substr($time, 4, 4).'-1'.substr($time, 1, 3).substr($uuid, 18);
+        }
+
+        if ($node) {
+            $uuid = substr($uuid, 0, 24).substr($node->uid, 24);
+        }
+
+        return $uuid;
     }
 }

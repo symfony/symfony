@@ -15,7 +15,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -61,7 +63,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithExtraAttributes()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\ExtraAttributesException::class);
+        $this->expectException(ExtraAttributesException::class);
         $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new AbstractObjectNormalizerDummy($factory);
@@ -75,7 +77,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeWithExtraAttributesAndNoGroupsWithMetadataFactory()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\ExtraAttributesException::class);
+        $this->expectException(ExtraAttributesException::class);
         $this->expectExceptionMessage('Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).');
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $normalizer->denormalize(
@@ -130,7 +132,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForDummyCollection()
     {
-        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('array', false, null, true, new Type('int'), new Type('object', false, DummyChild::class))],
@@ -185,7 +187,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForStringCollection()
     {
-        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('array', false, null, true, new Type('int'), new Type('string'))],
@@ -320,7 +322,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     private function getDenormalizerForObjectWithBasicProperties()
     {
-        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor = $this->createMock(PhpDocExtractor::class);
         $extractor->method('getTypes')
             ->will($this->onConsecutiveCalls(
                 [new Type('bool')],
@@ -351,7 +353,7 @@ class AbstractObjectNormalizerTest extends TestCase
      */
     public function testExtraAttributesException()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A class metadata factory must be provided in the constructor when setting "allow_extra_attributes" to false.');
         $normalizer = new ObjectNormalizer();
 

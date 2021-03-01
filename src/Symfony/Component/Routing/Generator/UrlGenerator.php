@@ -66,6 +66,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // some webservers don't allow the slash in encoded form in the path for security reasons anyway
         // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
         '%2F' => '/',
+        '%252F' => '%2F',
         // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
         // so they can safely be used in the path in unencoded form
         '%40' => '@',

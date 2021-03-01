@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
@@ -54,7 +55,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
 
     public function testValidationFailedException()
     {
-        $this->expectException(\Symfony\Component\Messenger\Exception\ValidationFailedException::class);
+        $this->expectException(ValidationFailedException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.');
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);

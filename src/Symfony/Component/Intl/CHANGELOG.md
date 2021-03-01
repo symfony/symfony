@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `Currencies::getCashFractionDigits()` and `Currencies::getCashRoundingIncrement()`
+
 5.0.0
 -----
 

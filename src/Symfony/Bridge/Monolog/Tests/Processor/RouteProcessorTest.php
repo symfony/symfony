@@ -149,7 +149,7 @@ class RouteProcessorTest extends TestCase
 
     private function mockRequest(array $attributes): Request
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request = $this->createMock(Request::class);
         $request->attributes = new ParameterBag($attributes);
 
         return $request;

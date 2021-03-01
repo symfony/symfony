@@ -30,6 +30,7 @@
         "symfony/form": "^5.3",
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/intl": "^4.4|^5.0",
         "symfony/mime": "^5.2",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/property-info": "^4.4|^5.1",

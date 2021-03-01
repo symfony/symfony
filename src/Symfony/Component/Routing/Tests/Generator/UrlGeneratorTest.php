@@ -12,6 +12,10 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -78,7 +82,7 @@ class UrlGeneratorTest extends TestCase
 
     public function testRelativeUrlWithNullParameterButNotOptional()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}/bar', ['foo' => null]));
         // This must raise an exception because the default requirement for "foo" is "[^/]+" which is not met with these params.
         // Generating path "/testing//bar" would be wrong as matching this route would fail.
@@ -264,14 +268,14 @@ class UrlGeneratorTest extends TestCase
 
     public function testGenerateWithoutRoutes()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
+        $this->expectException(RouteNotFoundException::class);
         $routes = $this->getRoutes('foo', new Route('/testing/{foo}'));
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateWithInvalidLocale()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\RouteNotFoundException::class);
+        $this->expectException(RouteNotFoundException::class);
         $routes = new RouteCollection();
 
         $route = new Route('');
@@ -293,21 +297,21 @@ class UrlGeneratorTest extends TestCase
 
     public function testGenerateForRouteWithoutMandatoryParameter()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\MissingMandatoryParametersException::class);
+        $this->expectException(MissingMandatoryParametersException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}'));
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidOptionalParameter()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', ['foo' => '1'], ['foo' => 'd+']));
         $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidParameter()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => '1|2']));
         $this->getGenerator($routes)->generate('test', ['foo' => '0'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -323,7 +327,7 @@ class UrlGeneratorTest extends TestCase
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', ['foo' => '1'], ['foo' => 'd+']));
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
             ->method('error');
         $generator = $this->getGenerator($routes, [], $logger);
@@ -341,21 +345,21 @@ class UrlGeneratorTest extends TestCase
 
     public function testGenerateForRouteWithInvalidMandatoryParameter()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => 'd+']));
         $this->getGenerator($routes)->generate('test', ['foo' => 'bar'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testGenerateForRouteWithInvalidUtf8Parameter()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', [], ['foo' => '\pL+'], ['utf8' => true]));
         $this->getGenerator($routes)->generate('test', ['foo' => 'abc123'], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function testRequiredParamAndEmptyPassed()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{slug}', [], ['slug' => '.+']));
         $this->getGenerator($routes)->generate('test', ['slug' => '']);
     }
@@ -467,6 +471,12 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
     }
 
+    public function testEncodingOfSlashInPath()
+    {
+        $routes = $this->getRoutes('test', new Route('/dir/{path}/dir2', [], ['path' => '.+']));
+        $this->assertSame('/app.php/dir/foo/bar%2Fbaz/dir2', $this->getGenerator($routes)->generate('test', ['path' => 'foo/bar%2Fbaz']));
+    }
+
     public function testAdjacentVariables()
     {
         $routes = $this->getRoutes('test', new Route('/{x}{y}{z}.{_format}', ['z' => 'default-z', '_format' => 'html'], ['y' => '\d+']));
@@ -476,7 +486,7 @@ class UrlGeneratorTest extends TestCase
 
         // The default requirement for 'x' should not allow the separator '.' in this case because it would otherwise match everything
         // and following optional variables like _format could never match.
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $generator->generate('test', ['x' => 'do.t', 'y' => '123', 'z' => 'bar', '_format' => 'xml']);
     }
 
@@ -517,7 +527,7 @@ class UrlGeneratorTest extends TestCase
 
     public function testImportantVariableWithNoDefault()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\MissingMandatoryParametersException::class);
+        $this->expectException(MissingMandatoryParametersException::class);
         $routes = $this->getRoutes('test', new Route('/{page}.{!_format}'));
         $generator = $this->getGenerator($routes);
 
@@ -526,14 +536,14 @@ class UrlGeneratorTest extends TestCase
 
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
         $this->getGenerator($routes)->generate('test', ['page' => 'index', '_format' => 'sl/ash']);
     }
 
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
         $this->getGenerator($routes)->generate('test', ['page' => 'do.t', '_format' => 'html']);
     }
@@ -561,21 +571,21 @@ class UrlGeneratorTest extends TestCase
 
     public function testUrlWithInvalidParameterInHost()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', [], ['foo' => 'bar'], [], '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     public function testUrlWithInvalidParameterInHostWhenParamHasADefaultValue()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', ['foo' => 'bar'], ['foo' => 'bar'], [], '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     public function testUrlWithInvalidParameterEqualsDefaultValueInHost()
     {
-        $this->expectException(\Symfony\Component\Routing\Exception\InvalidParameterException::class);
+        $this->expectException(InvalidParameterException::class);
         $routes = $this->getRoutes('test', new Route('/', ['foo' => 'baz'], ['foo' => 'bar'], [], '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', ['foo' => 'baz'], UrlGeneratorInterface::ABSOLUTE_PATH);
     }

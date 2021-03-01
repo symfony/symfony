@@ -40,7 +40,7 @@
         "symfony/yaml": "<4.4"
     },
     "provide": {
-        "symfony/translation-implementation": "2.0"
+        "symfony/translation-implementation": "2.3"
     },
     "suggest": {
         "symfony/config": "",

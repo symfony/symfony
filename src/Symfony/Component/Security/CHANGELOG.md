@@ -4,6 +4,11 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
+ * Deprecate the `SessionInterface $session` constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
+ * Deprecate the `session` service provided by the ServiceLocator injected in `UsageTrackingTokenStorage`, provide a `request_stack` service instead
+ * Deprecate using `SessionTokenStorage` outside a request context, it will throw a `SessionNotFoundException` in Symfony 6.0
+ * Randomize CSRF tokens to harden BREACH attacks
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
 
 5.2.0

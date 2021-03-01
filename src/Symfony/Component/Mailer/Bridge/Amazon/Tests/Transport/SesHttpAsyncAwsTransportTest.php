@@ -69,6 +69,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
+            $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -86,6 +87,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             ->text('Hello There!');
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
+        $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
 
         $message = $transport->send($mail);
 
@@ -95,15 +97,16 @@ class SesHttpAsyncAwsTransportTest extends TestCase
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            $xml = "<SendEmailResponse xmlns=\"https://email.amazonaws.com/doc/2010-03-31/\">
-                <Error>
-                    <Message>i'm a teapot</Message>
-                    <Code>418</Code>
-                </Error>
-            </SendEmailResponse>";
+            $json = json_encode([
+                'message' => 'i\'m a teapot',
+                'type' => 'sender',
+            ]);
 
-            return new MockResponse($xml, [
+            return new MockResponse($json, [
                 'http_code' => 418,
+                'response_headers' => [
+                    'x-amzn-errortype' => '418',
+                ],
             ]);
         });
 

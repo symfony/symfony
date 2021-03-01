@@ -13,7 +13,9 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\ConsoleCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -286,7 +288,7 @@ class CommandTest extends TestCase
 
     public function testRunWithInvalidOption()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\InvalidOptionException::class);
+        $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('The "--bar" option does not exist.');
         $command = new \TestCommand();
         $tester = new CommandTester($command);
@@ -391,6 +393,27 @@ class CommandTest extends TestCase
     {
         $output->writeln('from the code...');
     }
+
+    public function testSetCodeWithStaticAnonymousFunction()
+    {
+        $command = new \TestCommand();
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $output->writeln(isset($this) ? 'bound' : 'not bound');
+        });
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+
+        $this->assertEquals('interact called'.\PHP_EOL.'not bound'.\PHP_EOL, $tester->getDisplay());
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testConsoleCommandAttribute()
+    {
+        $this->assertSame('|foo|f', Php8Command::getDefaultName());
+        $this->assertSame('desc', Php8Command::getDefaultDescription());
+    }
 }
 
 // In order to get an unbound closure, we should create it outside a class
@@ -400,4 +423,9 @@ function createClosure()
     return function (InputInterface $input, OutputInterface $output) {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
     };
+}
+
+#[ConsoleCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
+class Php8Command extends Command
+{
 }

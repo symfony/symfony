@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', MessageDigestPasswordEncoder::class, MessageDigestPasswordHasher::class));
 
 /**
  * MessageDigestPasswordEncoder uses a message digest algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use {@link MessageDigestPasswordHasher} instead
  */
 class MessageDigestPasswordEncoder extends BasePasswordEncoder
 {
-    private $algorithm;
-    private $encodeHashAsBase64;
-    private $iterations = 1;
-    private $encodedLength = -1;
+    use LegacyEncoderTrait;
 
     /**
      * @param string $algorithm          The digest algorithm to use
@@ -32,51 +33,6 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      */
     public function __construct(string $algorithm = 'sha512', bool $encodeHashAsBase64 = true, int $iterations = 5000)
     {
-        $this->algorithm = $algorithm;
-        $this->encodeHashAsBase64 = $encodeHashAsBase64;
-
-        try {
-            $this->encodedLength = \strlen($this->encodePassword('', 'salt'));
-        } catch (\LogicException $e) {
-            // ignore algorithm not supported
-        }
-
-        $this->iterations = $iterations;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function encodePassword(string $raw, ?string $salt)
-    {
-        if ($this->isPasswordTooLong($raw)) {
-            throw new BadCredentialsException('Invalid password.');
-        }
-
-        if (!\in_array($this->algorithm, hash_algos(), true)) {
-            throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
-        }
-
-        $salted = $this->mergePasswordAndSalt($raw, $salt);
-        $digest = hash($this->algorithm, $salted, true);
-
-        // "stretch" hash
-        for ($i = 1; $i < $this->iterations; ++$i) {
-            $digest = hash($this->algorithm, $digest.$salted, true);
-        }
-
-        return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isPasswordValid(string $encoded, string $raw, ?string $salt)
-    {
-        if (\strlen($encoded) !== $this->encodedLength || false !== strpos($encoded, '$')) {
-            return false;
-        }
-
-        return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
+        $this->hasher = new MessageDigestPasswordHasher($algorithm, $encodeHashAsBase64, $iterations);
     }
 }

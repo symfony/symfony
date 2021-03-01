@@ -12,9 +12,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder(SessionInterface::class)
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('set')
             ->with('_security.firewall_name.target_path', '/foo');
@@ -26,9 +24,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder(SessionInterface::class)
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('get')
             ->with('_security.cool_firewall.target_path')
@@ -45,9 +41,7 @@ class TargetPathTraitTest extends TestCase
     {
         $obj = new TestClassWithTargetPathTrait();
 
-        $session = $this->getMockBuilder(SessionInterface::class)
-                    ->getMock();
-
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
             ->method('remove')
             ->with('_security.best_firewall.target_path');

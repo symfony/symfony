@@ -12,8 +12,12 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type;
@@ -36,10 +40,10 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface::class, $this->propertyInfo);
-        $this->assertInstanceOf(\Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(PropertyInfoExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(PropertyTypeExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(PropertyDescriptionExtractorInterface::class, $this->propertyInfo);
+        $this->assertInstanceOf(PropertyAccessExtractorInterface::class, $this->propertyInfo);
         $this->assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
     }
 

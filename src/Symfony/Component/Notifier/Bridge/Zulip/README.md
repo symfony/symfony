@@ -1,7 +1,7 @@
 Zulip Notifier
 ==============
 
-Provides [Zulip](https://zulip.comw) integration for Symfony Notifier.
+Provides [Zulip](https://zulip.com) integration for Symfony Notifier.
 
 DSN example
 -----------

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
  * Tests UserPasswordEncoderCommand.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
+ * @group legacy
  */
 class UserPasswordEncoderCommandTest extends AbstractWebTestCase
 {
@@ -40,7 +41,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         ], ['decorated' => false]);
         $expected = str_replace("\n", \PHP_EOL, file_get_contents(__DIR__.'/app/PasswordEncode/emptysalt.txt'));
 
-        $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertStringContainsString($expected, $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodeNoPasswordNoInteraction()
@@ -301,7 +302,7 @@ EOTXT
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured encoders for the "security" extension.');
         $application = new ConsoleApplication();
-        $application->add(new UserPasswordEncoderCommand($this->getMockBuilder(EncoderFactoryInterface::class)->getMock(), []));
+        $application->add(new UserPasswordEncoderCommand($this->createMock(EncoderFactoryInterface::class), []));
 
         $passwordEncoderCommand = $application->find('security:encode-password');
 

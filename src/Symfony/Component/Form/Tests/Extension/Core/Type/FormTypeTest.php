@@ -13,15 +13,19 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\Validation;
 
@@ -63,7 +67,7 @@ class FormTypeTest extends BaseTypeTest
 
     public function testCreateFormInstances()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\Form::class, $this->factory->create(static::TESTED_TYPE));
+        $this->assertInstanceOf(Form::class, $this->factory->create(static::TESTED_TYPE));
     }
 
     public function testPassRequiredAsOption()
@@ -149,28 +153,31 @@ class FormTypeTest extends BaseTypeTest
 
     public function testDataClassMayBeNull()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(
+            FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'data_class' => null,
         ]));
     }
 
     public function testDataClassMayBeAbstractClass()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(
+            FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
         ]));
     }
 
     public function testDataClassMayBeInterface()
     {
-        $this->assertInstanceOf(\Symfony\Component\Form\FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
+        $this->assertInstanceOf(
+            FormBuilderInterface::class, $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
         ]));
     }
 
     public function testDataClassMustBeValidClassOrInterface()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'data_class' => 'foobar',
         ]);
@@ -337,13 +344,13 @@ class FormTypeTest extends BaseTypeTest
 
     public function testAttributesException()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, ['attr' => '']);
     }
 
     public function testActionCannotBeNull()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, ['action' => null]);
     }
 

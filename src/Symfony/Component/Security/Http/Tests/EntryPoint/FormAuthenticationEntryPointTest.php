@@ -13,19 +13,21 @@ namespace Symfony\Component\Security\Http\Tests\EntryPoint;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class FormAuthenticationEntryPointTest extends TestCase
 {
     public function testStart()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
+        $request = $this->createMock(Request::class);
         $response = new RedirectResponse('/the/login/path');
 
-        $httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $httpUtils = $this->getMockBuilder(\Symfony\Component\Security\Http\HttpUtils::class)->getMock();
+        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpUtils = $this->createMock(HttpUtils::class);
         $httpUtils
             ->expects($this->once())
             ->method('createRedirectResponse')
@@ -40,11 +42,11 @@ class FormAuthenticationEntryPointTest extends TestCase
 
     public function testStartWithUseForward()
     {
-        $request = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
-        $subRequest = $this->getMockBuilder(\Symfony\Component\HttpFoundation\Request::class)->disableOriginalConstructor()->disableOriginalClone()->getMock();
+        $request = $this->createMock(Request::class);
+        $subRequest = $this->createMock(Request::class);
         $response = new Response('', 200);
 
-        $httpUtils = $this->getMockBuilder(\Symfony\Component\Security\Http\HttpUtils::class)->getMock();
+        $httpUtils = $this->createMock(HttpUtils::class);
         $httpUtils
             ->expects($this->once())
             ->method('createRequest')
@@ -52,7 +54,7 @@ class FormAuthenticationEntryPointTest extends TestCase
             ->willReturn($subRequest)
         ;
 
-        $httpKernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $httpKernel = $this->createMock(HttpKernelInterface::class);
         $httpKernel
             ->expects($this->once())
             ->method('handle')

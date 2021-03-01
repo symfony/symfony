@@ -12,17 +12,20 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->getMockBuilder(\Psr\Cache\CacheItemPoolInterface::class)->getMock();
-        $cacheItemMock = $this->getMockBuilder(\Psr\Cache\CacheItemInterface::class)->getMock();
+        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = $this->createMock(CacheItemInterface::class);
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
@@ -107,7 +110,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function testParseThrowsInsteadOfNotice()
     {
-        $this->expectException(\Symfony\Component\ExpressionLanguage\SyntaxError::class);
+        $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected end of expression around position 6 for expression `node.`.');
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->parse('node.', ['node']);
@@ -155,8 +158,8 @@ class ExpressionLanguageTest extends TestCase
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->getMockBuilder(\Psr\Cache\CacheItemPoolInterface::class)->getMock();
-        $cacheItemMock = $this->getMockBuilder(\Psr\Cache\CacheItemInterface::class)->getMock();
+        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItemMock = $this->createMock(CacheItemInterface::class);
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpression = null;
 

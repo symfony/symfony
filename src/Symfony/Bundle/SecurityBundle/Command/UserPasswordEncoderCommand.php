@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 
@@ -30,6 +31,8 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
  *
  * @final
+ *
+ * @deprecated since Symfony 5.3, use {@link UserPasswordHashCommand} instead
  */
 class UserPasswordEncoderCommand extends Command
 {
@@ -106,6 +109,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
+
+        $errorIo->caution('The use of the "security:encode-password" command is deprecated since version 5.3 and will be removed in 6.0. Use "security:hash-password" instead.');
 
         $input->isInteractive() ? $errorIo->title('Symfony Password Encoder Utility') : $errorIo->newLine();
 

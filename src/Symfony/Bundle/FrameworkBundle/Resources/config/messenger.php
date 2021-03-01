@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\TraceableMiddleware;
 use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
@@ -98,6 +99,11 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 service('debug.stopwatch'),
+            ])
+
+        ->set('messenger.middleware.router_context', RouterContextMiddleware::class)
+            ->args([
+                service('router'),
             ])
 
         // Discovery

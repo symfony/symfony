@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\IpValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IpValidatorTest extends ConstraintValidatorTestCase
@@ -38,13 +40,13 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Ip());
     }
 
     public function testInvalidValidatorVersion()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new Ip([
             'version' => 666,
         ]);

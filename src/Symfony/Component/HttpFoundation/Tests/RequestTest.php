@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -726,7 +727,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * @dataProvider getRelativeUriForPathData()
+     * @dataProvider getRelativeUriForPathData
      */
     public function testGetRelativeUriForPath($expected, $pathinfo, $path)
     {
@@ -804,7 +805,7 @@ class RequestTest extends TestCase
             ['bar=&foo=bar', 'bar=&foo=bar', '->works with empty parameters'],
             ['foo=bar&bar=', 'bar=&foo=bar', 'sorts keys alphabetically'],
 
-            // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
+            // GET parameters, that are submitted from an HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
             ['baz=Foo%20Baz&bar=Foo+Bar', 'bar=Foo%20Bar&baz=Foo%20Baz', 'normalizes spaces in both encodings "%20" and "+"'],
 
@@ -1086,7 +1087,7 @@ class RequestTest extends TestCase
      */
     public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
     {
-        $this->expectException(\Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException::class);
+        $this->expectException(ConflictingHeadersException::class);
         $request = new Request();
 
         $server = [
@@ -1259,7 +1260,7 @@ class RequestTest extends TestCase
     {
         $req = new Request();
         $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Response body is empty.');
+        $this->expectExceptionMessage('Request body is empty.');
         $req->toArray();
     }
 

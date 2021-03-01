@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
+use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
@@ -18,6 +19,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -89,6 +91,8 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 break;
             } catch (AuthenticationException $e) {
                 $lastException = $e;
+            } catch (InvalidPasswordException $e) {
+                $lastException = new BadCredentialsException('Bad credentials.', 0, $e);
             }
         }
 

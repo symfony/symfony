@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4
+---
+
+ * Add `HttpClientInterface::withOptions()`
+
 2.3.0
 -----
 

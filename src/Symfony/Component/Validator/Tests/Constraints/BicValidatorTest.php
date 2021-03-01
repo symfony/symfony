@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -182,7 +183,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Bic());
     }
 

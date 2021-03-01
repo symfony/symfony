@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Request stack that controls the lifecycle of requests.
  *
@@ -99,5 +102,19 @@ class RequestStack
         }
 
         return $this->requests[$pos];
+    }
+
+    /**
+     * Gets the current session.
+     *
+     * @throws SessionNotFoundException
+     */
+    public function getSession(): SessionInterface
+    {
+        if ((null !== $request = end($this->requests) ?: null) && $request->hasSession()) {
+            return $request->getSession();
+        }
+
+        throw new SessionNotFoundException();
     }
 }

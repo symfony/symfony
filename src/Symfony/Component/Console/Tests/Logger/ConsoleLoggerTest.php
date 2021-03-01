@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Logger;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -20,8 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 /**
- * Console logger test.
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -140,7 +139,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testThrowsOnInvalidLevel()
     {
-        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $logger = $this->getLogger();
         $logger->log('invalid level', 'Foo');
     }
@@ -157,9 +156,9 @@ class ConsoleLoggerTest extends TestCase
     public function testObjectCastToString()
     {
         if (method_exists($this, 'createPartialMock')) {
-            $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         } else {
-            $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', ['__toString']);
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         }
         $dummy->method('__toString')->willReturn('DUMMY');
 

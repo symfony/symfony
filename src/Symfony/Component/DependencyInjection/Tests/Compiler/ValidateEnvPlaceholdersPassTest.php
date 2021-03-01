@@ -14,10 +14,13 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
@@ -43,7 +46,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testDefaultEnvIsValidatedInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "env_extension.string_node": "fail" is not a valid string');
         $container = new ContainerBuilder();
         $container->setParameter('env(STRING)', 'fail');
@@ -57,7 +60,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "float" given to "env(FLOATISH)".');
 
         $container = new ContainerBuilder();
@@ -72,7 +75,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".');
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -87,7 +90,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testInvalidEnvInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.int_node". Expected "int", but got "array".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
@@ -100,7 +103,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testNulledEnvInConfig()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidTypeException::class);
+        $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
@@ -152,7 +155,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvIsIncompatibleWithEnumNode()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\EnumNode" node type at path "env_extension.enum_node".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
@@ -165,7 +168,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEnvIsIncompatibleWithArrayNode()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\ArrayNode" node type at path "env_extension.simple_array_node".');
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
@@ -217,7 +220,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.');
 
         $container = new ContainerBuilder();

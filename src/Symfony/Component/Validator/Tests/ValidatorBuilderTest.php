@@ -16,8 +16,12 @@ use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
@@ -41,7 +45,7 @@ class ValidatorBuilderTest extends TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->getMockBuilder(\Symfony\Component\Validator\ObjectInitializerInterface::class)->getMock()
+            $this->createMock(ObjectInitializerInterface::class)
         ));
     }
 
@@ -163,14 +167,14 @@ class ValidatorBuilderTest extends TestCase
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->getMockBuilder(\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class)->getMock())
+            $this->createMock(ConstraintValidatorFactoryInterface::class))
         );
     }
 
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->getMockBuilder(\Symfony\Contracts\Translation\TranslatorInterface::class)->getMock())
+            $this->createMock(TranslatorInterface::class))
         );
     }
 
@@ -181,6 +185,6 @@ class ValidatorBuilderTest extends TestCase
 
     public function testGetValidator()
     {
-        $this->assertInstanceOf(\Symfony\Component\Validator\Validator\RecursiveValidator::class, $this->builder->getValidator());
+        $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());
     }
 }

@@ -28,7 +28,7 @@ class LocaleAwareListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->localeAwareService = $this->getMockBuilder(LocaleAwareInterface::class)->getMock();
+        $this->localeAwareService = $this->createMock(LocaleAwareInterface::class);
         $this->requestStack = new RequestStack();
         $this->listener = new LocaleAwareListener(new \ArrayIterator([$this->localeAwareService]), $this->requestStack);
     }
@@ -40,7 +40,7 @@ class LocaleAwareListenerTest extends TestCase
             ->method('setLocale')
             ->with($this->equalTo('fr'));
 
-        $event = new RequestEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
@@ -57,7 +57,7 @@ class LocaleAwareListenerTest extends TestCase
                 $this->throwException(new \InvalidArgumentException())
             );
 
-        $event = new RequestEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
@@ -71,7 +71,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createHttpKernel(), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
@@ -84,7 +84,7 @@ class LocaleAwareListenerTest extends TestCase
 
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createHttpKernel(), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
@@ -104,13 +104,8 @@ class LocaleAwareListenerTest extends TestCase
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createHttpKernel(), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
-    }
-
-    private function createHttpKernel()
-    {
-        return $this->getMockBuilder(HttpKernelInterface::class)->getMock();
     }
 
     private function createRequest($locale)

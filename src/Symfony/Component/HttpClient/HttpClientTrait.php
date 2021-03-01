@@ -17,13 +17,24 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
  *
- * All methods are static to prevent implementers from creating memory leaks via circular references.
+ * All private methods are static to prevent implementers from creating memory leaks via circular references.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 trait HttpClientTrait
 {
     private static $CHUNK_SIZE = 16372;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withOptions(array $options): self
+    {
+        $clone = clone $this;
+        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+
+        return $clone;
+    }
 
     /**
      * Validates and normalizes method, URL and options, and merges them with defaults.
@@ -434,6 +445,10 @@ trait HttpClientTrait
 
         if ('' === ($url['path'] ?? '')) {
             $url['path'] = '/';
+        }
+
+        if ('?' === ($url['query'] ?? '')) {
+            $url['query'] = null;
         }
 
         return $url;

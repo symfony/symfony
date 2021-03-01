@@ -24,7 +24,7 @@ class LockFactoryTest extends TestCase
 {
     public function testCreateLock()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $store->expects($this->any())->method('exists')->willReturn(false);
 
         $keys = [];
@@ -38,7 +38,7 @@ class LockFactoryTest extends TestCase
             }))
             ->willReturn(true);
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
         $factory->setLogger($logger);
 
@@ -54,7 +54,7 @@ class LockFactoryTest extends TestCase
 
     public function testCreateLockFromKey()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $store->expects($this->any())->method('exists')->willReturn(false);
 
         $keys = [];
@@ -68,7 +68,7 @@ class LockFactoryTest extends TestCase
             }))
             ->willReturn(true);
 
-        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
         $factory->setLogger($logger);
 

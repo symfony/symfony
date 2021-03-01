@@ -12,6 +12,7 @@
 namespace Symfony\Component\Uid\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 
@@ -75,13 +76,18 @@ class UlidTest extends TestCase
     /**
      * @group time-sensitive
      */
-    public function testGetTime()
+    public function testGetDateTime()
     {
         $time = microtime(false);
         $ulid = new Ulid();
         $time = substr($time, 11).substr($time, 1, 4);
 
-        $this->assertSame((float) $time, $ulid->getTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
+
+        $this->assertEquals(new \DateTimeImmutable('@0'), (new Ulid('000000000079KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '0.001'), (new Ulid('000000000179KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.654'), (new Ulid('7ZZZZZZZZY79KA1307SR9X4MV3'))->getDateTime());
+        $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.655'), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
     }
 
     public function testIsValid()
@@ -225,5 +231,10 @@ class UlidTest extends TestCase
             ['01EW2RYKDCT2SAK454KBR2QG08'],
             ['1BVXue8CnY8ogucrHX3TeF'],
         ];
+    }
+
+    public function testFromStringOnExtendedClassReturnsStatic()
+    {
+        $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
 }

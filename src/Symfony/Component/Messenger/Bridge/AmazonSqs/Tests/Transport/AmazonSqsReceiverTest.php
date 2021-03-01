@@ -29,7 +29,7 @@ class AmazonSqsReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $sqsEnvelop = $this->createSqsEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($sqsEnvelop);
 
         $receiver = new AmazonSqsReceiver($connection, $serializer);
@@ -46,7 +46,7 @@ class AmazonSqsReceiverTest extends TestCase
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $sqsEnvelop = $this->createSqsEnvelope();
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection = $this->createMock(Connection::class);
         $connection->method('get')->willReturn($sqsEnvelop);
         $connection->expects($this->once())->method('delete');
 

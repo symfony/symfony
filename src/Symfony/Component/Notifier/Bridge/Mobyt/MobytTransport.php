@@ -33,11 +33,15 @@ final class MobytTransport extends AbstractTransport
     private $from;
     private $typeQuality;
 
-    public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $accountSid, string $authToken, string $from, string $typeQuality = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->accountSid = $accountSid;
         $this->authToken = $authToken;
         $this->from = $from;
+
+        $typeQuality = $typeQuality ?? MobytOptions::MESSAGE_TYPE_QUALITY_LOW;
+        MobytOptions::validateMessageType($typeQuality);
+
         $this->typeQuality = $typeQuality;
 
         parent::__construct($client, $dispatcher);
@@ -77,14 +81,16 @@ final class MobytTransport extends AbstractTransport
                 'user_key: '.$this->accountSid,
                 'Access_token: '.$this->authToken,
             ],
-            'body' => json_encode(array_filter($options)),
+            'json' => array_filter($options),
         ]);
 
-        if (401 === $response->getStatusCode() || 404 === $response->getStatusCode()) {
+        $statusCode = $response->getStatusCode();
+
+        if (401 === $statusCode || 404 === $statusCode) {
             throw new TransportException(sprintf('Unable to send the SMS: "%s". Check your credentials.', $message->getSubject()), $response);
         }
 
-        if (201 !== $response->getStatusCode()) {
+        if (201 !== $statusCode) {
             $error = $response->toArray(false);
 
             throw new TransportException(sprintf('Unable to send the SMS: "%s".', $error['result']), $response);

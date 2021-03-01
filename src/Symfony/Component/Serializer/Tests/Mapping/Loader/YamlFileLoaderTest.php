@@ -16,11 +16,13 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
+use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -28,6 +30,8 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class YamlFileLoaderTest extends TestCase
 {
+    use ContextMappingTestTrait;
+
     /**
      * @var YamlFileLoader
      */
@@ -45,7 +49,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testInterface()
     {
-        $this->assertInstanceOf(\Symfony\Component\Serializer\Mapping\Loader\LoaderInterface::class, $this->loader);
+        $this->assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
@@ -61,7 +65,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadClassMetadataReturnsThrowsInvalidMapping()
     {
-        $this->expectException(\Symfony\Component\Serializer\Exception\MappingException::class);
+        $this->expectException(MappingException::class);
         $loader = new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-mapping.yml');
         $loader->loadClassMetadata($this->metadata);
     }
@@ -124,5 +128,10 @@ class YamlFileLoaderTest extends TestCase
         $this->expectExceptionMessage('The "ignore" value must be a boolean');
 
         (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
+    }
+
+    protected function getLoaderForContextMapping(): LoaderInterface
+    {
+        return $this->loader;
     }
 }

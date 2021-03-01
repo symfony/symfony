@@ -28,8 +28,8 @@ class MockHttpClient implements HttpClientInterface
     use HttpClientTrait;
 
     private $responseFactory;
-    private $baseUri;
     private $requestsCount = 0;
+    private $defaultOptions = [];
 
     /**
      * @param callable|callable[]|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
@@ -47,7 +47,7 @@ class MockHttpClient implements HttpClientInterface
         }
 
         $this->responseFactory = $responseFactory;
-        $this->baseUri = $baseUri;
+        $this->defaultOptions['base_uri'] = $baseUri;
     }
 
     /**
@@ -55,7 +55,7 @@ class MockHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        [$url, $options] = $this->prepareRequest($method, $url, $options, ['base_uri' => $this->baseUri], true);
+        [$url, $options] = $this->prepareRequest($method, $url, $options, $this->defaultOptions, true);
         $url = implode('', $url);
 
         if (null === $this->responseFactory) {
@@ -95,5 +95,16 @@ class MockHttpClient implements HttpClientInterface
     public function getRequestsCount(): int
     {
         return $this->requestsCount;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withOptions(array $options): self
+    {
+        $clone = clone $this;
+        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions, true);
+
+        return $clone;
     }
 }

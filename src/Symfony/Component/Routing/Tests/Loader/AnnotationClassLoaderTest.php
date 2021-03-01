@@ -247,5 +247,16 @@ abstract class AnnotationClassLoaderTest extends TestCase
         $this->assertEquals('/prefix/path', $routes->get('action')->getPath());
     }
 
+    public function testWhenEnv()
+    {
+        $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
+        $this->assertCount(0, $routes);
+
+        $this->setUp('some-env');
+        $routes = $this->loader->load($this->getNamespace().'\RouteWithEnv');
+        $this->assertCount(1, $routes);
+        $this->assertSame('/path', $routes->get('action')->getPath());
+    }
+
     abstract protected function getNamespace(): string;
 }

@@ -21,7 +21,7 @@ abstract class ResourceBundleTestCase extends TestCase
     // not loaded, because it is NOT possible to skip the execution of data
     // providers.
 
-    private static $locales = [
+    private const LOCALES = [
         'af',
         'af_NA',
         'af_ZA',
@@ -677,7 +677,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'zu_ZA',
     ];
 
-    private static $localeAliases = [
+    private const LOCALE_ALIASES = [
         'az_AZ' => 'az_Latn_AZ',
         'bs_BA' => 'bs_Latn_BA',
         'en_NH' => 'en_VU',
@@ -759,12 +759,12 @@ abstract class ResourceBundleTestCase extends TestCase
 
     protected function getLocales()
     {
-        return self::$locales;
+        return self::LOCALES;
     }
 
     protected function getLocaleAliases()
     {
-        return self::$localeAliases;
+        return self::LOCALE_ALIASES;
     }
 
     protected function getRootLocales()

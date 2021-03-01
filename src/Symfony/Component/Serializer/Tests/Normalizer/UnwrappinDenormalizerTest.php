@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 
 /**
@@ -26,7 +27,7 @@ class UnwrappinDenormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->getMockBuilder(\Symfony\Component\Serializer\Serializer::class)->getMock();
+        $this->serializer = $this->createMock(Serializer::class);
         $this->denormalizer = new UnwrappingDenormalizer();
         $this->denormalizer->setSerializer($this->serializer);
     }

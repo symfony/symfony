@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ExprBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ExprBuilderTest extends TestCase
 {
@@ -167,7 +168,7 @@ class ExprBuilderTest extends TestCase
 
     public function testThenInvalid()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $test = $this->getTestBuilder()
             ->ifString()
             ->thenInvalid('Invalid value')

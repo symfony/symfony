@@ -29,7 +29,7 @@ class SemaphoreTest extends TestCase
     public function testAcquireReturnsTrue()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -45,7 +45,7 @@ class SemaphoreTest extends TestCase
     public function testAcquireReturnsFalse()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -62,7 +62,7 @@ class SemaphoreTest extends TestCase
     public function testAcquireThrowException()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -81,7 +81,7 @@ class SemaphoreTest extends TestCase
     public function testRefresh()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store, 10.0);
 
         $store
@@ -97,7 +97,7 @@ class SemaphoreTest extends TestCase
     public function testRefreshWithCustomTtl()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store, 10.0);
 
         $store
@@ -113,7 +113,7 @@ class SemaphoreTest extends TestCase
     public function testRefreshWhenItFails()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -132,7 +132,7 @@ class SemaphoreTest extends TestCase
     public function testRefreshWhenItFailsHard()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -151,7 +151,7 @@ class SemaphoreTest extends TestCase
     public function testRelease()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -166,7 +166,7 @@ class SemaphoreTest extends TestCase
     public function testReleaseWhenItFails()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -185,7 +185,7 @@ class SemaphoreTest extends TestCase
     public function testReleaseWhenItFailsHard()
     {
         $key = new Key('key', 1);
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
         $semaphore = new Semaphore($key, $store);
 
         $store
@@ -241,7 +241,7 @@ class SemaphoreTest extends TestCase
 
     public function testExpiration()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store);
@@ -258,7 +258,7 @@ class SemaphoreTest extends TestCase
      */
     public function testExpirationResetAfter()
     {
-        $store = $this->getMockBuilder(PersistingStoreInterface::class)->getMock();
+        $store = $this->createMock(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store, 1);

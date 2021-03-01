@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * The bridge is not marked as `@experimental` anymore
+ * Validate message types
 
 5.2.0
 -----

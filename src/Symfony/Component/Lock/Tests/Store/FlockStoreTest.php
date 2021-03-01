@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -34,7 +35,7 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryCannotBeCreated()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
@@ -45,7 +46,7 @@ class FlockStoreTest extends AbstractStoreTest
 
     public function testConstructWhenRepositoryIsNotWriteable()
     {
-        $this->expectException(\Symfony\Component\Lock\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');

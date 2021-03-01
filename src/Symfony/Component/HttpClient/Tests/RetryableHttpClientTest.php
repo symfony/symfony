@@ -5,6 +5,7 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
@@ -132,5 +133,30 @@ class RetryableHttpClientTest extends TestCase
                 self::assertSame(500, $response->getStatusCode());
             }
         }
+    }
+
+    public function testRetryWithDnsIssue()
+    {
+        $client = new RetryableHttpClient(
+            new NativeHttpClient(),
+            new class(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0) extends GenericRetryStrategy {
+                public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+                {
+                    $this->fail('should not be called');
+                }
+            },
+            2,
+            $logger = new TestLogger()
+        );
+
+        $response = $client->request('GET', 'http://does.not.exists/foo-bar');
+
+        try {
+            $response->getHeaders();
+        } catch (TransportExceptionInterface $e) {
+            $this->assertSame('Could not resolve host "does.not.exists".', $e->getMessage());
+        }
+        $this->assertCount(2, $logger->logs);
+        $this->assertSame('Try #{count} after {delay}ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
     }
 }

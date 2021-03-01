@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
@@ -99,14 +100,14 @@ class IniFileLoaderTest extends TestCase
 
     public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "nonvalid.ini" file is not valid.');
         @$this->loader->load('nonvalid.ini');
     }
 
     public function testExceptionIsRaisedWhenIniFileIsAlmostValid()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "almostvalid.ini" file is not valid.');
         @$this->loader->load('almostvalid.ini');
     }
@@ -118,5 +119,14 @@ class IniFileLoaderTest extends TestCase
         $this->assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
         $this->assertTrue($loader->supports('with_wrong_ext.yml', 'ini'), '->supports() returns true if the resource with forced type is loadable');
+    }
+
+    public function testWhenEnv()
+    {
+        $container = new ContainerBuilder();
+        $loader = new IniFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/').'/ini'), 'some-env');
+        $loader->load('when-env.ini');
+
+        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 }

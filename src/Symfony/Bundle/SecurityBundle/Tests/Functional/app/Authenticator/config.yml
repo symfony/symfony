@@ -5,7 +5,7 @@ framework:
     default_locale: en
     profiler: false
     session:
-        storage_id: session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
 
 services:
     logger: { class: Psr\Log\NullLogger }

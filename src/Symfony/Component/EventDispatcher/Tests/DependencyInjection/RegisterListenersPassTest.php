@@ -13,12 +13,19 @@ namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\Attribute\EventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\CustomEvent;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedInvokableListener;
+use Symfony\Component\EventDispatcher\Tests\Fixtures\TaggedMultiListener;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -231,6 +238,90 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedInvokableEventListener()
+    {
+        if (!class_exists(AttributeAutoconfigurationPass::class)) {
+            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
+        }
+
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
+            $definition->addTag('kernel.event_listener', get_object_vars($attribute));
+        });
+        $container->register('foo', TaggedInvokableListener::class)->setAutoconfigured(true);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), '__invoke'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedMultiEventListener()
+    {
+        if (!class_exists(AttributeAutoconfigurationPass::class)) {
+            self::markTestSkipped('This test requires Symfony DependencyInjection >= 5.3');
+        }
+
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
+            $definition->addTag('kernel.event_listener', get_object_vars($attribute));
+        });
+        $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    CustomEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onCustomEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onFoo'],
+                    42,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'bar',
+                    [new ServiceClosureArgument(new Reference('foo')), 'onBarEvent'],
+                    0,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
+
     public function testAliasedEventListener()
     {
         $container = new ContainerBuilder();
@@ -413,10 +504,6 @@ final class AliasedSubscriber implements EventSubscriberInterface
 }
 
 final class AliasedEvent
-{
-}
-
-final class CustomEvent
 {
 }
 

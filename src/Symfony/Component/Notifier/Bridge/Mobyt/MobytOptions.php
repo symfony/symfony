@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
@@ -27,6 +28,10 @@ final class MobytOptions implements MessageOptionsInterface
 
     public function __construct(array $options = [])
     {
+        if (isset($options['message_type'])) {
+            self::validateMessageType($options['message_type']);
+        }
+
         $this->options = $options;
     }
 
@@ -66,6 +71,17 @@ final class MobytOptions implements MessageOptionsInterface
 
     public function messageType(string $type)
     {
+        self::validateMessageType($type);
+
         $this->options['message_type'] = $type;
+    }
+
+    public static function validateMessageType($type): string
+    {
+        if (!\in_array($type, $supported = [self::MESSAGE_TYPE_QUALITY_HIGH, self::MESSAGE_TYPE_QUALITY_MEDIUM, self::MESSAGE_TYPE_QUALITY_LOW], true)) {
+            throw new InvalidArgumentException(sprintf('The message type "%s" is not supported; supported message types are: "%s"', $type, implode('", "', $supported)));
+        }
+
+        return $type;
     }
 }

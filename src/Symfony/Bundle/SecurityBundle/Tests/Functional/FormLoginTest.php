@@ -143,8 +143,10 @@ class FormLoginTest extends AbstractWebTestCase
 
     public function provideInvalidCredentials()
     {
-        yield 'invalid_password' => ['johannes', 'wrong'];
-        yield 'invalid_username' => ['wrong', 'wrong'];
+        yield 'invalid_password' => ['johannes', 'wrong', 1];
+        yield 'invalid_password_again' => ['johannes', 'also_wrong', 2];
+        yield 'invalid_username' => ['wrong', 'wrong', 3];
+        yield 'invalid_password_again_bis' => ['johannes', 'wrong_again', 4];
     }
 
     public function provideClientOptions()

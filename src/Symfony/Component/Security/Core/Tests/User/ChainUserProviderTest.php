@@ -17,12 +17,14 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ChainUserProviderTest extends TestCase
 {
     public function testLoadUserByUsername()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -30,12 +32,12 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foo'))
-            ->willReturn($account = $this->getAccount())
+            ->willReturn($account = $this->createMock(UserInterface::class))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
@@ -45,7 +47,7 @@ class ChainUserProviderTest extends TestCase
     public function testLoadUserByUsernameThrowsUsernameNotFoundException()
     {
         $this->expectException(UsernameNotFoundException::class);
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -53,7 +55,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('loadUserByUsername')
@@ -67,14 +69,14 @@ class ChainUserProviderTest extends TestCase
 
     public function testRefreshUser()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
             ->willReturn(false)
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -87,7 +89,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider3 = $this->getProvider();
+        $provider3 = $this->createMock(UserProviderInterface::class);
         $provider3
             ->expects($this->once())
             ->method('supportsClass')
@@ -97,16 +99,16 @@ class ChainUserProviderTest extends TestCase
         $provider3
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->getAccount())
+            ->willReturn($account = $this->createMock(UserInterface::class))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2, $provider3]);
-        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
     }
 
     public function testRefreshUserAgain()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
@@ -119,7 +121,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -129,17 +131,17 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->getAccount())
+            ->willReturn($account = $this->createMock(UserInterface::class))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
-        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
     }
 
     public function testRefreshUserThrowsUnsupportedUserException()
     {
         $this->expectException(UnsupportedUserException::class);
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
@@ -152,7 +154,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -166,12 +168,12 @@ class ChainUserProviderTest extends TestCase
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
-        $provider->refreshUser($this->getAccount());
+        $provider->refreshUser($this->createMock(UserInterface::class));
     }
 
     public function testSupportsClass()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
@@ -179,7 +181,7 @@ class ChainUserProviderTest extends TestCase
             ->willReturn(false)
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -193,7 +195,7 @@ class ChainUserProviderTest extends TestCase
 
     public function testSupportsClassWhenNotSupported()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
@@ -201,7 +203,7 @@ class ChainUserProviderTest extends TestCase
             ->willReturn(false)
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -215,7 +217,7 @@ class ChainUserProviderTest extends TestCase
 
     public function testAcceptsTraversable()
     {
-        $provider1 = $this->getProvider();
+        $provider1 = $this->createMock(UserProviderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
@@ -228,7 +230,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getProvider();
+        $provider2 = $this->createMock(UserProviderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
@@ -238,25 +240,25 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->getAccount())
+            ->willReturn($account = $this->createMock(UserInterface::class))
         ;
 
         $provider = new ChainUserProvider(new \ArrayObject([$provider1, $provider2]));
-        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
+        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
     }
 
     public function testPasswordUpgrades()
     {
         $user = new User('user', 'pwd');
 
-        $provider1 = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $provider1 = $this->createMock(PasswordUpgraderInterface::class);
         $provider1
             ->expects($this->once())
             ->method('upgradePassword')
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider2 = $this->getMockBuilder(PasswordUpgraderInterface::class)->getMock();
+        $provider2 = $this->createMock(PasswordUpgraderInterface::class);
         $provider2
             ->expects($this->once())
             ->method('upgradePassword')
@@ -265,15 +267,5 @@ class ChainUserProviderTest extends TestCase
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
         $provider->upgradePassword($user, 'foobar');
-    }
-
-    protected function getAccount()
-    {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserInterface::class)->getMock();
-    }
-
-    protected function getProvider()
-    {
-        return $this->getMockBuilder(\Symfony\Component\Security\Core\User\UserProviderInterface::class)->getMock();
     }
 }

@@ -12,6 +12,10 @@
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
+use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
+use Symfony\Component\Intl\Exception\MethodNotImplementedException;
+use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
 /**
@@ -39,7 +43,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testConstructorWithUnsupportedLocale()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException::class);
+        $this->expectException(MethodArgumentValueNotImplementedException::class);
         $this->getDateFormatter('pt_BR', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
     }
 
@@ -69,7 +73,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         try {
             $formatter->format($localtime);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(\Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException::class, $e);
+            $this->assertInstanceOf(MethodArgumentValueNotImplementedException::class, $e);
 
             $this->assertStringEndsWith('Only integer Unix timestamps and DateTime objects are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
         }
@@ -77,7 +81,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testFormatWithUnimplementedChars()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\NotImplementedException::class);
+        $this->expectException(NotImplementedException::class);
         $pattern = 'Y';
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
         $formatter->format(0);
@@ -85,7 +89,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testFormatWithNonIntegerTimestamp()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\NotImplementedException::class);
+        $this->expectException(NotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->format([]);
     }
@@ -110,14 +114,14 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testLocaltime()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
+        $this->expectException(MethodNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->localtime('Wednesday, December 31, 1969 4:00:00 PM PT');
     }
 
     public function testParseWithNotNullPositionValue()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException::class);
+        $this->expectException(MethodArgumentNotImplementedException::class);
         $position = 0;
         $formatter = $this->getDefaultDateFormatter('y');
         $this->assertSame(0, $formatter->parse('1970', $position));
@@ -125,27 +129,27 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     public function testSetCalendar()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodNotImplementedException::class);
+        $this->expectException(MethodNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->setCalendar(IntlDateFormatter::GREGORIAN);
     }
 
     public function testSetLenient()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException::class);
+        $this->expectException(MethodArgumentValueNotImplementedException::class);
         $formatter = $this->getDefaultDateFormatter();
         $formatter->setLenient(true);
     }
 
     public function testFormatWithGmtTimeZoneAndMinutesOffset()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\NotImplementedException::class);
+        $this->expectException(NotImplementedException::class);
         parent::testFormatWithGmtTimeZoneAndMinutesOffset();
     }
 
     public function testFormatWithNonStandardTimezone()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\NotImplementedException::class);
+        $this->expectException(NotImplementedException::class);
         parent::testFormatWithNonStandardTimezone();
     }
 

@@ -13,6 +13,14 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Dumper\Preloader;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\A;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\B;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\C;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\D;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\Dummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\E;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy;
 
 class PreloaderTest extends TestCase
 {
@@ -28,10 +36,10 @@ class PreloaderTest extends TestCase
 
         $r->invokeArgs(null, ['Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\Dummy', &$preloaded]);
 
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\Dummy::class, false));
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\A::class, false));
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\B::class, false));
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\C::class, false));
+        self::assertTrue(class_exists(Dummy::class, false));
+        self::assertTrue(class_exists(A::class, false));
+        self::assertTrue(class_exists(B::class, false));
+        self::assertTrue(class_exists(C::class, false));
     }
 
     /**
@@ -45,7 +53,7 @@ class PreloaderTest extends TestCase
         $preloaded = [];
 
         $r->invokeArgs(null, ['Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface', &$preloaded]);
-        self::assertFalse(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterface::class, false));
+        self::assertFalse(class_exists(DummyWithInterface::class, false));
     }
 
     /**
@@ -60,8 +68,8 @@ class PreloaderTest extends TestCase
 
         $r->invokeArgs(null, ['Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy', &$preloaded]);
 
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy::class, false));
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\D::class, false));
-        self::assertTrue(class_exists(\Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\E::class, false));
+        self::assertTrue(class_exists(UnionDummy::class, false));
+        self::assertTrue(class_exists(D::class, false));
+        self::assertTrue(class_exists(E::class, false));
     }
 }

@@ -34,7 +34,7 @@ class ArrayDenormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->getMockBuilder(ContextAwareDenormalizerInterface::class)->getMock();
+        $this->serializer = $this->createMock(ContextAwareDenormalizerInterface::class);
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setDenormalizer($this->serializer);
     }
@@ -74,7 +74,7 @@ class ArrayDenormalizerTest extends TestCase
      */
     public function testDenormalizeLegacy()
     {
-        $serializer = $this->getMockBuilder(Serializer::class)->getMock();
+        $serializer = $this->createMock(Serializer::class);
 
         $serializer->expects($this->exactly(2))
             ->method('denormalize')

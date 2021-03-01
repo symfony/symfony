@@ -16,7 +16,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -235,7 +239,7 @@ class OptionsResolverTest extends TestCase
 
     public function testResolveFailsIfRequiredOptionMissing()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
         $this->resolver->setRequired('foo');
 
         $this->resolver->resolve();
@@ -462,7 +466,7 @@ class OptionsResolverTest extends TestCase
 
     public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid type for deprecation message argument, expected string or \Closure, but got "bool".');
         $this->resolver
             ->setDefined('foo')
@@ -472,7 +476,7 @@ class OptionsResolverTest extends TestCase
 
     public function testLazyDeprecationFailsIfInvalidDeprecationMessageType()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid type for deprecation message, expected string but got "bool", return an empty string to ignore.');
         $this->resolver
             ->setDefined('foo')
@@ -485,7 +489,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfCyclicDependencyBetweenDeprecation()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->expectExceptionMessage('The options "foo", "bar" have a cyclic dependency.');
         $this->resolver
             ->setDefined(['foo', 'bar'])
@@ -1364,7 +1368,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailIfCyclicDependencyBetweenNormalizers()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefault('norm1', 'bar');
         $this->resolver->setDefault('norm2', 'baz');
 
@@ -1381,7 +1385,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailIfCyclicDependencyBetweenNormalizerAndLazyOption()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefault('lazy', function (Options $options) {
             $options['norm'];
         });
@@ -1805,7 +1809,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailIfGetNonExisting()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoSuchOptionException::class);
+        $this->expectException(NoSuchOptionException::class);
         $this->expectExceptionMessage('The option "undefined" does not exist. Defined options are: "foo", "lazy".');
         $this->resolver->setDefault('foo', 'bar');
 
@@ -1818,7 +1822,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailIfGetDefinedButUnset()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\NoSuchOptionException::class);
+        $this->expectException(NoSuchOptionException::class);
         $this->expectExceptionMessage('The optional option "defined" has no value set. You should make sure it is set with "isset" before reading it.');
         $this->resolver->setDefined('defined');
 
@@ -1831,7 +1835,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailIfCyclicDependency()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefault('lazy1', function (Options $options) {
             $options['lazy2'];
         });
@@ -2031,7 +2035,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfMissingRequiredNestedOption()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "database[host]" is missing.');
         $this->resolver->setDefaults([
             'name' => 'default',
@@ -2270,7 +2274,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfCyclicDependencyBetweenSameNestedOption()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
             $resolver->setDefault('replicas', $parent['database']);
         });
@@ -2279,7 +2283,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfCyclicDependencyBetweenNestedOptionAndParentLazyOption()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefaults([
             'version' => function (Options $options) {
                 return $options['database']['server_version'];
@@ -2293,7 +2297,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfCyclicDependencyBetweenNormalizerAndNestedOption()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver
             ->setDefault('name', 'default')
             ->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
@@ -2307,7 +2311,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfCyclicDependencyBetweenNestedOptions()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
             $resolver->setDefault('host', $parent['replica']['host']);
         });
@@ -2400,7 +2404,7 @@ class OptionsResolverTest extends TestCase
 
     public function testFailsIfOptionIsAlreadyDefined()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\OptionDefinitionException::class);
+        $this->expectException(OptionDefinitionException::class);
         $this->expectExceptionMessage('The option "foo" is already defined.');
         $this->resolver->define('foo');
         $this->resolver->define('foo');

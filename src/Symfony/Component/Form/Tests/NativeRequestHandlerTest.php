@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\NativeRequestHandler;
 
 /**
@@ -50,7 +51,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
     public function testRequestShouldBeNull()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), 'request');
     }
 

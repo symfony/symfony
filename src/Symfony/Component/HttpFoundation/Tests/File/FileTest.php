@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -41,7 +42,7 @@ class FileTest extends TestCase
 
     public function testConstructWhenFileNotExists()
     {
-        $this->expectException(\Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException::class);
+        $this->expectException(FileNotFoundException::class);
 
         new File(__DIR__.'/Fixtures/not_here');
     }

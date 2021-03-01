@@ -91,7 +91,7 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getToken()
     {
-        return $this->getMockBuilder(TokenInterface::class)->getMock();
+        return $this->createMock(TokenInterface::class);
     }
 
     protected function getAnonymousToken()
@@ -107,8 +107,8 @@ class AuthenticationTrustResolverTest extends TestCase
     protected function getResolver()
     {
         return new AuthenticationTrustResolver(
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken',
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken'
+            AnonymousToken::class,
+            RememberMeToken::class
         );
     }
 }

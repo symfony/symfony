@@ -145,6 +145,11 @@ class Dummy extends ParentDummy
      */
     public $arrayOfMixed;
 
+    /**
+     * @var parent
+     */
+    public $parentAnnotation;
+
     public static function getStatic()
     {
     }
@@ -231,6 +236,10 @@ class Dummy extends ParentDummy
     }
 
     public function addDate(\DateTime $date)
+    {
+    }
+
+    public function hasElement(string $element): bool
     {
     }
 }

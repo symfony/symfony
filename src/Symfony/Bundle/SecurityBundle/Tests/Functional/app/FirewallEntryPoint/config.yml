@@ -9,7 +9,7 @@ framework:
     test: ~
     default_locale: en
     session:
-        storage_id:     session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
     profiler: { only_exceptions: false }
 
 services:
@@ -28,5 +28,5 @@ security:
             memory:
                 users:
                     john: { password: doe, roles: [ROLE_SECURE] }
-    encoders:
+    password_hashers:
         Symfony\Component\Security\Core\User\User: plaintext

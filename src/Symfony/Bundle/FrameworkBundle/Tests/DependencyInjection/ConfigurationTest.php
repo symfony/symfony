@@ -22,6 +22,8 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
+use Symfony\Component\Uid\Factory\UuidFactory;
 
 class ConfigurationTest extends TestCase
 {
@@ -442,6 +444,7 @@ class ConfigurationTest extends TestCase
                 'mapping' => ['paths' => []],
             ],
             'property_access' => [
+                'enabled' => true,
                 'magic_call' => false,
                 'magic_get' => true,
                 'magic_set' => true,
@@ -462,6 +465,7 @@ class ConfigurationTest extends TestCase
             'session' => [
                 'enabled' => false,
                 'storage_id' => 'session.storage.native',
+                'storage_factory_id' => null,
                 'handler_id' => 'session.handler.native_file',
                 'cookie_httponly' => true,
                 'cookie_samesite' => null,
@@ -560,8 +564,14 @@ class ConfigurationTest extends TestCase
                 'private_headers' => [],
             ],
             'rate_limiter' => [
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class) && class_exists(TokenBucketLimiter::class),
                 'limiters' => [],
+            ],
+            'uid' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(UuidFactory::class),
+                'default_uuid_version' => 6,
+                'name_based_uuid_version' => 5,
+                'time_based_uuid_version' => 6,
             ],
         ];
     }

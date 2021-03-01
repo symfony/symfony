@@ -49,6 +49,16 @@ class ParentDummy
     public $files;
 
     /**
+     * @var static
+     */
+    public $propertyTypeStatic;
+
+    /**
+     * @var parent
+     */
+    public $parentAnnotationNoParent;
+
+    /**
      * @return bool|null
      */
     public function isC()

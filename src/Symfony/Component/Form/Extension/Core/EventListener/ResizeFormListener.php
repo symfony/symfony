@@ -132,6 +132,10 @@ class ResizeFormListener implements EventSubscriberInterface
             $previousData = $form->getData();
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
+                if (!$child->isValid() || !$child->isSynchronized()) {
+                    continue;
+                }
+
                 $isNew = !isset($previousData[$name]);
                 $isEmpty = \is_callable($this->deleteEmpty) ? ($this->deleteEmpty)($child->getData()) : $child->isEmpty();
 

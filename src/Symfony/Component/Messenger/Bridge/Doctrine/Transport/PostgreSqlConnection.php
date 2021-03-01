@@ -87,7 +87,7 @@ final class PostgreSqlConnection extends Connection
     {
         parent::setup();
 
-        $this->executeStatement(implode("\n", $this->getTriggerSql()));
+        $this->executeStatement('BEGIN;'.implode("\n", $this->getTriggerSql()).'COMMIT;');
     }
 
     /**
@@ -109,7 +109,6 @@ final class PostgreSqlConnection extends Connection
     private function getTriggerSql(): array
     {
         return [
-            'BEGIN;',
             sprintf('LOCK TABLE %s;', $this->configuration['table_name']),
             // create trigger function
             sprintf(<<<'SQL'
@@ -124,7 +123,6 @@ SQL
             // register trigger
             sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
             sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE notify_%1$s();', $this->configuration['table_name']),
-            'COMMIT;',
         ];
     }
 

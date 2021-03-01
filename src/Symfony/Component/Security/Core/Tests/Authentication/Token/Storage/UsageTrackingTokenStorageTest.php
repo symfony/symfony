@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token\Storage;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
@@ -24,14 +26,19 @@ class UsageTrackingTokenStorageTest extends TestCase
     public function testGetSetToken()
     {
         $sessionAccess = 0;
-        $sessionLocator = new class(['session' => function () use (&$sessionAccess) {
+        $sessionLocator = new class(['request_stack' => function () use (&$sessionAccess) {
             ++$sessionAccess;
 
             $session = $this->createMock(SessionInterface::class);
             $session->expects($this->once())
                     ->method('getMetadataBag');
 
-            return $session;
+            $request = new Request();
+            $request->setSession($session);
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+
+            return $requestStack;
         }]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
@@ -39,7 +46,7 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
         $this->assertNull($trackingStorage->getToken());
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $token = $this->createMock(TokenInterface::class);
 
         $trackingStorage->setToken($token);
         $this->assertSame($token, $trackingStorage->getToken());

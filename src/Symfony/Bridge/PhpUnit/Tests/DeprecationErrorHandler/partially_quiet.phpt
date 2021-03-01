@@ -24,7 +24,7 @@ require __DIR__.'/fake_vendor/acme/outdated-lib/outdated_file.php';
 --EXPECTF--
 Unsilenced deprecation notices (3)
 
-Remaining direct deprecation notices (1)
+Remaining direct deprecation notices (2)
 
 Remaining indirect deprecation notices (1)
 
@@ -32,6 +32,4 @@ Remaining indirect deprecation notices (1)
     1x in SomeService::deprecatedApi from acme\lib
 
 Legacy deprecation notices (2)
-
-Other deprecation notices (1)
 

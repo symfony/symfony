@@ -13,7 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @group legacy
+ */
 class PlaintextPasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()
@@ -40,7 +44,7 @@ class PlaintextPasswordEncoderTest extends TestCase
 
     public function testEncodePasswordLength()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\BadCredentialsException::class);
+        $this->expectException(BadCredentialsException::class);
         $encoder = new PlaintextPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');

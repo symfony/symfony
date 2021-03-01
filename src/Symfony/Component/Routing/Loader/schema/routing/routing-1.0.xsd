@@ -21,7 +21,16 @@
     <xsd:choice minOccurs="0" maxOccurs="unbounded">
       <xsd:element name="import" type="import" />
       <xsd:element name="route" type="route" />
+      <xsd:element name="when" type="when" />
     </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="when">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="import" type="import" />
+      <xsd:element name="route" type="route" />
+    </xsd:choice>
+    <xsd:attribute name="env" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="localized-path">

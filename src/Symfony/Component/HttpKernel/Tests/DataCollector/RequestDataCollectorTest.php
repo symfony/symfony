@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -206,7 +207,7 @@ class RequestDataCollectorTest extends TestCase
             'sf_redirect' => '{}',
         ]);
 
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
+        $kernel = $this->createMock(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
         $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $this->createResponse()));
@@ -371,8 +372,8 @@ class RequestDataCollectorTest extends TestCase
      */
     protected function injectController($collector, $controller, $request)
     {
-        $resolver = $this->getMockBuilder(\Symfony\Component\HttpKernel\Controller\ControllerResolverInterface::class)->getMock();
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMockBuilder(ArgumentResolverInterface::class)->getMock());
+        $resolver = $this->createMock(ControllerResolverInterface::class);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
         $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
         $collector->onKernelController($event);
     }

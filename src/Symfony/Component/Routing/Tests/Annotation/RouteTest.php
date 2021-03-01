@@ -12,16 +12,25 @@
 namespace Symfony\Component\Routing\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Routing\Annotation\Route;
 
 class RouteTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testInvalidRouteParameter()
     {
         $this->expectException(\BadMethodCallException::class);
         new Route(['foo' => 'bar']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testTryingToSetLocalesDirectly()
     {
         $this->expectException(\BadMethodCallException::class);
@@ -29,18 +38,30 @@ class RouteTest extends TestCase
     }
 
     /**
+     * @requires PHP 8
      * @dataProvider getValidParameters
      */
-    public function testRouteParameters($parameter, $value, $getter)
+    public function testRouteParameters(string $parameter, $value, string $getter)
     {
+        $route = new Route(...[$parameter => $value]);
+        $this->assertEquals($route->$getter(), $value);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getLegacyValidParameters
+     */
+    public function testLegacyRouteParameters(string $parameter, $value, string $getter)
+    {
+        $this->expectDeprecation('Since symfony/routing 5.3: Passing an array as first argument to "Symfony\Component\Routing\Annotation\Route::__construct" is deprecated. Use named arguments instead.');
+
         $route = new Route([$parameter => $value]);
         $this->assertEquals($route->$getter(), $value);
     }
 
-    public function getValidParameters()
+    public function getValidParameters(): iterable
     {
         return [
-            ['value', '/Blog', 'getPath'],
             ['requirements', ['locale' => 'en'], 'getRequirements'],
             ['options', ['compiler_class' => 'RouteCompiler'], 'getOptions'],
             ['name', 'blog_index', 'getName'],
@@ -49,7 +70,14 @@ class RouteTest extends TestCase
             ['methods', ['GET', 'POST'], 'getMethods'],
             ['host', '{locale}.example.com', 'getHost'],
             ['condition', 'context.getMethod() == "GET"', 'getCondition'],
-            ['value', ['nl' => '/hier', 'en' => '/here'], 'getLocalizedPaths'],
         ];
+    }
+
+    public function getLegacyValidParameters(): iterable
+    {
+        yield from $this->getValidParameters();
+
+        yield ['value', '/Blog', 'getPath'];
+        yield ['value', ['nl' => '/hier', 'en' => '/here'], 'getLocalizedPaths'];
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder as BaseNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition as BaseVariableNodeDefinition;
 
@@ -79,10 +81,10 @@ class NodeBuilderTest extends TestCase
         $builder = new BaseNodeBuilder();
 
         $node = $builder->integerNode('foo')->min(3)->max(5);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition::class, $node);
+        $this->assertInstanceOf(IntegerNodeDefinition::class, $node);
 
         $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
-        $this->assertInstanceOf(\Symfony\Component\Config\Definition\Builder\FloatNodeDefinition::class, $node);
+        $this->assertInstanceOf(FloatNodeDefinition::class, $node);
     }
 }
 

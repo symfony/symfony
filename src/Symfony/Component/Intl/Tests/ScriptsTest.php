@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Scripts;
 
 /**
@@ -280,7 +281,7 @@ class ScriptsTest extends ResourceBundleTestCase
 
     public function testGetNameWithInvalidScriptCode()
     {
-        $this->expectException(\Symfony\Component\Intl\Exception\MissingResourceException::class);
+        $this->expectException(MissingResourceException::class);
         Scripts::getName('foo');
     }
 

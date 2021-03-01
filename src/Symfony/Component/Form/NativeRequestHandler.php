@@ -26,7 +26,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * The allowed keys of the $_FILES array.
      */
-    private static $fileKeys = [
+    private const FILE_KEYS = [
         'error',
         'name',
         'size',
@@ -201,12 +201,12 @@ class NativeRequestHandler implements RequestHandlerInterface
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if (self::FILE_KEYS !== $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
         $files = $data;
-        foreach (self::$fileKeys as $k) {
+        foreach (self::FILE_KEYS as $k) {
             unset($files[$k]);
         }
 
@@ -237,7 +237,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::$fileKeys === $keys) {
+        if (self::FILE_KEYS === $keys) {
             if (\UPLOAD_ERR_NO_FILE === $data['error']) {
                 return null;
             }

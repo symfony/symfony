@@ -59,7 +59,7 @@ class FormRenderer implements FormRendererInterface
     public function renderCsrfToken(string $tokenId)
     {
         if (null === $this->csrfTokenManager) {
-            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct().');
+            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct(). Try running "composer require symfony/security-csrf".');
         }
 
         return $this->csrfTokenManager->getToken($tokenId)->getValue();

@@ -1,0 +1,8 @@
+imports:
+    - { resource: container1.yml }
+
+security:
+    password_hashers:
+        JMS\FooBundle\Entity\User7:
+            algorithm: bcrypt
+            cost: 15

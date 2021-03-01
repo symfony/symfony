@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null` (instead of `lock.factory`)
+ * Add a `login_throttling.interval` (in `security.firewalls`) option to change the default throttling interval.
  * Add the `debug:firewall` command.
  * Deprecate `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
@@ -12,7 +13,6 @@ CHANGELOG
    use `security.password_hasher_factory` and `Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface` instead
  * Deprecate the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
-
 
 5.2.0
 -----

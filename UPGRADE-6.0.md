@@ -92,6 +92,8 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Remove `ArgumentInterface`
+ * Remove `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Made `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Removed support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
 
@@ -122,6 +124,7 @@ Messenger
  * The signature of method `RetryStrategyInterface::isRetryable()` has been updated to `RetryStrategyInterface::isRetryable(Envelope $message, \Throwable $throwable = null)`.
  * The signature of method `RetryStrategyInterface::getWaitingTime()` has been updated to `RetryStrategyInterface::getWaitingTime(Envelope $message, \Throwable $throwable = null)`.
  * Removed the `prefetch_count` parameter in the AMQP bridge.
+ * Removed the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
 
 Mime
 ----
@@ -164,6 +167,7 @@ Routing
  * Removed `RouteCollectionBuilder`.
  * Added argument `$priority` to `RouteCollection::add()`
  * Removed the `RouteCompiler::REGEX_DELIMITER` constant
+ * Removed the `$data` parameter from the constructor of the `Route` annotation class
 
 Security
 --------

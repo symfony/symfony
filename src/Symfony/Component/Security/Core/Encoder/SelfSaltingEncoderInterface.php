@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" interface is deprecated, use "%s" on hasher implementations that deal with salts instead.', SelfSaltingEncoderInterface::class, LegacyPasswordHasherInterface::class));
-
 use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" interface is deprecated, use "%s" on hasher implementations that deal with salts instead.', SelfSaltingEncoderInterface::class, LegacyPasswordHasherInterface::class));
 
 /**
  * SelfSaltingEncoderInterface is a marker interface for encoders that do not

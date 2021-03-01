@@ -36,7 +36,7 @@ class LogoutListenerTest extends TestCase
         $dispatcher = $this->getEventDispatcher();
         [$listener, , $httpUtils, $options] = $this->getListener($dispatcher);
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $logoutEventDispatched = false;
         $dispatcher->addListener(LogoutEvent::class, function (LogoutEvent $event) use (&$logoutEventDispatched) {
@@ -60,7 +60,7 @@ class LogoutListenerTest extends TestCase
 
         [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher, $tokenManager);
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $request->query->set('_csrf_token', 'token');
 
@@ -98,7 +98,7 @@ class LogoutListenerTest extends TestCase
         $dispatcher = $this->getEventDispatcher();
         [$listener, $tokenStorage, $httpUtils, $options] = $this->getListener($dispatcher);
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -131,7 +131,7 @@ class LogoutListenerTest extends TestCase
 
         [$listener, , $httpUtils, $options] = $this->getListener();
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -148,7 +148,7 @@ class LogoutListenerTest extends TestCase
 
         [$listener, , $httpUtils, $options] = $this->getListener(null, $tokenManager);
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $request->query->set('_csrf_token', 'token');
 
@@ -179,7 +179,7 @@ class LogoutListenerTest extends TestCase
         $token = $this->getToken();
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
 
-        [$event, $request] = $this->getGetResponseEvent();
+        [$event, $request] = $this->getRequestEvent();
 
         $httpUtils->expects($this->once())
             ->method('checkRequestPath')
@@ -208,7 +208,7 @@ class LogoutListenerTest extends TestCase
         return $this->createMock(TokenStorageInterface::class);
     }
 
-    private function getGetResponseEvent()
+    private function getRequestEvent()
     {
         $event = $this->createMock(RequestEvent::class);
 

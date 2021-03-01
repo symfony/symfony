@@ -27,6 +27,7 @@ Form
  * Deprecated passing an array as the first argument of the `CheckboxListMapper::mapFormsToData()` method, pass `\Traversable` instead
  * Deprecated passing an array as the second argument of the `RadioListMapper::mapDataToForms()` method, pass `\Traversable` instead
  * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead
+ * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`
 
 FrameworkBundle
 ---------------
@@ -43,12 +44,15 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Deprecate `ArgumentInterface`
+ * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
 
 Messenger
 ---------
 
  * Deprecated the `prefetch_count` parameter in the AMQP bridge, it has no effect and will be removed in Symfony 6.0
+ * Deprecated the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
 
 Notifier
 --------
@@ -68,6 +72,11 @@ PropertyInfo
 
  * Deprecated the `Type::getCollectionKeyType()` and `Type::getCollectionValueType()` methods, use `Type::getCollectionKeyTypes()` and `Type::getCollectionValueTypes()` instead
 
+Routing
+-------
+
+ * Deprecated creating instances of the `Route` annotation class by passing an array of parameters, use named arguments instead
+
 Security
 --------
 
@@ -77,6 +86,8 @@ Security
 SecurityBundle
 --------------
 
+ * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null`. Set this option
+   to `lock.factory` if you need precise login rate limiting with synchronous requests.
  * Deprecate `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead
  * Deprecate the `security.encoder_factory.generic` service, the `security.encoder_factory` and `Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface` aliases,

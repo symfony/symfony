@@ -77,10 +77,22 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new UserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, new CurrentUser());
+        $metadata = $this->createMock(ArgumentMetadata::class);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->assertSame([$user], iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
+    }
+
+    public function testResolveWithAttributeAndNoUser()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken('username', 'password', 'provider'));
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
     public function testIntegration()

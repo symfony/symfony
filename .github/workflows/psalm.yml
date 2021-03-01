@@ -1,0 +1,58 @@
+name: Static analysis
+
+on:
+  pull_request: ~
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  psalm:
+    name: Psalm
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          ini-values: "memory_limit=-1"
+          coverage: none
+
+      - name: Checkout target branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Checkout PR
+        uses: actions/checkout@v2
+
+      - name: Configure composer
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+      - name: Install Psalm
+        run: |
+          echo "::group::modify composer.json"
+          composer remove --no-update --no-interaction symfony/phpunit-bridge
+          composer require --no-update psalm/phar phpunit/phpunit php-http/discovery psr/event-dispatcher
+          echo "::endgroup::"
+          echo "::group::composer update"
+          composer update --no-progress --ansi
+          git checkout composer.json
+          echo "::endgroup::"
+          ./vendor/bin/psalm.phar --version
+
+      - name: Generate Psalm baseline
+        run: |
+          git checkout -m ${{ github.base_ref }}
+          ./vendor/bin/psalm.phar --set-baseline=.github/psalm/psalm.baseline.xml --no-progress
+          git checkout -m FETCH_HEAD
+
+      - name: Psalm
+        run: |
+          ./vendor/bin/psalm.phar --output-format=github --no-progress

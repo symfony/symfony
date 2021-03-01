@@ -4,6 +4,9 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate `ArgumentInterface`
+ * Add `ArgumentMetadata::getAttributes()`
+ * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
 
 5.2.0

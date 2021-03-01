@@ -55,6 +55,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
                 ->scalarNode('limiter')->info(sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
                 ->scalarNode('interval')->defaultValue('1 minute')->end()
+                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking)')->defaultNull()->end()
             ->end();
     }
 
@@ -77,6 +78,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
                 'policy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
                 'interval' => $config['interval'],
+                'lock_factory' => $config['lock_factory'],
             ];
             FrameworkExtension::registerRateLimiter($container, $localId = '_login_local_'.$firewallName, $limiterOptions);
 

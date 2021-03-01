@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecated passing an array as the first argument of the `RadioListMapper::mapFormsToData()` method, pass `\Traversable` instead.
  * Added a `choice_translation_parameters` option to `ChoiceType`
  * Add `UuidType` and `UlidType`
+ * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`.
 
 5.2.0
 -----

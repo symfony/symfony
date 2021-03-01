@@ -341,30 +341,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     public function reset()
     {
-        if ($this->logger) {
-            foreach ($this->multi->pushedResponses as $url => $response) {
-                $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
-            }
-        }
-
-        $this->multi->pushedResponses = [];
-        $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
-        $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];
-
-        if (\is_resource($this->multi->handle) || $this->multi->handle instanceof \CurlMultiHandle) {
-            if (\defined('CURLMOPT_PUSHFUNCTION')) {
-                curl_multi_setopt($this->multi->handle, \CURLMOPT_PUSHFUNCTION, null);
-            }
-
-            $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active));
-        }
-
-        foreach ($this->multi->openHandles as [$ch]) {
-            if (\is_resource($ch) || $ch instanceof \CurlHandle) {
-                curl_setopt($ch, \CURLOPT_VERBOSE, false);
-            }
-        }
+        $this->multi->logger = $this->logger;
+        $this->multi->reset();
     }
 
     public function __sleep()
@@ -379,7 +357,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     public function __destruct()
     {
-        $this->reset();
+        $this->multi->logger = $this->logger;
     }
 
     private function handlePush($parent, $pushed, array $requestHeaders, int $maxPendingPushes): int

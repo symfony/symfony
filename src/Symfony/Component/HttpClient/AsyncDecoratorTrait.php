@@ -51,4 +51,15 @@ trait AsyncDecoratorTrait
 
         return new ResponseStream(AsyncResponse::stream($responses, $timeout, static::class));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withOptions(array $options): self
+    {
+        $clone = clone $this;
+        $clone->client = $this->client->withOptions($options);
+
+        return $clone;
+    }
 }

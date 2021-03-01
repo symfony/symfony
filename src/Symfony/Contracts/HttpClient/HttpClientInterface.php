@@ -19,6 +19,8 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
  *
  * @see HttpClientTestCase for a reference test suite
  *
+ * @method static withOptions(array $options) Returns a new instance of the client with new default options
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 interface HttpClientInterface

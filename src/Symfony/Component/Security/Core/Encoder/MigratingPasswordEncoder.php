@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', MigratingPasswordEncoder::class, MigratingPasswordHasher::class));
-
 use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
+
+trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', MigratingPasswordEncoder::class, MigratingPasswordHasher::class));
 
 /**
  * Hashes passwords using the best available encoder.

@@ -86,6 +86,9 @@ class ConnectionTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testFromDsnWithTls()
     {
         $redis = $this->createMock(\Redis::class);
@@ -97,6 +100,9 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('redis://127.0.0.1?tls=1', [], $redis);
     }
 
+    /**
+     * @group legacy
+     */
     public function testFromDsnWithTlsOption()
     {
         $redis = $this->createMock(\Redis::class);
@@ -106,6 +112,17 @@ class ConnectionTest extends TestCase
             ->willReturn(null);
 
         Connection::fromDsn('redis://127.0.0.1', ['tls' => true], $redis);
+    }
+
+    public function testFromDsnWithRedissScheme()
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())
+            ->method('connect')
+            ->with('tls://127.0.0.1', 6379)
+            ->willReturn(null);
+
+        Connection::fromDsn('rediss://127.0.0.1', [], $redis);
     }
 
     public function testFromDsnWithQueryOptions()

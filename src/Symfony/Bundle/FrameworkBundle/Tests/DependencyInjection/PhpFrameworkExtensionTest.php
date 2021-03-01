@@ -90,6 +90,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         try {
             $this->createContainerFromClosure(function (ContainerBuilder $container) {
                 $container->loadFromExtension('framework', [
+                    'lock' => false,
                     'rate_limiter' => [
                         'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
                     ],

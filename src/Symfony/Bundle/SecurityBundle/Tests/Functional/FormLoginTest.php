@@ -112,7 +112,7 @@ class FormLoginTest extends AbstractWebTestCase
      * @dataProvider provideInvalidCredentials
      * @group time-sensitive
      */
-    public function testLoginThrottling($username, $password)
+    public function testLoginThrottling(string $username, string $password, int $attemptIndex)
     {
         if (!class_exists(LoginThrottlingListener::class)) {
             $this->markTestSkipped('Login throttling requires symfony/security-http:^5.2');
@@ -125,19 +125,28 @@ class FormLoginTest extends AbstractWebTestCase
         $form['_password'] = $password;
         $client->submit($form);
 
-        $client->followRedirect()->selectButton('login')->form();
-        $form['_username'] = $username;
-        $form['_password'] = $password;
-        $client->submit($form);
-
         $text = $client->followRedirect()->text(null, true);
-        $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in %d minute%s', $text);
+        if (1 === $attemptIndex) {
+            // First attempt : Invalid credentials (OK)
+            $this->assertStringMatchesFormat('%sInvalid credentials%s', $text);
+        } elseif (2 === $attemptIndex) {
+            // Second attempt : login throttling !
+            $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in 8 minutes%s', $text);
+        } elseif (3 === $attemptIndex) {
+            // Third attempt with unexisting username
+            $this->assertStringMatchesFormat('%sUsername could not be found.%s', $text);
+        } elseif (4 === $attemptIndex) {
+            // Fourth attempt : still login throttling !
+            $this->assertStringMatchesFormat('%sToo many failed login attempts, please try again in 8 minutes%s', $text);
+        }
     }
 
     public function provideInvalidCredentials()
     {
-        yield 'invalid_password' => ['johannes', 'wrong'];
-        yield 'invalid_username' => ['wrong', 'wrong'];
+        yield 'invalid_password' => ['johannes', 'wrong', 1];
+        yield 'invalid_password_again' => ['johannes', 'also_wrong', 2];
+        yield 'invalid_username' => ['wrong', 'wrong', 3];
+        yield 'invalid_password_again_bis' => ['johannes', 'wrong_again', 4];
     }
 
     public function provideClientOptions()

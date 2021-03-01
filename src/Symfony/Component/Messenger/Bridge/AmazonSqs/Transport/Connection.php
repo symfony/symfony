@@ -37,6 +37,7 @@ class Connection
         'buffer_size' => 9,
         'wait_time' => 20,
         'poll_timeout' => 0.1,
+        'retention_period' => null,
         'visibility_timeout' => null,
         'auto_setup' => true,
         'access_key' => null,
@@ -96,6 +97,7 @@ class Connection
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
+     * * retention_period: amount of seconds the message will be retained
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
@@ -128,6 +130,7 @@ class Connection
             'wait_time' => (int) $options['wait_time'],
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => $options['visibility_timeout'],
+            'retention_period' => $options['retention_period'],
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOLEAN),
             'queue_name' => (string) $options['queue_name'],
         ];
@@ -275,11 +278,21 @@ class Connection
 
         $parameters = ['QueueName' => $this->configuration['queue_name']];
 
-        if (self::isFifoQueue($this->configuration['queue_name'])) {
-            $parameters['Attributes'] = [
-                'FifoQueue' => 'true',
-            ];
+        $attributes = ['ReceiveMessageWaitTimeSeconds' => $this->configuration['wait_time']];
+
+        if (null !== $this->configuration['visibility_timeout']) {
+            $attributes['VisibilityTimeout'] = $this->configuration['visibility_timeout'];
         }
+
+        if (null !== $this->configuration['retention_period']) {
+            $attributes['MessageRetentionPeriod'] = $this->configuration['retention_period'];
+        }
+
+        if (self::isFifoQueue($this->configuration['queue_name'])) {
+            $attributes['FifoQueue'] = 'true';
+        }
+
+        $parameters['Attributes'] = $attributes;
 
         $this->client->createQueue($parameters);
         $exists = $this->client->queueExists(['QueueName' => $this->configuration['queue_name']]);

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null` (instead of `lock.factory`)
+ * Add a `login_throttling.interval` (in `security.firewalls`) option to change the default throttling interval.
  * Add the `debug:firewall` command.
  * Deprecate `UserPasswordEncoderCommand` class and the corresponding `user:encode-password` command,
    use `UserPasswordHashCommand` and `user:hash-password` instead

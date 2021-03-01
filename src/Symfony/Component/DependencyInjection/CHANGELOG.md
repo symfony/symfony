@@ -10,6 +10,7 @@ CHANGELOG
  * Add autoconfigurable attributes
  * Add support for per-env configuration in loaders
  * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
+ * Add support an integer return value for default_index_method
 
 5.2.0
 -----

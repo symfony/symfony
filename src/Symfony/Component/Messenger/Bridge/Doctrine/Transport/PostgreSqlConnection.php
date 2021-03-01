@@ -87,7 +87,7 @@ final class PostgreSqlConnection extends Connection
     {
         parent::setup();
 
-        $this->executeStatement('BEGIN;'.implode("\n", $this->getTriggerSql()).'COMMIT;');
+        $this->executeStatement(implode("\n", $this->getTriggerSql()));
     }
 
     /**
@@ -109,6 +109,7 @@ final class PostgreSqlConnection extends Connection
     private function getTriggerSql(): array
     {
         return [
+            'BEGIN;',
             sprintf('LOCK TABLE %s;', $this->configuration['table_name']),
             // create trigger function
             sprintf(<<<'SQL'

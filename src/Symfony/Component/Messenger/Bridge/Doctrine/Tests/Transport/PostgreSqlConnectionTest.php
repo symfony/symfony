@@ -49,7 +49,19 @@ class PostgreSqlConnectionTest extends TestCase
 
         $table = new Table('queue_table');
         $table->addOption('_symfony_messenger_table_name', 'queue_table');
-        $this->assertStringContainsString('CREATE TRIGGER', implode("\n", $connection->getExtraSetupSqlForTable($table)));
+        $sql = implode("\n", $connection->getExtraSetupSqlForTable($table));
+
+        /*
+         * We need to start a transaction for the following commands to work properly:
+         * doctrine:schema:create
+         * messenger:setup-transports
+         * doctrine:migrations:diff and doctrine:migrations:migrate
+         */
+        $this->assertStringContainsString('BEGIN;', $sql);
+        $this->assertStringContainsString('CREATE TRIGGER', $sql);
+
+        // We MUST NOT commit, that will mess with the PDO in PHP 8
+        $this->assertStringNotContainsString('COMMIT;', $sql);
     }
 
     public function testGetExtraSetupSqlWrongTable()

@@ -858,9 +858,9 @@ class UrlGeneratorTest extends TestCase
 
     public function testNonStringableObjectParameterCannotBeConvertedToString()
     {
-        $this->expectException(InvalidParameterException::class);
         $object = new \stdClass();
         $routes = $this->getRoutes('test', new Route('/testing'));
+        $this->expectException(InvalidParameterException::class);
         $this->getGenerator($routes)->generate('test', ['param' => $object]);
     }
 

@@ -172,9 +172,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
-        // force string for an object. See https://bugs.php.net/bug.php?id=66966
-        $parameters = array_map(static function ($param) { return \is_object($param) ? (string) $param : $param; }, $parameters);
-
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
             throw new MissingMandatoryParametersException(sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', array_keys($diff)), $name));
@@ -296,6 +293,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, function ($a, $b) {
             return $a == $b ? 0 : 1;
         });
+
+        // force string for an object. See https://bugs.php.net/bug.php?id=66966
+        $extra = array_map(static function ($param) { return \is_object($param) ? (string) $param : $param; }, $extra);
 
         // extract fragment
         $fragment = $defaults['_fragment'] ?? '';

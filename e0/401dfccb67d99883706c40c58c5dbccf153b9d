@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-02T05:20:14Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-02T08:46:54Z
+
+> These method was added in 2010. It is true that they are not covered by any interface.
+
+The interface has been removed in 5.0.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-02T08:50:54Z
+
+I'm fine with this change, however I think we should copy the doc blocks from the old interface instead of just deleting the `@inheritdoc`s:
+
+https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Security/Core/User/AdvancedUserInterface.php
+
+Also, the change should be done on the 5.2 branch.
+
+---------------------------------------------------------------------------
+
+by junaidbinfarooq at 2021-03-02T16:11:56Z
+
+> I'm fine with this change, however I think we should copy the doc blocks from the old interface instead of just deleting the `@inheritdoc`s:
+>
+> https://github.com/symfony/symfony/blob/4.4/src/Symfony/Component/Security/Core/User/AdvancedUserInterface.php
+>
+> Also, the change should be done on the 5.2 branch.
+
+Thanks for the review.
+So should I go ahead with adding the doc blocks from `AdvancedUserInterface` to this class or leave it as such?
+And regarding your last point, should I mention 5.2 in the QA in the initial comment?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T16:19:28Z
+
+> So should I go ahead with adding the doc blocks from AdvancedUserInterface to this class
+
+Yes please.
+
+> And regarding your last point, should I mention 5.2 in the QA in the initial comment?
+
+Sure, you can update the PR description. But more importantly, click on the "Edit" button next to the PR title and change the base to 5.2.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-02T16:29:32Z
+
+> . But more importantly, click on the "Edit" button next to the PR title and change the base to 5.2.
+
+In case you don't know, this also requires re-basing your branch from 5.x to 5.2 using git:
+
+```
+# given "upstream" is the git remote pointing to symfony/symfony, this rebases from the
+# symfony/symfony:5.x branch onto the symfony/symfony:5.2 branch (removing the 479
+# unrelated commits from the PR diff)
+git rebase --onto upstream/5.2 upstream/5.x
+```
+
+---------------------------------------------------------------------------
+
+by junaidbinfarooq at 2021-03-02T17:28:53Z
+
+> > So should I go ahead with adding the doc blocks from AdvancedUserInterface to this class
+>
+> Yes please.
+>
+> > And regarding your last point, should I mention 5.2 in the QA in the initial comment?
+>
+> Sure, you can update the PR description. But more importantly, click on the "Edit" button next to the PR title and change the base to 5.2.
+
+Thanks.
+Changed the base to 5.2. It apparently lead to problems with tons of commits from the other branch showing up in this branch. I rebased the said branch on 5.2 and force pushed the changes but that didn't help either.
+I added the relevant doc blocks though.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-02T18:13:47Z
+
+Let me fix that for you.

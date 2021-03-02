@@ -173,7 +173,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // force string for an object. See https://bugs.php.net/bug.php?id=66966
-        $parameters = array_map(static function ($param) { return is_object($param) ? (string) $param : $param; }, $parameters);
+        $parameters = array_map(static function ($param) { return \is_object($param) ? (string) $param : $param; }, $parameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {

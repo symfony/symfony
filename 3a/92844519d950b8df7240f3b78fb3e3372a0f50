@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-02-27T00:32:28Z
+
+travis failure appears to be unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by michaljusiega at 2021-02-27T01:36:38Z
+
+Simple question. If serialize will be added, why not unserialize too?
+
+Second question: why only objects we can serialize?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-27T10:14:47Z
+
+Unserialize has not really a use case 🧐
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-02-27T19:25:57Z
+
+~For the travis failure:~
+```
+1) Symfony\Bridge\Twig\Tests\Extension\SerializerExtensionTest::testContextPassedToSerializer
+
+Twig\Error\RuntimeError: An exception has been thrown during the rendering of a template ("[Semantical Error] The annotation "@Groups" in property Symfony\Bridge\Twig\Tests\Fixtures\extension\SerializerModelFixture::$name was never imported. Did you maybe forget to add a "use" statement for this annotation?") in "template" at line 1.
+```
+~Am I missing something obvious?~
+`doctrine/annotations` dev dependency version constraint was to low for PHP8
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-03-02T06:29:17Z
+
+this should be all set now

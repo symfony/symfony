@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by damienfa at 2021-03-02T12:54:57Z
+
+@wouterj You're right, the tests failed for this reason. 🤔  But I have launched the tests with phpunit before pushing the PR and everything has run fine.
+
+`cd src/Symfony/Bundle/SecurityBundle`
+`phpunit ./`
+![image](https://user-images.githubusercontent.com/3252640/109651019-4f268980-7b5e-11eb-8273-600884e2265b.png)
+
+May one of you have a clue as to what's wrong? Or at least, to reproduce the test failure ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-02T13:07:32Z
+
+I'll have look :)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-02T13:44:28Z
+
+@damienfa I've been able to reproduce it locally and fix the tests (see the commit I pushed to this PR). You somehow lost the change in the security test config while creating this PR.
+
+I think I also discovered why you didn't see this error locally. Instead of using a globally installed `phpunit`, you should use the `./phpunit` utility that comes with this repo:
+
+```
+# given you're in the root of the repo (so `symfony/symfony`)
+$ ./phpunit src/Symfony/Bundle/SecurityBundle
+```
+
+---------------------------------------------------------------------------
+
+by damienfa at 2021-03-02T13:50:44Z
+
+@wouterj Yes ! I have just come to the same conclusion 🤦🏻‍♂️   I'm now able to reproduce it locally.
+In the rebase / merge process, I've also lost the `interval: 8minutes` in the yaml. I see in your commit that you fix it as well.
+Thanks for your help !

@@ -94,6 +94,7 @@ class Connection
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
+     * * sslmode: Can be "disable" to use http for a custom endpoint
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      */
     public static function fromDsn(string $dsn, array $options = [], HttpClientInterface $client = null): self

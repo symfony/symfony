@@ -856,6 +856,15 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('/app.php/testing#fragment', $url);
     }
 
+    public function testStringableObjectParameterIsConvertedToString()
+    {
+        $object = new StringableStub();
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', ['param' => $object]);
+
+        $this->assertEquals('/app.php/testing?param=dummy', $url);
+    }
+
     /**
      * @dataProvider provideLookAroundRequirementsInPath
      */

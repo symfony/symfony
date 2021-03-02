@@ -120,5 +120,10 @@ class ExtensionPass implements CompilerPassInterface
         } else {
             $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
         }
+
+        if ($container->has('serializer')) {
+            $container->getDefinition('twig.runtime.serializer')->addTag('twig.runtime');
+            $container->getDefinition('twig.extension.serializer')->addTag('twig.extension');
+        }
     }
 }

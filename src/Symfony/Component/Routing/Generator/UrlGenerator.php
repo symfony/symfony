@@ -300,8 +300,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 continue;
             }
             if (!\is_callable([$param, '__toString'])) {
-                $message = 'Error when generating an URL for "{route}". Cannot convert object of type {type} to string for parameter "{parameter}".';
-                throw new InvalidParameterException(strtr($message, ['{route}' => $name, '{type}' => get_debug_type($param), '{parameter}' => $paramName]));
+                throw new InvalidParameterException(\sprintf('Error when generating an URL for "%s". Cannot convert object of type "%s" to string for parameter "%s".', $name, get_debug_type($param), $paramName));
             }
             $extra[$paramName] = (string) $param;
         }

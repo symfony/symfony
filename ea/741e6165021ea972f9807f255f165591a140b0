@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-02-24T18:41:52Z
+
+Awesome. Thank you @OxanaKozlova.
+
+@belangela, it seams like @OxanaKozlova have made this fix. Could you review this pull request to see if the translations makes sense for you?
+
+---------------------------------------------------------------------------
+
+by VladimirBerezkin at 2021-03-03T08:22:31Z
+
+@Nyholm hi! I'm a native speaker. All looks good.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-03T08:23:24Z
+
+Awesome. Thank you. Then let's merge this =)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-03T09:01:46Z
+
+Alternatively, one could allow maintainers to push to the fork by selecting this option in the sidebar.
+
+<img width="415" alt="Screenshot 2021-03-03 at 10 00 22" src="https://user-images.githubusercontent.com/1275206/109780571-6d948f80-7c07-11eb-9262-43b4f90fd177.png">

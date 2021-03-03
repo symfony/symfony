@@ -62,6 +62,14 @@
                 <source>Account is locked.</source>
                 <target>Акаўнт заблакіраван.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>Зашмат няўдалых спроб уваходу, калі ласка, паспрабуйце пазней.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Спасылка для ўваходу несапраўдная або пратэрмінаваная.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

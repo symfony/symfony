@@ -471,7 +471,7 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('Invalid method call for service "%s", did you forgot a leading dash before "%s: ..." in "%s"?', $id, $k, $file));
                 }
 
-                if (isset($call['method'])) {
+                if (isset($call['method']) && \is_string($call['method'])) {
                     $method = $call['method'];
                     $args = $call['arguments'] ?? [];
                     $returnsClone = $call['returns_clone'] ?? false;

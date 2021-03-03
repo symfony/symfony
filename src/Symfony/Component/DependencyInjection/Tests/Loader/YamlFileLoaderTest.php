@@ -968,6 +968,7 @@ class YamlFileLoaderTest extends TestCase
         $expected = [
             ['foo', [1, 2, 3]],
             ['bar', [1, 2, 3], true],
+            ['method', ['url']],
         ];
 
         $this->assertSame($expected, $container->getDefinition('foo')->getMethodCalls());

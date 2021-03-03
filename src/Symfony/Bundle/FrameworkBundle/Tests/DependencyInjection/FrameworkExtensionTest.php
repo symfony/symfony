@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -578,7 +579,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
+        $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
 
     /**
@@ -597,7 +598,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $expected = ['session', 'initialized_session', 'logger', 'session_collector'];
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
-        $this->assertSame(false, $container->getDefinition('session.storage.factory.native')->getArgument(3));
+        $this->assertFalse($container->getDefinition('session.storage.factory.native')->getArgument(3));
     }
 
     public function testRequest()
@@ -980,7 +981,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache_adapter')->getArgument(2));
-        $this->assertSame('annotations.filesystem_cache', (string) $container->getDefinition('annotation_reader')->getArgument(1));
+        $this->assertSame(class_exists(PsrCachedReader::class) ? 'annotations.filesystem_cache_adapter' : 'annotations.filesystem_cache', (string) $container->getDefinition('annotation_reader')->getArgument(1));
     }
 
     public function testFileLinkFormat()

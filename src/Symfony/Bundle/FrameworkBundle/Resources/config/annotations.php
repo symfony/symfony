@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -36,7 +37,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('annotations.reader'),
                 inline_service(DoctrineProvider::class)->args([
-                    inline_service(ArrayAdapter::class)
+                    inline_service(ArrayAdapter::class),
                 ]),
                 abstract_arg('Debug-Flag'),
             ])
@@ -74,4 +75,22 @@ return static function (ContainerConfigurator $container) {
 
         ->alias('annotation_reader', 'annotations.reader')
         ->alias(Reader::class, 'annotation_reader');
+
+    if (class_exists(PsrCachedReader::class)) {
+        $container->services()
+            ->set('annotations.psr_cached_reader', PsrCachedReader::class)
+                ->args([
+                    service('annotations.reader'),
+                    inline_service(ArrayAdapter::class),
+                    abstract_arg('Debug-Flag'),
+                ])
+            ->set('annotations.psr_cache', PhpArrayAdapter::class)
+                ->factory([PhpArrayAdapter::class, 'create'])
+                ->args([
+                    param('kernel.cache_dir').'/annotations.php',
+                    service('cache.annotations'),
+                ])
+                ->tag('container.hot_path')
+        ;
+    }
 };

@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * Constraint instances are immutable and serializable.
  *
- * @property array $groups The groups that the constraint belongs to
+ * @property string[] $groups The groups that the constraint belongs to
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -246,7 +246,7 @@ abstract class Constraint
      *
      * Override this method if you want to define required options.
      *
-     * @return array
+     * @return string[]
      *
      * @see __construct()
      */
@@ -276,7 +276,7 @@ abstract class Constraint
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
      *
-     * @return string|array One or more constant values
+     * @return string|string[] One or more constant values
      */
     public function getTargets()
     {

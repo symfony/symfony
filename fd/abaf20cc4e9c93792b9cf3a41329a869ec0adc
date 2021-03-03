@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T05:25:24Z
+
+Without a config option the user cannot specify their own psr6 cache service.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T07:33:56Z
+
+I removed the option, If the user provides a custom service, I'll check if it is PSR6 compatible or not.
+
+The only "weird" thing now is, if the user is using `doctrine/annotations:1.10` (old version) and trying to use a PSR6 cache, they will get an error like "Second argument to X class must be a DoctrineCache, you provided Y.
+
+I could add an extra check for this, but then I also need to check if user that has specified a custom class that implements both doctrine cache and PSR6.. Should I add this extra logic for this edge case?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T07:57:26Z
+
+> Should I add this extra logic for this edge case?
+
+I added a check for all edge cases =)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-02T08:35:24Z
+
+> The only "weird" thing now is, if the user is using `doctrine/annotations:1.10` (old version) and trying to use a PSR6 cache
+
+On the 5.x branch, I think we can bump to 1.13 as soon as it's released. Routing already requires 1.12 and I'm about to bump the requirement for the serializer as well.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T08:37:33Z
+
+> On the 5.x branch, I think we can bump to 1.13 as soon as it's released. Routing already requires 1.12 and I'm about to bump the requirement for the serializer as well.
+
+That will not make a difference. Doctrine/annotations is just a dev requirement.  I need to add a “conflict”
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-02T08:53:52Z
+
+> I need to add a “conflict”
+
+Exactly, see #40266.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T08:55:28Z
+
+> I think we can bump to 1.13 as soon as it's released.
+
+Sure, but that would make things a bit simpler.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T09:10:54Z
+
+Wohoo. Im just waiting for appveyor. The other builds are super green.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T18:14:14Z
+
+Thank you. I have applied the changes.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T20:16:14Z
+
+What?! 6/6 is green now. =)

@@ -4,17 +4,14 @@ CONTRIBUTORS
 Symfony is the result of the work of many people who made the code better.
 
 The Symfony Connect username in parenthesis allows to get more information
-about contributors (like https://connect.symfony.com/profile/fabpot). See
-https://symfony.com/contributors for more information.
-
  - Fabien Potencier (fabpot)
  - Nicolas Grekas (nicolas-grekas)
  - Christian Flothmann (xabbuh)
  - Bernhard Schussek (bschussek)
  - Tobias Schultze (tobion)
  - Robin Chalas (chalas_r)
- - Christophe Coevoet (stof)
  - Alexander M. Turek (derrabus)
+ - Christophe Coevoet (stof)
  - Kévin Dunglas (dunglas)
  - Maxime Steinhausser (ogizanagi)
  - Jordi Boggiano (seldaek)
@@ -26,12 +23,12 @@ https://symfony.com/contributors for more information.
  - Jakub Zalas (jakubzalas)
  - Johannes S (johannes)
  - Kris Wallsmith (kriswallsmith)
- - Wouter de Jong (wouterj)
+ - Wouter De Jong (wouterj)
  - Jérémy DERUSSÉ (jderusse)
  - Thomas Calvet (fancyweb)
- - Yonel Ceruto (yonelceruto)
+ - Yonel Ceruto González (yonelceruto)
  - Hugo Hamon (hhamon)
- - Abdellatif Ait boudad (aitboudad)
+ - Ait Boudad Abdellatif (aitboudad)
  - Samuel ROZE (sroze)
  - Romain Neutron (romain)
  - Pascal Borreli (pborreli)
@@ -39,20 +36,20 @@ https://symfony.com/contributors for more information.
  - Karma Dordrak (drak)
  - Jules Pietri (heah)
  - Lukas Kahwe Smith (lsmith)
- - Martin Hasoň (hason)
- - Hamza Amrouche (simperfit)
  - Tobias Nyholm (tobias)
+ - Martin Hasoň (hason)
+ - Amrouche Hamza (simperfit)
  - Jeremy Mikola (jmikola)
+ - Oskar Stark (oskarstark)
  - Jean-François Simon (jfsimon)
  - Benjamin Eberlei (beberlei)
  - Igor Wiedler (igorw)
- - Oskar Stark (oskarstark)
  - Eriksen Costa (eriksencosta)
- - Guilhem Niot (energetick)
+ - Ener-Getick (energetick)
  - Sarah Khalil (saro0h)
  - Jan Schädlich (jschaedl)
  - Jonathan Wage (jwage)
- - Lynn van der Berg (kjarli)
+ - Iltar van der Berg (kjarli)
  - Pierre du Plessis (pierredup)
  - Matthias Pigulla (mpdude)
  - Diego Saint Esteben (dosten)
@@ -70,7 +67,7 @@ https://symfony.com/contributors for more information.
  - Bulat Shakirzyanov (avalanche123)
  - Saša Stamenković (umpirsky)
  - Peter Rehm (rpet)
- - Gabriel Ostrolucký (gadelat)
+ - gadelat (gadelat)
  - Titouan Galopin (tgalopin)
  - David Maicher (dmaicher)
  - Gábor Egyed (1ed)
@@ -90,14 +87,14 @@ https://symfony.com/contributors for more information.
  - Eric Clemmons (ericclemmons)
  - Charles Sarrazin (csarrazi)
  - Douglas Greenshields (shieldo)
+ - Jérôme Tamarelle (gromnan)
  - Laurent VOULLEMIER (lvo)
  - Arnout Boks (aboks)
  - Graham Campbell (graham)
- - Jérôme Tamarelle (gromnan)
+ - David Buchmann (dbu)
  - Deni
  - Henrik Westphal (snc)
  - Dariusz Górecki (canni)
- - David Buchmann (dbu)
  - Dariusz Ruminski
  - Fran Moreno (franmomu)
  - Lee McDermott
@@ -130,6 +127,7 @@ https://symfony.com/contributors for more information.
  - Massimiliano Arione (garak)
  - Włodzimierz Gajda (gajdaw)
  - Adrien Brault (adrienbrault)
+ - Antoine M (amakdessi)
  - Jacob Dreesen (jdreesen)
  - Florian Voutzinos (florianv)
  - Teoh Han Hui (teohhanhui)
@@ -137,21 +135,21 @@ https://symfony.com/contributors for more information.
  - Colin Frei
  - Javier Spagnoletti (phansys)
  - Joshua Thijssen
- - Antoine Makdessi (amakdessi)
  - Daniel Wehner (dawehner)
  - Tugdual Saunier (tucksaun)
+ - Julien Falque (julienfalque)
  - excelwebzone
  - Gordon Franke (gimler)
  - Joel Wurtz (brouznouf)
  - Fabien Pennequin (fabienpennequin)
- - Julien Falque (julienfalque)
  - Théo FIDRY (theofidry)
  - Eric GELOEN (gelo)
  - Jannik Zschiesche (apfelbox)
- - jeremyFreeAgent (jeremyfreeagent)
+ - Jérémy Romey (jeremyfreeagent)
  - Robert Schönthal (digitalkaoz)
  - Gregor Harlan (gharlan)
  - Florian Lonqueu-Brochard (florianlb)
+ - Tigran Azatyan (tigranazatyan)
  - Gabriel Caruso (carusogabriel)
  - Stefano Sala (stefano.sala)
  - Yanick Witschi (toflar)
@@ -159,7 +157,6 @@ https://symfony.com/contributors for more information.
  - Vincent AUBERT (vincent)
  - Juti Noppornpitak (shiroyuki)
  - Anthony MARTIN (xurudragon)
- - Tigran Azatyan (tigranazatyan)
  - Sebastian Hörl (blogsh)
  - Daniel Gomes (danielcsgomes)
  - Hidenori Goto (hidenorigoto)
@@ -176,13 +173,14 @@ https://symfony.com/contributors for more information.
  - François-Xavier de Guillebon (de-gui_f)
  - Oleg Voronkovich
  - Tomas Norkūnas (norkunas)
- - Philipp Wahala (hifi)
+ - hacfi (hifi)
  - Rafael Dohms (rdohms)
  - jwdeitch
  - Ahmed TAILOULOUTE (ahmedtai)
  - Mathias Arlaud (mtarld)
  - Mikael Pajunen
  - Gary PEGEOT (gary-p)
+ - HypeMC (hypemc)
  - Arman Hosseini (arman)
  - Niels Keurentjes (curry684)
  - Vyacheslav Pavlov
@@ -195,7 +193,6 @@ https://symfony.com/contributors for more information.
  - Ben Davies (bendavies)
  - Andreas Schempp (aschempp)
  - Clemens Tolboom
- - HypeMC (hypemc)
  - Helmer Aaviksoo
  - Hiromi Hishida (77web)
  - Matthieu Ouellette-Vachon (maoueh)
@@ -203,6 +200,7 @@ https://symfony.com/contributors for more information.
  - Dawid Nowak
  - Maxime Helias (maxhelias)
  - Amal Raghav (kertz)
+ - Albert Casademont (acasademont)
  - Jonathan Ingram (jonathaningram)
  - Artur Kotyrba
  - Tyson Andre
@@ -210,7 +208,7 @@ https://symfony.com/contributors for more information.
  - Samuel NELA (snela)
  - Olivier Dolbeau (odolbeau)
  - Fabien Bourigault (fbourigault)
- - Saif (╯°□°)╯ (azjezz)
+ - Saif Eddin Gmati (azjezz)
  - James Halsall (jaitsu)
  - Florent Mata (fmata)
  - Warnar Boekkooi (boekkooi)
@@ -224,7 +222,7 @@ https://symfony.com/contributors for more information.
  - Michaël Perrin (michael.perrin)
  - Sergey Linnik (linniksa)
  - Richard Miller (mr_r_miller)
- - Albert Casademont (acasademont)
+ - Ruud Kamphuis (ruudk)
  - Wouter J
  - Mario A. Alvarez Garcia (nomack84)
  - Dennis Benkert (denderello)
@@ -238,7 +236,7 @@ https://symfony.com/contributors for more information.
  - Benjamin Dulau (dbenjamin)
  - Jan Rosier (rosier)
  - Mathieu Lemoine (lemoinem)
- - Rémon van de Kamp (rpkamp)
+ - Remon van de Kamp (rpkamp)
  - Christian Schmidt
  - Andreas Hucks (meandmymonkey)
  - Tom Van Looy (tvlooy)
@@ -263,6 +261,7 @@ https://symfony.com/contributors for more information.
  - Hidde Wieringa (hiddewie)
  - Jeremy Livingston (jeremylivingston)
  - Michael Lee (zerustech)
+ - Timo Bakx (timobakx)
  - Dmitrii Poddubnyi (karser)
  - Matthieu Auger (matthieuauger)
  - Leszek Prabucki (l3l0)
@@ -279,6 +278,7 @@ https://symfony.com/contributors for more information.
  - Maxime Veber (nek-)
  - Rui Marinho (ruimarinho)
  - Eugene Wissner
+ - Andreas Möller (localheinz)
  - Edi Modrić (emodric)
  - Pascal Montoya
  - Julien Brochet (mewt)
@@ -287,7 +287,6 @@ https://symfony.com/contributors for more information.
  - Victor Bocharsky (bocharsky_bw)
  - Marcel Beerta (mazen)
  - Christopher Hertel (chertel)
- - Ruud Kamphuis (ruudk)
  - Chi-teck
  - Pavel Batanov (scaytrase)
  - Mantis Development
@@ -300,7 +299,6 @@ https://symfony.com/contributors for more information.
  - julien pauli (jpauli)
  - Lorenz Schori
  - Sébastien Lavoie (lavoiesl)
- - Timo Bakx (timobakx)
  - Dariusz
  - Farhad Safarov (safarov)
  - Michael Babker (mbabker)
@@ -348,7 +346,7 @@ https://symfony.com/contributors for more information.
  - Joseph Rouff (rouffj)
  - Félix Labrecque (woodspire)
  - GordonsLondon
- - Quynh Xuan Nguyen (xuanquynh)
+ - Nguyen Xuan Quynh (xuanquynh)
  - Jan Sorgalla (jsor)
  - Ray
  - Chekote
@@ -362,10 +360,11 @@ https://symfony.com/contributors for more information.
  - Nikita Konstantinov
  - Wodor Wodorski
  - Joe Bennett (kralos)
+ - Simon Berger
  - soyuka
  - Giorgio Premi
  - renanbr
- - Alex Rock (pierstoval)
+ - Alex Rock Ancelet (pierstoval)
  - Beau Simensen (simensen)
  - Michael Hirschler (mvhirsch)
  - Robert Kiss (kepten)
@@ -431,6 +430,7 @@ https://symfony.com/contributors for more information.
  - Julien Galenski (ruian)
  - Thomas Landauer (thomas-landauer)
  - Bongiraud Dominique
+ - Kyle
  - janschoenherr
  - Emanuele Gaspari (inmarelibero)
  - Dariusz Rumiński
@@ -442,7 +442,6 @@ https://symfony.com/contributors for more information.
  - Mark Challoner (markchalloner)
  - ivan
  - Karoly Gossler (connorhu)
- - Simon Berger
  - Ahmed Raafat
  - Philippe Segatori
  - Gennady Telegin (gtelegin)
@@ -469,6 +468,7 @@ https://symfony.com/contributors for more information.
  - Sylvain Fabre (sylfabre)
  - Artur Eshenbrener
  - Harm van Tilborg (hvt)
+ - Malte Schlüter (maltemaltesich)
  - Thomas Perez (scullwm)
  - Felix Labrecque
  - Yaroslav Kiliba
@@ -494,7 +494,7 @@ https://symfony.com/contributors for more information.
  - ShinDarth
  - Stéphane PY (steph_py)
  - Philipp Kräutli (pkraeutli)
- - Grzegorz (Greg) Zdanowski (kiler129)
+ - Grzegorz Zdanowski (kiler129)
  - Dimitri Gritsajuk (ottaviano)
  - Kirill chEbba Chebunin (chebba)
  - 
@@ -576,6 +576,7 @@ https://symfony.com/contributors for more information.
  - Mihai Stancu
  - Ivan Nikolaev (destillat)
  - Gildas Quéméner (gquemener)
+ - BoShurik
  - Laurent Masforné (heisenberg)
  - Claude Khedhiri (ck-developer)
  - Desjardins Jérôme (jewome62)
@@ -593,7 +594,6 @@ https://symfony.com/contributors for more information.
  - Asier Illarramendi (doup)
  - Martijn Cuppens
  - Vlad Gregurco (vgregurco)
- - Malte Schlüter (maltemaltesich)
  - Boris Vujicic (boris.vujicic)
  - Artem Lopata
  - Judicaël RUFFIEUX (axanagor)
@@ -624,6 +624,7 @@ https://symfony.com/contributors for more information.
  - Tavo Nieves J
  - Luc Vieillescazes (iamluc)
  - Lukáš Holeczy (holicz)
+ - Erik Saunier (snickers)
  - franek (franek)
  - Raulnet
  - Christian Wahler
@@ -658,6 +659,7 @@ https://symfony.com/contributors for more information.
  - Nathan Dench (ndenc2)
  - Sebastian Bergmann
  - Miroslav Sustek
+ - Michał (bambucha15)
  - Pablo Díez (pablodip)
  - Kevin McBride
  - Sergio Santoro
@@ -666,6 +668,7 @@ https://symfony.com/contributors for more information.
  - Manuel de Ruiter (manuel)
  - Nathanael Noblet (gnat)
  - nikos.sotiropoulos
+ - BENOIT POLASZEK (bpolaszek)
  - Eduardo Oliveira (entering)
  - Oleksii Zhurbytskyi
  - Ilya Antipenko (aivus)
@@ -752,7 +755,6 @@ https://symfony.com/contributors for more information.
  - Michiel Boeckaert (milio)
  - Geoffrey Tran (geoff)
  - Pablo Lozano (arkadis)
- - Kyle
  - Jan Behrens
  - Mantas Var (mvar)
  - Terje Bråten
@@ -794,7 +796,6 @@ https://symfony.com/contributors for more information.
  - James Johnston
  - Noémi Salaün (noemi-salaun)
  - Sinan Eldem
- - BoShurik
  - Alexandre Dupuy (satchette)
  - Michel Hunziker
  - Malte Blättermann
@@ -848,7 +849,7 @@ https://symfony.com/contributors for more information.
  - adev
  - Stefan Warman
  - Tristan Maindron (tmaindron)
- - Behnoush Norouzali (behnoush)
+ - Behnoush norouzali (behnoush)
  - Marko H. Tamminen (gzumba)
  - Wesley Lancel
  - Xavier Briand (xavierbriand)
@@ -871,6 +872,7 @@ https://symfony.com/contributors for more information.
  - Ivan Grigoriev
  - Johann Saunier (prophet777)
  - Sergey (upyx)
+ - Fabien Salles (blacked)
  - Andreas Erhard
  - Michael Devery (mickadoo)
  - Antoine Corcy
@@ -929,7 +931,6 @@ https://symfony.com/contributors for more information.
  - Michel Roca (mroca)
  - Reedy
  - Arturas Smorgun (asarturas)
- - Michał (bambucha15)
  - Alexander Volochnev (exelenz)
  - Michael Piecko
  - Toni Peric (tperic)
@@ -980,8 +981,10 @@ https://symfony.com/contributors for more information.
  - Andrew Tchircoff (andrewtch)
  - michaelwilliams
  - Martin Kirilov
+ - Alexandre Parent
  - 1emming
  - Nykopol (nykopol)
+ - Piotr Kugla (piku235)
  - Jordan Deitch
  - Casper Valdemar Poulsen
  - Josiah (josiah)
@@ -990,9 +993,9 @@ https://symfony.com/contributors for more information.
  - John Bohn (jbohn)
  - Marc Morera (mmoreram)
  - Jason Tan
- - BENOIT POLASZEK (bpolaszek)
  - Julien Pauli
  - Mathieu Rochette (mathroc)
+ - Jérôme Tanghe (deuchnord)
  - Andrew Hilobok (hilobok)
  - Noah Heck (myesain)
  - Christian Soronellas (theunic)
@@ -1045,7 +1048,6 @@ https://symfony.com/contributors for more information.
  - Rafał Wrzeszcz (rafalwrzeszcz)
  - Vincent CHALAMON (vincentchalamon)
  - Reen Lokum
- - Andreas Möller (localheinz)
  - Dennis Langen (nijusan)
  - Martin Parsiegla (spea)
  - Manuel Alejandro Paz Cetina
@@ -1174,7 +1176,6 @@ https://symfony.com/contributors for more information.
  - Benoît Merlet (trompette)
  - Koen Kuipers
  - datibbaw
- - Erik Saunier (snickers)
  - Thiago Cordeiro (thiagocordeiro)
  - Rootie
  - Bernd Stellwag
@@ -1219,6 +1220,7 @@ https://symfony.com/contributors for more information.
  - Christin Gruber (christingruber)
  - Phan Thanh Ha (haphan)
  - Chris Jones (leek)
+ - James Hemery
  - neghmurken
  - xaav
  - Mahmoud Mostafa (mahmoud)
@@ -1547,6 +1549,7 @@ https://symfony.com/contributors for more information.
  - Jorge Vahldick (jvahldick)
  - Frederic Godfrin
  - Paul Matthews
+ - Xesxen
  - Jakub Kisielewski
  - Vacheslav Silyutin
  - Aleksandr Dankovtsev
@@ -1618,6 +1621,7 @@ https://symfony.com/contributors for more information.
  - Lars Ambrosius Wallenborn (larsborn)
  - Oriol Mangas Abellan (oriolman)
  - Sebastian Göttschkes (sgoettschkes)
+ - Frankie Wittevrongel
  - Tatsuya Tsuruoka
  - Ross Tuck
  - Gerben Oolbekkink
@@ -1649,7 +1653,6 @@ https://symfony.com/contributors for more information.
  - Sebastian Utz
  - Adrien Gallou (agallou)
  - Andrea Sprega (asprega)
- - Fabien Salles (blacked)
  - Maks Rafalko (bornfree)
  - Karol Sójko (karolsojko)
  - sl_toto (sl_toto)
@@ -1670,7 +1673,6 @@ https://symfony.com/contributors for more information.
  - Cédric Lahouste (rapotor)
  - Samuel Vogel (samuelvogel)
  - Osayawe Ogbemudia Terry (terdia)
- - Alexandre Parent
  - Berat Doğan
  - Guillaume LECERF
  - Juanmi Rodriguez Cerón
@@ -1701,6 +1703,7 @@ https://symfony.com/contributors for more information.
  - Łukasz Makuch
  - George Giannoulopoulos
  - Alexander Pasichnick
+ - Ilya Ch. (ilya0)
  - Luis Ramirez (luisdeimos)
  - Daniel Richter (richtermeister)
  - ChrisC
@@ -1735,6 +1738,7 @@ https://symfony.com/contributors for more information.
  - Fabien S (bafs)
  - Daniel Rotter (danrot)
  - Frédéric Bouchery (fbouchery)
+ - kylekatarnls (kylekatarnls)
  - Patrick Daley (padrig)
  - Max Summe
  - WedgeSama
@@ -1858,6 +1862,7 @@ https://symfony.com/contributors for more information.
  - Dominik Piekarski (dompie)
  - Andrew (drew)
  - kor3k kor3k (kor3k)
+ - Rares Sebastian Moldovan (raresmldvn)
  - Stelian Mocanita (stelian)
  - Justin (wackymole)
  - Flavian (2much)
@@ -1865,6 +1870,7 @@ https://symfony.com/contributors for more information.
  - mike
  - Gilbertsoft
  - tadas
+ - Bastien Picharles
  - Kirk Madera
  - Keith Maika
  - Mephistofeles
@@ -1901,10 +1907,10 @@ https://symfony.com/contributors for more information.
  - wusuopu
  - povilas
  - Gavin Staniforth
+ - bahram
  - Alessandro Tagliapietra (alex88)
  - Andy Palmer (andyexeter)
  - Biji (biji)
- - Jérôme Tanghe (deuchnord)
  - Alex Teterin (errogaht)
  - Gunnar Lium (gunnarlium)
  - Tiago Garcia (tiagojsag)
@@ -2210,6 +2216,7 @@ https://symfony.com/contributors for more information.
  - Ahmed Hannachi (tiecoders)
  - Vincent LEFORT (vlefort)
  - Walid BOUGHDIRI (walidboughdiri)
+ - wicliff wolda (wickedone)
  - Wim Molenberghs (wimm)
  - Darryl Hein (xmmedia)
  - Sadicov Vladimir (xtech)
@@ -2252,10 +2259,12 @@ https://symfony.com/contributors for more information.
  - Götz Gottwald
  - Veres Lajos
  - Ernest Hymel
+ - LoginovIlya
  - Nick Chiu
  - grifx
  - Robert Campbell
  - Matt Lehner
+ - carlos-ea
  - Helmut Januschka
  - Jérémy Benoist
  - Hein Zaw Htet™
@@ -2272,6 +2281,7 @@ https://symfony.com/contributors for more information.
  - Marin Nicolae
  - Alessandro Loffredo
  - Ian Phillips
+ - Carlos Tasada
  - Haritz
  - Matthieu Prat
  - Grummfy
@@ -2465,6 +2475,7 @@ https://symfony.com/contributors for more information.
  - Matt Fields
  - Olatunbosun Egberinde
  - Andras Debreczeni
+ - Knallcharge
  - Vladimir Sazhin
  - Michel Bardelmeijer
  - Tomas Kmieliauskas
@@ -2513,6 +2524,7 @@ https://symfony.com/contributors for more information.
  - Alexis BOYER
  - Kaipi Yann
  - adam-mospan
+ - Steve Hyde
  - Sam Williams
  - Guillaume Aveline
  - Adrian Philipp
@@ -2624,6 +2636,7 @@ https://symfony.com/contributors for more information.
  - sualko
  - Molkobain
  - Bilge
+ - Yendric
  - ADmad
  - Nicolas Roudaire
  - Matthias Meyer
@@ -2779,6 +2792,7 @@ https://symfony.com/contributors for more information.
  - Michael
  - fh-github@fholzhauer.de
  - AbdElKader Bouadjadja
+ - ddegentesh
  - DSeemiller
  - Jan Emrich
  - Mark Topper

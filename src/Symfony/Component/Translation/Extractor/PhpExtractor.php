@@ -236,6 +236,19 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     }
                     break;
                 case \T_END_HEREDOC:
+                    if ($indentation = strspn($t[1], ' ')) {
+                        $docPartWithLineBreaks = $docPart;
+                        $docPart = '';
+
+                        foreach (preg_split('~(\r\n|\n|\r)~', $docPartWithLineBreaks, -1, \PREG_SPLIT_DELIM_CAPTURE) as $str) {
+                            if (\in_array($str, ["\r\n", "\n", "\r"], true)) {
+                                $docPart .= $str;
+                            } else {
+                                $docPart .= substr($str, $indentation);
+                            }
+                        }
+                    }
+
                     $message .= PhpStringTokenParser::parseDocString($docToken, $docPart);
                     $docToken = '';
                     $docPart = '';

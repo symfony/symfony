@@ -362,6 +362,30 @@
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
                 <target>Гэты пароль быў выкрадзены ў выніку ўзлому дадзеных, таму яго нельга выкарыстоўваць. Калі ласка, выкарыстоўвайце іншы пароль.</target>
             </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Значэнне павінна быць паміж {{min}} і {{max}}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Значэнне не з'яўляецца карэктным імем хаста.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Колькасць элементаў у гэтай калекцыі павінна быць кратным {{compared_value}}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Значэнне павінна задавальняць як мінімум аднаму з наступных абмежаванняў:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Кожны элемент гэтай калекцыі павінен задавальняць свайму ўласнаму набору абмежаванняў.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Значэнне не з'яўляецца карэктным міжнародным ідэнтыфікацыйным нумарам каштоўных папер (ISIN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

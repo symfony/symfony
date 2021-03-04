@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-01T16:57:57Z
+
+About #39928.
+
+The issue is when we run `doctrine:migrations:diff` or `make:migration`, doctrine checks with the metadata drivers (ie annotations) to get all metadata about the entities. A new project does not have any entities and that is why no metadata is returned.
+
+If, however, some metadata was retuned, then doctrine would trigger event `onSchemaCreateTable` and the messenger component would inject some sql to create the "queue".
+
+I also cannot reproduce this comment by @OskarStark https://github.com/symfony/symfony/issues/39928#issuecomment-765318867. I might be missing something, but I don't think #40055 is an actual fix for #39928.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-02T09:42:01Z
+
+:-1:  When using a migration to setup the PotgreSQL transport, we are already in a transaction, so adding another one breaks. Reverting my PR would re-introduce the bug.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-02T10:46:28Z
+
+After some more investigating and help from @derrabus. I've managed to reproduce the issue in #39928.
+
+On PHP 7.4 everything is working as expected. But on PHP 8, we need #40055 because it fixes the issue with nested transactions. Without #40055 we get an exception like
+> In Connection.php line 1761:
+>
+>  There is no active transaction
+
+------
+
+When running migrations in a transaction (default). Then:
+1. Doctrine will start a transaction
+2. The migration will run `BEGIN` and try to start a second transaction (Postgres will not do that, but only give a warning)
+3. The migration will run `COMMIT` and close the transaction, this is okey, but it closes the transaction Doctrine started
+4. Doctrine will try to close the transaction, but the transaction is already closed, hence the exception.
+
+Why this don't happen in PHP7 is beyond me. @derrabus says that the PDO has become a bit more aware on the transaction state in PHP 8.0.
+
+-----------
+
+The solution I propose is to try to start the transaction but never run `COMMIT`. This will work when:
+- Run `bin/console messenger:setup`
+- Run `bin/console doctrine:schema:create`
+- Run `bin/console doctrine:migration:diff && bin/console doctrine:migration:migrate` with `AbstractMigration::isTransactional() === true`
+- Run `bin/console doctrine:migration:diff && bin/console doctrine:migration:migrate` with `AbstractMigration::isTransactional() === false`
+
+We don't need `COMMIT` because the transaction will commit itself when we close the connection.
+
+--------
+
+FYI Since the SQL includes a `LOCK TABLE`, the SQL needs to be in a transaction.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2021-03-04T13:36:56Z
+
+> The issue is when we run doctrine:migrations:diff or make:migration, doctrine checks with the metadata drivers (ie annotations) to get all metadata about the entities. A new project does not have any entities and that is why no metadata is returned.
+
+> If, however, some metadata was retuned, then doctrine would trigger event onSchemaCreateTable and the messenger component would inject some sql to create the "queue".
+
+Do we agree that we can't setup the transport with migrations when we don't have any entity? It's an edge case but maybe this tell us that setting up transports using migrations is not the right solution.
+
+What about using `beginTransaction` in `Symfony\Component\Messenger\Bridge\Doctrine\Transport::updateSchema` to let the driver handle the case when a transaction is already started? By doing so the SQL snippet doesn't have to contain any `BEGIN` or `COMMIT` statement and it became caller responsibility to run the snipped in a transaction.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-04T13:53:23Z
+
+Thank you for the suggestion. But wouldn’t that trigger an event at every request?
+
+If you don’t have any entities, why would you use migrations? The transport can create the table in prod when you first need the table.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2021-03-04T14:11:06Z
+
+> If you don’t have any entities, why would you use migrations?
+
+So let's give up on this edge case.
+
+My suggestion was to use `beginTransation` in `Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection::updateSchema` and not `Symfony\Component\Messenger\Bridge\Doctrine\Transport::updateSchema`!
+
+This code is only called by `Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection::setup()` which is only called by `auto_setup` and the `messenger:setup-transports` command.
+
+We just have to be careful with `auto_setup` because we are in the app business when called but since it's all happening in `Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection` (`auto_setup` and transaction) it's probably feasible to opt-out the transaction stuff if problems arise.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-04T15:34:16Z
+
+Not directly related to this PR, but the more I think about it, the more I think we should remove the `auto-setup` feature. Now that we have the possibility to generate a migration, it is way better IMHO.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-04T15:37:47Z
+
+I think it make sense to remove all "auto-setup" features for all transports. They are just making all transports filled with options and complexity. It is a different discussion, I'll start a new issue.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-04T15:52:41Z
+
+> Not directly related to this PR, but the more I think about it, the more I think we should remove the auto-setup feature. Now that we have the possibility to generate a migration, it is way better IMHO.
+
+I agree, its to much magic which can cause weird errors and does not feel very stable.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-04T15:59:46Z
+
+I opened the issue: https://github.com/symfony/symfony/issues/40361

@@ -142,7 +142,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
         $this->assertTrue($client->getResponse()->headers->getCacheControlDirective('public'));
-        $this->assertSame(0, self::$container->get('session')->getUsageIndex());
+        $this->assertSame(0, self::getContainer()->get('session')->getUsageIndex());
     }
 
     private function assertAllowed($client, $path)

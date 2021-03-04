@@ -27,12 +27,12 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container']);
 
-        $this->assertFileExists(static::$container->getParameter('debug.container.dump'));
+        $this->assertFileExists(static::getContainer()->getParameter('debug.container.dump'));
     }
 
     public function testNoDebug()
@@ -91,7 +91,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-vars' => true], ['decorated' => false]);
@@ -128,7 +128,7 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
@@ -156,7 +156,7 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
@@ -176,7 +176,7 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);
@@ -194,7 +194,7 @@ TXT
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::$container->getParameter('debug.container.dump'));
+        @unlink(static::getContainer()->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--deprecations' => true]);

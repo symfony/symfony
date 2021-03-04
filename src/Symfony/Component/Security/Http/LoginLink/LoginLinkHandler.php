@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Security\Http\LoginLink;
 
+use ParagonIE\Halite\Alerts\InvalidMessage;
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Symmetric\Crypto;
+use ParagonIE\Halite\Symmetric\EncryptionKey;
+use ParagonIE\HiddenString\HiddenString;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -55,7 +60,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $user->getUsername(),
+            'user' => $this->encrypt($user->getUsername()),
             'expires' => $expires,
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
@@ -71,7 +76,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $username = $request->get('user');
+        $usernameMessage = $request->get('user');
+        $username = $this->decrypt($usernameMessage);
 
         try {
             $user = $this->userProvider->loadUserByUsername($username);
@@ -118,5 +124,33 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         }
 
         return base64_encode(hash_hmac('sha256', implode(':', $signatureFields), $this->secret));
+    }
+
+    private function encrypt(string $message): string
+    {
+        if (class_exists(Crypto::class)) {
+            return Crypto::encrypt(new HiddenString($message), $this->createKey());
+        }
+
+        return $message;
+    }
+
+    private function decrypt(string $message): string
+    {
+        try {
+            return Crypto::decrypt($message, $this->createKey());
+        } catch (InvalidMessage $e) {
+            // TODO Catch other exceptions?
+            return $message;
+        }
+    }
+
+    private function createKey(): EncryptionKey
+    {
+        // TODO make sure we dont use a static salt.
+        // TODO store salt some how between requests
+        $salt = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f";
+
+        return KeyFactory::deriveEncryptionKey(new HiddenString($this->secret), $salt, KeyFactory::MODERATE);
     }
 }

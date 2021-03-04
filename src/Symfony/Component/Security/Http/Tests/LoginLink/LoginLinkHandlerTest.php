@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\LoginLink;
 
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Symmetric\Crypto;
+use ParagonIE\HiddenString\HiddenString;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,6 +47,18 @@ class LoginLinkHandlerTest extends TestCase
         $this->expiredLinkStorage = $this->createMock(ExpiredLoginLinkStorage::class);
     }
 
+    private function encrypt(string $message): string
+    {
+        $key = KeyFactory::deriveEncryptionKey(
+            new HiddenString('s3cret'),
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+            KeyFactory::MODERATE
+        );
+        $cipherText = Crypto::encrypt(new HiddenString($message), $key);
+
+        return $cipherText;
+    }
+
     /**
      * @dataProvider provideCreateLoginLinkData
      * @group time-sensitive
@@ -55,7 +70,7 @@ class LoginLinkHandlerTest extends TestCase
             ->with(
                 'app_check_login_link_route',
                 $this->callback(function ($parameters) use ($extraProperties) {
-                    return 'weaverryan' == $parameters['user']
+                    return isset($parameters['user'])
                         && isset($parameters['expires'])
                         && isset($parameters['hash'])
                         // make sure hash is what we expect
@@ -91,6 +106,30 @@ class LoginLinkHandlerTest extends TestCase
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
+
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with('weaverryan')
+            ->willReturn($user);
+
+        $this->expiredLinkStorage->expects($this->once())
+            ->method('incrementUsages')
+            ->with($signature);
+
+        $linker = $this->createLinker(['max_uses' => 3]);
+        $actualUser = $linker->consumeLoginLink($request);
+        $this->assertSame($user, $actualUser);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testConsumeLoginLinkUnencryptedUser()
+    {
+        $expires = time() + 500;
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
@@ -113,7 +152,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->expectException(ExpiredLoginLinkException::class);
         $expires = time() - 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -128,7 +167,7 @@ class LoginLinkHandlerTest extends TestCase
     public function testConsumeLoginLinkWithUserNotFound()
     {
         $this->expectException(InvalidLoginLinkException::class);
-        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=10000');
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=thehash&expires=10000', $this->encrypt('weaverryan')));
 
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')
@@ -142,7 +181,7 @@ class LoginLinkHandlerTest extends TestCase
     public function testConsumeLoginLinkWithDifferentSignature()
     {
         $this->expectException(InvalidLoginLinkException::class);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=fake_hash&expires=%d', $this->encrypt('weaverryan'), time() + 500));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())
@@ -159,7 +198,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->expectException(ExpiredLoginLinkException::class);
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires, ['ryan@symfonycasts.com', 'pwhash']);
-        $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+        $request = Request::create(sprintf('/login/verify?user=%s&hash=%s&expires=%d', $this->encrypt('weaverryan'), $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->expects($this->once())

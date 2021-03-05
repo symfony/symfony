@@ -207,7 +207,7 @@ trait ControllerTrait
      */
     protected function renderView(string $view, array $parameters = []): string
     {
-        if ($this->container->has('templating')) {
+        if ($this->container->has('templating') && $this->container->get('templating')->supports($view)) {
             @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
             return $this->container->get('templating')->render($view, $parameters);
@@ -227,7 +227,7 @@ trait ControllerTrait
      */
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
-        if ($this->container->has('templating')) {
+        if ($this->container->has('templating') && $this->container->get('templating')->supports($view)) {
             @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
 
             $content = $this->container->get('templating')->render($view, $parameters);

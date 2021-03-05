@@ -146,7 +146,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->decoratedClass = null;
         $this->getPreviousValue = null;
 
-        if ($isRoot && ($definition = $this->container->getDefinition($this->currentId)) && $this->container->has($this->decoratedId = $definition->innerServiceId)) {
+        if ($isRoot && ($definition = $this->container->getDefinition($this->currentId)) && null !== ($this->decoratedId = $definition->innerServiceId) && $this->container->has($this->decoratedId)) {
             $this->decoratedClass = $this->container->findDefinition($this->decoratedId)->getClass();
         }
 

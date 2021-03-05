@@ -109,8 +109,6 @@ final class PostgreSqlConnection extends Connection
     private function getTriggerSql(): array
     {
         return [
-            'BEGIN;',
-            sprintf('LOCK TABLE %s;', $this->configuration['table_name']),
             // create trigger function
             sprintf(<<<'SQL'
 CREATE OR REPLACE FUNCTION notify_%1$s() RETURNS TRIGGER AS $$

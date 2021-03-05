@@ -89,7 +89,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('notifier.transport_factory.zulip', ZulipTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
-            ->tag('texter.transport_factory')
+            ->tag('chatter.transport_factory')
 
         ->set('notifier.transport_factory.infobip', InfobipTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')

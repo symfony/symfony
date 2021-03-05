@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2021-03-05T12:38:18Z
+
+IIRC it was to prevent data to be added to the table while the trigger is being created but I think that it's an edge case. (I'm not even sure if it can happen). +1 on my side for this patch.

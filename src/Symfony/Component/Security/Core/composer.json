@@ -21,7 +21,7 @@
         "symfony/service-contracts": "^1.1.6|^2"
     },
     "require-dev": {
-        "psr/container": "^1.0",
+        "psr/container": "^1.0|^2.0",
         "symfony/event-dispatcher": "^4.3",
         "symfony/expression-language": "^3.4|^4.0|^5.0",
         "symfony/http-foundation": "^3.4|^4.0|^5.0",

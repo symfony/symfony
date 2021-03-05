@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2021-02-20T22:37:38Z
+
+> Should this be treated as a bug fix or a new feature?
+
+I think this should be treated as a new feature, yes.
+
+> Is there a better way to get the source directory that doesn't involve hardcoding /src?
+
+What about adding a new option in related commands to extract also from one specific directory or file?
+
+For example, with such option we could add the `src/` path to the current `$viewPaths` list:
+```
+bin/console translation:update en --extra-path=src
+```
+The option could accept an array of paths too. What do you think?
+
+---------------------------------------------------------------------------
+
+by Pixelshaped at 2021-02-21T11:37:18Z
+
+Have I missed something or `TranslatableMessage` are now extracted?
+Went to see the PhpExtractor and found they were!
+That's great: in our project we built a whole workaround to extract all keys that were not in classes where the `TranslationInterface` could be injected (say, enums, DTOs, etc). Using grep.
+I'm absolutely seconding the fact that we should be able to provide all paths necessary to the extraction command!
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2021-02-21T17:29:43Z
+
+> The option could accept an array of paths too. What do you think?
+
+Thinking about DX I think having `src` included by default is consistent with having things "just work". I know our team would always want to include `src`. I've seen other places hardcode this path, but just wanted to mention it in case there's actually a way to avoid that.
+
+Regarding adding that as an option does solve my concern around making this work for teams that use non-standard directories, but I think adding that should be in a separate PR as they are different features. If it turns out that including `src` by default isn't wanted, I think adding the path as an option is a good fallback.
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2021-02-21T17:34:38Z
+
+> Have I missed something or `TranslatableMessage` are now extracted?
+> Went to see the PhpExtractor and found they were!
+
+Support was added to `PhpExtractor` along with the feature. The missing part is that the commands that use them only include classes that inject `TranslatorInterface`. I haven't had a chance to test this out, but potentially as another workaround, you could determine which tag is being detected by the commands and add it through `services.yaml`?
+
+---------------------------------------------------------------------------
+
+by natewiebe13 at 2021-02-22T22:09:18Z
+
+> ... potentially as another workaround, you could determine which tag is being detected by the commands and add it through `services.yaml`?
+
+I had a chance to dig into this and it doesn't appear that this is a potential workaround.
+
+---------------------------------------------------------------------------
+
+by Pixelshaped at 2021-02-25T16:08:45Z
+
+> > Have I missed something or `TranslatableMessage` are now extracted?
+> > Went to see the PhpExtractor and found they were!
+>
+> Support was added to `PhpExtractor` along with the feature. The missing part is that the commands that use them only include classes that inject `TranslatorInterface`. I haven't had a chance to test this out, but potentially as another workaround, you could determine which tag is being detected by the commands and add it through `services.yaml`?
+
+As long as `TranslatableMessage` aren't picked up in any class they might be declared in, the extract command will be a bit underwhelming. But I'm not sure that's the case: I went to see PhpExtractor and it seems all php files are parsed and every sequence in the `$sequences` array is looked for. Sure for `->trans(` to work you have to inject the TranslatorInterface somewhere, but `new TranslatableMessage(` does not need this requirement and seems to be picked up by default. This is cool!

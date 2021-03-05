@@ -93,7 +93,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function has($id): bool
+    public function has(string $id): bool
     {
         return $this->getPublicContainer()->has($id) || $this->getPrivateContainer()->has($id);
     }
@@ -101,7 +101,7 @@ class TestContainer extends Container
     /**
      * {@inheritdoc}
      */
-    public function get($id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
+    public function get(string $id, int $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->getPrivateContainer()->has($id) ? $this->getPrivateContainer()->get($id) : $this->getPublicContainer()->get($id, $invalidBehavior);
     }

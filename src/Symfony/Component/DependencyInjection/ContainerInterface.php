@@ -48,7 +48,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @see Reference
      */
-    public function get($id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
     /**
      * Returns true if the given service is defined.
@@ -57,7 +57,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @return bool true if the service is defined, false otherwise
      */
-    public function has($id);
+    public function has(string $id);
 
     /**
      * Check for whether or not a service has been initialized.

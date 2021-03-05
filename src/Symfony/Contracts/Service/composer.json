@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "psr/container": "^1.0"
+        "psr/container": "^1.1"
     },
     "suggest": {
         "symfony/service-implementation": ""

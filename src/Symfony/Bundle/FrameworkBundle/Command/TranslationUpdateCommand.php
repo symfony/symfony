@@ -51,9 +51,9 @@ class TranslationUpdateCommand extends Command
     private $defaultTransPath;
     private $defaultViewsPath;
     private $transPaths;
-    private $viewsPaths;
+    private $codePaths;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $viewsPaths = [])
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $codePaths = [])
     {
         parent::__construct();
 
@@ -64,7 +64,7 @@ class TranslationUpdateCommand extends Command
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
         $this->transPaths = $transPaths;
-        $this->viewsPaths = $viewsPaths;
+        $this->codePaths = $codePaths;
     }
 
     /**
@@ -150,9 +150,10 @@ EOF
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = $this->viewsPaths;
+        $codePaths = $this->codePaths;
+        $codePaths[] = $kernel->getProjectDir().'/src';
         if ($this->defaultViewsPath) {
-            $viewsPaths[] = $this->defaultViewsPath;
+            $codePaths[] = $this->defaultViewsPath;
         }
         $currentName = 'default directory';
 
@@ -162,12 +163,12 @@ EOF
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
                 $bundleDir = $foundBundle->getPath();
                 $transPaths = [is_dir($bundleDir.'/Resources/translations') ? $bundleDir.'/Resources/translations' : $bundleDir.'/translations'];
-                $viewsPaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
+                $codePaths = [is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundleDir.'/templates'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
                 if ($this->defaultViewsPath) {
-                    $viewsPaths[] = $this->defaultViewsPath;
+                    $codePaths[] = $this->defaultViewsPath;
                 }
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
@@ -175,7 +176,7 @@ EOF
                 $path = $input->getArgument('bundle');
 
                 $transPaths = [$path.'/translations'];
-                $viewsPaths = [$path.'/templates'];
+                $codePaths = [$path.'/templates'];
 
                 if (!is_dir($transPaths[0]) && !isset($transPaths[1])) {
                     throw new InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
@@ -190,7 +191,7 @@ EOF
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $io->comment('Parsing templates...');
         $this->extractor->setPrefix($input->getOption('prefix'));
-        foreach ($viewsPaths as $path) {
+        foreach ($codePaths as $path) {
             if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }

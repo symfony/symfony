@@ -139,7 +139,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $viewsPaths = []): CommandTester
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null, array $transPaths = [], array $codePaths = []): CommandTester
     {
         $translator = $this->createMock(Translator::class);
         $translator
@@ -190,7 +190,7 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $viewsPaths);
+        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates', $transPaths, $codePaths);
 
         $application = new Application($kernel);
         $application->add($command);

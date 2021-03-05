@@ -33,13 +33,12 @@ final class OvhCloudTransport extends AbstractTransport
     private $serviceName;
     private $sender;
 
-    public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, string $sender = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $applicationKey, string $applicationSecret, string $consumerKey, string $serviceName, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->applicationKey = $applicationKey;
         $this->applicationSecret = $applicationSecret;
         $this->consumerKey = $consumerKey;
         $this->serviceName = $serviceName;
-        $this->sender = $sender;
 
         parent::__construct($client, $dispatcher);
     }
@@ -51,6 +50,13 @@ final class OvhCloudTransport extends AbstractTransport
         }
 
         return sprintf('ovhcloud://%s?consumer_key=%s&service_name=%s', $this->getEndpoint(), $this->consumerKey, $this->serviceName);
+    }
+
+    public function setSender(?string $sender): self
+    {
+        $this->sender = $sender;
+
+        return $this;
     }
 
     public function supports(MessageInterface $message): bool

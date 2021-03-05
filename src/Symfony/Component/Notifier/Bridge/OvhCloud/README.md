@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME&SENDER=SENDER
+OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME&sender=SENDER
 ```
 
 where:

@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME
+OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=CONSUMER_KEY&service_name=SERVICE_NAME&SENDER=SENDER
 ```
 
 where:
@@ -15,6 +15,7 @@ where:
 - `APPLICATION_SECRET` is your OvhCloud application secret
 - `CONSUMER_KEY` is your OvhCloud consumer key
 - `SERVICE_NAME` is your OvhCloud service name
+- `SENDER` is your sender (optional)
 
 Resources
 ---------

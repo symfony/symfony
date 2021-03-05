@@ -28,6 +28,9 @@ trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is d
  */
 final class MigratingPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
 {
+    private $bestEncoder;
+    private $extraEncoders;
+
     public function __construct(PasswordEncoderInterface $bestEncoder, PasswordEncoderInterface ...$extraEncoders)
     {
         $this->bestEncoder = $bestEncoder;

@@ -40,7 +40,7 @@ class WorkflowDumpCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
-                new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Labels a graph'),
+                new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Label a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
             ])
             ->setDescription('Dump a workflow')

@@ -50,7 +50,7 @@ class EventDispatcherDebugCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
-            ->setDescription('Displays configured listeners for an application')
+            ->setDescription('Display configured listeners for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
 

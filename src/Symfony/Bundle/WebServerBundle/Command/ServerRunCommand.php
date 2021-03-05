@@ -57,7 +57,7 @@ class ServerRunCommand extends Command
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ])
-            ->setDescription('Runs a local web server')
+            ->setDescription('Run a local web server')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> runs a local web server: By default, the server
 listens on <comment>127.0.0.1</> address and the port number is automatically selected

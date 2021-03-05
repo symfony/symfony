@@ -64,7 +64,7 @@ class DebugCommand extends Command
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ])
-            ->setDescription('Displays form type information')
+            ->setDescription('Display form type information')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
 

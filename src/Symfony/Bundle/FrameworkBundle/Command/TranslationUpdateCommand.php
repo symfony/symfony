@@ -85,7 +85,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
             ])
-            ->setDescription('Updates the translation file')
+            ->setDescription('Update the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the default translations directory. It can display them or merge

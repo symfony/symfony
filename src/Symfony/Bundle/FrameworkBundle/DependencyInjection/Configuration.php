@@ -1746,9 +1746,22 @@ class Configuration implements ConfigurationInterface
                                 ->beforeNormalization()
                                     ->ifTrue(function ($v) { return !\is_array($v) || array_keys($v) !== ['value']; })
                                     ->then(function ($v) { return ['value' => $v]; })
+                                    ->always()
+                                    ->then(function ($headers) {
+                                        foreach ($headers as $name => $value) {
+                                            // From message header needs a capital F (https://www.rfc-editor.org/rfc/rfc2076.txt)
+                                            if ('from' === $name) {
+                                                $headers[$name] = 'From';
+                                            }
+                                        }
+
+                                        return $headers;
+                                    })
+                                    ->end()
                                 ->end()
                                 ->children()
-                                    ->variableNode('value')->end()
+                                    ->variableNode('value')
+                                    ->end()
                                 ->end()
                             ->end()
                         ->end()

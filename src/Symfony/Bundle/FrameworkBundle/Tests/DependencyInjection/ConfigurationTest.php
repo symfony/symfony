@@ -360,6 +360,24 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testMailerFromHeader()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'mailer' => [
+                    'headers' => [
+                        'from' => 'Fabien <fabien@example.com>',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey('From', $config['mailer']['headers']);
+        $this->assertArrayNotHasKey('from', $config['mailer']['headers']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

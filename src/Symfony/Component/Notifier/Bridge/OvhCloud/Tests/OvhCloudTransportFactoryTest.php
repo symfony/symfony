@@ -31,12 +31,17 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
             'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName',
             'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName',
         ];
+
+        yield [
+            'ovhcloud://host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender',
+            'ovhcloud://key:secret@host.test?consumer_key=consumerKey&service_name=serviceName&sender=sender',
+        ];
     }
 
     public function supportsProvider(): iterable
     {
-        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
-        yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield [true, 'ovhcloud://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
+        yield [false, 'somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
     }
 
     public function missingRequiredOptionProvider(): iterable
@@ -47,8 +52,9 @@ final class OvhCloudTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield ['somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName'];
+        yield ['somethingElse://key:secret@default?consumer_key=consumerKey&service_name=serviceName&sender=sender'];
         yield ['somethingElse://key:secret@default?service_name=serviceName'];
         yield ['somethingElse://key:secret@default?consumer_key=consumerKey'];
+        yield ['somethingElse://key:secret@default?sender=sender'];
     }
 }

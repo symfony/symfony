@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-01-06T14:28:13Z
+
+@carsonbot do you know who could review this?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-01-06T14:36:55Z
+
+@carsonbot please find me a reviewer
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-06T14:37:50Z
+
+@pupaxxo could maybe review this PR?
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2021-02-05T18:21:18Z
+
+I think that this PR is not a feature, but a bug fix and that it should be merged into the 4.4 branch.
+
+My problem is that when my app sends a templated email to the async transport, it is rerenderd in an HTTP context and stored with the URLs pointing to the correct hostname, but when the message is consumed from the console `message:consume` command it is rendered again in a CLI context, and the URL finally points to `localhost`.
+
+I know that it can be fixed by setting the `router.request_context.host` parameter, but it is not so easy in a multitenant environment, and it's annoying to see that the email body in the profiler differs from the email body really sent to my address.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-02-05T19:18:10Z
+
+> I know that it can be fixed by setting the `router.request_context.host` parameter, but it is not so easy in a multitenant environment, and it's annoying to see that the email body in the profiler differs from the email body really sent to my address.
+
+This issue is addressed by another of my PR 😛 https://github.com/symfony/symfony/pull/39688
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2021-02-08T08:12:39Z
+
+> This issue is addressed by another of my PR stuck_out_tongue #39688
+
+That is a great new feature.
+
+But IMO this PR is a bug fix and shoud be merged into v4.4 to fix #39718.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-02-08T22:23:08Z
+
+rebased on 4.4
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2021-03-05T13:59:29Z
+
+I though this PR would be merged before releasing version [4.4.20](https://github.com/symfony/symfony/releases/tag/v4.4.20). Can I help to get it merged soon?
+
+Thanks

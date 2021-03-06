@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:validator';
-    protected static $defaultDescription = 'Displays validation constraints for classes';
+    protected static $defaultDescription = 'Display validation constraints for classes';
 
     private $validator;
 

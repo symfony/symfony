@@ -76,7 +76,7 @@
         "phpunit/phpunit": "<5.4.3",
         "symfony/asset": "<5.1",
         "symfony/browser-kit": "<4.4",
-        "symfony/console": "<5.2",
+        "symfony/console": "<5.2.5",
         "symfony/dotenv": "<5.1",
         "symfony/dom-crawler": "<4.4",
         "symfony/http-client": "<4.4",

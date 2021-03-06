@@ -1,5 +1,5 @@
 Description:
-  Displays help for a command
+  Display help for a command
 
 Usage:
   help [options] [--] [<command_name>]

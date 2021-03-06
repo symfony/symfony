@@ -205,7 +205,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'list']);
 
         $this->assertSame(0, $tester->getStatusCode());
-        $display = explode('Lists commands', $tester->getDisplay());
+        $display = explode('List commands', $tester->getDisplay());
 
         $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }

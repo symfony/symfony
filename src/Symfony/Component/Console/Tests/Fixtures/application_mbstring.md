@@ -11,7 +11,7 @@ MbString åpplicätion
 `help`
 ------
 
-Displays help for a command
+Display help for a command
 
 ### Usage
 
@@ -122,7 +122,7 @@ Do not ask any interactive question
 `list`
 ------
 
-Lists commands
+List commands
 
 ### Usage
 

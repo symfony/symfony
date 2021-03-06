@@ -79,11 +79,11 @@ class TranslationDebugCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
-                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
-                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
+                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
+                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ])
-            ->setDescription('Displays translation messages information')
+            ->setDescription('Display translation messages information')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the

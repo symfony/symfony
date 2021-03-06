@@ -85,7 +85,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically', 'asc'),
                 new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
-            ->setDescription('Updates the translation file')
+            ->setDescription('Update the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the default translations directory. It can display them or merge

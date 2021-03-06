@@ -44,20 +44,20 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
-                new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Used to show hidden (internal) services'),
-                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
-                new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
-                new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
-                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
-                new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
-                new InputOption('env-var', null, InputOption::VALUE_REQUIRED, 'Displays a specific environment variable used in the container'),
-                new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Displays environment variables used in the container'),
+                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
+                new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
+                new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
+                new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Display a specific parameter for an application'),
+                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Display parameters for an application'),
+                new InputOption('types', null, InputOption::VALUE_NONE, 'Display types (classes/interfaces) available in the container'),
+                new InputOption('env-var', null, InputOption::VALUE_REQUIRED, 'Display a specific environment variable used in the container'),
+                new InputOption('env-vars', null, InputOption::VALUE_NONE, 'Display environment variables used in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
-                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Displays deprecations generated when compiling and warming up the container'),
+                new InputOption('deprecations', null, InputOption::VALUE_NONE, 'Display deprecations generated when compiling and warming up the container'),
             ])
-            ->setDescription('Displays current services for an application')
+            ->setDescription('Display current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 

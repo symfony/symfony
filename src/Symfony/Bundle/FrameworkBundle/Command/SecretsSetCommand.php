@@ -45,11 +45,11 @@ final class SecretsSetCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Sets a secret in the vault')
+            ->setDescription('Set a secret in the vault')
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret')
             ->addArgument('file', InputArgument::OPTIONAL, 'A file where to read the secret from or "-" for reading from STDIN')
-            ->addOption('local', 'l', InputOption::VALUE_NONE, 'Updates the local vault.')
-            ->addOption('random', 'r', InputOption::VALUE_OPTIONAL, 'Generates a random value.', false)
+            ->addOption('local', 'l', InputOption::VALUE_NONE, 'Update the local vault.')
+            ->addOption('random', 'r', InputOption::VALUE_OPTIONAL, 'Generate a random value.', false)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command stores a secret in the vault.
 

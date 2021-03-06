@@ -48,7 +48,7 @@ class CacheWarmupCommand extends Command
             ->setDefinition([
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ])
-            ->setDescription('Warms up an empty cache')
+            ->setDescription('Warm up an empty cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command warms up the cache.
 

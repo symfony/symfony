@@ -52,7 +52,7 @@ class UserPasswordEncoderCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Encodes a password')
+            ->setDescription('Encode a password')
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
             ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the encoder generate one.')

@@ -42,7 +42,7 @@ class StopWorkersCommand extends Command
     {
         $this
             ->setDefinition([])
-            ->setDescription('Stops workers after their current message')
+            ->setDescription('Stop workers after their current message')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command sends a signal to stop any <info>messenger:consume</info> processes that are running.
 

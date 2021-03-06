@@ -53,7 +53,7 @@ class XliffLintCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lints an XLIFF file and outputs encountered errors')
+            ->setDescription('Lint an XLIFF file and outputs encountered errors')
             ->addArgument('filename', InputArgument::IS_ARRAY, 'A file, a directory or "-" for reading from STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF

@@ -48,7 +48,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
             ])
-            ->setDescription('Dumps the default configuration for an extension')
+            ->setDescription('Dump the default configuration for an extension')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the default configuration for an
 extension/bundle.

@@ -41,7 +41,7 @@ final class SecretsEncryptFromLocalCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Encrypts all local secrets to the vault')
+            ->setDescription('Encrypt all local secrets to the vault')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command encrypts all locally overridden secrets to the vault.
 

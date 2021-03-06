@@ -42,6 +42,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
@@ -664,6 +665,9 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         $encoderMap = [];
         foreach ($encoders as $class => $encoder) {
+            if (class_exists($class) && !is_a($class, PasswordAuthenticatedUserInterface::class, true)) {
+                trigger_deprecation('symfony/security-bundle', '5.3', 'Configuring an encoder for a user class that does not implement "%s" is deprecated, class "%s" should implement it.', PasswordAuthenticatedUserInterface::class, $class);
+            }
             $encoderMap[$class] = $this->createEncoder($encoder);
         }
 
@@ -775,6 +779,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         $hasherMap = [];
         foreach ($hashers as $class => $hasher) {
+            // @deprecated since Symfony 5.3, remove the check in 6.0
+            if (class_exists($class) && !is_a($class, PasswordAuthenticatedUserInterface::class, true)) {
+                trigger_deprecation('symfony/security-bundle', '5.3', 'Configuring a password hasher for a user class that does not implement "%s" is deprecated, class "%s" should implement it.', PasswordAuthenticatedUserInterface::class, $class);
+            }
             $hasherMap[$class] = $this->createHasher($hasher);
         }
 

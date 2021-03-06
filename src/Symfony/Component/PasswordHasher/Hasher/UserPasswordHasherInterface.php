@@ -11,27 +11,17 @@
 
 namespace Symfony\Component\PasswordHasher\Hasher;
 
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * Interface for the user password hasher service.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
+ *
+ * @method string hashPassword(PasswordAuthenticatedUserInterface $user, string $plainPassword)    Hashes the plain password for the given user.
+ * @method string isPasswordValid(PasswordAuthenticatedUserInterface $user, string $plainPassword) Checks if the plaintext password matches the user's password.
+ * @method bool   needsRehash(PasswordAuthenticatedUserInterface $user)                            Checks if the plaintext password matches the user's password.
  */
 interface UserPasswordHasherInterface
 {
-    /**
-     * Hashes the plain password for the given user.
-     */
-    public function hashPassword(UserInterface $user, string $plainPassword): string;
-
-    /**
-     * Checks if the plaintext password matches the user's password.
-     */
-    public function isPasswordValid(UserInterface $user, string $plainPassword): bool;
-
-    /**
-     * Checks if a password hash would benefit from rehashing.
-     */
-    public function needsRehash(UserInterface $user): bool;
 }

@@ -12,6 +12,9 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -23,9 +26,6 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
@@ -380,4 +380,5 @@ class TestUser implements UserInterface
 }
 interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
 {
+    public function upgradePassword(UserInterface $user, string $newHashedPassword): void;
 }

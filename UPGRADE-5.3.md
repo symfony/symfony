@@ -80,6 +80,88 @@ Routing
 Security
 --------
 
+ * Deprecate `UserInterface::getPassword()`
+   If your `getPassword()` method does not return `null` (i.e. you are using password-based authentication),
+   you should implement `PasswordAuthenticatedUserInterface`.
+
+   Before:
+   ```php
+   use Symfony\Component\Security\Core\User\UserInterface;
+
+   class User implements UserInterface
+   {
+       // ...
+
+       public function getPassword()
+       {
+           return $this->password;
+       }
+   }
+   ```
+
+   After:
+   ```php
+   use Symfony\Component\Security\Core\User\UserInterface;
+   use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
+   class User implements UserInterface, PasswordAuthenticatedUserInterface
+   {
+       // ...
+
+       public function getPassword(): ?string
+       {
+           return $this->password;
+       }
+   }
+   ```
+
+ * Deprecate `UserInterface::getSalt()`
+   If your `getSalt()` method does not return `null` (i.e. you are using password-based authentication with an old password hash algorithm that requires user-provided salts),
+   implement `LegacyPasswordAuthenticatedUserInterface`.
+
+   Before:
+   ```php
+   use Symfony\Component\Security\Core\User\UserInterface;
+
+   class User implements UserInterface
+   {
+       // ...
+
+       public function getPassword()
+       {
+           return $this->password;
+       }
+
+       public function getSalt()
+       {
+           return $this->salt;
+       }
+   }
+   ```
+
+   After:
+   ```php
+   use Symfony\Component\Security\Core\User\UserInterface;
+   use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+
+   class User implements UserInterface, LegacyPasswordAuthenticatedUserInterface
+   {
+       // ...
+
+       public function getPassword(): ?string
+       {
+           return $this->password;
+       }
+
+       public function getSalt(): ?string
+       {
+           return $this->salt;
+       }
+   }
+   ```
+
+ * Deprecate calling `PasswordUpgraderInterface::upgradePassword()` with a `UserInterface` instance that does not implement `PasswordAuthenticatedUserInterface`
+ * Deprecate calling methods `hashPassword()`, `isPasswordValid()` and `needsRehash()` on `UserPasswordHasherInterface` with a `UserInterface` instance that does not implement `PasswordAuthenticatedUserInterface`
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
  * Deprecated voters that do not return a valid decision when calling the `vote` method
 

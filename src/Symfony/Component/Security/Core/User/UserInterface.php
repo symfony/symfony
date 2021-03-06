@@ -52,6 +52,8 @@ interface UserInterface
      * This should be the hashed password. On authentication, a plain-text
      * password will be hashed, and then compared to this value.
      *
+     * This method is deprecated since Symfony 5.3, implement it from {@link PasswordAuthenticatedUserInterface} instead.
+     *
      * @return string|null The hashed password if any
      */
     public function getPassword();
@@ -60,6 +62,8 @@ interface UserInterface
      * Returns the salt that was originally used to hash the password.
      *
      * This can return null if the password was not hashed using a salt.
+     *
+     * This method is deprecated since Symfony 5.3, implement it from {@link LegacyPasswordAuthenticatedUserInterface} instead.
      *
      * @return string|null The salt
      */

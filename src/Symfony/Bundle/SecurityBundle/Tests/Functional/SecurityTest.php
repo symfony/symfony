@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Security\Core\User\ArrayUserProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -78,7 +79,7 @@ class SecurityTest extends AbstractWebTestCase
     }
 }
 
-final class UserWithoutEquatable implements UserInterface
+final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private $username;
     private $password;
@@ -119,7 +120,7 @@ final class UserWithoutEquatable implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }

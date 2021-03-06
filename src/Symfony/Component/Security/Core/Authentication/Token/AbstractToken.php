@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -262,10 +263,12 @@ abstract class AbstractToken implements TokenInterface
             return !(bool) $this->user->isEqualTo($user);
         }
 
+        // @deprecated since Symfony 5.3, check for PasswordAuthenticatedUserInterface on both user objects before comparing passwords
         if ($this->user->getPassword() !== $user->getPassword()) {
             return true;
         }
 
+        // @deprecated since Symfony 5.3, check for LegacyPasswordAuthenticatedUserInterface on both user objects before comparing salts
         if ($this->user->getSalt() !== $user->getSalt()) {
             return true;
         }

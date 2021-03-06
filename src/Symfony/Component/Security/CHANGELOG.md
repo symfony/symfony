@@ -4,6 +4,8 @@ CHANGELOG
 5.3
 ---
 
+ * Add `PasswordAuthenticatedUserInterface` for user classes that use passwords
+ * Add `LegacyPasswordAuthenticatedUserInterface` for user classes that use user-provided salts in addition to passwords
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
  * Deprecate the `SessionInterface $session` constructor argument of `SessionTokenStorage`, inject a `\Symfony\Component\HttpFoundation\RequestStack $requestStack` instead
  * Deprecate the `session` service provided by the ServiceLocator injected in `UsageTrackingTokenStorage`, provide a `request_stack` service instead

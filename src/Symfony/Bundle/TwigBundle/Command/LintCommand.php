@@ -23,7 +23,7 @@ use Symfony\Component\Finder\Finder;
 final class LintCommand extends BaseLintCommand
 {
     protected static $defaultName = 'lint:twig';
-    protected static $defaultDescription = 'Lints a Twig template and outputs encountered errors';
+    protected static $defaultDescription = 'Lint a Twig template and outputs encountered errors';
 
     /**
      * {@inheritdoc}

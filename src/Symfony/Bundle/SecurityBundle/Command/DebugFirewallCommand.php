@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 final class DebugFirewallCommand extends Command
 {
     protected static $defaultName = 'debug:firewall';
-    protected static $defaultDescription = 'Displays information about your security firewall(s)';
+    protected static $defaultDescription = 'Display information about your security firewall(s)';
 
     private $firewallNames;
     private $contexts;

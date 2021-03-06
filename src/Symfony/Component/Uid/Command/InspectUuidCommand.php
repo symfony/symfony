@@ -25,7 +25,7 @@ use Symfony\Component\Uid\UuidV6;
 class InspectUuidCommand extends Command
 {
     protected static $defaultName = 'uuid:inspect';
-    protected static $defaultDescription = 'Inspects a UUID';
+    protected static $defaultDescription = 'Inspect a UUID';
 
     /**
      * {@inheritdoc}

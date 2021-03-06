@@ -23,7 +23,7 @@ use Symfony\Component\Uid\Ulid;
 class InspectUlidCommand extends Command
 {
     protected static $defaultName = 'ulid:inspect';
-    protected static $defaultDescription = 'Inspects a ULID';
+    protected static $defaultDescription = 'Inspect a ULID';
 
     /**
      * {@inheritdoc}

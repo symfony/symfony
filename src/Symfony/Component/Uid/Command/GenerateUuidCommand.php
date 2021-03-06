@@ -23,7 +23,7 @@ use Symfony\Component\Uid\Uuid;
 class GenerateUuidCommand extends Command
 {
     protected static $defaultName = 'uuid:generate';
-    protected static $defaultDescription = 'Generates a UUID';
+    protected static $defaultDescription = 'Generate a UUID';
 
     private $factory;
 

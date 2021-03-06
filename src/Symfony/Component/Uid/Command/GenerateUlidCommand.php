@@ -22,7 +22,7 @@ use Symfony\Component\Uid\Factory\UlidFactory;
 class GenerateUlidCommand extends Command
 {
     protected static $defaultName = 'ulid:generate';
-    protected static $defaultDescription = 'Generates a ULID';
+    protected static $defaultDescription = 'Generate a ULID';
 
     private $factory;
 

@@ -25,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class CachePoolPruneCommand extends Command
 {
     protected static $defaultName = 'cache:pool:prune';
-    protected static $defaultDescription = 'Prunes cache pools';
+    protected static $defaultDescription = 'Prune cache pools';
 
     private $pools;
 

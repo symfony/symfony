@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 class CacheWarmupCommand extends Command
 {
     protected static $defaultName = 'cache:warmup';
-    protected static $defaultDescription = 'Warms up an empty cache';
+    protected static $defaultDescription = 'Warm up an empty cache';
 
     private $cacheWarmer;
 

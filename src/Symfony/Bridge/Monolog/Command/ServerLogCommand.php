@@ -34,7 +34,7 @@ class ServerLogCommand extends Command
     private $handler;
 
     protected static $defaultName = 'server:log';
-    protected static $defaultDescription = 'Starts a log server that displays logs in real time';
+    protected static $defaultDescription = 'Start a log server that displays logs in real time';
 
     public function isEnabled()
     {

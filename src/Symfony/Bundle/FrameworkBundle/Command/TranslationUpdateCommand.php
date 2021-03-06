@@ -42,7 +42,7 @@ class TranslationUpdateCommand extends Command
     private const SORT_ORDERS = [self::ASC, self::DESC];
 
     protected static $defaultName = 'translation:update';
-    protected static $defaultDescription = 'Updates the translation file';
+    protected static $defaultDescription = 'Update the translation file';
 
     private $writer;
     private $reader;

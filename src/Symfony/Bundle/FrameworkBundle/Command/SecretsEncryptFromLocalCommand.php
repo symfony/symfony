@@ -26,7 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SecretsEncryptFromLocalCommand extends Command
 {
     protected static $defaultName = 'secrets:encrypt-from-local';
-    protected static $defaultDescription = 'Encrypts all local secrets to the vault';
+    protected static $defaultDescription = 'Encrypt all local secrets to the vault';
 
     private $vault;
     private $localVault;

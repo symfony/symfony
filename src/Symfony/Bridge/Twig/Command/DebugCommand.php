@@ -33,7 +33,7 @@ use Twig\Loader\FilesystemLoader;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:twig';
-    protected static $defaultDescription = 'Shows a list of twig functions, filters, globals and tests';
+    protected static $defaultDescription = 'Show a list of twig functions, filters, globals and tests';
 
     private $twig;
     private $projectDir;

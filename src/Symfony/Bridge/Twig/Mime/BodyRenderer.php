@@ -46,6 +46,14 @@ final class BodyRenderer implements BodyRendererInterface
         }
 
         $messageContext = $message->getContext();
+
+        $previousRenderingKey = $messageContext[__CLASS__] ?? null;
+        unset($messageContext[__CLASS__]);
+        $currentRenderingKey = md5(serialize([$messageContext, $message->getTextTemplate(), $message->getHtmlTemplate()]));
+        if ($previousRenderingKey === $currentRenderingKey) {
+            return;
+        }
+
         if (isset($messageContext['email'])) {
             throw new InvalidArgumentException(sprintf('A "%s" context cannot have an "email" entry as this is a reserved variable.', get_debug_type($message)));
         }
@@ -66,6 +74,7 @@ final class BodyRenderer implements BodyRendererInterface
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
             $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
         }
+        $message->context($message->getContext() + [__CLASS__ => $currentRenderingKey]);
     }
 
     private function convertHtmlToText(string $html): string

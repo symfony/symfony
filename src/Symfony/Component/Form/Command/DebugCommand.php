@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:form';
-    protected static $defaultDescription = 'Displays form type information';
+    protected static $defaultDescription = 'Display form type information';
 
     private $formRegistry;
     private $namespaces;

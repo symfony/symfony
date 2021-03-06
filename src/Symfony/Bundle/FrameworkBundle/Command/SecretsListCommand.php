@@ -30,7 +30,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SecretsListCommand extends Command
 {
     protected static $defaultName = 'secrets:list';
-    protected static $defaultDescription = 'Lists all secrets';
+    protected static $defaultDescription = 'List all secrets';
 
     private $vault;
     private $localVault;

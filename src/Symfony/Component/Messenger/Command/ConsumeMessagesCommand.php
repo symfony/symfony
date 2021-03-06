@@ -36,7 +36,7 @@ use Symfony\Component\Messenger\Worker;
 class ConsumeMessagesCommand extends Command
 {
     protected static $defaultName = 'messenger:consume';
-    protected static $defaultDescription = 'Consumes messages';
+    protected static $defaultDescription = 'Consume messages';
 
     private $routableBus;
     private $receiverLocator;

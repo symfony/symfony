@@ -36,7 +36,7 @@ class RouterDebugCommand extends Command
     use BuildDebugContainerTrait;
 
     protected static $defaultName = 'debug:router';
-    protected static $defaultDescription = 'Displays current routes for an application';
+    protected static $defaultDescription = 'Display current routes for an application';
     private $router;
     private $fileLinkFormatter;
 

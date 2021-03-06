@@ -26,7 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DebugCommand extends Command
 {
     protected static $defaultName = 'debug:messenger';
-    protected static $defaultDescription = 'Lists messages you can dispatch using the message buses';
+    protected static $defaultDescription = 'List messages you can dispatch using the message buses';
 
     private $mapping;
 

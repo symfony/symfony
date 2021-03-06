@@ -31,7 +31,7 @@ use Symfony\Component\Routing\RouterInterface;
 class RouterMatchCommand extends Command
 {
     protected static $defaultName = 'router:match';
-    protected static $defaultDescription = 'Helps debug routes by simulating a path info match';
+    protected static $defaultDescription = 'Help debug routes by simulating a path info match';
 
     private $router;
     private $expressionLanguageProviders;
@@ -52,9 +52,9 @@ class RouterMatchCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
-                new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),
-                new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Sets the URI scheme (usually http or https)'),
-                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
+                new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Set the HTTP method'),
+                new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Set the URI scheme (usually http or https)'),
+                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Set the URI host'),
             ])
             ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'

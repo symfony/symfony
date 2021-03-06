@@ -36,7 +36,7 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     protected static $defaultName = 'config:dump-reference';
-    protected static $defaultDescription = 'Dumps the default configuration for an extension';
+    protected static $defaultDescription = 'Dump the default configuration for an extension';
 
     /**
      * {@inheritdoc}

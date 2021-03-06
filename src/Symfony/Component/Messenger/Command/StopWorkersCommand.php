@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 class StopWorkersCommand extends Command
 {
     protected static $defaultName = 'messenger:stop-workers';
-    protected static $defaultDescription = 'Stops workers after their current message';
+    protected static $defaultDescription = 'Stop workers after their current message';
 
     private $restartSignalCachePool;
 

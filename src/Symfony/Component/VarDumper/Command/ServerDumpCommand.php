@@ -35,7 +35,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 class ServerDumpCommand extends Command
 {
     protected static $defaultName = 'server:dump';
-    protected static $defaultDescription = 'Starts a dump server that collects and displays dumps in a single place';
+    protected static $defaultDescription = 'Start a dump server that collects and displays dumps in a single place';
 
     private $server;
 

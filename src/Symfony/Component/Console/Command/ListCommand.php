@@ -37,7 +37,7 @@ class ListCommand extends Command
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('short', null, InputOption::VALUE_NONE, 'To skip describing commands\' arguments'),
             ])
-            ->setDescription('Lists commands')
+            ->setDescription('List commands')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lists all commands:
 

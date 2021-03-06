@@ -28,7 +28,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:show';
-    protected static $defaultDescription = 'Shows one or more messages from the failure transport';
+    protected static $defaultDescription = 'Show one or more messages from the failure transport';
 
     /**
      * {@inheritdoc}

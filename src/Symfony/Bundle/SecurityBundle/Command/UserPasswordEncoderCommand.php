@@ -37,7 +37,7 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 class UserPasswordEncoderCommand extends Command
 {
     protected static $defaultName = 'security:encode-password';
-    protected static $defaultDescription = 'Encodes a password';
+    protected static $defaultDescription = 'Encode a password';
 
     private $encoderFactory;
     private $userClasses;

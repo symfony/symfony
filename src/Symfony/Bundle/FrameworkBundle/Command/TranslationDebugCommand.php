@@ -47,7 +47,7 @@ class TranslationDebugCommand extends Command
     public const MESSAGE_EQUALS_FALLBACK = 2;
 
     protected static $defaultName = 'debug:translation';
-    protected static $defaultDescription = 'Displays translation messages information';
+    protected static $defaultDescription = 'Display translation messages information';
 
     private $translator;
     private $reader;
@@ -80,8 +80,8 @@ class TranslationDebugCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
-                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
-                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
+                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
+                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ])
             ->setDescription(self::$defaultDescription)

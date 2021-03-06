@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\Kernel;
 final class ContainerLintCommand extends Command
 {
     protected static $defaultName = 'lint:container';
-    protected static $defaultDescription = 'Ensures that arguments injected into services match type declarations';
+    protected static $defaultDescription = 'Ensure that arguments injected into services match type declarations';
 
     /**
      * @var ContainerBuilder

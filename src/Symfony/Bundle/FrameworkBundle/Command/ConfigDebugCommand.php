@@ -33,7 +33,7 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigDebugCommand extends AbstractConfigCommand
 {
     protected static $defaultName = 'debug:config';
-    protected static $defaultDescription = 'Dumps the current configuration for an extension';
+    protected static $defaultDescription = 'Dump the current configuration for an extension';
 
     /**
      * {@inheritdoc}

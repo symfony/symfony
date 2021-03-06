@@ -33,7 +33,7 @@ class EventDispatcherDebugCommand extends Command
     private const DEFAULT_DISPATCHER = 'event_dispatcher';
 
     protected static $defaultName = 'debug:event-dispatcher';
-    protected static $defaultDescription = 'Displays configured listeners for an application';
+    protected static $defaultDescription = 'Display configured listeners for an application';
     private $dispatchers;
 
     public function __construct(ContainerInterface $dispatchers)

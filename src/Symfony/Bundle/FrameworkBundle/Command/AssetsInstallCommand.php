@@ -40,7 +40,7 @@ class AssetsInstallCommand extends Command
     public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
     protected static $defaultName = 'assets:install';
-    protected static $defaultDescription = 'Installs bundles web assets under a public directory';
+    protected static $defaultDescription = 'Install bundle\'s web assets under a public directory';
 
     private $filesystem;
     private $projectDir;
@@ -62,7 +62,7 @@ class AssetsInstallCommand extends Command
             ->setDefinition([
                 new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', null),
             ])
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
             ->addOption('no-cleanup', null, InputOption::VALUE_NONE, 'Do not remove the assets of the bundles that no longer exist')
             ->setDescription(self::$defaultDescription)

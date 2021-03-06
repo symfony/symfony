@@ -33,7 +33,7 @@ use Symfony\Component\Yaml\Yaml;
 class LintCommand extends Command
 {
     protected static $defaultName = 'lint:yaml';
-    protected static $defaultDescription = 'Lints a YAML file and outputs encountered errors';
+    protected static $defaultDescription = 'Lint a YAML file and outputs encountered errors';
 
     private $parser;
     private $format;

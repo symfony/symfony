@@ -48,7 +48,7 @@ final class TraceableSerializerTest extends TestCase
     public function testTracerIsResettableSerializer()
     {
         self::assertInstanceOf(SerializerInterface::class, $this->traceableSerializer);
-        self::assertInstanceOf('Symfony\Contracts\Service\ResetInterface', $this->traceableSerializer);
+        self::assertInstanceOf(\Symfony\Contracts\Service\ResetInterface::class, $this->traceableSerializer);
     }
 
     public function testSerializeMustCallDelegate()

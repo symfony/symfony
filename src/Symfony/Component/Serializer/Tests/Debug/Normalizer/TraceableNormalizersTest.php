@@ -63,7 +63,7 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideDataForNormalizationDelegation
      */
-    public function testSupportsNormalizationDelegation(bool $supports, $normalizer, $tracer): void
+    public function testSupportsNormalizationDelegation(bool $supports, $normalizer, $tracer)
     {
         $something = new \stdClass();
         $format = 'json';
@@ -76,7 +76,7 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideDataForNormalizationDelegation
      */
-    public function testNormalizationDelegation($_, $normalizer, $tracer): void
+    public function testNormalizationDelegation($_, $normalizer, $tracer)
     {
         $something = new \stdClass();
         $format = 'json';
@@ -133,7 +133,7 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideDataForDenormalizationDelegation
      */
-    public function testSupportsDenormalizationDelegation(bool $supports, $denormalizer, $tracer): void
+    public function testSupportsDenormalizationDelegation(bool $supports, $denormalizer, $tracer)
     {
         $something = '<some-serialized-thing>';
         $type = \stdClass::class;
@@ -153,7 +153,7 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideDataForDenormalizationDelegation
      */
-    public function testDenormalizationDelegation($_, $denormalizer, $tracer): void
+    public function testDenormalizationDelegation($_, $denormalizer, $tracer)
     {
         $something = new \stdClass();
         $type = \stdClass::class;
@@ -226,7 +226,7 @@ final class TraceableNormalizersTest extends TestCase
     /**
      * @dataProvider provideYesNo
      */
-    public function testCacheableSupport(bool $isCachable): void
+    public function testCacheableSupport(bool $isCachable)
     {
         $tracer = new TraceableHybridNormalizer(new TestCacheableNormalizer($isCachable), $this->serializerActionFactory);
         self::assertSame($isCachable, $tracer->hasCacheableSupportsMethod());

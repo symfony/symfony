@@ -45,9 +45,9 @@ final class TraceableSerializerTest extends TestCase
         $this->emptyContext = [];
     }
 
-    public function testTracerIsSerializer()
+    public function testTracerIsResettableSerializer()
     {
-        self::assertInstanceOf('Symfony\Component\Serializer\SerializerInterface', $this->traceableSerializer);
+        self::assertInstanceOf(SerializerInterface::class, $this->traceableSerializer);
         self::assertInstanceOf('Symfony\Contracts\Service\ResetInterface', $this->traceableSerializer);
     }
 
@@ -128,7 +128,7 @@ final class TraceableSerializerTest extends TestCase
         self::assertCount(0, $this->traceableSerializer->getDeserializations());
     }
 
-    private function assertSerializeToBeCalled(): void
+    private function assertSerializeToBeCalled()
     {
         $this->delegateMock
             ->expects(self::once())
@@ -137,7 +137,7 @@ final class TraceableSerializerTest extends TestCase
             ->willReturn(self::SERIALIZED_OBJECT);
     }
 
-    private function assertDeserializeToBeCalled(): void
+    private function assertDeserializeToBeCalled()
     {
         $this->delegateMock
             ->expects(self::once())
@@ -146,7 +146,7 @@ final class TraceableSerializerTest extends TestCase
             ->willReturn($this->something);
     }
 
-    private function callDeserialize(): void
+    private function callDeserialize()
     {
         $this->traceableSerializer->deserialize(
             self::SERIALIZED_OBJECT,
@@ -156,7 +156,7 @@ final class TraceableSerializerTest extends TestCase
         );
     }
 
-    private function callSerialize(): void
+    private function callSerialize()
     {
         $this->traceableSerializer->serialize(
             $this->something,

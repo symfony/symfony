@@ -50,7 +50,7 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 new InputArgument('search', InputArgument::OPTIONAL, 'A search filter'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Show also services that are not aliased'),
             ])
-            ->setDescription('Lists classes/interfaces you can use for autowiring')
+            ->setDescription('List classes/interfaces you can use for autowiring')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays the classes and interfaces that
 you can use as type-hints for autowiring:

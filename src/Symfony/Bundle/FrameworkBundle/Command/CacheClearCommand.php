@@ -57,7 +57,7 @@ class CacheClearCommand extends Command
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ])
-            ->setDescription('Clears the cache')
+            ->setDescription('Clear the cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:

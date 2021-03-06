@@ -33,7 +33,7 @@ class ListCommand extends Command
         $this
             ->setName('list')
             ->setDefinition($this->createDefinition())
-            ->setDescription('Lists commands')
+            ->setDescription('List commands')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lists all commands:
 

@@ -59,7 +59,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
             ])
-            ->setDescription('Retries one or more messages from the failure transport.')
+            ->setDescription('Retry one or more messages from the failure transport.')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
 

@@ -47,7 +47,7 @@ final class CachePoolClearCommand extends Command
             ->setDefinition([
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ])
-            ->setDescription('Clears cache pools')
+            ->setDescription('Clear cache pools')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
 

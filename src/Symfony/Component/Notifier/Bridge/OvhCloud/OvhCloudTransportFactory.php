@@ -33,10 +33,11 @@ final class OvhCloudTransportFactory extends AbstractTransportFactory
         $applicationSecret = $this->getPassword($dsn);
         $consumerKey = $dsn->getRequiredOption('consumer_key');
         $serviceName = $dsn->getRequiredOption('service_name');
+        $sender = $dsn->getOption('sender');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new OvhCloudTransport($applicationKey, $applicationSecret, $consumerKey, $serviceName, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new OvhCloudTransport($applicationKey, $applicationSecret, $consumerKey, $serviceName, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSender($sender);
     }
 
     protected function getSupportedSchemes(): array

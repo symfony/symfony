@@ -234,4 +234,7 @@ abstract class UserLoaderRepository implements ObjectRepository, UserLoaderInter
 
 abstract class PasswordUpgraderRepository implements ObjectRepository, PasswordUpgraderInterface
 {
+    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    {
+    }
 }

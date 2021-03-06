@@ -1,5 +1,5 @@
 Description:
-  Lists commands
+  List commands
 
 Usage:
   list [options] [--] [<namespace>]

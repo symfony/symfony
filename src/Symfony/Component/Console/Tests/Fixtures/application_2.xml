@@ -5,7 +5,7 @@
       <usages>
         <usage>help [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
       </usages>
-      <description>Displays help for a command</description>
+      <description>Display help for a command</description>
       <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
    &lt;info&gt;php app/console help list&lt;/info&gt;
@@ -60,7 +60,7 @@
       <usages>
         <usage>list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
       </usages>
-      <description>Lists commands</description>
+      <description>List commands</description>
       <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
    &lt;info&gt;php app/console list&lt;/info&gt;

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by danepowell at 2021-03-05T18:06:59Z
+
+I don't think the test failures are due to my changes, but let me know if I'm wrong
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-05T22:23:42Z
+
+~~45 commands in the diff, I guess we probably have very few commands using imperative.
+We use the indicative mood for class/method descriptions in doc blocks. Command descriptions are similar to me, I'd prefer imperative.~~
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-05T22:42:07Z
+
+@chalasr Let's keep the discussion on #36973.

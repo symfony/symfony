@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-21T13:08:37Z
+
+Build failure with high-deps expected (will be fixed once merged).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-02-21T23:39:41Z
+
+> I think we can trigger the deprecation in GuardAuthenticationProvider and GuardBridgeAuthenticator if we check for $guard instanceof PasswordAuthenticatedInterface && !$user instanceof PasswordAuthenticatedUserInterface
+
+Good idea. Done, thank you.
+
+Note that `UserPasswordHasher` already triggers a deprecation notice when `getPassword()` is defined but the new interface is not implemented (and another for `getSalt()`). GuardAuthenticationProvider uses it for password upgrades, and userland authenticators created via `make:auth` also use it for password verification.
+Guard is now well covered I guess :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-05T09:41:00Z
+
+Added one compile-time deprecation to ease upgrading. Fixed psalm reports also.
+This is ready.

@@ -110,7 +110,7 @@ class PasswordMigratingListenerTest extends TestCase
 
     private function createPasswordUpgrader()
     {
-        return $this->createMock(PasswordUpgraderInterface::class);
+        return $this->createMock(MigratingUserProvider::class);
     }
 
     private function createEvent(PassportInterface $passport)
@@ -121,4 +121,7 @@ class PasswordMigratingListenerTest extends TestCase
 
 abstract class MigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
+    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    {
+    }
 }

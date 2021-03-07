@@ -197,7 +197,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
 
-        $this->validator->validate('example@localhost', $constraint);
+        $this->validator->validate('example@mywebsite.tld', $constraint);
 
         $this->assertNoViolation();
     }

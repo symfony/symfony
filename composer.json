@@ -145,7 +145,7 @@
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0",
-        "egulias/email-validator": "^2.1.10",
+        "egulias/email-validator": "^2.1.10|^3.1",
         "symfony/phpunit-bridge": "^5.2",
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
@@ -155,6 +155,7 @@
     },
     "conflict": {
         "doctrine/dbal": "<2.10",
+        "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",

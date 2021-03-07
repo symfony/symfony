@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -28,6 +29,11 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IteratorConsumer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerConsumer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\LocatorConsumerFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\MultipleArgumentBindings;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
@@ -317,6 +323,33 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar_tab_class_with_defaultmethod'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(IteratorConsumer::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(IteratorConsumer::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+    }
+
     public function testTaggedIteratorWithMultipleIndexAttribute()
     {
         $container = new ContainerBuilder();
@@ -341,6 +374,104 @@ class IntegrationTest extends TestCase
 
         $param = iterator_to_array($s->getParam()->getIterator());
         $this->assertSame(['bar' => $container->get(BarTagClass::class), 'bar_duplicate' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testTaggedLocatorConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar_tab_class_with_defaultmethod'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(LocatorConsumer::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumer $s */
+        $s = $container->get(LocatorConsumer::class);
+
+        $locator = $s->getLocator();
+        self::assertSame($container->get(BarTagClass::class), $locator->get('bar_tab_class_with_defaultmethod'));
+        self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(LocatorConsumerConsumer::class)
+            ->setPublic(true)
+            ->setArguments([
+                (new Definition(LocatorConsumer::class))
+                    ->setAutoconfigured(true),
+            ])
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumerConsumer $s */
+        $s = $container->get(LocatorConsumerConsumer::class);
+
+        $locator = $s->getLocatorConsumer()->getLocator();
+        self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testFactoryWithAutoconfiguredArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'my_service'])
+        ;
+        $container->register(LocatorConsumerFactory::class);
+        $container->register(LocatorConsumer::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true)
+            ->setFactory(new Reference(LocatorConsumerFactory::class))
+        ;
+
+        $container->compile();
+
+        /** @var LocatorConsumer $s */
+        $s = $container->get(LocatorConsumer::class);
+
+        $locator = $s->getLocator();
+        self::assertSame($container->get(FooTagClass::class), $locator->get('my_service'));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testMultipleArgumentBindings()
+    {
+        $container = new ContainerBuilder();
+        $container->register(MultipleArgumentBindings::class)
+            ->setPublic(true)
+            ->setAutoconfigured(true)
+        ;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot autoconfigure argument "$collection": More than one autoconfigurable attribute found.');
+        $container->compile();
     }
 
     public function testTaggedServiceWithDefaultPriorityMethod()

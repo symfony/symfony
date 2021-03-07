@@ -17,8 +17,8 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserPasswordHasherTest extends TestCase
@@ -110,7 +110,7 @@ class UserPasswordHasherTest extends TestCase
 
     public function testNeedsRehash()
     {
-        $user = new User('username', null);
+        $user = new InMemoryUser('username', null);
         $hasher = new NativePasswordHasher(4, 20000, 4);
 
         $mockPasswordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
@@ -121,7 +121,7 @@ class UserPasswordHasherTest extends TestCase
 
         $passwordHasher = new UserPasswordHasher($mockPasswordHasherFactory);
 
-        $user->setPassword($passwordHasher->hashPassword($user, 'foo', 'salt'));
+        \Closure::bind(function () use ($passwordHasher) { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, InMemoryUser::class)();
         $this->assertFalse($passwordHasher->needsRehash($user));
         $this->assertTrue($passwordHasher->needsRehash($user));
         $this->assertFalse($passwordHasher->needsRehash($user));

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 
@@ -49,7 +49,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $userProvider->expects($this->once())
             ->method('loadUserByUsername')
             ->with('TheUsername')
-            ->willReturn($user = new User('TheUsername', null));
+            ->willReturn($user = new InMemoryUser('TheUsername', null));
 
         $passport = $authenticator->authenticate($request);
         $this->assertEquals($user, $passport->getUser());

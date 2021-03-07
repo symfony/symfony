@@ -5,7 +5,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundl
 use Symfony\Bundle\SecurityBundle\Tests\Functional\UserWithoutEquatable;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -52,11 +52,11 @@ class ArrayUserProvider implements UserProviderInterface
         $storedUser = $this->getUser($user->getUsername());
         $class = \get_class($storedUser);
 
-        return new $class($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked());
+        return new $class($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }
 
     public function supportsClass($class)
     {
-        return User::class === $class || UserWithoutEquatable::class === $class;
+        return InMemoryUser::class === $class || UserWithoutEquatable::class === $class;
     }
 }

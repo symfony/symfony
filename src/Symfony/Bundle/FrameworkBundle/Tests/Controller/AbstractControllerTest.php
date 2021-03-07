@@ -38,15 +38,15 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\WebLink\Link;
 use Twig\Environment;
 
@@ -137,7 +137,7 @@ class AbstractControllerTest extends TestCase
 
     public function testGetUser()
     {
-        $user = new User('user', 'pass');
+        $user = new InMemoryUser('user', 'pass');
         $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
 
         $controller = $this->createController();

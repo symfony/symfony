@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class SecurityTest extends TestCase
 {
@@ -66,7 +66,7 @@ class SecurityTest extends TestCase
 
         yield [new StringishUser(), null];
 
-        $user = new User('nice_user', 'foo');
+        $user = new InMemoryUser('nice_user', 'foo');
         yield [$user, $user];
     }
 

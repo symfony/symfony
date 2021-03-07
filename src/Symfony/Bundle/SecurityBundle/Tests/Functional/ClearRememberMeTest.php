@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -73,7 +73,7 @@ class RememberMeUserProvider implements UserProviderInterface
     {
         $user = $this->inner->refreshUser($user);
 
-        $alterUser = \Closure::bind(function (User $user) { $user->password = 'foo'; }, null, User::class);
+        $alterUser = \Closure::bind(function (InMemoryUser $user) { $user->password = 'foo'; }, null, InMemoryUser::class);
         $alterUser($user);
 
         return $user;

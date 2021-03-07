@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -165,7 +165,7 @@ class SwitchUserListenerTest extends TestCase
     {
         $this->expectException(AccessDeniedException::class);
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -206,7 +206,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUser()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
@@ -238,7 +238,7 @@ class SwitchUserListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($alreadySwitchedToken);
 
-        $targetUser = new User('kuba', 'password', ['ROLE_FOO', 'ROLE_BAR']);
+        $targetUser = new InMemoryUser('kuba', 'password', ['ROLE_FOO', 'ROLE_BAR']);
 
         $this->request->query->set('_switch_user', 'kuba');
 
@@ -266,7 +266,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserWorksWithFalsyUsernames()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', '0');
@@ -293,7 +293,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserKeepsOtherQueryStringParameters()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->replace([
@@ -322,10 +322,10 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserWithReplacedToken()
     {
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
         $token = new UsernamePasswordToken($user, '', 'provider123', ['ROLE_FOO']);
 
-        $user = new User('replaced', 'password', []);
+        $user = new InMemoryUser('replaced', 'password', []);
         $replacedToken = new UsernamePasswordToken($user, '', 'provider123', ['ROLE_BAR']);
 
         $this->tokenStorage->setToken($token);
@@ -374,7 +374,7 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserStateless()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $user = new InMemoryUser('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');

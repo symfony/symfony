@@ -41,9 +41,9 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\MissingUserProvider;
-use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -126,7 +126,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(UserPasswordEncoderInterface::class, 'security.password_encoder')
             ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "'.UserPasswordHasherInterface::class.'" instead.')
 
-        ->set('security.user_checker', UserChecker::class)
+        ->set('security.user_checker', InMemoryUserChecker::class)
 
         ->set('security.expression_language', ExpressionLanguage::class)
             ->args([service('cache.security_expression_language')->nullOnInvalid()])

@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', User::class, InMemoryUser::class);
+
 /**
  * User is the user implementation used by the in-memory user provider.
  *
  * This should not be used for anything else.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use {@link InMemoryUser} instead
  */
 final class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
@@ -171,8 +175,8 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface, E
             return false;
         }
 
-        $currentRoles = array_map('strval', (array) $this->getRoles());
-        $newRoles = array_map('strval', (array) $user->getRoles());
+        $currentRoles = array_map('strval', (array)$this->getRoles());
+        $newRoles = array_map('strval', (array)$user->getRoles());
         $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
         if ($rolesChanged) {
             return false;

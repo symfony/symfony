@@ -25,7 +25,7 @@ use Symfony\Component\Ldap\Security\LdapBadge;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -188,7 +188,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new UserBadge('Wouter', function () { return new User('Wouter', null, ['ROLE_USER']); }), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
+            new Passport(new UserBadge('Wouter', function () { return new InMemoryUser('Wouter', null, ['ROLE_USER']); }), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 

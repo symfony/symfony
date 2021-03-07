@@ -3,7 +3,7 @@ imports:
 
 security:
     encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
         Custom\Class\Native\User:
             algorithm: native
             cost:      10

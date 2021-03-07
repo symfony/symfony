@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -70,7 +70,7 @@ class RememberMeAuthenticatorTest extends TestCase
 
     public function testAuthenticate()
     {
-        $this->request->attributes->set('_remember_me_token', new RememberMeToken($user = new User('wouter', 'test'), 'main', 'secret'));
+        $this->request->attributes->set('_remember_me_token', new RememberMeToken($user = new InMemoryUser('wouter', 'test'), 'main', 'secret'));
         $passport = $this->authenticator->authenticate($this->request);
 
         $this->assertSame($user, $passport->getUser());

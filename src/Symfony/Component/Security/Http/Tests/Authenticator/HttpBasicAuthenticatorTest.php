@@ -4,7 +4,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
@@ -44,7 +44,7 @@ class HttpBasicAuthenticatorTest extends TestCase
             ->expects($this->any())
             ->method('loadUserByUsername')
             ->with('TheUsername')
-            ->willReturn($user = new User('TheUsername', 'ThePassword'));
+            ->willReturn($user = new InMemoryUser('TheUsername', 'ThePassword'));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
@@ -78,7 +78,7 @@ class HttpBasicAuthenticatorTest extends TestCase
         ]);
 
         $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
-        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
+        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new InMemoryUser('test', 's$cr$t'));
         $authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
 
         $passport = $authenticator->authenticate($request);

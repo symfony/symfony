@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\Authenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 
@@ -48,7 +48,7 @@ class X509AuthenticatorTest extends TestCase
         $this->userProvider->expects($this->any())
             ->method('loadUserByUsername')
             ->with($username)
-            ->willReturn(new User($username, null));
+            ->willReturn(new InMemoryUser($username, null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals($username, $passport->getUser()->getUsername());
@@ -72,7 +72,7 @@ class X509AuthenticatorTest extends TestCase
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')
             ->with($emailAddress)
-            ->willReturn(new User($emailAddress, null));
+            ->willReturn(new InMemoryUser($emailAddress, null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals($emailAddress, $passport->getUser()->getUsername());
@@ -108,7 +108,7 @@ class X509AuthenticatorTest extends TestCase
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')
             ->with('TheUser')
-            ->willReturn(new User('TheUser', null));
+            ->willReturn(new InMemoryUser('TheUser', null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('TheUser', $passport->getUser()->getUsername());
@@ -126,7 +126,7 @@ class X509AuthenticatorTest extends TestCase
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')
             ->with('cert@example.com')
-            ->willReturn(new User('cert@example.com', null));
+            ->willReturn(new InMemoryUser('cert@example.com', null));
 
         $passport = $authenticator->authenticate($request);
         $this->assertEquals('cert@example.com', $passport->getUser()->getUsername());

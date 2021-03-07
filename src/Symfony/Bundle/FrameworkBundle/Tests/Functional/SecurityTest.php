@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class SecurityTest extends AbstractWebTestCase
 {
@@ -20,7 +20,7 @@ class SecurityTest extends AbstractWebTestCase
      */
     public function testLoginUser(string $username, array $roles, ?string $firewallContext)
     {
-        $user = new User($username, 'the-password', $roles);
+        $user = new InMemoryUser($username, 'the-password', $roles);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
 
         if (null === $firewallContext) {
@@ -45,7 +45,7 @@ class SecurityTest extends AbstractWebTestCase
 
     public function testLoginUserMultipleRequests()
     {
-        $user = new User('the-username', 'the-password', ['ROLE_FOO']);
+        $user = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
         $client->loginUser($user);
 
@@ -58,7 +58,7 @@ class SecurityTest extends AbstractWebTestCase
 
     public function testLoginInBetweenRequests()
     {
-        $user = new User('the-username', 'the-password', ['ROLE_FOO']);
+        $user = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
 
         $client->request('GET', '/main/user_profile');

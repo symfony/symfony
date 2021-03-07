@@ -2,7 +2,7 @@ security:
     enable_authenticator_manager: true
 
     password_hashers:
-        Symfony\Component\Security\Core\User\User: plaintext
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     providers:
         in_memory:

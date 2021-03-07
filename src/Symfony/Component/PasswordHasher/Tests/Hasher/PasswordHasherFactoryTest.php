@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class PasswordHasherFactoryTest extends TestCase
@@ -46,7 +46,7 @@ class PasswordHasherFactoryTest extends TestCase
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
 
-        $hasher = $factory->getPasswordHasher(new User('user', 'pass'));
+        $hasher = $factory->getPasswordHasher(new InMemoryUser('user', 'pass'));
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
@@ -65,10 +65,10 @@ class PasswordHasherFactoryTest extends TestCase
     public function testGetHasherConfiguredForConcreteClassWithService()
     {
         $factory = new PasswordHasherFactory([
-            'Symfony\Component\Security\Core\User\User' => new MessageDigestPasswordHasher('sha1'),
+            'Symfony\Component\Security\Core\User\InMemoryUser' => new MessageDigestPasswordHasher('sha1'),
         ]);
 
-        $hasher = $factory->getPasswordHasher(new User('user', 'pass'));
+        $hasher = $factory->getPasswordHasher(new InMemoryUser('user', 'pass'));
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }

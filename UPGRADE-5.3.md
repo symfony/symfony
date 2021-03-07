@@ -87,6 +87,10 @@ Routing
 Security
 --------
 
+ * Deprecate class `User`, use `InMemoryUser` or your own implementation instead.
+   If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing
+   them in your own user class, as they are not part of the `InMemoryUser` API
+ * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
  * Deprecate `UserInterface::getPassword()`
    If your `getPassword()` method does not return `null` (i.e. you are using password-based authentication),
    you should implement `PasswordAuthenticatedUserInterface`.

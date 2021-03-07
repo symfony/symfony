@@ -20,6 +20,9 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class UserCheckerTest extends TestCase
 {
     public function testCheckPostAuthNotAdvancedUserInterface()

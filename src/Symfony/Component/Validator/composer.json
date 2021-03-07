@@ -37,7 +37,7 @@
         "symfony/translation": "^4.2",
         "doctrine/annotations": "^1.10.4",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "^2.1.10"
+        "egulias/email-validator": "^2.1.10|^3"
     },
     "conflict": {
         "doctrine/lexer": "<1.0.2",

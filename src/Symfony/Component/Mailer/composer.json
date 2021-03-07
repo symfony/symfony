@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "egulias/email-validator": "^2.1.10",
+        "egulias/email-validator": "^2.1.10|^3",
         "psr/log": "~1.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/mime": "^5.2",

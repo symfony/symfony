@@ -23,7 +23,7 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "egulias/email-validator": "^2.1.10",
+        "egulias/email-validator": "^2.1.10|^3.1",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.1",
@@ -31,6 +31,7 @@
         "symfony/serializer": "^5.2"
     },
     "conflict": {
+        "egulias/email-validator": "~3.0.0",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/mailer": "<4.4"

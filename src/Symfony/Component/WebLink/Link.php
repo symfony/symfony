@@ -99,7 +99,6 @@ class Link implements EvolvableLinkInterface
     {
         $that = clone $this;
         $that->href = $href;
-        $that->templated = $this->hrefIsTemplated($href);
 
         return $that;
     }

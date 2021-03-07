@@ -48,7 +48,7 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
 
     public function __call(string $method, array $args)
     {
-        if ('onKernelRequest' !== $method && 'onKernelRequest' !== strtolower($method)) {
+        if ('onKernelRequest' !== $method && 'onkernelrequest' !== strtolower($method)) {
             throw new \Error(sprintf('Error: Call to undefined method "%s::%s()".', static::class, $method));
         }
 

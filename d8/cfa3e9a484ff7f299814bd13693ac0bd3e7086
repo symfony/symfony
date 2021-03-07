@@ -1,0 +1,171 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-02T20:00:08Z
+
+I need a little help with that test:
+
+https://github.com/symfony/symfony/blob/04c67e61e2fd3a6323c403e148304fb445f93f23/src/Symfony/Component/Mime/Tests/Header/IdentificationHeaderTest.php#L109-L118
+
+During the construction of `IdentificationHeader` the email validator is called. After upgrading the library to v3, all of the special characters used here are rejected by the validator: `+&%$`. I am not familiar with the spec, but my gut feeling is that neither of those characters should be part of a domain name.
+
+@fabpot you are the author of that test: Do you recall what is tested here and have an idea how we can proceed with the changed behavior of `egulias/email-validator`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-03T09:01:29Z
+
+> I need a little help with that test:
+>
+> https://github.com/symfony/symfony/blob/04c67e61e2fd3a6323c403e148304fb445f93f23/src/Symfony/Component/Mime/Tests/Header/IdentificationHeaderTest.php#L109-L118
+>
+> During the construction of `IdentificationHeader` the email validator is called. After upgrading the library to v3, all of the special characters used here are rejected by the validator: `+&%$`. I am not familiar with the spec, but my gut feeling is that neither of those characters should be part of a domain name.
+>
+> @fabpot you are the author of that test: Do you recall what is tested here and have an idea how we can proceed with the changed behavior of `egulias/email-validator`?
+
+But these characters are valid (see https://tools.ietf.org/html/rfc2822#section-3.2.4). If looks like a wrong change in email validator.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-01-03T13:04:16Z
+
+Indeed, when validating strictly according to the RFC, these characters should be allowed if I read the RFC correctly. Friendly ping to @egulias.
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-01-03T23:32:08Z
+
+Hello there,
+thanks for the ping, happy to help.
+As you can read in the [breacking changes for v3](https://github.com/egulias/EmailValidator/blob/3.x/CHANGELOG.md#breacking-changes) is that domain will be enforced towards RFC1035 ("internet domains" RFC). The reasons for this change are that email RFCs are very broad in the requirement for the domain part (chich caused a series of "user" complications" and "suggest" to follow RFC1035 and the fact that in Real Life® SMTP follow RFC1035.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-01-04T07:46:16Z
+
+@egulias Thanks for the comment. The main "issue" here is that we are validating a message id/reference/reply to and for those, I'm not sure we should use RFC 1035. At least, that would be a BC break (which we can assume for good reasons). Is there a way to keep validating according to the original spec?
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-01-04T21:54:50Z
+
+Hi @fabpot ,
+what would solve the issue would be adding support for it, as suggested in https://github.com/egulias/EmailValidator/pull/193#issuecomment-480439157 ; RFC2822 is deprecated in favour of RFC5322 with the described behaviour in the issue.
+
+To solve this two options come to my mind:
+
+a) is for Symfony to add a custom validator for it implementing the interface.
+
+b) is to make it the next feature to be added. I can work on my own here but it will take time; some help would be very much appreciated to speed it up.
+
+Happy to hear more possibilites.
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-01-17T14:25:20Z
+
+Hi @fabpot @derrabus ,
+To better address the validations of ID & mailbox (https://tools.ietf.org/html/rfc2822#section-3.4), can you point me to how this is used and were? I'm aware of Symfony's Email component and the validator, but it would be of great help to know where to look.
+While mailbox has some patterns to distinguish from an email address, id has some challenges.
+I'm pondering adding an specific method for validating them or having the capability of distinguishing from the pattern.
+Which would better help you?
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-01-30T18:38:00Z
+
+Ok. So did a research on how the validator is being used in Symfony & Swiftmailer.
+
+My conclusion is as follows:
+Symfony (and Swiftmailer for that matter) are using the EmailValidator for validating a Header field "message-id" ([section 3.6.4](https://tools.ietf.org/html/rfc2822#section-3.6.4)) which has a different syntaxis **for the right side after the @ sign** than "addr-spec" ([section 3.4.1](https://tools.ietf.org/html/rfc2822#section-3.4.1)) which is the commonly known as "email address".
+
+This was possible in version <3 of the EmailValidator because of the interpretation done of the RFC.
+Version 3 follows the suggestions of the RFC and user land feedback, by following RFC 1035 (see below for details), breaking that use case.
+
+The solution for this, then, is to create a new validation for "message-id" and then addapt `Address` to it.
+The change would be in [Address#L54](https://github.com/symfony/symfony/blob/494ef421c554a78b38c6779c4b7deb9a20d89923/src/Symfony/Component/Mime/Address.php#L54):
+
+```php
+if (!self::$validator->isValid($this->address, new MessageIDValidation())) {
+```
+@fabpot @xabbuh & others, please let me know if this would work for you.
+
+### Details
+The exception bubbles from [Address](https://github.com/symfony/symfony/blob/494ef421c554a78b38c6779c4b7deb9a20d89923/src/Symfony/Component/Mime/Address.php#L55) in the Mime component, used from the `IdentificationHeader` when building from message IDs.
+
+Now, here's the thing. `message-id` has a different syntaxis for [id-right ](https://tools.ietf.org/html/rfc2822#section-3.6.4) (not a "domain" as will see) than [addr-spec](https://tools.ietf.org/html/rfc2822#section-3.4.1) has for it. In fact, despite previous use-case seeming to validate, it was actually allowing for non-compliant `id-right` elemtns, like `[` or `CFWS`.
+
+**id-right**
+> dot-atom-text / no-fold-literal / obs-id-right
+
+To note that `obs-id-right` in [4.5.4](https://tools.ietf.org/html/rfc2822#section-4.5.4) is defined as `domain`
+
+**domain syntaxis**
+
+> domain          =       dot-atom / domain-literal / obs-domain
+
+> domain-literal  =       [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
+
+> dcontent        =       dtext / quoted-pair
+
+> dtext           =       NO-WS-CTL /     ; Non white space controls
+>  %d33-90 /       ; The rest of the US-ASCII
+>  %d94-126        ;  characters not including "[",
+>                                       ;  "]", or "\"
+
+And at the ends, specifies:
+
+   > The domain portion identifies the point to which the mail is
+   delivered. In the dot-atom form, this is interpreted as an Internet
+   domain name (either a host name or a mail exchanger name) as
+   described in [STD3, STD13, STD14].  In the domain-literal form, the
+   domain is interpreted as the literal Internet address of the
+   particular host.  In both cases, how addressing is used and how
+   messages are transported to a particular host is covered in the mail
+   transport document [RFC2821].  These mechanisms are outside of the
+   scope of this document.
+
+[STD13 ](https://tools.ietf.org/html/rfc2822#ref-STD13) is RFC1035
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-02-21T21:48:23Z
+
+Hi there!
+I've done some progress and I have a working solution. I should be able to release v3.1 in a couple of weeks.
+It will require the change in the line mentioned in https://github.com/symfony/symfony/pull/39685#issuecomment-770261211
+The change would be in [Address#L54](https://github.com/symfony/symfony/blob/494ef421c554a78b38c6779c4b7deb9a20d89923/src/Symfony/Component/Mime/Address.php#L54):
+
+```php
+if (!self::$validator->isValid($this->address, new MessageIDValidation())) {
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-22T12:31:09Z
+
+@egulias That's great news, thank you. Give me a ping as soon as we can test the new validator. I'll update this PR then.
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-02-28T17:12:04Z
+
+PR ready @derrabus https://github.com/egulias/EmailValidator/pull/290 , will give it a week and merge next one.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-02-28T23:03:17Z
+
+@egulias This PR now runs against your feature branch and the tests are green now. Apparently, your changes work for us. 🎉
+
+---------------------------------------------------------------------------
+
+by egulias at 2021-03-07T14:54:39Z
+
+@derrabus [release ](https://github.com/egulias/EmailValidator/releases/tag/3.1.0)done! You can continue now, let me know when it is done!
+Thanks for your help!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-07T15:21:34Z
+
+Thank you, the PR is ready now. 🚀

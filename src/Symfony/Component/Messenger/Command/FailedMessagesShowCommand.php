@@ -19,8 +19,11 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -29,6 +32,15 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:show';
     protected static $defaultDescription = 'Show one or more messages from the failure transport';
+
+    private $phpSerializer;
+
+    public function __construct(string $receiverName, ReceiverInterface $receiver, ?PhpSerializer $phpSerializer = null)
+    {
+        parent::__construct($receiverName, $receiver);
+
+        $this->phpSerializer = $phpSerializer;
+    }
 
     /**
      * {@inheritdoc}
@@ -84,27 +96,33 @@ EOF
         $envelopes = $receiver->all($max);
 
         $rows = [];
-        foreach ($envelopes as $envelope) {
-            /** @var RedeliveryStamp|null $lastRedeliveryStamp */
-            $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
-            /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
-            $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-            $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
+        try {
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation();
 
-            $errorMessage = '';
-            if (null !== $lastErrorDetailsStamp) {
-                $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
-                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
+            foreach ($envelopes as $envelope) {
+                /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+                $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
+                /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
+                $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+                $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
+
+                $errorMessage = '';
+                if (null !== $lastErrorDetailsStamp) {
+                    $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
+                } elseif (null !== $lastRedeliveryStampWithException) {
+                    // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
+                    $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
+                }
+
+                $rows[] = [
+                    $this->getMessageId($envelope),
+                    \get_class($envelope->getMessage()),
+                    null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                    $errorMessage,
+                ];
             }
-
-            $rows[] = [
-                $this->getMessageId($envelope),
-                \get_class($envelope->getMessage()),
-                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
-                $errorMessage,
-            ];
+        } finally {
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation(false);
         }
 
         if (0 === \count($rows)) {
@@ -126,17 +144,29 @@ EOF
     {
         /** @var ListableReceiverInterface $receiver */
         $receiver = $this->getReceiver();
-        $envelope = $receiver->find($id);
+
+        try {
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation();
+
+            $envelope = $receiver->find($id);
+        } finally {
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation(false);
+        }
+
         if (null === $envelope) {
             throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
         }
 
         $this->displaySingleMessage($envelope, $io);
 
-        $io->writeln([
-            '',
-            sprintf(' Run <comment>messenger:failed:retry %s</comment> to retry this message.', $id),
-            sprintf(' Run <comment>messenger:failed:remove %s</comment> to delete it.', $id),
-        ]);
+        $io->newLine();
+
+        if ($envelope->last(MessageDecodingFailedStamp::class)) {
+            $io->writeln(' This message could not be retried.');
+        } else {
+            $io->writeln(sprintf(' Run <comment>messenger:failed:retry %s</comment> to retry this message.', $id));
+        }
+
+        $io->writeln(sprintf(' Run <comment>messenger:failed:remove %s</comment> to delete it.', $id));
     }
 }

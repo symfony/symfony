@@ -22,11 +22,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
-use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Worker;
 
 /**
@@ -40,12 +41,14 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
     private $eventDispatcher;
     private $messageBus;
     private $logger;
+    private $phpSerializer;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null)
+    public function __construct(string $receiverName, ReceiverInterface $receiver, MessageBusInterface $messageBus, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, ?PhpSerializer $phpSerializer = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->messageBus = $messageBus;
         $this->logger = $logger;
+        $this->phpSerializer = $phpSerializer;
 
         parent::__construct($receiverName, $receiver);
     }
@@ -130,23 +133,26 @@ EOF
             // to be temporarily "acked", even if the user aborts
             // handling the message
             while (true) {
-                $ids = [];
-                foreach ($receiver->all(1) as $envelope) {
-                    ++$count;
+                $envelopes = [];
 
-                    $id = $this->getMessageId($envelope);
-                    if (null === $id) {
-                        throw new LogicException(sprintf('The "%s" receiver is able to list messages by id but the envelope is missing the TransportMessageIdStamp stamp.', $this->getReceiverName()));
+                try {
+                    $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation();
+
+                    foreach ($receiver->all(1) as $envelope) {
+                        ++$count;
+
+                        $envelopes[] = $envelope;
                     }
-                    $ids[] = $id;
+                } finally {
+                    $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation(false);
                 }
 
                 // break the loop if all messages are consumed
-                if (0 === \count($ids)) {
+                if (0 === \count($envelopes)) {
                     break;
                 }
 
-                $this->retrySpecificIds($ids, $io, $shouldForce);
+                $this->retrySpecificEnvelop($envelopes, $io, $shouldForce);
             }
         } else {
             // get() and ask messages one-by-one
@@ -168,6 +174,10 @@ EOF
 
             $this->displaySingleMessage($envelope, $io);
 
+            if ($envelope->last(MessageDecodingFailedStamp::class)) {
+                throw new \RuntimeException(sprintf('This message with id "%s" could not decoded. It can only be shown or removed.', $this->getMessageId($envelope) ?? 'NULL'));
+            }
+
             $shouldHandle = $shouldForce || $io->confirm('Do you want to retry (yes) or delete this message (no)?');
 
             if ($shouldHandle) {
@@ -187,9 +197,11 @@ EOF
         );
 
         try {
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation();
+
             $worker->run();
         } finally {
-            $this->eventDispatcher->removeListener(WorkerMessageReceivedEvent::class, $listener);
+            $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation(false);
         }
 
         return $count;
@@ -204,11 +216,28 @@ EOF
         }
 
         foreach ($ids as $id) {
-            $envelope = $receiver->find($id);
+            try {
+                $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation();
+
+                $envelope = $receiver->find($id);
+            } finally {
+                $this->phpSerializer && $this->phpSerializer->enableClassNotFoundCreation(false);
+            }
+
             if (null === $envelope) {
                 throw new RuntimeException(sprintf('The message "%s" was not found.', $id));
             }
 
+            $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
+            $this->runWorker($singleReceiver, $io, $shouldForce);
+        }
+    }
+
+    private function retrySpecificEnvelop(array $envelopes, SymfonyStyle $io, bool $shouldForce)
+    {
+        $receiver = $this->getReceiver();
+
+        foreach ($envelopes as $envelope) {
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
             $this->runWorker($singleReceiver, $io, $shouldForce);
         }

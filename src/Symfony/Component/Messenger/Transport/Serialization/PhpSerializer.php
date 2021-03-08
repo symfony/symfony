@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
@@ -20,6 +21,14 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
  */
 class PhpSerializer implements SerializerInterface
 {
+    private static $classNotFoundDetected = false;
+    private $createClassNotFound = false;
+
+    public function enableClassNotFoundCreation(bool $enable = true): void
+    {
+        $this->createClassNotFound = $enable;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -56,10 +65,17 @@ class PhpSerializer implements SerializerInterface
         ];
     }
 
-    private function safelyUnserialize(string $contents)
+    private function safelyUnserialize(string $contents): Envelope
     {
         $signalingException = new MessageDecodingFailedException(sprintf('Could not decode message using PHP serialization: %s.', $contents));
-        $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
+
+        if ($this->createClassNotFound) {
+            self::$classNotFoundDetected = false;
+            $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallbackWithClassCreation');
+        } else {
+            $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
+
+        }
         $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
             if (__FILE__ === $file) {
                 throw $signalingException;
@@ -69,13 +85,18 @@ class PhpSerializer implements SerializerInterface
         });
 
         try {
-            $meta = unserialize($contents);
+            /** @var Envelope */
+            $envelope = unserialize($contents);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
 
-        return $meta;
+        if (self::$classNotFoundDetected) {
+            $envelope = $envelope->with(new MessageDecodingFailedStamp());
+        }
+
+        return $envelope;
     }
 
     /**
@@ -84,5 +105,29 @@ class PhpSerializer implements SerializerInterface
     public static function handleUnserializeCallback($class)
     {
         throw new MessageDecodingFailedException(sprintf('Message class "%s" not found during decoding.', $class));
+    }
+
+    /**
+     * @internal
+     */
+    public function handleUnserializeCallbackWithClassCreation($class)
+    {
+        self::$classNotFoundDetected = true;
+
+        $parts = explode('\\', $class);
+        $class = array_pop($parts);
+        $namespace = implode('\\', $parts);
+        $code = <<<EOPHP
+            class $class
+            {
+                private \$__WARNING__ = '⚠⚠ WARNING This class could not be unserialized. A mock has been created on the fly. ⚠⚠';
+            }
+        EOPHP;
+
+        if ($namespace) {
+            eval("namespace $namespace { $code };");
+        } else {
+            eval($code);
+        }
     }
 }

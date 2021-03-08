@@ -17,6 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
+use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -72,6 +73,8 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
         /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
         $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
+        /** @var MessageDecodingFailedStamp|null $lastMessageDecodingFailedStamp */
+        $lastMessageDecodingFailedStamp = $envelope->last(MessageDecodingFailedStamp::class);
         $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
         $rows = [
@@ -127,6 +130,9 @@ abstract class AbstractFailedMessagesCommand extends Command
 
         if ($io->isVeryVerbose()) {
             $io->title('Message:');
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded. See below an APPROXIMATIVE representation of the class.');
+            }
             $dump = new Dumper($io, null, $this->createCloner());
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
@@ -138,6 +144,9 @@ abstract class AbstractFailedMessagesCommand extends Command
             }
             $io->writeln(null === $flattenException ? '(no data)' : $dump($flattenException));
         } else {
+            if (null !== $lastMessageDecodingFailedStamp) {
+                $io->error('The message could not be decoded.');
+            }
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }
     }

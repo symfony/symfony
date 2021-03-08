@@ -202,18 +202,11 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
 
-    public function testJsonEncodeFlags()
-    {
-        $response = new JsonResponse('<>\'&"');
-
-        $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
-    }
-
     public function testGetEncodingOptions()
     {
         $response = new JsonResponse();
 
-        $this->assertEquals(\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT, $response->getEncodingOptions());
+        $this->assertEquals(0, $response->getEncodingOptions());
     }
 
     public function testSetEncodingOptions()

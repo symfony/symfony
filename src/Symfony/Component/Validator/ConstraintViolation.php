@@ -100,7 +100,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessageTemplate()
     {
-        return $this->messageTemplate;
+        return (string) $this->messageTemplate;
     }
 
     /**

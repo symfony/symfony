@@ -29,7 +29,7 @@ class JsonResponse extends Response
 
     public const DEFAULT_ENCODING_OPTIONS = 0;
 
-    protected $encodingOptions = 0;
+    protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
      * @param mixed $data    The response data

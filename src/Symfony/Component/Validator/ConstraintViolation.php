@@ -140,7 +140,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getPropertyPath()
     {
-        return $this->propertyPath;
+        return (string) $this->propertyPath;
     }
 
     /**

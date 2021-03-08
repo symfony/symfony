@@ -138,9 +138,9 @@
         "symfony/phpunit-bridge": "^5.2",
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "twig/cssinliner-extra": "^2.12",
-        "twig/inky-extra": "^2.12",
-        "twig/markdown-extra": "^2.12"
+        "twig/cssinliner-extra": "^2.12|^3",
+        "twig/inky-extra": "^2.12|^3",
+        "twig/markdown-extra": "^2.12|^3"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",

@@ -45,9 +45,9 @@
         "symfony/expression-language": "^3.4|^4.0|^5.0",
         "symfony/web-link": "^4.4|^5.0",
         "symfony/workflow": "^4.3|^5.0",
-        "twig/cssinliner-extra": "^2.12",
-        "twig/inky-extra": "^2.12",
-        "twig/markdown-extra": "^2.12"
+        "twig/cssinliner-extra": "^2.12|^3",
+        "twig/inky-extra": "^2.12|^3",
+        "twig/markdown-extra": "^2.12|^3"
     },
     "conflict": {
         "symfony/console": "<3.4",

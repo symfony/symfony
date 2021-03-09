@@ -1573,13 +1573,16 @@ class FrameworkExtension extends Extension
         $magicMethods |= $config['magic_get'] ? PropertyAccessor::MAGIC_GET : 0;
         $magicMethods |= $config['magic_set'] ? PropertyAccessor::MAGIC_SET : 0;
 
+        $throw = PropertyAccessor::DO_NOT_THROW;
+        $throw |= $config['throw_exception_on_invalid_index'] ? PropertyAccessor::THROW_ON_INVALID_INDEX : 0;
+        $throw |= $config['throw_exception_on_invalid_property_path'] ? PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH : 0;
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $magicMethods)
-            ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
-            ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
-            ->replaceArgument(4, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
-            ->replaceArgument(5, new Reference(PropertyWriteInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->replaceArgument(1, $throw)
+            ->replaceArgument(3, new Reference(PropertyReadInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->replaceArgument(4, new Reference(PropertyWriteInfoExtractorInterface::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ;
     }
 

@@ -152,6 +152,7 @@ PhpUnitBridge
 PropertyAccess
 --------------
 
+ * Drop support for booleans as the second argument of `PropertyAccessor::__construct()`, pass a combination of bitwise flags instead.
  * Dropped support for booleans as the first argument of `PropertyAccessor::__construct()`.
    Pass a combination of bitwise flags instead.
 

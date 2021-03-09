@@ -283,6 +283,16 @@ class PropertyAccessorBuilder
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicMethods, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool, $this->throwExceptionOnInvalidPropertyPath, $this->readInfoExtractor, $this->writeInfoExtractor);
+        $throw = PropertyAccessor::DO_NOT_THROW;
+
+        if ($this->throwExceptionOnInvalidIndex) {
+            $throw |= PropertyAccessor::THROW_ON_INVALID_INDEX;
+        }
+
+        if ($this->throwExceptionOnInvalidPropertyPath) {
+            $throw |= PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH;
+        }
+
+        return new PropertyAccessor($this->magicMethods, $throw, $this->cacheItemPool, $this->readInfoExtractor, $this->writeInfoExtractor);
     }
 }

@@ -1287,6 +1287,20 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
+    public function testSubmitSingleExpandedClearMissingFalse()
+    {
+        $form = $this->factory->create(self::TESTED_TYPE, 'foo', [
+            'choices' => [
+                'foo label' => 'foo',
+                'bar label' => 'bar',
+            ],
+            'expanded' => true,
+        ]);
+        $form->submit('bar', false);
+
+        $this->assertSame('bar', $form->getData());
+    }
+
     public function testSubmitMultipleExpanded()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

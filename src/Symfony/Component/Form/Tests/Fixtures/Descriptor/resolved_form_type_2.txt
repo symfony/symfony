@@ -19,6 +19,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   disabled                      
   empty_data                    
   error_bubbling                
+  form_attr                     
   getter                        
   help                          
   help_attr                     

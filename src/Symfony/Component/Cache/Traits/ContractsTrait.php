@@ -57,7 +57,7 @@ trait ContractsTrait
 
         static $setMetadata;
 
-        $setMetadata = $setMetadata ?? \Closure::bind(
+        $setMetadata ?? $setMetadata = \Closure::bind(
             static function (CacheItem $item, float $startTime, ?array &$metadata) {
                 if ($item->expiry > $endTime = microtime(true)) {
                     $item->newMetadata[CacheItem::METADATA_EXPIRY] = $metadata[CacheItem::METADATA_EXPIRY] = $item->expiry;

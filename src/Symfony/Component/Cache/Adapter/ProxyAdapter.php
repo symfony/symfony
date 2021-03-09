@@ -28,22 +28,26 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     use ContractsTrait;
     use ProxyTrait;
 
-    private $namespace;
+    private $namespace = '';
     private $namespaceLen;
-    private $createCacheItem;
-    private $setInnerItem;
     private $poolHash;
     private $defaultLifetime;
+
+    private static $createCacheItem;
+    private static $setInnerItem;
 
     public function __construct(CacheItemPoolInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->pool = $pool;
         $this->poolHash = $poolHash = spl_object_hash($pool);
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace);
+        if ('' !== $namespace) {
+            \assert('' !== CacheItem::validateKey($namespace));
+            $this->namespace = $namespace;
+        }
         $this->namespaceLen = \strlen($namespace);
         $this->defaultLifetime = $defaultLifetime;
-        $this->createCacheItem = \Closure::bind(
-            static function ($key, $innerItem) use ($poolHash) {
+        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
+            static function ($key, $innerItem, $poolHash) {
                 $item = new CacheItem();
                 $item->key = $key;
 
@@ -74,7 +78,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             null,
             CacheItem::class
         );
-        $this->setInnerItem = \Closure::bind(
+        self::$setInnerItem ?? self::$setInnerItem = \Closure::bind(
             /**
              * @param array $item A CacheItem cast to (array); accessing protected properties requires adding the "\0*\0" PHP prefix
              */
@@ -105,9 +109,9 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
 
         return $this->pool->get($this->getId($key), function ($innerItem, bool &$save) use ($key, $callback) {
-            $item = ($this->createCacheItem)($key, $innerItem);
+            $item = (self::$createCacheItem)($key, $innerItem, $this->poolHash);
             $item->set($value = $callback($item, $save));
-            ($this->setInnerItem)($innerItem, (array) $item);
+            (self::$setInnerItem)($innerItem, (array) $item);
 
             return $value;
         }, $beta, $metadata);
@@ -118,10 +122,9 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
      */
     public function getItem($key)
     {
-        $f = $this->createCacheItem;
         $item = $this->pool->getItem($this->getId($key));
 
-        return $f($key, $item);
+        return (self::$createCacheItem)($key, $item, $this->poolHash);
     }
 
     /**
@@ -233,33 +236,32 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         } elseif ($this->pool instanceof AdapterInterface) {
             // this is an optimization specific for AdapterInterface implementations
             // so we can save a round-trip to the backend by just creating a new item
-            $f = $this->createCacheItem;
-            $innerItem = $f($this->namespace.$item["\0*\0key"], null);
+            $innerItem = (self::$createCacheItem)($this->namespace.$item["\0*\0key"], null, $this->poolHash);
         } else {
             $innerItem = $this->pool->getItem($this->namespace.$item["\0*\0key"]);
         }
 
-        ($this->setInnerItem)($innerItem, $item);
+        (self::$setInnerItem)($innerItem, $item);
 
         return $this->pool->$method($innerItem);
     }
 
     private function generateItems(iterable $items)
     {
-        $f = $this->createCacheItem;
+        $f = self::$createCacheItem;
 
         foreach ($items as $key => $item) {
             if ($this->namespaceLen) {
                 $key = substr($key, $this->namespaceLen);
             }
 
-            yield $key => $f($key, $item);
+            yield $key => $f($key, $item, $this->poolHash);
         }
     }
 
     private function getId($key): string
     {
-        CacheItem::validateKey($key);
+        \assert('' !== CacheItem::validateKey($key));
 
         return $this->namespace.$key;
     }

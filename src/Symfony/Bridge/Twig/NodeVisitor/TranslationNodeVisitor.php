@@ -208,7 +208,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $this->getReadVariablesFromNode($argument);
     }
 
-    private function getReadVariablesFromNode(Node $node): ?array
+    private function getReadVariablesFromNode(Node $node): array
     {
         if (!empty($node)) {
             $variables = [];

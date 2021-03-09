@@ -24,6 +24,7 @@ use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
+use Symfony\Component\Translation\MetadataAwareInterface;
 use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
@@ -242,10 +243,12 @@ EOF
                 $result->replace($allIntlMessages + $newMessages, $intlDomain);
 
                 // Move new metadata
-                foreach ($newMessages as $key => $message) {
-                    if (null !== $extractedCatalogue->getMetadata($key, $domain)) {
-                        $result->setMetadata($key, $extractedCatalogue->getMetadata($key, $domain), $intlDomain);
-                        $extractedCatalogue->deleteMetadata($key, $domain);
+                if ($result instanceof MetadataAwareInterface) {
+                    foreach ($newMessages as $key => $message) {
+                        if (null !== $extractedCatalogue->getMetadata($key, $domain)) {
+                            $result->setMetadata($key, $extractedCatalogue->getMetadata($key, $domain), $intlDomain);
+                            $extractedCatalogue->deleteMetadata($key, $domain);
+                        }
                     }
                 }
             }

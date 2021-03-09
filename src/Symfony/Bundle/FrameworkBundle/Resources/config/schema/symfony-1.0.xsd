@@ -171,7 +171,7 @@
             <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="enabled-locale" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="pseudo_localization" type="pseudo_localization" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="pseudo-localization" type="pseudo_localization" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />
@@ -182,7 +182,7 @@
 
     <xsd:complexType name="pseudo_localization">
         <xsd:sequence>
-            <xsd:element name="localizable_html_attribute" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="localizable-html-attribute" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="accents" type="xsd:boolean" />

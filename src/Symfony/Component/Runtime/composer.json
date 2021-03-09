@@ -24,7 +24,10 @@
         "symfony/console": "^4.4|^5",
         "symfony/dotenv": "^5.1",
         "symfony/http-foundation": "^4.4|^5",
-        "symfony/http-kernel": "^4.4|^5"
+        "symfony/http-kernel": "^4.4|^5",
+        "psr/http-server-handler": "^1.0",
+        "nyholm/psr7-server": "^1.0",
+        "laminas/laminas-httphandlerrunner": "^1.3"
     },
     "conflict": {
         "symfony/dotenv": "<5.1"

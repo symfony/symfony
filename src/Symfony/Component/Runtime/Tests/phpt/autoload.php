@@ -12,7 +12,8 @@ if (file_exists(dirname(__DIR__, 2).'/vendor/autoload.php')) {
     }
 
     $app = require $_SERVER['SCRIPT_FILENAME'];
-    $runtime = new SymfonyRuntime($_SERVER['APP_RUNTIME_OPTIONS']);
+    $runtimeClass = $_SERVER['APP_RUNTIME'] ?? SymfonyRuntime::class;
+    $runtime = new $runtimeClass($_SERVER['APP_RUNTIME_OPTIONS']);
     [$app, $args] = $runtime->getResolver($app)->resolve();
     exit($runtime->getRunner($app(...$args))->run());
 }

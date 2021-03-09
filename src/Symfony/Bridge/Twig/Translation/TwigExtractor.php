@@ -81,9 +81,10 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
             $message = trim($extractedMessage[0]);
             $domain = $extractedMessage[1] ?: $this->defaultDomain;
 
-            $catalogue->set($message, $this->prefix.trim($extractedMessage[0]), $domain);
+            $catalogue->set($message, $this->prefix.$message, $domain);
 
-            if (!empty($extractedMessage[2])) {
+            // Are there any variables available for the current message?
+            if (\count($extractedMessage[2]) > 0) {
                 $metadata = $catalogue->getMetadata($message, $domain);
                 $variablesNote = [
                     'category' => 'symfony-extractor-variables',

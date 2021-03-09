@@ -30,6 +30,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
     public const UNDEFINED_DOMAIN = '_undefined';
 
     private $enabled = false;
+
     /**
      * This class cannot read nodes backwards.
      * We need a way to track when we encounter a "|trans()" filter containing
@@ -37,6 +38,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
      * as if it was used alone.
      */
     private $skipTFunctionAfterFilter = false;
+
     /**
      * This array stores found messages.
      *

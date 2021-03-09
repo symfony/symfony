@@ -350,7 +350,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
                     $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];
 
-                    if (!empty($variables)) {
+                    if (\count($variables) > 0) {
                         $variablesNote = [
                                 'category' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY,
                                 'content' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_PREFIX.implode(', ', $variables),

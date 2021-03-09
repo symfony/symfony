@@ -195,6 +195,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return null;
     }
 
+    /**
+     * Extracts variable names from a @Node containing all arguments passed to
+     * a Twig function/filter.
+     */
     private function getReadVariablesFromArguments(Node $arguments, int $index): array
     {
         if ($arguments->hasNode('vars')) {
@@ -208,24 +212,32 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         return $this->getReadVariablesFromNode($argument);
     }
 
+    /**
+     * Extracts variable names from a @Node representing the array of
+     * parameters passed to the translation function/filter.
+     */
     private function getReadVariablesFromNode(Node $node): array
     {
-        if (!empty($node)) {
-            $variables = [];
-
-            foreach ($node as $key => $variable) {
-                // Odd children are variable names, even ones are values
-                if (1 == $key % 2) {
-                    continue;
-                }
-
-                $variables[] = $variable->getAttribute('value');
-            }
-
-            return $variables;
+        if (\count($node) <= 0) {
+            return [];
         }
 
-        return [];
+        $variables = [];
+        $isVariableName = true;
+
+        foreach ($node as $parameterToken) {
+            /*
+             * Variable names and values are direct children of the parent node (e.g. ['var1', 'value1', 'var2',
+             * 'value2', 'var3', 'value3']), so we can get all names by skipping the values every two cycles.
+             */
+            if ($isVariableName ^= 1) {
+                continue;
+            }
+
+            $variables[] = $parameterToken->getAttribute('value');
+        }
+
+        return $variables;
     }
 
     private function getReadDomainFromArguments(Node $arguments, int $index): ?string

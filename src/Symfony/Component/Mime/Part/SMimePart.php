@@ -56,6 +56,10 @@ class SMimePart extends AbstractPart
             return $this->body;
         }
 
+        if ($this->body instanceof \Generator && !$this->body->valid()) {
+            return '';
+        }
+
         $body = '';
         foreach ($this->body as $chunk) {
             $body .= $chunk;
@@ -69,6 +73,12 @@ class SMimePart extends AbstractPart
     {
         if (\is_string($this->body)) {
             yield $this->body;
+
+            return;
+        }
+
+        if ($this->body instanceof \Generator && !$this->body->valid()) {
+            yield from [];
 
             return;
         }

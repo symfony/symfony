@@ -165,7 +165,7 @@ abstract class AbstractOperation implements OperationInterface
 
                 // Get target variables note
                 foreach ($this->target->getMetadata($id, $targetDomain)['notes'] ?? [] as $note) {
-                    if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
+                    if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
                         $variablesNote = $note;
 
                         break;
@@ -176,7 +176,7 @@ abstract class AbstractOperation implements OperationInterface
                     // Update old variables note (if any)
                     if (isset($sourceMetadata['notes'])) {
                         foreach ($sourceMetadata['notes'] as $index => $note) {
-                            if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
+                            if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
                                 $sourceMetadata['notes'][$index] = $variablesNote;
 
                                 break;

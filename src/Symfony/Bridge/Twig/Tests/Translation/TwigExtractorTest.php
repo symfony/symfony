@@ -22,9 +22,6 @@ use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
-    private const VARIABLES_NOTE_CATEGORY = 'symfony-extractor-variables';
-    private const VARIABLES_NOTE_PREFIX = 'Available variables: ';
-
     /**
      * @dataProvider getExtractData
      */
@@ -58,8 +55,8 @@ class TwigExtractorTest extends TestCase
             // Check variables
             if ($notes = $catalogue->getMetadata($key, $data[0])['notes'] ?? null) {
                 foreach ($notes as $note) {
-                    if (isset($note['category']) && self::VARIABLES_NOTE_CATEGORY === $note['category']) {
-                        $this->assertEquals(self::VARIABLES_NOTE_PREFIX.$data[1], $note['content']);
+                    if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
+                        $this->assertEquals(MessageCatalogue::METADATA_AVAILABLE_VARIABLES_PREFIX.$data[1], $note['content']);
 
                         break;
                     }
@@ -76,7 +73,7 @@ class TwigExtractorTest extends TestCase
          *        1 => [
          *            'message_key' => [
          *                0 => 'domain',
-         *                1 => 'var1, var2'|null, // Complete message is 'Available variables: var1, var2'
+         *                1 => 'var1, var2'|null, // Complete message is 'Variables: var1, var2'
          *                ...
          *            ]
          *        ],

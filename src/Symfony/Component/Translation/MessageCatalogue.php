@@ -19,6 +19,18 @@ use Symfony\Component\Translation\Exception\LogicException;
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
+    /**
+     * This metadata key is used to store a note containing available variables for each message
+     */
+    public const METADATA_AVAILABLE_VARIABLES_KEY = 'symfony-extractor-variables';
+
+    /**
+     * The comma-separated list of available variables is appended to this prefix.
+     *
+     * Example: "Variables: foo, bar"
+     */
+    public const METADATA_AVAILABLE_VARIABLES_PREFIX = 'Variables: ';
+
     private $messages = [];
     private $metadata = [];
     private $resources = [];

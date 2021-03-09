@@ -352,15 +352,15 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
                     if (!empty($variables)) {
                         $variablesNote = [
-                                'category' => 'symfony-extractor-variables',
-                                'content' => 'Available variables: '.implode(', ', $variables),
+                                'category' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY,
+                                'content' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_PREFIX.implode(', ', $variables),
                         ];
 
                         // Update old variables note (if any)
                         if (isset($metadata['notes'])) {
                             foreach ($metadata['notes'] as $index => $note) {
-                                if (isset($note['category']) && 'symfony-extractor-variables' === $note['category']) {
-                                    // Keep the higher variables count
+                                if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
+                                    // Keep the highest variables count
                                     if (\count($variables) > substr_count($note['content'], ',')) {
                                         $metadata['notes'][$index] = $variablesNote;
                                     }

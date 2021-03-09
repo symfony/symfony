@@ -46,7 +46,7 @@ class SMimePartTest extends TestCase
     {
         $iterable = $this->getIterable();
         // We using this method for close a generator which should throws: Exception : Cannot traverse an already closed generator
-        \iterator_to_array($iterable);
+        iterator_to_array($iterable);
 
         $p = new SMimePart($iterable, 'multipart', 'signed', []);
         $this->assertEquals('', $p->bodyToString());

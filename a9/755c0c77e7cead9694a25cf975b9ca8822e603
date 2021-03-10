@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by reypm at 2021-03-09T17:04:40Z
+
+@jderusse steps followed:
+
+ - `composer update "symfony/*" --with-all-dependencies`
+ - `bin/console clear:cache` && `bin/console clear:cache --env=test`
+
+```
+$ bin/console cache:clear
+
+ // Clearing the cache for the local environment with debug true
+
+ [OK] Cache for the "local" environment (debug=true) was successfully cleared.
+
+$ bin/console cache:clear --env=test
+
+ // Clearing the cache for the test environment with debug true
+
+ [OK] Cache for the "test" environment (debug=true) was successfully cleared.
+```
+
+> Note: I never get the error while clearing the cache but when running tests
+
+Results with the fix: no more issues
+
+![image](https://user-images.githubusercontent.com/627886/110508917-8d2c2c00-80cf-11eb-82d0-ec94f4577e03.png)
+
+---------------------------------------------------------------------------
+
+by michanismus at 2021-03-09T17:05:48Z
+
+@jderusse Works!
+
+---------------------------------------------------------------------------
+
+by fliespl at 2021-03-10T07:23:37Z
+
+@jderusse I can confirm that it works in our case as well.

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Attribute;
 
-trigger_deprecation('symfony/http-foundation', '5.3', sprintf('The "%s" class is deprecated.', NamespacedAttributeBag::class));
+trigger_deprecation('symfony/http-foundation', '5.3', 'The "%s" class is deprecated.', NamespacedAttributeBag::class);
 
 /**
  * This class provides structured storage of session attributes using

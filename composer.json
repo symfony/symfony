@@ -52,7 +52,8 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
-        "symfony/polyfill-uuid": "^1.15"
+        "symfony/polyfill-uuid": "^1.15",
+        "symfony/runtime": "self.version"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -193,6 +194,10 @@
                     "symfony/contracts": "2.4.x-dev"
                 }
             }
+        },
+        {
+            "type": "path",
+            "url": "src/Symfony/Component/Runtime"
         }
     ],
     "minimum-stability": "dev"

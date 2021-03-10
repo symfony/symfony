@@ -38,6 +38,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -78,6 +79,7 @@ return static function (ContainerConfigurator $container) {
                 service('argument_resolver'),
             ])
             ->tag('container.hot_path')
+            ->tag('container.preload', ['class' => SymfonyRuntime::class])
         ->alias(HttpKernelInterface::class, 'http_kernel')
 
         ->set('request_stack', RequestStack::class)

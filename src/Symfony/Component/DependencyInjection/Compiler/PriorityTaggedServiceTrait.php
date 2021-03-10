@@ -139,8 +139,12 @@ class PriorityTaggedServiceUtil
 
         $defaultIndex = $rm->invoke(null);
 
+        if (\is_int($defaultIndex)) {
+            $defaultIndex = (string) $defaultIndex;
+        }
+
         if (!\is_string($defaultIndex)) {
-            throw new InvalidArgumentException(implode(sprintf('return a string (got "%s")', get_debug_type($defaultIndex)), $message));
+            throw new InvalidArgumentException(implode(sprintf('return string|int (got "%s")', get_debug_type($defaultIndex)), $message));
         }
 
         return $defaultIndex;

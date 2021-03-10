@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedForInvalidDefaultMethodClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\IntTagClass;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
@@ -145,12 +146,15 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $definition->addTag('my_custom_tag', ['priority' => 100]);
         $definition->addTag('my_custom_tag', []);
 
+        $container->register('service3', IntTagClass::class)->addTag('my_custom_tag');
+
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
         $expected = [
             'bar_tab_class_with_defaultmethod' => new TypedReference('service2', BarTagClass::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
+            '10' => new TypedReference('service3', IntTagClass::class),
         ];
         $services = $priorityTaggedServiceTraitImplementation->test($tag, $container);
         $this->assertSame(array_keys($expected), array_keys($services));

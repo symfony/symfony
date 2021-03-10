@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -98,7 +98,7 @@ class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, Aut
         $user = $this->guard->getUser($credentials, $this->userProvider);
 
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($this->guard)));
+            throw new UserNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($this->guard)));
         }
 
         if (!$user instanceof UserInterface) {

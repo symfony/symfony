@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -20,8 +21,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -29,12 +31,24 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class DaoAuthenticationProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException(AuthenticationServiceException::class);
-        $provider = $this->getProvider('fabien');
+        $userProvider = $this->createMock(DaoAuthenticationProviderTest_UserProvider::class);
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->willReturn('fabien')
+        ;
+        $provider = $this->getProvider(null, null, null, $userProvider);
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
+
+        $this->expectDeprecation('Since symfony/security-core 5.3: Not implementing method "loadUserByIdentifier()" in user provider "'.get_debug_type($userProvider).'" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.');
 
         $method->invoke($provider, 'fabien', $this->getSupportedToken());
     }
@@ -44,12 +58,8 @@ class DaoAuthenticationProviderTest extends TestCase
      */
     public function testRetrieveUserWhenUsernameIsNotFoundWithLegacyEncoderFactory()
     {
-        $this->expectException(UsernameNotFoundException::class);
-        $userProvider = $this->createMock(UserProviderInterface::class);
-        $userProvider->expects($this->once())
-                     ->method('loadUserByUsername')
-                     ->willThrowException(new UsernameNotFoundException())
-        ;
+        $this->expectException(UserNotFoundException::class);
+        $userProvider = new InMemoryUserProvider();
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(EncoderFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
@@ -60,12 +70,8 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserWhenUsernameIsNotFound()
     {
-        $this->expectException(UsernameNotFoundException::class);
-        $userProvider = $this->createMock(UserProviderInterface::class);
-        $userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->willThrowException(new UsernameNotFoundException())
-        ;
+        $this->expectException(UserNotFoundException::class);
+        $userProvider = new InMemoryUserProvider();
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
@@ -77,9 +83,9 @@ class DaoAuthenticationProviderTest extends TestCase
     public function testRetrieveUserWhenAnExceptionOccurs()
     {
         $this->expectException(AuthenticationServiceException::class);
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         $userProvider->expects($this->once())
-                     ->method('loadUserByUsername')
+                     ->method('loadUserByIdentifier')
                      ->willThrowException(new \RuntimeException())
         ;
 
@@ -92,9 +98,9 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUserReturnsUserFromTokenOnReauthentication()
     {
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         $userProvider->expects($this->never())
-                     ->method('loadUserByUsername')
+                     ->method('loadUserByIdentifier')
         ;
 
         $user = new TestUser();
@@ -114,19 +120,13 @@ class DaoAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUser()
     {
-        $user = new TestUser();
-
-        $userProvider = $this->createMock(UserProviderInterface::class);
-        $userProvider->expects($this->once())
-                     ->method('loadUserByUsername')
-                     ->willReturn($user)
-        ;
+        $userProvider = new InMemoryUserProvider(['fabien' => []]);
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->createMock(UserCheckerInterface::class), 'key', $this->createMock(PasswordHasherFactoryInterface::class));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
-        $this->assertSame($user, $method->invoke($provider, 'fabien', $this->getSupportedToken()));
+        $this->assertEquals('fabien', $method->invoke($provider, 'fabien', $this->getSupportedToken())->getUserIdentifier());
     }
 
     public function testCheckAuthenticationWhenCredentialsAreEmpty()
@@ -323,14 +323,16 @@ class DaoAuthenticationProviderTest extends TestCase
         return $mock;
     }
 
-    protected function getProvider($user = null, $userChecker = null, $passwordHasher = null)
+    protected function getProvider($user = null, $userChecker = null, $passwordHasher = null, $userProvider = null)
     {
-        $userProvider = $this->createMock(PasswordUpgraderProvider::class);
-        if (null !== $user) {
-            $userProvider->expects($this->once())
-                         ->method('loadUserByUsername')
-                         ->willReturn($user)
-            ;
+        if (null === $userProvider) {
+            $userProvider = $this->createMock(PasswordUpgraderProvider::class);
+            if (null !== $user) {
+                $userProvider->expects($this->once())
+                             ->method('loadUserByIdentifier')
+                             ->willReturn($user)
+                ;
+            }
         }
 
         if (null === $userChecker) {
@@ -374,6 +376,11 @@ class TestUser implements UserInterface
         return 'jane_doe';
     }
 
+    public function getUserIdentifier(): string
+    {
+        return 'jane_doe';
+    }
+
     public function eraseCredentials()
     {
     }
@@ -381,4 +388,10 @@ class TestUser implements UserInterface
 interface PasswordUpgraderProvider extends UserProviderInterface, PasswordUpgraderInterface
 {
     public function upgradePassword(UserInterface $user, string $newHashedPassword): void;
+    public function loadUserByIdentifier(string $identifier): UserInterface;
+}
+
+interface DaoAuthenticationProviderTest_UserProvider extends UserProviderInterface
+{
+    public function loadUserByUsername($username);
 }

@@ -6,6 +6,11 @@ Asset
 
  * Removed `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead.
 
+DoctrineBridge
+--------------
+
+ * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
+
 Config
 ------
 
@@ -262,6 +267,11 @@ Security
    }
    ```
 
+ * Remove `UserInterface::getUsername()` in favor of `UserInterface::getUserIdentifier()`
+ * Remove `TokenInterface::getUsername()` in favor of `TokenInterface::getUserIdentifier()`
+ * Remove `UserProviderInterface::loadUserByUsername()` in favor of `UserProviderInterface::loadUserByIdentifier()`
+ * Remove `UsernameNotFoundException` in favor of `UserNotFoundException` and `getUsername()`/`setUsername()` in favor of `getUserIdentifier()`/`setUserIdentifier()`
+ * Remove `PersistentTokenInterface::getUsername()` in favor of `PersistentTokenInterface::getUserIdentifier()`
  * Calling `PasswordUpgraderInterface::upgradePassword()` with a `UserInterface` instance that
    does not implement `PasswordAuthenticatedUserInterface` now throws a `\TypeError`.
  * Calling methods `hashPassword()`, `isPasswordValid()` and `needsRehash()` on `UserPasswordHasherInterface`

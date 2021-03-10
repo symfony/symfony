@@ -106,7 +106,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
 
     public function __toString()
     {
-        return $this->getUsername();
+        return $this->getUserIdentifier();
     }
 
     /**
@@ -137,6 +137,11 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
      * {@inheritdoc}
      */
     public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getUserIdentifier()
     {
         return $this->username;
     }

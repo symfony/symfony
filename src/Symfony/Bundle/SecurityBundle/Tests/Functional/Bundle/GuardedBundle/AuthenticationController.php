@@ -33,6 +33,6 @@ class AuthenticationController
             return new Response('Not logged in.');
         }
 
-        return new Response('Username: '.$user->getUsername());
+        return new Response('Username: '.$user->getUserIdentifier());
     }
 }

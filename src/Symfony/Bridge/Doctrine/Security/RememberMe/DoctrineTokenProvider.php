@@ -119,7 +119,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
             .' VALUES (:class, :username, :series, :value, :lastUsed)';
         $paramValues = [
             'class' => $token->getClass(),
-            'username' => $token->getUsername(),
+            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            'username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
             'series' => $token->getSeries(),
             'value' => $token->getTokenValue(),
             'lastUsed' => $token->getLastUsed(),

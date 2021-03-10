@@ -26,7 +26,7 @@ class SwitchUserTokenTest extends TestCase
         $unserializedToken = unserialize(serialize($token));
 
         $this->assertInstanceOf(SwitchUserToken::class, $unserializedToken);
-        $this->assertSame('admin', $unserializedToken->getUsername());
+        $this->assertSame('admin', $unserializedToken->getUserIdentifier());
         $this->assertSame('bar', $unserializedToken->getCredentials());
         $this->assertSame('provider-key', $unserializedToken->getFirewallName());
         $this->assertEquals(['ROLE_USER'], $unserializedToken->getRoleNames());
@@ -35,7 +35,7 @@ class SwitchUserTokenTest extends TestCase
         $unserializedOriginalToken = $unserializedToken->getOriginalToken();
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $unserializedOriginalToken);
-        $this->assertSame('user', $unserializedOriginalToken->getUsername());
+        $this->assertSame('user', $unserializedOriginalToken->getUserIdentifier());
         $this->assertSame('foo', $unserializedOriginalToken->getCredentials());
         $this->assertSame('provider-key', $unserializedOriginalToken->getFirewallName());
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
@@ -45,6 +45,11 @@ class SwitchUserTokenTest extends TestCase
     {
         $impersonated = new class() implements UserInterface {
             public function getUsername()
+            {
+                return 'impersonated';
+            }
+
+            public function getUserIdentifier()
             {
                 return 'impersonated';
             }
@@ -92,7 +97,7 @@ class SwitchUserTokenTest extends TestCase
 
         self::assertInstanceOf(SwitchUserToken::class, $token);
         self::assertInstanceOf(UsernamePasswordToken::class, $token->getOriginalToken());
-        self::assertSame('john', $token->getUsername());
+        self::assertSame('john', $token->getUserIdentifier());
         self::assertSame(['foo' => 'bar'], $token->getCredentials());
         self::assertSame('main', $token->getFirewallName());
         self::assertEquals(['ROLE_USER'], $token->getRoleNames());

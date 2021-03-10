@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
@@ -26,7 +26,7 @@ class InMemoryUserProviderTest extends TestCase
     {
         $provider = $this->createProvider();
 
-        $user = $provider->loadUserByUsername('fabien');
+        $user = $provider->loadUserByIdentifier('fabien');
         $this->assertEquals('foo', $user->getPassword());
         $this->assertEquals(['ROLE_USER'], $user->getRoles());
         $this->assertFalse($user->isEnabled());
@@ -76,7 +76,7 @@ class InMemoryUserProviderTest extends TestCase
         $provider = new InMemoryUserProvider();
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
 
-        $user = $provider->loadUserByUsername('fabien');
+        $user = $provider->loadUserByIdentifier('fabien');
         $this->assertEquals('foo', $user->getPassword());
     }
 
@@ -90,8 +90,8 @@ class InMemoryUserProviderTest extends TestCase
 
     public function testLoadUserByUsernameDoesNotExist()
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $provider = new InMemoryUserProvider();
-        $provider->loadUserByUsername('fabien');
+        $provider->loadUserByIdentifier('fabien');
     }
 }

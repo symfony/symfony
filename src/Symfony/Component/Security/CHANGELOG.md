@@ -4,6 +4,11 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate `PersistentTokenInterface::getUsername()` in favor of `PersistentTokenInterface::getUserIdentifier()`
+ * Deprecate `UsernameNotFoundException` in favor of `UserNotFoundException` and `getUsername()`/`setUsername()` in favor of `getUserIdentifier()`/`setUserIdentifier()`
+ * Deprecate `UserProviderInterface::loadUserByUsername()` in favor of `UserProviderInterface::loadUserByIdentifier()`
+ * Deprecate `TokenInterface::getUsername()` in favor of `TokenInterface::getUserIdentifier()`
+ * Deprecate `UserInterface::getUsername()` in favor of `getUserIdentifier()`
  * Add `PassportInterface:getBadges()`, implemented by `PassportTrait`
  * [BC BREAK] Remove method `checkIfCompletelyResolved()` from `PassportInterface`, checking that passport badges are
    resolved is up to `AuthenticatorManager`

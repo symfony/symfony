@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 // Help opcache.preload discover always-needed symbols
@@ -103,6 +104,11 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
             if (null !== $this->eventDispatcher) {
                 $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($result), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+            }
+
+            // @deprecated since 5.3
+            if ($user = $result->getUser() instanceof UserInterface && !method_exists($result->getUser(), 'getUserIdentifier')) {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "getUserIdentifier(): string" in user class "%s" is deprecated. This method will replace "getUsername()" in Symfony 6.0.', get_debug_type($result->getUser()));
             }
 
             return $result;

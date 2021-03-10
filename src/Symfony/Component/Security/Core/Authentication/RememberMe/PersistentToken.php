@@ -19,18 +19,18 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 final class PersistentToken implements PersistentTokenInterface
 {
     private $class;
-    private $username;
+    private $userIdentifier;
     private $series;
     private $tokenValue;
     private $lastUsed;
 
-    public function __construct(string $class, string $username, string $series, string $tokenValue, \DateTime $lastUsed)
+    public function __construct(string $class, string $userIdentifier, string $series, string $tokenValue, \DateTime $lastUsed)
     {
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
-        if ('' === $username) {
-            throw new \InvalidArgumentException('$username must not be empty.');
+        if ('' === $userIdentifier) {
+            throw new \InvalidArgumentException('$userIdentifier must not be empty.');
         }
         if (empty($series)) {
             throw new \InvalidArgumentException('$series must not be empty.');
@@ -40,7 +40,7 @@ final class PersistentToken implements PersistentTokenInterface
         }
 
         $this->class = $class;
-        $this->username = $username;
+        $this->userIdentifier = $userIdentifier;
         $this->series = $series;
         $this->tokenValue = $tokenValue;
         $this->lastUsed = $lastUsed;
@@ -59,7 +59,14 @@ final class PersistentToken implements PersistentTokenInterface
      */
     public function getUsername(): string
     {
-        return $this->username;
+        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
+
+        return $this->userIdentifier;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->userIdentifier;
     }
 
     /**

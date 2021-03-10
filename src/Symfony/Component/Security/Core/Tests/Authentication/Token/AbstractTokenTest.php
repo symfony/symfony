@@ -12,12 +12,19 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class AbstractTokenTest extends TestCase
 {
-    public function testGetUsername()
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetUsername()
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser('fabien');
@@ -26,10 +33,43 @@ class AbstractTokenTest extends TestCase
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
-        $user = $this->createMock(UserInterface::class);
-        $user->expects($this->once())->method('getUsername')->willReturn('fabien');
-        $token->setUser($user);
+        $legacyUser = new class implements UserInterface {
+            public function getUsername()
+            {
+                return 'fabien';
+            }
+
+            public function getRoles()
+            {}
+
+            public function getPassword()
+            {}
+
+            public function getSalt()
+            {}
+
+            public function eraseCredentials()
+            {}
+        };
+        $token->setUser($legacyUser);
         $this->assertEquals('fabien', $token->getUsername());
+
+        $token->setUser($legacyUser);
+        $this->assertEquals('fabien', $token->getUserIdentifier());
+    }
+
+    public function testGetUserIdentifier()
+    {
+        $token = new ConcreteToken(['ROLE_FOO']);
+        $token->setUser('fabien');
+        $this->assertEquals('fabien', $token->getUserIdentifier());
+
+        $token->setUser(new TestUser('fabien'));
+        $this->assertEquals('fabien', $token->getUserIdentifier());
+
+        $user = new InMemoryUser('fabien', null);
+        $token->setUser($user);
+        $this->assertEquals('fabien', $token->getUserIdentifier());
     }
 
     public function testEraseCredentials()
@@ -106,10 +146,8 @@ class AbstractTokenTest extends TestCase
 
     public function getUsers()
     {
-        $user = $this->createMock(UserInterface::class);
-
         return [
-            [$user],
+            [new InMemoryUser('foo', null)],
             [new TestUser('foo')],
             ['foo'],
         ];
@@ -206,6 +244,11 @@ class SerializableUser implements UserInterface, \Serializable
     }
 
     public function getUsername()
+    {
+        return $this->name;
+    }
+
+    public function getUserIdentifier()
     {
         return $this->name;
     }

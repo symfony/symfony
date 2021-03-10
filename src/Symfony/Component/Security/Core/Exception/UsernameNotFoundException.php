@@ -11,65 +11,15 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
-/**
- * UsernameNotFoundException is thrown if a User cannot be found by its username.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander <iam.asm89@gmail.com>
- */
-class UsernameNotFoundException extends AuthenticationException
-{
-    private $username;
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', UsernameNotFoundException::class, UserNotFoundException::class);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageKey()
-    {
-        return 'Username could not be found.';
-    }
+class_exists(UserNotFoundException::class);
 
+if (false) {
     /**
-     * Get the username.
-     *
-     * @return string
+     * @deprecated since Symfony 5.3 to be removed in 6.0, use UserNotFoundException instead.
      */
-    public function getUsername()
+    class UsernameNotFoundException extends AuthenticationException
     {
-        return $this->username;
-    }
-
-    /**
-     * Set the username.
-     */
-    public function setUsername(string $username)
-    {
-        $this->username = $username;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessageData()
-    {
-        return ['{{ username }}' => $this->username];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __serialize(): array
-    {
-        return [$this->username, parent::__serialize()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __unserialize(array $data): void
-    {
-        [$this->username, $parentData] = $data;
-        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
-        parent::__unserialize($parentData);
     }
 }

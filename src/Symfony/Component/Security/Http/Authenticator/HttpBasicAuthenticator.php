@@ -67,14 +67,18 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         $username = $request->headers->get('PHP_AUTH_USER');
         $password = $request->headers->get('PHP_AUTH_PW', '');
 
-        $passport = new Passport(new UserBadge($username, function ($username) {
-            $user = $this->userProvider->loadUserByUsername($username);
-            if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
-            }
+        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        $method = 'loadUserByIdentifier';
+        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
 
-            return $user;
-        }), new PasswordCredentials($password));
+            $method = 'loadUserByUsername';
+        }
+
+        $passport = new Passport(
+            new UserBadge($username, [$this->userProvider, $method]),
+            new PasswordCredentials($password)
+        );
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($password, $this->userProvider));
         }

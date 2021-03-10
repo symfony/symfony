@@ -31,7 +31,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -69,7 +69,7 @@ class ContextListenerTest extends TestCase
 
         $token = unserialize($session->get('_security_session'));
         $this->assertInstanceOf(UsernamePasswordToken::class, $token);
-        $this->assertEquals('test1', $token->getUsername());
+        $this->assertEquals('test1', $token->getUserIdentifier());
     }
 
     public function testOnKernelResponseWillReplaceSession()
@@ -81,7 +81,7 @@ class ContextListenerTest extends TestCase
 
         $token = unserialize($session->get('_security_session'));
         $this->assertInstanceOf(UsernamePasswordToken::class, $token);
-        $this->assertEquals('test1', $token->getUsername());
+        $this->assertEquals('test1', $token->getUserIdentifier());
     }
 
     public function testOnKernelResponseWillRemoveSession()
@@ -478,7 +478,12 @@ class NotSupportingUserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username): UserInterface
     {
-        throw new UsernameNotFoundException();
+        throw new UserNotFoundException();
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        throw new UserNotFoundException();
     }
 
     public function refreshUser(UserInterface $user): UserInterface
@@ -509,6 +514,10 @@ class SupportingUserProvider implements UserProviderInterface
     {
     }
 
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+    }
+
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof InMemoryUser) {
@@ -516,7 +525,7 @@ class SupportingUserProvider implements UserProviderInterface
         }
 
         if (null === $this->refreshedUser) {
-            throw new UsernameNotFoundException();
+            throw new UserNotFoundException();
         }
 
         return $this->refreshedUser;

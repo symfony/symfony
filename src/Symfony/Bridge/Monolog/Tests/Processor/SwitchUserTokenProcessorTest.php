@@ -37,11 +37,15 @@ class SwitchUserTokenProcessorTest extends TestCase
 
         $expected = [
             'impersonator_token' => [
-                'username' => 'original_user',
                 'authenticated' => true,
                 'roles' => ['ROLE_SUPER_ADMIN'],
+                'username' => 'original_user',
             ],
         ];
-        $this->assertSame($expected, $record['extra']);
+        if (method_exists($originalToken, 'getUserIdentifier')) {
+            $expected['impersonator_token']['user_identifier'] = 'original_user';
+        }
+
+        $this->assertEquals($expected, $record['extra']);
     }
 }

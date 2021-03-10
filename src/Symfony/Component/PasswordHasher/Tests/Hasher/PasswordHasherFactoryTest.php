@@ -196,6 +196,10 @@ class SomeUser implements UserInterface
     {
     }
 
+    public function getUserIdentifier(): string
+    {
+    }
+
     public function eraseCredentials()
     {
     }

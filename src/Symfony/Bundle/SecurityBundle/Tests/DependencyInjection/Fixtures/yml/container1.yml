@@ -84,4 +84,4 @@ security:
         -
             path: /blog/.*
             role: IS_AUTHENTICATED_ANONYMOUSLY
-        - { path: /blog/524, role: IS_AUTHENTICATED_ANONYMOUSLY, allow_if: "token.getUsername() matches '/^admin/'" }
+        - { path: /blog/524, role: IS_AUTHENTICATED_ANONYMOUSLY, allow_if: "token.getUserIdentifier() matches '/^admin/'" }

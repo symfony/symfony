@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -22,6 +23,8 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
 
 class UserProviderListenerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $userProvider;
     private $listener;
 
@@ -38,7 +41,7 @@ class UserProviderListenerTest extends TestCase
         $this->listener->checkPassport(new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport));
 
         $badge = $passport->getBadge(UserBadge::class);
-        $this->assertEquals([$this->userProvider, 'loadUserByUsername'], $badge->getUserLoader());
+        $this->assertEquals([$this->userProvider, 'loadUserByIdentifier'], $badge->getUserLoader());
 
         $user = new InMemoryUser('wouter', null);
         $this->userProvider->createUser($user);

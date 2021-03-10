@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 /**
  * Chain User Provider.
@@ -51,16 +51,30 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
      */
     public function loadUserByUsername(string $username)
     {
+        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
+
+        return $this->loadUserByIdentifier($username);
+    }
+
+    public function loadUserByIdentifier(string $userIdentifier): UserInterface
+    {
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUserByUsername($username);
-            } catch (UsernameNotFoundException $e) {
+                // @deprecated since 5.3, change to $provider->loadUserByIdentifier() in 6.0
+                if (!method_exists($provider, 'loadUserByIdentifier')) {
+                    trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', \get_debug_type($provider));
+
+                    return $provider->loadUserByUsername($userIdentifier);
+                }
+
+                return $provider->loadUserByIdentifier($userIdentifier);
+            } catch (UserNotFoundException $e) {
                 // try next one
             }
         }
 
-        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
-        $ex->setUsername($username);
+        $ex = new UserNotFoundException(sprintf('There is no user with identifier "%s".', $userIdentifier));
+        $ex->setUserIdentifier($userIdentifier);
         throw $ex;
     }
 
@@ -80,15 +94,17 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $e) {
                 // try next one
-            } catch (UsernameNotFoundException $e) {
+            } catch (UserNotFoundException $e) {
                 $supportedUserFound = true;
                 // try next one
             }
         }
 
         if ($supportedUserFound) {
-            $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
-            $e->setUsername($user->getUsername());
+            // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+            $username = method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername();
+            $e = new UserNotFoundException(sprintf('There is no user with name "%s".', $username));
+            $e->setUserIdentifier($username);
             throw $e;
         } else {
             throw new UnsupportedUserException(sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', get_debug_type($user)));

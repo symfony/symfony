@@ -87,9 +87,18 @@ abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthe
 
     public function authenticate(Request $request): PassportInterface
     {
-        return new SelfValidatingPassport(new UserBadge($request->attributes->get('_pre_authenticated_username'), function ($username) {
-            return $this->userProvider->loadUserByUsername($username);
-        }), [new PreAuthenticatedUserBadge()]);
+        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        $method = 'loadUserByIdentifier';
+        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+            $method = 'loadUserByUsername';
+        }
+
+        return new SelfValidatingPassport(
+            new UserBadge($request->attributes->get('_pre_authenticated_username'), [$this->userProvider, $method]),
+            [new PreAuthenticatedUserBadge()]
+        );
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface

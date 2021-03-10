@@ -25,20 +25,20 @@
 
         <provider name="default">
             <memory>
-                <user name="foo" password="foo" roles="ROLE_USER" />
+                <user identifier="foo" password="foo" roles="ROLE_USER" />
             </memory>
         </provider>
 
         <provider name="digest">
             <memory>
-                <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
+                <user identifier="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
             </memory>
         </provider>
 
         <provider name="basic">
             <memory>
-                <user name="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
-                <user name="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
+                <user identifier="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
+                <user identifier="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
             </memory>
         </provider>
 
@@ -78,6 +78,6 @@
 
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" port="8000" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
-        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() matches '/^admin/'" path="/blog/524" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUserIdentifier() matches '/^admin/'" path="/blog/524" />
     </config>
 </srv:container>

@@ -11,6 +11,6 @@ class TestCustomLoginLinkSuccessHandler implements AuthenticationSuccessHandlerI
 {
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        return new JsonResponse(['message' => sprintf('Welcome %s!', $token->getUsername())]);
+        return new JsonResponse(['message' => sprintf('Welcome %s!', $token->getUserIdentifier())]);
     }
 }

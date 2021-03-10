@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * This authentication provider will not perform any checks on authentication
  * requests, as they should already be pre-authenticated. However, the
  * UserProviderInterface implementation may still throw a
- * UsernameNotFoundException, for example.
+ * UserNotFoundException, for example.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -54,7 +54,15 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
             throw new BadCredentialsException('No pre-authenticated principal found in request.');
         }
 
-        $user = $this->userProvider->loadUserByUsername($user);
+        $userIdentifier = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+        // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+        } else {
+            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+            $user = $this->userProvider->loadUserByUsername($userIdentifier);
+        }
 
         $this->userChecker->checkPostAuth($user);
 

@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
  * Deprecate `DoctrineTestHelper` and `TestRepositoryFactory`
  * [BC BREAK] Remove `UuidV*Generator` classes
  * Add `UuidGenerator`

@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T13:48:15Z
+
+Integration test suite failure seems unrelated
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T13:59:38Z
+
+Good catch. We have the same problem with the `$messageTemplate` property in that class if I'm not mistaken. In both cases, I'd suggest to perform the string cast inside the constructor already. Either way, it looks like a mistake to me that we allow `null` to be passed to the constructor.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T14:04:23Z
+
+ > Either way, it looks like a mistake to me that we allow `null` to be passed to the constructor.
+
+That ship has sailed though, and there's active design around the property path being missing.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T14:27:20Z
+
+> That ship has sailed though, and there's active design around the property path being missing.
+
+Yeah, for sure, we cannot just change the type now. But if it's a mistake, we could try to correct it for Symfony 6. The parameter types for `$propertyPath` and `$messageTemplate` have been added with #24722 despite the PHPDoc block documenting those parameters as non-nullable.
+
+Our own code (`ExecutionContext::addViolation()` and `ConstraintViolationBuilder::addViolation()`) should make sure that we don't pass `null` to either of them. May I ask how you got yourself a `ConstraintViolation` instance with a `null` property path? Maybe I missed something.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T14:36:50Z
+
+> Our own code (`ExecutionContext::addViolation()` and `ConstraintViolationBuilder::addViolation()`) should make sure that we don't pass `null` to either of them. May I ask how you got yourself a `ConstraintViolation` instance with a `null` property path? Maybe I missed something.
+
+I was copying violations reported from one validator to another, pretty much like `ConstraintViolationBuilderInterface#atPath(ConstraintViolationInterface#getPropertyPath())`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-08T15:37:43Z
+
+Thank you. Could you do the same fix for the `$messageTemplate` please? The same bug is for `getMessageTemplate()` too.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T15:40:01Z
+
+Will send a separate patch
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T15:47:32Z
+
+I still think we should perform the string cast inside the constructor though. 🙃
+
+btw: is the 4.4 branch affected as well?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-08T15:49:06Z
+
+Hm, the small benefit to cast it to a string in the constructor is that we can remove the cast in the `__toString()` method.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T15:50:20Z
+
+ > I still think we should perform the string cast inside the constructor though. upside_down_face
+
+You do that, you break subclassing types for little benefit.
+
+I can imagine that some subclassing will likely rely on the fact that `$this->foo !== null` to take internal decisions.
+
+EDIT: keep in mind that the scope of this is a **bugfix**, not a refactoring. That would probably target `5.x` instead.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T15:56:08Z
+
+ > btw: is the 4.4 branch affected as well?
+
+Possibly, didn't check, since I'd rather leave 4.4 alone. This is the sort of bugfix that I would never ever want to see in an LTS, since there's a subtle change in behavior.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T15:57:07Z
+
+> > I still think we should perform the string cast inside the constructor though. upside_down_face
+>
+> You do that, you break subclassing types for little benefit.
+
+`$propertyPath` is declared private, so a subclass would need access it via the very same getter that you are patching right now.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2021-03-08T16:02:22Z
+
+Ah, true that :+1:

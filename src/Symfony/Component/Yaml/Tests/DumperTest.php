@@ -494,7 +494,7 @@ YAML;
         $data = [
             'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
         ];
-        $expected = "foo: !bar |\n".
+        $expected = "foo: !bar |-\n".
             "    foo\n".
             "    line with trailing spaces:\n".
             "      \n".

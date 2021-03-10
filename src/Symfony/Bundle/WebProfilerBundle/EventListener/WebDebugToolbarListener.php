@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -44,8 +45,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $excludedAjaxPaths;
     private $cspHandler;
+    private $dumpDataCollector;
 
-    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(Environment $twig, bool $interceptRedirects = false, int $mode = self::ENABLED, UrlGeneratorInterface $urlGenerator = null, string $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null, DumpDataCollector $dumpDataCollector = null)
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
@@ -53,6 +55,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = $mode;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
         $this->cspHandler = $cspHandler;
+        $this->dumpDataCollector = $dumpDataCollector;
     }
 
     public function isEnabled(): bool
@@ -89,7 +92,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : [];
+        $nonces = [];
+        if ($this->cspHandler) {
+            if ($this->dumpDataCollector && $this->dumpDataCollector->getDumpsCount() > 0) {
+                $this->cspHandler->disableCsp();
+            }
+
+            $nonces = $this->cspHandler->updateResponseHeaders($request, $response);
+        }
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {

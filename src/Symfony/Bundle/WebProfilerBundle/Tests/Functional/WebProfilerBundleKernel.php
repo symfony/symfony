@@ -10,6 +10,7 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
@@ -65,6 +66,7 @@ class WebProfilerBundleKernel extends Kernel
 
     protected function build(ContainerBuilder $container)
     {
+        $container->register('data_collector.dump', DumpDataCollector::class);
         $container->register('logger', NullLogger::class);
     }
 

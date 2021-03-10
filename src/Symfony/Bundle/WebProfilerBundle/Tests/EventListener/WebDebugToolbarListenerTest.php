@@ -12,11 +12,13 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -298,6 +300,48 @@ class WebDebugToolbarListenerTest extends TestCase
         $listener->onKernelResponse($event);
 
         $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
+    }
+
+    public function testCspIsDisabledIfDumperWasUsed()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createMock(Kernel::class), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $cspHandler = $this->createMock(ContentSecurityPolicyHandler::class);
+        $cspHandler->expects($this->once())
+            ->method('disableCsp');
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector->expects($this->once())
+            ->method('getDumpsCount')
+            ->willReturn(1);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    public function testCspIsKeptEnabledIfDumperWasNotUsed()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createMock(Kernel::class), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $cspHandler = $this->createMock(ContentSecurityPolicyHandler::class);
+        $cspHandler->expects($this->never())
+            ->method('disableCsp');
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector->expects($this->once())
+            ->method('getDumpsCount')
+            ->willReturn(0);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)

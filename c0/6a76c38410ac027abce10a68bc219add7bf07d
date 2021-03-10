@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-04T20:00:34Z
+
+PR is rebased and ready. Let me know if you have any further questions.
+
+In https://github.com/symfony/recipes/pull/787#issuecomment-648088390, @javiereguiluz asks if this could work:
+```php
+return function (Context $context) {
+    $kernel = new Kernel($context->env(), $context->debug());
+
+    return new Application($kernel);
+};
+```
+
+The answer is yes. It could be nice for a separate PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-01-05T11:05:27Z
+
+@fabpot thanks for the review, comments addressed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-07T14:36:06Z
+
+PR rebased and ready.
+
+I realized that the resolution of its arguments should be easier to split from the decoration of their corresponding callable.
+
+This allows cleaner naming:
+- the "resolved-app" term is replaced by "resolver";
+- the "started-app" term is replaced by "runner".
+
+This change also allows for reduced stack traces.
+
+RuntimeInterface now looks like:
+```php
+interface RuntimeInterface
+{
+    /**
+     * Returns a resolver that should compute the arguments of a callable.
+     *
+     * The callable itself should return an object that represents the application to pass to the getRunner() method.
+     */
+    public function getResolver(callable $callable): ResolverInterface;
+
+    /**
+     * Returns a callable that knows how to run the passed object and that returns its exit status as int.
+     *
+     * The passed object is typically created by calling ResolverInterface::resolve().
+     */
+    public function getRunner(object $application): RunnerInterface;
+}
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-09T14:49:25Z
+
+I will do a final review tonight.
+
+If someone really want to merge this before then, I'll follow up with PRs instead of comments (if any).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-09T14:55:55Z
+
+As this is a significant change in the front controllers, I would kindly, but strongly, ask to consider to first prepare updates for the documentation (and maybe SymfonyCasts) before merging this PR :pray:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-09T14:57:27Z
+
+@nicolas-grekas is going to create a doc PR ASAP, I think/hope that the diff will be very minimal :crossed_fingers:.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-09T18:42:07Z
+
+Thank you Nicolas for the updates. I've been carefully reviewing and testing this while writing some docs. See https://github.com/symfony/symfony-docs/pull/15081

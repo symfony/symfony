@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-03-10T08:57:42Z
+
+this was not introduced in https://github.com/symfony/symfony/pull/7437. The code was already there before. This PR only moved it.
+
+Supporting returning a ContainerBuilder was actually a BC layer for code written before 2.0.0-PR3 (see https://github.com/symfony/symfony/commit/dcaf436d9af025161f9cbd6fc423ed397803edbb). So :+1: for finally cleaning that.

@@ -156,4 +156,19 @@ EOF;
             null
         );
     }
+
+    public function testRetrievedPropertyPathIsAStringEvenIfNotSet()
+    {
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                '',
+                [],
+                'irrelevant',
+                null,
+                null
+            ))->getPropertyPath()
+        );
+    }
 }

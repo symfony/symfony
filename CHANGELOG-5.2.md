@@ -7,6 +7,17 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.5 (2021-03-10)
+
+ * bug #40415 Fix `ConstraintViolation#getPropertyPath()` to always return `string` (Ocramius)
+ * bug #40421 [FrameworkBundle] fix XSD (nicolas-grekas)
+ * bug #39685 [Mailer][Mime][TwigBridge][Validator] Allow egulias/email-validator 3.x (derrabus)
+ * bug #40398 [FrameworkBundle] : Fix method name compare in ResolveControllerNameSubscriber (glensc)
+ * bug #39733 [TwigBridge] Render email once (jderusse)
+ * bug #40386 [DependencyInjection][Security] Backport psr/container 1.1/2.0 compatibility (derrabus)
+ * bug #40376 [Messenger] Don't lock tables or start transactions (Nyholm)
+ * bug #40378 Changing ZulipTransportFactory tag to prevent the exception UnsupportedSchemeException (big-r81)
+
 * 5.2.4 (2021-03-04)
 
  * bug #40336 [Messenger] Doctrine setup with migrations (Nyholm)

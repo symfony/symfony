@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Ingen sesjon tilgjengeleg. Sesjonen er anten ikkje lenger gyldig, eller informasjonskapslar er ikke skrudd på i nettlesaren.</target>
+                <target>Ingen sesjon tilgjengeleg. Sesjonen er anten ikkje lenger gyldig, eller informasjonskapslar er ikkje skrudd på i nettlesaren.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
@@ -56,11 +56,19 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Brukarkontoen er deaktivert.</target>
+                <target>Brukarkontoen er sperra.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
                 <target>Brukarkontoen er sperra.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Too many failed login attempts, please try again later.</source>
+                <target>For mange innloggingsforsøk har feila, prøv igjen seinare.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Invalid or expired login link.</source>
+                <target>Innloggingslenka er ugyldig eller utgjengen.</target>
             </trans-unit>
         </body>
     </file>

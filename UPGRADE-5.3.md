@@ -46,7 +46,8 @@ HttpKernel
 
  * Deprecate `ArgumentInterface`
  * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
- * Marked the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+ * Mark the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
+ * Deprecate returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
 
 Messenger
 ---------

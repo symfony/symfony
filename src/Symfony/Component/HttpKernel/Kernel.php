@@ -642,6 +642,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $this->prepareContainer($container);
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+            trigger_deprecation('symfony/http-kernel', '5.3', 'Returning a ContainerBuilder from "%s::registerContainerConfiguration()" is deprecated.', get_debug_type($this));
             $container->merge($cont);
         }
 

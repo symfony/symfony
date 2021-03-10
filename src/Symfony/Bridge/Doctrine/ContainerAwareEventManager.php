@@ -177,6 +177,7 @@ class ContainerAwareEventManager extends EventManager
             if (!isset($this->listeners[$event])) {
                 $this->listeners[$event] = [];
             }
+            unset($this->initialized[$event]);
             $this->listeners[$event] += $listeners;
         }
         $this->subscribers = [];

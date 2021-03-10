@@ -101,7 +101,16 @@ class Dumper
                         // If the first line starts with a space character, the spec requires a blockIndicationIndicator
                         // http://www.yaml.org/spec/1.2/spec.html#id2793979
                         $blockIndentationIndicator = (' ' === substr($value->getValue(), 0, 1)) ? (string) $this->indentation : '';
-                        $output .= sprintf(' |%s', $blockIndentationIndicator);
+
+                        if (isset($value->getValue()[-2]) && "\n" === $value->getValue()[-2] && "\n" === $value->getValue()[-1]) {
+                            $blockChompingIndicator = '+';
+                        } elseif ("\n" === $value->getValue()[-1]) {
+                            $blockChompingIndicator = '';
+                        } else {
+                            $blockChompingIndicator = '-';
+                        }
+
+                        $output .= sprintf(' |%s%s', $blockIndentationIndicator, $blockChompingIndicator);
 
                         foreach (explode("\n", $value->getValue()) as $row) {
                             $output .= sprintf("\n%s%s%s", $prefix, str_repeat(' ', $this->indentation), $row);

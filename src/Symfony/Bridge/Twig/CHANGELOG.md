@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.3
+-----
+
+* Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
+
 5.3.0
 -----
 

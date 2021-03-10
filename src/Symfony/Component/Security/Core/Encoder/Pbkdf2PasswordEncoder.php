@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', Pbkdf2PasswordEncoder::class, Pbkdf2PasswordHasher::class));
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', Pbkdf2PasswordEncoder::class, Pbkdf2PasswordHasher::class);
 
 /**
  * Pbkdf2PasswordEncoder uses the PBKDF2 (Password-Based Key Derivation Function 2).

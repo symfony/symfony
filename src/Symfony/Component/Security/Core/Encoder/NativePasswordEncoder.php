@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 
-trigger_deprecation('symfony/security-core', '5.3', sprintf('The "%s" class is deprecated, use "%s" instead.', NativePasswordEncoder::class, NativePasswordHasher::class));
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', NativePasswordEncoder::class, NativePasswordHasher::class);
 
 /**
  * Hashes passwords using password_hash().

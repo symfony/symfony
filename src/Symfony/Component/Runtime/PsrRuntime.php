@@ -55,11 +55,11 @@ class PsrRuntime extends GenericRuntime
     public function getRunner(?object $application): RunnerInterface
     {
         if ($application instanceof RequestHandlerInterface) {
-            return LaminasEmitter::createForRequestHandler($application, $this->createRequest(), ['emitter'=>$this->options['laminas_emitter'] ?? null]);
+            return LaminasEmitter::createForRequestHandler($application, $this->createRequest(), ['emitter' => $this->options['laminas_emitter'] ?? null]);
         }
 
         if ($application instanceof ResponseInterface) {
-            return LaminasEmitter::createForResponse($application, ['emitter'=>$this->options['laminas_emitter'] ?? null]);
+            return LaminasEmitter::createForResponse($application, ['emitter' => $this->options['laminas_emitter'] ?? null]);
         }
 
         return parent::getRunner($application);

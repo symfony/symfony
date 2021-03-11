@@ -78,7 +78,7 @@ class SMimePart extends AbstractPart
         }
 
         if ($this->body instanceof \Generator && !$this->body->valid()) {
-            yield from [];
+            yield;
 
             return;
         }

@@ -78,14 +78,7 @@ class SMimePartTest extends TestCase
 
     private function getIterable(): iterable
     {
-        $f = fopen('php://memory', 'r+', false);
-        fwrite($f, 'content');
-        rewind($f);
-
-        while (!feof($f)) {
-            yield fread($f, 2);
-        }
-
-        fclose($f);
+        yield 'con';
+        yield 'tent';
     }
 }

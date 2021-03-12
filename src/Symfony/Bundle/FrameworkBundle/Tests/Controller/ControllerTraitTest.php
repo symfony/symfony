@@ -449,6 +449,7 @@ abstract class ControllerTraitTest extends TestCase
     {
         $templating = $this->createMock(EngineInterface::class);
         $templating->expects($this->once())->method('render')->willReturn('bar');
+        $templating->expects($this->once())->method('supports')->willReturn(true);
 
         $container = new Container();
         $container->set('templating', $templating);
@@ -466,6 +467,7 @@ abstract class ControllerTraitTest extends TestCase
     {
         $templating = $this->createMock(EngineInterface::class);
         $templating->expects($this->once())->method('render')->willReturn('bar');
+        $templating->expects($this->once())->method('supports')->willReturn(true);
 
         $container = new Container();
         $container->set('templating', $templating);

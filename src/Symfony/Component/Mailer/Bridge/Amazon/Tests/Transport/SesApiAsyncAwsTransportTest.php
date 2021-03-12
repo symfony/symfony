@@ -64,8 +64,8 @@ class SesApiAsyncAwsTransportTest extends TestCase
             $content = json_decode($options['body'], true);
 
             $this->assertSame('Hello!', $content['Content']['Simple']['Subject']['Data']);
-            $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
-            $this->assertSame('Fabien <fabpot@symfony.com>', $content['FromEmailAddress']);
+            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
+            $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['FromEmailAddress']);
             $this->assertSame('Hello There!', $content['Content']['Simple']['Body']['Text']['Data']);
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
             $this->assertSame(['replyto-1@example.com', 'replyto-2@example.com'], $content['ReplyToAddresses']);

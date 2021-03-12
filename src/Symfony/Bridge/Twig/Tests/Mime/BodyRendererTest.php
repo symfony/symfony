@@ -100,6 +100,27 @@ HTML;
         $this->assertEquals('reset', $email->getTextBody());
     }
 
+    public function testRenderedOnceUnserializableContext()
+    {
+        $twig = new Environment(new ArrayLoader([
+            'text' => 'Text',
+        ]));
+        $renderer = new BodyRenderer($twig);
+        $email = (new TemplatedEmail())
+            ->to('fabien@symfony.com')
+            ->from('helene@symfony.com')
+        ;
+        $email->textTemplate('text');
+        $email->context([
+            'foo' => static function () {
+                return 'bar';
+            },
+        ]);
+
+        $renderer->render($email);
+        $this->assertEquals('Text', $email->getTextBody());
+    }
+
     private function prepareEmail(?string $text, ?string $html, array $context = []): TemplatedEmail
     {
         $twig = new Environment(new ArrayLoader([

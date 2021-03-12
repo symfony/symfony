@@ -19,6 +19,7 @@ CHANGELOG
  * Bind the `default_context` parameter onto serializer's encoders and normalizers
  * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
  * Deprecate `translation:update` command, use `translation:extract` instead
+ * Add `PhpStanExtractor` support for the PropertyInfo component
 
 5.3
 ---

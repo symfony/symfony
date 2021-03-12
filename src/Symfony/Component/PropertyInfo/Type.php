@@ -53,6 +53,16 @@ class Type
         self::BUILTIN_TYPE_ITERABLE,
     ];
 
+    /**
+     * List of PHP builtin collection types.
+     *
+     * @var string[]
+     */
+    public static $builtinCollectionTypes = [
+        self::BUILTIN_TYPE_ARRAY,
+        self::BUILTIN_TYPE_ITERABLE,
+    ];
+
     private $builtinType;
     private $nullable;
     private $class;

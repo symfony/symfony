@@ -64,10 +64,17 @@ class NotificationEmail extends TemplatedEmail
     public static function asPublicEmail(Headers $headers = null, AbstractPart $body = null): self
     {
         $email = new static($headers, $body);
-        $email->context['importance'] = null;
-        $email->context['footer_text'] = null;
+        $email->markAsPublic();
 
         return $email;
+    }
+
+    public function markAsPublic(): self
+    {
+        $this->context['importance'] = null;
+        $this->context['footer_text'] = null;
+
+        return $this;
     }
 
     /**

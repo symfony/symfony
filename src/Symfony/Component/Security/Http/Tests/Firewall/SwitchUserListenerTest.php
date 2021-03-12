@@ -396,4 +396,34 @@ class SwitchUserListenerTest extends TestCase
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
         $this->assertFalse($this->event->hasResponse());
     }
+
+    public function testSwitchUserRefreshesOriginalToken()
+    {
+        $originalUser = $this->createMock(UserInterface::class);
+        $refreshedOriginalUser = $this->createMock(UserInterface::class);
+        $this
+            ->userProvider
+            ->expects($this->any())
+            ->method('refreshUser')
+            ->with($originalUser)
+            ->willReturn($refreshedOriginalUser);
+        $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
+        $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(function (SwitchUserEvent $event) use ($refreshedOriginalUser) {
+                    return $event->getToken()->getUser() === $refreshedOriginalUser;
+                }),
+                SecurityEvents::SWITCH_USER
+            )
+        ;
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener($this->event);
+    }
 }

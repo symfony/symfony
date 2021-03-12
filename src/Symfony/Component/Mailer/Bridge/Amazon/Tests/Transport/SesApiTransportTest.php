@@ -65,8 +65,8 @@ class SesApiTransportTest extends TestCase
             parse_str($options['body'], $content);
 
             $this->assertSame('Hello!', $content['Message_Subject_Data']);
-            $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $content['Destination_ToAddresses_member'][0]);
-            $this->assertSame('Fabien <fabpot@symfony.com>', $content['Source']);
+            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination_ToAddresses_member'][0]);
+            $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['Source']);
             $this->assertSame('Hello There!', $content['Message_Body_Text_Data']);
             $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
 

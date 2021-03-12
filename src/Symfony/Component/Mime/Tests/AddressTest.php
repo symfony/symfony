@@ -27,7 +27,7 @@ class AddressTest extends TestCase
         $a = new Address('fabien@symfonï.com', 'Fabien');
         $this->assertEquals('Fabien', $a->getName());
         $this->assertEquals('fabien@symfonï.com', $a->getAddress());
-        $this->assertEquals('Fabien <fabien@xn--symfon-nwa.com>', $a->toString());
+        $this->assertEquals('"Fabien" <fabien@xn--symfon-nwa.com>', $a->toString());
         $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
     }
 
@@ -169,5 +169,11 @@ class AddressTest extends TestCase
                 'example@example.com',
             ],
         ];
+    }
+
+    public function testEncodeNameIfNameContainsCommas()
+    {
+        $address = new Address('fabien@symfony.com', 'Fabien, "Potencier');
+        $this->assertSame('"Fabien, \"Potencier" <fabien@symfony.com>', $address->toString());
     }
 }

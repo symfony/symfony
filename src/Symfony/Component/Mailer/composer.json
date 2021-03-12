@@ -20,7 +20,7 @@
         "egulias/email-validator": "^2.1.10|^3",
         "psr/log": "~1.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/mime": "^5.2",
+        "symfony/mime": "^5.2.6",
         "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.1|^2"
     },

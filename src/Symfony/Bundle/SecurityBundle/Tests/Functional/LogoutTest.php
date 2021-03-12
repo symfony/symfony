@@ -51,7 +51,7 @@ class LogoutTest extends AbstractWebTestCase
         $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
         $this->callInRequestContext($client, function () {
-            static::$container->get('security.csrf.token_storage')->setToken('foo', 'bar');
+            static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
         $client->request('POST', '/login', [
@@ -60,14 +60,14 @@ class LogoutTest extends AbstractWebTestCase
         ]);
 
         $this->callInRequestContext($client, function () {
-            $this->assertTrue(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
-            $this->assertSame('bar', static::$container->get('security.csrf.token_storage')->getToken('foo'));
+            $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
+            $this->assertSame('bar', static::getContainer()->get('security.csrf.token_storage')->getToken('foo'));
         });
 
         $client->request('GET', '/logout');
 
         $this->callInRequestContext($client, function () {
-            $this->assertFalse(static::$container->get('security.csrf.token_storage')->hasToken('foo'));
+            $this->assertFalse(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
         });
     }
 
@@ -101,7 +101,7 @@ class LogoutTest extends AbstractWebTestCase
     private function callInRequestContext(KernelBrowser $client, callable $callable): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = static::$container->get(EventDispatcherInterface::class);
+        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
         $wrappedCallable = function (RequestEvent $event) use (&$callable) {
             $callable();
             $event->setResponse(new Response(''));

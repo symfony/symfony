@@ -80,7 +80,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
     {
         $tester = $this->createCommandTester();
         /** @var FilesystemAdapter $pool */
-        $pool = static::$container->get('cache.public_pool');
+        $pool = static::getContainer()->get('cache.public_pool');
         $item = $pool->getItem('foo');
         $item->set('baz');
         $pool->save($item);
@@ -108,7 +108,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
     private function createCommandTester()
     {
         $application = new Application(static::$kernel);
-        $application->add(new CachePoolClearCommand(static::$container->get('cache.global_clearer')));
+        $application->add(new CachePoolClearCommand(static::getContainer()->get('cache.global_clearer')));
 
         return new CommandTester($application->find('cache:pool:clear'));
     }

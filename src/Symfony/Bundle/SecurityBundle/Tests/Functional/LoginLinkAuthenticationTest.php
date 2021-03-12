@@ -32,10 +32,10 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
 
         // we need an active request that is under the firewall to use the linker
         $request = Request::create('/get-login-link');
-        self::$container->get(RequestStack::class)->push($request);
+        self::getContainer()->get(RequestStack::class)->push($request);
 
         /** @var LoginLinkHandlerInterface $loginLinkHandler */
-        $loginLinkHandler = self::$container->get(LoginLinkHandlerInterface::class);
+        $loginLinkHandler = self::getContainer()->get(LoginLinkHandlerInterface::class);
         $user = new User('weaverryan', 'foo');
         $loginLink = $loginLinkHandler->createLoginLink($user);
         $this->assertStringContainsString('user=weaverryan', $loginLink);

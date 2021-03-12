@@ -28,8 +28,8 @@ class MailerTest extends AbstractWebTestCase
             $this->assertEquals('sender@example.org', $envelope->getSender()->getAddress());
         };
 
-        $eventDispatcher = self::$container->get(EventDispatcherInterface::class);
-        $logger = self::$container->get('logger');
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $logger = self::getContainer()->get('logger');
 
         $testTransport = new class($eventDispatcher, $logger, $onDoSend) extends AbstractTransport {
             /**

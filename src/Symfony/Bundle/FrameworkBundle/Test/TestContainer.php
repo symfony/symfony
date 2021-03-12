@@ -17,6 +17,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * A special container used in tests. This gives access to both public and
+ * private services. The container will not include private services that has
+ * been inlined or removed. Private services will be removed when they are not
+ * used by other services.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal

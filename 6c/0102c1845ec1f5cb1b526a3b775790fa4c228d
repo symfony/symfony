@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2021-02-18T14:12:36Z
+
+I'm not fond of creation a special case in the option resolver component like this.
+
+Maybe we could instead create a new `Validation::createValidCallable` (or another name) method that returns a boolean instead of throwing which could be useful for more cases that just passing it to the option resolver
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-18T14:15:52Z
+
+I tend to agree with @jvasseur here. That sounds like a better approach
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-02-18T14:36:53Z
+
+I agree with @jvasseur too.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-18T15:21:28Z
+
+I agree, I'll update the PR later today.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-02-18T16:47:43Z
+
+PR updated. Thanks @jvasseur for the great suggestion!
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2021-02-22T16:18:58Z
+
+@javiereguiluz I would expect a function named `isValid` to directly do the validation and return a `bool` instead of creating a `callable`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-02-22T16:28:01Z
+
+@jvasseur you are right! I mixed things up ... as usually happens to me with the validator. Sorry! I deleted the original comment.

@@ -130,8 +130,8 @@ class MailgunApiTransportTest extends TestCase
             }
 
             $this->assertStringContainsString('Hello!', $content);
-            $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
-            $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
+            $this->assertStringContainsString('"Saif Eddin" <saif.gmati@symfony.com>', $content);
+            $this->assertStringContainsString('"Fabien" <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
 
             return new MockResponse(json_encode(['id' => 'foobar']), [

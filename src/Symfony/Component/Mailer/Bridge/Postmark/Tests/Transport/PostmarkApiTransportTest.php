@@ -76,8 +76,8 @@ class PostmarkApiTransportTest extends TestCase
             $this->assertStringContainsStringIgnoringCase('X-Postmark-Server-Token: KEY', $options['headers'][1] ?? $options['request_headers'][1]);
 
             $body = json_decode($options['body'], true);
-            $this->assertSame('Fabien <fabpot@symfony.com>', $body['From']);
-            $this->assertSame('Saif Eddin <saif.gmati@symfony.com>', $body['To']);
+            $this->assertSame('"Fabien" <fabpot@symfony.com>', $body['From']);
+            $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $body['To']);
             $this->assertSame('Hello!', $body['Subject']);
             $this->assertSame('Hello There!', $body['TextBody']);
 

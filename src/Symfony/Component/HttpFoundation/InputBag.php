@@ -21,16 +21,16 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 final class InputBag extends ParameterBag
 {
     /**
-     * Returns a string input value by name.
+     * Returns a scalar input value by name.
      *
-     * @param string|null $default The default value if the input key does not exist
+     * @param string|int|float|bool|null $default The default value if the input key does not exist
      *
-     * @return string|null
+     * @return string|int|float|bool|null
      */
     public function get(string $key, $default = null)
     {
         if (null !== $default && !is_scalar($default) && !(\is_object($default) && method_exists($default, '__toString'))) {
-            trigger_deprecation('symfony/http-foundation', '5.1', 'Passing a non-string value as 2nd argument to "%s()" is deprecated, pass a string or null instead.', __METHOD__);
+            trigger_deprecation('symfony/http-foundation', '5.1', 'Passing a non-scalar value as 2nd argument to "%s()" is deprecated, pass a scalar or null instead.', __METHOD__);
         }
 
         $value = parent::get($key, $this);
@@ -72,12 +72,12 @@ final class InputBag extends ParameterBag
     /**
      * Sets an input by name.
      *
-     * @param string|array|null $value
+     * @param string|int|float|bool|array|null $value
      */
     public function set(string $key, $value)
     {
         if (null !== $value && !is_scalar($value) && !\is_array($value) && !method_exists($value, '__toString')) {
-            trigger_deprecation('symfony/http-foundation', '5.1', 'Passing "%s" as a 2nd Argument to "%s()" is deprecated, pass a string, array, or null instead.', get_debug_type($value), __METHOD__);
+            trigger_deprecation('symfony/http-foundation', '5.1', 'Passing "%s" as a 2nd Argument to "%s()" is deprecated, pass a scalar, array, or null instead.', get_debug_type($value), __METHOD__);
         }
 
         $this->parameters[$key] = $value;

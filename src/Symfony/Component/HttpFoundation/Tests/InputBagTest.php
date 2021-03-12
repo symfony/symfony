@@ -21,11 +21,14 @@ class InputBagTest extends TestCase
 
     public function testGet()
     {
-        $bag = new InputBag(['foo' => 'bar', 'null' => null]);
+        $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false]);
 
-        $this->assertEquals('bar', $bag->get('foo'), '->get() gets the value of a parameter');
-        $this->assertEquals('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
+        $this->assertSame('bar', $bag->get('foo'), '->get() gets the value of a string parameter');
+        $this->assertSame('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
+        $this->assertSame(1, $bag->get('int'), '->get() gets the value of an int parameter');
+        $this->assertSame(1.0, $bag->get('float'), '->get() gets the value of a float parameter');
+        $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
     public function testGetDoesNotUseDeepByDefault()
@@ -59,10 +62,10 @@ class InputBagTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSetWithNonStringishOrArrayIsDeprecated()
+    public function testSetWithNonScalarOrArrayIsDeprecated()
     {
         $bag = new InputBag();
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing "Symfony\Component\HttpFoundation\InputBag" as a 2nd Argument to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated, pass a string, array, or null instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing "Symfony\Component\HttpFoundation\InputBag" as a 2nd Argument to "Symfony\Component\HttpFoundation\InputBag::set()" is deprecated, pass a scalar, array, or null instead.');
         $bag->set('foo', new InputBag());
     }
 
@@ -82,7 +85,7 @@ class InputBagTest extends TestCase
     public function testGetWithNonStringDefaultValueIsDeprecated()
     {
         $bag = new InputBag(['foo' => 'bar']);
-        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing a non-string value as 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, pass a string or null instead.');
+        $this->expectDeprecation('Since symfony/http-foundation 5.1: Passing a non-scalar value as 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()" is deprecated, pass a scalar or null instead.');
         $bag->get('foo', ['a', 'b']);
     }
 

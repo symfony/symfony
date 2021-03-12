@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by acasademont at 2021-02-26T11:56:57Z
+
+PS: Also not sure if this should be considered a bugfix and merged into 5.2.x instead of 5.x
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-26T12:09:46Z
+
+Thinking a bit more about this, there might still be an issue when using JSON payloads: the `InputBag::get()` returns only `string|null`. That means booleans, integers, floats found in JSONs will be lost.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2021-02-26T12:39:31Z
+
+@nicolas-grekas that's only because of the phpdoc typehint, there's nothing preventing an `int|bool|float` from being returned. Maybe the typehint of InputBag should be `string|int|bool|float|null`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-26T16:51:32Z
+
+Can you update the type hints so that we can discuss the full change that would be needed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-02-26T16:56:25Z
+
+(and add related tests btw)
+
+---------------------------------------------------------------------------
+
+by acasademont at 2021-02-26T22:11:54Z
+
+Added the missing scalar type hints and some testing

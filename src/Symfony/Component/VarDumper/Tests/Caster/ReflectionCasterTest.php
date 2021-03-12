@@ -14,8 +14,11 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
+use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
+use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -75,7 +78,7 @@ Closure($x) {
     $b: & 123
   }
   file: "%sReflectionCasterTest.php"
-  line: "68 to 68"
+  line: "71 to 71"
 }
 EOTXT
             , $var
@@ -205,6 +208,104 @@ ReflectionParameter {
   position: 0
   allowsNull: true
   typeHint: "int|float|null"
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testReflectionPropertyScalar()
+    {
+        $var = new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a');
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionProperty {
+  +name: "a"
+  +class: "Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture"
+  modifiers: "public"
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 7.4
+     */
+    public function testReflectionNamedType()
+    {
+        $var = (new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a'))->getType();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionNamedType {
+  name: "int"
+  allowsNull: false
+  isBuiltin: true
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testReflectionUnionType()
+    {
+        $var = (new \ReflectionProperty(ReflectionUnionTypeFixture::class, 'a'))->getType();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionUnionType {
+  allowsNull: false
+  types: array:2 [
+    0 => ReflectionNamedType {
+      name: "string"
+      allowsNull: false
+      isBuiltin: true
+    }
+    1 => ReflectionNamedType {
+      name: "int"
+      allowsNull: false
+      isBuiltin: true
+    }
+  ]
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testExtendsReflectionType()
+    {
+        $var = new ExtendsReflectionTypeFixture();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture {
+  allowsNull: false
+}
+EOTXT
+            , $var
+        );
+    }
+
+    /**
+     * @requires PHP < 8
+     */
+    public function testLegacyExtendsReflectionType()
+    {
+        $var = new ExtendsReflectionTypeFixture();
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+Symfony\Component\VarDumper\Tests\Fixtures\ExtendsReflectionTypeFixture {
+  name: "fake"
+  allowsNull: false
+  isBuiltin: false
 }
 EOTXT
             , $var

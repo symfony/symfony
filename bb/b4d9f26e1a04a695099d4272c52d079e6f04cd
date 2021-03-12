@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by monojp at 2021-03-11T14:32:48Z
+
+I noticed that although the CSP is disabled and the header removed it still shows up in the profiler response page for that request which is kind of a lie. But on the other hand it _should_ be there and is only removed temporarily because of the dumper. I'm not sure if this is a problem and should be addressed

@@ -171,4 +171,19 @@ EOF;
             ))->getPropertyPath()
         );
     }
+
+    public function testRetrievedMessageTemplateIsAStringEvenIfNotSet()
+    {
+        self::assertSame(
+            '',
+            (new ConstraintViolation(
+                'irrelevant',
+                null,
+                [],
+                'irrelevant',
+                'irrelevant',
+                null
+            ))->getMessageTemplate()
+        );
+    }
 }

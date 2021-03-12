@@ -49,7 +49,7 @@ final class BodyRenderer implements BodyRendererInterface
 
         $previousRenderingKey = $messageContext[__CLASS__] ?? null;
         unset($messageContext[__CLASS__]);
-        $currentRenderingKey = md5(serialize([$messageContext, $message->getTextTemplate(), $message->getHtmlTemplate()]));
+        $currentRenderingKey = $this->getFingerPrint($message);
         if ($previousRenderingKey === $currentRenderingKey) {
             return;
         }
@@ -75,6 +75,23 @@ final class BodyRenderer implements BodyRendererInterface
             $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
         }
         $message->context($message->getContext() + [__CLASS__ => $currentRenderingKey]);
+    }
+
+    private function getFingerPrint(TemplatedEmail $message): string
+    {
+        $messageContext = $message->getContext();
+        unset($messageContext[__CLASS__]);
+
+        $payload = [$messageContext, $message->getTextTemplate(), $message->getHtmlTemplate()];
+        try {
+            $serialized = serialize($payload);
+        } catch (\Exception $e) {
+            // Serialization of 'Closure' is not allowed
+            // Happens when context contain a closure, in that case, we assume that context always change.
+            $serialized = random_bytes(8);
+        }
+
+        return md5($serialized);
     }
 
     private function convertHtmlToText(string $html): string

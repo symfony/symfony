@@ -30,8 +30,8 @@ class InputDefinition
 {
     private $arguments;
     private $requiredCount;
-    private $hasAnArrayArgument = false;
-    private $hasOptional;
+    private $lastArrayArgument;
+    private $lastOptionalArgument;
     private $options;
     private $negations;
     private $shortcuts;
@@ -72,8 +72,8 @@ class InputDefinition
     {
         $this->arguments = [];
         $this->requiredCount = 0;
-        $this->hasOptional = false;
-        $this->hasAnArrayArgument = false;
+        $this->lastOptionalArgument = null;
+        $this->lastArrayArgument = null;
         $this->addArguments($arguments);
     }
 
@@ -100,22 +100,22 @@ class InputDefinition
             throw new LogicException(sprintf('An argument with name "%s" already exists.', $argument->getName()));
         }
 
-        if ($this->hasAnArrayArgument) {
-            throw new LogicException('Cannot add an argument after an array argument.');
+        if (null !== $this->lastArrayArgument) {
+            throw new LogicException(sprintf('Cannot add a required argument "%s" after an array argument "%s".', $argument->getName(), $this->lastArrayArgument->getName()));
         }
 
-        if ($argument->isRequired() && $this->hasOptional) {
-            throw new LogicException('Cannot add a required argument after an optional one.');
+        if ($argument->isRequired() && null !== $this->lastOptionalArgument) {
+            throw new LogicException(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $argument->getName(), $this->lastOptionalArgument->getName()));
         }
 
         if ($argument->isArray()) {
-            $this->hasAnArrayArgument = true;
+            $this->lastArrayArgument = $argument;
         }
 
         if ($argument->isRequired()) {
             ++$this->requiredCount;
         } else {
-            $this->hasOptional = true;
+            $this->lastOptionalArgument = $argument;
         }
 
         $this->arguments[$argument->getName()] = $argument;
@@ -172,7 +172,7 @@ class InputDefinition
      */
     public function getArgumentCount()
     {
-        return $this->hasAnArrayArgument ? \PHP_INT_MAX : \count($this->arguments);
+        return null !== $this->lastArrayArgument ? \PHP_INT_MAX : \count($this->arguments);
     }
 
     /**

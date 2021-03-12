@@ -101,7 +101,7 @@ class InputDefinitionTest extends TestCase
     public function testArrayArgumentHasToBeLast()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot add an argument after an array argument.');
+        $this->expectExceptionMessage('Cannot add a required argument "anotherbar" after an array argument "fooarray".');
         $this->initializeArguments();
 
         $definition = new InputDefinition();
@@ -111,9 +111,9 @@ class InputDefinitionTest extends TestCase
 
     public function testRequiredArgumentCannotFollowAnOptionalOne()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot add a required argument after an optional one.');
         $this->initializeArguments();
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('Cannot add a required argument "%s" after an optional one "%s".', $this->foo2->getName(), $this->foo->getName()));
 
         $definition = new InputDefinition();
         $definition->addArgument($this->foo);

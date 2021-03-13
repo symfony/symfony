@@ -37,6 +37,7 @@ class StringableNormalizerTest extends TestCase
     public function testSupportNormalization()
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new StringableDummy()));
+        $this->assertTrue($this->normalizer->supportsNormalization(new StringableLegacyDummy()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 

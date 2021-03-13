@@ -29,11 +29,6 @@ class StringableNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    /**
-     * @var MockObject|SerializerInterface
-     */
-    private $serializer;
-
     protected function setUp(): void
     {
         $this->normalizer = new StringableNormalizer();

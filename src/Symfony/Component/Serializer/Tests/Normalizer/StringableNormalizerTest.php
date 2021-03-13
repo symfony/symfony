@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Serializer\SerializerInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\StringableDummy;
 use Symfony\Component\Serializer\Normalizer\StringableNormalizer;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\StringableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StringableLegacyDummy;
 
 /**
@@ -50,12 +47,12 @@ class StringableNormalizerTest extends TestCase
 
     public function testNormalize()
     {
-        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableDummy));
+        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableDummy()));
     }
 
     public function testNormalizeLegacy()
     {
-        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableLegacyDummy));
+        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableLegacyDummy()));
     }
 }
 

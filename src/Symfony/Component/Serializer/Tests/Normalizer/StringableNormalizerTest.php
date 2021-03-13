@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Normalizer\StringableNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\StringableDummy;
+use Symfony\Component\Serializer\Normalizer\StringableNormalizer;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\StringableLegacyDummy;
 
 /**
  * @author Craig Morris <craig.michael.morris@gmail.com>
@@ -37,14 +39,7 @@ class StringableNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->createNormalizer();
-    }
-
-    private function createNormalizer(array $defaultContext = [])
-    {
-        $this->serializer = $this->createMock(StringableNormalizer::class);
-        $this->normalizer = new StringableNormalizer(null, null, $defaultContext);
-        $this->normalizer->setSerializer($this->serializer);
+        $this->normalizer = new StringableNormalizer();
     }
 
     public function testSupportNormalization()
@@ -55,45 +50,15 @@ class StringableNormalizerTest extends TestCase
 
     public function testNormalize()
     {
-        $this->serializer
-            ->expects($this->once())
-            ->method('normalize')
-            ->willReturnCallback(function ($data) {
-                $this->assertSame(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], array_diff_key($data, ['qux' => '']));
-
-                return 'string_object';
-            })
-        ;
-
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
+        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableDummy));
     }
 
-    public function testCircularNormalize()
+    public function testNormalizeLegacy()
     {
-        $this->expectException(CircularReferenceException::class);
-        $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
-
-        $this->serializer
-            ->expects($this->once())
-            ->method('normalize')
-            ->willReturnCallback(function ($data, $format, $context) {
-                $this->normalizer->normalize($data['qux'], $format, $context);
-
-                return 'string_object';
-            })
-        ;
-
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
-    }
-
-    public function testInvalidDataThrowException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The object must implement "JsonSerializable".');
-        $this->normalizer->normalize(new \stdClass());
+        $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableLegacyDummy));
     }
 }
 
-abstract class JsonSerializerNormalizer implements SerializerInterface, NormalizerInterface
+abstract class StringNormalizer implements SerializerInterface, NormalizerInterface
 {
 }

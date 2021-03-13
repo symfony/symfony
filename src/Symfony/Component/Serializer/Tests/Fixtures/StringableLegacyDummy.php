@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-class StringableDummy implements \Stringable
+class StringableLegacyDummy
 {
     public function __toString(): string
     {

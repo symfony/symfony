@@ -30,15 +30,11 @@ class StringableNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        if (!$object instanceof \JsonSerializable) {
-            throw new InvalidArgumentException(sprintf('The object must implement "%s".', \JsonSerializable::class));
+        if (!$object instanceof \Stringable && !method_exists($object, '__toString')) {
+            throw new InvalidArgumentException(sprintf('The object must implement "%s or __toString()".', \Stringable::class));
         }
 
-        if (!$this->serializer instanceof NormalizerInterface) {
-            throw new LogicException('Cannot normalize object because injected serializer is not a normalizer.');
-        }
-
-        return $this->serializer->normalize($object->jsonSerialize(), $format, $context);
+        return $object->__toString();
     }
 
     /**
@@ -46,7 +42,7 @@ class StringableNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, string $format = null)
     {
-        return $data instanceof \JsonSerializable;
+        return $data instanceof \Stringable;
     }
 
     /**

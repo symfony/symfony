@@ -19,17 +19,13 @@ use Symfony\Component\Serializer\Exception\LogicException;
  *
  * @author Craig Morris <craig.michael.morris@gmail.com>
  */
-class StringableNormalizer extends AbstractNormalizer
+class StringableNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     /**
      * {@inheritdoc}
      */
     public function normalize($object, string $format = null, array $context = [])
     {
-        if ($this->isCircularReference($object, $context)) {
-            return $this->handleCircularReference($object);
-        }
-
         if (!$object instanceof \Stringable && !method_exists($object, '__toString')) {
             throw new InvalidArgumentException(sprintf('The object must implement "%s or __toString()".', \Stringable::class));
         }

@@ -12,9 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\StringableNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\StringableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StringableLegacyDummy;
 

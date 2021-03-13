@@ -50,7 +50,3 @@ class StringableNormalizerTest extends TestCase
         $this->assertSame('hello worlds', $this->normalizer->normalize(new StringableLegacyDummy()));
     }
 }
-
-abstract class StringNormalizer implements SerializerInterface, NormalizerInterface
-{
-}

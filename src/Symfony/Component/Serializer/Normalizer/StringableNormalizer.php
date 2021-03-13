@@ -42,7 +42,7 @@ class StringableNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, string $format = null)
     {
-        return $data instanceof \Stringable;
+        return $data instanceof \Stringable || method_exists($data, '__toString');
     }
 
     /**

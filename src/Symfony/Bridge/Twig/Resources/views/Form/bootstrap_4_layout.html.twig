@@ -132,9 +132,15 @@
 {% endblock %}
 
 {% block form_widget_simple -%}
-    {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
-    {% endif %}
+    {%- if type is not defined or type != 'hidden' -%}
+        {%- set className = ' form-control' -%}
+        {%- if type|default('') == 'file' -%}
+            {%- set className = ' custom-file-input' -%}
+        {%- elseif type|default('') == 'range' -%}
+            {%- set className = ' form-control-range' -%}
+        {%- endif -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ className)|trim}) -%}
+    {%- endif -%}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
@@ -142,12 +148,12 @@
     {{- parent() -}}
 {%- endblock form_widget_simple %}
 
-{%- block widget_attributes -%}
-    {%- if not valid %}
+{% block widget_attributes -%}
+    {%- if not valid -%}
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) %}
-    {% endif -%}
+    {%- endif -%}
     {{ parent() }}
-{%- endblock widget_attributes -%}
+{%- endblock widget_attributes %}
 
 {% block button_widget -%}
     {%- set attr = attr|merge({class: (attr.class|default('btn-secondary') ~ ' btn')|trim}) -%}

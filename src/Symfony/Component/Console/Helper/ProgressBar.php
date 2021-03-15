@@ -441,8 +441,15 @@ final class ProgressBar
         if ($this->overwrite) {
             if (null !== $this->previousMessage) {
                 if ($this->output instanceof ConsoleSectionOutput) {
-                    $lines = floor(Helper::strlen($message) / $this->terminal->getWidth()) + $this->formatLineCount + 1;
-                    $this->output->clear($lines);
+                    $message_lines = explode("\n", $message);
+                    $line_count = \count($message_lines);
+                    foreach ($message_lines as $message_line) {
+                        $message_line_length = Helper::strlenWithoutDecoration($this->output->getFormatter(), $message_line);
+                        if ($message_line_length > $this->terminal->getWidth()) {
+                            $line_count += floor($message_line_length / $this->terminal->getWidth());
+                        }
+                    }
+                    $this->output->clear($line_count);
                 } else {
                     // Erase previous lines
                     if ($this->formatLineCount > 0) {

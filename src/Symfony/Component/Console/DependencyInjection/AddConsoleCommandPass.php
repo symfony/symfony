@@ -36,6 +36,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
     public function __construct(string $commandLoaderServiceId = 'console.command_loader', string $commandTag = 'console.command', string $noPreloadTag = 'container.no_preload', string $privateTagName = 'container.private')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/console', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->commandLoaderServiceId = $commandLoaderServiceId;
         $this->commandTag = $commandTag;
         $this->noPreloadTag = $noPreloadTag;

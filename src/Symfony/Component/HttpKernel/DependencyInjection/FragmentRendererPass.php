@@ -30,6 +30,10 @@ class FragmentRendererPass implements CompilerPassInterface
 
     public function __construct(string $handlerService = 'fragment.handler', string $rendererTag = 'kernel.fragment_renderer')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/http-kernel', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->handlerService = $handlerService;
         $this->rendererTag = $rendererTag;
     }

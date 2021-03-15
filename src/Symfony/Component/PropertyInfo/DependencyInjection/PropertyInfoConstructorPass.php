@@ -30,6 +30,10 @@ final class PropertyInfoConstructorPass implements CompilerPassInterface
 
     public function __construct(string $service = 'property_info.constructor_extractor', string $tag = 'property_info.constructor_extractor')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/property-info', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->service = $service;
         $this->tag = $tag;
     }

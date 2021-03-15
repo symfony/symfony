@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
+use ArrayIterator;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\Expression\Binary\ConcatBinary;
@@ -104,8 +105,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         ) {
             // extract t() nodes with a trans filter applied
             $functionNodeArguments = $node->getNode('node')->getNode('arguments');
+            /** @var ArrayIterator $iterator */
+            $iterator = $functionNodeArguments->getIterator();
 
-            if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
+            if ($iterator->current() instanceof ConstantExpression) {
                 $this->messages[] = [
                     $this->getReadMessageFromArguments($functionNodeArguments, 0),
                     $this->getReadDomainFromArguments($functionNodeArguments, 2),
@@ -127,8 +130,10 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             }
 
             $functionNodeArguments = $node->getNode('arguments');
+            /** @var ArrayIterator $iterator */
+            $iterator = $functionNodeArguments->getIterator();
 
-            if ($functionNodeArguments->getIterator()->current() instanceof ConstantExpression) {
+            if ($iterator->current() instanceof ConstantExpression) {
                 $this->messages[] = [
                     $this->getReadMessageFromArguments($functionNodeArguments, 0),
                     $this->getReadDomainFromArguments($functionNodeArguments, 2),

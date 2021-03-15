@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 
-class TranslationPassTest extends TestCase
+class TranslatorPassTest extends TestCase
 {
     public function testValidCollector()
     {
@@ -35,7 +35,7 @@ class TranslationPassTest extends TestCase
         $container->setDefinition('translation.reader', $reader);
         $container->setDefinition('translation.xliff_loader', $loader);
 
-        $pass = new TranslatorPass('translator.default', 'translation.reader');
+        $pass = new TranslatorPass();
         $pass->process($container);
 
         $expectedReader = (new Definition())
@@ -72,7 +72,7 @@ class TranslationPassTest extends TestCase
         ;
         $container->setParameter('twig.default_path', 'templates');
 
-        $pass = new TranslatorPass('translator.default');
+        $pass = new TranslatorPass();
         $pass->process($container);
 
         $expectedViewPaths = ['other/templates', 'tpl'];
@@ -113,7 +113,7 @@ class TranslationPassTest extends TestCase
         ;
         $container->setParameter('twig.default_path', 'templates');
 
-        $pass = new TranslatorPass('translator.default');
+        $pass = new TranslatorPass();
         $pass->process($container);
 
         $this->assertSame('templates', $debugCommand->getArgument(4));

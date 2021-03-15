@@ -378,7 +378,7 @@ class ProgressBarTest extends TestCase
         $stream = $this->getOutputStream(true);
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
-        ProgressBar::setFormatDefinition('test', "%current%/%max% [%bar%] %percent:3s%% %message% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.");
+        ProgressBar::setFormatDefinition('test', '%current%/%max% [%bar%] %percent:3s%% %message% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.');
 
         $bar = new ProgressBar($output, 50, 0);
         $bar->setFormat('test');

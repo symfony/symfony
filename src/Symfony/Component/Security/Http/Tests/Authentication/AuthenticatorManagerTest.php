@@ -17,10 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -130,6 +132,37 @@ class AuthenticatorManagerTest extends TestCase
             ->with($this->request, $this->isInstanceOf(BadCredentialsException::class));
 
         $manager = $this->createManager([$authenticator]);
+        $manager->authenticateRequest($this->request);
+    }
+
+    public function testRequiredBadgeMissing()
+    {
+        $authenticator = $this->createAuthenticator();
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
+
+        $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(function ($exception) {
+            return 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage();
+        }));
+
+        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
+        $manager->authenticateRequest($this->request);
+    }
+
+    public function testAllRequiredBadgesPresent()
+    {
+        $authenticator = $this->createAuthenticator();
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $csrfBadge = new CsrfTokenBadge('csrfid', 'csrftoken');
+        $csrfBadge->markResolved();
+        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
+        $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn(new UsernamePasswordToken($this->user, null, 'main'));
+
+        $authenticator->expects($this->once())->method('onAuthenticationSuccess');
+
+        $manager = $this->createManager([$authenticator], 'main', true, [CsrfTokenBadge::class]);
         $manager->authenticateRequest($this->request);
     }
 
@@ -243,8 +276,8 @@ class AuthenticatorManagerTest extends TestCase
         return $authenticator;
     }
 
-    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true)
+    private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [])
     {
-        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials);
+        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials, $requiredBadges);
     }
 }

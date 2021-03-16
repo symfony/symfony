@@ -495,6 +495,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->replaceArgument(0, $authenticators)
                 ->replaceArgument(2, new Reference($firewallEventDispatcherId))
                 ->replaceArgument(3, $id)
+                ->replaceArgument(6, $firewall['required_badges'] ?? [])
                 ->addTag('monolog.logger', ['channel' => 'security'])
             ;
 

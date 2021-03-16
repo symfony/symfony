@@ -1,9 +1,12 @@
 <?php
 
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+
 $container->loadFromExtension('security', [
     'enable_authenticator_manager' => true,
     'firewalls' => [
         'main' => [
+            'required_badges' => [CsrfTokenBadge::class, 'RememberMeBadge'],
             'login_link' => [
                 'check_route' => 'login_check',
                 'check_post_only' => true,

@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
@@ -194,6 +195,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->disallowNewKeysInSubsequentConfigs()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->fixXmlConfig('required_badge')
                         ->children()
         ;
 
@@ -265,6 +267,29 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
                 ->end()
+            ->end()
+            ->arrayNode('required_badges')
+                ->info('A list of badges that must be present on the authenticated passport.')
+                ->validate()
+                    ->always()
+                    ->then(function ($requiredBadges) {
+                        return array_map(function ($requiredBadge) {
+                            if (class_exists($requiredBadge)) {
+                                return $requiredBadge;
+                            }
+
+                            if (false === strpos($requiredBadge, '\\')) {
+                                $fqcn = 'Symfony\Component\Security\Http\Authenticator\Passport\Badge\\'.$requiredBadge;
+                                if (class_exists($fqcn)) {
+                                    return $fqcn;
+                                }
+                            }
+
+                            throw new InvalidConfigurationException(sprintf('Undefined security Badge class "%s" set in "security.firewall.required_badges".', $requiredBadge));
+                        }, $requiredBadges);
+                    })
+                ->end()
+                ->prototype('scalar')->end()
             ->end()
         ;
 

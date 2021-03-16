@@ -1,0 +1,293 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-19T18:00:31Z
+
+Hey!
+
+I appreciate you submitting this PR.
+
+I think @daniel-iwaniec has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T12:06:01Z
+
+Any comment here? /cc @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-11T12:29:08Z
+
+Will this mean that any class with `#[Service(name: 'acme.foobar')]` will be registered as a service? Or is it just classes that I've defined?
+
+Example:
+
+```yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    App\:
+        resource: '../src/*'
+```
+
+The DI only cares about classes in the `src`, right?
+If a class in my `vendor` directory is loaded at build time, it will still not be automatically registered with the PHP8 annotation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T12:31:30Z
+
+This is read only for autoconfigured services. Loading services is not affected by the annotation.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-11T12:34:31Z
+
+Cool. So this PR just adds support for another way to define services. PHP, Yaml, XML and PHP8 annotations.
+
+I would like to see this feature. I find it useful to get an easy way to prioritise tagged services.
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-11T12:55:24Z
+
+An `@Service` annotation has been proposed and rejected several times in the past because a class should not know/control how it is wired, nor it should know about the concept of services.
+
+How is this different from e.g. https://github.com/symfony/symfony/issues/34095#issuecomment-545819822?
+
+Also, having yet another way to configure services feels too much to me.
+I would prefer not having to educate people to use it, nor to use it myself, which will inevitably happen if we merge this.
+
+I'm sorry, but I'm 👎  for this as-is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T13:35:58Z
+
+Argh, please, reconsider. I already recorded my talk about new feats in 5.3, because this one makes just so much sense!
+
+How does this differ from https://github.com/symfony/symfony/issues/34095#issuecomment-545819822? Exactly like #39776: because it is opt-in and bound to autoconfiguration.
+
+This attribute is the only elegant way to improve the ugly `public static getDefaultName()` and `public static getDefaultPriority()` methods that ppl are using right now, because PHP didn't have attributes.
+
+We cannot *not* merge this (or a variant of it).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-11T14:26:12Z
+
+Thanks for adding some detailed context on the scope of this attribute Nicolas!
+
+> Right now, in order to declare the same thing, one has to:
+>
+> - for the "name" and "priority" parts: create `public static getDefaultName()` and `public static getDefaultPriority()` to define the (default) name/priority of a class in a tagged collection (either `!tagged_iterator` or `!tagged_locator`)
+> - for the "name" and "type" parts: create a named autowiring alias via either `$container->registerAliasForArgument()` or via an explicit alias `App\LoggerInterface $apiLogger: @App\MyApiLogger`
+> - for the "id" part: create a regular alias to the FQCN that autodiscovery mandates.
+>
+> This PR replaces these techniques by a single declarative way.
+
+To me, it seems like it's doing too many things at once (and e.g. the "name" argument has multiple meanings). This also makes the `#[Service]` attribute a bit too generic. It looks a lot like `<service id="app.api_logger" class="App\MyApiLogger"/>`, but that's not what this attribute does.
+
+Would it make sense to create an attribute for each use-case?
+
+* `#[TaggedService(name: "app.api_logger", priority: 123)]`
+* `#[ArgumentAlias(name: "apiLogger", type: "App\LoggerInterface")]`
+* `#[Autodiscoverable(id: "app.api_logger")]`
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-03-11T14:33:46Z
+
+@chalasr if I understand correctly, there is a huge difference: the service isn't registered by the attribute, but only configured by it. The YAML still drives the loading, whereas in your mentioned proposal, the author was talking about registration of service.
+
+Generally speaking, my main concerns regarding attributes like these is to be clear that they don't *register* but *configure* things. Basically, they are (and should stay) hints for the DI container, like an implemented interface would be (Twig ExtensionInterface).
+
+Perhaps is the "Service" attribute name misleading in that regard?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-11T14:38:35Z
+
+> @chalasr if I understand correctly, there is a huge difference: the service isn't registered by the attribute, but only configured by it. The YAML still drives the loading, whereas in your mentioned proposal, the author was talking about registration of service.
+
+That is worst to me, it's even more complex to understand and explain.
+Any newcomer looking at the attribute would probably expect it to register a service on its own.
+
+> Perhaps is the "Service" attribute name misleading in that regard?
+
+Yes, I think so.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-03-11T14:43:56Z
+
+> Any newcomer looking at the attribute would probably expect it to register a service on its own.
+
+I see your point and I agree then. But I do think this idea make a lot of sense, if the wording was improved.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T14:53:37Z
+
+`HerebyIDescribeHowThisClassShouldBeConsideredWhenRegisteredAsAService`
+Or shorter: `Service` *attribute* ("attribute" means the whole prefix).
+What attributes lead to in terms of behavior is not their business, by definition.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T14:59:06Z
+
+In the description, I didn't mention the part related to the "id" until the last sentence:
+it allows overriding the default service id that autodiscovery uses to register classes.
+By default, services are register after their FQCN. This "id" part allows overriding this.
+I'm fine removing that part!
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-11T15:05:22Z
+
+I don't think there is a need to discuss in over-exaggerated terms.
+
+In https://github.com/symfony/symfony/pull/39776#issuecomment-757836140 , we established that attribute names should be crystal clear about their meaning and function in their name. `Service` is a very generic term and, as it's exactly equal to - among others - the `<service>` tag in Symfony, it'll quickly lead to wrong conclusions about its function (as can be seen in the reactions on this PR).
+
+I think there is, at least for the tagged features, a consensus that attributes are a better replacement for the static methods we currently use. The only thing there is no consensus about is the name of the attribute. I think it makes sense to see what other naming alternatives we have.
+
+E.g. the static methods both include "default" (`getDefaultName()`, `getDefaultPriority()`), can we do something with that (`#[DefaultService]`)?
+
+Personally, I feel like that is still not crystal clear. I would be in favor of also mentioning its purpose: default values when used with the tagged features. `#[TaggedService]`? `#[TaggedDefaults]`?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-11T15:10:54Z
+
+`#[ConfigureService]`?
+`#[AutoconfiguredService]`?
+
+Naming things is always hard. 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T15:20:04Z
+
+> I don't think there is a need to discuss in over-exaggerated terms.
+
+Sorry about that, I didn't want to be - I'm so frustrated, certainly because I can't find a better name and I really want the implementation. Naming things :)
+
+I have a train to take, will come back later.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-03-11T15:56:54Z
+
+My comment is not related to the core discussion, but it's related to this feature.
+
+The description says:
+
+> This PR adds a new #[Service] attribute that ppl can use [...]
+> to define the named autowiring alias(es) to bind to them.
+
+And this is the example:
+
+```php
+#[Service(type: LoggerInterface::class, name: 'api.logger')]
+class MyApiLogger implements LoggerInterface {}
+```
+
+The (minor) problem I see is that the `name` is `api.logger`, but the name you must use in other parts of the application in `apiLogger` instead (e.g. `LoggerInterface $apiLogger`).
+
+I guess it's not possible to do it as part of this PR, but couldn't we make the `name` value the same everywhere? Otherwise, it's always a bit confusing (you need to learn this; always remember it when using it; etc.) Thanks!
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-11T16:26:09Z
+
+> #[ConfigureService]?
+> #[AutoconfiguredService]?
+>
+> Naming things is always hard. 🙂
+
+How about just `#[Configure]`? The namespace will show it is related to dependency injection.
+
+```php
+
+use Symfony\Component\DependencyInjection\Attribute\Configure;
+
+#[Configure(...)]
+class Foo
+{
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T16:32:33Z
+
+As my understanding becomes clearer thanks to your comments, I'd say this attribute is meant to declare how a service should be named when it is part of a collection of siblings.
+
+I allowed adding a type so that the name could vary by type, when a class implements many base types and is part of many collections, one for each such type.
+
+Declaring a name when part of a collection allows several use cases. We identified 3 of them: key in an iterator, id in a locator, and name for an autowiring alias. There could be more use cases, that's the point of attributes - being decoupled from their use cases.
+
+For the named autow alias use case, we need an interface to create them. If the attribute doesn't declare the type, I don't know which interface I should prefix to the name. Taking all supertypes would look wrong to me.
+
+Maybe we can also drop this named autow alias part (alongside with dropping the "id" part). But I don't see anything inherently wrong with generating these aliases - quite the contrary.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-11T16:43:04Z
+
+About naming, we have already made some decisions:
+
+`#[ConsoleCommand]` replaces the `$defaultName` and `$defaultDescription` properties. The corresponding entries in the attribute are `name` and `description`. There is a reason for that: attributes should be ignorable, by their very declarative nature. That means being attributes, they already embed the notion of being some defaults (aka "unless better is known".)
+
+About using `Autoconfigure` in the name, I was the one, in https://github.com/symfony/symfony/pull/39776#issuecomment-757836140, to ask for adding the `Auto` word in all attributes that are taken into account when autoconfiguration is enabled. We finally did not adopt my proposal. Adopting it now and here would not be consistent, since there is nothing more specific about autoconfiguration for the tag proposed here, compared to eg `EventListener`.
+
+Talking about `EventListener`, we adopted this name because it's just plain descriptive: "this class can be used as an event listener". Using the word `Service` here is also plain descriptive: "this class can be used as a service, and here are some more details about it, eg its name and its priority if one cares".
+
+About `Configure`, it looks wrong to me to use a verb: this turns something that should be descriptive into something that looks imperative. `EventLister` also "configures" a class, if one cares about the declaration (aka if one enabled autoconfiguration here.)
+
+`Service` looks like the correct term to me, I can't think of a better one for now.
+
+Actually yes, I do have one: `AsService`.
+I think it would help to have this `As` prefix to all class attributes that relate to autoconfiguration: `AsCommand`, `AsEventListener`, etc.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-11T17:00:18Z
+
+> Using the word `Service` here is also plain descriptive: "this class can be used as a service, and here are some more details about it, eg its name and its priority if one cares".
+
+but **any** class registered in the container is used a a service.
+The attribute does not define that you can use it as a service (services don't have priorities at all btw). It defines some info about how this class should be handled when referenced inside a collection of references (and then, the important thing is *which* collection this applies too, as there can be multiple ones needing different config)
+
+Regarding defining named autowiring aliases, I'm wondering about the usefulness. In my experience, the main benefit of named autowiring aliases (over normal autowiring aliases) is when you register multiple instances of your class in the container (generally with different config in them). And in that case, you cannot rely on autoconfiguration anyway (as you cannot autoconfigure them in different ways as they will have the same attributes for both instances of the same class).
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-03-11T18:24:21Z
+
+> Regarding defining named autowiring aliases, I'm wondering about the usefulness
+
+In his example, he would use several loggers and a single LoggerInterface type, thus a default name for the autowiring aliases on the children classes. I do think it makes sense there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-12T17:13:43Z
+
+I think I found the way to go!
+The attribute is now named `TaggedItem`, and restricted to tagged collections.
+See updated description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-15T11:19:51Z
+
+Thank you all for the review and the discussion, as always we've made a useful turn towards the better.
+
+I've now updated the implementation to make this a strict replacement for the static methods. No more "type" property anymore, this is strictly a `PriorityTaggedServiceTrait` concern now.

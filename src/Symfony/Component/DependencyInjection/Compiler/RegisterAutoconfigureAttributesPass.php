@@ -24,16 +24,13 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 {
-    private $ignoreAttributesTag;
     private $registerForAutoconfiguration;
 
-    public function __construct(string $ignoreAttributesTag = 'container.ignore_attributes')
+    public function __construct()
     {
         if (80000 > \PHP_VERSION_ID) {
             return;
         }
-
-        $this->ignoreAttributesTag = $ignoreAttributesTag;
 
         $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
         $parseDefinitions->setAccessible(true);
@@ -80,7 +77,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 
     public function accept(Definition $definition): bool
     {
-        return 80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() && !$definition->hasTag($this->ignoreAttributesTag);
+        return 80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
     }
 
     public function processClass(ContainerBuilder $container, \ReflectionClass $class)

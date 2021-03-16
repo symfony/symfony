@@ -36,6 +36,10 @@ class MessengerPass implements CompilerPassInterface
 
     public function __construct(string $handlerTag = 'messenger.message_handler', string $busTag = 'messenger.bus', string $receiverTag = 'messenger.receiver')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/messenger', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->handlerTag = $handlerTag;
         $this->busTag = $busTag;
         $this->receiverTag = $receiverTag;

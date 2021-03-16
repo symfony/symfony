@@ -29,6 +29,10 @@ class ResolveNoPreloadPass extends AbstractRecursivePass
 
     public function __construct(string $tagName = 'container.no_preload')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/dependency-injection', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->tagName = $tagName;
     }
 

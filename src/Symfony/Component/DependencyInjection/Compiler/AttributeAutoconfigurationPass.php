@@ -19,13 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 final class AttributeAutoconfigurationPass implements CompilerPassInterface
 {
-    private $ignoreAttributesTag;
-
-    public function __construct(string $ignoreAttributesTag = 'container.ignore_attributes')
-    {
-        $this->ignoreAttributesTag = $ignoreAttributesTag;
-    }
-
     public function process(ContainerBuilder $container): void
     {
         if (80000 > \PHP_VERSION_ID) {
@@ -37,7 +30,7 @@ final class AttributeAutoconfigurationPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$definition->isAutoconfigured()
                 || $definition->isAbstract()
-                || $definition->hasTag($this->ignoreAttributesTag)
+                || $definition->hasTag('container.ignore_attributes')
                 || !($reflector = $container->getReflectionClass($definition->getClass(), false))
             ) {
                 continue;

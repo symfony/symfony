@@ -40,6 +40,10 @@ class CachePoolPass implements CompilerPassInterface
 
     public function __construct(string $cachePoolTag = 'cache.pool', string $kernelResetTag = 'kernel.reset', string $cacheClearerId = 'cache.global_clearer', string $cachePoolClearerTag = 'cache.pool.clearer', string $cacheSystemClearerId = 'cache.system_clearer', string $cacheSystemClearerTag = 'kernel.cache_clearer', string $reverseContainerId = 'reverse_container', string $reversibleTag = 'container.reversible', string $messageHandlerId = 'cache.early_expiration_handler')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/cache', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->cachePoolTag = $cachePoolTag;
         $this->kernelResetTag = $kernelResetTag;
         $this->cacheClearerId = $cacheClearerId;

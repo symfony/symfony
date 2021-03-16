@@ -32,6 +32,10 @@ class CacheCollectorPass implements CompilerPassInterface
 
     public function __construct(string $dataCollectorCacheId = 'data_collector.cache', string $cachePoolTag = 'cache.pool', string $cachePoolRecorderInnerSuffix = '.recorder_inner')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/cache', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->dataCollectorCacheId = $dataCollectorCacheId;
         $this->cachePoolTag = $cachePoolTag;
         $this->cachePoolRecorderInnerSuffix = $cachePoolRecorderInnerSuffix;

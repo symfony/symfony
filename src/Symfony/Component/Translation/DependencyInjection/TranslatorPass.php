@@ -26,6 +26,10 @@ class TranslatorPass implements CompilerPassInterface
 
     public function __construct(string $translatorServiceId = 'translator.default', string $readerServiceId = 'translation.reader', string $loaderTag = 'translation.loader', string $debugCommandServiceId = 'console.command.translation_debug', string $updateCommandServiceId = 'console.command.translation_update')
     {
+        if (0 < \func_num_args()) {
+            trigger_deprecation('symfony/translation', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
+        }
+
         $this->translatorServiceId = $translatorServiceId;
         $this->readerServiceId = $readerServiceId;
         $this->loaderTag = $loaderTag;

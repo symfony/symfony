@@ -23,6 +23,7 @@
         <xsd:attribute name="hide-user-not-found" type="xsd:boolean" />
         <xsd:attribute name="always-authenticate-before-granting" type="xsd:boolean" />
         <xsd:attribute name="erase-credentials" type="xsd:boolean" />
+        <xsd:attribute name="enable-authenticator-manager" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="encoders">
@@ -141,6 +142,7 @@
             <xsd:element name="http-basic-ldap" type="http_basic_ldap" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login" type="json_login" minOccurs="0" maxOccurs="1" />
             <xsd:element name="json-login-ldap" type="json_login_ldap" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="login-throttling" type="login_throttling" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remember-me" type="remember_me" minOccurs="0" maxOccurs="1" />
             <xsd:element name="remote-user" type="remote_user" minOccurs="0" maxOccurs="1" />
             <xsd:element name="x509" type="x509" minOccurs="0" maxOccurs="1" />
@@ -160,6 +162,7 @@
         <xsd:attribute name="provider" type="xsd:string" />
         <xsd:attribute name="stateless" type="xsd:boolean" />
         <xsd:attribute name="context" type="xsd:string" />
+        <xsd:attribute name="lazy" type="xsd:boolean" />
         <!-- allow factories to use dynamic elements -->
         <xsd:anyAttribute processContents="lax" />
     </xsd:complexType>
@@ -231,6 +234,7 @@
                 <xsd:attribute name="csrf-token-id" type="xsd:string" />
                 <xsd:attribute name="post-only" type="xsd:boolean" />
                 <xsd:attribute name="csrf-token-generator" type="xsd:string" />
+                <xsd:attribute name="enable-csrf" type="xsd:boolean" />
                 <xsd:attributeGroup ref="success-handler-options" />
                 <xsd:attributeGroup ref="failure-handler-options" />
             </xsd:extension>
@@ -281,6 +285,25 @@
                 <xsd:attributeGroup ref="ldap-factory" />
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="login_link">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="signature-property" type="xsd:string" />
+        </xsd:choice>
+        <xsd:attribute name="check-route" type="xsd:string" />
+        <xsd:attribute name="check-post-only" type="xsd:boolean" />
+        <xsd:attribute name="lifetime" type="xsd:integer" />
+        <xsd:attribute name="max-uses" type="xsd:integer" />
+        <xsd:attribute name="used-link-cache" type="xsd:string" />
+        <xsd:attribute name="success-handler" type="xsd:string" />
+        <xsd:attribute name="failure-handler" type="xsd:string" />
+        <xsd:attribute name="provider" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="login_throttling">
+        <xsd:attribute name="limiter" type="xsd:string" />
+        <xsd:attribute name="max-attempts" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="remember_me">

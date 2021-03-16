@@ -51,7 +51,6 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authenticator.cache.expired_links')
             ->parent('cache.app')
             ->private()
-            ->tag('cache.pool')
 
         ->set('security.authenticator.firewall_aware_login_link_handler', FirewallAwareLoginLinkHandler::class)
             ->args([

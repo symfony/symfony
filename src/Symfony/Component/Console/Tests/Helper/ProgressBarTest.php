@@ -343,6 +343,31 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testOverwriteWithAnsiSectionOutput()
+    {
+        // output has 43 visible characters plus 2 invisible ANSI characters
+        putenv('COLUMNS=43');
+        $sections = [];
+        $stream = $this->getOutputStream(true);
+        $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
+
+        $bar = new ProgressBar($output, 50, 0);
+        $bar->setFormat(" \033[44;37m%current%/%max%\033[0m [%bar%] %percent:3s%%");
+        $bar->start();
+        $bar->display();
+        $bar->advance();
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertSame(
+            " \033[44;37m 0/50\033[0m [>---------------------------]   0%".\PHP_EOL.
+            "\x1b[1A\x1b[0J"." \033[44;37m 1/50\033[0m [>---------------------------]   2%".\PHP_EOL.
+            "\x1b[1A\x1b[0J"." \033[44;37m 2/50\033[0m [=>--------------------------]   4%".\PHP_EOL,
+            stream_get_contents($output->getStream())
+        );
+        putenv('COLUMNS=120');
+    }
+
     public function testOverwriteMultipleProgressBarsWithSectionOutputs()
     {
         $sections = [];

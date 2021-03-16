@@ -120,7 +120,7 @@ class KernelBrowser extends HttpKernelBrowser
             throw new \LogicException(sprintf('The first argument of "%s" must be instance of "%s", "%s" provided.', __METHOD__, UserInterface::class, \is_object($user) ? \get_class($user) : \gettype($user)));
         }
 
-        $token = new TestBrowserToken($user->getRoles(), $user);
+        $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
         $token->setAuthenticated(true);
         $session = $this->getContainer()->get('test.service_container')->get('session.factory')->createSession();
         $session->set('_security_'.$firewallContext, serialize($token));

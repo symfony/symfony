@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
+use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 
@@ -1227,6 +1228,41 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     [contains(.., "‱")]
                 ]
     ]
+'
+        );
+    }
+
+    public function testRange()
+    {
+        $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5]]);
+
+        $this->assertWidgetMatchesXpath(
+            $form->createView(),
+            ['attr' => ['class' => 'my&class']],
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value="42"]
+    [@min="5"]
+    [@class="my&class form-control-range"]
+'
+        );
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5, 'max' => 57]]);
+
+        $this->assertWidgetMatchesXpath(
+            $form->createView(),
+            ['attr' => ['class' => 'my&class']],
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value="42"]
+    [@min="5"]
+    [@max="57"]
+    [@class="my&class form-control-range"]
 '
         );
     }

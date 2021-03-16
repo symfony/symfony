@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by danepowell at 2021-03-11T20:36:48Z
+
+I don't see how the test failures are related to this PR, let me know if anything else is needed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-12T05:53:16Z
+
+Can you add a test to cover this bug?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-12T16:04:01Z
+
+I can reproduce the bug with a small terminal window. I can confirm via a manual test that the upstream change does resolve the issue.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2021-03-12T19:10:17Z
+
+I added a unit test. You can see it failing in the [test-only commit](https://travis-ci.com/github/symfony/symfony/jobs/490641898) and then [passing after the fix](https://travis-ci.com/github/symfony/symfony/jobs/490642699).
+
+(both commits fail the full test suite due to some unrelated issue on the 4.4 branch)

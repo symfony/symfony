@@ -61,16 +61,4 @@ class UserProviderListenerTest extends TestCase
     {
         yield [new SelfValidatingPassport(new UserBadge('wouter', function () {}))];
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserPassport()
-    {
-        $passport = new SelfValidatingPassport($user = $this->createMock(UserInterface::class));
-        $this->listener->checkPassport(new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport));
-
-        $this->assertFalse($passport->hasBadge(UserBadge::class));
-        $this->assertSame($user, $passport->getUser());
-    }
 }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate class `User`, use `InMemoryUser` instead
  * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
+ * [BC break] Remove support for passing a `UserInterface` implementation to `Passport`, use the `UserBadge` instead.
  * Add `PasswordAuthenticatedUserInterface` for user classes that use passwords
  * Add `LegacyPasswordAuthenticatedUserInterface` for user classes that use user-provided salts in addition to passwords
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead

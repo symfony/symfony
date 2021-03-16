@@ -24,6 +24,9 @@ trait ServiceSubscriberTrait
     /** @var ContainerInterface */
     protected $container;
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedServices(): array
     {
         static $services;

@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTo
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
@@ -247,7 +247,7 @@ class ContextListenerTest extends TestCase
 
     public function testIfTokenIsDeauthenticated()
     {
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
         $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]);
 
         $this->assertNull($tokenStorage->getToken());
@@ -256,8 +256,8 @@ class ContextListenerTest extends TestCase
     public function testIfTokenIsNotDeauthenticated()
     {
         $tokenStorage = new TokenStorage();
-        $badRefreshedUser = new User('foobar', 'baz');
-        $goodRefreshedUser = new User('foobar', 'bar');
+        $badRefreshedUser = new InMemoryUser('foobar', 'baz');
+        $goodRefreshedUser = new InMemoryUser('foobar', 'bar');
         $tokenStorage = $this->handleEventWithPreviousSession([new SupportingUserProvider($badRefreshedUser), new SupportingUserProvider($goodRefreshedUser)], $goodRefreshedUser);
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
@@ -265,7 +265,7 @@ class ContextListenerTest extends TestCase
     public function testRememberMeGetsCanceledIfTokenIsDeauthenticated()
     {
         $tokenStorage = new TokenStorage();
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
 
         $rememberMeServices = $this->createMock(RememberMeServicesInterface::class);
         $rememberMeServices->expects($this->once())->method('loginFail');
@@ -277,7 +277,7 @@ class ContextListenerTest extends TestCase
 
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
     {
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
         $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
@@ -285,7 +285,7 @@ class ContextListenerTest extends TestCase
 
     public function testNextSupportingUserProviderIsTriedIfPreviousSupportingUserProviderDidNotLoadTheUser()
     {
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
         $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)], $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
@@ -306,7 +306,7 @@ class ContextListenerTest extends TestCase
 
     public function testAcceptsProvidersAsTraversable()
     {
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
         $tokenStorage = $this->handleEventWithPreviousSession(new \ArrayObject([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]), $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
@@ -315,9 +315,9 @@ class ContextListenerTest extends TestCase
     public function testDeauthenticatedEvent()
     {
         $tokenStorage = new TokenStorage();
-        $refreshedUser = new User('foobar', 'baz');
+        $refreshedUser = new InMemoryUser('foobar', 'baz');
 
-        $user = new User('foo', 'bar');
+        $user = new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
 
@@ -420,7 +420,7 @@ class ContextListenerTest extends TestCase
 
     private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
     {
-        $tokenUser = $user ?: new User('foo', 'bar');
+        $tokenUser = $user ?: new InMemoryUser('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, '', 'context_key', ['ROLE_USER'])));
 
@@ -500,7 +500,7 @@ class SupportingUserProvider implements UserProviderInterface
 {
     private $refreshedUser;
 
-    public function __construct(User $refreshedUser = null)
+    public function __construct(InMemoryUser $refreshedUser = null)
     {
         $this->refreshedUser = $refreshedUser;
     }
@@ -511,7 +511,7 @@ class SupportingUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user): UserInterface
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof InMemoryUser) {
             throw new UnsupportedUserException();
         }
 
@@ -524,6 +524,6 @@ class SupportingUserProvider implements UserProviderInterface
 
     public function supportsClass($class): bool
     {
-        return 'Symfony\Component\Security\Core\User\User' === $class;
+        return InMemoryUser::class === $class;
     }
 }

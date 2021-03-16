@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UserPasswordHashCommandTest extends TestCase
 {
@@ -30,7 +30,7 @@ class UserPasswordHashCommandTest extends TestCase
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
-            'user-class' => 'Symfony\Component\Security\Core\User\User',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
             '--empty-salt' => true,
         ], ['decorated' => false]);
 
@@ -173,7 +173,7 @@ class UserPasswordHashCommandTest extends TestCase
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'p@ssw0rd',
-            'user-class' => 'Symfony\Component\Security\Core\User\User',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
             '--empty-salt' => true,
         ]);
 
@@ -260,7 +260,7 @@ class UserPasswordHashCommandTest extends TestCase
   [0] Custom\Class\Native\User
   [1] Custom\Class\Pbkdf2\User
   [2] Custom\Class\Test\User
-  [3] Symfony\Component\Security\Core\User\User
+  [3] Symfony\Component\Security\Core\User\InMemoryUser
 EOTXT
         , $this->passwordHasherCommandTester->getDisplay(true));
     }
@@ -289,7 +289,7 @@ EOTXT
     {
         putenv('COLUMNS='.(119 + \strlen(\PHP_EOL)));
         $hasherFactory = new PasswordHasherFactory([
-            User::class => ['algorithm' => 'plaintext'],
+            InMemoryUser::class => ['algorithm' => 'plaintext'],
             'Custom\Class\Native\User' => ['algorithm' => 'native', 'cost' => 10],
             'Custom\Class\Pbkdf2\User' => ['algorithm' => 'pbkdf2', 'hash_algorithm' => 'sha512', 'iterations' => 1000, 'encode_as_base64' => true],
             'Custom\Class\Test\User' => ['algorithm' => 'test'],
@@ -297,7 +297,7 @@ EOTXT
 
         $this->passwordHasherCommandTester = new CommandTester(new UserPasswordHashCommand(
             $hasherFactory,
-            [User::class, 'Custom\Class\Native\User', 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
+            [InMemoryUser::class, 'Custom\Class\Native\User', 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
         ));
     }
 
@@ -342,7 +342,7 @@ EOTXT
 
         $this->passwordHasherCommandTester = new CommandTester(new UserPasswordHashCommand(
             $hasherFactory,
-            [User::class, 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
+            [InMemoryUser::class, 'Custom\Class\Pbkdf2\User', 'Custom\Class\Test\User']
         ));
     }
 

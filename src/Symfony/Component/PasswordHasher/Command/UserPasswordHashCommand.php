@@ -71,7 +71,7 @@ Suppose that you have the following security configuration in your application:
 # app/config/security.yml
 security:
     password_hashers:
-        Symfony\Component\Security\Core\User\User: plaintext
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
         App\Entity\User: auto
 </comment>
 

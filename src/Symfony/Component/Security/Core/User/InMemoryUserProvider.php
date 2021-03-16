@@ -38,7 +38,7 @@ class InMemoryUserProvider implements UserProviderInterface
             $password = $attributes['password'] ?? null;
             $enabled = $attributes['enabled'] ?? true;
             $roles = $attributes['roles'] ?? [];
-            $user = new User($username, $password, $roles, $enabled, true, true, true);
+            $user = new InMemoryUser($username, $password, $roles, $enabled);
 
             $this->createUser($user);
         }
@@ -65,7 +65,7 @@ class InMemoryUserProvider implements UserProviderInterface
     {
         $user = $this->getUser($username);
 
-        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(), $user->isCredentialsNonExpired(), $user->isAccountNonLocked());
+        return new InMemoryUser($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled());
     }
 
     /**
@@ -73,13 +73,28 @@ class InMemoryUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof InMemoryUser && !$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
 
         $storedUser = $this->getUser($user->getUsername());
 
-        return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $storedUser->isAccountNonExpired(), $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword(), $storedUser->isAccountNonLocked());
+        // @deprecated since Symfony 5.3
+        if ($user instanceof User) {
+            if (!$storedUser instanceof User) {
+                $accountNonExpired = true;
+                $credentialsNonExpired = $storedUser->getPassword() === $user->getPassword();
+                $accountNonLocked = true;
+            } else {
+                $accountNonExpired = $storedUser->isAccountNonExpired();
+                $credentialsNonExpired = $storedUser->isCredentialsNonExpired() && $storedUser->getPassword() === $user->getPassword();
+                $accountNonLocked = $storedUser->isAccountNonLocked();
+            }
+
+            return new User($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled(), $accountNonExpired, $credentialsNonExpired, $accountNonLocked);
+        }
+
+        return new InMemoryUser($storedUser->getUsername(), $storedUser->getPassword(), $storedUser->getRoles(), $storedUser->isEnabled());
     }
 
     /**
@@ -87,7 +102,12 @@ class InMemoryUserProvider implements UserProviderInterface
      */
     public function supportsClass(string $class)
     {
-        return 'Symfony\Component\Security\Core\User\User' === $class;
+        // @deprecated since Symfony 5.3
+        if (User::class === $class) {
+            return true;
+        }
+
+        return InMemoryUser::class == $class;
     }
 
     /**
@@ -95,7 +115,7 @@ class InMemoryUserProvider implements UserProviderInterface
      *
      * @throws UsernameNotFoundException if user whose given username does not exist
      */
-    private function getUser(string $username): User
+    private function getUser(string $username)/*: InMemoryUser */
     {
         if (!isset($this->users[strtolower($username)])) {
             $ex = new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));

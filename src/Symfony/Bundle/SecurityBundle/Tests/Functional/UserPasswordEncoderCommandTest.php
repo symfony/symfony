@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
  * Tests UserPasswordEncoderCommand.
@@ -36,7 +37,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         $this->passwordEncoderCommandTester->execute([
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Symfony\Component\Security\Core\User\User',
+            'user-class' => InMemoryUser::class,
             '--empty-salt' => true,
         ], ['decorated' => false]);
         $expected = str_replace("\n", \PHP_EOL, file_get_contents(__DIR__.'/app/PasswordEncode/emptysalt.txt'));
@@ -189,7 +190,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
         $this->passwordEncoderCommandTester->execute([
             'command' => 'security:encode-password',
             'password' => 'p@ssw0rd',
-            'user-class' => 'Symfony\Component\Security\Core\User\User',
+            'user-class' => InMemoryUser::class,
             '--empty-salt' => true,
         ]);
 
@@ -282,7 +283,7 @@ class UserPasswordEncoderCommandTest extends AbstractWebTestCase
   [0] Custom\Class\Native\User
   [1] Custom\Class\Pbkdf2\User
   [2] Custom\Class\Test\User
-  [3] Symfony\Component\Security\Core\User\User
+  [3] Symfony\Component\Security\Core\User\InMemoryUser
 EOTXT
         , $this->passwordEncoderCommandTester->getDisplay(true));
     }

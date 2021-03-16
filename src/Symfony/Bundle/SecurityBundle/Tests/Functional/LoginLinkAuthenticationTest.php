@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
@@ -36,7 +36,7 @@ class LoginLinkAuthenticationTest extends AbstractWebTestCase
 
         /** @var LoginLinkHandlerInterface $loginLinkHandler */
         $loginLinkHandler = self::getContainer()->get(LoginLinkHandlerInterface::class);
-        $user = new User('weaverryan', 'foo');
+        $user = new InMemoryUser('weaverryan', 'foo');
         $loginLink = $loginLinkHandler->createLoginLink($user);
         $this->assertStringContainsString('user=weaverryan', $loginLink);
         $this->assertStringContainsString('hash=', $loginLink);

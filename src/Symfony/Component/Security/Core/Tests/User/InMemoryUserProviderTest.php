@@ -12,12 +12,16 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 
 class InMemoryUserProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructor()
     {
         $provider = $this->createProvider();
@@ -29,6 +33,21 @@ class InMemoryUserProviderTest extends TestCase
     }
 
     public function testRefresh()
+    {
+        $user = new InMemoryUser('fabien', 'bar');
+
+        $provider = $this->createProvider();
+
+        $refreshedUser = $provider->refreshUser($user);
+        $this->assertEquals('foo', $refreshedUser->getPassword());
+        $this->assertEquals(['ROLE_USER'], $refreshedUser->getRoles());
+        $this->assertFalse($refreshedUser->isEnabled());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRefreshWithLegacyUser()
     {
         $user = new User('fabien', 'bar');
 

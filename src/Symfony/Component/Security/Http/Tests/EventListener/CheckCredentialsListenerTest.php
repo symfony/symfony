@@ -12,9 +12,8 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -37,7 +36,7 @@ class CheckCredentialsListenerTest extends TestCase
     {
         $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $this->listener = new CheckCredentialsListener($this->hasherFactory);
-        $this->user = new User('wouter', 'password-hash');
+        $this->user = new InMemoryUser('wouter', 'password-hash');
     }
 
     /**

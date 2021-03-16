@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -250,7 +250,7 @@ class ChainUserProviderTest extends TestCase
 
     public function testPasswordUpgrades()
     {
-        $user = new User('user', 'pwd');
+        $user = new InMemoryUser('user', 'pwd');
 
         $provider1 = $this->getMockForAbstractClass(MigratingProvider::class);
         $provider1

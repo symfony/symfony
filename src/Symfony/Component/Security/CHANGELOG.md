@@ -4,6 +4,8 @@ CHANGELOG
 5.3
 ---
 
+ * Deprecate class `User`, use `InMemoryUser` instead
+ * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
  * Add `PasswordAuthenticatedUserInterface` for user classes that use passwords
  * Add `LegacyPasswordAuthenticatedUserInterface` for user classes that use user-provided salts in addition to passwords
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead

@@ -113,7 +113,9 @@ EOT
         } else {
             $size = 0;
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS | \RecursiveDirectoryIterator::FOLLOW_SYMLINKS)) as $file) {
-                $size += $file->getSize();
+                if ($file->isReadable()) {
+                    $size += $file->getSize();
+                }
             }
         }
 

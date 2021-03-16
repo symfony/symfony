@@ -21,13 +21,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class TestBrowserToken extends AbstractToken
 {
-    public function __construct(array $roles = [], UserInterface $user = null)
+    private $firewallName;
+
+    public function __construct(array $roles = [], UserInterface $user = null, string $firewallName = 'main')
     {
         parent::__construct($roles);
 
         if (null !== $user) {
             $this->setUser($user);
         }
+
+        $this->firewallName = $firewallName;
+    }
+
+    public function getFirewallName(): string
+    {
+        return $this->firewallName;
     }
 
     public function getCredentials()

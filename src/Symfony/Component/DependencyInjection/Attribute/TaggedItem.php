@@ -20,7 +20,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class TaggedItem
 {
     public function __construct(
-        public string $index,
+        public ?string $index = null,
         public ?int $priority = null,
     ) {
     }

@@ -205,6 +205,9 @@ class PriorityTaggedServiceTraitTest extends TestCase
                 HelloNamedService::class => (new ChildDefinition(''))->addTag('my_custom_tag'),
                 \stdClass::class => (new ChildDefinition(''))->addTag('my_custom_tag2'),
             ]);
+        $container->register('service3', HelloNamedService2::class)
+            ->setAutoconfigured(true)
+            ->addTag('my_custom_tag');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
@@ -212,6 +215,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
         $tag = new TaggedIteratorArgument('my_custom_tag', 'foo', 'getFooBar');
         $expected = [
+            'service3' => new TypedReference('service3', HelloNamedService2::class),
             'hello' => new TypedReference('service2', HelloNamedService::class),
             'service1' => new TypedReference('service1', FooTagClass::class),
         ];
@@ -233,5 +237,10 @@ class PriorityTaggedServiceTraitImplementation
 
 #[TaggedItem(index: 'hello', priority: 1)]
 class HelloNamedService extends \stdClass
+{
+}
+
+#[TaggedItem(priority: 2)]
+class HelloNamedService2
 {
 }

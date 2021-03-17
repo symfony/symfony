@@ -91,6 +91,7 @@ Security
    If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing
    them in your own user class, as they are not part of the `InMemoryUser` API
  * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
+ * [BC break] Remove support for passing a `UserInterface` implementation to `Passport`, use the `UserBadge` instead.
  * Deprecate `UserInterface::getPassword()`
    If your `getPassword()` method does not return `null` (i.e. you are using password-based authentication),
    you should implement `PasswordAuthenticatedUserInterface`.

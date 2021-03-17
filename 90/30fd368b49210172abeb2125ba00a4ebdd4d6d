@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-03T01:18:22Z
+
+Quick before and after:
+```
+- // Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et             \n
+- // dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea       \n
+- // commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla     \n
+- // pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim            \n
+- // id est laborum                                                                                                      \n
++ // Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore      \n
++ // magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo      \n
++ // consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla             \n
++ // pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id         \n
++ // est laborum                                                                                                         \n
+```
+
+Notice that after, we are correctly filling the line with text up to 120 chars as expected. Before, the words were wrapped too early.
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-03T17:35:36Z
+
+Hey!
+
+I like what you have done here. Keep up the good work.
+
+I think @Simperfit has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-03T17:57:37Z
+
+what if there is extra decoration inside the message ?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-15T20:48:05Z
+
+@stof
+
+> what if there is extra decoration inside the message ?
+
+Not sure what you mean. We're measuring the "decoration" with `Helper::strlen($message) - Helper::strlenWithoutDecoration($this->getFormatter(), $message);`. What other decoration might there be?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-16T13:01:47Z
+
+I'd like to note that while this PR improves the situation, it's still not perfect. The correct solution would actually be to follow the example of formatAndWrap() and actually parse the string one character at a time to wrap the line while not breaking a tag.
+
+I looked into using formatAndWrap(), but it's problematic. We really need the wrap aspect of it and not the format aspect.

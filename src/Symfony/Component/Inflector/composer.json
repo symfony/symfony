@@ -25,7 +25,7 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/string": "~5.1.10|^5.2.1"
+        "symfony/string": "^5.2.6"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Inflector\\": "" },

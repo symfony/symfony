@@ -178,7 +178,7 @@ class EsmtpTransport extends SmtpTransport
         }
 
         if (!$authNames) {
-            throw new TransportException('Failed to find an authenticator supported by the SMTP server, which currently supports: '.implode(', ', $modes));
+            throw new TransportException(sprintf('Failed to find an authenticator supported by the SMTP server, which currently supports: "%s".', implode('", "', $modes)));
         }
 
         $message = sprintf('Failed to authenticate on SMTP server with username "%s" using the following authenticators: "%s".', $this->username, implode('", "', $authNames));

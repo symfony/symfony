@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-17T15:25:50Z
+
+This indeed fixes an issue that would occur in 5.3 due to the changes made in #39851 (5.2.5 seems to have accidentally been installed, these tags have already been removed from the repository).

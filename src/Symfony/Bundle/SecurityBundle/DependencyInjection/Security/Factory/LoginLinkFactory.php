@@ -31,7 +31,7 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
     public function addConfiguration(NodeDefinition $node)
     {
         /** @var NodeBuilder $builder */
-        $builder = $node->children();
+        $builder = $node->fixXmlConfig('signature_property', 'signature_properties')->children();
 
         $builder
             ->scalarNode('check_route')
@@ -98,6 +98,10 @@ class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
         if (null !== $config['max_uses'] && !isset($config['used_link_cache'])) {
             $config['used_link_cache'] = 'security.authenticator.cache.expired_links';
+            $defaultCacheDefinition = $container->getDefinition($config['used_link_cache']);
+            if (!$defaultCacheDefinition->hasTag('cache.pool')) {
+                $defaultCacheDefinition->addTag('cache.pool');
+            }
         }
 
         $expiredStorageId = null;

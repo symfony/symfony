@@ -25,12 +25,45 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
     abstract protected function getLoader(ContainerBuilder $container);
 
     abstract protected function getFileExtension();
+
+    public function testAuthenticatorManager()
+    {
+        $container = $this->getContainer('authenticator_manager');
+
+        $this->assertEquals(AuthenticatorManager::class, $container->getDefinition('security.authenticator.manager.main')->getClass());
+
+        // login link
+        $expiredStorage = $container->getDefinition($expiredStorageId = 'security.authenticator.expired_login_link_storage.main');
+        $this->assertEquals('cache.redis', (string) $expiredStorage->getArgument(0));
+        $this->assertEquals(3600, (string) $expiredStorage->getArgument(1));
+
+        $linker = $container->getDefinition($linkerId = 'security.authenticator.login_link_handler.main');
+        $this->assertEquals(['id', 'email'], $linker->getArgument(3));
+        $this->assertEquals([
+            'route_name' => 'login_check',
+            'lifetime' => 3600,
+            'max_uses' => 1,
+        ], $linker->getArgument(5));
+        $this->assertEquals($expiredStorageId, (string) $linker->getArgument(6));
+
+        $authenticator = $container->getDefinition('security.authenticator.login_link.main');
+        $this->assertEquals($linkerId, (string) $authenticator->getArgument(0));
+        $this->assertEquals([
+            'check_route' => 'login_check',
+            'check_post_only' => true,
+        ], $authenticator->getArgument(4));
+
+        // login throttling
+        $listener = $container->getDefinition('security.listener.login_throttling.main');
+        $this->assertEquals('app.rate_limiter', (string) $listener->getArgument(1));
+    }
 
     public function testRolesHierarchy()
     {
@@ -940,6 +973,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $container->setParameter('kernel.debug', false);
         $container->setParameter('request_listener.http_port', 80);
         $container->setParameter('request_listener.https_port', 443);
+        $container->register('cache.app', \stdClass::class);
 
         $security = new SecurityExtension();
         $container->registerExtension($security);

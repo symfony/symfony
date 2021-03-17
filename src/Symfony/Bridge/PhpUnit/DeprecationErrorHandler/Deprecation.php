@@ -121,11 +121,11 @@ class Deprecation
             return;
         }
 
-        $test = $line['args'][0] ?? null;
+        $test = isset($line['args'][0]) ? $line['args'][0] : null;
 
         if (($test instanceof TestCase || $test instanceof TestSuite) && ('trigger_error' !== $trace[$i - 2]['function'] || isset($trace[$i - 2]['class']))) {
-            $this->originClass = \get_class($line['args'][0]);
-            $this->originMethod = $line['args'][0]->getName();
+            $this->originClass = \get_class($test);
+            $this->originMethod = $test->getName();
 
             return;
         }

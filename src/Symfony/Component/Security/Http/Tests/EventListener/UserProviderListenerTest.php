@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 

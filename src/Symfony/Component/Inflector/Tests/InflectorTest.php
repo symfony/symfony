@@ -204,6 +204,7 @@ class InflectorTest extends TestCase
             ['crisis', 'crises'],
             ['criteria', 'criterion'],
             ['cup', 'cups'],
+            ['coupon', 'coupons'],
             ['data', 'data'],
             ['day', 'days'],
             ['disco', 'discos'],

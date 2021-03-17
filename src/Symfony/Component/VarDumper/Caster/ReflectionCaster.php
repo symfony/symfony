@@ -96,11 +96,20 @@ class ReflectionCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        $a += [
-            $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : (string) $c,
-            $prefix.'allowsNull' => $c->allowsNull(),
-            $prefix.'isBuiltin' => $c->isBuiltin(),
-        ];
+        if ($c instanceof \ReflectionNamedType || \PHP_VERSION_ID < 80000) {
+            $a += [
+                $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : (string) $c,
+                $prefix.'allowsNull' => $c->allowsNull(),
+                $prefix.'isBuiltin' => $c->isBuiltin(),
+            ];
+        } elseif ($c instanceof \ReflectionUnionType) {
+            $a[$prefix.'allowsNull'] = $c->allowsNull();
+            self::addMap($a, $c, [
+                'types' => 'getTypes',
+            ]);
+        } else {
+            $a[$prefix.'allowsNull'] = $c->allowsNull();
+        }
 
         return $a;
     }

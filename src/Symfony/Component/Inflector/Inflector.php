@@ -231,6 +231,9 @@ final class Inflector
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
         ['noi', 3, true, true, 'ions'],
 
+        // coupon (coupons)
+        ['nop', 3, true, true, 'pons'],
+
         // seasons (season), treasons (treason), poisons (poison), lessons (lesson)
         ['nos', 3, true, true, 'sons'],
 

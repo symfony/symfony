@@ -143,6 +143,12 @@ class Connection
         }
         unset($query['region']);
 
+        // if accessKeyId and accessKeySecret are both null assume we are using metadata credentials so don't pass the keys in
+        if ($clientConfiguration['accessKeyId'] === null && $clientConfiguration['accessKeySecret'] === null) {
+            unset($clientConfiguration['accessKeyId']);
+            unset($clientConfiguration['accessKeySecret']);
+        }
+
         if ('default' !== ($parsedUrl['host'] ?? 'default')) {
             $clientConfiguration['endpoint'] = sprintf('%s://%s%s', ($query['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $parsedUrl['host'], ($parsedUrl['port'] ?? null) ? ':'.$parsedUrl['port'] : '');
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $parsedUrl['host'], $matches)) {

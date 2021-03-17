@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-17T15:18:37Z
+
+This issue needs to be fixed on 4.4 (inflector component).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-17T15:37:32Z
+
+You are correct. The bug existed in 4.4 in the inflector component too. I guess it will be merged up properly if I target 4.4.
+
+The PR is updated.

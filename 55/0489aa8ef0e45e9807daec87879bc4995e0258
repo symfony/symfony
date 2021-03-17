@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-12T06:18:30Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by michaeldnelson at 2021-03-12T07:08:04Z
+
+Looking at ci It makes sense **tests** would break using php < 8.  I'm not quite sure the best way to add this without breaking and I don't have multiple php versions running at the moment.  I'm happy to take and suggestions about how to test this feature without breaking php < 8. Two possibilities I can think of are multiple classes or a single class with a conditional as below, either used in conjunction with the @require php8 annotation.  I'm not sure if the parser lints a file on include, if that is the case I have no idea how to resolve this.
+
+ReflectionPropertyFixture.php
+```
+if (\PHP_VERSION_ID >= 80000) {
+    class ReflectionPropertyFixture
+    {
+        public int $a;
+        public int|string $b;
+    }
+} else {
+    class ReflectionPropertyFixture
+    {
+        public int $a;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-12T23:26:40Z
+
+Thank you for working on this bugfix.
+
+> This commit fixes a crash when dumping ReflectionUnionType. This targets 5.2 due to it being a bugfix that only impacts PHP 8.
+
+Your pull request targets 5.x right now which is probably mot what you wanted. If you can reproduce the crash on 4.4 as well (and I’m pretty sure that this is the case), then we should target 4.4 instead.
+
+> Thanks for Symfony it's a wonderful project.
+
+❤️
+
+---------------------------------------------------------------------------
+
+by michaeldnelson at 2021-03-13T02:37:30Z
+
+@derrabus I've rebased onto 4.4 and resolved the php7 issues as suggested.  CI is stuck due to a perceived conflict before I switched the target branch of the PR so I am unable to verify it is passing.  Please let me know if there are any further issues, and thanks again.

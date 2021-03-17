@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-14T13:55:13Z
+
+Thanks for this. Should it be applied to 4.4 as well?
+Also, can you add a test?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T16:21:30Z
+
+Yes, I’m working on a test and also trying to diagnose why the current tests are failing. But, I find that running tests while Xdebug is enableed is extremely slow with Symfony. Any tips on speeding that up?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T18:00:32Z
+
+So, the test is failing because it expects:
+```
+  0/50 [>---------------------------]   0%
+\x1b[1A\x1b[0J  1/50 [>---------------------------]   2%
+\x1b[1A\x1b[0J  2/50 [=>--------------------------]   4%
+```
+
+But the actual is:
+```
+  0/50 [>---------------------------]   0%
+\x1b[2A\x1b[0J  1/50 [>---------------------------]   2%
+\x1b[2A\x1b[0J  2/50 [=>--------------------------]   4%
+
+```
+
+I don't really understand the difference between the `\x1b[1A` and `\x1b[2A` strings.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T18:11:43Z
+
+Ok, so I did so research. This is a great article: https://notes.burke.libbey.me/ansi-escape-codes/. The 2A indicates that 2 lines should be cleared rather than 1. That seems right looking at the 3 line output in the example.
+
+The rather unfun part of testing this is that you can't actually _see_ the diff for the failing tests on the command line because they're rendered ANSI escape codes and not actually visible. Apart from using xDebug to inspect the variables (which is terribly slow) I'm not sure how one is supposed to know what's being printed.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T19:28:21Z
+
+I don't believe new tests are needed. The existing test fixtures have been updated to assert that lines are emitted correctly.
+
+Admittedly just _looking_ at the test fixtures doesn't grant much confidence. I performed a number of successful manual tests that used combinations of short content, long content, and content with new line characters. They all displayed as expected.
+
+However, I'd like a functional review by someone else who is able to more readily identify issues.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T19:53:23Z
+
+@chalasr I believe this is ready to be merged. The failing tests seem unrelated to the changes made here.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-14T19:59:39Z
+
+Thank you for the detailed explanations, it makes everyone more comfortable with reviewing/merging such a patch (low-level + changes in existing tests).
+
+Still, I'd like to checkout your branch to ensure we don't have any regression on the modified test cases (as it happened a lot in the past). I will look into this by the end of the week.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T20:05:27Z
+
+> Still, I'd like to checkout your branch to ensure we don't have any regression on the modified test cases (as it happened a lot in the past). I will look into this by the end of the week.
+
+Completely agree. 👍
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T20:09:45Z
+
+Separately, it looks like I should merge my approach with this proposed change: https://github.com/symfony/symfony/pull/40450/files
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-14T20:11:38Z
+
+Thanks, I was about to ask you if you could have a look at #40450 :)
+Also can you rebase your PR on the 4.4 branch (+ change the base branch by editing your PR)?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-14T23:05:55Z
+
+I can rebase it, but I would prefer to have that in a separate pull request. Would that be OK?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-15T14:03:46Z
+
+Need to do some more work here to correctly integrate changes from #40450, seems to have caused a problem.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-15T16:48:04Z
+
+@chalasr Ok. Lot's of changes, but much better now:
+
+1. I've added a new test and left existing fixtures as-is.
+2. I've rebased on to 4.4 and changed the base branch for the PR.
+3. I've cherry-picked @danepowell's new test from #40450.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-15T17:03:42Z
+
+I think that all test failures are unrelated to the changes. You can see the relevant tests passing here:
+https://travis-ci.com/github/symfony/symfony/jobs/491226919#L8401
+
+---------------------------------------------------------------------------
+
+by danepowell at 2021-03-15T17:04:11Z
+
+As the owner of #40450, I think this approach makes sense.
+
+---------------------------------------------------------------------------
+
+by danepowell at 2021-03-15T18:17:58Z
+
+I guess I should say, I'd prefer for #40450 to be merged first since it addresses a separate bug and I'd love to get credit for the fix 😄 . But as long the bugs get fixed (this PR now fixes both), that's what matters most.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-15T18:21:46Z
+
+@danepowell I'm fine with that! Though I should say, I intentionally cherry picked your commit so you'd get commit credit if this PR is merged as is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-16T08:55:27Z
+
+I merged #40450 to ease with squashing this PR.
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-16T15:07:51Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-16T22:07:50Z
+
+@grasmash Can you squash your 7 commits into 1 so that we can merge?
+
+---------------------------------------------------------------------------
+
+by grasmash at 2021-03-17T02:20:46Z
+
+@chalasr Done!

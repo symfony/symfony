@@ -80,8 +80,8 @@ class InMemoryUserProvider implements UserProviderInterface
         $storedUser = $this->getUser($user->getUsername());
 
         // @deprecated since Symfony 5.3
-        if ($user instanceof User) {
-            if (!$storedUser instanceof User) {
+        if (User::class === \get_class($user)) {
+            if (User::class !== \get_class($storedUser)) {
                 $accountNonExpired = true;
                 $credentialsNonExpired = $storedUser->getPassword() === $user->getPassword();
                 $accountNonLocked = true;

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', User::class, InMemoryUser::class);
-
 /**
  * User is the user implementation used by the in-memory user provider.
  *
@@ -22,7 +20,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
  *
  * @deprecated since Symfony 5.3, use {@link InMemoryUser} instead
  */
-final class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     private $username;
     private $password;
@@ -35,6 +33,10 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface, E
 
     public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true, bool $userNonExpired = true, bool $credentialsNonExpired = true, bool $userNonLocked = true, array $extraFields = [])
     {
+        if (InMemoryUser::class !== static::class) {
+            trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', self::class, InMemoryUser::class);
+        }
+
         if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
         }
@@ -175,8 +177,8 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface, E
             return false;
         }
 
-        $currentRoles = array_map('strval', (array)$this->getRoles());
-        $newRoles = array_map('strval', (array)$user->getRoles());
+        $currentRoles = array_map('strval', (array) $this->getRoles());
+        $newRoles = array_map('strval', (array) $user->getRoles());
         $rolesChanged = \count($currentRoles) !== \count($newRoles) || \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
         if ($rolesChanged) {
             return false;
@@ -186,16 +188,18 @@ final class User implements UserInterface, PasswordAuthenticatedUserInterface, E
             return false;
         }
 
-        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
-            return false;
-        }
+        if (self::class === static::class) {
+            if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
+                return false;
+            }
 
-        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
-            return false;
-        }
+            if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
+                return false;
+            }
 
-        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
-            return false;
+            if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
+                return false;
+            }
         }
 
         if ($this->isEnabled() !== $user->isEnabled()) {

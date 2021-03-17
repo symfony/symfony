@@ -38,7 +38,7 @@ class InMemoryUserChecker implements UserCheckerInterface
         }
 
         // @deprecated since Symfony 5.3
-        if ($user instanceof User) {
+        if (User::class === \get_class($user)) {
             if (!$user->isAccountNonLocked()) {
                 $ex = new LockedException('User account is locked.');
                 $ex->setUser($user);
@@ -56,7 +56,7 @@ class InMemoryUserChecker implements UserCheckerInterface
     public function checkPostAuth(UserInterface $user)
     {
         // @deprecated since Symfony 5.3, noop in 6.0
-        if (!$user instanceof User) {
+        if (User::class !== \get_class($user)) {
             return;
         }
 

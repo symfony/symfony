@@ -74,7 +74,7 @@ class InMemoryUserProviderTest extends TestCase
     public function testCreateUser()
     {
         $provider = new InMemoryUserProvider();
-        $provider->createUser(new User('fabien', 'foo'));
+        $provider->createUser(new InMemoryUser('fabien', 'foo'));
 
         $user = $provider->loadUserByUsername('fabien');
         $this->assertEquals('foo', $user->getPassword());
@@ -84,8 +84,8 @@ class InMemoryUserProviderTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $provider = new InMemoryUserProvider();
-        $provider->createUser(new User('fabien', 'foo'));
-        $provider->createUser(new User('fabien', 'foo'));
+        $provider->createUser(new InMemoryUser('fabien', 'foo'));
+        $provider->createUser(new InMemoryUser('fabien', 'foo'));
     }
 
     public function testLoadUserByUsernameDoesNotExist()

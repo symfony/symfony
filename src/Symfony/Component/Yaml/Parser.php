@@ -169,7 +169,10 @@ class Parser
                 }
 
                 // array
-                if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
+                if (isset($values['value']) && 0 === strpos(ltrim($values['value'], ' '), '-')) {
+                    // Inline first child
+                    $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(2, true, true) ?? '', $flags);
+                } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true) ?? '', $flags);
                 } elseif (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags)) {
                     $data[] = new TaggedValue(
@@ -558,16 +561,17 @@ class Parser
      *
      * @param int|null $indentation The indent level at which the block is to be read, or null for default
      * @param bool     $inSequence  True if the enclosing data structure is a sequence
+     * @param bool     $isInlineFirstChild
      *
      * @return string A YAML string
      *
      * @throws ParseException When indentation problem are detected
      */
-    private function getNextEmbedBlock(int $indentation = null, bool $inSequence = false): string
+    private function getNextEmbedBlock(int $indentation = null, bool $inSequence = false, $isInlineFirstChild = false): string
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
 
-        if (!$this->moveToNextLine()) {
+        if (!$isInlineFirstChild && !$this->moveToNextLine()) {
             return '';
         }
 
@@ -604,7 +608,9 @@ class Parser
         }
 
         $data = [];
-        if ($this->getCurrentLineIndentation() >= $newIndent) {
+        if ($isInlineFirstChild) {
+            $data[] = substr($this->currentLine, $newIndent);
+        } elseif ($this->getCurrentLineIndentation() >= $newIndent) {
             $data[] = substr($this->currentLine, $newIndent);
         } elseif ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
             $data[] = $this->currentLine;
@@ -614,7 +620,7 @@ class Parser
             return '';
         }
 
-        if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
+        if (!$isInlineFirstChild && $inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
             // the previous line contained a dash but no item content, this line is a sequence item with the same indentation
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();
@@ -633,7 +639,7 @@ class Parser
 
             $indent = $this->getCurrentLineIndentation();
 
-            if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
+            if (!$isInlineFirstChild && $isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
                 break;
             }

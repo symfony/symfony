@@ -200,3 +200,41 @@ php: |
          'age' => 38
        ]
      ]
+---
+test: Block Sequence in Block Sequence 1
+brief: |
+  Block Sequence in Block Sequence 1
+yaml: |
+  - - s1_i1
+    - s1_i2
+  - s2
+php: |
+  [
+    [
+      "s1_i1",
+      "s1_i2"
+    ],
+    "s2"
+  ]
+---
+test: Block Sequence in Block Sequence 2
+brief: |
+  Block Sequence in Block Sequence 2
+yaml: |
+  - - s1_i1
+    - - s1_i1_1
+      - s1_i1_2
+    - s1_i2
+  - s2
+php: |
+  [
+    [
+      "s1_i1",
+      [
+        "s1_i1_1",
+        "s1_i1_2",
+      ],
+      "s1_i2"
+    ],
+      "s2"
+  ]

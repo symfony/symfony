@@ -144,7 +144,7 @@ class Connection
         unset($query['region']);
 
         // if accessKeyId and accessKeySecret are both null assume we are using metadata credentials so don't pass the keys in
-        if ($clientConfiguration['accessKeyId'] === null && $clientConfiguration['accessKeySecret'] === null) {
+        if (null === $clientConfiguration['accessKeyId'] && null === $clientConfiguration['accessKeySecret']) {
             unset($clientConfiguration['accessKeyId']);
             unset($clientConfiguration['accessKeySecret']);
         }

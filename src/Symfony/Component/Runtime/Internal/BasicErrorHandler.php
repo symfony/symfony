@@ -18,7 +18,7 @@ namespace Symfony\Component\Runtime\Internal;
  */
 class BasicErrorHandler
 {
-    public function __construct(bool $debug)
+    public static function register(bool $debug): void
     {
         error_reporting(-1);
 
@@ -32,10 +32,11 @@ class BasicErrorHandler
         if (0 <= ini_get('zend.assertions')) {
             ini_set('zend.assertions', 1);
             ini_set('assert.active', $debug);
-            ini_set('assert.bail', 0);
             ini_set('assert.warning', 0);
             ini_set('assert.exception', 1);
         }
+
+        set_error_handler(new self());
     }
 
     public function __invoke(int $type, string $message, string $file, int $line): bool

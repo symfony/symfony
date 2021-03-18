@@ -102,14 +102,12 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             throw new \InvalidArgumentException(sprintf('Class "%s" listed under "extra.runtime.class" in your composer.json file '.(class_exists($runtimeClass) ? 'should implement "%s".' : 'not found.'), $runtimeClass, RuntimeInterface::class));
         }
 
-        if (!\is_array($runtimeOptions = $extra['options'] ?? [])) {
-            throw new \InvalidArgumentException('The "extra.runtime.options" entry in your composer.json file must be an array.');
-        }
+        unset($extra['class'], $extra['autoload_template']);
 
         $code = strtr(file_get_contents($autoloadTemplate), [
             '%project_dir%' => $projectDir,
             '%runtime_class%' => var_export($runtimeClass, true),
-            '%runtime_options%' => '['.substr(var_export($runtimeOptions, true), 7, -1)."  'project_dir' => {$projectDir},\n]",
+            '%runtime_options%' => '['.substr(var_export($extra, true), 7, -1)."  'project_dir' => {$projectDir},\n]",
         ]);
 
         file_put_contents(substr_replace($autoloadFile, '_runtime', -4, 0), $code);

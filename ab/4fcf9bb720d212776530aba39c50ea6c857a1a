@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-17T16:14:56Z
+
+I don't think we should do this on 4.4. On 4.4, it should be ppl's job to call the method early enough.
+
+On 5.2, we should call the method when constructing the `http_cache` service.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-17T20:19:17Z
+
+I think you are right. This also fixes the cache key issue.

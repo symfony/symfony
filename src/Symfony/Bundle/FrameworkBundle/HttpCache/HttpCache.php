@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -60,6 +61,15 @@ class HttpCache extends BaseHttpCache
         }
 
         parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge($this->options, $this->getOptions()));
+    }
+
+    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    {
+        if ($this->kernel->getContainer()->getParameter('kernel.http_method_override')) {
+            Request::enableHttpMethodParameterOverride();
+        }
+
+        return parent::handle($request, $type, $catch);
     }
 
     /**

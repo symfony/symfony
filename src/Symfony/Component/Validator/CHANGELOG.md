@@ -3,7 +3,7 @@ CHANGELOG
 
 5.3
 ---
-
+ * Add the `normalizer` option to the `Unique` constraint
  * Add `Validation::createIsValidCallable()` that returns true/false instead of throwing exceptions
 
 5.2.0

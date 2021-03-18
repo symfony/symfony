@@ -17,6 +17,7 @@
             "disabled",
             "empty_data",
             "error_bubbling",
+            "form_attr",
             "getter",
             "help",
             "help_attr",

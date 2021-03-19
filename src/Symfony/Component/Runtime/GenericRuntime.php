@@ -22,8 +22,12 @@ class_exists(ClosureResolver::class);
 /**
  * A runtime to do bare-metal PHP without using superglobals.
  *
- * One option named "debug" is supported; it toggles displaying errors
- * and defaults to the "APP_ENV" environment variable.
+ * It supports the following options:
+ *  - "debug" toggles displaying errors and defaults
+ *    to the "APP_DEBUG" environment variable;
+ *  - "runtimes" maps types to a GenericRuntime implementation
+ *    that knows how to deal with each of them;
+ *  - "error_handler" defines the class to use to handle PHP errors.
  *
  * The app-callable can declare arguments among either:
  * - "array $context" to get a local array similar to $_SERVER;
@@ -42,42 +46,48 @@ class_exists(ClosureResolver::class);
  */
 class GenericRuntime implements RuntimeInterface
 {
-    private $debug;
+    protected $options;
 
     /**
      * @param array {
      *   debug?: ?bool,
+     *   runtimes?: ?array,
+     *   error_handler?: string|false,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $this->debug = $options['debug'] ?? $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? true;
+        $debug = $options['debug'] ?? $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? true;
 
-        if (!\is_bool($this->debug)) {
-            $this->debug = filter_var($this->debug, \FILTER_VALIDATE_BOOLEAN);
+        if (!\is_bool($debug)) {
+            $debug = filter_var($debug, \FILTER_VALIDATE_BOOLEAN);
         }
 
-        if ($this->debug) {
+        if ($debug) {
+            umask(0000);
             $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '1';
-            $errorHandler = new BasicErrorHandler($this->debug);
-            set_error_handler($errorHandler);
+
+            if (false !== $errorHandler = ($options['error_handler'] ?? BasicErrorHandler::class)) {
+                $errorHandler::register($debug);
+                $options['error_handler'] = false;
+            }
         } else {
             $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0';
         }
+
+        $this->options = $options;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResolver(callable $callable): ResolverInterface
+    public function getResolver(callable $callable, \ReflectionFunction $reflector = null): ResolverInterface
     {
         if (!$callable instanceof \Closure) {
             $callable = \Closure::fromCallable($callable);
         }
 
-        $function = new \ReflectionFunction($callable);
-        $parameters = $function->getParameters();
-
+        $parameters = ($reflector ?? new \ReflectionFunction($callable))->getParameters();
         $arguments = function () use ($parameters) {
             $arguments = [];
 
@@ -95,7 +105,7 @@ class GenericRuntime implements RuntimeInterface
             return $arguments;
         };
 
-        if ($this->debug) {
+        if ($_SERVER['APP_DEBUG']) {
             return new DebugClosureResolver($callable, $arguments);
         }
 
@@ -115,15 +125,19 @@ class GenericRuntime implements RuntimeInterface
             return $application;
         }
 
-        if (!\is_callable($application)) {
-            throw new \LogicException(sprintf('"%s" doesn\'t know how to handle apps of type "%s".', get_debug_type($this), get_debug_type($application)));
-        }
-
         if (!$application instanceof \Closure) {
+            if ($runtime = $this->resolveRuntime(\get_class($application))) {
+                return $runtime->getRunner($application);
+            }
+
+            if (!\is_callable($application)) {
+                throw new \LogicException(sprintf('"%s" doesn\'t know how to handle apps of type "%s".', get_debug_type($this), get_debug_type($application)));
+            }
+
             $application = \Closure::fromCallable($application);
         }
 
-        if ($this->debug && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
+        if ($_SERVER['APP_DEBUG'] && ($r = new \ReflectionFunction($application)) && $r->getNumberOfRequiredParameters()) {
             throw new \ArgumentCountError(sprintf('Zero argument should be required by the runner callable, but at least one is in "%s" on line "%d.', $r->getFileName(), $r->getStartLine()));
         }
 
@@ -163,8 +177,56 @@ class GenericRuntime implements RuntimeInterface
             return $this;
         }
 
-        $r = $parameter->getDeclaringFunction();
+        if (!$runtime = $this->getRuntime($type)) {
+            $r = $parameter->getDeclaringFunction();
 
-        throw new \InvalidArgumentException(sprintf('Cannot resolve argument "%s $%s" in "%s" on line "%d": "%s" supports only arguments "array $context", "array $argv" and "array $request".', $type, $parameter->name, $r->getFileName(), $r->getStartLine(), get_debug_type($this)));
+            throw new \InvalidArgumentException(sprintf('Cannot resolve argument "%s $%s" in "%s" on line "%d": "%s" supports only arguments "array $context", "array $argv" and "array $request", or a runtime named "Symfony\Runtime\%1$sRuntime".', $type, $parameter->name, $r->getFileName(), $r->getStartLine(), get_debug_type($this)));
+        }
+
+        return $runtime->getArgument($parameter, $type);
+    }
+
+    protected static function register(self $runtime): self
+    {
+        return $runtime;
+    }
+
+    private function getRuntime(string $type): ?self
+    {
+        if (null === $runtime = ($this->options['runtimes'][$type] ?? null)) {
+            $runtime = 'Symfony\Runtime\\'.$type.'Runtime';
+            $runtime = class_exists($runtime) ? $runtime : $this->options['runtimes'][$type] = false;
+        }
+
+        if (\is_string($runtime)) {
+            $runtime = $runtime::register($this);
+        }
+
+        if ($this === $runtime) {
+            return null;
+        }
+
+        return $runtime ?: null;
+    }
+
+    private function resolveRuntime(string $class): ?self
+    {
+        if ($runtime = $this->getRuntime($class)) {
+            return $runtime;
+        }
+
+        foreach (class_parents($class) as $type) {
+            if ($runtime = $this->getRuntime($type)) {
+                return $runtime;
+            }
+        }
+
+        foreach (class_implements($class) as $type) {
+            if ($runtime = $this->getRuntime($type)) {
+                return $runtime;
+            }
+        }
+
+        return null;
     }
 }

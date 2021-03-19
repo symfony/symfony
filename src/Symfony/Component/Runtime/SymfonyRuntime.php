@@ -18,38 +18,35 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Runtime\Internal\MissingDotenv;
+use Symfony\Component\Runtime\Internal\SymfonyErrorHandler;
 use Symfony\Component\Runtime\Runner\Symfony\ConsoleApplicationRunner;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
 
 // Help opcache.preload discover always-needed symbols
-class_exists(ResponseRunner::class);
-class_exists(HttpKernelRunner::class);
 class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || class_exists(MissingDotenv::class);
 
 /**
  * Knows the basic conventions to run Symfony apps.
  *
- * Accepts the following options:
- *  - "debug" to toggle debugging features
- *  - "env" to define the name of the environment the app runs in
- *  - "disable_dotenv" to disable looking for .env files
- *  - "dotenv_path" to define the path of dot-env files - defaults to ".env"
- *  - "prod_envs" to define the names of the production envs - defaults to ["prod"]
- *  - "test_envs" to define the names of the test envs - defaults to ["test"]
+ * In addition to the options managed by GenericRuntime, it accepts the following options:
+ *  - "env" to define the name of the environment the app runs in;
+ *  - "disable_dotenv" to disable looking for .env files;
+ *  - "dotenv_path" to define the path of dot-env files - defaults to ".env";
+ *  - "prod_envs" to define the names of the production envs - defaults to ["prod"];
+ *  - "test_envs" to define the names of the test envs - defaults to ["test"];
+ *  - "use_putenv" to tell Dotenv to set env vars using putenv() (NOT RECOMMENDED.)
  *
- * When these options are not defined, they will fallback:
- *  - to reading the "APP_DEBUG" and "APP_ENV" environment variables;
- *  - to parsing the "--env|-e" and "--no-debug" command line arguments
- *    if the "symfony/console" component is installed.
+ * When the "debug" / "env" options are not defined, they will fallback to the
+ * "APP_DEBUG" / "APP_ENV" environment variables, and to the "--env|-e" / "--no-debug"
+ * command line arguments if "symfony/console" is installed.
  *
  * When the "symfony/dotenv" component is installed, .env files are loaded.
- * When "symfony/error-handler" is installed, it is registred in debug mode.
+ * When "symfony/error-handler" is installed, it is registered in debug mode.
  *
  * On top of the base arguments provided by GenericRuntime,
  * this runtime can feed the app-callable with arguments of type:
@@ -74,7 +71,6 @@ class SymfonyRuntime extends GenericRuntime
     private $output;
     private $console;
     private $command;
-    private $env;
 
     /**
      * @param array {
@@ -85,31 +81,32 @@ class SymfonyRuntime extends GenericRuntime
      *   prod_envs?: ?string[],
      *   dotenv_path?: ?string,
      *   test_envs?: ?string[],
+     *   use_putenv?: ?bool,
+     *   runtimes?: ?array,
+     *   error_handler?: string|false,
      * } $options
      */
     public function __construct(array $options = [])
     {
-        $this->env = $options['env'] ?? null;
-        $_SERVER['APP_ENV'] = $options['env'] ?? $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null;
-
-        if (isset($_SERVER['argv']) && null === $this->env && class_exists(ArgvInput::class)) {
+        if (isset($_SERVER['argv']) && !isset($options['env']) && class_exists(ArgvInput::class)) {
+            $this->options = $options;
             $this->getInput();
         }
+
+        $_SERVER['APP_ENV'] = $options['env'] ?? $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev';
 
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
             (new Dotenv())
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
+                ->usePutenv($options['use_putenv'] ?? false)
                 ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']));
             $options['debug'] ?? $options['debug'] = '1' === $_SERVER['APP_DEBUG'];
+            $options['disable_dotenv'] = true;
         }
+
+        $options['error_handler'] ?? $options['error_handler'] = SymfonyErrorHandler::class;
 
         parent::__construct($options);
-
-        if ($_SERVER['APP_DEBUG'] && class_exists(Debug::class)) {
-            restore_error_handler();
-            umask(0000);
-            Debug::enable();
-        }
     }
 
     public function getRunner(?object $application): RunnerInterface
@@ -142,7 +139,7 @@ class SymfonyRuntime extends GenericRuntime
             }
 
             set_time_limit(0);
-            $defaultEnv = null === $this->env ? ($_SERVER['APP_ENV'] ?? 'dev') : null;
+            $defaultEnv = !isset($this->options['env']) ? ($_SERVER['APP_ENV'] ?? 'dev') : null;
             $output = $this->output ?? $this->output = new ConsoleOutput();
 
             return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
@@ -180,6 +177,23 @@ class SymfonyRuntime extends GenericRuntime
         return parent::getArgument($parameter, $type);
     }
 
+    protected static function register(parent $runtime): parent
+    {
+        $self = new self($runtime->options + ['runtimes' => []]);
+        $self->options['runtimes'] += [
+            HttpKernelInterface::class => $self,
+            Request::class => $self,
+            Response::class => $self,
+            Application::class => $self,
+            Command::class => $self,
+            InputInterface::class => $self,
+            OutputInterface::class => $self,
+        ];
+        $runtime->options = $self->options;
+
+        return $self;
+    }
+
     private function getInput(): ArgvInput
     {
         if (null !== $this->input) {
@@ -188,7 +202,7 @@ class SymfonyRuntime extends GenericRuntime
 
         $input = new ArgvInput();
 
-        if (null !== $this->env) {
+        if (isset($this->options['env'])) {
             return $this->input = $input;
         }
 

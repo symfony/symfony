@@ -1,9 +1,9 @@
 <?php
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Runtime\Runner\ClosureRunner;
 use Symfony\Component\Runtime\RunnerInterface;
+use Symfony\Component\Runtime\SymfonyRuntime;
 
 require __DIR__.'/autoload.php';
 

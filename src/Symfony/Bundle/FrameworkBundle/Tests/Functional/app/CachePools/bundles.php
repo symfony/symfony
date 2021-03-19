@@ -14,5 +14,4 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle
 
 return [
     new FrameworkBundle(),
-    new TestBundle(),
 ];

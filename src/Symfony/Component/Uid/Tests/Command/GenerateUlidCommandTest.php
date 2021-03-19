@@ -89,4 +89,15 @@ final class GenerateUlidCommandTest extends TestCase
 
         Ulid::fromRfc4122(trim($commandTester->getDisplay()));
     }
+
+    public function testTimestampIncrementWhenGeneratingSeveralTimeBasedUlids()
+    {
+        $commandTester = new CommandTester(new GenerateUlidCommand());
+
+        $this->assertSame(0, $commandTester->execute(['--time' => 'now', '--count' => '2']));
+
+        $ulids = explode("\n", trim($commandTester->getDisplay(true)));
+
+        $this->assertNotSame($ulids[0], $ulids[1]);
+    }
 }

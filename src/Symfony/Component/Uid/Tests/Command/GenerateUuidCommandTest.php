@@ -209,4 +209,15 @@ final class GenerateUuidCommandTest extends TestCase
 
         Uuid::fromBase32(trim($commandTester->getDisplay()));
     }
+
+    public function testTimestampIncrementWhenGeneratingSeveralTimeBasedUuids()
+    {
+        $commandTester = new CommandTester(new GenerateUuidCommand());
+
+        $this->assertSame(0, $commandTester->execute(['--time-based' => 'now', '--count' => '2']));
+
+        $uuids = explode("\n", trim($commandTester->getDisplay(true)));
+
+        $this->assertNotSame($uuids[0], $uuids[1]);
+    }
 }

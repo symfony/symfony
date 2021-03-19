@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-18T21:30:23Z
+
+> There is no clear way how to use GenericRuntime as "main" and be able to pass options to the PsrRuntime.
+
+Oh, I can pass the "PSR options"  to the "GenericRuntime". Then on `PsrRuntime::register()`, I'll just take the `GenericRuntime::$options` and create a new instance of `PsrRuntime`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-18T21:42:39Z
+
+> That is only true if the runtime is located in a class starting with Symfony\Runtime\.. So if my acme/library wants to create a "auto discoverable" runtime, then I need to define that namespace.
+
+Correct, that's the convention. This effectively means that's we're globally reserving the `Symfony\Runtime` namespace for this purpose. I think that's appropriate.
+
+Adding the namespace should be done in the `composer.json`, as this PR does. Eg:
+```json
+"psr4": {
+	"Symfony\\Runtime\\Acme\\Lib\\": "src/Runtime/"
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-19T10:33:58Z
+
+(PR is ready, now tested)

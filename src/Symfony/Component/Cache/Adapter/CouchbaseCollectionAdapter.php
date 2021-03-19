@@ -75,8 +75,8 @@ class CouchbaseCollectionAdapter extends AbstractAdapter
         $newServers = [];
         $protocol = 'couchbase';
         try {
-            $username = $options['username'];
-            $password = $options['password'];
+            $username = $options['username'] ?? '';
+            $password = $options['password'] ?? '';
 
             foreach ($servers as $dsn) {
                 if (0 !== strpos($dsn, 'couchbase:')) {

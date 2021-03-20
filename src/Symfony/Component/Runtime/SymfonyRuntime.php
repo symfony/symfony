@@ -177,7 +177,7 @@ class SymfonyRuntime extends GenericRuntime
         return parent::getArgument($parameter, $type);
     }
 
-    protected static function register(parent $runtime): parent
+    protected static function register(GenericRuntime $runtime): GenericRuntime
     {
         $self = new self($runtime->options + ['runtimes' => []]);
         $self->options['runtimes'] += [

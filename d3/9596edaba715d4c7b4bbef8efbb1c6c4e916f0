@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-21T05:36:21Z
+
+I have the same warning when using Ulid::fromString() from an extending class. It tells me return type is AbstractUlid while it is the extending class
+
+Shall we use static in this case?

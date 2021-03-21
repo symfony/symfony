@@ -27,7 +27,10 @@ matrix:
           env: deps=high
         - php: 8.0
           env: deps=low
+        - php: nightly
     fast_finish: true
+    allow_failures:
+        - php: nightly
 
 cache:
     directories:
@@ -129,7 +132,7 @@ before_install:
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          if [[ $PHP != 8.* ]]; then
+          if [[ $PHP = 7.* ]]; then
               echo extension = memcached.so >> $INI
           fi
       done
@@ -146,7 +149,7 @@ before_install:
           if ! php --ri sodium > /dev/null; then
               tfold ext.libsodium tpecl libsodium sodium.so $INI
           fi
-          if [[ $PHP = 8.* ]]; then
+          if [[ $PHP != 7.* ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
           else
               tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI

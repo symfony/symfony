@@ -90,4 +90,9 @@ final class UuidFactoryTest extends TestCase
     {
         $this->assertInstanceOf(UuidV4::class, (new UuidFactory())->randomBased()->create());
     }
+
+    public function testCreateNamedWithNamespacePredefinedKeyword()
+    {
+        $this->assertSame('1002657d-3019-59b1-96dc-afc2a3e57c61', (string) (new UuidFactory())->nameBased('dns')->create('symfony.com'));
+    }
 }

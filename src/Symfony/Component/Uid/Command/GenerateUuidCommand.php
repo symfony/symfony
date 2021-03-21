@@ -44,7 +44,7 @@ class GenerateUuidCommand extends Command
                 new InputOption('time-based', null, InputOption::VALUE_REQUIRED, 'The timestamp, to generate a time-based UUID: a parsable date/time string'),
                 new InputOption('node', null, InputOption::VALUE_REQUIRED, 'The UUID whose node part should be used as the node of the generated UUID'),
                 new InputOption('name-based', null, InputOption::VALUE_REQUIRED, 'The name, to generate a name-based UUID'),
-                new InputOption('namespace', null, InputOption::VALUE_REQUIRED, 'The UUID to use at the namespace for named-based UUIDs'),
+                new InputOption('namespace', null, InputOption::VALUE_REQUIRED, 'The UUID to use at the namespace for named-based UUIDs, predefined namespaces keywords "dns", "url", "oid" and "x500" are accepted'),
                 new InputOption('random-based', null, InputOption::VALUE_NONE, 'To generate a random-based UUID'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of UUID to generate', 1),
                 new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The UUID output format: rfc4122, base58 or base32', 'rfc4122'),
@@ -144,7 +144,7 @@ EOF
                 break;
 
             case null !== $name:
-                if ($namespace) {
+                if ($namespace && !\in_array($namespace, ['dns', 'url', 'oid', 'x500'], true)) {
                     try {
                         $namespace = Uuid::fromString($namespace);
                     } catch (\InvalidArgumentException $e) {

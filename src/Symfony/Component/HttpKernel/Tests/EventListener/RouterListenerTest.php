@@ -83,7 +83,7 @@ class RouterListenerTest extends TestCase
         $request = Request::create($uri);
         $request->attributes->set('_controller', null); // Prevents going in to routing process
 
-        return new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     public function testInvalidMatcher()
@@ -96,7 +96,7 @@ class RouterListenerTest extends TestCase
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->once())
@@ -112,7 +112,7 @@ class RouterListenerTest extends TestCase
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'post');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->any())
@@ -154,7 +154,7 @@ class RouterListenerTest extends TestCase
         $request = Request::create('http://localhost/');
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
-        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function getLoggingParameterData()
@@ -214,7 +214,7 @@ class RouterListenerTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('http://bad host %22/');
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
 
@@ -243,7 +243,7 @@ class RouterListenerTest extends TestCase
         $request = Request::create('https://www.symfony.com/path');
         $request->headers->set('referer', 'https://www.google.com');
 
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new RouterListener($urlMatcher, $this->requestStack);
         $listener->onKernelRequest($event);
@@ -269,7 +269,7 @@ class RouterListenerTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('https://www.symfony.com/path');
 
-        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new RouterListener($urlMatcher, $this->requestStack);
         $listener->onKernelRequest($event);

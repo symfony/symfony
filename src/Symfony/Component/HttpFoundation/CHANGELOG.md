@@ -8,7 +8,8 @@ CHANGELOG
  * Calling `Request::getSession()` when there is no available session throws a `SessionNotFoundException`
  * Add the `RequestStack::getSession` method
  * Deprecate the `NamespacedAttributeBag` class
- * added `ResponseFormatSame` PHPUnit constraint
+ * Add `ResponseFormatSame` PHPUnit constraint
+ * Deprecate the `RequestStack::getMasterRequest()` method and add `getMainRequest()` as replacement
 
 5.2.0
 -----

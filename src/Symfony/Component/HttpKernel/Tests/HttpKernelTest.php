@@ -37,7 +37,7 @@ class HttpKernelTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); });
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
     }
 
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsFalseAndNoListenerIsRegistered()
@@ -45,7 +45,7 @@ class HttpKernelTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $kernel = $this->getHttpKernel(new EventDispatcher(), function () { throw new \RuntimeException(); });
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
     }
 
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithAHandlingListener()
@@ -56,7 +56,7 @@ class HttpKernelTest extends TestCase
         });
 
         $kernel = $this->getHttpKernel($dispatcher, function () { throw new \RuntimeException('foo'); });
-        $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertEquals('500', $response->getStatusCode());
         $this->assertEquals('foo', $response->getContent());
@@ -74,7 +74,7 @@ class HttpKernelTest extends TestCase
         $kernel = $this->getHttpKernel($dispatcher, function () use ($exception) { throw $exception; });
 
         try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
             $this->fail('LogicException expected');
         } catch (\RuntimeException $e) {
             $this->assertSame($exception, $e);
@@ -313,10 +313,10 @@ class HttpKernelTest extends TestCase
         $dispatcher = new EventDispatcher();
         $kernel = $this->getHttpKernel($dispatcher, null, $stack);
 
-        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
+        $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST);
     }
 
-    public function testInconsistentClientIpsOnMasterRequests()
+    public function testInconsistentClientIpsOnMainRequests()
     {
         $this->expectException(BadRequestHttpException::class);
         $request = new Request();
@@ -331,7 +331,7 @@ class HttpKernelTest extends TestCase
         });
 
         $kernel = $this->getHttpKernel($dispatcher);
-        $kernel->handle($request, $kernel::MASTER_REQUEST, false);
+        $kernel->handle($request, $kernel::MAIN_REQUEST, false);
 
         Request::setTrustedProxies([], -1);
     }

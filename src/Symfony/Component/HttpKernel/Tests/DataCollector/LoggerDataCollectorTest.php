@@ -45,11 +45,11 @@ class LoggerDataCollectorTest extends TestCase
         ], $compilerLogs['Unknown Compiler Pass']);
     }
 
-    public function testWithMasterRequest()
+    public function testWithMainRequest()
     {
-        $masterRequest = new Request();
+        $mainRequest = new Request();
         $stack = new RequestStack();
-        $stack->push($masterRequest);
+        $stack->push($mainRequest);
 
         $logger = $this
             ->getMockBuilder(DebugLoggerInterface::class)
@@ -60,16 +60,16 @@ class LoggerDataCollectorTest extends TestCase
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
-        $c->collect($masterRequest, new Response());
+        $c->collect($mainRequest, new Response());
         $c->lateCollect();
     }
 
     public function testWithSubRequest()
     {
-        $masterRequest = new Request();
+        $mainRequest = new Request();
         $subRequest = new Request();
         $stack = new RequestStack();
-        $stack->push($masterRequest);
+        $stack->push($mainRequest);
         $stack->push($subRequest);
 
         $logger = $this

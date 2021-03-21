@@ -190,7 +190,7 @@ class KernelTest extends TestCase
 
     public function testHandleCallsHandleOnHttpKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -212,7 +212,7 @@ class KernelTest extends TestCase
 
     public function testHandleBootsTheKernel()
     {
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $request = new Request();
 
@@ -678,7 +678,7 @@ class TestKernel implements HttpKernelInterface
         $this->terminateCalled = true;
     }
 
-    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
+    public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
     }
 

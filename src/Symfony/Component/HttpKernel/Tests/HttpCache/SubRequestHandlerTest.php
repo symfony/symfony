@@ -51,7 +51,7 @@ class SubRequestHandlerTest extends TestCase
             $this->assertSame('https', $request->headers->get('X-Forwarded-Proto'));
         });
 
-        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MASTER_REQUEST, true);
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertSame($globalState, $this->getGlobalState());
     }
@@ -75,7 +75,7 @@ class SubRequestHandlerTest extends TestCase
             $this->assertSame('for="10.0.0.1";host="localhost";proto=http', $request->headers->get('Forwarded'));
         });
 
-        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MASTER_REQUEST, true);
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertSame(self::$globalState, $this->getGlobalState());
     }
@@ -97,7 +97,7 @@ class SubRequestHandlerTest extends TestCase
             $this->assertSame(1234, $request->getPort());
         });
 
-        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MASTER_REQUEST, true);
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertSame($globalState, $this->getGlobalState());
     }
@@ -120,7 +120,7 @@ class SubRequestHandlerTest extends TestCase
             $this->assertSame('https', $request->getScheme());
         });
 
-        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MASTER_REQUEST, true);
+        SubRequestHandler::handle($kernel, $request, HttpKernelInterface::MAIN_REQUEST, true);
 
         $this->assertSame($globalState, $this->getGlobalState());
     }
@@ -143,7 +143,7 @@ class TestSubRequestHandlerKernel implements HttpKernelInterface
         $this->assertCallback = $assertCallback;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         $assertCallback = $this->assertCallback;
         $assertCallback($request, $type, $catch);

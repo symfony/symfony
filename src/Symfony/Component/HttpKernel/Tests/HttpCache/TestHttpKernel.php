@@ -54,7 +54,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         }
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false): Response
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = false): Response
     {
         $this->catch = $catch;
         $this->backendRequest = [Request::getTrustedProxies(), Request::getTrustedHeaderSet(), $request];

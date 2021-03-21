@@ -34,7 +34,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $subscriber = new AddLinkHeaderListener();
 
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $subscriber->onKernelResponse($event);
 

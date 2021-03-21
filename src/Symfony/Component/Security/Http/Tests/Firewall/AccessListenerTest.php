@@ -74,7 +74,7 @@ class AccessListenerTest extends TestCase
             $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenTheTokenIsNotAuthenticated()
@@ -138,7 +138,7 @@ class AccessListenerTest extends TestCase
             $authManager
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest()
@@ -173,7 +173,7 @@ class AccessListenerTest extends TestCase
             $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenAccessMapReturnsEmptyAttributes()
@@ -201,7 +201,7 @@ class AccessListenerTest extends TestCase
             $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener(new LazyResponseEvent($event));
     }
@@ -233,7 +233,7 @@ class AccessListenerTest extends TestCase
             $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenTheSecurityTokenStorageHasNoTokenAndExceptionOnTokenIsFalse()
@@ -263,7 +263,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenPublicAccessIsAllowedAndExceptionOnTokenIsFalse()
@@ -292,7 +292,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleWhenPublicAccessWhileAuthenticated()
@@ -323,7 +323,7 @@ class AccessListenerTest extends TestCase
             false
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
     public function testHandleMWithultipleAttributesShouldBeHandledAsAnd()
@@ -363,6 +363,6 @@ class AccessListenerTest extends TestCase
             $this->createMock(AuthenticationManagerInterface::class)
         );
 
-        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST));
+        $listener(new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 }

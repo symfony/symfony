@@ -122,7 +122,7 @@ class MicroKernelTraitTest extends TestCase
         };
 
         $request = Request::create('/');
-        $response = $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+        $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
         $this->assertSame('Hello World!', $response->getContent());
     }
@@ -156,7 +156,7 @@ class MicroKernelTraitTest extends TestCase
         $this->expectExceptionMessage('"Symfony\Bundle\FrameworkBundle\Tests\Kernel\MinimalKernel@anonymous" uses "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait", but does not implement the required method "protected function configureRoutes(RoutingConfigurator $routes): void".');
 
         $request = Request::create('/');
-        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
     }
 }
 

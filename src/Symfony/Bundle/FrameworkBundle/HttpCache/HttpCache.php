@@ -63,7 +63,7 @@ class HttpCache extends BaseHttpCache
         parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge($this->options, $this->getOptions()));
     }
 
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true)
     {
         if ($this->kernel->getContainer()->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();

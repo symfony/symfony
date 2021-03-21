@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 class ProfilerListenerTest extends TestCase
 {
     /**
-     * Test a master and sub request with an exception and `onlyException` profiler option enabled.
+     * Test a main and sub request with an exception and `onlyException` profiler option enabled.
      */
     public function testKernelTerminate()
     {
@@ -40,23 +40,23 @@ class ProfilerListenerTest extends TestCase
             ->willReturn($profile);
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $masterRequest = $this->createMock(Request::class);
+        $mainRequest = $this->createMock(Request::class);
         $subRequest = $this->createMock(Request::class);
         $response = $this->createMock(Response::class);
 
         $requestStack = new RequestStack();
-        $requestStack->push($masterRequest);
+        $requestStack->push($mainRequest);
 
         $onlyException = true;
         $listener = new ProfilerListener($profiler, $requestStack, null, $onlyException);
 
-        // master request
-        $listener->onKernelResponse(new ResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST, $response));
+        // main request
+        $listener->onKernelResponse(new ResponseEvent($kernel, $mainRequest, Kernel::MAIN_REQUEST, $response));
 
         // sub request
         $listener->onKernelException(new ExceptionEvent($kernel, $subRequest, Kernel::SUB_REQUEST, new HttpException(404)));
         $listener->onKernelResponse(new ResponseEvent($kernel, $subRequest, Kernel::SUB_REQUEST, $response));
 
-        $listener->onKernelTerminate(new TerminateEvent($kernel, $masterRequest, $response));
+        $listener->onKernelTerminate(new TerminateEvent($kernel, $mainRequest, $response));
     }
 }

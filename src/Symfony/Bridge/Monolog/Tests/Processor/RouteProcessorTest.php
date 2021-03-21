@@ -123,14 +123,14 @@ class RouteProcessorTest extends TestCase
         $this->assertEquals(['extra' => []], $record);
     }
 
-    private function getRequestEvent(Request $request, int $requestType = HttpKernelInterface::MASTER_REQUEST): RequestEvent
+    private function getRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
         return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
     }
 
     private function getFinishRequestEvent(Request $request): FinishRequestEvent
     {
-        return new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        return new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     private function mockEmptyRequest(): Request

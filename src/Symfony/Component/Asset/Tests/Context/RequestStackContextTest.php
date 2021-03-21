@@ -34,7 +34,7 @@ class RequestStackContextTest extends TestCase
         $request->method('getBasePath')
             ->willReturn($testBasePath);
         $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->method('getMasterRequest')
+        $requestStack->method('getMainRequest')
             ->willReturn($request);
 
         $requestStackContext = new RequestStackContext($requestStack);
@@ -56,7 +56,7 @@ class RequestStackContextTest extends TestCase
         $request->method('isSecure')
             ->willReturn(true);
         $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->method('getMasterRequest')
+        $requestStack->method('getMainRequest')
             ->willReturn($request);
 
         $requestStackContext = new RequestStackContext($requestStack);

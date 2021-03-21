@@ -42,7 +42,7 @@ final class LoginThrottlingListener implements EventSubscriberInterface
             return;
         }
 
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         $request->attributes->set(Security::LAST_USERNAME, $passport->getBadge(UserBadge::class)->getUserIdentifier());
 
         $limit = $this->limiter->consume($request);

@@ -70,7 +70,7 @@ class DebugHandlersListenerTest extends TestCase
         $event = new KernelEvent(
             $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
 
         $exception = null;

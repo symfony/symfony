@@ -29,7 +29,7 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
         "symfony/form": "^5.3",
-        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/http-foundation": "^5.3",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/intl": "^4.4|^5.0",
         "symfony/mime": "^5.2",
@@ -57,7 +57,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/console": "<4.4",
         "symfony/form": "<5.3",
-        "symfony/http-foundation": "<4.4",
+        "symfony/http-foundation": "<5.3",
         "symfony/http-kernel": "<4.4",
         "symfony/translation": "<5.2",
         "symfony/workflow": "<5.2"

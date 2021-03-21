@@ -105,8 +105,8 @@ class ErrorListenerTest extends TestCase
 
         $request = new Request();
         $exception = new \Exception('foo');
-        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
-        $event2 = new ExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
+        $event2 = new ExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
 
         return [
             [$event, $event2],
@@ -125,7 +125,7 @@ class ErrorListenerTest extends TestCase
         $request = Request::create('/');
         $request->setRequestFormat('xml');
 
-        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
         $response = $event->getResponse();
@@ -145,13 +145,13 @@ class ErrorListenerTest extends TestCase
         $dispatcher->addSubscriber($listener);
 
         $request = Request::create('/');
-        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
         $response = new Response('', 200, ['content-security-policy' => "style-src 'self'"]);
         $this->assertTrue($response->headers->has('content-security-policy'));
 
-        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
@@ -174,7 +174,7 @@ class ErrorListenerTest extends TestCase
             return $controller(...$event->getArguments());
         });
 
-        $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $event = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
         $this->assertSame('OK: foo', $event->getResponse()->getContent());
@@ -208,7 +208,7 @@ class TestLogger extends Logger implements DebugLoggerInterface
 
 class TestKernel implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         return new Response('foo');
     }
@@ -216,7 +216,7 @@ class TestKernel implements HttpKernelInterface
 
 class TestKernelThatThrowsException implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         throw new \RuntimeException('bar');
     }

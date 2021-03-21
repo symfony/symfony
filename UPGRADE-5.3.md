@@ -36,11 +36,13 @@ FrameworkBundle
  * Deprecate the `framework.session.storage_id` configuration option, use the `framework.session.storage_factory_id` configuration option instead
  * Deprecate the `session` service and the `SessionInterface` alias, use the `\Symfony\Component\HttpFoundation\Request::getSession()` or the new `\Symfony\Component\HttpFoundation\RequestStack::getSession()` methods instead
  * Deprecate the `KernelTestCase::$container` property, use `KernelTestCase::getContainer()` instead
+ * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
 
 HttpFoundation
 --------------
 
  * Deprecate the `NamespacedAttributeBag` class
+ * Deprecate the `RequestStack::getMasterRequest()` method and add `getMainRequest()` as replacement
 
 HttpKernel
 ----------
@@ -49,6 +51,8 @@ HttpKernel
  * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Mark the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
  * Deprecate returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
+ * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
 
 Messenger
 ---------

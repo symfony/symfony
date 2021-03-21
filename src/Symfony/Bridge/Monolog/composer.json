@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "monolog/monolog": "^1.25.1|^2",
         "symfony/service-contracts": "^1.1|^2",
-        "symfony/http-kernel": "^4.4|^5.0",
+        "symfony/http-kernel": "^5.3",
         "symfony/deprecation-contracts": "^2.1"
     },
     "require-dev": {
@@ -32,7 +32,7 @@
     },
     "conflict": {
         "symfony/console": "<4.4",
-        "symfony/http-foundation": "<4.4"
+        "symfony/http-foundation": "<5.3"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",

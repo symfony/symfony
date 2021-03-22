@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-22T14:14:08Z
+
+With "deps=low", Security/Csrf installs the wrong commit from 5.x.
+
+That is why Travis is red.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-22T15:12:01Z
+
+The title of the PR needs to be updated, as it does not describe what is done anymore

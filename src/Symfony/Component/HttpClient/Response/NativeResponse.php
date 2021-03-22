@@ -137,7 +137,7 @@ final class NativeResponse implements ResponseInterface
 
                 // Send request and follow redirects when needed
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
-                self::addResponseHeaders($http_response_header, $this->info, $this->headers, $this->info['debug']);
+                self::addResponseHeaders(stream_get_meta_data($h)['wrapper_data'], $this->info, $this->headers, $this->info['debug']);
                 $url = ($this->resolveRedirect)($this->multi, $this->headers['location'][0] ?? null, $this->context);
 
                 if (null === $url) {

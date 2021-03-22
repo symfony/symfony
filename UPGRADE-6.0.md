@@ -89,6 +89,7 @@ HttpFoundation
    `BinaryFileResponse::create()` methods (use `__construct()` instead)
  * Not passing a `Closure` together with `FILTER_CALLBACK` to `ParameterBag::filter()` throws an `InvalidArgumentException`; wrap your filter in a closure instead.
  * Removed the `Request::HEADER_X_FORWARDED_ALL` constant, use either `Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO` or `Request::HEADER_X_FORWARDED_AWS_ELB` or `Request::HEADER_X_FORWARDED_TRAEFIK`constants instead.
+ * Rename `RequestStack::getMasterRequest()` to `getMainRequest()`
 
 HttpKernel
 ----------
@@ -98,6 +99,8 @@ HttpKernel
  * Make `WarmableInterface::warmUp()` return a list of classes or files to preload on PHP 7.4+
  * Remove support for `service:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead.
  * Remove support for returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Rename `HttpKernelInterface::MASTER_REQUEST` to `MAIN_REQUEST`
+ * Rename `KernelEvent::isMasterRequest()` to `isMainRequest()`
 
 Inflector
 ---------

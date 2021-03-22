@@ -107,7 +107,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
@@ -130,7 +130,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
@@ -153,7 +153,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
@@ -180,7 +180,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 
@@ -204,7 +204,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->createMock(HttpKernelInterface::class), $httpUtils),
             ['require_previous_session' => false, 'post_only' => $postOnly]
         );
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $listener($event);
     }
 

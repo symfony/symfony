@@ -31,7 +31,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 null,
                 param('profiler_listener.only_exceptions'),
-                param('profiler_listener.only_master_requests'),
+                param('profiler_listener.only_main_requests'),
             ])
             ->tag('kernel.event_subscriber')
     ;

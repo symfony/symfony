@@ -12,11 +12,14 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStackTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testGetCurrentRequest()
     {
         $requestStack = new RequestStack();
@@ -33,6 +36,23 @@ class RequestStackTest extends TestCase
         $this->assertNull($requestStack->pop());
     }
 
+    public function testGetMainRequest()
+    {
+        $requestStack = new RequestStack();
+        $this->assertNull($requestStack->getMainRequest());
+
+        $mainRequest = Request::create('/foo');
+        $subRequest = Request::create('/bar');
+
+        $requestStack->push($mainRequest);
+        $requestStack->push($subRequest);
+
+        $this->assertSame($mainRequest, $requestStack->getMainRequest());
+    }
+
+    /**
+     * @group legacy
+     */
     public function testGetMasterRequest()
     {
         $requestStack = new RequestStack();
@@ -44,6 +64,7 @@ class RequestStackTest extends TestCase
         $requestStack->push($masterRequest);
         $requestStack->push($subRequest);
 
+        $this->expectDeprecation('Since symfony/http-foundation 5.3: "Symfony\Component\HttpFoundation\RequestStack::getMasterRequest()" is deprecated, use "getMainRequest()" instead.');
         $this->assertSame($masterRequest, $requestStack->getMasterRequest());
     }
 
@@ -52,15 +73,15 @@ class RequestStackTest extends TestCase
         $requestStack = new RequestStack();
         $this->assertNull($requestStack->getParentRequest());
 
-        $masterRequest = Request::create('/foo');
+        $mainRequest = Request::create('/foo');
 
-        $requestStack->push($masterRequest);
+        $requestStack->push($mainRequest);
         $this->assertNull($requestStack->getParentRequest());
 
         $firstSubRequest = Request::create('/bar');
 
         $requestStack->push($firstSubRequest);
-        $this->assertSame($masterRequest, $requestStack->getParentRequest());
+        $this->assertSame($mainRequest, $requestStack->getParentRequest());
 
         $secondSubRequest = Request::create('/baz');
 

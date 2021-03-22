@@ -42,7 +42,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
+        $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
         $this->data = [
             'called_listeners' => [],
             'not_called_listeners' => [],

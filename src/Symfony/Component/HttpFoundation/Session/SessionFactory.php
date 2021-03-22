@@ -35,6 +35,6 @@ class SessionFactory
 
     public function createSession(): SessionInterface
     {
-        return new Session($this->storageFactory->createStorage($this->requestStack->getMasterRequest()), null, null, $this->usageReporter);
+        return new Session($this->storageFactory->createStorage($this->requestStack->getMainRequest()), null, null, $this->usageReporter);
     }
 }

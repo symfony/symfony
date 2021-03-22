@@ -86,7 +86,7 @@ class ContextListener extends AbstractListener
      */
     public function authenticate(RequestEvent $event)
     {
-        if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
+        if (!$this->registered && null !== $this->dispatcher && $event->isMainRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
             $this->registered = true;
         }
@@ -153,7 +153,7 @@ class ContextListener extends AbstractListener
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

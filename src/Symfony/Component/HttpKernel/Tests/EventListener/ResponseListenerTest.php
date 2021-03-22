@@ -58,7 +58,7 @@ class ResponseListenerTest extends TestCase
 
         $response = new Response('foo');
 
-        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
@@ -72,7 +72,7 @@ class ResponseListenerTest extends TestCase
         $response = new Response('foo');
         $response->setCharset('ISO-8859-1');
 
-        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-1', $response->getCharset());
@@ -87,7 +87,7 @@ class ResponseListenerTest extends TestCase
         $request = Request::create('/');
         $request->setRequestFormat('application/json');
 
-        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
         $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());

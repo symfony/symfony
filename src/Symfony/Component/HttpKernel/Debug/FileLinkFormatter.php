@@ -91,7 +91,7 @@ class FileLinkFormatter
         }
 
         if ($this->requestStack && $this->baseDir && $this->urlFormat) {
-            $request = $this->requestStack->getMasterRequest();
+            $request = $this->requestStack->getMainRequest();
 
             if ($request instanceof Request && (!$this->urlFormat instanceof \Closure || $this->urlFormat = ($this->urlFormat)())) {
                 return [

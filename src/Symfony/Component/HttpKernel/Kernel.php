@@ -177,7 +177,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true)
     {
         if (!$this->booted) {
             $container = $this->container ?? $this->preBoot();

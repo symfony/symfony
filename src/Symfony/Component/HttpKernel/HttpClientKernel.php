@@ -42,7 +42,7 @@ final class HttpClientKernel implements HttpKernelInterface
         $this->client = $client ?? HttpClient::create();
     }
 
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true): Response
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         $headers = $this->getHeaders($request);
         $body = '';

@@ -17,6 +17,7 @@ CHANGELOG
  * Add support to use a PSR-6 compatible cache for Doctrine annotations
  * Deprecate all other values than "none", "php_array" and "file" for `framework.annotation.cache`
  * Add `KernelTestCase::getContainer()` as the best way to get a container in tests
+ * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
 
 5.2.0
 -----

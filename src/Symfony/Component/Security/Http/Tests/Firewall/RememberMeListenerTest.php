@@ -352,7 +352,7 @@ class RememberMeListenerTest extends TestCase
         $request = $request ?? new Request();
 
         $event = $this->getMockBuilder(RequestEvent::class)
-            ->setConstructorArgs([$this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MASTER_REQUEST])
+            ->setConstructorArgs([$this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST])
             ->getMock();
         $event
             ->expects($this->any())

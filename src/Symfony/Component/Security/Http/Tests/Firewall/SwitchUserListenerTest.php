@@ -53,7 +53,7 @@ class SwitchUserListenerTest extends TestCase
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->request = new Request();
-        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MASTER_REQUEST);
+        $this->event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     public function testFirewallNameIsRequired()

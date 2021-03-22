@@ -24,8 +24,11 @@
     },
     "require-dev": {
         "symfony/http-client": "^4.4|^5.0",
-        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/http-foundation": "^5.3",
         "symfony/http-kernel": "^4.4|^5.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<5.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Asset\\": "" },

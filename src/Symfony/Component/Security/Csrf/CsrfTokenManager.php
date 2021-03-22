@@ -34,7 +34,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
      * @param string|RequestStack|callable|null $namespace
      *                                                     * null: generates a namespace using $_SERVER['HTTPS']
      *                                                     * string: uses the given string
-     *                                                     * RequestStack: generates a namespace using the current master request
+     *                                                     * RequestStack: generates a namespace using the current main request
      *                                                     * callable: uses the result of this callable (must return a string)
      */
     public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null)
@@ -50,7 +50,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
             $this->namespace = $superGlobalNamespaceGenerator;
         } elseif ($namespace instanceof RequestStack) {
             $this->namespace = function () use ($namespace, $superGlobalNamespaceGenerator) {
-                if ($request = $namespace->getMasterRequest()) {
+                if ($request = $namespace->getMainRequest()) {
                     return $request->isSecure() ? 'https-' : '';
                 }
 

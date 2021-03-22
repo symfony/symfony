@@ -27,10 +27,10 @@
     },
     "require-dev": {
         "symfony/http-foundation": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0"
+        "symfony/http-kernel": "^5.3"
     },
     "conflict": {
-        "symfony/http-kernel": "<4.4"
+        "symfony/http-kernel": "<5.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

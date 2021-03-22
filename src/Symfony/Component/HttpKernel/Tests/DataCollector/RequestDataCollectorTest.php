@@ -210,7 +210,7 @@ class RequestDataCollectorTest extends TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
-        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $this->createResponse()));
+        $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $this->createResponse()));
 
         $this->assertTrue($request->attributes->get('_redirected'));
     }
@@ -374,7 +374,7 @@ class RequestDataCollectorTest extends TestCase
     {
         $resolver = $this->createMock(ControllerResolverInterface::class);
         $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
-        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }
 

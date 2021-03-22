@@ -41,7 +41,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -59,12 +59,12 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
     }
 
     /**
-     * Checks if session was initialized and saves if current request is master
+     * Checks if session was initialized and saves if current request is the main request
      * Runs on 'kernel.response' in test environment.
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

@@ -49,7 +49,7 @@ class UserAuthenticator implements UserAuthenticatorInterface
 
     private function getUserAuthenticator(): UserAuthenticatorInterface
     {
-        $firewallConfig = $this->firewallMap->getFirewallConfig($this->requestStack->getMasterRequest());
+        $firewallConfig = $this->firewallMap->getFirewallConfig($this->requestStack->getMainRequest());
         if (null === $firewallConfig) {
             throw new LogicException('Cannot call authenticate on this request, as it is not behind a firewall.');
         }

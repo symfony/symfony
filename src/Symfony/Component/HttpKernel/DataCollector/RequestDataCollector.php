@@ -106,7 +106,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
             'session_usages' => array_values($this->sessionUsages),
-            'stateless_check' => $this->requestStack && $this->requestStack->getMasterRequest()->attributes->get('_stateless', false),
+            'stateless_check' => $this->requestStack && $this->requestStack->getMainRequest()->attributes->get('_stateless', false),
             'flashes' => $flashes,
             'path_info' => $request->getPathInfo(),
             'controller' => 'n/a',
@@ -374,7 +374,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

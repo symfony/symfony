@@ -46,7 +46,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->currentRequest = $this->requestStack && $this->requestStack->getMasterRequest() !== $request ? $request : null;
+        $this->currentRequest = $this->requestStack && $this->requestStack->getMainRequest() !== $request ? $request : null;
     }
 
     /**

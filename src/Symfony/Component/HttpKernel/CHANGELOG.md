@@ -9,6 +9,8 @@ CHANGELOG
  * Deprecate `ArgumentMetadata::getAttribute()`, use `getAttributes()` instead
  * Mark the class `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` as internal
  * Deprecate returning a `ContainerBuilder` from `KernelInterface::registerContainerConfiguration()`
+ * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
+ * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
 
 5.2.0
 -----

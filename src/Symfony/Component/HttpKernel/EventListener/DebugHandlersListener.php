@@ -76,7 +76,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         if ($event instanceof ConsoleEvent && !\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             return;
         }
-        if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMasterRequest()) {
+        if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMainRequest()) {
             return;
         }
         $this->firstCall = $this->hasTerminatedWithException = false;

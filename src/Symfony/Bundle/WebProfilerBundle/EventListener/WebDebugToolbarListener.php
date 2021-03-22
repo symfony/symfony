@@ -88,7 +88,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             }
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

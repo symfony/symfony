@@ -126,7 +126,7 @@ class Uuid extends AbstractUid
         return $this->uid;
     }
 
-    public function compare(parent $other): int
+    public function compare(AbstractUid $other): int
     {
         if (false !== $cmp = uuid_compare($this->uid, $other->uid)) {
             return $cmp;

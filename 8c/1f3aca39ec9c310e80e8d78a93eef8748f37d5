@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-22T12:58:07Z
+
+As discussed with @nicolas-grekas via Slack: We decided to go with a soft deprecation of the constant for now. The reason is that it would get unreasonably hard to implement `HttpKernelInterface` in a way that is compatible with Symfony 4.4 and 5.3 without triggering the deprecation, because the constant is part of the interface here.
+
+```PHP
+public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true);
+```

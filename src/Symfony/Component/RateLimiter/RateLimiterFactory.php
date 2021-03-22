@@ -46,7 +46,7 @@ final class RateLimiterFactory
 
     public function create(?string $key = null): LimiterInterface
     {
-        $id = $this->config['id'].$key;
+        $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory ? $this->lockFactory->createLock($id) : new NoLock();
 
         switch ($this->config['policy']) {

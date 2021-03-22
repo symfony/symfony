@@ -64,7 +64,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
         }
 
         if (!class_exists(RateLimiterFactory::class)) {
-            throw new \LogicException('Login throttling requires symfony/rate-limiter to be installed and enabled.');
+            throw new \LogicException('Login throttling requires the Rate Limiter component. Try running "composer require symfony/rate-limiter".');
         }
 
         if (!isset($config['limiter'])) {

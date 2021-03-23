@@ -279,11 +279,7 @@ install:
 
               [[ ! $X ]] || (exit 1)
           elif [[ $deps = low ]]; then
-              [[ -e ~/php-ext/composer-lowest.lock.tar ]] && tar -xf ~/php-ext/composer-lowest.lock.tar
-              tar -cf ~/php-ext/composer-lowest.lock.tar --files-from /dev/null
-              php .github/rm-invalid-lowest-lock-files.php $COMPONENTS
-              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && ([ -e composer.lock ] && ${COMPOSER_UP/update/install} || $COMPOSER_UP --prefer-lowest --prefer-stable) && $PHPUNIT_X'"
-              echo "$COMPONENTS" | xargs -n1 -I{} tar --append -f ~/php-ext/composer-lowest.lock.tar {}/composer.lock
+              echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'"
           else
               if [[ $PHP = 8.0* ]]; then
                   # add return types before running the test suite

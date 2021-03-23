@@ -67,7 +67,7 @@ foreach ($dirs as $dir) {
 
 $referencedCommits = [];
 
-foreach ($composerJsons as list($dir, $lockedPackages)) {
+foreach ($composerJsons as [$dir, $lockedPackages]) {
     foreach ($lockedPackages as $lockedJson) {
         if (0 !== strpos($version = $lockedJson['version'], 'dev-') && '-dev' !== substr($version, -4)) {
             continue;
@@ -119,11 +119,13 @@ curl_share_setopt($sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
 $chs = [];
 
 foreach ($referencedCommits as $name => $dirsByCommit) {
-    $chs[] = $ch = [curl_init(), fopen($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json', 'wb')];
-    curl_setopt($ch[0], CURLOPT_URL, 'https://repo.packagist.org/p/'.$name.'.json');
-    curl_setopt($ch[0], CURLOPT_FILE, $ch[1]);
-    curl_setopt($ch[0], CURLOPT_SHARE, $sh);
-    curl_multi_add_handle($mh, $ch[0]);
+    foreach (['', '~dev'] as $suffix) {
+        $chs[] = $ch = [curl_init(), fopen($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '~').$suffix.'.json', 'w')];
+        curl_setopt($ch[0], CURLOPT_URL, 'https://repo.packagist.org/p2/'.$name.$suffix.'.json');
+        curl_setopt($ch[0], CURLOPT_FILE, $ch[1]);
+        curl_setopt($ch[0], CURLOPT_SHARE, $sh);
+        curl_multi_add_handle($mh, $ch[0]);
+    }
 }
 
 do {
@@ -131,18 +133,22 @@ do {
     curl_multi_select($mh);
 } while ($active);
 
-foreach ($chs as list($ch, $fd)) {
+foreach ($chs as [$ch, $fd]) {
     curl_multi_remove_handle($mh, $ch);
     curl_close($ch);
     fclose($fd);
 }
 
 foreach ($referencedCommits as $name => $dirsByCommit) {
-    $repo = file_get_contents($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '$').'.json');
-    $repo = json_decode($repo, true);
+    foreach (['', '~dev'] as $suffix) {
+        $repo = file_get_contents($_SERVER['HOME'].'/.cache/composer/repo/https---repo.packagist.org/provider-'.strtr($name, '/', '~').$suffix.'.json');
+        $repo = json_decode($repo, true);
 
-    foreach ($repo['packages'][$name] as $version) {
-        unset($referencedCommits[$name][$version['source']['reference']]);
+        foreach ($repo['packages'][$name] as $version) {
+            if (isset($version['source']['reference'])) {
+                unset($referencedCommits[$name][$version['source']['reference']]);
+            }
+        }
     }
 }
 

@@ -125,7 +125,7 @@
         {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' custom-file-label')|trim }) -%}
         {%- set input_lang = 'en' -%}
         {% if app is defined and app.request is defined %}{%- set input_lang = app.request.locale -%}{%- endif -%}
-        <label for="{{ form.vars.id }}" lang="{{ input_lang }}" {% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        <label for="{{ form.vars.id }}" lang="{{ input_lang }}" {% with { attr: label_attr|merge({id: label_attr.id~'_file_label'}) } %}{{ block('attributes') }}{% endwith %}>
             {%- if attr.placeholder is defined and attr.placeholder is not none -%}
                 {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}
             {%- endif -%}

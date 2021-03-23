@@ -123,7 +123,7 @@
         {%- set type = type|default('file') -%}
         {{- block('form_widget_simple') -}}
         {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' custom-file-label')|trim }) -%}
-        <label for="{{ form.vars.id }}" {% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+        <label for="{{ form.vars.id }}" {% with { attr: label_attr|merge({id: label_attr.id~'_file_label'}) } %}{{ block('attributes') }}{% endwith %}>
             {%- if attr.placeholder is defined and attr.placeholder is not none -%}
                 {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}
             {%- endif -%}

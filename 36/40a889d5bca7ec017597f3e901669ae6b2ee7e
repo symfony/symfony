@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-03-23T17:52:31Z
+
+I think the renaming of other attributes at least deserves being in its own commit rather than being bundled in a commit saying `Add AsController attribute` in the git history.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-23T17:58:34Z
+
+@yceruto for all autoconfiguration attributes, I agree. I would not describe that as `for all attributes`. The routing and validator usages don't make sense if prefixed with `As`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-23T17:59:43Z
+
+@stof works for me, see https://github.com/symfony/symfony/pull/40556
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-03-23T18:03:07Z
+
+> for all autoconfiguration attributes
+
+@stof my bad, but that's what I meant 😄  !

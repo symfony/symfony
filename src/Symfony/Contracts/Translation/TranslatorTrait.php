@@ -32,6 +32,8 @@ trait TranslatorTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getLocale()
     {

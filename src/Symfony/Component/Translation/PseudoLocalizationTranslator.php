@@ -108,6 +108,11 @@ final class PseudoLocalizationTranslator implements TranslatorInterface
         return $trans;
     }
 
+    public function getLocale(): string
+    {
+        return $this->translator->getLocale();
+    }
+
     private function getParts(string $originalTrans): array
     {
         if (!$this->parseHTML) {

@@ -501,8 +501,6 @@ class SymfonyStyle extends OutputStyle
             }
 
             $line = $prefix.$line;
-            $decorationLength = Helper::strlen($line) - Helper::strlenWithoutDecoration($this->getFormatter(), $line);
-            $messageLineLength = min($this->lineLength - $prefixLength - $indentLength + $decorationLength, $this->lineLength);
             $line .= str_repeat(' ', max($this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line), 0));
 
             if ($style) {

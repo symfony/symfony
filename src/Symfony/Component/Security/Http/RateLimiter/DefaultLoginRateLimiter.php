@@ -41,7 +41,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
     {
         return [
             $this->globalFactory->create($request->getClientIp()),
-            $this->localFactory->create($request->attributes->get(Security::LAST_USERNAME).$request->getClientIp()),
+            $this->localFactory->create($request->attributes->get(Security::LAST_USERNAME).'-'.$request->getClientIp()),
         ];
     }
 }

@@ -43,4 +43,16 @@ class TestBrowserToken extends AbstractToken
     {
         return null;
     }
+
+    public function __serialize(): array
+    {
+        return [$this->firewallName, parent::__serialize()];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->firewallName, $parentData] = $data;
+
+        parent::__unserialize($parentData);
+    }
 }

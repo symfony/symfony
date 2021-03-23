@@ -656,8 +656,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return;
         }
 
-        // If the value is a scalar, pass it anyway, because we want
-        // a NoSuchMetadataException to be thrown in that case
+        if (!\is_object($value)) {
+            throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: "%s".', \gettype($value)));
+        }
+
         $this->validateObject(
             $value,
             $propertyPath,

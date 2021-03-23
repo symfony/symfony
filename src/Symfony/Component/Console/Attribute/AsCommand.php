@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Console\Attribute;
 
+/**
+ * Service tag to autoconfigure commands.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class ConsoleCommand
+class AsCommand
 {
     public function __construct(
         public string $name,

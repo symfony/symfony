@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use Symfony\Component\DependencyInjection\Attribute\TaggedItem;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -126,7 +126,7 @@ class PriorityTaggedServiceUtil
         }
 
         if ($checkTaggedItem && !$r->hasMethod($defaultMethod)) {
-            foreach ($r->getAttributes(TaggedItem::class) as $attribute) {
+            foreach ($r->getAttributes(AsTaggedItem::class) as $attribute) {
                 return 'priority' === $indexAttribute ? $attribute->newInstance()->priority : $attribute->newInstance()->index;
             }
 

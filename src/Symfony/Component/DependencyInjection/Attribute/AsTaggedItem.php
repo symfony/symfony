@@ -17,7 +17,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
  * @author Nicolas Grekas <p@tchwork.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class TaggedItem
+class AsTaggedItem
 {
     public function __construct(
         public ?string $index = null,

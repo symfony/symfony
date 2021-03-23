@@ -40,8 +40,8 @@ class UuidFactory
             $timeBasedNode = Uuid::fromString($timeBasedNode);
         }
 
-        if (null !== $nameBasedNamespace && !$nameBasedNamespace instanceof Uuid) {
-            $nameBasedNamespace = Uuid::fromString($nameBasedNamespace);
+        if (null !== $nameBasedNamespace) {
+            $nameBasedNamespace = $this->getNamespace($nameBasedNamespace);
         }
 
         $this->defaultClass = is_numeric($defaultClass) ? Uuid::class.'V'.$defaultClass : $defaultClass;
@@ -95,10 +95,24 @@ class UuidFactory
             throw new \LogicException(sprintf('A namespace should be defined when using "%s()".', __METHOD__));
         }
 
-        if (!$namespace instanceof Uuid) {
-            $namespace = Uuid::fromString($namespace);
+        return new NameBasedUuidFactory($this->nameBasedClass, $this->getNamespace($namespace));
+    }
+
+    /**
+     * @param Uuid|string $namespace
+     */
+    private function getNamespace($namespace): Uuid
+    {
+        if ($namespace instanceof Uuid) {
+            return $namespace;
         }
 
-        return new NameBasedUuidFactory($this->nameBasedClass, $namespace);
+        switch ($namespace) {
+            case 'dns': return new UuidV1(Uuid::NAMESPACE_DNS);
+            case 'url': return new UuidV1(Uuid::NAMESPACE_URL);
+            case 'oid': return new UuidV1(Uuid::NAMESPACE_OID);
+            case 'x500': return new UuidV1(Uuid::NAMESPACE_X500);
+            default: return Uuid::fromString($namespace);
+        }
     }
 }

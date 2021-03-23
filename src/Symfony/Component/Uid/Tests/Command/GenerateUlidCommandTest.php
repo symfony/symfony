@@ -90,7 +90,7 @@ final class GenerateUlidCommandTest extends TestCase
         Ulid::fromRfc4122(trim($commandTester->getDisplay()));
     }
 
-    public function testTimestampIncrementWhenGeneratingSeveralUlids()
+    public function testUlidsAreDifferentWhenGeneratingSeveralNow()
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 

@@ -220,4 +220,13 @@ final class GenerateUuidCommandTest extends TestCase
 
         $this->assertNotSame($uuids[0], $uuids[1]);
     }
+
+    public function testNamespacePredefinedKeyword()
+    {
+        $commandTester = new CommandTester(new GenerateUuidCommand());
+
+        $this->assertSame(0, $commandTester->execute(['--name-based' => 'https://symfony.com', '--namespace' => 'url']));
+
+        $this->assertSame('9c7d0eda-982d-5708-b4bd-79b3b179725d', (string) Uuid::fromRfc4122(trim($commandTester->getDisplay())));
+    }
 }

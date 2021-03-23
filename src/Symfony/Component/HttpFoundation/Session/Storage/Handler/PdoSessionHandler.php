@@ -486,10 +486,32 @@ class PdoSessionHandler extends AbstractSessionHandler
             $driver = substr($driver, 4);
         }
 
+        $dsn = null;
         switch ($driver) {
             case 'mysql':
+                $dsn = 'mysql:';
+                if ('' !== ($params['query'] ?? '')) {
+                    $queryParams = [];
+                    parse_str($params['query'], $queryParams);
+                    if ('' !== ($queryParams['charset'] ?? '')) {
+                        $dsn .= 'charset='.$queryParams['charset'].';';
+                    }
+
+                    if ('' !== ($queryParams['unix_socket'] ?? '')) {
+                        $dsn .= 'unix_socket='.$queryParams['unix_socket'].';';
+
+                        if (isset($params['path'])) {
+                            $dbName = substr($params['path'], 1); // Remove the leading slash
+                            $dsn .= 'dbname='.$dbName.';';
+                        }
+
+                        return $dsn;
+                    }
+                }
+            // If "unix_socket" is not in the query, we continue with the same process as pgsql
+            // no break
             case 'pgsql':
-                $dsn = $driver.':';
+                $dsn ?? $dsn = 'pgsql:';
 
                 if (isset($params['host']) && '' !== $params['host']) {
                     $dsn .= 'host='.$params['host'].';';

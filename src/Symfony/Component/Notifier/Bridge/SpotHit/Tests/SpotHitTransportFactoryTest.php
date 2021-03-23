@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SpotHitTransportFactoryTest extends TransportFactoryTestCase

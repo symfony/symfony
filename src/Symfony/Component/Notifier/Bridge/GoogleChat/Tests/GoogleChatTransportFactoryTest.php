@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\GoogleChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class GoogleChatTransportFactoryTest extends TransportFactoryTestCase

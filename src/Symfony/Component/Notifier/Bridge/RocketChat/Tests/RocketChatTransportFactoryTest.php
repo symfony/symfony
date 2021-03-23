@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\RocketChat\Tests;
 
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**

@@ -16,7 +16,7 @@ use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;

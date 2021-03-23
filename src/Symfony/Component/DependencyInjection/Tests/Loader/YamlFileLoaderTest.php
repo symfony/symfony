@@ -220,6 +220,27 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(['$a' => 'a', 'App\Foo' => 'foo'], $services['bar_foo']->getArguments());
     }
 
+    public function testLoadDeprecatedDefinitionWithoutMessageKey()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('deprecated_definition_without_message.yml');
+
+        $this->assertTrue($container->getDefinition('service_without_deprecation_message')->isDeprecated());
+        $deprecation = $container->getDefinition('service_without_deprecation_message')->getDeprecation('service_without_deprecation_message');
+        $message = 'The "service_without_deprecation_message" service is deprecated. You should stop using it, as it will be removed in the future.';
+        $this->assertSame($message, $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+
+        $this->assertTrue($container->getAlias('alias_without_deprecation_message')->isDeprecated());
+        $deprecation = $container->getAlias('alias_without_deprecation_message')->getDeprecation('alias_without_deprecation_message');
+        $message = 'The "alias_without_deprecation_message" service alias is deprecated. You should stop using it, as it will be removed in the future.';
+        $this->assertSame($message, $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+    }
+
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();

@@ -1752,7 +1752,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
-     * Normalize the given path (transform each blackslash into a real directory separator).
+     * Normalize the given path (transform each forward slash into a real directory separator).
      */
     private function normalize(string $path): string
     {

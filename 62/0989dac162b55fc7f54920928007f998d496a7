@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by bcremer at 2021-02-25T09:31:45Z
+
+Travis CI fail seems to be unrelated.
+
+---------------------------------------------------------------------------
+
+by bcremer at 2021-02-25T15:52:54Z
+
+Added a commit but I'm not sure if the added complexity is worth it.
+
+The documentation states:
+>    The MySQL Unix socket (shouldn't be used with host or port).
+
+Still it works fine when port and host are given. So I would argue it's up the the user not specify a host that's not localhost when using the unix_socket param.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-18T15:25:23Z
+
+I moved around the logic in a way so it became more clear and (hopefully) less complex. Basically: "If you are doing `unix_socket`, do the complex code. If not, just continue as normally".
+
+---------------------------------------------------------------------------
+
+by bcremer at 2021-03-18T17:50:22Z
+
+@Nyholm Looks like an reasonable improvement for me.
+
+Maybe add the following testcase to be sure the charset option works also when unix_socket is not given:
+
+```
+yield ['mysql://localhost/test?charset=utf8mb4', 'mysql:charset=utf8mb4;dbname=test'];
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-18T20:00:53Z
+
+Great idea.
+Yes, please do

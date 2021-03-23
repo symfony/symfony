@@ -3,7 +3,7 @@
 namespace Symfony\Component\Notifier\Bridge\Clickatell\Tests;
 
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 class ClickatellTransportFactoryTest extends TransportFactoryTestCase

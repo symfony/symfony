@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Infobip\Tests;
 
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class InfobipTransportFactoryTest extends TransportFactoryTestCase

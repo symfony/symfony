@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Octopush\Tests;
 
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class OctopushTransportFactoryTest extends TransportFactoryTestCase

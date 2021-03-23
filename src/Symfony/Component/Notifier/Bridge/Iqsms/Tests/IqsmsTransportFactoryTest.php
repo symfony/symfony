@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Iqsms\Tests;
 
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class IqsmsTransportFactoryTest extends TransportFactoryTestCase

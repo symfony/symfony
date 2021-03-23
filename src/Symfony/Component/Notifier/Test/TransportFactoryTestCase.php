@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Tests;
+namespace Symfony\Component\Notifier\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\IncompleteDsnException;

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class TelegramTransportFactoryTest extends TransportFactoryTestCase

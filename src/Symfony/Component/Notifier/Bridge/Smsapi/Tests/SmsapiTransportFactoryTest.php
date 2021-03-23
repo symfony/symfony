@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Smsapi\Tests;
 
 use Symfony\Component\Notifier\Bridge\Smsapi\SmsapiTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class SmsapiTransportFactoryTest extends TransportFactoryTestCase

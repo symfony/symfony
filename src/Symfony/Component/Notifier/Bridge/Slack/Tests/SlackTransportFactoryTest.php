@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransportFactory;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 

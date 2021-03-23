@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\FreeMobile\Tests;
 
 use Symfony\Component\Notifier\Bridge\FreeMobile\FreeMobileTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class FreeMobileTransportFactoryTest extends TransportFactoryTestCase

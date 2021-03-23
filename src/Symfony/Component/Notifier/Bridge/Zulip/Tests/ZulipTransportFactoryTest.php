@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Zulip\Tests;
 
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class ZulipTransportFactoryTest extends TransportFactoryTestCase

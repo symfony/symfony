@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Nexmo\Tests;
 
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
-use Symfony\Component\Notifier\Tests\TransportFactoryTestCase;
+use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 final class NexmoTransportFactoryTest extends TransportFactoryTestCase

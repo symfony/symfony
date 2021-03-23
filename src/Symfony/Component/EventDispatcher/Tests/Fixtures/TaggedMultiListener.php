@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\EventDispatcher\Tests\Fixtures;
 
-use Symfony\Component\EventDispatcher\Attribute\EventListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[EventListener(event: CustomEvent::class, method: 'onCustomEvent')]
-#[EventListener(event: 'foo', priority: 42)]
-#[EventListener(event: 'bar', method: 'onBarEvent')]
+#[AsEventListener(event: CustomEvent::class, method: 'onCustomEvent')]
+#[AsEventListener(event: 'foo', priority: 42)]
+#[AsEventListener(event: 'bar', method: 'onBarEvent')]
 final class TaggedMultiListener
 {
     public function onCustomEvent(CustomEvent $event): void

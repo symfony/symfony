@@ -17,7 +17,7 @@ namespace Symfony\Component\EventDispatcher\Attribute;
  * @author Alexander M. Turek <me@derrabus.de>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class EventListener
+class AsEventListener
 {
     public function __construct(
         public ?string $event = null,

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionals
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\Attribute\EventListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -248,7 +248,7 @@ class RegisterListenersPassTest extends TestCase
         }
 
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
         });
         $container->register('foo', TaggedInvokableListener::class)->setAutoconfigured(true);
@@ -282,7 +282,7 @@ class RegisterListenersPassTest extends TestCase
         }
 
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
         });
         $container->register('foo', TaggedMultiListener::class)->setAutoconfigured(true);

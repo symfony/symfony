@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Attribute\ConsoleCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -67,7 +67,7 @@ class Command
     {
         $class = static::class;
 
-        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(ConsoleCommand::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->name;
         }
 
@@ -83,7 +83,7 @@ class Command
     {
         $class = static::class;
 
-        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(ConsoleCommand::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->description;
         }
 

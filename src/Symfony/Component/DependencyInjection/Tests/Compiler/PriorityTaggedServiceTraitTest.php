@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use Symfony\Component\DependencyInjection\Attribute\TaggedItem;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -235,12 +235,12 @@ class PriorityTaggedServiceTraitImplementation
     }
 }
 
-#[TaggedItem(index: 'hello', priority: 1)]
+#[AsTaggedItem(index: 'hello', priority: 1)]
 class HelloNamedService extends \stdClass
 {
 }
 
-#[TaggedItem(priority: 2)]
+#[AsTaggedItem(priority: 2)]
 class HelloNamedService2
 {
 }

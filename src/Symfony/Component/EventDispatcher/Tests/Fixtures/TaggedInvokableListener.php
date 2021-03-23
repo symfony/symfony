@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher\Tests\Fixtures;
 
-use Symfony\Component\EventDispatcher\Attribute\EventListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[EventListener]
+#[AsEventListener]
 final class TaggedInvokableListener
 {
     public function __invoke(CustomEvent $event): void

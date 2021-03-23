@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Attribute\ConsoleCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -409,7 +409,7 @@ class CommandTest extends TestCase
     /**
      * @requires PHP 8
      */
-    public function testConsoleCommandAttribute()
+    public function testCommandAttribute()
     {
         $this->assertSame('|foo|f', Php8Command::getDefaultName());
         $this->assertSame('desc', Php8Command::getDefaultDescription());
@@ -425,7 +425,7 @@ function createClosure()
     };
 }
 
-#[ConsoleCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
+#[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
 class Php8Command extends Command
 {
 }

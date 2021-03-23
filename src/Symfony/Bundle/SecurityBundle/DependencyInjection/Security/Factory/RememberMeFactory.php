@@ -69,7 +69,12 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         // remember-me options
-        $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
+        $mergedOptions = array_intersect_key($config, $this->options);
+        if ('auto' === $mergedOptions['secure']) {
+            $mergedOptions['secure'] = null;
+        }
+
+        $rememberMeServices->replaceArgument(3, $mergedOptions);
 
         // attach to remember-me aware listeners
         $userProviders = [];

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -64,6 +65,12 @@ class LoginLinkHandlerTest extends TestCase
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
             ->willReturn('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000');
+
+        if ($request) {
+            $this->router->expects($this->once())
+                ->method('getContext')
+                ->willReturn(new RequestContext());
+        }
 
         $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());

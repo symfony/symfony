@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -168,7 +169,11 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->eventDispatcher->dispatch($event);
 
             // check if all badges are resolved
-            $passport->checkIfCompletelyResolved();
+            foreach ($passport->getBadges() as $badge) {
+                if (!$badge->isResolved()) {
+                    throw new BadCredentialsException(sprintf('Authentication failed: Security badge "%s" is not resolved, did you forget to register the correct listeners?', get_debug_type($badge)));
+                }
+            }
 
             // create the authenticated token
             $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->firewallName);

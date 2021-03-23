@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**
@@ -21,9 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  */
 trait PassportTrait
 {
-    /**
-     * @var BadgeInterface[]
-     */
     private $badges = [];
 
     public function addBadge(BadgeInterface $badge): PassportInterface
@@ -43,12 +39,11 @@ trait PassportTrait
         return $this->badges[$badgeFqcn] ?? null;
     }
 
-    public function checkIfCompletelyResolved(): void
+    /**
+     * @return array<class-string<BadgeInterface>, BadgeInterface>
+     */
+    public function getBadges(): array
     {
-        foreach ($this->badges as $badge) {
-            if (!$badge->isResolved()) {
-                throw new BadCredentialsException(sprintf('Authentication failed security badge "%s" is not resolved, did you forget to register the correct listeners?', \get_class($badge)));
-            }
-        }
+        return $this->badges;
     }
 }

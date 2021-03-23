@@ -91,6 +91,8 @@ Routing
 Security
 --------
 
+ * [BC BREAK] Remove method `checkIfCompletelyResolved()` from `PassportInterface`, checking that passport badges are
+   resolved is up to `AuthenticatorManager`
  * Deprecate class `User`, use `InMemoryUser` or your own implementation instead.
    If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing
    them in your own user class, as they are not part of the `InMemoryUser` API

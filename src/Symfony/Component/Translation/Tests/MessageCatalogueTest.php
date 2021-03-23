@@ -58,7 +58,7 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals($messages, $catalogue->all());
     }
 
-    public function testAllIntICU()
+    public function testAllIntlIcu()
     {
         $messages = [
             'domain1+intl-icu' => ['foo' => 'bar'],
@@ -116,6 +116,16 @@ class MessageCatalogueTest extends TestCase
 
         $catalogue->add(['foo' => 'bar'], 'domain88');
         $this->assertEquals('bar', $catalogue->get('foo', 'domain88'));
+    }
+
+    public function testAddIntlIcu()
+    {
+        $catalogue = new MessageCatalogue('en', ['domain1+intl-icu' => ['foo' => 'foo']]);
+        $catalogue->add(['foo1' => 'foo1'], 'domain1');
+        $catalogue->add(['foo' => 'bar'], 'domain1');
+
+        $this->assertSame('bar', $catalogue->get('foo', 'domain1'));
+        $this->assertSame('foo1', $catalogue->get('foo1', 'domain1'));
     }
 
     public function testReplace()

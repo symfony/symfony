@@ -129,6 +129,16 @@ class MessageCatalogueTest extends TestCase
         $this->assertEquals('bar', $catalogue->get('foo', 'domain88'));
     }
 
+    public function testAddIntICU()
+    {
+        $catalogue = new MessageCatalogue('en', ['domain1+intl-icu' => ['foo' => 'foo']]);
+        $catalogue->add(['foo1' => 'foo1'], 'domain1');
+        $catalogue->add(['foo' => 'bar'], 'domain1');
+
+        $this->assertEquals('bar', $catalogue->get('foo', 'domain1'));
+        $this->assertEquals('foo1', $catalogue->get('foo1', 'domain1'));
+    }
+
     public function testReplace()
     {
         $catalogue = new MessageCatalogue('en', ['domain1' => ['foo' => 'foo'], 'domain1+intl-icu' => ['bar' => 'bar']]);

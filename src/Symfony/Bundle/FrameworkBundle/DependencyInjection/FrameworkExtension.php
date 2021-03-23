@@ -74,6 +74,7 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -557,6 +558,9 @@ class FrameworkExtension extends Extension
 
         $container->registerAttributeForAutoconfiguration(EventListener::class, static function (ChildDefinition $definition, EventListener $attribute): void {
             $definition->addTag('kernel.event_listener', get_object_vars($attribute));
+        });
+        $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
+            $definition->addTag('controller.service_arguments');
         });
 
         if (!$container->getParameter('kernel.debug')) {

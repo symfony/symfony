@@ -167,7 +167,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         }
         $intlDomain = $domain;
         $suffixLength = \strlen(self::INTL_DOMAIN_SUFFIX);
-        if (\strlen($domain) > $suffixLength && false !== strpos($domain, self::INTL_DOMAIN_SUFFIX, -$suffixLength)) {
+        if (\strlen($domain) < $suffixLength || false === strpos($domain, self::INTL_DOMAIN_SUFFIX, -$suffixLength)) {
             $intlDomain .= self::INTL_DOMAIN_SUFFIX;
         }
         foreach ($messages as $id => $message) {

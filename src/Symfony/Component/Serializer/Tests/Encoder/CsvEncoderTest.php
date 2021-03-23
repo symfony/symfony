@@ -621,4 +621,11 @@ CSV;
             $this->encoder->decode($csv, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false])
         );
     }
+
+    public function testEndOfLine()
+    {
+        $value = ['foo' => 'hello', 'bar' => 'test'];
+
+        $this->assertSame("foo,bar\r\nhello,test\r\n", $this->encoder->encode($value, 'csv', [CsvEncoder::END_OF_LINE => "\r\n"]));
+    }
 }

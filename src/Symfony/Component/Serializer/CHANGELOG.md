@@ -5,8 +5,9 @@ CHANGELOG
 ---
 
  * Add the ability to provide (de)normalization context using metadata (e.g. `@Symfony\Component\Serializer\Annotation\Context`)
- * deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.
- * added normalization formats to `UidNormalizer`
+ * Deprecate `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Add normalization formats to `UidNormalizer`
+ * Add `CsvEncoder::END_OF_LINE` context option
 
 5.2.0
 -----

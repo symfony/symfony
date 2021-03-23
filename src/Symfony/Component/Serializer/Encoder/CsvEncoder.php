@@ -31,6 +31,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
     public const AS_COLLECTION_KEY = 'as_collection';
     public const NO_HEADERS_KEY = 'no_headers';
+    public const END_OF_LINE = 'csv_end_of_line';
     public const OUTPUT_UTF8_BOM_KEY = 'output_utf8_bom';
 
     private const UTF8_BOM = "\xEF\xBB\xBF";
@@ -40,6 +41,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '',
+        self::END_OF_LINE => "\n",
         self::ESCAPE_FORMULAS_KEY => false,
         self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
@@ -94,11 +96,17 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         if (!($context[self::NO_HEADERS_KEY] ?? $this->defaultContext[self::NO_HEADERS_KEY])) {
             fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+            if ("\n" !== ($context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE]) && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $context[self::END_OF_LINE]);
+            }
         }
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
             fputcsv($handle, array_replace($headers, $row), $delimiter, $enclosure, $escapeChar);
+            if ("\n" !== ($context[self::END_OF_LINE] ?? $this->defaultContext[self::END_OF_LINE]) && 0 === fseek($handle, -1, \SEEK_CUR)) {
+                fwrite($handle, $context[self::END_OF_LINE]);
+            }
         }
 
         rewind($handle);

@@ -4,6 +4,9 @@ CHANGELOG
 5.3
 ---
 
+ * Add `PassportInterface:getBadges()`, implemented by `PassportTrait`
+ * [BC BREAK] Remove method `checkIfCompletelyResolved()` from `PassportInterface`, checking that passport badges are
+   resolved is up to `AuthenticatorManager`
  * Deprecate class `User`, use `InMemoryUser` instead
  * Deprecate class `UserChecker`, use `InMemoryUserChecker` or your own implementation instead
  * [BC break] Remove support for passing a `UserInterface` implementation to `Passport`, use the `UserBadge` instead.

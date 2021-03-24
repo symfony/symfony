@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * Add a new `markAsPublic` method on `NotificationEmail` to change the `importance` context option to null after creation
+* Add a new `fragment_uri()` helper to generate the URI of a fragment
 
 5.3.0
 -----

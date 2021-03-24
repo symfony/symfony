@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
  * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
  * Add `#[AsController]` attribute for declaring standalone controllers on PHP 8
+ * Add `FragmentUriGeneratorInterface` and `FragmentUriGenerator` to generate the URI of a fragment
 
 5.2.0
 -----

@@ -123,7 +123,7 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.extension.httpkernel', HttpKernelExtension::class)
 
         ->set('twig.runtime.httpkernel', HttpKernelRuntime::class)
-            ->args([service('fragment.handler')])
+            ->args([service('fragment.handler'), service('fragment.uri_generator')->ignoreOnInvalid()])
 
         ->set('twig.extension.httpfoundation', HttpFoundationExtension::class)
             ->args([service('url_helper')])

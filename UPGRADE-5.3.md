@@ -60,6 +60,11 @@ Messenger
  * Deprecated the `prefetch_count` parameter in the AMQP bridge, it has no effect and will be removed in Symfony 6.0
  * Deprecated the use of TLS option for Redis Bridge, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
 
+Mime
+----
+
+ * Remove the internal annotation from the `getHeaderBody()` and `getHeaderParameter()` methods of the `Headers` class.
+
 Notifier
 --------
 

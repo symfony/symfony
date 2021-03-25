@@ -108,12 +108,13 @@ class ArrayInput extends Input
         $params = [];
         foreach ($this->parameters as $param => $val) {
             if ($param && \is_string($param) && '-' === $param[0]) {
+                $glue = ('-' === $param[1]) ? '=' : ' ';
                 if (\is_array($val)) {
                     foreach ($val as $v) {
-                        $params[] = $param.('' != $v ? '='.$this->escapeToken($v) : '');
+                        $params[] = $param.('' != $v ? $glue.$this->escapeToken($v) : '');
                     }
                 } else {
-                    $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
+                    $params[] = $param.('' != $val ? $glue.$this->escapeToken($val) : '');
                 }
             } else {
                 $params[] = \is_array($val) ? implode(' ', array_map([$this, 'escapeToken'], $val)) : $this->escapeToken($val);

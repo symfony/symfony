@@ -97,14 +97,13 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function listing(array $elements)
+    public function listing(iterable $elements)
     {
         $this->autoPrependText();
-        $elements = array_map(function ($element) {
-            return sprintf(' * %s', $element);
-        }, $elements);
+        foreach ($elements as $element) {
+            $this->writeln(sprintf(' * %s', $element));
+        }
 
-        $this->writeln($elements);
         $this->newLine();
     }
 

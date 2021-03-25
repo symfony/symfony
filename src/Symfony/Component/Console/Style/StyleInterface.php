@@ -31,7 +31,7 @@ interface StyleInterface
     /**
      * Formats a list.
      */
-    public function listing(array $elements);
+    public function listing(iterable $elements);
 
     /**
      * Formats informational text.

@@ -63,6 +63,19 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertTrue(feof($stream));
     }
 
+    public function testStreamCopyToStream()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057');
+        $h = fopen('php://temp', 'w+');
+        stream_copy_to_stream($response->toStream(), $h);
+
+        $this->assertTrue(rewind($h));
+        $this->assertSame("{\n    \"SER", fread($h, 10));
+        $this->assertSame('VER_PROTOCOL', fread($h, 12));
+        $this->assertFalse(feof($h));
+    }
+
     public function testToStream404()
     {
         $client = $this->getHttpClient(__FUNCTION__);

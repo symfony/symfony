@@ -281,7 +281,7 @@ class StreamWrapper
             'uid' => 0,
             'gid' => 0,
             'rdev' => 0,
-            'size' => (int) ($headers['content-length'][0] ?? 0),
+            'size' => (int) ($headers['content-length'][0] ?? -1),
             'atime' => 0,
             'mtime' => strtotime($headers['last-modified'][0] ?? '') ?: 0,
             'ctime' => 0,

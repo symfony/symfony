@@ -49,17 +49,17 @@ final class NativePasswordHasher implements PasswordHasherInterface
             throw new \InvalidArgumentException('$cost must be in the range of 4-31.');
         }
 
-        $algorithms = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
-
-        if (\defined('PASSWORD_ARGON2I')) {
-            $algorithms[2] = $algorithms['argon2i'] = (string) \PASSWORD_ARGON2I;
-        }
-
-        if (\defined('PASSWORD_ARGON2ID')) {
-            $algorithms[3] = $algorithms['argon2id'] = (string) \PASSWORD_ARGON2ID;
-        }
-
         if (null !== $algorithm) {
+            $algorithms = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
+
+            if (\defined('PASSWORD_ARGON2I')) {
+                $algorithms[2] = $algorithms['argon2i'] = (string) \PASSWORD_ARGON2I;
+            }
+
+            if (\defined('PASSWORD_ARGON2ID')) {
+                $algorithms[3] = $algorithms['argon2id'] = (string) \PASSWORD_ARGON2ID;
+            }
+
             $this->algorithm = $algorithms[$algorithm] ?? $algorithm;
         }
 

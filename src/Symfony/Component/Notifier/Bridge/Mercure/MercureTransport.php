@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
+use Symfony\Component\Mercure\Exception\InvalidArgumentException as MercureInvalidArgumentException;
+use Symfony\Component\Mercure\Exception\RuntimeException as MercureRuntimeException;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -32,21 +36,22 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MercureTransport extends AbstractTransport
 {
-    private $publisher;
-    private $publisherId;
+    private $hub;
+    private $hubId;
     private $topics;
 
     /**
+     * @param HubInterface         $hub
      * @param string|string[]|null $topics
      */
-    public function __construct(PublisherInterface $publisher, string $publisherId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct($hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
             throw new \TypeError(sprintf('"%s()" expects parameter 3 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));
         }
 
-        $this->publisher = $publisher;
-        $this->publisherId = $publisherId;
+        $this->hub = $hub;
+        $this->hubId = $hubId;
         $this->topics = $topics ?? 'https://symfony.com/notifier';
 
         parent::__construct($client, $dispatcher);
@@ -54,7 +59,7 @@ final class MercureTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('mercure://%s?%s', $this->publisherId, http_build_query(['topic' => $this->topics]));
+        return sprintf('mercure://%s?%s', $this->hubId, http_build_query(['topic' => $this->topics]));
     }
 
     public function supports(MessageInterface $message): bool
@@ -87,7 +92,11 @@ final class MercureTransport extends AbstractTransport
         ]), $options->isPrivate(), $options->getId(), $options->getType(), $options->getRetry());
 
         try {
-            $messageId = ($this->publisher)($update);
+            if ($this->hub instanceof HubInterface) {
+                $messageId = $this->hub->publish($update);
+            } else {
+                $messageId = ($this->hub)($update);
+            }
 
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($messageId);
@@ -95,9 +104,9 @@ final class MercureTransport extends AbstractTransport
             return $sentMessage;
         } catch (HttpExceptionInterface $e) {
             throw new TransportException('Unable to post the Mercure message: '.$e->getResponse()->getContent(false), $e->getResponse(), $e->getCode(), $e);
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface | MercureRuntimeException $e) {
             throw new RuntimeException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException | MercureInvalidArgumentException $e) {
             throw new InvalidArgumentException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         }
     }

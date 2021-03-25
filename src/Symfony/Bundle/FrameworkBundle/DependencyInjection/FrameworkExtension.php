@@ -95,6 +95,7 @@ use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -2368,11 +2369,17 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages) && ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages)) {
-            $container->getDefinition($classToServices[MercureTransportFactory::class])
-                ->replaceArgument('$publisherLocator', new ServiceLocatorArgument(new TaggedIteratorArgument('mercure.publisher', null, null, true)));
-        } elseif (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages)) {
-            $container->removeDefinition($classToServices[MercureTransportFactory::class]);
+        if (ContainerBuilder::willBeAvailable('symfony/mercure-notifier', MercureTransportFactory::class, $parentPackages)) {
+            if (ContainerBuilder::willBeAvailable('symfony/mercure-bundle', MercureBundle::class, $parentPackages)) {
+                $definition = $container->getDefinition($classToServices[MercureTransportFactory::class]);
+                if (ContainerBuilder::willBeAvailable('symfony/mercure', HubRegistry::class, $parentPackages)) {
+                    $definition->replaceArgument('$registry', new Reference(HubRegistry::class));
+                } else {
+                    $definition->replaceArgument('$registry', new ServiceLocatorArgument(new TaggedIteratorArgument('mercure.publisher', null, null, true)));
+                }
+            } else {
+                $container->removeDefinition($classToServices[MercureTransportFactory::class]);
+            }
         }
 
         if (isset($config['admin_recipients'])) {

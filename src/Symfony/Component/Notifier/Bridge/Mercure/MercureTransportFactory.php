@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
 use Symfony\Bundle\MercureBundle\MercureBundle;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
@@ -25,16 +26,16 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 final class MercureTransportFactory extends AbstractTransportFactory
 {
-    private $publisherLocator;
+    private $registry;
 
     /**
-     * @param ServiceProviderInterface $publisherLocator A container that holds {@see PublisherInterface} instances
+     * @param HubRegistry $registry
      */
-    public function __construct(ServiceProviderInterface $publisherLocator)
+    public function __construct(HubRegistry $registry)
     {
         parent::__construct();
 
-        $this->publisherLocator = $publisherLocator;
+        $this->registry = $registry;
     }
 
     /**
@@ -46,18 +47,24 @@ final class MercureTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'mercure', $this->getSupportedSchemes());
         }
 
-        $publisherId = $dsn->getHost();
-        if (!$this->publisherLocator->has($publisherId)) {
+        $hubId = $dsn->getHost();
+        $topic = $dsn->getOption('topic');
+
+        if ($this->registry instanceof HubRegistry) {
+            $hub = $this->registry->getHub($hubId);
+
+            return new MercureTransport($hub, $hubId, $topic);
+        }
+
+        if (!$this->publisherLocator->has($hubId)) {
             if (!class_exists(MercureBundle::class) && !$this->publisherLocator->getProvidedServices()) {
                 throw new LogicException('No publishers found. Did you forget to install the MercureBundle? Try running "composer require symfony/mercure-bundle".');
             }
 
-            throw new LogicException(sprintf('"%s" not found. Did you mean one of: %s?', $publisherId, implode(', ', array_keys($this->publisherLocator->getProvidedServices()))));
+            throw new LogicException(sprintf('"%s" not found. Did you mean one of: %s?', $hubId, implode(', ', array_keys($this->publisherLocator->getProvidedServices()))));
         }
 
-        $topic = $dsn->getOption('topic');
-
-        return new MercureTransport($this->publisherLocator->get($publisherId), $publisherId, $topic);
+        return new MercureTransport($this->publisherLocator->get($hubId), $hubId, $topic);
     }
 
     protected function getSupportedSchemes(): array

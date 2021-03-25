@@ -18,7 +18,7 @@
     "require": {
         "php": ">=7.2.5",
         "ext-json": "*",
-        "symfony/mercure": "^0.4",
+        "symfony/mercure": "^0.4|^0.5",
         "symfony/notifier": "^5.3",
         "symfony/service-contracts": "^1.10|^2"
     },

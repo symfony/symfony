@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-21T22:47:11Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-22T07:36:10Z
+
+How is it possible that we get `null` here in the first place? Shouldn't we always be able to determine that piece of information?
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2021-03-22T08:24:35Z
+
+@derrabus Not when this condition is false https://github.com/symfony/symfony/blob/b5693be406dfeed8b768a4a9af997338e3e72450/src/Symfony/Component/HttpKernel/DataCollector/ConfigDataCollector.php#L81-L93
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-03-22T08:27:36Z
+
+we should only rely on the `$this->kernel` instance for bundle aggregration IMHO.
+
+then always get remaining metadata from static `Kernel` symbol (which is a hard dep)
+
+---------------------------------------------------------------------------
+
+by topikito at 2021-03-22T09:45:56Z
+
+I have suggested a different solution as to the suggestion of @fabpot to return `false`: bring out of the `if` block all assignments that rely on `Kernel` and not on `$kernel`.
+
+https://github.com/symfony/symfony/pull/40535#discussion_r598559548
+
+---------------------------------------------------------------------------
+
+by topikito at 2021-03-22T23:20:56Z
+
+I have extracted the corresponding bits outside of the `if` block.
+
+For the tests, I decided to add extra checks for all the content I extracted. I required a way to generate the same output for `determineSymfonyState()` so I decided to copy the behaviour. The reason behind this is that I assume it's not desired to rewrite the tests for each version, so it should rather expect to have the same logic in the tests. If the logic in the class would change, the test should catch it. If this is not acceptable, please let me know how to proceed to test that particular getter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-23T12:32:49Z
+
+The descrition+title of the PR need an update now ;)

@@ -1312,7 +1312,7 @@ class FrameworkExtension extends Extension
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled && \PHP_VERSION_ID < 80000) {
-                throw new \LogicException('"enable_annotations" on the validator cannot be set as Doctrine Annotations support is disabled.');
+                throw new \LogicException('"enable_annotations" on the validator cannot be set as the PHP version is lower than 8 and Doctrine Annotations support is disabled. Consider upgrading PHP.');
             }
 
             $validatorBuilder->addMethodCall('enableAnnotationMapping', [true]);
@@ -1576,7 +1576,7 @@ class FrameworkExtension extends Extension
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
-                throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
+                throw new \LogicException('"enable_annotations" on the serializer cannot be set as the PHP version is lower than 8 and Annotations support is disabled. Consider upgrading PHP.');
             }
 
             $annotationLoader = new Definition(

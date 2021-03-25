@@ -35,6 +35,8 @@
 /src/Symfony/Component/Notifier/ @OskarStark
 # OptionsResolver
 /src/Symfony/Component/OptionsResolver/ @yceruto
+# PasswordHasher
+/src/Symfony/Component/PropertyInfo/ @chalasr
 # PropertyInfo
 /src/Symfony/Component/PropertyInfo/ @dunglas
 /src/Symfony/Bridge/Doctrine/PropertyInfo/ @dunglas

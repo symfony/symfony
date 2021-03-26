@@ -36,7 +36,7 @@
 # OptionsResolver
 /src/Symfony/Component/OptionsResolver/ @yceruto
 # PasswordHasher
-/src/Symfony/Component/PropertyInfo/ @chalasr
+/src/Symfony/Component/PasswordHasher/ @chalasr
 # PropertyInfo
 /src/Symfony/Component/PropertyInfo/ @dunglas
 /src/Symfony/Bridge/Doctrine/PropertyInfo/ @dunglas

@@ -353,7 +353,7 @@ EODUMP;
      */
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
-        $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
+        $p = new \DatePeriod(new \DateTime($start, new \DateTimeZone('UTC')), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end, new \DateTimeZone('UTC')), $options);
         $stub = new Stub();
 
         $cast = DateCaster::castPeriod($p, [], $stub, false, 0);

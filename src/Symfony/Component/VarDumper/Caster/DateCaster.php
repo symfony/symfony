@@ -92,7 +92,7 @@ class DateCaster
         if (\PHP_VERSION_ID >= 70107) { // see https://bugs.php.net/74639
             foreach (clone $p as $i => $d) {
                 if (self::PERIOD_LIMIT === $i) {
-                    $now = new \DateTimeImmutable();
+                    $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
                     $dates[] = sprintf('%s more', ($end = $p->getEndDate())
                         ? ceil(($end->format('U.u') - $d->format('U.u')) / ((int) $now->add($p->getDateInterval())->format('U.u') - (int) $now->format('U.u')))
                         : $p->recurrences - $i

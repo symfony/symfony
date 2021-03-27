@@ -13,6 +13,7 @@ CHANGELOG
  * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
  * Add support an integer return value for default_index_method
  * Add `env()` and `EnvConfigurator` in the PHP-DSL
+ * Add support for `ConfigBuilder` in the `PhpFileLoader`
 
 5.2.0
 -----

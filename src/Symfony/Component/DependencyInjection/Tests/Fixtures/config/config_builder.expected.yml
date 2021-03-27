@@ -1,0 +1,8 @@
+parameters:
+    acme.configs: [{ color: blue }]
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true

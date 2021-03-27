@@ -216,6 +216,11 @@ class PrototypedArrayNode extends ArrayNode
         $value = $this->remapXml($value);
 
         $isAssoc = array_keys($value) !== range(0, \count($value) - 1);
+
+        if (null === $this->keyAttribute && [] !== $value && $isAssoc) {
+            trigger_deprecation('symfony/config', '5.3', sprintf('Support for passing a map to a node that is configured as a list is deprecated for path "%s".', $this->getPath()));
+        }
+
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {

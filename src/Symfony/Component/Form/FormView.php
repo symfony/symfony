@@ -34,7 +34,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * The child views.
      *
-     * @var FormView[]
+     * @var array<string, FormView>
      */
     public $children = [];
 

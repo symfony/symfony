@@ -1741,7 +1741,7 @@ class FilesystemTest extends FilesystemTestCase
         file_put_contents($filename, 'FOO BAR');
         chmod($filename, 0745);
 
-        $this->filesystem->dumpFile($filename, 'bar', null);
+        $this->filesystem->dumpFile($filename, 'bar');
 
         $this->assertFilePermissions(745, $filename);
     }

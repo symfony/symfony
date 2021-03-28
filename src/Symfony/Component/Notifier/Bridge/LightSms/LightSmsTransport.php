@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\LightSms;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\MessageInterface;
@@ -132,7 +131,7 @@ final class LightSmsTransport extends AbstractTransport
             throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
         }
 
-        $phone = preg_replace("/[^\d]/", "", $message->getPhone());
+        $phone = preg_replace("/[^\d]/", '', $message->getPhone());
         if (32 == $content[$phone]['error']) {
             throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
         }

@@ -22,9 +22,9 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -94,12 +94,6 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         ;
         $service->setTokenProvider($tokenProvider);
 
-        $userProvider
-            ->expects($this->once())
-            ->method('loadUserByUsername')
-            ->willThrowException(new UsernameNotFoundException('user not found'))
-        ;
-
         $this->assertNull($service->autoLogin($request));
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
@@ -161,20 +155,10 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
      */
     public function testAutoLogin(bool $hashTokenValue)
     {
-        $user = $this->createMock(UserInterface::class);
-        $user
-            ->expects($this->once())
-            ->method('getRoles')
-            ->willReturn(['ROLE_FOO'])
-        ;
+        $user = new User('foouser', null, ['ROLE_FOO']);
 
         $userProvider = $this->getProvider();
-        $userProvider
-            ->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with($this->equalTo('foouser'))
-            ->willReturn($user)
-        ;
+        $userProvider->createUser($user);
 
         $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'secure' => false, 'httponly' => false, 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
@@ -186,14 +170,14 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', $tokenValue, new \DateTime()))
+            ->willReturn(new PersistentToken(User::class, 'foouser', 'fooseries', $tokenValue, new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
         $returnedToken = $service->autoLogin($request);
 
         $this->assertInstanceOf(RememberMeToken::class, $returnedToken);
-        $this->assertSame($user, $returnedToken->getUser());
+        $this->assertTrue($user->isEqualTo($returnedToken->getUser()));
         $this->assertEquals('foosecret', $returnedToken->getSecret());
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
@@ -339,14 +323,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     protected function getProvider()
     {
-        $provider = $this->createMock(UserProviderInterface::class);
-        $provider
-            ->expects($this->any())
-            ->method('supportsClass')
-            ->willReturn(true)
-        ;
-
-        return $provider;
+        return new InMemoryUserProvider();
     }
 
     protected function generateHash(string $tokenValue): string

@@ -16,9 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -36,13 +37,12 @@ class PasswordMigratingListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->user = $this->createMock(UserInterface::class);
-        $this->user->expects($this->any())->method('getPassword')->willReturn('old-encoded-password');
+        $this->user = new User('test', 'old-encoded-password');
         $encoder = $this->createMock(PasswordEncoderInterface::class);
         $encoder->expects($this->any())->method('needsRehash')->willReturn(true);
         $encoder->expects($this->any())->method('encodePassword')->with('pa$$word', null)->willReturn('new-encoded-password');
         $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
-        $this->encoderFactory->expects($this->any())->method('getEncoder')->with($this->user)->willReturn($encoder);
+        $this->encoderFactory->expects($this->any())->method('getEncoder')->with($this->callback(function ($user) { return $this->user->isEqualTo($user); }))->willReturn($encoder);
         $this->listener = new PasswordMigratingListener($this->encoderFactory);
     }
 
@@ -96,12 +96,12 @@ class PasswordMigratingListenerTest extends TestCase
 
     public function testUpgradeWithoutUpgrader()
     {
-        $userLoader = $this->createMock(MigratingUserProvider::class);
-        $userLoader->expects($this->any())->method('loadUserByUsername')->willReturn($this->user);
+        $userLoader = $this->getMockBuilder(MigratingUserProvider::class)->setMethods(['upgradePassword'])->getMock();
+        $userLoader->createUser($this->user);
 
         $userLoader->expects($this->once())
             ->method('upgradePassword')
-            ->with($this->user, 'new-encoded-password')
+            ->with($this->callback(function ($user) { return $this->user->isEqualTo($user); }), 'new-encoded-password')
         ;
 
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByUsername']), [new PasswordUpgradeBadge('pa$$word')]));
@@ -119,7 +119,7 @@ class PasswordMigratingListenerTest extends TestCase
     }
 }
 
-abstract class MigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
+class MigratingUserProvider extends InMemoryUserProvider implements PasswordUpgraderInterface
 {
     public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
     {

@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Vasilij Duško <vasilij@d4d.lt>
+ * @author Vasilij Duško <vasilij@prado.lt>
  */
 final class LightSmsTransportFactory extends AbstractTransportFactory
 {

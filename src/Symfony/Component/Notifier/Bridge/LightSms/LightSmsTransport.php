@@ -65,7 +65,7 @@ final class LightSmsTransport extends AbstractTransport
         '30' => 'No date (format: YYYY-MM-DD)',
         '31' => 'Closing direction to the user',
         '32' => 'Not enough money',
-        '33' => 'Phone number is not set',
+        '33' => 'Missing phone number',
         '34' => 'Phone is in stop list',
         '35' => 'Not enough money',
         '36' => 'Can not obtain information about phone',

@@ -41,7 +41,7 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield ['somethingElse://accountSid:authToken@default?from=37061234567'];
+        yield ['somethingElse://accountSid:authToken@default?phone=37061234567'];
         yield ['somethingElse://accountSid:authToken@default']; // missing "phone" option
     }
 }

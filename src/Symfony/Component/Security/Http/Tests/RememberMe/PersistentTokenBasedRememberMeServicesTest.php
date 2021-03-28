@@ -24,7 +24,6 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
@@ -267,12 +266,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $account = $this->createMock(UserInterface::class);
-        $account
-            ->expects($this->once())
-            ->method('getUsername')
-            ->willReturn('foo')
-        ;
+        $account = new User('foo', null);
         $token = $this->createMock(TokenInterface::class);
         $token
             ->expects($this->any())

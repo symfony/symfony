@@ -22,10 +22,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -48,7 +47,7 @@ class SwitchUserListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->tokenStorage = new TokenStorage();
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new InMemoryUserProvider(['kuba' => []]);
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
         $this->request = new Request();
@@ -113,8 +112,8 @@ class SwitchUserListenerTest extends TestCase
     {
         $originalUser = new User('username', null);
         $refreshedUser = new User('username', null);
-        $this
-            ->userProvider
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
+        $userProvider
             ->expects($this->any())
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
@@ -135,15 +134,15 @@ class SwitchUserListenerTest extends TestCase
             )
         ;
 
-        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener($this->event);
     }
 
     public function testExitUserDoesNotDispatchEventWithStringUser()
     {
         $originalUser = 'anon.';
-        $this
-            ->userProvider
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
+        $userProvider
             ->expects($this->never())
             ->method('refreshUser');
         $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
@@ -156,7 +155,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('dispatch')
         ;
 
-        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener($this->event);
     }
 
@@ -173,11 +172,6 @@ class SwitchUserListenerTest extends TestCase
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
             ->willReturn(false);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
-
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener($this->event);
     }
@@ -188,15 +182,10 @@ class SwitchUserListenerTest extends TestCase
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_ALLOWED_TO_SWITCH']);
 
         $this->tokenStorage->setToken($token);
-        $this->request->query->set('_switch_user', 'kuba');
+        $this->request->query->set('_switch_user', 'not-existing');
 
         $this->accessDecisionManager->expects($this->never())
             ->method('decide');
-
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'], ['username'])
-            ->will($this->onConsecutiveCalls($this->throwException(new UsernameNotFoundException())));
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener($this->event);
@@ -205,21 +194,16 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUser()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
 
         $this->accessDecisionManager->expects($this->once())
-            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $this->callback(function ($user) { return 'kuba' === $user->getUsername(); }))
             ->willReturn(true);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')->with($this->callback(function ($user) { return 'kuba' === $user->getUsername(); }));
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener($this->event);
@@ -237,20 +221,15 @@ class SwitchUserListenerTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($alreadySwitchedToken);
 
-        $targetUser = new User('kuba', 'password', ['ROLE_FOO', 'ROLE_BAR']);
-
         $this->request->query->set('_switch_user', 'kuba');
 
+        $targetsUser = $this->callback(function ($user) { return 'kuba' === $user->getUsername(); });
         $this->accessDecisionManager->expects($this->once())
-            ->method('decide')->with($originalToken, ['ROLE_ALLOWED_TO_SWITCH'], $targetUser)
+            ->method('decide')->with($originalToken, ['ROLE_ALLOWED_TO_SWITCH'], $targetsUser)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($targetUser, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($targetUser);
+            ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, false);
         $listener($this->event);
@@ -264,22 +243,19 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserWorksWithFalsyUsernames()
     {
-        $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
+        $token = new UsernamePasswordToken('kuba', '', 'key', ['ROLE_FOO']);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', '0');
+
+        $this->userProvider->createUser($user = new User('0', null));
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
             ->willReturn(true);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['0'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')->with($this->callback(function ($argUser) use ($user) { return $user->isEqualTo($argUser); }));
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener($this->event);
@@ -292,7 +268,6 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserKeepsOtherQueryStringParameters()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->replace([
@@ -301,16 +276,13 @@ class SwitchUserListenerTest extends TestCase
             'section' => 2,
         ]);
 
+        $targetsUser = $this->callback(function ($user) { return 'kuba' === $user->getUsername(); });
         $this->accessDecisionManager->expects($this->once())
-            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $targetsUser)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener($this->event);
@@ -331,21 +303,16 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', 'kuba');
 
         $this->accessDecisionManager->expects($this->any())
-            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $this->callback(function ($user) { return 'kuba' === $user->getUsername(); }))
             ->willReturn(true);
-
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (SwitchUserEvent $event) use ($replacedToken, $user) {
-                    if ($user !== $event->getTargetUser()) {
+                $this->callback(function (SwitchUserEvent $event) use ($replacedToken) {
+                    if ('kuba' !== $event->getTargetUser()->getUsername()) {
                         return false;
                     }
                     $event->setToken($replacedToken);
@@ -373,21 +340,17 @@ class SwitchUserListenerTest extends TestCase
     public function testSwitchUserStateless()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);
-        $user = new User('username', 'password', []);
 
         $this->tokenStorage->setToken($token);
         $this->request->query->set('_switch_user', 'kuba');
 
+        $targetsUser = $this->callback(function ($user) { return 'kuba' === $user->getUsername(); });
         $this->accessDecisionManager->expects($this->once())
-            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $targetsUser)
             ->willReturn(true);
 
-        $this->userProvider->expects($this->exactly(2))
-            ->method('loadUserByUsername')
-            ->withConsecutive(['kuba'])
-            ->will($this->onConsecutiveCalls($user, $this->throwException(new UsernameNotFoundException())));
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')->with($targetsUser);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', null, true);
         $listener($this->event);
@@ -400,8 +363,8 @@ class SwitchUserListenerTest extends TestCase
     {
         $originalUser = new User('username', null);
         $refreshedOriginalUser = new User('username', null);
-        $this
-            ->userProvider
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
+        $userProvider
             ->expects($this->any())
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
@@ -422,7 +385,7 @@ class SwitchUserListenerTest extends TestCase
             )
         ;
 
-        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener($this->event);
     }
 }

@@ -219,7 +219,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns true if the debug is enabled.
      *
-     * @return bool true if debug is enabled, false otherwise
+     * @return bool|string true if debug is enabled, false otherwise or a string if no kernel was set
      */
     public function isDebug()
     {

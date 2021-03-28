@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
@@ -170,18 +169,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
+        $user = new InMemoryUser('foouser', 'foopass');
         $token = $this->createMock(TokenInterface::class);
-        $user = $this->createMock(UserInterface::class);
-        $user
-            ->expects($this->once())
-            ->method('getPassword')
-            ->willReturn('foopass')
-        ;
-        $user
-            ->expects($this->once())
-            ->method('getUsername')
-            ->willReturn('foouser')
-        ;
         $token
             ->expects($this->atLeastOnce())
             ->method('getUser')

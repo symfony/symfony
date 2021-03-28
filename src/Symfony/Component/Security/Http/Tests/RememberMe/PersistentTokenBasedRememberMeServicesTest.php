@@ -267,12 +267,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $account = $this->createMock(UserInterface::class);
-        $account
-            ->expects($this->once())
-            ->method('getUsername')
-            ->willReturn('foo')
-        ;
+        $account = new InMemoryUser('foo', null);
         $token = $this->createMock(TokenInterface::class);
         $token
             ->expects($this->any())

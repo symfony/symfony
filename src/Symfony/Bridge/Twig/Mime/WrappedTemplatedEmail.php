@@ -182,7 +182,7 @@ final class WrappedTemplatedEmail
      */
     public function setPriority(int $priority): self
     {
-        $this->message->setPriority($priority);
+        $this->message->priority($priority);
 
         return $this;
     }

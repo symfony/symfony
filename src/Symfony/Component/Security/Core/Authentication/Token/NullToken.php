@@ -43,6 +43,13 @@ class NullToken implements TokenInterface
 
     public function getUsername()
     {
+        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
+
+        return '';
+    }
+
+    public function getUserIdentifier(): string
+    {
         return '';
     }
 

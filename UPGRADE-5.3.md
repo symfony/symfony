@@ -9,6 +9,7 @@ Asset
 DoctrineBridge
 --------------
 
+ * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
  * Remove `UuidV*Generator` classes
 
 DomCrawler
@@ -178,6 +179,11 @@ Security
    }
    ```
 
+ * Deprecate `UserInterface::getUsername()` in favor of `UserInterface::getUserIdentifier()`
+ * Deprecate `TokenInterface::getUsername()` in favor of `TokenInterface::getUserIdentifier()`
+ * Deprecate `UserProviderInterface::loadUserByUsername()` in favor of `UserProviderInterface::loadUserByIdentifier()`
+ * Deprecate `UsernameNotFoundException` in favor of `UserNotFoundException` and `getUsername()`/`setUsername()` in favor of `getUserIdentifier()`/`setUserIdentifier()`
+ * Deprecate `PersistentTokenInterface::getUsername()` in favor of `PersistentTokenInterface::getUserIdentifier()`
  * Deprecate calling `PasswordUpgraderInterface::upgradePassword()` with a `UserInterface` instance that does not implement `PasswordAuthenticatedUserInterface`
  * Deprecate calling methods `hashPassword()`, `isPasswordValid()` and `needsRehash()` on `UserPasswordHasherInterface` with a `UserInterface` instance that does not implement `PasswordAuthenticatedUserInterface`
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead

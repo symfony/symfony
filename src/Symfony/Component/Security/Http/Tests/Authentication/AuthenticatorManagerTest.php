@@ -44,6 +44,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->request = new Request();
         $this->user = new InMemoryUser('wouter', null);
         $this->token = $this->createMock(TokenInterface::class);
+        $this->token->expects($this->any())->method('getUser')->willReturn($this->user);
         $this->response = $this->createMock(Response::class);
     }
 
@@ -166,6 +167,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('createAuthenticatedToken')->willReturn($this->token);
 
         $modifiedToken = $this->createMock(TokenInterface::class);
+        $modifiedToken->expects($this->any())->method('getUser')->willReturn($this->user);
         $listenerCalled = false;
         $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
             $event->setAuthenticatedToken($modifiedToken);
@@ -198,6 +200,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())->method('onAuthenticationSuccess')->willReturn($this->response);
 
         $modifiedToken = $this->createMock(TokenInterface::class);
+        $modifiedToken->expects($this->any())->method('getUser')->willReturn($this->user);
         $listenerCalled = false;
         $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
             $event->setAuthenticatedToken($modifiedToken);

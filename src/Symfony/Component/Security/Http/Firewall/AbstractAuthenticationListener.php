@@ -195,7 +195,8 @@ abstract class AbstractAuthenticationListener extends AbstractListener
     private function onSuccess(Request $request, TokenInterface $token): Response
     {
         if (null !== $this->logger) {
-            $this->logger->info('User has been authenticated successfully.', ['username' => $token->getUsername()]);
+            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            $this->logger->info('User has been authenticated successfully.', ['username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()]);
         }
 
         $this->tokenStorage->setToken($token);

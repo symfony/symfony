@@ -97,7 +97,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
             $impersonatorUser = null;
             if ($token instanceof SwitchUserToken) {
-                $impersonatorUser = $token->getOriginalToken()->getUsername();
+                $originalToken = $token->getOriginalToken();
+                // @deprecated since 5.3, change to $originalToken->getUserIdentifier() in 6.0
+                $impersonatorUser = method_exists($originalToken, 'getUserIdentifier') ? $originalToken->getUserIdentifier() : $originalToken->getUsername();
             }
 
             if (null !== $this->roleHierarchy) {
@@ -126,7 +128,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token' => $token,
                 'token_class' => $this->hasVarDumper ? new ClassStub(\get_class($token)) : \get_class($token),
                 'logout_url' => $logoutUrl,
-                'user' => $token->getUsername(),
+                // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+                'user' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(),
                 'roles' => $assignedRoles,
                 'inherited_roles' => array_unique($inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,

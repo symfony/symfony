@@ -21,7 +21,7 @@ use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -60,7 +60,7 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $this->assertSame($user, $provider->loadUserByUsername('user1'));
+        $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
     public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty()
@@ -70,7 +70,7 @@ class EntityUserProviderTest extends TestCase
         $repository = $this->createMock(UserLoaderRepository::class);
         $repository
             ->expects($this->once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with('user1')
             ->willReturn($user);
 
@@ -82,7 +82,7 @@ class EntityUserProviderTest extends TestCase
             ->willReturn($repository);
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
-        $this->assertSame($user, $provider->loadUserByUsername('user1'));
+        $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
     public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty()
@@ -98,7 +98,7 @@ class EntityUserProviderTest extends TestCase
         $em->flush();
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
-        $provider->loadUserByUsername('user1');
+        $provider->loadUserByIdentifier('user1');
     }
 
     public function testRefreshUserRequiresId()
@@ -126,7 +126,7 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('User with id {"id1":1,"id2":2} not found');
 
         $provider->refreshUser($user2);
@@ -153,7 +153,7 @@ class EntityUserProviderTest extends TestCase
     {
         $repository = $this->createMock(UserLoaderRepository::class);
         $repository->expects($this->once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with('name')
             ->willReturn(
                 $this->createMock(UserInterface::class)
@@ -164,7 +164,7 @@ class EntityUserProviderTest extends TestCase
             'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
-        $provider->loadUserByUsername('name');
+        $provider->loadUserByIdentifier('name');
     }
 
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
@@ -177,7 +177,7 @@ class EntityUserProviderTest extends TestCase
             'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
-        $provider->loadUserByUsername('name');
+        $provider->loadUserByIdentifier('name');
     }
 
     public function testPasswordUpgrades()
@@ -231,6 +231,7 @@ class EntityUserProviderTest extends TestCase
 
 abstract class UserLoaderRepository implements ObjectRepository, UserLoaderInterface
 {
+    abstract public function loadUserByIdentifier(string $identifier): ?UserInterface;
 }
 
 abstract class PasswordUpgraderRepository implements ObjectRepository, PasswordUpgraderInterface

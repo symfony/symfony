@@ -155,6 +155,10 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
+    public function getUserIdentifier(): string
+    {
+    }
+
     public function isAuthenticated(): bool
     {
     }

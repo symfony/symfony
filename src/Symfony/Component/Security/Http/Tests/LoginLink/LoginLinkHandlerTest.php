@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
@@ -208,13 +208,13 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
         $this->users[$user->getUsername()] = $user;
     }
 
-    public function loadUserByUsername(string $username): TestLoginLinkHandlerUser
+    public function loadUserByIdentifier(string $userIdentifier): TestLoginLinkHandlerUser
     {
-        if (!isset($this->users[$username])) {
-            throw new UsernameNotFoundException();
+        if (!isset($this->users[$userIdentifier])) {
+            throw new UserNotFoundException();
         }
 
-        return clone $this->users[$username];
+        return clone $this->users[$userIdentifier];
     }
 
     public function refreshUser(UserInterface $user)
@@ -259,6 +259,11 @@ class TestLoginLinkHandlerUser implements UserInterface
     }
 
     public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getUserIdentifier()
     {
         return $this->username;
     }

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
@@ -56,7 +56,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         $expires = $expiresAt->format('U');
         $parameters = [
-            'user' => $user->getUsername(),
+            // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+            'user' => method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(),
             'expires' => $expires,
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
@@ -83,11 +84,18 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $username = $request->get('user');
+        $userIdentifier = $request->get('user');
 
         try {
-            $user = $this->userProvider->loadUserByUsername($username);
-        } catch (UsernameNotFoundException $exception) {
+            // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+            } else {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+                $user = $this->userProvider->loadUserByUsername($userIdentifier);
+            }
+        } catch (UserNotFoundException $exception) {
             throw new InvalidLoginLinkException('User not found.', 0, $exception);
         }
 
@@ -115,7 +123,8 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     private function computeSignatureHash(UserInterface $user, int $expires): string
     {
-        $signatureFields = [base64_encode($user->getUsername()), $expires];
+        // @deprecated since 5.3, change to $user->getUserIdentifier() in 6.0
+        $signatureFields = [base64_encode(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername()), $expires];
 
         foreach ($this->signatureProperties as $property) {
             $value = $this->propertyAccessor->getValue($user, $property) ?? '';

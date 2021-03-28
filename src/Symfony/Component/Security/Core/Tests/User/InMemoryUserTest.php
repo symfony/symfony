@@ -12,12 +12,15 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class InMemoryUserTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testConstructorException()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -39,10 +42,21 @@ class InMemoryUserTest extends TestCase
         $this->assertEquals('superpass', $user->getPassword());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUsername()
     {
         $user = new InMemoryUser('fabien', 'superpass');
+
+        $this->expectDeprecation('Since symfony/security-core 5.3: Method "Symfony\Component\Security\Core\User\User::getUsername()" is deprecated, use getUserIdentifier() instead.');
         $this->assertEquals('fabien', $user->getUsername());
+    }
+
+    public function testGetUserIdentifier()
+    {
+        $user = new InMemoryUser('fabien', 'superpass');
+        $this->assertEquals('fabien', $user->getUserIdentifier());
     }
 
     public function testGetSalt()

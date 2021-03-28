@@ -297,7 +297,7 @@ abstract class CompleteConfigurationTest extends TestCase
             } elseif (3 === $i) {
                 $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
                 $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
-                $this->assertEquals("token.getUsername() matches '/^admin/'", $expression);
+                $this->assertEquals("token.getUserIdentifier() matches '/^admin/'", $expression);
             }
         }
     }

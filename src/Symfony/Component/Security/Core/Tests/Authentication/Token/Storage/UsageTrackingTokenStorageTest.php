@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -46,7 +47,7 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
         $this->assertNull($trackingStorage->getToken());
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
 
         $trackingStorage->setToken($token);
         $this->assertSame($token, $trackingStorage->getToken());

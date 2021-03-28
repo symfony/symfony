@@ -338,12 +338,7 @@ class AccessListenerTest extends TestCase
             ->willReturn([['foo' => 'bar', 'bar' => 'baz'], null])
         ;
 
-        $authenticatedToken = $this->createMock(TokenInterface::class);
-        $authenticatedToken
-            ->expects($this->any())
-            ->method('isAuthenticated')
-            ->willReturn(true)
-        ;
+        $authenticatedToken = new UsernamePasswordToken('test', 'test', 'test', ['ROLE_USER']);
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($authenticatedToken);

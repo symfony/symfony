@@ -70,7 +70,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * The *credentials* are the return value from getCredentials()
      *
      * You may throw an AuthenticationException if you wish. If you return
-     * null, then a UsernameNotFoundException is thrown for you.
+     * null, then a UserNotFoundException is thrown for you.
      *
      * @param mixed $credentials
      *

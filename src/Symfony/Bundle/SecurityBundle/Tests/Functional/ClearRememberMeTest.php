@@ -51,7 +51,7 @@ class RememberMeFooController
 {
     public function __invoke(UserInterface $user)
     {
-        return new Response($user->getUsername());
+        return new Response($user->getUserIdentifier());
     }
 }
 
@@ -66,7 +66,12 @@ class RememberMeUserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username)
     {
-        return $this->inner->loadUserByUsername($username);
+        return $this->loadUserByIdentifier($username);
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        return $this->inner->loadUserByIdentifier($identifier);
     }
 
     public function refreshUser(UserInterface $user)

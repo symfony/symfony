@@ -26,6 +26,8 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @see UserProviderInterface
  *
+ * @method string getUserIdentifier() returns the identifier for this user (e.g. its username or e-mailaddress)
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface UserInterface
@@ -68,13 +70,6 @@ interface UserInterface
      * @return string|null The salt
      */
     public function getSalt();
-
-    /**
-     * Returns the username used to authenticate the user.
-     *
-     * @return string The username
-     */
-    public function getUsername();
 
     /**
      * Removes sensitive data from the user.

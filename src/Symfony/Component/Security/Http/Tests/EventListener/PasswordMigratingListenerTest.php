@@ -99,14 +99,14 @@ class PasswordMigratingListenerTest extends TestCase
     public function testUpgradeWithoutUpgrader()
     {
         $userLoader = $this->getMockForAbstractClass(TestMigratingUserProvider::class);
-        $userLoader->expects($this->any())->method('loadUserByUsername')->willReturn($this->user);
+        $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
 
         $userLoader->expects($this->once())
             ->method('upgradePassword')
             ->with($this->user, 'new-hash')
         ;
 
-        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByUsername']), [new PasswordUpgradeBadge('pa$$word')]));
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', [$userLoader, 'loadUserByIdentifier']), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);
     }
 
@@ -124,6 +124,7 @@ class PasswordMigratingListenerTest extends TestCase
 abstract class TestMigratingUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     abstract public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void;
+    abstract public function loadUserByIdentifier(string $identifier): UserInterface;
 }
 
 abstract class TestPasswordAuthenticatedUser implements UserInterface, PasswordAuthenticatedUserInterface

@@ -46,7 +46,7 @@ interface AuthenticatorInterface
      * presented password and the CSRF token value.
      *
      * You may throw any AuthenticationException in this method in case of error (e.g.
-     * a UsernameNotFoundException when the user cannot be found).
+     * a UserNotFoundException when the user cannot be found).
      *
      * @throws AuthenticationException
      */

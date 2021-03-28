@@ -21,6 +21,6 @@ class SecurityController implements ContainerAwareInterface
 
     public function profileAction()
     {
-        return new Response('Welcome '.$this->container->get('security.token_storage')->getToken()->getUsername().'!');
+        return new Response('Welcome '.$this->container->get('security.token_storage')->getToken()->getUserIdentifier().'!');
     }
 }

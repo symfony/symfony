@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticati
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -81,10 +82,10 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
     public function testRetrieveUser()
     {
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         $userProvider
             ->expects($this->once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with('foo')
         ;
         $ldap = $this->createMock(LdapInterface::class);

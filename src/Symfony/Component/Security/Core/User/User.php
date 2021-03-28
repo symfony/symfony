@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
 
     public function __toString(): string
     {
-        return $this->getUsername();
+        return $this->getUserIdentifier();
     }
 
     /**
@@ -84,6 +84,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
      * {@inheritdoc}
      */
     public function getUsername(): string
+    {
+        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
+
+        return $this->username;
+    }
+
+    /**
+     * Returns the identifier for this user (e.g. its username or e-mailaddress).
+     */
+    public function getUserIdentifier(): string
     {
         return $this->username;
     }
@@ -184,7 +194,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

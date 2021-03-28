@@ -82,7 +82,8 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             throw new \LogicException('No remember me token is set.');
         }
 
-        return new SelfValidatingPassport(new UserBadge($token->getUsername(), [$token, 'getUser']));
+        // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+        return new SelfValidatingPassport(new UserBadge(method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(), [$token, 'getUser']));
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface

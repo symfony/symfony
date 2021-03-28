@@ -90,7 +90,7 @@ class LoginThrottlingListenerTest extends TestCase
     private function createLoginSuccessfulEvent($passport, $username = 'wouter')
     {
         $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())->method('getUsername')->willReturn($username);
+        $token->expects($this->any())->method('getUserIdentifier')->willReturn($username);
 
         return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $token, $this->requestStack->getCurrentRequest(), null, 'main');
     }

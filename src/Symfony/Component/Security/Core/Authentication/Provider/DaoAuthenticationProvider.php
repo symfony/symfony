@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -108,7 +108,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * {@inheritdoc}
      */
-    protected function retrieveUser(string $username, UsernamePasswordToken $token)
+    protected function retrieveUser(string $userIdentifier, UsernamePasswordToken $token)
     {
         $user = $token->getUser();
         if ($user instanceof UserInterface) {
@@ -116,15 +116,22 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
         }
 
         try {
-            $user = $this->userProvider->loadUserByUsername($username);
+            // @deprecated since 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+            if (method_exists($this->userProvider, 'loadUserByIdentifier')) {
+                $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+            } else {
+                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+                $user = $this->userProvider->loadUserByUsername($userIdentifier);
+            }
 
             if (!$user instanceof UserInterface) {
                 throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
             }
 
             return $user;
-        } catch (UsernameNotFoundException $e) {
-            $e->setUsername($username);
+        } catch (UserNotFoundException $e) {
+            $e->setUserIdentifier($userIdentifier);
             throw $e;
         } catch (\Exception $e) {
             $e = new AuthenticationServiceException($e->getMessage(), 0, $e);

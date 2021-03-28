@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -112,8 +112,9 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
 
         if (null === $user) {
-            $e = new UsernameNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
-            $e->setUsername($token->getUsername());
+            $e = new UserNotFoundException(sprintf('Null returned from "%s::getUser()".', get_debug_type($guardAuthenticator)));
+            // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
+            $e->setUserIdentifier(method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername());
 
             throw $e;
         }

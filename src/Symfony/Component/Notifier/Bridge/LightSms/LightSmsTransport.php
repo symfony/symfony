@@ -100,7 +100,8 @@ final class LightSmsTransport extends AbstractTransport
 
     public function supports(MessageInterface $message): bool
     {
-        return $message instanceof SmsMessage && $this->phone === str_replace('+', '', $message->getPhone());
+        return $message instanceof SmsMessage;
+
     }
 
     protected function doSend(MessageInterface $message): SentMessage

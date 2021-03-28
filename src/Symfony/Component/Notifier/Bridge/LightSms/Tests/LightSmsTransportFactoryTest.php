@@ -29,7 +29,7 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
     {
         yield [
             'lightsms://host.test?phone=0611223344',
-            'lightsms://accountSid:authToken@host.test?phone=0611223344',
+            'lightsms://login:token@host.test?phone=0611223344',
         ];
     }
 

@@ -15,7 +15,7 @@ LIGHTSMS_DSN=lightsms://LOGIN:TOKEN@default?phone=PHONE
 where:
  - `LOGIN` is your LightSms login
  - `TOKEN` is the token displayed in your account
- - `PHONE` is your LightSms phone number
+ - `PHONE` is your LightSms sender phone number
 
 See your account info at https://www.lightsms.com/external/client/api/
 

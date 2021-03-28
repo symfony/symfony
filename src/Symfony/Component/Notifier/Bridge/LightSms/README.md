@@ -1,10 +1,6 @@
 LightSms Notifier
 =================
 
-Provides [LightSms](https://www.lightsms.com/) integration for Symfony Notifier.
-
-This provider allows you to receive an SMS notification on your mobile number.
-
 DSN example
 -----------
 

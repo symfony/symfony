@@ -70,7 +70,7 @@ final class LightSmsTransport extends AbstractTransport
         '35' => 'Not enough money',
         '36' => 'Can not obtain information about phone',
         '37' => 'Base Id is not set',
-        '38' => 'Phone number is already exist in this base',
+        '38' => 'Phone number already exists in this database',
         '39' => 'Phone number is not exist in this base',
     ];
 

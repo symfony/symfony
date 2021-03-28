@@ -2,7 +2,7 @@
     "name": "symfony/lightsms-notifier",
     "type": "symfony-bridge",
     "description": "Symfony LightSms Notifier Bridge",
-    "keywords": ["sms", "LightSms", "notifier"],
+    "keywords": ["sms", "light-sms", "notifier"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

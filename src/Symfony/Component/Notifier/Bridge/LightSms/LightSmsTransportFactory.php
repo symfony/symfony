@@ -34,7 +34,7 @@ final class LightSmsTransportFactory extends AbstractTransportFactory
 
         $login = $this->getUser($dsn);
         $token = $this->getPassword($dsn);
-        $phone = $dsn->getOption('phone');
+        $phone = $dsn->getRequiredOption('phone');
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();

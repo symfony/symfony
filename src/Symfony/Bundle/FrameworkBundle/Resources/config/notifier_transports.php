@@ -162,7 +162,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.lightsms', LightSmsTransportFactory::class)
-        ->parent('notifier.transport_factory.abstract')
-        ->tag('texter.transport_factory')
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
     ;
 };

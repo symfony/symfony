@@ -110,7 +110,7 @@ final class LightSmsTransport extends AbstractTransport
 
         $this->message = $message;
 
-        $signature = $this->getSignature();
+        $signature = $this->generateSignature();
 
         $endpoint = sprintf(
             'https://%s?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
@@ -144,7 +144,7 @@ final class LightSmsTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    private function getSignature(): string
+    private function generateSignature(): string
     {
         $params = [
             'timestamp' => time(),

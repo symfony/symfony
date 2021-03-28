@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-28T13:55:44Z
+
+This fixes tests where the code is patched to have real return type declarations.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T14:03:51Z
+
+I think you are referring to this PR #40535
+
+But I dont see how your fix solves the build. Could you please elaborate?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-28T14:08:46Z
+
+@Nyholm In the pipeline we have a job that patches our code to add real return type declarations. Which means here that when `n/a` is cast to a boolean `isDebug()` always returns `true`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T15:13:49Z
+
+Oh. That is cool. I didn't know that.

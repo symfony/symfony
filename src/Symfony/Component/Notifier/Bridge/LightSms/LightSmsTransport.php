@@ -62,7 +62,7 @@ final class LightSmsTransport extends AbstractTransport
         '22' => 'Template already exists',
         '23' => 'Month not specifies (Format: YYYY-MM)',
         '24' => 'Timestamp not specified',
-        '25' =>'Error in access to the list',
+        '25' => 'Error in access to the list',
         '26' => 'There are no numbers in the list',
         '27' => 'No valid numbers',
         '28' => 'Date of start not specified (Format: YYYY-MM-DD)',
@@ -101,7 +101,6 @@ final class LightSmsTransport extends AbstractTransport
     public function supports(MessageInterface $message): bool
     {
         return $message instanceof SmsMessage;
-
     }
 
     protected function doSend(MessageInterface $message): SentMessage
@@ -125,7 +124,6 @@ final class LightSmsTransport extends AbstractTransport
             time()
         );
 
-
         $response = $this->client->request('GET', $endpoint);
 
         $content = $response->toArray(false);
@@ -134,22 +132,21 @@ final class LightSmsTransport extends AbstractTransport
             throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
         }
 
-
         $phone = preg_replace("/[^\d]/", "", $message->getPhone());
-
-        if ($content[$phone]['error'] == 32) {
+        if (32 == $content[$phone]['error']) {
             throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
         }
 
-        if ($content[$phone]['error'] == 0) {
+        if (0 == $content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($content[$phone]['id_sms']);
         }
+
+        return $sentMessage;
     }
 
     private function getSignature(): string
     {
-
         $params = [
             'timestamp' => time(),
             'login' => $this->login,
@@ -161,6 +158,6 @@ final class LightSmsTransport extends AbstractTransport
         ksort($params);
         reset($params);
 
-        return md5(implode($params) . $this->password);
+        return md5(implode('', $params).$this->password);
     }
 }

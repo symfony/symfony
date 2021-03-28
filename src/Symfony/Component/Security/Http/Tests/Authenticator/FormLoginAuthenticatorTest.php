@@ -17,8 +17,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
@@ -37,8 +36,7 @@ class FormLoginAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
-        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new InMemoryUser('test', 's$cr$t'));
+        $this->userProvider = new InMemoryUserProvider(['test' => ['password' => 's$cr$t']]);
         $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
         $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
     }
@@ -149,8 +147,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
         $request->setSession($this->createSession());
 
-        $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
-        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new InMemoryUser('test', 's$cr$t'));
+        $this->userProvider = new PasswordUpgraderProvider(['test' => ['password' => 's$cr$t']]);
 
         $this->setUpAuthenticator();
         $passport = $this->authenticator->authenticate($request);

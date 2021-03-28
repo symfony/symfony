@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\X509Authenticator;
 
 class X509AuthenticatorTest extends TestCase
@@ -25,7 +25,7 @@ class X509AuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new InMemoryUserProvider();
         $this->authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main');
     }
 
@@ -45,10 +45,7 @@ class X509AuthenticatorTest extends TestCase
         $request = $this->createRequest($serverVars);
         $this->assertTrue($this->authenticator->supports($request));
 
-        $this->userProvider->expects($this->any())
-            ->method('loadUserByUsername')
-            ->with($username)
-            ->willReturn(new InMemoryUser($username, null));
+        $this->userProvider->createUser(new InMemoryUser($username, null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals($username, $passport->getUser()->getUsername());
@@ -69,10 +66,7 @@ class X509AuthenticatorTest extends TestCase
 
         $this->assertTrue($this->authenticator->supports($request));
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with($emailAddress)
-            ->willReturn(new InMemoryUser($emailAddress, null));
+        $this->userProvider->createUser(new InMemoryUser($emailAddress, null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals($emailAddress, $passport->getUser()->getUsername());
@@ -105,10 +99,7 @@ class X509AuthenticatorTest extends TestCase
         ]);
         $this->assertTrue($authenticator->supports($request));
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('TheUser')
-            ->willReturn(new InMemoryUser('TheUser', null));
+        $this->userProvider->createUser(new InMemoryUser('TheUser', null));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('TheUser', $passport->getUser()->getUsername());
@@ -123,10 +114,7 @@ class X509AuthenticatorTest extends TestCase
         ]);
         $this->assertTrue($authenticator->supports($request));
 
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('cert@example.com')
-            ->willReturn(new InMemoryUser('cert@example.com', null));
+        $this->userProvider->createUser(new InMemoryUser('cert@example.com', null));
 
         $passport = $authenticator->authenticate($request);
         $this->assertEquals('cert@example.com', $passport->getUser()->getUsername());

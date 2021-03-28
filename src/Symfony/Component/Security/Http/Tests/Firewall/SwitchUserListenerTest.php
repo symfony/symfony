@@ -25,7 +25,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
@@ -112,13 +111,13 @@ class SwitchUserListenerTest extends TestCase
 
     public function testExitUserDispatchesEventWithRefreshedUser()
     {
-        $originalUser = $this->createMock(UserInterface::class);
-        $refreshedUser = $this->createMock(UserInterface::class);
+        $originalUser = new InMemoryUser('username', null);
+        $refreshedUser = new InMemoryUser('username', null);
         $this
             ->userProvider
             ->expects($this->any())
             ->method('refreshUser')
-            ->with($originalUser)
+            ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedUser);
         $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
         $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));
@@ -399,13 +398,13 @@ class SwitchUserListenerTest extends TestCase
 
     public function testSwitchUserRefreshesOriginalToken()
     {
-        $originalUser = $this->createMock(UserInterface::class);
-        $refreshedOriginalUser = $this->createMock(UserInterface::class);
+        $originalUser = new InMemoryUser('username', null);
+        $refreshedOriginalUser = new InMemoryUser('username', null);
         $this
             ->userProvider
             ->expects($this->any())
             ->method('refreshUser')
-            ->with($originalUser)
+            ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedOriginalUser);
         $originalToken = new UsernamePasswordToken($originalUser, '', 'key');
         $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', ['ROLE_USER'], $originalToken));

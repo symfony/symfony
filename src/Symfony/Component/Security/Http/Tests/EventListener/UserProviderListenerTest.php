@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -27,7 +27,7 @@ class UserProviderListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new InMemoryUserProvider();
         $this->listener = new UserProviderListener($this->userProvider);
     }
 
@@ -41,8 +41,8 @@ class UserProviderListenerTest extends TestCase
         $this->assertEquals([$this->userProvider, 'loadUserByUsername'], $badge->getUserLoader());
 
         $user = new InMemoryUser('wouter', null);
-        $this->userProvider->expects($this->once())->method('loadUserByUsername')->with('wouter')->willReturn($user);
-        $this->assertSame($user, $passport->getUser());
+        $this->userProvider->createUser($user);
+        $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     /**

@@ -6,8 +6,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
@@ -22,7 +22,7 @@ class HttpBasicAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new InMemoryUserProvider();
         $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
         $this->encoder = $this->createMock(PasswordEncoderInterface::class);
         $this->encoderFactory
@@ -40,16 +40,12 @@ class HttpBasicAuthenticatorTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $this->userProvider
-            ->expects($this->any())
-            ->method('loadUserByUsername')
-            ->with('TheUsername')
-            ->willReturn($user = new User('TheUsername', 'ThePassword'));
+        $this->userProvider->createUser($user = new User('TheUsername', 'ThePassword'));
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertEquals('ThePassword', $passport->getBadge(PasswordCredentials::class)->getPassword());
 
-        $this->assertSame($user, $passport->getUser());
+        $this->assertTrue($user->isEqualTo($passport->getUser()));
     }
 
     /**
@@ -77,8 +73,7 @@ class HttpBasicAuthenticatorTest extends TestCase
             'PHP_AUTH_PW' => 'ThePassword',
         ]);
 
-        $this->userProvider = $this->createMock(PasswordUpgraderProvider::class);
-        $this->userProvider->expects($this->any())->method('loadUserByUsername')->willReturn(new User('test', 's$cr$t'));
+        $this->userProvider = new PasswordUpgraderProvider(['test' => ['password' => 's$cr$t']]);
         $authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
 
         $passport = $authenticator->authenticate($request);

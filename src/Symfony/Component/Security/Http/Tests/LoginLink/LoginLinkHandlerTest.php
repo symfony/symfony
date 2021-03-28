@@ -29,7 +29,7 @@ class LoginLinkHandlerTest extends TestCase
 {
     /** @var MockObject|UrlGeneratorInterface */
     private $router;
-    /** @var MockObject|UserProviderInterface */
+    /** @var TestLoginLinkHandlerUserProvider */
     private $userProvider;
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
@@ -39,7 +39,7 @@ class LoginLinkHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->router = $this->createMock(UrlGeneratorInterface::class);
-        $this->userProvider = $this->createMock(UserProviderInterface::class);
+        $this->userProvider = new TestLoginLinkHandlerUserProvider();
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->expiredLinkStorage = $this->createMock(ExpiredLoginLinkStorage::class);
     }
@@ -94,10 +94,7 @@ class LoginLinkHandlerTest extends TestCase
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('weaverryan')
-            ->willReturn($user);
+        $this->userProvider->createUser($user);
 
         $this->expiredLinkStorage->expects($this->once())
             ->method('incrementUsages')
@@ -105,7 +102,7 @@ class LoginLinkHandlerTest extends TestCase
 
         $linker = $this->createLinker(['max_uses' => 3]);
         $actualUser = $linker->consumeLoginLink($request);
-        $this->assertSame($user, $actualUser);
+        $this->assertEquals($user, $actualUser);
     }
 
     public function testConsumeLoginLinkWithExpired()
@@ -116,10 +113,7 @@ class LoginLinkHandlerTest extends TestCase
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('weaverryan')
-            ->willReturn($user);
+        $this->userProvider->createUser($user);
 
         $linker = $this->createLinker(['max_uses' => 3]);
         $linker->consumeLoginLink($request);
@@ -129,11 +123,6 @@ class LoginLinkHandlerTest extends TestCase
     {
         $this->expectException(InvalidLoginLinkException::class);
         $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=10000');
-
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('weaverryan')
-            ->willThrowException(new UsernameNotFoundException());
 
         $linker = $this->createLinker();
         $linker->consumeLoginLink($request);
@@ -145,10 +134,7 @@ class LoginLinkHandlerTest extends TestCase
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('weaverryan')
-            ->willReturn($user);
+        $this->userProvider->createUser($user);
 
         $linker = $this->createLinker();
         $linker->consumeLoginLink($request);
@@ -162,10 +148,7 @@ class LoginLinkHandlerTest extends TestCase
         $request = Request::create(sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
 
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
-        $this->userProvider->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('weaverryan')
-            ->willReturn($user);
+        $this->userProvider->createUser($user);
 
         $this->expiredLinkStorage->expects($this->once())
             ->method('countUsages')
@@ -195,6 +178,35 @@ class LoginLinkHandlerTest extends TestCase
         ], $options);
 
         return new LoginLinkHandler($this->router, $this->userProvider, $this->propertyAccessor, $extraProperties, 's3cret', $options, $this->expiredLinkStorage);
+    }
+}
+
+class TestLoginLinkHandlerUserProvider implements UserProviderInterface
+{
+    private $users = [];
+
+    public function createUser(TestLoginLinkHandlerUser $user): void
+    {
+        $this->users[$user->getUsername()] = $user;
+    }
+
+    public function loadUserByUsername(string $username): TestLoginLinkHandlerUser
+    {
+        if (!isset($this->users[$username])) {
+            throw new UsernameNotFoundException();
+        }
+
+        return clone $this->users[$username];
+    }
+
+    public function refreshUser(UserInterface $user)
+    {
+        return $this->users[$username];
+    }
+
+    public function supportsClass(string $class)
+    {
+        return TestLoginLinkHandlerUser::class === $class;
     }
 }
 

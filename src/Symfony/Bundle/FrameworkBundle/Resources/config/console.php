@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
+use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpBuilderCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
@@ -38,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
 use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
+use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Console\EventListener\ErrorListener;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
@@ -109,6 +111,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('console.command.config_debug', ConfigDebugCommand::class)
+            ->tag('console.command')
+
+        ->set('console.command.config_dump_builder', ConfigDumpBuilderCommand::class)
+            ->args([
+                service(ConfigBuilderGeneratorInterface::class),
+            ])
             ->tag('console.command')
 
         ->set('console.command.config_dump_reference', ConfigDumpReferenceCommand::class)

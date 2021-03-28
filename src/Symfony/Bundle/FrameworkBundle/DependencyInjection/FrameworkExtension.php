@@ -425,6 +425,7 @@ class FrameworkExtension extends Extension
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
         $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
+        $loader->load('config.php');
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists(\Symfony\Component\Serializer\Serializer::class)) {

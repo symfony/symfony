@@ -132,6 +132,18 @@ final class LightSmsTransport extends AbstractTransport
         if (isset($content['error'])) {
             throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
         }
+
+
+        $phone = preg_replace("/[^\d]/", "", $message->getPhone());
+
+        if ($content[$phone]['error'] == 32) {
+            throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
+        }
+
+        if ($content[$phone]['error'] == 0) {
+            $sentMessage = new SentMessage($message, (string) $this);
+            $sentMessage->setMessageId($content[$phone]['id_sms']);
+        }
     }
 
     private function getSignature(): string

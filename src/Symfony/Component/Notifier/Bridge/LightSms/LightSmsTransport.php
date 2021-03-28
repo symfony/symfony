@@ -33,7 +33,7 @@ final class LightSmsTransport extends AbstractTransport
 
     private const ERROR_CODES = [
         '000' => 'Service unavailable',
-        '1' => 'Signature not specified',
+        '1' => 'Missing Signature',
         '2' => 'Login not specified',
         '3' => 'Text not specified',
         '4' => 'Phone number not specified',

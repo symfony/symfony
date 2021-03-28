@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LightSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'www.lightsms.com/external/get/send.php';
+    protected const HOST = 'www.lightsms.com';
 
     private $login;
     private $password;
@@ -78,13 +78,8 @@ final class LightSmsTransport extends AbstractTransport
         '39' => 'Phone number is not exist in this base',
     ];
 
-    public function __construct(
-        string $login,
-        string $password,
-        string $phone,
-        HttpClientInterface $client = null,
-        EventDispatcherInterface $dispatcher = null
-    ) {
+    public function __construct(string $login, string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    {
         $this->login = $login;
         $this->password = $password;
         $this->phone = $phone;
@@ -113,7 +108,7 @@ final class LightSmsTransport extends AbstractTransport
         $signature = $this->generateSignature();
 
         $endpoint = sprintf(
-            'https://%s?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
+            'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
             $this->getEndpoint(),
             $this->login,
             $signature,

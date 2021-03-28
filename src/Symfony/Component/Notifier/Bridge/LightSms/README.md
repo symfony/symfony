@@ -1,5 +1,5 @@
 LightSms Notifier
-====================
+===============
 
 Provides [LightSms](https://www.lightsms.com/) integration for Symfony Notifier.
 

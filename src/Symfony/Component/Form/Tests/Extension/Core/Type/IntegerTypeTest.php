@@ -17,11 +17,46 @@ class IntegerTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
+    private $previousLocale;
+
     protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
-
+        $this->previousLocale = \Locale::getDefault();
         parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->previousLocale);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testArabicLocale()
+    {
+        \Locale::setDefault('ar');
+
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit('123456');
+
+        $this->assertSame(123456, $form->getData());
+        $this->assertSame('123456', $form->getViewData());
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testArabicLocaleNonHtml5()
+    {
+        \Locale::setDefault('ar');
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true]);
+        $form->submit('123456');
+
+        $this->assertSame(123456, $form->getData());
+        $this->assertSame('١٢٣٬٤٥٦', $form->getViewData());
     }
 
     public function testSubmitRejectsFloats()

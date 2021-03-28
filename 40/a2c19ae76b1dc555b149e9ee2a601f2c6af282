@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-07T17:51:06Z
+
+Thanks Robin!
+
+> Given that DebugClassLoader will automatically trigger a deprecation notice thanks to the added @method phpdoc, I'm fine with the proposed BC layer and the additional notices it introduces.
+
+Oh, that's nice. The powers of the `DebugClassLoader` keeps surprising me :)
+
+> Regarding tests, we should keep some legacy ones using the deprecated method to make sure everything keeps working.
+
+Yes, sure thing. I've basically been find&replacing `getUsername()` occurrences in the tests (to see if this actually works). This PR needs lots more love before it's ready.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-09T09:35:16Z
+
+I guess we will need to rename `UserProviderInterface::loadUserByUsername()` here
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-11T22:58:53Z
+
+For reference, I consider this PR to be "feature complete". However, we do need to have more tests to make sure all authentication providers/listeners can work with both the old and new names. I'll add these over the next few days.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-16T11:28:59Z
+
+I think this PR is ready. However, 2 comments are left unresolved (open discussion), and the travis high builds are failing (I guess I need to submit another PR for 5.2 to change all tests to fix them?).
+
+appveyor builds have a timeout, they were green before.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-16T18:13:40Z
+
+The merge of the User rename makes a lot of conflicts here, sorry about that :(
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-28T06:41:47Z
+
+@wouterj Do you have time to rebase this PR?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-28T13:17:24Z
+
+Rebased. I believe the deps=high builds will be fixed when https://github.com/symfony/symfony/pull/40609 is merged (other failures are unrelated). I'll rebase this PR again when that PR is merged up to 5.x.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-28T17:39:57Z
+
+(Hopefully last) rebase needed
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-28T19:42:33Z
+
+If we ignore psalm (which we should in this PR), we're finally green. Thanks for your help @chalasr!

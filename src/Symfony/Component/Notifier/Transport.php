@@ -74,6 +74,7 @@ class Transport
         OctopushTransportFactory::class,
         GitterTransportFactory::class,
         ClickatellTransportFactory::class,
+        LightSmsTransportFactory::class,
     ];
 
     private $factories;

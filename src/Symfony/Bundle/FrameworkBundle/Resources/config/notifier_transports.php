@@ -40,6 +40,7 @@ use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\NullTransportFactory;
+use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -159,5 +160,9 @@ return static function (ContainerConfigurator $container) {
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
             ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.lightsms', LightSmsTransportFactory::class)
+        ->parent('notifier.transport_factory.abstract')
+        ->tag('texter.transport_factory')
     ;
 };

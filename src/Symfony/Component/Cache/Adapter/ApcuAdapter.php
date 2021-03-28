@@ -13,16 +13,19 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class ApcuAdapter extends AbstractAdapter
 {
+    private $marshaller;
+
     /**
      * @throws CacheException if APCu is not enabled
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null, ?MarshallerInterface $marshaller = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled.');
@@ -40,6 +43,8 @@ class ApcuAdapter extends AbstractAdapter
                 apcu_add($version.'@'.$namespace, null);
             }
         }
+
+        $this->marshaller = $marshaller;
     }
 
     public static function isSupported()
@@ -57,7 +62,7 @@ class ApcuAdapter extends AbstractAdapter
             $values = [];
             foreach (apcu_fetch($ids, $ok) ?: [] as $k => $v) {
                 if (null !== $v || $ok) {
-                    $values[$k] = $v;
+                    $values[$k] = null !== $this->marshaller ? $this->marshaller->unmarshall($v) : $v;
                 }
             }
 
@@ -104,6 +109,10 @@ class ApcuAdapter extends AbstractAdapter
      */
     protected function doSave(array $values, int $lifetime)
     {
+        if (null !== $this->marshaller && (!$values = $this->marshaller->marshall($values, $failed))) {
+            return $failed;
+        }
+
         try {
             if (false === $failures = apcu_store($values, null, $lifetime)) {
                 $failures = $values;

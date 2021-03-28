@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 class ApcuAdapterTest extends AdapterTestCase
 {
@@ -121,5 +122,31 @@ class ApcuAdapterTest extends AdapterTestCase
         } finally {
             restore_error_handler();
         }
+    }
+
+    public function testCacheItemValueRunsThroughMarshaller()
+    {
+        $namespace = str_replace('\\', '.', static::class);
+
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshaller->expects($this->once())
+            ->method('marshall')
+            ->with([$namespace.':foo' => 'bar'])
+            ->willReturn([$namespace.':foo' => 'bar_serialized']);
+
+        $marshaller->expects($this->once())
+            ->method('unmarshall')
+            ->with('bar_serialized')
+            ->willReturn('bar');
+
+        $pool = new ApcuAdapter($namespace, 0, 'p1', $marshaller);
+
+        $item = $pool->getItem('foo');
+        $this->assertFalse($item->isHit());
+        $this->assertTrue($pool->save($item->set('bar')));
+
+        $item = $pool->getItem('foo');
+        $this->assertTrue($item->isHit());
+        $this->assertSame('bar', $item->get());
     }
 }

@@ -61,7 +61,7 @@ final class LightSmsTransport extends AbstractTransport
         '26' => 'There are no numbers in the list',
         '27' => 'No valid numbers',
         '28' => 'Date of start not specified (Format: YYYY-MM-DD)',
-        '29' => 'Date of end not specified (Format: YYYY-MM-DD)',
+        '29' => 'Missing end date (Format: YYYY-MM-DD)',
         '30' => 'No date (format: YYYY-MM-DD)',
         '31' => 'Closing direction to the user',
         '32' => 'Not enough money',

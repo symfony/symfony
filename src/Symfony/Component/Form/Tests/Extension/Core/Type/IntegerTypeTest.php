@@ -31,6 +31,9 @@ class IntegerTypeTest extends BaseTypeTest
         \Locale::setDefault($this->previousLocale);
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testArabicLocale()
     {
         \Locale::setDefault('ar');
@@ -42,6 +45,9 @@ class IntegerTypeTest extends BaseTypeTest
         $this->assertSame('123456', $form->getViewData());
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testArabicLocaleNonHtml5()
     {
         \Locale::setDefault('ar');

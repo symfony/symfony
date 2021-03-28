@@ -55,7 +55,7 @@ final class LightSmsTransport extends AbstractTransport
         '20' => 'The number already exists',
         '21' => 'No name',
         '22' => 'Template already exists',
-        '23' => 'Month not specifies (Format: YYYY-MM)',
+        '23' => 'Missing Month (Format: YYYY-MM)',
         '24' => 'Timestamp not specified',
         '25' => 'Error in access to the list',
         '26' => 'There are no numbers in the list',

@@ -103,10 +103,10 @@ final class LightSmsTransport extends AbstractTransport
         return $message instanceof SmsMessage && $this->phone === str_replace('+', '', $message->getPhone());
     }
 
-    protected function doSend(MessageInterface $message): void
+    protected function doSend(MessageInterface $message): SentMessage
     {
         if (!$message instanceof SmsMessage) {
-            throw new LogicException(sprintf('The "%s" transport only supports instances of "%s" (instance of "%s" given).', __CLASS__, SmsMessage::class, \get_class($message)));
+            throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
         $this->message = $message;

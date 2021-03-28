@@ -30,12 +30,8 @@ final class LightSmsTransport extends AbstractTransport
     private $login;
     private $password;
     private $phone;
-    /**
-     * @var MessageInterface
-     */
-    private $message;
 
-    private $errorCodes = [
+    private const ERROR_CODES = [
         '000' => 'Service unavailable',
         '1' => 'Signature not specified',
         '2' => 'Login not specified',
@@ -103,9 +99,7 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $this->message = $message;
-
-        $signature = $this->generateSignature();
+        $signature = $this->generateSignature($message);
 
         $endpoint = sprintf(
             'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
@@ -123,12 +117,12 @@ final class LightSmsTransport extends AbstractTransport
         $content = $response->toArray(false);
 
         if (isset($content['error'])) {
-            throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
+            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
 
         $phone = preg_replace("/[^\d]/", '', $message->getPhone());
         if (32 == $content[$phone]['error']) {
-            throw new TransportException('Unable to send the SMS: '.$this->errorCodes[$content['error']], $response);
+            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
 
         if (0 == $content[$phone]['error']) {
@@ -139,14 +133,14 @@ final class LightSmsTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    private function generateSignature(): string
+    private function generateSignature(SmsMessage $message): string
     {
         $params = [
             'timestamp' => time(),
             'login' => $this->login,
-            'phone' => str_replace('+', '', $this->message->getPhone()),
+            'phone' => str_replace('+', '', $message->getPhone()),
             'sender' => $this->phone,
-            'text' => $this->message->getSubject(),
+            'text' => $message->getSubject(),
         ];
 
         ksort($params);

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by pounard at 2021-03-19T17:23:48Z
+
+Build failure seems to be unrelated, am I misreading it ?
+
+---------------------------------------------------------------------------
+
+by pounard at 2021-03-22T16:33:36Z
+
+@ro0NL @nicolas-grekas thank you. I hope it will land in next 5.2 release, I have to maintain a patch in the meantime.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-22T17:26:28Z
+
+I rebased on 4.4, where bugfixes should be merged.
+
+---------------------------------------------------------------------------
+
+by pounard at 2021-03-22T20:28:27Z
+
+> I rebased on 4.4, where bugfixes should be merged.
+
+Oh, nice ! Thank you very much.

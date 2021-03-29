@@ -1,0 +1,163 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-23T10:38:23Z
+
+I really like this bridge but I think we can do better.
+
+I am thinking of using the same approach as in the mercure-notifier and provide a service id for the mailer which should be used.
+
+Another thing which came to my mind: why not change ne name and scheme to "fake" only and support chat and sms?
+
+Please let's discuss this first before changing some code and get some feedback of others about this idea 💡 thanks
+
+---------------------------------------------------------------------------
+
+by JamesHemery at 2021-01-23T12:22:50Z
+
+> I am thinking of using the same approach as in the mercure-notifier and provide a service id for the mailer which should be used.
+
+@OskarStark Why using the service id instead of dependency injection from the constructor here ?
+
+> Another thing which came to my mind: why not change ne name and scheme to "fake" only and support chat and sms?
+
+It's good idea, yes.
+
+---------------------------------------------------------------------------
+
+by tigitz at 2021-02-05T13:22:25Z
+
+Maybe it has been discussed before but why not calling the bridge EmailNotifier instead ? And let developers use it for testing purposes or not.
+
+The primary need of this bridge is to "Fake SMS" in dev, I get it, but it doesnt necessarily mean that you have to use Email to do that. You could "fake it" by writing in logs for example.
+
+Also, a dedicated Email notifier could be useful in case where you have to notify both through SMS *and* Email while keeping the same kind of logic.
+
+---------------------------------------------------------------------------
+
+by JamesHemery at 2021-02-05T14:40:11Z
+
+> Maybe it has been discussed before but why not calling the bridge EmailNotifier instead ? And let developers use it for testing purposes or not.
+>
+> The primary need of this bridge is to "Fake SMS" in dev, I get it, but it doesnt necessarily mean that you have to use Email to do that. You could "fake it" by writing in logs for example.
+>
+> Also, a dedicated Email notifier could be useful in case where you have to notify both through SMS _and_ Email while keeping the same kind of logic.
+
+So, it's also an idea, but I think it would be more interesting to keep the name "FakeNotifier" and to add several channels (like emails, logs, ...). Because, except for tests, there is no reason to use SMS Notifier to finally send emails.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-02-05T16:21:58Z
+
+Lets think a bit further, but I think my idea with the chat is not ideal, because they are not interchangeable because of the options, or we accept all options and add the json payload to the "log", "mail", or "database".
+
+We can enable the recipe for `dev`, but also for `test` env 👍
+
+**Small recap**
+So we would end up with a `symfony/fake-notifier` for `dev` and `test`, with the following themes:
+* `fakesms+mail` _should receive a mailer service id_
+* `fakesms+log` _should receive a logger service id + an optional channel_ ?? 🤔
+* `fakesms+database` _should receive an entity manager service id_ ?? 🤔
+
+* `fakechat+mail`
+* `fakechat+log`
+* `fakechat+database`
+
+And we end up with one `Factory` (like https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Mailer/Bridge/Amazon/Transport/SesTransportFactory.php) and 6 transports
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-08T05:52:25Z
+
+@JamesHemery open to go further? Do you agree with n ideas?
+
+If you don't have to much time right now I think we can go with the mail only solution for now and add other ones later.
+
+However to make it more clear I would name the scheme: fakesms+mail
+
+---------------------------------------------------------------------------
+
+by JamesHemery at 2021-03-08T11:02:17Z
+
+Hi @OskarStark,
+
+Yes I agree with these suggestions.
+
+I will be doing the schema fix within a week.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-19T12:53:39Z
+
+friendly ping @JamesHemery 😃
+
+---------------------------------------------------------------------------
+
+by JamesHemery at 2021-03-24T23:14:55Z
+
+> Some minor
+
+I will make update tomorrow
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-29T11:57:52Z
+
+This Psalm error is weird:
+https://github.com/symfony/symfony/pull/39949/files#diff-de425b06bdc779077bd9be9d754864c705ba18bab82af6affafefb7c61bd18e8R35
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-29T12:00:47Z
+
+It is because of the weird logic in that method. I suggest rewriting it to something more similar to:
+
+```php
+public function create(Dsn $dsn): TransportInterface
+{
+    if ('fakesms+email' !== $dsn->getScheme()) {
+        throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
+    }
+
+    $serviceId = $dsn->getHost();
+    $to = $dsn->getRequiredOption('to');
+    $from = $dsn->getRequiredOption('from');
+
+    $factory = new FakeSmsEmailTransport($this->serviceProvider->get($serviceId), $to, $from);
+    $factory->setHost($serviceId);
+
+    return $factory;
+}
+```
+
+---------------------------------------------------------------------------
+
+by JamesHemery at 2021-03-29T12:02:23Z
+
+> It is because of the weird logic in that method. I suggest rewriting it to something more similar to:
+>
+> ```
+> public function create(Dsn $dsn): TransportInterface
+>     {
+>         if ('fakesms+email' !== $dsn->getScheme()) {
+>             throw new UnsupportedSchemeException($dsn, 'fakesms', $this->getSupportedSchemes());
+>         }
+>
+>         $serviceId = $dsn->getHost();
+>         $to = $dsn->getRequiredOption('to');
+>         $from = $dsn->getRequiredOption('from');
+>
+>         return (new FakeSmsEmailTransport($this->serviceProvider->get($serviceId), $to, $from))->setHost($serviceId);
+>     }
+> ```
+
+Yes, I think too. But this will need a rewrite when we will add new transport.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-29T12:03:13Z
+
+> But this will need a rewrite when we will add new transport.
+
+No (almost). It requires a rewrite when you add a new schema to this transport.
+
+Im okey with that.

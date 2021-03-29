@@ -109,8 +109,8 @@ final class LightSmsTransport extends AbstractTransport
             $this->getEndpoint(),
             $this->login,
             $signature,
-            str_replace('+', '', $message->getPhone()),
-            $message->getSubject(),
+            $this->escapePhoneNumber($message->getPhone()),
+            $this->escapeSubject($message->getSubject()),
             $this->phone,
             time()
         );
@@ -141,14 +141,24 @@ final class LightSmsTransport extends AbstractTransport
         $params = [
             'timestamp' => $params['timestamp'],
             'login' => $this->login,
-            'phone' => str_replace('+', '', $params['message']->getPhone()),
+            'phone' => $this->escapePhoneNumber($params['message']->getPhone()),
             'sender' => $this->phone,
-            'text' => $params['message']->getSubject(),
+            'text' => $this->escapeSubject($params['message']->getSubject()),
         ];
 
         ksort($params);
         reset($params);
 
         return md5(implode('', $params).$this->password);
+    }
+
+    private function escapeSubject($subject): string
+    {
+        return strip_tags($subject);
+    }
+
+    private function escapePhoneNumber($phoneNumber): string
+    {
+        return str_replace('+', '', $phoneNumber);
     }
 }

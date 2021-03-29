@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -42,15 +43,25 @@ class LoggerPassTest extends TestCase
         $this->assertSame('Foo', $container->getDefinition('logger')->getClass());
     }
 
-    public function testRegisterLogger()
+    /**
+     * @dataProvider providesEnvironments
+     */
+    public function testRegisterLogger(string $environment, string $expectedClass)
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', $environment);
 
         (new LoggerPass())->process($container);
 
         $definition = $container->getDefinition('logger');
-        $this->assertSame(Logger::class, $definition->getClass());
+        $this->assertSame($expectedClass, $definition->getClass());
         $this->assertFalse($definition->isPublic());
+    }
+
+    public function providesEnvironments()
+    {
+        yield 'Dev environment' => ['dev', Logger::class];
+        yield 'Test environment' => ['test', TestLogger::class];
     }
 }

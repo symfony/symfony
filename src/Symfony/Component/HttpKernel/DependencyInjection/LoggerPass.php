@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Log\Logger;

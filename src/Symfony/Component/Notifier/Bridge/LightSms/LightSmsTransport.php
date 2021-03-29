@@ -30,7 +30,7 @@ final class LightSmsTransport extends AbstractTransport
 
     private $login;
     private $password;
-    private $phone;
+    private $from;
 
     private const ERROR_CODES = [
         '000' => 'Service unavailable',

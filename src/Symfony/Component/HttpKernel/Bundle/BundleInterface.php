@@ -68,4 +68,22 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle absolute path
      */
     public function getPath();
+
+    /**
+     * Gets the Bundle template path.
+     *
+     * The path should always be returned as a Unix path (with /).
+     *
+     * @return string The Bundle template absolute path
+     */
+    public function getTemplatesPath();
+
+    /**
+     * Gets the Bundle translation directory path.
+     *
+     * The path should always be returned as a Unix path (with /).
+     *
+     * @return string The Bundle translations absolute path
+     */
+    public function getTranslationsPath();
 }

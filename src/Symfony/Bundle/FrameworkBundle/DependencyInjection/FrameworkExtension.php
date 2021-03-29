@@ -1251,7 +1251,7 @@ class FrameworkExtension extends Extension
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if ($container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
+            if ($container->fileExists($dir = $bundle['translations_path']) || $container->fileExists($dir = $bundle['path'].'/Resources/translations') || $container->fileExists($dir = $bundle['path'].'/translations')) {
                 $dirs[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;

@@ -600,6 +600,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $bundlesMetadata[$name] = [
                 'path' => $bundle->getPath(),
                 'namespace' => $bundle->getNamespace(),
+                'translations_path' => $bundle->getTranslationsPath(),
+                'templates_path' => $bundle->getTemplatesPath(),
             ];
         }
 

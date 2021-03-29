@@ -115,6 +115,22 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTranslationsPath()
+    {
+        return $this->getPath() . '/translations';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTemplatesPath()
+    {
+        return $this->getPath() . '/templates';
+    }
+
+    /**
      * Returns the bundle name (the class short name).
      */
     final public function getName(): string

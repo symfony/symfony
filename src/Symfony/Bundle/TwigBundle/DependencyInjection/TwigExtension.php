@@ -162,7 +162,7 @@ class TwigExtension extends Extension
             }
             $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
 
-            if (file_exists($dir = $bundle['path'].'/Resources/views') || file_exists($dir = $bundle['path'].'/templates')) {
+            if (file_exists($dir = $bundle['templates_path']) || file_exists($dir = $bundle['path'].'/Resources/views') || file_exists($dir = $bundle['path'].'/templates')) {
                 $bundleHierarchy[$name][] = $dir;
             }
             $container->addResource(new FileExistenceResource($dir));

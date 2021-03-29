@@ -278,6 +278,8 @@ class TwigExtensionTest extends TestCase
                 'AcmeBundle' => [
                     'namespace' => 'Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle',
                     'path' => __DIR__.'/AcmeBundle',
+                    'templates_path' => __DIR__.'/AcmeBundle/templates',
+                    'translations_path' => __DIR__.'/AcmeBundle/translations',
                 ],
             ],
         ]));

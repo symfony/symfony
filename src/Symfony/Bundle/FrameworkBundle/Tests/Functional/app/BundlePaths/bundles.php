@@ -12,11 +12,13 @@
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\LegacyBundle\LegacyBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ModernBundle\src\ModernBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\CustomBundle\src\CustomBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
 return [
     new FrameworkBundle(),
     new TwigBundle(),
+    new CustomBundle(),
     new ModernBundle(),
     new LegacyBundle(),
 ];

@@ -31,6 +31,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $exitCode = (new CommandTester($command))->execute(['target' => $projectDir.'/public']);
 
         $this->assertSame(0, $exitCode);
+        $this->assertFileExists($projectDir.'/public/bundles/custom/custom.css');
         $this->assertFileExists($projectDir.'/public/bundles/modern/modern.css');
         $this->assertFileExists($projectDir.'/public/bundles/legacy/legacy.css');
 
@@ -48,6 +49,9 @@ class BundlePathsTest extends AbstractWebTestCase
 
         $this->assertSame([$bundlesMetadata['ModernBundle']['path'].'/templates'], $twig->getLoader()->getPaths('Modern'));
         $this->assertSame("OK\n", $twig->render('@Modern/index.html.twig'));
+
+        $this->assertSame([$bundlesMetadata['CustomBundle']['templates_path']], $twig->getLoader()->getPaths('Custom'));
+        $this->assertSame("OK\n", $twig->render('@Custom/index.html.twig'));
     }
 
     public function testBundleTranslationsDir()
@@ -57,6 +61,7 @@ class BundlePathsTest extends AbstractWebTestCase
 
         $this->assertSame('OK', $translator->trans('ok_label', [], 'legacy'));
         $this->assertSame('OK', $translator->trans('ok_label', [], 'modern'));
+        $this->assertSame('OK', $translator->trans('ok_label', [], 'custom'));
     }
 
     public function testBundleValidationConfigDir()

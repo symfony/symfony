@@ -1,0 +1,5 @@
+Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\CustomBundle\src\Entity\CustomPerson:
+    properties:
+        age:
+            - GreaterThan:
+                  value: 18

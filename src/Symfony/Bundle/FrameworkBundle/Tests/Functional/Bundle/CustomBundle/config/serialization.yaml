@@ -1,0 +1,4 @@
+Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\CustomBundle\src\Entity\CustomPerson:
+    attributes:
+        name:
+            serialized_name: 'full_name'

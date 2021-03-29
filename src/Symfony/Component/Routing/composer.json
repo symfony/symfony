@@ -38,8 +38,7 @@
         "symfony/http-foundation": "For using a Symfony Request object",
         "symfony/config": "For using the all-in-one router or any loader",
         "symfony/yaml": "For using the YAML loader",
-        "symfony/expression-language": "For using expression matching",
-        "doctrine/annotations": "For using the annotation loader"
+        "symfony/expression-language": "For using expression matching"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Routing\\": "" },

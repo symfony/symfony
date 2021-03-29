@@ -284,6 +284,7 @@ class ConnectionTest extends TestCase
             ->willReturn($queryBuilder);
         $queryBuilder
             ->method('where')
+            ->with('m.id = ? and m.queue_name = ?')
             ->willReturn($queryBuilder);
         $queryBuilder
             ->method('getSQL')

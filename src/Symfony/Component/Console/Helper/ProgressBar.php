@@ -514,7 +514,7 @@ final class ProgressBar
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
                 if ($completeBars < $bar->getBarWidth()) {
                     $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlenWithoutDecoration($output->getFormatter(), $bar->getProgressCharacter());
-                    $display .= $bar->getProgressCharacter().str_repeat($bar->getEmptyBarCharacter(), max($emptyBars,0));
+                    $display .= $bar->getProgressCharacter().str_repeat($bar->getEmptyBarCharacter(), max($emptyBars, 0));
                 }
 
                 return $display;

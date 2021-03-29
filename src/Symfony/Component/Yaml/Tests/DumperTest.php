@@ -553,6 +553,21 @@ YAML;
         $this->assertSame("- \"a\\r\\nb\\nc\"\n", $this->dumper->dump(["a\r\nb\nc"], 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
+    public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingTaggedValueAsMultiLineLiteralBlock()
+    {
+        $expected = <<<'YAML'
+parent:
+    foo: !my-tag "bar\n\rbaz: qux"
+
+YAML;
+
+        $this->assertSame($expected, $this->dumper->dump([
+            'parent' => [
+                'foo' => new TaggedValue('my-tag', "bar\n\rbaz: qux"),
+            ],
+        ], 4, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock()
     {
         $expected = <<<'YAML'

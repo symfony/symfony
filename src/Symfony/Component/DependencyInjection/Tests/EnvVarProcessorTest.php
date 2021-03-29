@@ -610,4 +610,26 @@ CSV;
             return null;
         });
     }
+
+    /**
+     * @dataProvider provideGetEnvUrlPath
+     */
+    public function testGetEnvUrlPath(?string $expected, string $url)
+    {
+        $this->assertSame($expected, (new EnvVarProcessor(new Container()))->getEnv('url', 'foo', static function () use ($url): string {
+            return $url;
+        })['path']);
+    }
+
+    public function provideGetEnvUrlPath()
+    {
+        return [
+            [null, 'https://symfony.com'],
+            [null, 'https://symfony.com/'],
+            ['/', 'https://symfony.com//'],
+            ['blog', 'https://symfony.com/blog'],
+            ['blog/', 'https://symfony.com/blog/'],
+            ['blog//', 'https://symfony.com/blog//'],
+        ];
+    }
 }

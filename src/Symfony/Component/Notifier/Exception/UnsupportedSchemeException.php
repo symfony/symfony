@@ -72,6 +72,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',
         ],
+        'fakesms' => [
+            'class' => Bridge\FakeSms\FakeSmsTransportFactory::class,
+            'package' => 'symfony/fake-sms-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',

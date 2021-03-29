@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * Added support for the new `serialize` filter (from Twig Bridge)
+* Add templates and translations paths definitions to `Symfony\Component\HttpKernel\Bundle\Bundle`
 
 5.2.0
 -----

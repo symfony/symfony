@@ -35,7 +35,12 @@ class LoggerPass implements CompilerPassInterface
             return;
         }
 
-        $container->register('logger', Logger::class)
+        $definition = $container->register('logger', Logger::class)
             ->setPublic(false);
+
+        if ('test' === $container->getParameter('kernel.environment') && class_exists(TestLogger::class)) {
+            $definition->setClass(TestLogger::class)
+                ->addTag('kernel.reset', ['method' => 'reset']);
+        }
     }
 }

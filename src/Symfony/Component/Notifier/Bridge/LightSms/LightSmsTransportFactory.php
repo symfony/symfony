@@ -34,12 +34,12 @@ final class LightSmsTransportFactory extends AbstractTransportFactory
 
         $login = $this->getUser($dsn);
         $token = $this->getPassword($dsn);
-        $phone = $dsn->getRequiredOption('phone');
+        $from = $dsn->getRequiredOption('from');
 
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new LightSmsTransport($login, $token, $phone, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new LightSmsTransport($login, $token, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LightSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'www.lightsms.com';
+    protected const HOST = 'lightsms.com';
 
     private $login;
     private $password;
@@ -75,11 +75,11 @@ final class LightSmsTransport extends AbstractTransport
         '39' => 'Phone number does not exist in this database',
     ];
 
-    public function __construct(string $login, string $password, string $phone, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->login = $login;
         $this->password = $password;
-        $this->phone = $phone;
+        $this->from = $from;
 
         parent::__construct($client, $dispatcher);
     }
@@ -102,19 +102,16 @@ final class LightSmsTransport extends AbstractTransport
 
         $timestamp = time();
 
-        $signature = $this->generateSignature([
-            'message' => $message,
-            'timestamp' => $timestamp,
-        ]);
+        $signature = $this->generateSignature($message, $timestamp);
 
         $endpoint = sprintf(
-            'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
+            'https://www.%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
             $this->getEndpoint(),
             $this->login,
             $signature,
             $this->escapePhoneNumber($message->getPhone()),
             $this->escapeSubject($message->getSubject()),
-            $this->phone,
+            $this->from,
             $timestamp
         );
 
@@ -143,14 +140,14 @@ final class LightSmsTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    private function generateSignature(array $params): string
+    private function generateSignature(SmsMessage $message, string $timestamp): string
     {
         $params = [
-            'timestamp' => $params['timestamp'],
+            'timestamp' => $timestamp,
             'login' => $this->login,
-            'phone' => $this->escapePhoneNumber($params['message']->getPhone()),
-            'sender' => $this->phone,
-            'text' => $this->escapeSubject($params['message']->getSubject()),
+            'phone' => $this->escapePhoneNumber($message->getPhone()),
+            'sender' => $this->from,
+            'text' => $this->escapeSubject($message->getSubject()),
         ];
 
         ksort($params);

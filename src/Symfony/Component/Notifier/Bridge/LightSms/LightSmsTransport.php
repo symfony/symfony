@@ -99,7 +99,10 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $signature = $this->generateSignature($message);
+        $signature = $this->generateSignature([
+            'message' => $message,
+            'timestamp' => time(),
+        ]);
 
         $endpoint = sprintf(
             'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
@@ -121,7 +124,7 @@ final class LightSmsTransport extends AbstractTransport
         }
 
         $phone = preg_replace("/[^\d]/", '', $message->getPhone());
-        if (32 == $content[$phone]['error']) {
+        if (32 === $content[$phone]['error']) {
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
 
@@ -133,14 +136,14 @@ final class LightSmsTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    private function generateSignature(SmsMessage $message): string
+    private function generateSignature(array $params): string
     {
         $params = [
-            'timestamp' => time(),
+            'timestamp' => $params['timestamp'],
             'login' => $this->login,
-            'phone' => str_replace('+', '', $message->getPhone()),
+            'phone' => str_replace('+', '', $params['message']->getPhone()),
             'sender' => $this->phone,
-            'text' => $message->getSubject(),
+            'text' => $params['message']->getSubject(),
         ];
 
         ksort($params);

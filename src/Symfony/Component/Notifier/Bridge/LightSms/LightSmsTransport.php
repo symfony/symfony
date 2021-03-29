@@ -123,7 +123,7 @@ final class LightSmsTransport extends AbstractTransport
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
 
-        $phone = preg_replace("/[^\d]/", '', $message->getPhone());
+        $phone = $this->escapePhoneNumber($message->getPhone());
         if (32 === $content[$phone]['error']) {
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
@@ -159,6 +159,6 @@ final class LightSmsTransport extends AbstractTransport
 
     private function escapePhoneNumber($phoneNumber): string
     {
-        return str_replace('+', '', $phoneNumber);
+        return preg_replace("/[^\d]/", '', $phoneNumber);
     }
 }

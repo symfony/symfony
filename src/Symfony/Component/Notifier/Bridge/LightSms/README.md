@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-LIGHTSMS_DSN=lightsms://LOGIN:TOKEN@default?phone=PHONE
+LIGHTSMS_DSN=lightsms://LOGIN:TOKEN@default?from=PHONE
 ```
 
 where:

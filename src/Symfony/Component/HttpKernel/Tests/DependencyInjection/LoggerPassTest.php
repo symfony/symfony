@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
+use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -46,8 +47,11 @@ class LoggerPassTest extends TestCase
     /**
      * @dataProvider providesEnvironments
      */
-    public function testRegisterLogger(string $environment, string $expectedClass)
+    public function testRegisterLogger(string $environment, string $expectedClass, bool $classExists = true)
     {
+        ClassExistsMock::register(LoggerPass::class);
+        ClassExistsMock::withMockedClasses([TestLogger::class => $classExists]);
+
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container->setParameter('kernel.environment', $environment);
@@ -63,5 +67,6 @@ class LoggerPassTest extends TestCase
     {
         yield 'Dev environment' => ['dev', Logger::class];
         yield 'Test environment' => ['test', TestLogger::class];
+        yield 'Test environment, no TestLogger' => ['test', Logger::class, false];
     }
 }

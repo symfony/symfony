@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
  * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
  * Add `#[AsController]` attribute for declaring standalone controllers on PHP 8
+ * When available, use `Symfony\Component\HttpKernel\Log\Logger` as logger in test environment.
 
 5.2.0
 -----

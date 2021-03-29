@@ -166,6 +166,6 @@ final class LightSmsTransport extends AbstractTransport
 
     private function escapePhoneNumber($phoneNumber): string
     {
-        return preg_replace("/[^\d]/", '', $phoneNumber);
+        return str_replace('+', '00', $phoneNumber);
     }
 }

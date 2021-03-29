@@ -392,7 +392,7 @@ class FrameworkExtension extends Extension
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
         $this->registerValidationConfiguration($config['validation'], $container, $loader, $propertyInfoEnabled);
-        $this->registerHttpCacheConfiguration($config['http_cache'], $container);
+        $this->registerHttpCacheConfiguration($config['http_cache'], $container, $config['http_method_override']);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
@@ -580,7 +580,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container)
+    private function registerHttpCacheConfiguration(array $config, ContainerBuilder $container, bool $httpMethodOverride)
     {
         $options = $config;
         unset($options['enabled']);
@@ -592,6 +592,13 @@ class FrameworkExtension extends Extension
         $container->getDefinition('http_cache')
             ->setPublic($config['enabled'])
             ->replaceArgument(3, $options);
+
+        if ($httpMethodOverride) {
+            $container->getDefinition('http_cache')
+                  ->addArgument((new Definition('void'))
+                      ->setFactory([Request::class, 'enableHttpMethodParameterOverride'])
+                  );
+        }
     }
 
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

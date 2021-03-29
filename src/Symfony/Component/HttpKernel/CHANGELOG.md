@@ -12,6 +12,7 @@ CHANGELOG
  * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
  * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
  * Add `#[AsController]` attribute for declaring standalone controllers on PHP 8
+ * Add templates and translations paths definitions to `Symfony\Component\HttpKernel\Bundle\Bundle`
 
 5.2.0
 -----

@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\NullableOptionalConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
@@ -120,7 +121,31 @@ class AbstractNormalizerTest extends TestCase
     public function testObjectWithNullableConstructorArgument()
     {
         $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize(['foo' => null], NullableOptionalConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableConstructorArgumentWithoutInput()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize([], NullableOptionalConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableNonOptionalConstructorArgument()
+    {
+        $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInput()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
 
         $this->assertNull($dummy->getFoo());
     }

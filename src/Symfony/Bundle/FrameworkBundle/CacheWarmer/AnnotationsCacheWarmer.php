@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
 /**
@@ -74,6 +75,14 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         }
 
         return true;
+    }
+
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    {
+        // make sure we don't cache null values
+        $values = array_filter($values, function ($val) { return null !== $val; });
+
+        parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
     }
 
     private function readAllComponents(Reader $reader, string $class)

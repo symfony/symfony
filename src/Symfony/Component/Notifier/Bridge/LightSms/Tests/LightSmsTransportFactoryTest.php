@@ -28,7 +28,7 @@ final class LightSmsTransportFactoryTest extends TransportFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'lightsms://www.host.test/external/get/send.php?from=0611223344',
+            'lightsms://host.test/external/get/send.php?from=0611223344',
             'lightsms://login:token@host.test?from=0611223344',
         ];
     }

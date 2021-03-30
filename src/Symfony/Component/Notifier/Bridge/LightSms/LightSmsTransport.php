@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LightSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'lightsms.com';
+    protected const HOST = 'www.lightsms.com';
 
     private $login;
     private $password;
@@ -86,7 +86,7 @@ final class LightSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('lightsms://www.%s/external/get/send.php?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('lightsms://%s/external/get/send.php?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool

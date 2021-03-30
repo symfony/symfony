@@ -172,7 +172,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $t = \DateTime::createFromFormat('U', time() - 3600);
         $this->request('GET', '/', ['HTTP_IF_NONE_MATCH' => '12345', 'HTTP_IF_MODIFIED_SINCE' => $t->format(\DATE_RFC2822)]);
         $this->assertHttpKernelIsCalled();
-        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertEquals(304, $this->response->getStatusCode());
 
         // only Last-Modified matches
         $this->request('GET', '/', ['HTTP_IF_NONE_MATCH' => '1234', 'HTTP_IF_MODIFIED_SINCE' => $time->format(\DATE_RFC2822)]);

@@ -86,7 +86,7 @@ final class LightSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('lightsms://%s?phone=%s', $this->getEndpoint(), $this->from);
+        return sprintf('lightsms://www.%sexternal/get/send.php?phone=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool

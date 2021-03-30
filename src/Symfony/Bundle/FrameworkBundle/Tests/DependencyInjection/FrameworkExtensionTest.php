@@ -50,6 +50,7 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Security;
@@ -182,6 +183,8 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testFragmentsAndHinclude()
     {
         $container = $this->createContainerFromFile('fragments_and_hinclude');
+        $this->assertTrue($container->has('fragment.uri_generator'));
+        $this->assertTrue($container->hasAlias(FragmentUriGeneratorInterface::class));
         $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'));
     }

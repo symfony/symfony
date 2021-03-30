@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand;
+use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
+use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
@@ -402,7 +404,7 @@ class MessengerPassTest extends TestCase
     public function testItThrowsAnExceptionOnUnknownBus()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid configuration returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerOnUndefinedBus::getHandledMessages()" for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage": bus "some_undefined_bus" does not exist.');
+        $this->expectExceptionMessage('Invalid configuration "returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\HandlerOnUndefinedBus::getHandledMessages()"" for message "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage": bus "some_undefined_bus" does not exist.');
         $container = $this->getContainerBuilder();
         $container
             ->register(HandlerOnUndefinedBus::class, HandlerOnUndefinedBus::class)
@@ -415,7 +417,7 @@ class MessengerPassTest extends TestCase
     public function testUndefinedMessageClassForHandler()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler::__invoke()" not found.');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" "used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandler::__invoke()"" not found.');
         $container = $this->getContainerBuilder();
         $container
             ->register(UndefinedMessageHandler::class, UndefinedMessageHandler::class)
@@ -428,7 +430,7 @@ class MessengerPassTest extends TestCase
     public function testUndefinedMessageClassForHandlerImplementingMessageHandlerInterface()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface::__invoke()" not found.');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" "used as argument type in method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaHandlerInterface::__invoke()"" not found.');
         $container = $this->getContainerBuilder();
         $container
             ->register(UndefinedMessageHandlerViaHandlerInterface::class, UndefinedMessageHandlerViaHandlerInterface::class)
@@ -441,7 +443,7 @@ class MessengerPassTest extends TestCase
     public function testUndefinedMessageClassForHandlerImplementingMessageSubscriberInterface()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface::getHandledMessages()" not found.');
+        $this->expectExceptionMessage('Invalid handler service "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface": class or interface "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessage" "returned by method "Symfony\Component\Messenger\Tests\DependencyInjection\UndefinedMessageHandlerViaSubscriberInterface::getHandledMessages()"" not found.');
         $container = $this->getContainerBuilder();
         $container
             ->register(UndefinedMessageHandlerViaSubscriberInterface::class, UndefinedMessageHandlerViaSubscriberInterface::class)
@@ -692,6 +694,34 @@ class MessengerPassTest extends TestCase
 
             $this->assertEquals($options[$index] ?? [], $definitionArguments[1]);
         }
+    }
+
+    public function testFailedCommandsRegisteredWithServiceLocatorArgumentReplaced()
+    {
+        $globalReceiverName = 'global_failure_transport';
+        $container = $this->getContainerBuilder($messageBusId = 'message_bus');
+
+        $container->register('console.command.messenger_failed_messages_retry', FailedMessagesRetryCommand::class)
+            ->setArgument(0, $globalReceiverName)
+            ->setArgument(1, null)
+            ->setArgument(2, new Reference($messageBusId));
+        $container->register('console.command.messenger_failed_messages_show', FailedMessagesShowCommand::class)
+            ->setArgument(0, $globalReceiverName)
+            ->setArgument(1, null);
+        $container->register('console.command.messenger_failed_messages_remove', FailedMessagesRetryCommand::class)
+            ->setArgument(0, $globalReceiverName)
+            ->setArgument(1, null);
+
+        (new MessengerPass())->process($container);
+
+        $retryDefinition = $container->getDefinition('console.command.messenger_failed_messages_retry');
+        $this->assertNotNull($retryDefinition->getArgument(1));
+
+        $showDefinition = $container->getDefinition('console.command.messenger_failed_messages_show');
+        $this->assertNotNull($showDefinition->getArgument(1));
+
+        $removeDefinition = $container->getDefinition('console.command.messenger_failed_messages_remove');
+        $this->assertNotNull($removeDefinition->getArgument(1));
     }
 }
 

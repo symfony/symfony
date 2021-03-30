@@ -13,9 +13,12 @@ namespace Symfony\Component\Messenger\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -35,20 +38,36 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 abstract class AbstractFailedMessagesCommand extends Command
 {
-    private $receiverName;
-    private $receiver;
+    private $globalFailureReceiverName;
+    protected $failureTransports;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver)
+    public function __construct(?string $globalFailureReceiverName, $failureTransports)
     {
-        $this->receiverName = $receiverName;
-        $this->receiver = $receiver;
+        $this->failureTransports = $failureTransports;
+        if (!$failureTransports instanceof ServiceLocator) {
+            trigger_deprecation('symfony/messenger', '5.3', 'Passing a non-scalar value as 2nd argument to "%s()" is deprecated, pass a ServiceLocator instead.', __METHOD__);
+
+            if (null === $globalFailureReceiverName) {
+                throw new InvalidArgumentException(sprintf('The argument "globalFailureReceiver" from method "%s()" must be not null if 2nd argument is not a ServiceLocator.', __METHOD__));
+            }
+
+            $this->failureTransports = new ServiceLocator([$globalFailureReceiverName => function () use ($failureTransports) { return $failureTransports; },]);
+        }
+        $this->globalFailureReceiverName = $globalFailureReceiverName;
 
         parent::__construct();
     }
 
     protected function getReceiverName(): string
     {
-        return $this->receiverName;
+        trigger_deprecation('symfony/messenger', '5.3', 'The method "%s()" is deprecated, use getGlobalFailureReceiverName() instead.', __METHOD__);
+
+        return $this->globalFailureReceiverName;
+    }
+
+    protected function getGlobalFailureReceiverName(): ?string
+    {
+        return $this->globalFailureReceiverName;
     }
 
     /**
@@ -153,9 +172,18 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function getReceiver(): ReceiverInterface
+    protected function getReceiver(/* string $name */): ReceiverInterface
     {
-        return $this->receiver;
+        if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have a new "string $name" argument in version 5.3, not defining it is deprecated since Symfony 5.2.', __METHOD__), \E_USER_DEPRECATED);
+        }
+
+        $name = \func_num_args() > 0 ? func_get_arg(0) : $this->globalFailureReceiverName;
+        if (!$this->failureTransports->has($name)) {
+            throw new InvalidArgumentException(sprintf('The failure transport with name "%s" was not found. Available transports are: "%s".', $name, implode(', ', array_keys($this->failureTransports->getProvidedServices()))));
+        }
+
+        return $this->failureTransports->get($name);
     }
 
     protected function getLastRedeliveryStampWithException(Envelope $envelope): ?RedeliveryStamp
@@ -199,5 +227,28 @@ abstract class AbstractFailedMessagesCommand extends Command
         }]);
 
         return $cloner;
+    }
+
+    protected function printWarningAvailableFailureTransports(SymfonyStyle $io, ?string $failureTransportName): void
+    {
+        $failureTransports = array_keys($this->failureTransports->getProvidedServices());
+        $failureTransportsCount = \count($failureTransports);
+        if ($failureTransportsCount > 1) {
+            $io->writeln([
+                sprintf('> Loading messages from the <comment>global</comment> failure transport <comment>%s</comment>.', $failureTransportName),
+                '> To use a different failure transport, pass <comment>--transport=</comment>.',
+                sprintf('> Available failure transports are: <comment>%s</comment>', implode(', ', $failureTransports)),
+                "\n",
+            ]);
+        }
+    }
+
+    protected function interactiveChooseFailureTransport(SymfonyStyle $io)
+    {
+        $failedTransports = array_keys($this->failureTransports->getProvidedServices());
+        $question = new ChoiceQuestion('Select failed transport:', $failedTransports, 0);
+        $question->setMultiselect(false);
+
+        return $io->askQuestion($question);
     }
 }

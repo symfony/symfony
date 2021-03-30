@@ -32,6 +32,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -710,12 +711,92 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
     }
 
+    public function testMessengerMultipleFailureTransports()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports');
+
+        $failureTransport1Definition = $container->getDefinition('messenger.transport.failure_transport_1');
+        $failureTransport1Tags = $failureTransport1Definition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'failure_transport_1',
+            'is_failure_transport' => true,
+        ], $failureTransport1Tags);
+
+        $failureTransport3Definition = $container->getDefinition('messenger.transport.failure_transport_3');
+        $failureTransport3Tags = $failureTransport3Definition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'failure_transport_3',
+            'is_failure_transport' => true,
+        ], $failureTransport3Tags);
+
+        // transport 2 exists but does not appear in the mapping
+        $this->assertFalse($container->hasDefinition('messenger.transport.failure_transport_2'));
+
+        $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
+        $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
+        $expectedTransportsByFailureTransports = [
+            'transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'transport_3' => new Reference('messenger.transport.failure_transport_3'),
+        ];
+
+        $failureTransportsReferences = array_map(function (ServiceClosureArgument $serviceClosureArgument) {
+            $values = $serviceClosureArgument->getValues();
+
+            return array_shift($values);
+        }, $failureTransports);
+        $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+    }
+
+    public function testMessengerMultipleFailureTransportsWithGlobalFailureTransport()
+    {
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global');
+
+        $this->assertEquals('messenger.transport.failure_transport_global', (string) $container->getAlias('messenger.failure_transports.default'));
+
+        $failureTransport1Definition = $container->getDefinition('messenger.transport.failure_transport_1');
+        $failureTransport1Tags = $failureTransport1Definition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'failure_transport_1',
+            'is_failure_transport' => true,
+        ], $failureTransport1Tags);
+
+        $failureTransport3Definition = $container->getDefinition('messenger.transport.failure_transport_3');
+        $failureTransport3Tags = $failureTransport3Definition->getTag('messenger.receiver')[0];
+
+        $this->assertEquals([
+            'alias' => 'failure_transport_3',
+            'is_failure_transport' => true,
+        ], $failureTransport3Tags);
+
+        $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
+        $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
+        $expectedTransportsByFailureTransports = [
+            'failure_transport_1' => new Reference('messenger.transport.failure_transport_global'),
+            'failure_transport_3' => new Reference('messenger.transport.failure_transport_global'),
+            'failure_transport_global' => new Reference('messenger.transport.failure_transport_global'),
+            'transport_1' => new Reference('messenger.transport.failure_transport_1'),
+            'transport_2' => new Reference('messenger.transport.failure_transport_global'),
+            'transport_3' => new Reference('messenger.transport.failure_transport_3'),
+        ];
+
+        $failureTransportsReferences = array_map(function (ServiceClosureArgument $serviceClosureArgument) {
+            $values = $serviceClosureArgument->getValues();
+
+            return array_shift($values);
+        }, $failureTransports);
+        $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+    }
+
     public function testMessengerTransports()
     {
         $container = $this->createContainerFromFile('messenger_transports');
         $this->assertTrue($container->hasDefinition('messenger.transport.default'));
         $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
-        $this->assertEquals([['alias' => 'default']], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $this->assertEquals([
+            ['alias' => 'default', 'is_failure_transport' => false], ], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
         $transportArguments = $container->getDefinition('messenger.transport.default')->getArguments();
         $this->assertEquals(new Reference('messenger.default_serializer'), $transportArguments[2]);
 
@@ -756,7 +837,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
         $this->assertSame(100, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(3));
 
-        $this->assertEquals(new Reference('messenger.transport.failed'), $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0));
+        $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
+        $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);
+        $expectedTransportsByFailureTransports = [
+            'beanstalkd' => new Reference('messenger.transport.failed'),
+            'customised' => new Reference('messenger.transport.failed'),
+            'default' => new Reference('messenger.transport.failed'),
+            'failed' => new Reference('messenger.transport.failed'),
+            'redis' => new Reference('messenger.transport.failed'),
+        ];
+
+        $failureTransportsReferences = array_map(function (ServiceClosureArgument $serviceClosureArgument) {
+            $values = $serviceClosureArgument->getValues();
+
+            return array_shift($values);
+        }, $failureTransports);
+        $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
     }
 
     public function testMessengerRouting()

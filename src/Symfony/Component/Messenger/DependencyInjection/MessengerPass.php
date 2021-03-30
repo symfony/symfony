@@ -125,7 +125,7 @@ class MessengerPass implements CompilerPassInterface
                         if (!\in_array($options['bus'], $busIds)) {
                             $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                            throw new RuntimeException(sprintf('Invalid configuration %s for message "%s": bus "%s" does not exist.', $messageLocation, $message, $options['bus']));
+                            throw new RuntimeException(sprintf('Invalid configuration "%s" for message "%s": bus "%s" does not exist.', $messageLocation, $message, $options['bus']));
                         }
 
                         $buses = [$options['bus']];
@@ -134,7 +134,7 @@ class MessengerPass implements CompilerPassInterface
                     if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                         $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" %s not found.', $serviceId, $message, $messageLocation));
+                        throw new RuntimeException(sprintf('Invalid handler service "%s": class or interface "%s" "%s" not found.', $serviceId, $message, $messageLocation));
                     }
 
                     if (!$r->hasMethod($method)) {
@@ -255,6 +255,14 @@ class MessengerPass implements CompilerPassInterface
     private function registerReceivers(ContainerBuilder $container, array $busIds)
     {
         $receiverMapping = [];
+        $failureTransportsMap = [];
+        if ($container->hasDefinition('console.command.messenger_failed_messages_retry')) {
+            $commandDefinition = $container->getDefinition('console.command.messenger_failed_messages_retry');
+            $globalReceiverName = $commandDefinition->getArgument(0);
+            if (null !== $globalReceiverName) {
+                $failureTransportsMap[$commandDefinition->getArgument(0)] = new Reference('messenger.failure_transports.default');
+            }
+        }
 
         foreach ($container->findTaggedServiceIds($this->receiverTag) as $id => $tags) {
             $receiverClass = $this->getServiceClass($container, $id);
@@ -267,6 +275,9 @@ class MessengerPass implements CompilerPassInterface
             foreach ($tags as $tag) {
                 if (isset($tag['alias'])) {
                     $receiverMapping[$tag['alias']] = $receiverMapping[$id];
+                    if ($tag['is_failure_transport'] ?? false) {
+                        $failureTransportsMap[$tag['alias']] = $receiverMapping[$id];
+                    }
                 }
             }
         }
@@ -303,6 +314,8 @@ class MessengerPass implements CompilerPassInterface
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
 
+        $failureTransportsLocator = ServiceLocatorTagPass::register($container, $failureTransportsMap);
+
         $failedCommandIds = [
             'console.command.messenger_failed_messages_retry',
             'console.command.messenger_failed_messages_show',
@@ -311,7 +324,7 @@ class MessengerPass implements CompilerPassInterface
         foreach ($failedCommandIds as $failedCommandId) {
             if ($container->hasDefinition($failedCommandId)) {
                 $definition = $container->getDefinition($failedCommandId);
-                $definition->replaceArgument(1, $receiverMapping[$definition->getArgument(0)]);
+                $definition->replaceArgument(1, $failureTransportsLocator);
             }
         }
     }

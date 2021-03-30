@@ -18,6 +18,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkDetails;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
@@ -29,12 +30,13 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $user = $this->createMock(UserInterface::class);
         $linkDetails = new LoginLinkDetails('http://example.com', new \DateTimeImmutable());
         $request = Request::create('http://example.com/verify');
+        $requestContext = (new RequestContext())->fromRequest($request);
 
         $firewallMap = $this->createFirewallMap('main_firewall');
         $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
         $loginLinkHandler->expects($this->once())
             ->method('createLoginLink')
-            ->with($user, $request)
+            ->with($user, $requestContext)
             ->willReturn($linkDetails);
         $loginLinkHandler->expects($this->once())
             ->method('consumeLoginLink')
@@ -47,7 +49,7 @@ class FirewallAwareLoginLinkHandlerTest extends TestCase
         $requestStack->push($request);
 
         $linker = new FirewallAwareLoginLinkHandler($firewallMap, $locator, $requestStack);
-        $actualLinkDetails = $linker->createLoginLink($user, $request);
+        $actualLinkDetails = $linker->createLoginLink($user, $requestContext);
         $this->assertSame($linkDetails, $actualLinkDetails);
 
         $actualUser = $linker->consumeLoginLink($request);

@@ -49,7 +49,7 @@ class LoginLinkHandlerTest extends TestCase
      * @dataProvider provideCreateLoginLinkData
      * @group time-sensitive
      */
-    public function testCreateLoginLink($user, array $extraProperties, Request $request = null)
+    public function testCreateLoginLink($user, array $extraProperties, RequestContext $requestContext = null)
     {
         $this->router->expects($this->once())
             ->method('generate')
@@ -66,13 +66,13 @@ class LoginLinkHandlerTest extends TestCase
             )
             ->willReturn('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000');
 
-        if ($request) {
+        if ($requestContext) {
             $this->router->expects($this->once())
                 ->method('getContext')
                 ->willReturn(new RequestContext());
         }
 
-        $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
+        $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $requestContext);
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1601235000', $loginLink->getUrl());
     }
 
@@ -81,7 +81,7 @@ class LoginLinkHandlerTest extends TestCase
         yield [
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
             ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
-            Request::create('https://example.com'),
+            (new RequestContext())->fromRequest(Request::create('https://example.com')),
         ];
 
         yield [

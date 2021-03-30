@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\LoginLink;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -25,7 +26,7 @@ interface LoginLinkHandlerInterface
     /**
      * Generate a link that can be used to authenticate as the given user.
      */
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails;
+    public function createLoginLink(UserInterface $user, RequestContext $requestContext = null): LoginLinkDetails;
 
     /**
      * Validates if this request contains a login link and returns the associated User.

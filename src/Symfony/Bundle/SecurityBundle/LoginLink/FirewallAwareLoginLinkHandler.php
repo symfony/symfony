@@ -15,6 +15,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkDetails;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
@@ -37,9 +38,9 @@ class FirewallAwareLoginLinkHandler implements LoginLinkHandlerInterface
         $this->requestStack = $requestStack;
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, RequestContext $requestContext = null): LoginLinkDetails
     {
-        return $this->getLoginLinkHandler()->createLoginLink($user, $request);
+        return $this->getLoginLinkHandler()->createLoginLink($user, $requestContext);
     }
 
     public function consumeLoginLink(Request $request): UserInterface

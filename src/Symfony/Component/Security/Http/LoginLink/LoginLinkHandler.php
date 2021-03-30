@@ -50,7 +50,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         $this->expiredStorage = $expiredStorage;
     }
 
-    public function createLoginLink(UserInterface $user, Request $request = null): LoginLinkDetails
+    public function createLoginLink(UserInterface $user, RequestContext $requestContext = null): LoginLinkDetails
     {
         $expiresAt = new \DateTimeImmutable(sprintf('+%d seconds', $this->options['lifetime']));
 
@@ -62,9 +62,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             'hash' => $this->computeSignatureHash($user, $expires),
         ];
 
-        if ($request) {
+        if ($requestContext) {
             $currentRequestContext = $this->urlGenerator->getContext();
-            $this->urlGenerator->setContext((new RequestContext())->fromRequest($request));
+            $this->urlGenerator->setContext($requestContext);
         }
 
         try {
@@ -74,7 +74,7 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
         } finally {
-            if ($request) {
+            if ($requestContext) {
                 $this->urlGenerator->setContext($currentRequestContext);
             }
         }

@@ -123,7 +123,11 @@ final class LightSmsTransport extends AbstractTransport
 
         $content = $response->toArray(false);
 
-        if (isset($content['error'])) {
+        if (isset($content[''])) {
+            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['']['error']], $response);
+        }
+
+        if (isset($content['error']) || isset($content[''])) {
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
         }
 

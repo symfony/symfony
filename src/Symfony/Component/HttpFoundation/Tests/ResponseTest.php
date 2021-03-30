@@ -221,7 +221,6 @@ class ResponseTest extends ResponseTestCase
         $weakEtag = 'W/randomly_generated_etag';
 
         $request = new Request();
-        #$request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
         $request->headers->set('if_none_match', $etag);
         $response = new Response();
 
@@ -240,7 +239,6 @@ class ResponseTest extends ResponseTestCase
         $response->headers->set('ETag', $weakEtag);
         $this->assertTrue($response->isNotModified($request));
     }
-
 
     public function testIsNotModifiedLastModifiedAndEtag()
     {

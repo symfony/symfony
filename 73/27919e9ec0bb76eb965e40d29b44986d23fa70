@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by monteiro at 2020-10-07T16:59:30Z
+
+@weaverryan i have removed some of the tests because of merging conflicts.. since this is still being changed a lot... after we agree on an implementation it’s easy to fix them.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2020-10-15T18:27:20Z
+
+@weaverryan I just uploaded a working version of your proposal. Feel free to review, before I do the tests. Thanks!
+
+---------------------------------------------------------------------------
+
+by monteiro at 2020-12-31T12:35:44Z
+
+Waiting for Ryan to help me.
+He has been reviewing my PR since the beginning.
+
+Let me talk with him, to see what can we do.
+
+Thanks for pinging.
+
+On Thu, Dec 31, 2020 at 9:04 AM Kamil Ścisłowski <notifications@github.com>
+wrote:
+
+> How long it will take to be merged into master? @monteiro
+> <https://github.com/monteiro> are you still working on it? :)
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/38468#issuecomment-752896311>,
+> or unsubscribe
+> <https://github.com/notifications/unsubscribe-auth/AAASFW36LHEU3O7E3DDWKWTSXQ5ANANCNFSM4SHURUVA>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by escees at 2020-12-31T12:43:39Z
+
+Sure, I've deleted previous comment because I wasn't sure if it's appropriate place to ask :) But I appreciate for answering. For me and I see that not only for me it's really important feature that is missing from core.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-01-01T13:54:41Z
+
+@escees no worries. I already talked with @weaverryan to help me during this 2021 to merge this missing feature.
+
+---------------------------------------------------------------------------
+
+by rkazaniszyn at 2021-03-12T11:16:59Z
+
+Fingers crossed for this to be completed and merged :)
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-03-22T11:43:34Z
+
+@weaverryan I have done all changes, including fixing all the tests:
+- Most code is from the "legacy" tests. I have added the annotation so we support both ways until the switch (moving from SenderInterface to a ServiceLocator) for the major version.
+- There is a psalm error:
+```
+Run ./vendor/bin/psalm.phar --output-format=github --no-progress
+Error: Class or interface Prophecy\Prophecy\ProphecySubjectInterface does not exist
+Error: Process completed with exit code 2.
+```
+which I don't know how to fix, related to that weird extra parameter code in https://github.com/symfony/symfony/pull/38468/files#diff-9213ec846d94497cc34a4b922373cb52e0d53015604427a4aec0661289c58ac8R177
+
+- Feel free to test! Now it's ready!
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-03-23T17:50:35Z
+
+Pending to fix the console command tests after adding the list of transports and the warning.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-03-30T14:14:05Z
+
+Thanks @chalasr. Already fixed with your suggestions.

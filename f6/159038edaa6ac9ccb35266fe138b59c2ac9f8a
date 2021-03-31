@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-25T07:34:13Z
+
+Could you elaborate why you want them to be not internal? What is your scenario where these methods are the only solution?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-25T08:16:56Z
+
+Sure,
+
+I followed the recommendation https://github.com/symfony/symfony/issues/40056#issuecomment-770936827 and implemented my own mailchimp mailer with more configuration options.
+It implied that I have some code similar with the official symfony/mailchimp-mailer.
+
+When I create the payload, it requires at least the same data than the one symfony is building in https://github.com/symfony/mailchimp-mailer/blob/a6c3fa9aeaf83ad79445c9e7c072e15288bea3c9/Transport/MandrillApiTransport.php#L73
+And in this method, two internals method are used by symfony
+https://github.com/symfony/mailchimp-mailer/blob/a6c3fa9aeaf83ad79445c9e7c072e15288bea3c9/Transport/MandrillApiTransport.php#L92-L99
+
+If I want to reproduce the same behavior, I don't have any other options to get the `Content-Disposition`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-25T09:23:38Z
+
+Thank you. I appreciate the context.
+
+I don't think this is a bug fix. It is a feature that we are making methods non-internal. Ie we should target 5.x.
+
+I'll wait for a review from someone with better understanding of the Mime component.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-25T10:28:32Z
+
+I agree, but I would go to merge this as a bugfix, because it just removes an annotation and opens sth instead of closing.
+
+👍 for a bugfix
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-25T10:56:13Z
+
+I consider this the same as making a private function public. Ie, we add a new function to the public API, hence a feature.
+
+But Im not sure how we usually do in scenarios like this.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-25T11:07:18Z
+
+The code in the 4.4 branch and the 5.x one for these internal methods are the same, so it won't hurt to merge it on 4.4.
+It can fix some static analysis issues, like psalm reporting the usage of an internal method.
+
+But I understand if you prefer to merge this on 5.x, I'll just ignore the error until the next version. Not a big deal.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-25T12:05:30Z
+
+friendly ping @nicolas-grekas for a decision 😍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-25T12:30:13Z
+
+That's a new feature for sure: it will deserve dedicated changlog line + tests + doc.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-03-25T15:49:59Z
+
+IIUC the intended public API is `has()` and `get()`
+
+edit: oh Headers has zero inheritance :+1: i agree this API is less boring.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-25T16:17:09Z
+
+For instance, the `setHeaderBody` method does not properly validate the value for `$type` before calling the method with the name built dynamically based on the type. That's not really suitable as a non-internal method (for an internal method, it can be considered our own responsibility to use it only with valid values for the type, so skipping validation).
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-25T16:48:18Z
+
+> For instance, the `setHeaderBody` method does not properly validate the value for `$type` before calling the method with the name built dynamically based on the type. That's not really suitable as a non-internal method (for an internal method, it can be considered our own responsibility to use it only with valid values for the type, so skipping validation).
+
+What about keeping the setter as internal, but not the getters ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-26T12:53:54Z
+
+PR was updated to only remove @internal on the getters.

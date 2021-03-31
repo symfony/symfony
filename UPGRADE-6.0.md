@@ -9,7 +9,7 @@ Asset
 DoctrineBridge
 --------------
 
- * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
+ * Remove `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
 
 Config
 ------

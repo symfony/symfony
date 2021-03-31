@@ -51,7 +51,7 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
     public function supportsProvider(): iterable
     {
         yield [true, 'fakesms+email://mailer?to=recipient@email.net&from=sender@email.net'];
-        yield [false, 'somethingElse://api_token@default?from=MyCompany'];
+        yield [false, 'somethingElse://mailer?to=recipient@email.net&from=sender@email.net'];
     }
 
     public function incompleteDsnProvider(): iterable
@@ -62,7 +62,6 @@ final class FakeSmsTransportFactoryTest extends TransportFactoryTestCase
 
     public function unsupportedSchemeProvider(): iterable
     {
-        yield ['foobar://api_token@default?from=MyCompany'];
-        yield ['foobar://api_token@default'];
+        yield ['somethingElse://mailer?to=recipient@email.net&from=sender@email.net'];
     }
 }

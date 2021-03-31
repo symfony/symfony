@@ -899,6 +899,21 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         );
     }
 
+    public function testUnicode()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, 0);
+        ProgressBar::setFormatDefinition('test', '%current%/%max% [%bar%] %percent:3s%% %message% Fruitcake marzipan toffee. Cupcake gummi bears tart dessert ice cream chupa chups cupcake chocolate bar sesame snaps. Croissant halvah cookie jujubes powder macaroon. Fruitcake bear claw bonbon jelly beans oat cake pie muffin Fruitcake marzipan toffee.');
+        $bar->setFormat('test');
+        $bar->setProgressCharacter('💧');
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertStringContainsString(
+            ' 0/10 [💧]   0%',
+            stream_get_contents($output->getStream())
+        );
+        $bar->finish();
+    }
+
     /**
      * @dataProvider provideFormat
      */

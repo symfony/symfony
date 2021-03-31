@@ -64,9 +64,6 @@ class Regex extends Constraint
      * Example: /^[a-z]+$/ would be converted to [a-z]+
      * However, if options are specified, it cannot be converted.
      *
-     * Pattern is also ignored if match=false since the pattern should
-     * then be reversed before application.
-     *
      * @see http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
      *
      * @return string|null

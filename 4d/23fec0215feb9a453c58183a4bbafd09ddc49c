@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T19:38:20Z
+
+Btw, doing `sleep(-3)` is a fatal error in PHP8. (https://3v4l.org/lK3uR)
+
+Are we sure this method is always called when there are time left to wait? Or should we do `max(0, ...)` just to be sure?

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\NodeInterface;
@@ -126,50 +127,52 @@ class XmlReferenceDumper
 
             // get attributes and elements
             foreach ($children as $child) {
-                if (!$child instanceof ArrayNode) {
-                    // get attributes
-
-                    // metadata
-                    $name = str_replace('_', '-', $child->getName());
-                    $value = '%%%%not_defined%%%%'; // use a string which isn't used in the normal world
-
-                    // comments
-                    $comments = [];
-                    if ($info = $child->getInfo()) {
-                        $comments[] = $info;
-                    }
-
-                    if ($example = $child->getExample()) {
-                        $comments[] = 'Example: '.$example;
-                    }
-
-                    if ($child->isRequired()) {
-                        $comments[] = 'Required';
-                    }
-
-                    if ($child->isDeprecated()) {
-                        $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $node->getPath()));
-                    }
-
-                    if ($child instanceof EnumNode) {
-                        $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
-                    }
-
-                    if (\count($comments)) {
-                        $rootAttributeComments[$name] = implode(";\n", $comments);
-                    }
-
-                    // default values
-                    if ($child->hasDefaultValue()) {
-                        $value = $child->getDefaultValue();
-                    }
-
-                    // append attribute
-                    $rootAttributes[$name] = $value;
-                } else {
+                if ($child instanceof ArrayNode) {
                     // get elements
                     $rootChildren[] = $child;
+
+                    continue;
                 }
+
+                // get attributes
+
+                // metadata
+                $name = str_replace('_', '-', $child->getName());
+                $value = '%%%%not_defined%%%%'; // use a string which isn't used in the normal world
+
+                // comments
+                $comments = [];
+                if ($child instanceof BaseNode && $info = $child->getInfo()) {
+                    $comments[] = $info;
+                }
+
+                if ($child instanceof BaseNode && $example = $child->getExample()) {
+                    $comments[] = 'Example: '.$example;
+                }
+
+                if ($child->isRequired()) {
+                    $comments[] = 'Required';
+                }
+
+                if ($child instanceof BaseNode && $child->isDeprecated()) {
+                    $comments[] = sprintf('Deprecated (%s)', $child->getDeprecationMessage($child->getName(), $node->getPath()));
+                }
+
+                if ($child instanceof EnumNode) {
+                    $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
+                }
+
+                if (\count($comments)) {
+                    $rootAttributeComments[$name] = implode(";\n", $comments);
+                }
+
+                // default values
+                if ($child->hasDefaultValue()) {
+                    $value = $child->getDefaultValue();
+                }
+
+                // append attribute
+                $rootAttributes[$name] = $value;
             }
         }
 

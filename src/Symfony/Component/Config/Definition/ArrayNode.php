@@ -68,7 +68,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Retrieves the children of this node.
      *
-     * @return array The children
+     * @return array<string, NodeInterface>
      */
     public function getChildren()
     {

@@ -55,6 +55,9 @@ class Passport implements UserPassportInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUser(): UserInterface
     {
         if (null === $this->user) {

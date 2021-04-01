@@ -101,19 +101,15 @@ final class LightSmsTransport extends AbstractTransport
         }
 
         $timestamp = time();
-
-        $signature = $this->generateSignature($message, $timestamp);
-
-        $endpoint = sprintf(
-            'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
-            $this->getEndpoint(),
-            $this->login,
-            $signature,
-            $this->escapePhoneNumber($message->getPhone()),
-            $this->escapeSubject($message->getSubject()),
-            $this->from,
-            $timestamp
-        );
+        $data = [
+            'login'     => $this->login,
+            'phone'     => $this->escapePhoneNumber($message->getPhone()),
+            'text'      => $message->getSubject(),
+            'sender'    => $this->from,
+            'timestamp' => $timestamp
+        ];
+        $data['signature'] = $this->generateSignature($data, $timestamp);
+        $endpoint = 'https://'.$this->getEndpoint().'/external/get/send.php?'.http_build_query($data);
 
         $response = $this->client->request('GET', $endpoint);
 
@@ -145,25 +141,20 @@ final class LightSmsTransport extends AbstractTransport
         return $sentMessage;
     }
 
-    private function generateSignature(SmsMessage $message, string $timestamp): string
+    private function generateSignature(array $data, int $timestamp): string
     {
         $params = [
             'timestamp' => $timestamp,
             'login' => $this->login,
-            'phone' => $this->escapePhoneNumber($message->getPhone()),
+            'phone' => $data['phone'],
             'sender' => $this->from,
-            'text' => $this->escapeSubject($message->getSubject()),
+            'text' => $data['text'],
         ];
 
         ksort($params);
         reset($params);
 
         return md5(implode('', $params).$this->password);
-    }
-
-    private function escapeSubject(string $subject): string
-    {
-        return strip_tags($subject);
     }
 
     private function escapePhoneNumber(string $phoneNumber): string

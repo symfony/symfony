@@ -11,28 +11,23 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure\Tests;
 
-use Symfony\Component\HttpClient\Exception\TransportException as HttpClientTransportException;
+use Symfony\Component\Mercure\Exception\InvalidArgumentException;
 use Symfony\Component\Mercure\Exception\RuntimeException as MercureRuntimeException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
 use Symfony\Component\Mercure\MockHub;
-use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransport;
-use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
-use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use TypeError;
 
 /**
@@ -40,7 +35,7 @@ use TypeError;
  */
 final class MercureTransportTest extends TransportTestCase
 {
-    public function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'publisherId', $topics = null): TransportInterface
+    public function createTransport(?HttpClientInterface $client = null, ?HubInterface $hub = null, string $hubId = 'hubId', $topics = null): TransportInterface
     {
         $hub = $hub ?? $this->createMock(HubInterface::class);
 
@@ -49,9 +44,9 @@ final class MercureTransportTest extends TransportTestCase
 
     public function toStringProvider(): iterable
     {
-        yield ['mercure://publisherId?topic=https%3A%2F%2Fsymfony.com%2Fnotifier', $this->createTransport()];
-        yield ['mercure://customPublisherId?topic=%2Ftopic', $this->createTransport(null, null, 'customPublisherId', '/topic')];
-        yield ['mercure://customPublisherId?topic%5B0%5D=%2Ftopic%2F1&topic%5B1%5D%5B0%5D=%2Ftopic%2F2', $this->createTransport(null, null, 'customPublisherId', ['/topic/1', ['/topic/2']])];
+        yield ['mercure://hubId?topic=https%3A%2F%2Fsymfony.com%2Fnotifier', $this->createTransport()];
+        yield ['mercure://customHubId?topic=%2Ftopic', $this->createTransport(null, null, 'customHubId', '/topic')];
+        yield ['mercure://customHubId?topic%5B0%5D=%2Ftopic%2F1&topic%5B1%5D%5B0%5D=%2Ftopic%2F2', $this->createTransport(null, null, 'customHubId', ['/topic/1', ['/topic/2']])];
     }
 
     public function supportedMessagesProvider(): iterable
@@ -94,7 +89,7 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testSendWithTransportFailureThrows()
     {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(): void {
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), static function (): void {
             throw new MercureRuntimeException('Cannot connect to mercure');
         });
 
@@ -104,31 +99,13 @@ final class MercureTransportTest extends TransportTestCase
         $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
-    public function testSendWithWrongResponseThrows()
-    {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(): void {
-            $response = $this->createMock(ResponseInterface::class);
-            $response->method('getContent')->willReturn('Service Unavailable');
-
-            $httpException = $this->createMock(ServerExceptionInterface::class);
-            $httpException->method('getResponse')->willReturn($response);
-
-            throw $httpException;
-        });
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('Unable to post the Mercure message: Service Unavailable');
-
-        $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
-    }
-
     public function testSendWithWrongTokenThrows()
     {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(): void {
-            throw new \InvalidArgumentException('The provided JWT is not valid');
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), static function (): void {
+            throw new InvalidArgumentException('The provided JWT is not valid');
         });
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unable to post the Mercure message: The provided JWT is not valid');
 
         $this->createTransport(null, $hub)->send(new ChatMessage('subject'));
@@ -136,12 +113,12 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testSendWithMercureOptions()
     {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(Update $update): string {
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['/topic/1', '/topic/2'], $update->getTopics());
             $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
             $this->assertSame('id', $update->getId());
             $this->assertSame('type', $update->getType());
-            $this->assertSame('1', $update->getRetry());
+            $this->assertSame(1, $update->getRetry());
             $this->assertTrue($update->isPrivate());
 
             return 'id';
@@ -152,12 +129,12 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testSendWithMercureOptionsButWithoutOptionTopic()
     {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(Update $update): string {
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
             $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
             $this->assertSame('id', $update->getId());
             $this->assertSame('type', $update->getType());
-            $this->assertSame('1', $update->getRetry());
+            $this->assertSame(1, $update->getRetry());
             $this->assertTrue($update->isPrivate());
 
             return 'id';
@@ -168,9 +145,10 @@ final class MercureTransportTest extends TransportTestCase
 
     public function testSendWithoutMercureOptions()
     {
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(Update $update): string {
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
             $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
+            $this->assertFalse($update->isPrivate());
 
             return 'id';
         });
@@ -182,10 +160,7 @@ final class MercureTransportTest extends TransportTestCase
     {
         $messageId = 'urn:uuid:a7045be0-a75d-4d40-8bd2-29fa4e5dd10b';
 
-        $hub = new MockHub('default', 'https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function(Update $update) use($messageId): string {
-            $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
-            $this->assertSame('{"@context":"https:\/\/www.w3.org\/ns\/activitystreams","type":"Announce","summary":"subject"}', $update->getData());
-
+        $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update) use ($messageId): string {
             return $messageId;
         });
 

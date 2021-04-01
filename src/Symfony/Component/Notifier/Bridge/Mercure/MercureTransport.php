@@ -11,24 +11,18 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
-use Symfony\Component\Mercure\Exception\InvalidArgumentException as MercureInvalidArgumentException;
+use Symfony\Component\Mercure\Exception\InvalidArgumentException;
 use Symfony\Component\Mercure\Exception\RuntimeException as MercureRuntimeException;
 use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\HubRegistry;
-use Symfony\Component\Mercure\PublisherInterface;
 use Symfony\Component\Mercure\Update;
-use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\RuntimeException;
-use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -41,10 +35,9 @@ final class MercureTransport extends AbstractTransport
     private $topics;
 
     /**
-     * @param HubInterface         $hub
      * @param string|string[]|null $topics
      */
-    public function __construct($hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
+    public function __construct(HubInterface $hub, string $hubId, $topics = null, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $topics && !\is_array($topics) && !\is_string($topics)) {
             throw new \TypeError(sprintf('"%s()" expects parameter 3 to be an array of strings, a string or null, "%s" given.', __METHOD__, get_debug_type($topics)));
@@ -92,22 +85,14 @@ final class MercureTransport extends AbstractTransport
         ]), $options->isPrivate(), $options->getId(), $options->getType(), $options->getRetry());
 
         try {
-            if ($this->hub instanceof HubInterface) {
-                $messageId = $this->hub->publish($update);
-            } else {
-                $messageId = ($this->hub)($update);
-            }
+            $messageId = $this->hub->publish($update);
 
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($messageId);
 
             return $sentMessage;
-        } catch (HttpExceptionInterface $e) {
-            throw new TransportException('Unable to post the Mercure message: '.$e->getResponse()->getContent(false), $e->getResponse(), $e->getCode(), $e);
-        } catch (ExceptionInterface | MercureRuntimeException $e) {
+        } catch (MercureRuntimeException | InvalidArgumentException $e) {
             throw new RuntimeException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
-        } catch (\InvalidArgumentException | MercureInvalidArgumentException $e) {
-            throw new InvalidArgumentException('Unable to post the Mercure message: '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 }

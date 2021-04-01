@@ -11,15 +11,13 @@
 
 namespace Symfony\Component\Notifier\Bridge\Mercure;
 
-use Symfony\Bundle\MercureBundle\MercureBundle;
+use Symfony\Component\Mercure\Exception\InvalidArgumentException;
 use Symfony\Component\Mercure\HubRegistry;
-use Symfony\Component\Mercure\PublisherInterface;
-use Symfony\Component\Notifier\Exception\LogicException;
+use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -28,9 +26,6 @@ final class MercureTransportFactory extends AbstractTransportFactory
 {
     private $registry;
 
-    /**
-     * @param HubRegistry $registry
-     */
     public function __construct(HubRegistry $registry)
     {
         parent::__construct();
@@ -50,21 +45,13 @@ final class MercureTransportFactory extends AbstractTransportFactory
         $hubId = $dsn->getHost();
         $topic = $dsn->getOption('topic');
 
-        if ($this->registry instanceof HubRegistry) {
+        try {
             $hub = $this->registry->getHub($hubId);
-
-            return new MercureTransport($hub, $hubId, $topic);
+        } catch (InvalidArgumentException $exception) {
+            throw new IncompleteDsnException(sprintf('Hub "%s" not found. Did you mean one of: "%s"?', $hubId, implode('", "', array_keys($this->registry->all()))));
         }
 
-        if (!$this->publisherLocator->has($hubId)) {
-            if (!class_exists(MercureBundle::class) && !$this->publisherLocator->getProvidedServices()) {
-                throw new LogicException('No publishers found. Did you forget to install the MercureBundle? Try running "composer require symfony/mercure-bundle".');
-            }
-
-            throw new LogicException(sprintf('"%s" not found. Did you mean one of: %s?', $hubId, implode(', ', array_keys($this->publisherLocator->getProvidedServices()))));
-        }
-
-        return new MercureTransport($this->publisherLocator->get($hubId), $hubId, $topic);
+        return new MercureTransport($hub, $hubId, $topic);
     }
 
     protected function getSupportedSchemes(): array

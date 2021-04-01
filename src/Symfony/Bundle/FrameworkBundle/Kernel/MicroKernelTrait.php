@@ -61,7 +61,7 @@ trait MicroKernelTrait
      *
      *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    //abstract protected function configureContainer(ContainerConfigurator $c): void;
+    //abstract protected function configureContainer(ContainerConfigurator $container): void;
 
     /**
      * {@inheritdoc}
@@ -129,7 +129,7 @@ trait MicroKernelTrait
             try {
                 $configureContainer = new \ReflectionMethod($this, 'configureContainer');
             } catch (\ReflectionException $e) {
-                throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureContainer(ContainerConfigurator $c): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
+                throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureContainer(ContainerConfigurator $container): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
             }
 
             $configuratorClass = $configureContainer->getNumberOfParameters() > 0 && ($type = $configureContainer->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;

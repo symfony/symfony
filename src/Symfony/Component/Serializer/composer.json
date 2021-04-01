@@ -57,8 +57,6 @@
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",
         "symfony/mime": "For using a MIME type guesser within the DataUriNormalizer.",
-        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
-        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/var-exporter": "For using the metadata compiler."
     },
     "autoload": {

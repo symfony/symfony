@@ -220,7 +220,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(OutputInterface $output, string $template, Error $exception, string $file = null)
+    private function renderException(SymfonyStyle $output, string $template, Error $exception, string $file = null)
     {
         $line = $exception->getTemplateLine();
 

@@ -137,6 +137,7 @@ acme_root:
 
         # Prototype
         name:                 []
+    custom_node:          true
 
 EOL;
     }

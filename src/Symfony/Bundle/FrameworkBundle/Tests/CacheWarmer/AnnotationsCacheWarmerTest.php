@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
@@ -125,6 +126,35 @@ class AnnotationsCacheWarmerTest extends TestCase
         $warmer->warmUp($this->cacheDir);
 
         spl_autoload_unregister($classLoader);
+    }
+
+    public function testWarmupRemoveCacheMisses()
+    {
+        $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
+        $warmer = $this->getMockBuilder(AnnotationsCacheWarmer::class)
+            ->setConstructorArgs([new AnnotationReader(), $cacheFile])
+            ->setMethods(['doWarmUp'])
+            ->getMock();
+
+        $warmer->method('doWarmUp')->willReturnCallback(function ($cacheDir, ArrayAdapter $arrayAdapter) {
+            $arrayAdapter->getItem('foo_miss');
+
+            $item = $arrayAdapter->getItem('bar_hit');
+            $item->set('data');
+            $arrayAdapter->save($item);
+
+            $item = $arrayAdapter->getItem('baz_hit_null');
+            $item->set(null);
+            $arrayAdapter->save($item);
+
+            return true;
+        });
+
+        $warmer->warmUp($this->cacheDir);
+        $data = include $cacheFile;
+
+        $this->assertCount(1, $data[0]);
+        $this->assertTrue(isset($data[0]['bar_hit']));
     }
 
     /**

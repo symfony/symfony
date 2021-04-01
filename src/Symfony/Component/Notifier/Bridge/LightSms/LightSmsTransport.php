@@ -160,12 +160,12 @@ final class LightSmsTransport extends AbstractTransport
         return md5(implode('', $params).$this->password);
     }
 
-    private function escapeSubject($subject): string
+    private function escapeSubject(string $subject): string
     {
         return strip_tags($subject);
     }
 
-    private function escapePhoneNumber($phoneNumber): string
+    private function escapePhoneNumber(string $phoneNumber): string
     {
         return str_replace('+', '00', $phoneNumber);
     }

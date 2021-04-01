@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2021-03-31T09:33:59Z
+
+Controversial: do we even need these` @author` annotations? Git already has all the information. So, we are duplicating knowledge and we're doing it wrong as we only list "some" contributors.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T09:38:15Z
+
+I like them. Whenever you are dig around in your project's vendor directory, they can give you an idea who made the class and who you should give credit to. The vendor directory does not have any `git` information.
+
+The `@author` annotations are not important but I would miss them if they are gone.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-31T10:42:16Z
+
+@Nyholm but the `@author` annotations often give only partial credit as they list the one creating the class but not all the contributors improving it after that. So they are bad at giving credit.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T11:00:37Z
+
+Yeah, I know it is flawed.. I think there is a class with my author tag on it because I wrote it. Then every line except the license header has been fixed by someone else.
+
+One could imagine a set of rule to update/remove author tags automatically. Or we can make a habit of removing author tags if we change a file with a lot of patches on it.
+
+Or... one can say: "I know some users appreciate this tag, but let's remove it because it is flawed and we should focus the effort somewhere else".

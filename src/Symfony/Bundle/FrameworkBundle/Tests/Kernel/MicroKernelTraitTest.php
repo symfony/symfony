@@ -136,7 +136,7 @@ class MicroKernelTraitTest extends TestCase
         };
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('"Symfony\Bundle\FrameworkBundle\Tests\Kernel\MinimalKernel@anonymous" uses "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait", but does not implement the required method "protected function configureContainer(ContainerConfigurator $c): void".');
+        $this->expectExceptionMessage('"Symfony\Bundle\FrameworkBundle\Tests\Kernel\MinimalKernel@anonymous" uses "Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait", but does not implement the required method "protected function configureContainer(ContainerConfigurator $container): void".');
 
         $kernel->boot();
     }

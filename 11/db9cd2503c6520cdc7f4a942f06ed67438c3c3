@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by andrew-demb at 2021-03-31T06:50:25Z
+
+@Nyholm yes, I will.
+
+One of the links relates to `symfony/mailer`, which doesn't have a dependency on `symfony/deprecation-contracts`.
+Should I add it for this component?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T06:52:14Z
+
+Yes please
+
+---------------------------------------------------------------------------
+
+by andrew-demb at 2021-03-31T07:39:40Z
+
+Sorry for so many force pushes. It was hard to drop "committed by" from commits.
+
+All comments addressed. Thanks for the review.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-31T14:44:47Z
+
+To be merged into 5.2?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T19:54:40Z
+
+I dont know if this is considered a bugfix or just a minor improvement. Im happy with 5.x and 5.2.

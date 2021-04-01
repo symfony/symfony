@@ -156,7 +156,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
             return [];
         }
 
-        $secrets = include $file;
+        $secrets = eval('?>'.file_get_contents($file));
 
         if (!$reveal) {
             return $secrets;

@@ -46,18 +46,26 @@ class SodiumVaultTest extends TestCase
         $vault = new SodiumVault($this->secretsDir);
         $vault->generateKeys();
 
-        $plain = "plain\ntext";
+        $plainFoo = "plain\ntext";
+        $plainBar = "plain\ntext";
 
-        $vault->seal('foo', $plain);
+        $vault->seal('foo', $plainFoo);
+        $vault->seal('bar', $plainBar);
 
         $decrypted = $vault->reveal('foo');
-        $this->assertSame($plain, $decrypted);
+        $this->assertSame($plainFoo, $decrypted);
 
-        $this->assertSame(['foo' => null], $vault->list());
-        $this->assertSame(['foo' => $plain], $vault->list(true));
+        $decrypted = $vault->reveal('bar');
+        $this->assertSame($plainBar, $decrypted);
+
+        $this->assertSame(['bar' => null, 'foo' => null], $vault->list());
+        $this->assertSame(['bar' => $plainFoo, 'foo' => $plainBar], $vault->list(true));
 
         $this->assertTrue($vault->remove('foo'));
         $this->assertFalse($vault->remove('foo'));
+
+        $this->assertTrue($vault->remove('bar'));
+        $this->assertFalse($vault->remove('bar'));
 
         $this->assertSame([], $vault->list());
     }

@@ -36,9 +36,6 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * FrameworkExtension configuration structure.
- *
- * @author Jeremy Mikola <jmikola@gmail.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Configuration implements ConfigurationInterface
 {

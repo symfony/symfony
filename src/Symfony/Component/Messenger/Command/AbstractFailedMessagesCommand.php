@@ -30,6 +30,7 @@ use Symfony\Component\VarDumper\Caster\TraceStub;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -38,20 +39,24 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 abstract class AbstractFailedMessagesCommand extends Command
 {
-    private $globalFailureReceiverName;
     protected $failureTransports;
 
+    private $globalFailureReceiverName;
+
+    /**
+     * @param ServiceProviderInterface $failureTransports
+     */
     public function __construct(?string $globalFailureReceiverName, $failureTransports)
     {
         $this->failureTransports = $failureTransports;
-        if (!$failureTransports instanceof ServiceLocator) {
-            trigger_deprecation('symfony/messenger', '5.3', 'Passing a non-scalar value as 2nd argument to "%s()" is deprecated, pass a ServiceLocator instead.', __METHOD__);
+        if (!$failureTransports instanceof ServiceProviderInterface) {
+            trigger_deprecation('symfony/messenger', '5.3', 'Passing a receiver as 2nd argument to "%s()" is deprecated, pass a service locator instead.', __METHOD__);
 
             if (null === $globalFailureReceiverName) {
                 throw new InvalidArgumentException(sprintf('The argument "globalFailureReceiver" from method "%s()" must be not null if 2nd argument is not a ServiceLocator.', __METHOD__));
             }
 
-            $this->failureTransports = new ServiceLocator([$globalFailureReceiverName => function () use ($failureTransports) { return $failureTransports; },]);
+            $this->failureTransports = new ServiceLocator([$globalFailureReceiverName => static function () use ($failureTransports) { return $failureTransports; }]);
         }
         $this->globalFailureReceiverName = $globalFailureReceiverName;
 
@@ -172,15 +177,22 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
-    protected function getReceiver(/* string $name */): ReceiverInterface
+    /**
+     * @param string|null $name
+     */
+    protected function getReceiver(/* string $name = null */): ReceiverInterface
     {
-        if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "string $name" argument in version 5.3, not defining it is deprecated since Symfony 5.2.', __METHOD__), \E_USER_DEPRECATED);
+        if (1 > \func_num_args() && __CLASS__ !== static::class && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
+            trigger_error_deprecation('symfony/messenger', '5.3', 'The "%s()" method will have a new "string $name" argument in version 6.0, not defining it is deprecated.', __METHOD__);
+        }
+        $name = \func_num_args() > 0 ? func_get_arg(0) : null;
+
+        if (null === $name = $name ?? $this->globalFailureReceiverName) {
+            throw new InvalidArgumentException(sprintf('No default failure transport is defined. Available transports are: "%s".', $name, implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
         }
 
-        $name = \func_num_args() > 0 ? func_get_arg(0) : $this->globalFailureReceiverName;
         if (!$this->failureTransports->has($name)) {
-            throw new InvalidArgumentException(sprintf('The failure transport with name "%s" was not found. Available transports are: "%s".', $name, implode(', ', array_keys($this->failureTransports->getProvidedServices()))));
+            throw new InvalidArgumentException(sprintf('The "%s" failure transport was not found. Available transports are: "%s".', $name, implode('", "', array_keys($this->failureTransports->getProvidedServices()))));
         }
 
         return $this->failureTransports->get($name);

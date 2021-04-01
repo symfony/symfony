@@ -1,0 +1,155 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T00:17:16Z
+
+Thank you for these PRs.
+
+We are happy to improve minor things like this, but only if they are broken. What I can see, there is no bug this PR is fixing.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-28T00:31:49Z
+
+> We are happy to improve minor things like this, but only if they are broken. What I can see, there is no bug this PR is fixing.
+
+Hi @Nyholm . I'm not sure to understand, do you want that I do this PR on another branch or does these PR are not welcomed ?
+
+User of static analysis like phpstan/psalm can encounter an issue.
+For instance, SonataAdmin is implementing the interface and has the following method:
+https://github.com/sonata-project/SonataAdminBundle/blob/b737b64feea99be925af9b970bc42dca26d7587f/src/Translator/Extractor/AdminExtractor.php#L79-L84
+
+If this kind of situation, psalm is returning an error
+```
+MoreSpecificImplementedParamType - src/Translator/Extractor/AdminExtractor.php:84:29 - Argument 1 of Sonata\AdminBundle\Translator\Extractor\AdminExtractor::extract has the more specific type 'array<array-key, string>|string', expecting 'array<array-key, mixed>|string' as defined by Symfony\Component\Translation\Extractor\ExtractorInterface::extract
+```
+For this reason, some stubs are created to override/be more precise about the phpdoc of symfony (see https://github.com/psalm/psalm-plugin-symfony/tree/master/src/Stubs).
+
+Instead of creating a new stub in the psalm plugin symfony, I thought the phpdoc improvement would be accepted by symfony.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T09:29:19Z
+
+Im saying that we are happy to fix bugs. This is not a bug. This is a change to please a third party tool.
+(If you do think it is a bug, please provide a unit test that shows the issue being fixed.)
+
+Note that we do run psalm on all PRs to make sure we don't introduce more of these issues. We are also fixing issues found by psalm (see https://github.com/symfony/symfony/pull/40603).
+
+But again, it has to be real issues that affects the code. Changing from `array` to `string[]` would just make psalm happy.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T13:45:11Z
+
+I looked at the psalm errors for 4.4 and I did find a few that actually matters. https://github.com/symfony/symfony/pull/40610
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-28T17:24:59Z
+
+> Im saying that we are happy to fix bugs. This is not a bug. This is a change to please a third party tool.
+> (If you do think it is a bug, please provide a unit test that shows the issue being fixed.)
+>
+> Note that we do run psalm on all PRs to make sure we don't introduce more of these issues. We are also fixing issues found by psalm (see #40603).
+>
+> But again, it has to be real issues that affects the code. Changing from `array` to `string[]` would just make psalm happy.
+
+Sure, it's not a **bug**. But still an improvement. I still don't get why you're talking like these PR would be forbidden.
+I already did some, which was welcomed https://github.com/symfony/symfony/pull/39170
+And I found multiple others PR which was just changing the PhpDoc.
+
+For the method,
+```
+    /**
+     * Extracts translation messages from files, a file or a directory to the catalogue.
+     */
+    public function extract($resource, MessageCatalogue $catalogue);
+```
+You could believe that an array of `SplFileObject` could be handled.
+
+So changing the param typehint from `array` to `string[]` can be considered as a documentation improvement.
+It's not just about making psalm happy, it also helps the developer to correctly use this method when reading the phpdoc.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-29T08:42:05Z
+
+#39170 added missing documentation. This is changing a valid type to a slightly better valid type.
+
+I undertand that this may seam arbitrary. But I stand to the fact that this PR is not helping anybody. I don't want to allow this kind of PRs because that opens the door for more PRs like it. Instead I want to focus the effort in making changes that benefit the users in a more obvious way.
+
+I vote 👎  for this PR. Since you clearly disagree, I'll leave this open for a second opinion.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-29T09:43:45Z
+
+> This is changing a valid type to a slightly better valid type.
+
+So, it's an improvement that helps @VincentLanglet at least and does not hurt anyone. What is your alternative? Patch this on 5.x because it's not a bugfix? Leave an imprecise type declaration from 2015 as it is for eternity?
+
+While introducing a stricter static code analysis to my Symfony projects, I keep finding issues like this one more and more myself. I understand that you don't see value in such changes, but they actually do help.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-29T10:14:34Z
+
+👍 as a minor improvement on 5.x (no bug here)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-29T15:23:11Z
+
+@derrabus Should I change the target branch ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T20:22:19Z
+
+> Should I change the target branch ?
+
+Yes please. It seams like there are a few more people that disagree with me. I'll be happy yo merge this in 5.x as a minor improvement.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-31T20:23:56Z
+
+> I'll be happy yo merge this in 5.x as a minor improvement.
+
+Thank you!
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T20:25:48Z
+
+I suggest adding the change form #40601 in this PR too.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-03-31T21:03:24Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-01T06:39:43Z
+
+Could you please rebase your PR on 5.x so the tests are green? It looks like you forked it a long long time ago.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2021-04-01T10:00:01Z
+
+> Could you please rebase your PR on 5.x so the tests are green? It looks like you forked it a long long time ago.
+
+I just  pulled 5.x and rebased, but tests are still failing...
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-01T10:01:27Z
+
+Cool. Thank you.
+
+This test failure is fine. It is not related to this PR.
+
+(Before we were testing on PHP 7.1 which was dropped a long time ago)

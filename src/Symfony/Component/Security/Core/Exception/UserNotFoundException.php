@@ -24,7 +24,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Username could not be found.';
     }
@@ -38,11 +38,9 @@ class UserNotFoundException extends AuthenticationException
     }
 
     /**
-     * @return string
-     *
      * @deprecated
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
 
@@ -60,7 +58,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * @deprecated
      */
-    public function setUsername(string $username)
+    public function setUsername(string $username): void
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
 
@@ -70,7 +68,7 @@ class UserNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return ['{{ username }}' => $this->identifier, '{{ user_identifier }}' => $this->identifier];
     }

@@ -23,7 +23,7 @@ class ProviderNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'No authentication provider found to support the authentication token.';
     }

@@ -214,7 +214,7 @@ class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifTrue()
                                 ->then(function ($v) {
-                                    @trigger_error('Since symfony/framework-bundle 5.2: Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.', \E_USER_DEPRECATED);
+                                    trigger_deprecation('symfony/framework-bundle', '5.2', 'Setting the "framework.form.legacy_error_messages" option to "true" is deprecated. It will have no effect as of Symfony 6.0.');
 
                                     return $v;
                                 })

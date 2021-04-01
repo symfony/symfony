@@ -26,14 +26,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LightSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'www.lightsms.com';
+    protected const HOST = 'lightsms.com';
 
     private $login;
     private $password;
     private $from;
 
     private const ERROR_CODES = [
-        000 => 'Service unavailable',
         1 => 'Missing Signature',
         2 => 'Login not specified',
         3 => 'Text not specified',
@@ -118,6 +117,8 @@ final class LightSmsTransport extends AbstractTransport
         }
 
         $content = $response->toArray(false);
+
+        dump($content); die();
 
         // it happens if the host without www
         if (isset($content['']) && isset($content['']['error'])) {

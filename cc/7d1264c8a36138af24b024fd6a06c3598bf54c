@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T06:27:34Z
+
+@carsonbot could you find me a reviewer please?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-31T06:28:24Z
+
+I'm sorry. I could not find any suitable reviewer.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T06:29:10Z
+
+Oh. I guess it was too long ago @dmaicher wrote this class =)
+
+David, do you mind having a look at this PR?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-03-31T06:34:22Z
+
+Thanks for the quick fix :)
+
+If I understand correctly though, this means using lambdas like that will prevent caching of the resolved config and it'll reload on every request needing it. I guess it's thus worth avoiding lambda callbacks..
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T06:36:13Z
+
+Yes, that is correct.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T07:27:38Z
+
+I updated the docs with this observation: https://github.com/symfony/symfony-docs/pull/15172
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-31T08:04:49Z
+
+Storing misses is an important part of the performance provided by system caches.
+We should look for another solution if possible.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T08:09:56Z
+
+Yes, but these "misses" are interpreted as "hits". A "hit" with null is not the same as a miss. There should never be "null" stored in **this** cache.
+
+I have two alternative solutions. The first would be to find a way to serialize a `\Closure`. The second one is to throw an exception on cache warmup when you fail to save a value in cache.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-31T08:49:35Z
+
+The test case passes even without the change if I didn't mess up :)
+
+> Yes, but these "misses" are interpreted as "hits". A "hit" with null is not the same as a miss. There should never be "null" stored in this cache.
+
+For system caches, aka the ones sourced by the code itself, we can do this - cache misses.
+We built this logic because it saves CPU cycles, eg you don't want to read the annotations again on methods that don't have any annotation.
+
+> I have two alternative solutions. The first would be to find a way to serialize a \Closure. The second one is to throw an exception on cache warmup when you fail to save a value in cache.
+
+Why a closure ends up in the cache? That's the main question I have here indeed. An annotation should not lead to a closure because then of course it cannot be cached - while the source is a plain descriptive annotation.
+
+The second solution would be a major regression actually.
+
+Can you try this patch instead? It tries to not store misses for failures-to-save().
+```
+--- a/src/Symfony/Component/Cache/Traits/ArrayTrait.php
++++ b/src/Symfony/Component/Cache/Traits/ArrayTrait.php
+@@ -145,6 +145,7 @@ trait ArrayTrait
+             try {
+                 $serialized = serialize($value);
+             } catch (\Exception $e) {
++                unset($this->values[$key]);
+                 $type = \is_object($value) ? \get_class($value) : \gettype($value);
+                 $message = sprintf('Failed to save key "{key}" of type %s: ', $type).$e->getMessage();
+                 CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T08:58:35Z
+
+> The test case passes even without the change if I didn't mess up :)
+
+You did mess up =)
+
+```
+❯ ./phpunit src/Symfony/Bundle/FrameworkBundle/Tests/CacheWarmer
+#!/usr/bin/env php
+PHPUnit 9.5.3 by Sebastian Bergmann and contributors.
+
+Testing /src/Symfony/Bundle/FrameworkBundle/Tests/CacheWarmer
+....F..............                                               19 / 19 (100%)
+
+Time: 00:00.091, Memory: 16.00 MB
+
+There was 1 failure:
+
+1) Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer\AnnotationsCacheWarmerTest::testWarmupRemoveCacheMisses
+Failed asserting that actual size 3 matches expected size 2.
+
+/src/Symfony/Bundle/FrameworkBundle/Tests/CacheWarmer/AnnotationsCacheWarmerTest.php:149
+```
+
+> Why a closure ends up in the cache?
+
+Because we cache an object of `Symfony\Component\Validator\Constraint\Callback`. That object is given a closure by the user in its constructor.
+
+> Can you try this patch instead? It tries to not store misses for failures-to-save().
+
+I think that would work. But the end result would be the same. We would reread the annotations at runtime.
+Note that we still cache the empty array. Which means "we have read the annotations, and there weren't any".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-31T09:08:52Z
+
+> You did mess up =)
+
+I confirm :P
+
+> Because we cache an object of Symfony\Component\Validator\Constraint\Callback. That object is given a closure by the user in its constructor.
+
+I just read the doc PR, nice one.
+
+> I think that would work. But the end result would be the same. We would reread the annotations at runtime.
+
+True, but we would still store misses, and this is important for the other system caches.
+
+> Note that we still cache the empty array. Which means "we have read the annotations, and there weren't any".
+
+OK great, then I suppose other system caches need this. Annotations are not the only system caches, but the current patch changes the behavior for all of them.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T12:04:06Z
+
+I was wrong patching `AbstractPhpFileCacheWarmer`. What I really wanted to do is to only modify the behaviour of the `AnnotationCacheWarmer`.
+
+> Can you try this patch instead? It tries to not store misses for failures-to-save().
+
+This is not reliable. If a user does something like this, the bug will occur again.
+
+```php
+$i = $cache->getItem('foo');
+$i->set('data');
+$cache->save($i); // Save failed for some reason.
+
+// ...
+$cache->getItem('foo');
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-31T19:18:52Z
+
+The PR is updated
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2021-04-01T08:05:19Z
+
+> Oh. I guess it was too long ago @dmaicher wrote this class =)
+>
+> David, do you mind having a look at this PR?
+
+I think my work on that was related to https://github.com/symfony/symfony/pull/23558
+
+But now I see you changed the PR anyway :blush:

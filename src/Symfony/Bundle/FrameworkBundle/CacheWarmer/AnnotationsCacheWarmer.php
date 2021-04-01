@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
 /**
@@ -66,6 +67,17 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         }
 
         return true;
+    }
+
+    /**
+     * @return string[] A list of classes to preload on PHP 7.4+
+     */
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    {
+        // make sure we don't cache null values
+        $values = array_filter($values, function ($val) { return null !== $val; });
+
+        return parent::warmUpPhpArrayAdapter($phpArrayAdapter, $values);
     }
 
     private function readAllComponents(Reader $reader, string $class)

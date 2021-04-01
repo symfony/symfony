@@ -80,7 +80,7 @@ class Exporter
                 }
 
                 if (!\is_array($properties = $value->__serialize())) {
-                    throw new \Typerror($class.'::__serialize() must return an array');
+                    throw new \TypeError($class.'::__serialize() must return an array');
                 }
 
                 goto prepare_value;

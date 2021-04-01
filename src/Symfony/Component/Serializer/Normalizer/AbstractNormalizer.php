@@ -390,6 +390,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
+                } elseif ($constructorParameter->hasType() && $constructorParameter->getType()->allowsNull()) {
+                    $params[] = null;
                 } else {
                     throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }

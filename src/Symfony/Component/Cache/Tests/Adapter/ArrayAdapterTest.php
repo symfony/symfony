@@ -47,6 +47,10 @@ class ArrayAdapterTest extends AdapterTestCase
         // Miss (should be present as NULL in $values)
         $cache->getItem('bar');
 
+        // Fail (should be missing from $values)
+        $item = $cache->getItem('buz');
+        $cache->save($item->set(function() {}));
+
         $values = $cache->getValues();
 
         $this->assertCount(2, $values);

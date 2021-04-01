@@ -33,46 +33,46 @@ final class LightSmsTransport extends AbstractTransport
     private $from;
 
     private const ERROR_CODES = [
-        '000' => 'Service unavailable',
-        '1' => 'Missing Signature',
-        '2' => 'Login not specified',
-        '3' => 'Text not specified',
-        '4' => 'Phone number not specified',
-        '5' => 'Sender not specified',
-        '6' => 'Invalid signature',
-        '7' => 'Invalid login',
-        '8' => 'Invalid sender name',
-        '9' => 'Sender name not registered',
-        '10' => 'Sender name not approved',
-        '11' => 'There are forbidden words in the text',
-        '12' => 'Error in SMS sending',
-        '13' => 'Phone number is in the blackist. SMS sending to this number is forbidden.',
-        '14' => 'There are more than 50 numbers in the request',
-        '15' => 'List not specified',
-        '16' => 'Invalid phone number',
-        '17' => 'SMS ID not specified',
-        '18' => 'Status not obtained',
-        '19' => 'Empty response',
-        '20' => 'The number already exists',
-        '21' => 'No name',
-        '22' => 'Template already exists',
-        '23' => 'Missing Month (Format: YYYY-MM)',
-        '24' => 'Timestamp not specified',
-        '25' => 'Error in access to the list',
-        '26' => 'There are no numbers in the list',
-        '27' => 'No valid numbers',
-        '28' => 'Missing start date (Format: YYYY-MM-DD)',
-        '29' => 'Missing end date (Format: YYYY-MM-DD)',
-        '30' => 'No date (format: YYYY-MM-DD)',
-        '31' => 'Closing direction to the user',
-        '32' => 'Not enough money',
-        '33' => 'Missing phone number',
-        '34' => 'Phone is in stop list',
-        '35' => 'Not enough money',
-        '36' => 'Can not obtain information about phone',
-        '37' => 'Base Id is not set',
-        '38' => 'Phone number already exists in this database',
-        '39' => 'Phone number does not exist in this database',
+        000  => 'Service unavailable',
+        1    => 'Missing Signature',
+        2    => 'Login not specified',
+        3    => 'Text not specified',
+        4    => 'Phone number not specified',
+        5    => 'Sender not specified',
+        6    => 'Invalid signature',
+        7    => 'Invalid login',
+        8    => 'Invalid sender name',
+        9    => 'Sender name not registered',
+        10   => 'Sender name not approved',
+        11   => 'There are forbidden words in the text',
+        12   => 'Error in SMS sending',
+        13   => 'Phone number is in the blackist. SMS sending to this number is forbidden.',
+        14   => 'There are more than 50 numbers in the request',
+        15   => 'List not specified',
+        16   => 'Invalid phone number',
+        17   => 'SMS ID not specified',
+        18   => 'Status not obtained',
+        19   => 'Empty response',
+        20   => 'The number already exists',
+        21   => 'No name',
+        22   => 'Template already exists',
+        23   => 'Missing Month (Format: YYYY-MM)',
+        24   => 'Timestamp not specified',
+        25   => 'Error in access to the list',
+        26   => 'There are no numbers in the list',
+        27   => 'No valid numbers',
+        28   => 'Missing start date (Format: YYYY-MM-DD)',
+        29   => 'Missing end date (Format: YYYY-MM-DD)',
+        30   => 'No date (format: YYYY-MM-DD)',
+        31   => 'Closing direction to the user',
+        32   => 'Not enough money',
+        33   => 'Missing phone number',
+        34   => 'Phone is in stop list',
+        35   => 'Not enough money',
+        36   => 'Can not obtain information about phone',
+        37   => 'Base Id is not set',
+        38   => 'Phone number already exists in this database',
+        39   => 'Phone number does not exist in this database',
     ];
 
     public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
@@ -105,7 +105,7 @@ final class LightSmsTransport extends AbstractTransport
         $signature = $this->generateSignature($message, $timestamp);
 
         $endpoint = sprintf(
-            'https://www.%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
+            'https://%s/external/get/send.php?login=%s&signature=%s&phone=%s&text=%s&sender=%s&timestamp=%s',
             $this->getEndpoint(),
             $this->login,
             $signature,
@@ -123,7 +123,8 @@ final class LightSmsTransport extends AbstractTransport
 
         $content = $response->toArray(false);
 
-        if (isset($content[''])) {
+        // it happens if the host without www
+        if (isset($content['']) && isset($content['']['error'])) {
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['']['error']], $response);
         }
 

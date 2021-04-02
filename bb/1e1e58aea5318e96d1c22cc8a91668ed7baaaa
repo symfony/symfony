@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-03-30T14:28:17Z
+
+Thanks for the follow-up @roromix.
+Could you add a test case (or update an existing one) for this?
+
+---------------------------------------------------------------------------
+
+by roromix at 2021-03-30T14:47:42Z
+
+> Thanks for the follow-up @roromix.
+> Could you add a test case (or update an existing one) for this?
+
+@chalasr : I have updated provider
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-01T12:23:59Z
+
+If I copy the tests you written (without the changes in `LoginLinkHandler`), they will still run an be green. You need to write a test that will only pass if your patch for `LoginLinkHandler` is applied.
+
+---------------------------------------------------------------------------
+
+by roromix at 2021-04-01T13:19:26Z
+
+> If I copy the tests you written (without the changes in `LoginLinkHandler`), they will still run an be green. You need to write a test that will only pass if your patch for `LoginLinkHandler` is applied.
+
+Sorry, i have no idea how to do that. Need help
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-01T14:05:39Z
+
+Here is a patch covering this change:
+```diff
+diff --git a/src/Symfony/Component/Security/Http/Tests/LoginLink/LoginLinkHandlerTest.php b/src/Symfony/Component/Security/Http/Tests/LoginLink/LoginLinkHandlerTest.php
+index 03dd0287d7..12b8f7da4a 100644
+--- a/src/Symfony/Component/Security/Http/Tests/LoginLink/LoginLinkHandlerTest.php
++++ b/src/Symfony/Component/Security/Http/Tests/LoginLink/LoginLinkHandlerTest.php
+@@ -69,7 +69,12 @@ class LoginLinkHandlerTest extends TestCase
+         if ($request) {
+             $this->router->expects($this->once())
+                 ->method('getContext')
+-                ->willReturn(new RequestContext());
++                ->willReturn($currentRequestContext = new RequestContext());
++
++            $this->router
++                ->expects($this->exactly(2))
++                ->method('setContext')
++                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
+         }
+
+         $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);
+@@ -78,19 +83,15 @@ class LoginLinkHandlerTest extends TestCase
+
+     public function provideCreateLoginLinkData()
+     {
+-        $request = Request::create('https://example.com');
+-        $request->setLocale('en');
+-
+         yield [
+             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
+             ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
+-            $request,
++            Request::create('https://example.com'),
+         ];
+
+         yield [
+             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
+             ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
+-            Request::create('https://example.com'),
+         ];
+
+         yield [
+```
+
+---------------------------------------------------------------------------
+
+by roromix at 2021-04-01T14:48:54Z
+
+I still have a lot to learn about the Tests
+Thank you @chalasr

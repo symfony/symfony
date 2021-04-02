@@ -1044,9 +1044,36 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $view->children[$name] = $child->createView($view);
         }
 
+        $this->sort($view->children);
+
         $type->finishView($view, $this, $options);
 
         return $view;
+    }
+
+    /**
+     * Sorts view fields based on their priority value.
+     */
+    private function sort(array &$children): void
+    {
+        $c = [];
+        $i = 0;
+        $needsSorting = false;
+        foreach ($children as $name => $child) {
+            $c[$name] = ['p' => $child->vars['priority'] ?? 0, 'i' => $i++];
+
+            if (0 !== $c[$name]['p']) {
+                $needsSorting = true;
+            }
+        }
+
+        if (!$needsSorting) {
+            return;
+        }
+
+        uksort($children, static function ($a, $b) use ($c): int {
+            return [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']];
+        });
     }
 
     /**

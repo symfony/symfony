@@ -15,6 +15,7 @@ CHANGELOG
  * Added a `choice_translation_parameters` option to `ChoiceType`
  * Add `UuidType` and `UlidType`
  * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`.
+ * Add `priority` option to `BaseType` and sorting view fields
 
 5.2.0
 -----

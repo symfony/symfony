@@ -64,7 +64,11 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
         if ($request) {
             $currentRequestContext = $this->urlGenerator->getContext();
-            $this->urlGenerator->setContext((new RequestContext())->fromRequest($request));
+            $this->urlGenerator->setContext(
+                (new RequestContext())
+                    ->fromRequest($request)
+                    ->setParameter('_locale', $request->getLocale())
+            );
         }
 
         try {

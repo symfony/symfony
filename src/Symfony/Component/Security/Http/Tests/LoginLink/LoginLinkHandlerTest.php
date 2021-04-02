@@ -69,7 +69,11 @@ class LoginLinkHandlerTest extends TestCase
         if ($request) {
             $this->router->expects($this->once())
                 ->method('getContext')
-                ->willReturn(new RequestContext());
+                ->willReturn($currentRequestContext = new RequestContext());
+
+            $this->router->expects($this->exactly(2))
+                ->method('setContext')
+                ->withConsecutive([$this->equalTo((new RequestContext())->fromRequest($request)->setParameter('_locale', $request->getLocale()))], [$currentRequestContext]);
         }
 
         $loginLink = $this->createLinker([], array_keys($extraProperties))->createLoginLink($user, $request);

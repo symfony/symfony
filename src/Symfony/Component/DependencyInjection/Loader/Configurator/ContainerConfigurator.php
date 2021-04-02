@@ -201,3 +201,11 @@ function abstract_arg(string $description): AbstractArgument
 {
     return new AbstractArgument($description);
 }
+
+/**
+ * Creates an environment variable reference.
+ */
+function env(string $name): EnvConfigurator
+{
+    return new EnvConfigurator($name);
+}

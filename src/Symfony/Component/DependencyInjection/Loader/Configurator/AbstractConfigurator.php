@@ -83,6 +83,10 @@ abstract class AbstractConfigurator
             return $def;
         }
 
+        if ($value instanceof EnvConfigurator) {
+            return (string) $value;
+        }
+
         if ($value instanceof self) {
             throw new InvalidArgumentException(sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
         }

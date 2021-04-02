@@ -118,8 +118,6 @@ final class LightSmsTransport extends AbstractTransport
 
         $content = $response->toArray(false);
 
-        dump($content); die();
-
         // it happens if the host without www
         if (isset($content['']) && isset($content['']['error'])) {
             throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['']['error']], $response);

@@ -19,6 +19,7 @@ CHANGELOG
  * Add `KernelTestCase::getContainer()` as the best way to get a container in tests
  * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
  * Add service `fragment.uri_generator` to generate the URI of a fragment
+ * Add `--resolve-env` option to `debug:config` command to resolve the value of environment variables in the command output
 
 5.2.0
 -----

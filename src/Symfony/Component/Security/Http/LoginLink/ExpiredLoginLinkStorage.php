@@ -14,6 +14,8 @@ namespace Symfony\Component\Security\Http\LoginLink;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
+ * @experimental in 5.2
+ *
  * @final
  */
 class ExpiredLoginLinkStorage

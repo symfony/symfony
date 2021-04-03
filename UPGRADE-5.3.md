@@ -6,6 +6,11 @@ Asset
 
  * Deprecated `RemoteJsonManifestVersionStrategy`, use `JsonManifestVersionStrategy` instead
 
+Console
+-------
+
+ * Deprecate `Helper::strlen()`, use `Helper::width()` instead.
+
 DoctrineBridge
 --------------
 

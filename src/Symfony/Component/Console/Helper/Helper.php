@@ -116,17 +116,17 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
+    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, ?string $string)
     {
         return self::strlen(self::removeDecoration($formatter, $string));
     }
 
-    public static function removeDecoration(OutputFormatterInterface $formatter, $string)
+    public static function removeDecoration(OutputFormatterInterface $formatter, ?string $string)
     {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);
         // remove <...> formatting
-        $string = $formatter->format($string);
+        $string = $formatter->format($string ?? '');
         // remove already formatted characters
         $string = preg_replace("/\033\[[^m]*m/", '', $string);
         $formatter->setDecorated($isDecorated);

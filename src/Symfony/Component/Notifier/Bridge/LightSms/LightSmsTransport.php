@@ -121,19 +121,19 @@ final class LightSmsTransport extends AbstractTransport
 
         // it happens if the host without www
         if (isset($content['']['error'])) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int)$content['']['error']), $response);
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content['']['error']), $response);
         }
 
         if (isset($content['error'])) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int)$content['error']), $response);
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content['error']), $response);
         }
 
         $phone = $this->escapePhoneNumber($message->getPhone());
-        if (32 === (int)$content[$phone]['error']) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int)$content[$phone]['error']), $response);
+        if (32 === (int) $content[$phone]['error']) {
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content[$phone]['error']), $response);
         }
 
-        if (0 === (int)$content[$phone]['error']) {
+        if (0 === (int) $content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($content[$phone]['id_sms']);
 
@@ -166,6 +166,6 @@ final class LightSmsTransport extends AbstractTransport
 
     private function getErrorMsg(int $errorCode): string
     {
-        return isset(self::ERROR_CODES[$errorCode]) ? self::ERROR_CODES[$errorCode] : self::ERROR_CODES[999];
+        return self::ERROR_CODES[$errorCode] ?? self::ERROR_CODES[999];
     }
 }

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-03T13:50:54Z
+
+My bridges PR the same will have this issue
+
+---------------------------------------------------------------------------
+
+by iamvar at 2021-04-03T18:28:03Z
+
+> Can you please check if we need to fix any of those bridges on the 4.4/5.2 branches already?
+
+in 4.4 there is no Mailer/Bridge/Mailjet and Notification component, so nothing in there
+
+in 5.2 it is applicable for all existing there bridges
+src/Symfony/Component/Mailer/Bridge/Mailjet/.gitattributes
+src/Symfony/Component/Mailer/Bridge/Mailjet/.gitignore
+src/Symfony/Component/Notifier/Bridge/Discord/.gitignore
+src/Symfony/Component/Notifier/Bridge/Esendex/.gitattributes
+src/Symfony/Component/Notifier/Bridge/Esendex/.gitignore
+src/Symfony/Component/Notifier/Bridge/Firebase/.gitignore
+src/Symfony/Component/Notifier/Bridge/FreeMobile/.gitignore
+src/Symfony/Component/Notifier/Bridge/GoogleChat/.gitignore
+src/Symfony/Component/Notifier/Bridge/Infobip/.gitignore
+src/Symfony/Component/Notifier/Bridge/LinkedIn/.gitattributes
+src/Symfony/Component/Notifier/Bridge/LinkedIn/.gitignore
+src/Symfony/Component/Notifier/Bridge/Mattermost/.gitignore
+src/Symfony/Component/Notifier/Bridge/Mobyt/.gitignore
+src/Symfony/Component/Notifier/Bridge/Nexmo/.gitignore
+src/Symfony/Component/Notifier/Bridge/OvhCloud/.gitignore
+src/Symfony/Component/Notifier/Bridge/RocketChat/.gitignore
+src/Symfony/Component/Notifier/Bridge/Sendinblue/.gitignore
+src/Symfony/Component/Notifier/Bridge/Sinch/.gitignore
+src/Symfony/Component/Notifier/Bridge/Slack/.gitignore
+src/Symfony/Component/Notifier/Bridge/Smsapi/.gitignore
+src/Symfony/Component/Notifier/Bridge/Telegram/.gitignore
+src/Symfony/Component/Notifier/Bridge/Twilio/.gitignore
+src/Symfony/Component/Notifier/Bridge/Zulip/.gitignore
+
+Should I create merge request for 5.2?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-03T19:08:54Z
+
+> Should I create merge request for 5.2?
+
+Yes, please!
+
+---------------------------------------------------------------------------
+
+by iamvar at 2021-04-03T19:25:43Z
+
+> > Should I create merge request for 5.2?
+>
+> Yes, please!
+
+https://github.com/symfony/symfony/pull/40703
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-04T06:47:02Z
+
+I've merged some of these in 5.2. Let's wait (a day or two) until someone core team member merge 5.2 into 5.x. After that we should rebase this PR.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-04T12:46:21Z
+
+> merge 5.2 into 5.x.
+
+✅

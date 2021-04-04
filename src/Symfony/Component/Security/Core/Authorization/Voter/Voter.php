@@ -51,13 +51,18 @@ abstract class Voter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = $this->deny();
 
-            $v = \is_bool($v = $this->voteOnAttribute($attribute, $subject, $token)) ? Vote::create($v) : $v; // BC layer
-            if ($v->isGranted()) {
-                // grant access as soon as at least one attribute returns a positive response
-                return $v;
-            } else {
-                $vote->merge($v);
+            $decision = $this->voteOnAttribute($attribute, $subject, $token);
+            if (\is_bool($decision)) {
+                trigger_deprecation('symfony/security-core', '5.3', 'Returning a boolean in "%s::voteOnAttribute()" is deprecated, return an instance of "%s" instead.', static::class, Vote::class);
+                $decision = $decision ? $this->grant() : $this->deny();
             }
+
+            if ($decision->isGranted()) {
+                // grant access as soon as at least one attribute returns a positive response
+                return $decision;
+            }
+
+            $vote->setReason($vote->getReason().trim(' '.$decision->getReason()));
         }
 
         return $vote;
@@ -76,7 +81,7 @@ abstract class Voter implements VoterInterface
      */
     public function abstain(string $reason = '', array $parameters = []): Vote
     {
-        return Vote::createAbstrain($reason, $parameters);
+        return Vote::createAbstain($reason, $parameters);
     }
 
     /**
@@ -103,7 +108,7 @@ abstract class Voter implements VoterInterface
      *
      * @param mixed $subject
      *
-     * @return bool|Vote Returning a boolean is deprecated since Symfony 5.1. Return a Vote object instead.
+     * @return Vote Returning a boolean is deprecated since Symfony 5.1. Return a Vote object instead.
      */
     abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
 }

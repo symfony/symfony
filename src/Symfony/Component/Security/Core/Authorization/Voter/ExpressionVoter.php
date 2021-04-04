@@ -44,7 +44,7 @@ class ExpressionVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         $variables = null;
         foreach ($attributes as $attribute) {
             if (!$attribute instanceof Expression) {
@@ -55,9 +55,9 @@ class ExpressionVoter implements VoterInterface
                 $variables = $this->getVariables($token, $subject);
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
             if ($this->expressionLanguage->evaluate($attribute, $variables)) {
-                return VoterInterface::ACCESS_GRANTED;
+                return Vote::createGranted();
             }
         }
 

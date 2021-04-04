@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 class AuthenticatedVoterTest extends TestCase
 {
@@ -29,39 +29,39 @@ class AuthenticatedVoterTest extends TestCase
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
-        $this->assertSame($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
+        $this->assertEquals($expected, $voter->vote($this->getToken($authenticated), null, $attributes));
     }
 
     public function getVoteTests()
     {
         return [
-            ['fully', [], VoterInterface::ACCESS_ABSTAIN],
-            ['fully', ['FOO'], VoterInterface::ACCESS_ABSTAIN],
-            ['remembered', [], VoterInterface::ACCESS_ABSTAIN],
-            ['remembered', ['FOO'], VoterInterface::ACCESS_ABSTAIN],
-            ['anonymously', [], VoterInterface::ACCESS_ABSTAIN],
-            ['anonymously', ['FOO'], VoterInterface::ACCESS_ABSTAIN],
+            ['fully', [], Vote::createAbstain()],
+            ['fully', ['FOO'], Vote::createAbstain()],
+            ['remembered', [], Vote::createAbstain()],
+            ['remembered', ['FOO'], Vote::createAbstain()],
+            ['anonymously', [], Vote::createAbstain()],
+            ['anonymously', ['FOO'], Vote::createAbstain()],
 
-            ['fully', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
-            ['remembered', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
-            ['anonymously', ['IS_AUTHENTICATED_ANONYMOUSLY'], VoterInterface::ACCESS_GRANTED],
+            ['fully', ['IS_AUTHENTICATED_ANONYMOUSLY'], Vote::createGranted()],
+            ['remembered', ['IS_AUTHENTICATED_ANONYMOUSLY'], Vote::createGranted()],
+            ['anonymously', ['IS_AUTHENTICATED_ANONYMOUSLY'], Vote::createGranted()],
 
-            ['fully', ['IS_AUTHENTICATED_REMEMBERED'], VoterInterface::ACCESS_GRANTED],
-            ['remembered', ['IS_AUTHENTICATED_REMEMBERED'], VoterInterface::ACCESS_GRANTED],
-            ['anonymously', ['IS_AUTHENTICATED_REMEMBERED'], VoterInterface::ACCESS_DENIED],
+            ['fully', ['IS_AUTHENTICATED_REMEMBERED'], Vote::createGranted()],
+            ['remembered', ['IS_AUTHENTICATED_REMEMBERED'], Vote::createGranted()],
+            ['anonymously', ['IS_AUTHENTICATED_REMEMBERED'], Vote::createDenied()],
 
-            ['fully', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_GRANTED],
-            ['remembered', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
-            ['anonymously', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
+            ['fully', ['IS_AUTHENTICATED_FULLY'], Vote::createGranted()],
+            ['remembered', ['IS_AUTHENTICATED_FULLY'], Vote::createDenied()],
+            ['anonymously', ['IS_AUTHENTICATED_FULLY'], Vote::createDenied()],
 
-            ['fully', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
-            ['remembered', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
-            ['anonymously', ['IS_ANONYMOUS'], VoterInterface::ACCESS_GRANTED],
+            ['fully', ['IS_ANONYMOUS'], Vote::createDenied()],
+            ['remembered', ['IS_ANONYMOUS'], Vote::createDenied()],
+            ['anonymously', ['IS_ANONYMOUS'], Vote::createGranted()],
 
-            ['fully', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['remembered', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['anonymously', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['impersonated', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_GRANTED],
+            ['fully', ['IS_IMPERSONATOR'], Vote::createDenied()],
+            ['remembered', ['IS_IMPERSONATOR'], Vote::createDenied()],
+            ['anonymously', ['IS_IMPERSONATOR'], Vote::createDenied()],
+            ['impersonated', ['IS_IMPERSONATOR'], Vote::createGranted()],
         ];
     }
 

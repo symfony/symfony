@@ -50,31 +50,27 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      */
     final public function isGranted($attribute, $subject = null): bool
     {
+        return $this->getDecision($attribute, $subject)->isGranted();
+    }
+
+    public function getDecision($attribute, $subject = null): AccessDecision
+    {
         if (null === ($token = $this->tokenStorage->getToken())) {
             if ($this->exceptionOnNoToken) {
                 throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
             }
 
             $token = new NullToken();
-        } else {
-            if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
-                $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
-            }
+        } elseif ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
+            $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
         }
 
-        $this->lastAccessDecision = $this->accessDecisionManager->decide($token, [$attribute], $subject);
+        if (!method_exists($this->accessDecisionManager, 'getDecision')) {
+            trigger_deprecation('symfony/security-core', 5.3, 'Not implementing "%s::getDecision()" method is deprecated, and would be required in 6.0.', \get_class($this->accessDecisionManager));
 
-        if (\is_bool($this->lastAccessDecision)) {
-            trigger_deprecation('symfony/security', 5.1, 'Returning a boolean from the "%s::decide()" method is deprecated. Return an "%s" object instead', \get_class($this->accessDecisionManager), AccessDecision::class);
-
-            return $this->lastAccessDecision;
+            return $this->accessDecisionManager->decide($token, [$attribute], $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
         }
 
-        return $this->lastAccessDecision->isGranted();
-    }
-
-    public function getLastAccessDecision(): AccessDecision
-    {
-        return $this->lastAccessDecision;
+        return $this->accessDecisionManager->getDecision($token, [$attribute], $subject);
     }
 }

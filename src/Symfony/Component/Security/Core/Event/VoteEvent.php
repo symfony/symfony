@@ -29,11 +29,20 @@ final class VoteEvent extends Event
     private $attributes;
     private $vote;
 
-    public function __construct(VoterInterface $voter, $subject, array $attributes, Vote $vote)
+    /**
+     * @param Vote|int $vote
+     */
+    public function __construct(VoterInterface $voter, $subject, array $attributes, $vote)
     {
         $this->voter = $voter;
         $this->subject = $subject;
         $this->attributes = $attributes;
+        if (!$vote instanceof Vote) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Passing an int as the fourth argument to "%s::__construct" is deprecated, pass a "%s" instance instead.', __CLASS__, Vote::class);
+
+            $vote = Vote::create($vote);
+        }
+
         $this->vote = $vote;
     }
 

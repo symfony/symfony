@@ -35,9 +35,15 @@ class TraceableVoter implements VoterInterface
 
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
-        $result = \is_int($vote = $this->voter->vote($token, $subject, $attributes)) ? Vote::create($vote) : $vote;
+        $vote = $this->voter->vote($token, $subject, $attributes);
+        $result = $vote;
+        if (!$vote instanceof Vote && \in_array($vote, [VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_ABSTAIN])) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Returning an int from "%s::vote" is deprecated, return an instance of "%s" instead.', \get_class($this->voter), Vote::class);
 
-        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
+            $result = Vote::create($vote);
+        }
+
+        $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $vote), 'debug.security.authorization.vote');
 
         return $result;
     }

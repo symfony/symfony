@@ -32,7 +32,7 @@ class RoleVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
-        $result = VoterInterface::ACCESS_ABSTAIN;
+        $result = Vote::createAbstain();
         $roles = $this->extractRoles($token);
 
         foreach ($attributes as $attribute) {
@@ -44,10 +44,10 @@ class RoleVoter implements VoterInterface
                 trigger_deprecation('symfony/security-core', '5.1', 'The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
             }
 
-            $result = VoterInterface::ACCESS_DENIED;
+            $result = Vote::createDenied();
             foreach ($roles as $role) {
                 if ($attribute === $role) {
-                    return VoterInterface::ACCESS_GRANTED;
+                    return Vote::createGranted();
                 }
             }
         }

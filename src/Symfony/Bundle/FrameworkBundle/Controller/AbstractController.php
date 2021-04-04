@@ -37,6 +37,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -229,11 +230,22 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected function denyAccessUnlessGranted($attribute, $subject = null, string $message = 'Access Denied.'): void
     {
-        if (!$this->isGranted($attribute, $subject)) {
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
+        }
+
+        $checker = $this->container->get('security.authorization_checker');
+        if (method_exists($checker, 'getDecision')) {
+            $decision = $checker->getDecision($attribute, $subject);
+        } else {
+            $decision = $checker->isGranted($attribute, $subject) ? AccessDecision::createGranted() : AccessDecision::createDenied();
+        }
+
+        if (!$decision->isGranted()) {
             $exception = $this->createAccessDeniedException($message);
             $exception->setAttributes($attribute);
             $exception->setSubject($subject);
-            $exception->setAccessDecision($this->container->get('security.authorization_checker')->getLastAccessDecision());
+            $exception->setAccessDecision($decision);
 
             throw $exception;
         }

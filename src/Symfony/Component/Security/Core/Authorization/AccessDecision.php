@@ -86,8 +86,13 @@ final class AccessDecision
         return $this->getVotesByAccess(Voter::ACCESS_DENIED);
     }
 
+    /**
+     * @return Vote[]
+     */
     private function getVotesByAccess(int $access): array
     {
-        return array_filter($this->votes, function (Vote $vote) use ($access) { return $vote->getAccess() === $access; });
+        return array_filter($this->votes, static function (Vote $vote) use ($access): bool {
+            return $vote->getAccess() === $access;
+        });
     }
 }

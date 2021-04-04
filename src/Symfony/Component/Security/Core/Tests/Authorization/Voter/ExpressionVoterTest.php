@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 class ExpressionVoterTest extends TestCase
 {
@@ -29,19 +29,19 @@ class ExpressionVoterTest extends TestCase
     {
         $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
 
-        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
+        $this->assertEquals($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
     }
 
     public function getVoteTests()
     {
         return [
-            [[], [], VoterInterface::ACCESS_ABSTAIN, false, false],
-            [[], ['FOO'], VoterInterface::ACCESS_ABSTAIN, false, false],
+            [[], [], Vote::createAbstain(), false, false],
+            [[], ['FOO'], Vote::createAbstain(), false, false],
 
-            [[], [$this->createExpression()], VoterInterface::ACCESS_DENIED, true, false],
+            [[], [$this->createExpression()], Vote::createDenied(), true, false],
 
-            [['ROLE_FOO'], [$this->createExpression(), $this->createExpression()], VoterInterface::ACCESS_GRANTED],
-            [['ROLE_BAR', 'ROLE_FOO'], [$this->createExpression()], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_FOO'], [$this->createExpression(), $this->createExpression()], Vote::createGranted()],
+            [['ROLE_BAR', 'ROLE_FOO'], [$this->createExpression()], Vote::createGranted()],
         ];
     }
 

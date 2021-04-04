@@ -69,8 +69,15 @@ class AccessDeniedException extends RuntimeException
     public function setAccessDecision(AccessDecision $accessDecision)
     {
         $this->accessDecision = $accessDecision;
-        $reasons = array_map(function (Vote $vote) { return $vote->getReason(); }, $this->accessDecision->getDeniedVotes());
-        $this->message .= rtrim(' '.implode(' ', $reasons));
+        if (!$accessDecision->getDeniedVotes()) {
+            return;
+        }
+
+        $reasons = array_map(static function (Vote $vote) {
+            return $vote->getReason();
+        }, $accessDecision->getDeniedVotes());
+
+        $this->message = 'Access Denied: '.rtrim(' '.implode(' ', $reasons));
     }
 
     public function getAccessDecision(): AccessDecision

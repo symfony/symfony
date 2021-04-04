@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 /**
- * A Vote is returned by a Voter and contains the access (granted, abstain or denied). It can also contains a reason
- * explaining the why of the access which has been decided.
+ * A Vote is returned by a Voter and contains the access (granted, abstain or denied).
+ * It can also contains a reason explaining the vote decision.
  *
  * @author Dany Maillard <danymaillard93b@gmail.com>
  */
@@ -39,24 +39,24 @@ final class Vote
         return new self($access, $reason, $parameters);
     }
 
-    public static function createGranted(string $reason, array $parameters = []): self
+    public static function createGranted(string $reason = '', array $parameters = []): self
     {
         return new self(VoterInterface::ACCESS_GRANTED, $reason, $parameters);
     }
 
-    public static function createAbstrain(string $reason, array $parameters = []): self
+    public static function createAbstain(string $reason = '', array $parameters = []): self
     {
         return new self(VoterInterface::ACCESS_ABSTAIN, $reason, $parameters);
     }
 
-    public static function createDenied(string $reason, array $parameters = []): self
+    public static function createDenied(string $reason = '', array $parameters = []): self
     {
         return new self(VoterInterface::ACCESS_DENIED, $reason, $parameters);
     }
 
-    public function merge(self $vote): void
+    public function setReason(string $reason)
     {
-        $this->reason .= trim(' '.$vote->getReason());
+        $this->reason = $reason;
     }
 
     public function getReason(): string

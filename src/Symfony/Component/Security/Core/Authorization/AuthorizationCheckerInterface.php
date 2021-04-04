@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Authorization;
  * The AuthorizationCheckerInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @method AccessDecision getDecision(mixed $attribute, mixed $subject = null)
  */
 interface AuthorizationCheckerInterface
 {

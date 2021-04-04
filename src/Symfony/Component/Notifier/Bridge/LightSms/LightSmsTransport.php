@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LightSmsTransport extends AbstractTransport
 {
-    protected const HOST = 'lightsms.com';
+    protected const HOST = 'www.lightsms.com';
 
     private $login;
     private $password;
@@ -72,6 +72,7 @@ final class LightSmsTransport extends AbstractTransport
         37 => 'Base Id is not set',
         38 => 'Phone number already exists in this database',
         39 => 'Phone number does not exist in this database',
+        999 => 'Unknown Error',
     ];
 
     public function __construct(string $login, string $password, string $from, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null)
@@ -119,25 +120,27 @@ final class LightSmsTransport extends AbstractTransport
         $content = $response->toArray(false);
 
         // it happens if the host without www
-        if (isset($content['']) && isset($content['']['error'])) {
-            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['']['error']], $response);
+        if (isset($content['']['error'])) {
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg($content['']['error']), $response);
         }
 
         if (isset($content['error'])) {
-            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg($content['error']), $response);
         }
 
         $phone = $this->escapePhoneNumber($message->getPhone());
         if (32 === $content[$phone]['error']) {
-            throw new TransportException('Unable to send the SMS: '.self::ERROR_CODES[$content['error']], $response);
+            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg($content[$phone]['error']), $response);
         }
 
         if (0 == $content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($content[$phone]['id_sms']);
+
+            return $sentMessage;
         }
 
-        return $sentMessage;
+        throw new TransportException('Unable to send the SMS: ', $response);
     }
 
     private function generateSignature(array $data, int $timestamp): string
@@ -159,5 +162,10 @@ final class LightSmsTransport extends AbstractTransport
     private function escapePhoneNumber(string $phoneNumber): string
     {
         return str_replace('+', '00', $phoneNumber);
+    }
+
+    private function getErrorMsg(string $errorCode): string
+    {
+        return isset(self::ERROR_CODES[$errorCode]) ? self::ERROR_CODES[$errorCode] : self::ERROR_CODES[999];
     }
 }

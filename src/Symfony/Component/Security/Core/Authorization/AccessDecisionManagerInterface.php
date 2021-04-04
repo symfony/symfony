@@ -26,7 +26,7 @@ interface AccessDecisionManagerInterface
      * @param array  $attributes An array of attributes associated with the method being invoked
      * @param object $object     The object to secure
      *
-     * @return bool true if the access is granted, false otherwise
+     * @return bool|AccessDecision Returning a boolean is deprecated since Symfony 5.1. Return an AccessDecision object instead.
      */
     public function decide(TokenInterface $token, array $attributes, $object = null);
 }

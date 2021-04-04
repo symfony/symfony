@@ -233,6 +233,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             $exception = $this->createAccessDeniedException($message);
             $exception->setAttributes($attribute);
             $exception->setSubject($subject);
+            $exception->setAccessDecision($this->container->get('security.authorization_checker')->getLastAccessDecision());
 
             throw $exception;
         }

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 abstract class Voter implements VoterInterface
 {
@@ -27,7 +28,7 @@ abstract class Voter implements VoterInterface
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
         // abstain vote by default in case none of the attributes are supported
-        $vote = self::ACCESS_ABSTAIN;
+        $vote = $this->abstain();
 
         foreach ($attributes as $attribute) {
             try {
@@ -48,15 +49,42 @@ abstract class Voter implements VoterInterface
             }
 
             // as soon as at least one attribute is supported, default is to deny access
-            $vote = self::ACCESS_DENIED;
+            $vote = $this->deny();
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            $v = \is_bool($v = $this->voteOnAttribute($attribute, $subject, $token)) ? Vote::create($v) : $v; // BC layer
+            if ($v->isGranted()) {
                 // grant access as soon as at least one attribute returns a positive response
-                return self::ACCESS_GRANTED;
+                return $v;
+            } else {
+                $vote->merge($v);
             }
         }
 
         return $vote;
+    }
+
+    /**
+     * Creates a granted vote.
+     */
+    public function grant(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createGranted($reason, $parameters);
+    }
+
+    /**
+     * Creates an abstained vote.
+     */
+    public function abstain(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createAbstrain($reason, $parameters);
+    }
+
+    /**
+     * Creates a denied vote.
+     */
+    public function deny(string $reason = '', array $parameters = []): Vote
+    {
+        return Vote::createDenied($reason, $parameters);
     }
 
     /**
@@ -75,7 +103,7 @@ abstract class Voter implements VoterInterface
      *
      * @param mixed $subject
      *
-     * @return bool
+     * @return bool|Vote Returning a boolean is deprecated since Symfony 5.1. Return a Vote object instead.
      */
     abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token);
 }

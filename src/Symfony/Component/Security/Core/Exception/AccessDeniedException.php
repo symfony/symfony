@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+
 /**
  * AccessDeniedException is thrown when the account has not the required role.
  *
@@ -20,6 +23,8 @@ class AccessDeniedException extends RuntimeException
 {
     private $attributes = [];
     private $subject;
+    /** @var AccessDecision */
+    private $accessDecision;
 
     public function __construct(string $message = 'Access Denied.', \Throwable $previous = null)
     {
@@ -56,5 +61,20 @@ class AccessDeniedException extends RuntimeException
     public function setSubject($subject)
     {
         $this->subject = $subject;
+    }
+
+    /**
+     * Sets an access decision and appends the denied reasons to the exception message.
+     */
+    public function setAccessDecision(AccessDecision $accessDecision)
+    {
+        $this->accessDecision = $accessDecision;
+        $reasons = array_map(function (Vote $vote) { return $vote->getReason(); }, $this->accessDecision->getDeniedVotes());
+        $this->message .= rtrim(' '.implode(' ', $reasons));
+    }
+
+    public function getAccessDecision(): AccessDecision
+    {
+        return $this->accessDecision;
     }
 }

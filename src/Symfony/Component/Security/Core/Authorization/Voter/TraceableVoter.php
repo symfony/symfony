@@ -35,7 +35,7 @@ class TraceableVoter implements VoterInterface
 
     public function vote(TokenInterface $token, $subject, array $attributes)
     {
-        $result = $this->voter->vote($token, $subject, $attributes);
+        $result = \is_int($vote = $this->voter->vote($token, $subject, $attributes)) ? Vote::create($vote) : $vote;
 
         $this->eventDispatcher->dispatch(new VoteEvent($this->voter, $subject, $attributes, $result), 'debug.security.authorization.vote');
 

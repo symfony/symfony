@@ -346,16 +346,17 @@
                                             <td class="font-normal text-small">attribute {{ voter_detail['attributes'][0] }}</td>
                                             {% endif %}
                                             <td class="font-normal text-small">
-                                                {% if voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_GRANTED') %}
+                                                {% if voter_detail['vote'].access == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_GRANTED') %}
                                                     ACCESS GRANTED
-                                                {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_ABSTAIN') %}
+                                                {% elseif voter_detail['vote'].access == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_ABSTAIN') %}
                                                     ACCESS ABSTAIN
-                                                {% elseif voter_detail['vote'] == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_DENIED') %}
+                                                {% elseif voter_detail['vote'].access == constant('Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface::ACCESS_DENIED') %}
                                                     ACCESS DENIED
                                                 {% else %}
-                                                    unknown ({{ voter_detail['vote'] }})
+                                                    unknown ({{ voter_detail['vote'].access }})
                                                 {% endif %}
                                             </td>
+                                            <td class="font-normal text-small">{{ voter_detail['vote'].reason|default('~') }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

@@ -31,6 +31,8 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $authenticationManager;
     private $alwaysAuthenticate;
     private $exceptionOnNoToken;
+    /** @var AccessDecision */
+    private $lastAccessDecision;
 
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false, bool $exceptionOnNoToken = true)
     {
@@ -60,6 +62,19 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             }
         }
 
-        return $this->accessDecisionManager->decide($token, [$attribute], $subject);
+        $this->lastAccessDecision = $this->accessDecisionManager->decide($token, [$attribute], $subject);
+
+        if (\is_bool($this->lastAccessDecision)) {
+            trigger_deprecation('symfony/security', 5.1, 'Returning a boolean from the "%s::decide()" method is deprecated. Return an "%s" object instead', \get_class($this->accessDecisionManager), AccessDecision::class);
+
+            return $this->lastAccessDecision;
+        }
+
+        return $this->lastAccessDecision->isGranted();
+    }
+
+    public function getLastAccessDecision(): AccessDecision
+    {
+        return $this->lastAccessDecision;
     }
 }

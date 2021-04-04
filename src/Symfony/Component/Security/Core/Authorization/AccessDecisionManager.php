@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
@@ -77,17 +78,18 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    private function decideAffirmative(TokenInterface $token, array $attributes, $object = null): bool
+    private function decideAffirmative(TokenInterface $token, array $attributes, $object = null): AccessDecision
     {
+        $votes = [];
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $votes[] = $vote = $this->vote($voter, $token, $object, $attributes);
 
-            if (VoterInterface::ACCESS_GRANTED === $result) {
-                return true;
+            if ($vote->isGranted()) {
+                return AccessDecision::createGranted($votes);
             }
 
-            if (VoterInterface::ACCESS_DENIED === $result) {
+            if ($vote->isDenied()) {
                 ++$deny;
             } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
                 trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
@@ -95,10 +97,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         if ($deny > 0) {
-            return false;
+            return AccessDecision::createDenied($votes);
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->decideIfAllAbstainDecisions();
     }
 
     /**
@@ -115,16 +117,17 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    private function decideConsensus(TokenInterface $token, array $attributes, $object = null): bool
+    private function decideConsensus(TokenInterface $token, array $attributes, $object = null): AccessDecision
     {
+        $votes = [];
         $grant = 0;
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $votes[] = $vote = $this->vote($voter, $token, $object, $attributes);
 
-            if (VoterInterface::ACCESS_GRANTED === $result) {
+            if ($vote->isGranted()) {
                 ++$grant;
-            } elseif (VoterInterface::ACCESS_DENIED === $result) {
+            } elseif ($vote->isDenied()) {
                 ++$deny;
             } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
                 trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
@@ -132,18 +135,21 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         if ($grant > $deny) {
-            return true;
+            return AccessDecision::createGranted($votes);
         }
 
         if ($deny > $grant) {
-            return false;
+            return AccessDecision::createDenied($votes);
         }
 
         if ($grant > 0) {
-            return $this->allowIfEqualGrantedDeniedDecisions;
+            return $this->allowIfEqualGrantedDeniedDecisions
+                ? AccessDecision::createGranted()
+                : AccessDecision::createDenied()
+            ;
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->decideIfAllAbstainDecisions();
     }
 
     /**
@@ -152,18 +158,19 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).
      */
-    private function decideUnanimous(TokenInterface $token, array $attributes, $object = null): bool
+    private function decideUnanimous(TokenInterface $token, array $attributes, $object = null): AccessDecision
     {
+        $votes = [];
         $grant = 0;
         foreach ($this->voters as $voter) {
             foreach ($attributes as $attribute) {
-                $result = $voter->vote($token, $object, [$attribute]);
+                $votes[] = $vote = $this->vote($voter, $token, $object, [$attribute]);
 
-                if (VoterInterface::ACCESS_DENIED === $result) {
-                    return false;
+                if ($vote->isDenied()) {
+                    return AccessDecision::createDenied($votes);
                 }
 
-                if (VoterInterface::ACCESS_GRANTED === $result) {
+                if ($vote->isGranted()) {
                     ++$grant;
                 } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
                     trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
@@ -173,10 +180,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
         // no deny votes
         if ($grant > 0) {
-            return true;
+            return AccessDecision::createGranted($votes);
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->decideIfAllAbstainDecisions();
     }
 
     /**
@@ -205,5 +212,23 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    private function decideIfAllAbstainDecisions(): AccessDecision
+    {
+        return $this->allowIfAllAbstainDecisions
+            ? AccessDecision::createGranted()
+            : AccessDecision::createDenied()
+        ;
+    }
+
+    private function vote(VoterInterface $voter, TokenInterface $token, $subject, array $attributes): Vote
+    {
+        if (\is_int($vote = $voter->vote($token, $subject, $attributes))) {
+            trigger_deprecation('symfony/security', 5.1, 'Returning an int from the "%s::vote()" method is deprecated. Return a "%s" object instead.', \get_class($this->voter), Vote::class);
+            $vote = Vote::create($vote);
+        }
+
+        return $vote;
     }
 }

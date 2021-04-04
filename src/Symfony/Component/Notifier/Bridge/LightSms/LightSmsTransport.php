@@ -133,7 +133,7 @@ final class LightSmsTransport extends AbstractTransport
             throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int)$content[$phone]['error']), $response);
         }
 
-        if (0 == (int)$content[$phone]['error']) {
+        if (0 === (int)$content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($content[$phone]['id_sms']);
 

@@ -129,11 +129,11 @@ final class LightSmsTransport extends AbstractTransport
         }
 
         $phone = $this->escapePhoneNumber($message->getPhone());
-        if (32 === $content[$phone]['error']) {
+        if (32 === (int)$content[$phone]['error']) {
             throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int)$content[$phone]['error']), $response);
         }
 
-        if (0 == $content[$phone]['error']) {
+        if (0 == (int)$content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
             $sentMessage->setMessageId($content[$phone]['id_sms']);
 

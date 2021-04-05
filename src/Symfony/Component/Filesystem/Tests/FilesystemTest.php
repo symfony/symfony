@@ -13,6 +13,7 @@ namespace Symfony\Component\Filesystem\Tests;
 
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Test class for Filesystem.
@@ -1206,6 +1207,49 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The end path "var/lib/symfony/" is not absolute.');
         $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
+    }
+
+    public function testMirrorOriginIterator(): void
+    {
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        $sourceFile1 = $sourcePath.'file1';
+        $sourceFile2 = $sourcePath.'file2';
+        $targetFile1 = $targetPath.'file1';
+        $targetFile2 = $targetPath.'file2';
+
+        mkdir($sourcePath);
+        file_put_contents($sourceFile1, 'FILE1');
+        file_put_contents($sourceFile2, 'FILE2');
+
+        $originIterator = Finder::create();
+        $originIterator->files()->in($sourcePath)->name('file1');
+
+        $this->filesystem->mirror($sourcePath, $targetPath, $originIterator);
+
+        self::assertFileExists($targetFile1);
+        self::assertFileDoesNotExist($targetFile2);
+    }
+
+    public function testMirrorTargetIterator(): void
+    {
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        $targetFile1 = $targetPath.'file1';
+        $targetFile2 = $targetPath.'file2';
+
+        mkdir($sourcePath);
+        mkdir($targetPath);
+        file_put_contents($targetFile1, 'FILE1');
+        file_put_contents($targetFile2, 'FILE2');
+
+        $targetIterator = Finder::create();
+        $targetIterator->files()->in($targetPath)->name('file2');
+
+        $this->filesystem->mirror($sourcePath, $targetPath, NULL, ['delete' => true], $targetIterator);
+
+        self::assertFileExists($targetFile1);
+        self::assertFileDoesNotExist($targetFile2);
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()

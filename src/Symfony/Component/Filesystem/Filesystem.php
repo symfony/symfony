@@ -497,14 +497,14 @@ class Filesystem
      *  - existing files in the target directory will be overwritten, except if they are newer (see the `override` option)
      *  - files in the target directory that do not exist in the source directory will not be deleted (see the `delete` option)
      *
-     * @param string            $originDir The origin directory
-     * @param string            $targetDir The target directory
+     * @param string            $originDir      The origin directory
+     * @param string            $targetDir      The target directory
      * @param \Traversable|null $originIterator Iterator that filters which files and directories to copy, if null a recursive iterator is created
-     * @param array             $options   An array of boolean options
-     *                                     Valid options are:
-     *                                     - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
-     *                                     - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
-     *                                     - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
+     * @param array             $options        An array of boolean options
+     *                                          Valid options are:
+     *                                          - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
+     *                                          - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
+     *                                          - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      * @param \Traversable|null $targetIterator Iterator that filters which files and directory in target directory to delete if not in source directory (if $options['delete'] is true)
      *
      * @throws IOException When file type is unknown

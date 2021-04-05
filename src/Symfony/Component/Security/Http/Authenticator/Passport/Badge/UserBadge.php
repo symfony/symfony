@@ -55,6 +55,9 @@ class UserBadge implements BadgeInterface
         return $this->userIdentifier;
     }
 
+    /**
+     * @throws AuthenticationException when the user cannot be found
+     */
     public function getUser(): UserInterface
     {
         if (null === $this->user) {

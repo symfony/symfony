@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Annotation class for @SerializedName().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
@@ -30,11 +31,13 @@ final class SerializedName
     private $serializedName;
 
     /**
-     * @param string|array $serializedName
+     * @param string $serializedName
      */
     public function __construct($serializedName)
     {
         if (\is_array($serializedName)) {
+            trigger_deprecation('symfony/serializer', '5.3', 'Passing an array as first argument to "%s" is deprecated. Use named arguments instead.', __METHOD__);
+
             if (!isset($serializedName['value'])) {
                 throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', static::class));
             }

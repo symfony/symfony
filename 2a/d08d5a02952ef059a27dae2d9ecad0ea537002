@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-01T14:43:18Z
+
+~whoops, this was supposed to be for the 5.2 branch - stby~
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-01T14:50:38Z
+
+We also throw a `\LogicException` in `Passport::getUser()` -> https://github.com/symfony/symfony/blob/b5d1cbcd971e290eca0d460e49c4ba2f6fe01a37/src/Symfony/Component/Security/Http/Authenticator/Passport/Passport.php#L62
+
+Should we document that in the `@throws` as well or leave it out
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-02T12:56:24Z
+
+No need to document logic exceptions, they are not meant be caught.

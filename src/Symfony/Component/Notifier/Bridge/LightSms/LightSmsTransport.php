@@ -135,7 +135,9 @@ final class LightSmsTransport extends AbstractTransport
 
         if (0 === (int) $content[$phone]['error']) {
             $sentMessage = new SentMessage($message, (string) $this);
-            $sentMessage->setMessageId($content[$phone]['id_sms']);
+            if (isset($content[$phone]['id_sms'])) {
+                $sentMessage->setMessageId($content[$phone]['id_sms']);
+            }
 
             return $sentMessage;
         }

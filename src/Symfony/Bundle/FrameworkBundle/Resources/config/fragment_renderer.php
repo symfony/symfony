@@ -34,7 +34,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('fragment.uri_generator', FragmentUriGenerator::class)
-            ->args([param('fragment.path'), service('uri_signer')])
+            ->args([param('fragment.path'), service('uri_signer'), service('request_stack')])
         ->alias(FragmentUriGeneratorInterface::class, 'fragment.uri_generator')
 
         ->set('fragment.renderer.inline', InlineFragmentRenderer::class)

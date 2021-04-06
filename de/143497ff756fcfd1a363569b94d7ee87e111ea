@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2021-04-01T14:41:17Z
+
+fabbot.io is trigerring a false positive
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-04T08:27:25Z
+
+The test failure looks related.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2021-04-06T07:43:21Z
+
+About the failing tests, it's because of a BC break between 0.5.0 and 0.5.1. In fact, `MockHub` signature has changed.
+Maybe we can require at least `^0.5.1`? (Or even `^0.5.2` to have the `all` method available)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-06T08:46:48Z
+
+> Maybe we can require at least ^0.5.1? (Or even ^0.5.2 to have the all method available)
+
+Lets require `^0.5.2` then 👍

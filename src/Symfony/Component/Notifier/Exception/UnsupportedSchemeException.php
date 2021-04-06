@@ -72,6 +72,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
             'package' => 'symfony/spot-hit-notifier',
         ],
+        'fakechat' => [
+            'class' => Bridge\FakeChat\FakeChatTransportFactory::class,
+            'package' => 'symfony/fake-chat-notifier',
+        ],
         'fakesms' => [
             'class' => Bridge\FakeSms\FakeSmsTransportFactory::class,
             'package' => 'symfony/fake-sms-notifier',

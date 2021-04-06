@@ -31,7 +31,7 @@ final class LightSmsTransportTest extends TransportTestCase
 
     public function toStringProvider(): iterable
     {
-        yield ['lightsms://www.lightsms.com/external/get/send.php?from=from', $this->createTransport()];
+        yield ['lightsms://www.lightsms.com?from=from', $this->createTransport()];
     }
 
     public function supportedMessagesProvider(): iterable

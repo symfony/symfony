@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\MessageAttributeValue;
+use AsyncAws\Sqs\ValueObject\MessageSystemAttributeValue;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -312,7 +314,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null): void
+    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
@@ -323,6 +325,7 @@ class Connection
             'MessageBody' => $body,
             'DelaySeconds' => $delay,
             'MessageAttributes' => [],
+            'MessageSystemAttributes' => [],
         ];
 
         $specialHeaders = [];
@@ -343,6 +346,13 @@ class Connection
             $parameters['MessageAttributes'][self::MESSAGE_ATTRIBUTE_NAME] = new MessageAttributeValue([
                 'DataType' => 'String',
                 'StringValue' => json_encode($specialHeaders),
+            ]);
+        }
+
+        if (null !== $xrayTraceId) {
+            $parameters['MessageSystemAttributes'][MessageSystemAttributeName::AWSTRACE_HEADER] = new MessageSystemAttributeValue([
+                'DataType' => 'String',
+                'StringValue' => $xrayTraceId,
             ]);
         }
 

@@ -6,6 +6,7 @@ CHANGELOG
 
  * Added new `debug` option to log HTTP requests and responses.
  * Allowed for receiver & sender injection into AmazonSqsTransport
+ * Add X-Ray trace header support to the SQS transport
 
 5.2.0
 -----

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-03-28T09:29:34Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-03-28T13:14:23Z
+
+Do I need to make any action for this
+
+Issues that cannot be fixed automatically
+in Commits list, a `git rebase` is needed to remove any merges
+Merge remote-tracking branch 'origin/5.x' into 5.x
+
+Never used before
+
+Possible I need to do this one step https://symfony.com/doc/current/contributing/code/pull_requests.html#step-4-submit-your-pull-request
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-03-30T06:23:39Z
+
+As I see now I have some tests fails after HOST changes
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-31T12:08:18Z
+
+![CleanShot 2021-03-31 at 14 07 03](https://user-images.githubusercontent.com/995707/113141776-6b374c80-922a-11eb-8a21-01f671944e26.png)
+
+It looks like your commiter email is not associated with your Github account 🤔
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-01T10:58:12Z
+
+I think I am cannot add it while no git repository https://github.com/symfony/recipes/pull/921 :|
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-01T13:42:34Z
+
+Documentation changes https://github.com/symfony/symfony-docs/pull/15178
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-03T13:51:59Z
+
+TODO: https://github.com/symfony/symfony/pull/40696

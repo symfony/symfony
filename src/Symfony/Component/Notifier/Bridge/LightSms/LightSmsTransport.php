@@ -120,7 +120,7 @@ final class LightSmsTransport extends AbstractTransport
         );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
-            throw new TransportException('Unable to send the SMS', $response);
+            throw new TransportException('Unable to send the SMS.', $response);
         }
 
         $content = $response->toArray(false);
@@ -148,7 +148,7 @@ final class LightSmsTransport extends AbstractTransport
             return $sentMessage;
         }
 
-        throw new TransportException('Unable to send the SMS', $response);
+        throw new TransportException('Unable to send the SMS.', $response);
     }
 
     private function generateSignature(array $data, int $timestamp): string

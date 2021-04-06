@@ -120,6 +120,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
             'package' => 'symfony/clickatell-notifier',
         ],
+        'lightsms' => [
+            'class' => Bridge\LightSms\LightSmsTransportFactory::class,
+            'package' => 'symfony/lightsms-notifier',
+        ],
     ];
 
     /**

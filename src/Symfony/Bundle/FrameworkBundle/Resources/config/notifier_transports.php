@@ -23,6 +23,7 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Infobip\InfobipTransportFactory;
 use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
+use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
@@ -163,6 +164,10 @@ return static function (ContainerConfigurator $container) {
         ->set('notifier.transport_factory.null', NullTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.lightsms', LightSmsTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
     ;
 };

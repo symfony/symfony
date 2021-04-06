@@ -86,7 +86,7 @@ final class LightSmsTransport extends AbstractTransport
 
     public function __toString(): string
     {
-        return sprintf('lightsms://%s/external/get/send.php?from=%s', $this->getEndpoint(), $this->from);
+        return sprintf('lightsms://%s?from=%s', $this->getEndpoint(), $this->from);
     }
 
     public function supports(MessageInterface $message): bool
@@ -109,9 +109,15 @@ final class LightSmsTransport extends AbstractTransport
             'timestamp' => $timestamp,
         ];
         $data['signature'] = $this->generateSignature($data, $timestamp);
-        $endpoint = 'https://'.$this->getEndpoint().'/external/get/send.php?'.http_build_query($data);
 
-        $response = $this->client->request('GET', $endpoint);
+        $endpoint = sprintf('https://%s/external/get/send.php', $this->getEndpoint());
+        $response = $this->client->request(
+            'GET',
+            $endpoint,
+            [
+                'query' => $data,
+            ]
+        );
 
         if (Response::HTTP_OK !== $response->getStatusCode()) {
             throw new TransportException('Unable to send the SMS', $response);

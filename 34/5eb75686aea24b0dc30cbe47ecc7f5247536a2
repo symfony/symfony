@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-01T09:55:02Z
+
+`LICENSE` and `.git*` files are missing
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-01T09:57:32Z
+
+> LICENSE and .git* files are missing
+
+Thanks, fixed
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-04T15:49:57Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-06T10:47:45Z
+
+I merge this, as its mostly a copy paste from `FakeSms` bridge

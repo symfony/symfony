@@ -100,15 +100,14 @@ final class LightSmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $timestamp = time();
         $data = [
             'login' => $this->login,
-            'phone' => $this->escapePhoneNumber($message->getPhone()),
-            'text' => $message->getSubject(),
+            'phone' => $phone = $this->escapePhoneNumber($message->getPhone()),
             'sender' => $this->from,
-            'timestamp' => $timestamp,
+            'text' => $message->getSubject(),
+            'timestamp' => time(),
         ];
-        $data['signature'] = $this->generateSignature($data, $timestamp);
+        $data['signature'] = $this->generateSignature($data);
 
         $endpoint = sprintf('https://%s/external/get/send.php', $this->getEndpoint());
         $response = $this->client->request(
@@ -125,55 +124,33 @@ final class LightSmsTransport extends AbstractTransport
 
         $content = $response->toArray(false);
 
-        // it happens if the host without www
-        if (isset($content['']['error'])) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content['']['error']), $response);
-        }
-
-        if (isset($content['error'])) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content['error']), $response);
-        }
-
-        $phone = $this->escapePhoneNumber($message->getPhone());
-        if (32 === (int) $content[$phone]['error']) {
-            throw new TransportException('Unable to send the SMS: '.$this->getErrorMsg((int) $content[$phone]['error']), $response);
-        }
-
-        if (0 === (int) $content[$phone]['error']) {
-            $sentMessage = new SentMessage($message, (string) $this);
-            if (isset($content[$phone]['id_sms'])) {
-                $sentMessage->setMessageId($content[$phone]['id_sms']);
+        if (0 !== (int) $content[$phone]['error'] ?? -1) {
+            $errorCode = (int) $content['error'] ?? $content['']['error'] ?? $content[$phone]['error'] ?? -1;
+            if (-1 === $errorCode) {
+                throw new TransportException('Unable to send the SMS.', $response);
             }
 
-            return $sentMessage;
+            $error = self::ERROR_CODES[$errorCode] ?? self::ERROR_CODES[999];
+            throw new TransportException('Unable to send the SMS: '.$error, $response);
         }
 
-        throw new TransportException('Unable to send the SMS.', $response);
+        $sentMessage = new SentMessage($message, (string) $this);
+        if (isset($content[$phone]['id_sms'])) {
+            $sentMessage->setMessageId($content[$phone]['id_sms']);
+        }
+
+        return $sentMessage;
     }
 
-    private function generateSignature(array $data, int $timestamp): string
+    private function generateSignature(array $data): string
     {
-        $params = [
-            'timestamp' => $timestamp,
-            'login' => $this->login,
-            'phone' => $data['phone'],
-            'sender' => $this->from,
-            'text' => $data['text'],
-        ];
+        ksort($data);
 
-        ksort($params);
-        reset($params);
-
-        return md5(implode('', $params).$this->password);
+        return md5(implode('', array_values($data)).$this->password);
     }
 
     private function escapePhoneNumber(string $phoneNumber): string
     {
         return str_replace('+', '00', $phoneNumber);
-    }
-
-    private function getErrorMsg(int $errorCode): string
-    {
-        return self::ERROR_CODES[$errorCode] ?? self::ERROR_CODES[999];
     }
 }

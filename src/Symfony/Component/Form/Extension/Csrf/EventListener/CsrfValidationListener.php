@@ -55,7 +55,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         $this->errorMessage = $errorMessage;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
-        $this->serverParams = $serverParams ?: new ServerParams();
+        $this->serverParams = $serverParams ?? new ServerParams();
     }
 
     public function preSubmit(FormEvent $event)

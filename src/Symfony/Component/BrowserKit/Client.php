@@ -55,8 +55,8 @@ abstract class Client
     public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = $history ?: new History();
-        $this->cookieJar = $cookieJar ?: new CookieJar();
+        $this->history = $history ?? new History();
+        $this->cookieJar = $cookieJar ?? new CookieJar();
     }
 
     /**

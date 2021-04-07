@@ -42,7 +42,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
         $this->fields = $fields;
         $this->pad = $pad;
-        $this->referenceDate = $referenceDate ?: new \DateTimeImmutable('1970-01-01 00:00:00');
+        $this->referenceDate = $referenceDate ?? new \DateTimeImmutable('1970-01-01 00:00:00');
     }
 
     /**

@@ -51,7 +51,7 @@ class Connection
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
         }
 
-        $this->connection = $redis ?: new \Redis();
+        $this->connection = $redis ?? new \Redis();
         $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
 

@@ -38,7 +38,7 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->userProvider = $userProvider;
         $this->providerKey = $providerKey;
-        $this->userChecker = $userChecker ?: new UserChecker();
+        $this->userChecker = $userChecker ?? new UserChecker();
     }
 
     public function authenticate(TokenInterface $token)

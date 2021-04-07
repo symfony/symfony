@@ -405,7 +405,7 @@ class ContextListenerTest extends TestCase
 
     private function handleEventWithPreviousSession($userProviders, UserInterface $user = null, RememberMeServicesInterface $rememberMeServices = null)
     {
-        $tokenUser = $user ?: new User('foo', 'bar');
+        $tokenUser = $user ?? new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security_context_key', serialize(new UsernamePasswordToken($tokenUser, '', 'context_key', ['ROLE_USER'])));
 

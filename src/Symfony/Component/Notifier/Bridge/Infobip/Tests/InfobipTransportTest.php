@@ -26,7 +26,7 @@ final class InfobipTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return (new InfobipTransport('authtoken', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new InfobipTransport('authtoken', '0611223344', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable

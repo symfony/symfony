@@ -407,7 +407,7 @@ class ValidatorBuilder
             $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->mappingCache);
         }
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
+        $validatorFactory = $this->validatorFactory ?? new ConstraintValidatorFactory();
         $translator = $this->translator;
 
         if (null === $translator) {

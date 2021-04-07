@@ -121,6 +121,6 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
-        return new TraceableUrlMatcher($routes, $context ?: new RequestContext());
+        return new TraceableUrlMatcher($routes, $context ?? new RequestContext());
     }
 }

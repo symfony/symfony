@@ -35,7 +35,7 @@ abstract class AbstractTransport implements TransportInterface
     public function __construct(EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
-        $this->logger = $logger ?: new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**

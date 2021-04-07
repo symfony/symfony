@@ -25,8 +25,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
     {
-        $this->encodingImpl = $encodingImpl ?: new JsonEncode();
-        $this->decodingImpl = $decodingImpl ?: new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
+        $this->encodingImpl = $encodingImpl ?? new JsonEncode();
+        $this->decodingImpl = $decodingImpl ?? new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
     }
 
     /**

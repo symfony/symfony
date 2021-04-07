@@ -44,7 +44,7 @@ class SmtpTransport extends AbstractTransport
     {
         parent::__construct($dispatcher, $logger);
 
-        $this->stream = $stream ?: new SocketStream();
+        $this->stream = $stream ?? new SocketStream();
     }
 
     public function getStream(): AbstractStream

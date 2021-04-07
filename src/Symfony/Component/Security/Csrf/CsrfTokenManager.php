@@ -39,8 +39,8 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
      */
     public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null, $namespace = null)
     {
-        $this->generator = $generator ?: new UriSafeTokenGenerator();
-        $this->storage = $storage ?: new NativeSessionTokenStorage();
+        $this->generator = $generator ?? new UriSafeTokenGenerator();
+        $this->storage = $storage ?? new NativeSessionTokenStorage();
 
         $superGlobalNamespaceGenerator = function () {
             return !empty($_SERVER['HTTPS']) && 'off' !== strtolower($_SERVER['HTTPS']) ? 'https-' : '';

@@ -943,6 +943,6 @@ class UrlMatcherTest extends TestCase
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
-        return new UrlMatcher($routes, $context ?: new RequestContext());
+        return new UrlMatcher($routes, $context ?? new RequestContext());
     }
 }

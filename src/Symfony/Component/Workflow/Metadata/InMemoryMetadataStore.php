@@ -28,7 +28,7 @@ final class InMemoryMetadataStore implements MetadataStoreInterface
     {
         $this->workflowMetadata = $workflowMetadata;
         $this->placesMetadata = $placesMetadata;
-        $this->transitionsMetadata = $transitionsMetadata ?: new \SplObjectStorage();
+        $this->transitionsMetadata = $transitionsMetadata ?? new \SplObjectStorage();
     }
 
     public function getWorkflowMetadata(): array

@@ -32,7 +32,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 
     public function __construct(ServerParams $serverParams = null)
     {
-        $this->serverParams = $serverParams ?: new ServerParams();
+        $this->serverParams = $serverParams ?? new ServerParams();
     }
 
     /**

@@ -42,7 +42,7 @@ class CoreExtension extends AbstractExtension
             throw new \TypeError(sprintf('Argument 3 passed to "%s()" must be an instance of "%s", "%s" given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
         }
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
+        $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
         $this->translator = $translator;
     }
 

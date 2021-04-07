@@ -72,7 +72,7 @@ class SimplePreAuthenticationListener extends AbstractListener implements Listen
             $this->dispatcher = $dispatcher;
         }
 
-        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
     }
 
     /**

@@ -29,7 +29,7 @@ class TreeBuilder implements NodeParentInterface
         if (null === $name) {
             @trigger_error('A tree builder without a root node is deprecated since Symfony 4.2 and will not be supported anymore in 5.0.', \E_USER_DEPRECATED);
         } else {
-            $builder = $builder ?: new NodeBuilder();
+            $builder = $builder ?? new NodeBuilder();
             $this->root = $builder->node($name, $type)->setParent($this);
         }
     }
@@ -50,7 +50,7 @@ class TreeBuilder implements NodeParentInterface
     {
         @trigger_error(sprintf('The "%s()" method called for the "%s" configuration is deprecated since Symfony 4.3, pass the root name to the constructor instead.', __METHOD__, $name), \E_USER_DEPRECATED);
 
-        $builder = $builder ?: new NodeBuilder();
+        $builder = $builder ?? new NodeBuilder();
 
         return $this->root = $builder->node($name, $type)->setParent($this);
     }

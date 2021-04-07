@@ -40,7 +40,7 @@ abstract class Output implements OutputInterface
     public function __construct(?int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = false, OutputFormatterInterface $formatter = null)
     {
         $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
-        $this->formatter = $formatter ?: new OutputFormatter();
+        $this->formatter = $formatter ?? new OutputFormatter();
         $this->formatter->setDecorated($decorated);
     }
 

@@ -29,7 +29,7 @@ class Package implements PackageInterface
     public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
         $this->versionStrategy = $versionStrategy;
-        $this->context = $context ?: new NullContext();
+        $this->context = $context ?? new NullContext();
     }
 
     /**

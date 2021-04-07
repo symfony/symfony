@@ -76,7 +76,7 @@ class ContextListener extends AbstractListener implements ListenerInterface
             $this->dispatcher = $dispatcher;
         }
 
-        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 

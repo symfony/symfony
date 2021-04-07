@@ -33,7 +33,7 @@ class ExpressionLanguage
      */
     public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
     {
-        $this->cache = $cache ?: new ArrayAdapter();
+        $this->cache = $cache ?? new ArrayAdapter();
         $this->registerFunctions();
         foreach ($providers as $provider) {
             $this->registerProvider($provider);

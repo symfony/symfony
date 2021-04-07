@@ -44,7 +44,7 @@ class WebProfilerExtension extends ProfilerExtension
 
     public function __construct(HtmlDumper $dumper = null)
     {
-        $this->dumper = $dumper ?: new HtmlDumper();
+        $this->dumper = $dumper ?? new HtmlDumper();
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
     }
 

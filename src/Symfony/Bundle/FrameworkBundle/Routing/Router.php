@@ -49,7 +49,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     {
         $this->container = $container;
         $this->resource = $resource;
-        $this->context = $context ?: new RequestContext();
+        $this->context = $context ?? new RequestContext();
         $this->logger = $logger;
         $this->setOptions($options);
 

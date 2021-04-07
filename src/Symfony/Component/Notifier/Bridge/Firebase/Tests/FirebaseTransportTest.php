@@ -29,7 +29,7 @@ final class FirebaseTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new FirebaseTransport('username:password', $client ?: $this->createMock(HttpClientInterface::class));
+        return new FirebaseTransport('username:password', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

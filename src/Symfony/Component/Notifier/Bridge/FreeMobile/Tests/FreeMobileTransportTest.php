@@ -26,7 +26,7 @@ final class FreeMobileTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?: $this->createMock(HttpClientInterface::class));
+        return new FreeMobileTransport('login', 'pass', '0611223344', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

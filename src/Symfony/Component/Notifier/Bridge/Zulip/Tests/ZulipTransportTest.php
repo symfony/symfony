@@ -26,7 +26,7 @@ final class ZulipTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new ZulipTransport('testEmail', 'testToken', 'testChannel', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
     public function toStringProvider(): iterable

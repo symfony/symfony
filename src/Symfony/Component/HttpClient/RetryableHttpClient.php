@@ -43,7 +43,7 @@ class RetryableHttpClient implements HttpClientInterface
         $this->client = $client;
         $this->strategy = $strategy ?? new GenericRetryStrategy();
         $this->maxRetries = $maxRetries;
-        $this->logger = $logger ?: new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface

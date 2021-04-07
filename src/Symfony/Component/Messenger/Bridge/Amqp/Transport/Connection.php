@@ -117,7 +117,7 @@ class Connection
         $this->autoSetupExchange = $this->autoSetup = $connectionOptions['auto_setup'] ?? true;
         $this->exchangeOptions = $exchangeOptions;
         $this->queuesOptions = $queuesOptions;
-        $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
+        $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
     }
 
     /**

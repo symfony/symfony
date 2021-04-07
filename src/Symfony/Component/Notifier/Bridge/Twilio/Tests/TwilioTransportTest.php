@@ -26,7 +26,7 @@ final class TwilioTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new TwilioTransport('accountSid', 'authToken', 'from', $client ?: $this->createMock(HttpClientInterface::class));
+        return new TwilioTransport('accountSid', 'authToken', 'from', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

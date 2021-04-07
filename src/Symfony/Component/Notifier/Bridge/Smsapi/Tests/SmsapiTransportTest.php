@@ -26,7 +26,7 @@ final class SmsapiTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return (new SmsapiTransport('testToken', 'testFrom', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('test.host');
+        return (new SmsapiTransport('testToken', 'testFrom', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('test.host');
     }
 
     public function toStringProvider(): iterable

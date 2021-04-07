@@ -33,7 +33,7 @@ final class GoogleChatTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null, string $threadKey = null): TransportInterface
     {
-        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?: $this->createMock(HttpClientInterface::class));
+        return new GoogleChatTransport('My-Space', 'theAccessKey', 'theAccessToken=', $threadKey, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

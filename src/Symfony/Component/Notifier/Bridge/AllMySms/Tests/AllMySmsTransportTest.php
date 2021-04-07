@@ -26,7 +26,7 @@ final class AllMySmsTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null, string $from = null): TransportInterface
     {
-        return new AllMySmsTransport('login', 'apiKey', $from, $client ?: $this->createMock(HttpClientInterface::class));
+        return new AllMySmsTransport('login', 'apiKey', $from, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

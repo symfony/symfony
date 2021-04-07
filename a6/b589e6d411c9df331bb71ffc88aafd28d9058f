@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-07T21:19:45Z
+
+@jderusse You as always right :+1: Checked. Now works without any errors :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-07T21:23:28Z
+
+@StaffNowa Can you please squash your commits? https://stackoverflow.com/a/5189600/4363634
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-07T21:49:17Z
+
+omg something made bad... :skull:
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-07T22:10:50Z
+
+Finally
+
+```
+git rebase -f upstream/5.x
+git push --force origin lighsms-suggestion
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-07T22:12:22Z
+
+Well done :)

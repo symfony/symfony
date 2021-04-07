@@ -64,7 +64,7 @@ class Container implements ContainerInterface, ResetInterface
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
-        $this->parameterBag = $parameterBag ?: new EnvPlaceholderParameterBag();
+        $this->parameterBag = $parameterBag ?? new EnvPlaceholderParameterBag();
     }
 
     /**

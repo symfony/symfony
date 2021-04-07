@@ -57,7 +57,7 @@ class ChoiceType extends AbstractType
      */
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null, $translator = null)
     {
-        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(
+        $this->choiceListFactory = $choiceListFactory ?? new CachingFactoryDecorator(
             new PropertyAccessDecorator(
                 new DefaultChoiceListFactory()
             )

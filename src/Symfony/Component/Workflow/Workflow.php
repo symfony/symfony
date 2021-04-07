@@ -70,7 +70,7 @@ class Workflow implements WorkflowInterface
     public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed', array $eventsToDispatch = null)
     {
         $this->definition = $definition;
-        $this->markingStore = $markingStore ?: new MethodMarkingStore();
+        $this->markingStore = $markingStore ?? new MethodMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
         $this->eventsToDispatch = $eventsToDispatch;

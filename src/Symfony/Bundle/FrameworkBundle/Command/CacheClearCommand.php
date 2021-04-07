@@ -46,7 +46,7 @@ class CacheClearCommand extends Command
         parent::__construct();
 
         $this->cacheClearer = $cacheClearer;
-        $this->filesystem = $filesystem ?: new Filesystem();
+        $this->filesystem = $filesystem ?? new Filesystem();
     }
 
     /**

@@ -31,7 +31,7 @@ class Parser implements ParserInterface
 
     public function __construct(Tokenizer $tokenizer = null)
     {
-        $this->tokenizer = $tokenizer ?: new Tokenizer();
+        $this->tokenizer = $tokenizer ?? new Tokenizer();
     }
 
     /**

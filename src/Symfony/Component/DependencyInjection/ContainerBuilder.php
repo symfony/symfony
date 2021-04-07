@@ -363,7 +363,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($this->trackResources) {
             if (!$classReflector) {
-                $this->addResource($resource ?: new ClassExistenceResource($class, false));
+                $this->addResource($resource ?? new ClassExistenceResource($class, false));
             } elseif (!$classReflector->isInternal()) {
                 $path = $classReflector->getFileName();
 

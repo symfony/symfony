@@ -158,7 +158,7 @@ class TestSessionListenerTest extends TestCase
     private function filterResponse(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, Response $response = null)
     {
         $request->setSession($this->session);
-        $response = $response ?: new Response();
+        $response = $response ?? new Response();
         $kernel = $this->createMock(HttpKernelInterface::class);
         $event = new ResponseEvent($kernel, $request, $type, $response);
 

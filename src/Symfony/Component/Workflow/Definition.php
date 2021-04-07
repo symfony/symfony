@@ -44,7 +44,7 @@ final class Definition
 
         $this->setInitialPlaces($initialPlaces);
 
-        $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
+        $this->metadataStore = $metadataStore ?? new InMemoryMetadataStore();
     }
 
     /**

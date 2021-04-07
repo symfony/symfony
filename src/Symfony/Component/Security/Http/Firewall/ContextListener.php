@@ -69,7 +69,7 @@ class ContextListener extends AbstractListener
         $this->logger = $logger;
         $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
 
-        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->trustResolver = $trustResolver ?? new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
         $this->sessionTrackerEnabler = $sessionTrackerEnabler;
     }
 

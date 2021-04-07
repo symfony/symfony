@@ -50,7 +50,7 @@ class Translator implements TranslatorInterface
 
     public function __construct(ParserInterface $parser = null)
     {
-        $this->mainParser = $parser ?: new Parser();
+        $this->mainParser = $parser ?? new Parser();
 
         $this
             ->registerExtension(new Extension\NodeExtension())

@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**
  * A decorator that delegates all method calls to the authenticator
@@ -42,9 +43,12 @@ class UserAuthenticator implements UserAuthenticatorInterface
         $this->requestStack = $requestStack;
     }
 
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request): ?Response
+    /**
+     * {@inheritdoc}
+     */
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
-        return $this->getUserAuthenticator()->authenticateUser($user, $authenticator, $request);
+        return $this->getUserAuthenticator()->authenticateUser($user, $authenticator, $request, $badges);
     }
 
     private function getUserAuthenticator(): UserAuthenticatorInterface

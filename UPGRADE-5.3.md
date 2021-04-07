@@ -193,6 +193,7 @@ Security
  * Deprecate calling methods `hashPassword()`, `isPasswordValid()` and `needsRehash()` on `UserPasswordHasherInterface` with a `UserInterface` instance that does not implement `PasswordAuthenticatedUserInterface`
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
  * Deprecated voters that do not return a valid decision when calling the `vote` method
+ * [BC break] Add optional array argument `$badges` to `UserAuthenticatorInterface::authenticateUser()`
 
 SecurityBundle
 --------------

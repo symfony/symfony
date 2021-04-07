@@ -26,7 +26,7 @@ final class SinchTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new SinchTransport('accountSid', 'authToken', 'sender', $client ?: $this->createMock(HttpClientInterface::class));
+        return new SinchTransport('accountSid', 'authToken', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

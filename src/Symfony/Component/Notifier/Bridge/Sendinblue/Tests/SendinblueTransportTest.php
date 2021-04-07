@@ -29,7 +29,7 @@ final class SendinblueTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return (new SendinblueTransport('api-key', '0611223344', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new SendinblueTransport('api-key', '0611223344', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable

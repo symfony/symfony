@@ -33,7 +33,7 @@ final class SlackTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null, string $channel = null): TransportInterface
     {
-        return new SlackTransport('testToken', $channel, $client ?: $this->createMock(HttpClientInterface::class));
+        return new SlackTransport('testToken', $channel, $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

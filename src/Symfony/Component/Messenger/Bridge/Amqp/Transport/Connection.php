@@ -114,7 +114,7 @@ class Connection
         ], $connectionOptions);
         $this->exchangeOptions = $exchangeOptions;
         $this->queuesOptions = $queuesOptions;
-        $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
+        $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
     }
 
     /**

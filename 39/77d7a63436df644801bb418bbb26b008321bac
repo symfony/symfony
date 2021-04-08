@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-16T13:39:28Z
+
+> Don't we need to update the XSD schema for the XML format ?
+
+Yes, but we need to do it in 5.2: https://github.com/symfony/symfony/pull/40490 (or 5.1 actually, but that's no longer supported)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-03-16T14:18:21Z
+
+@wouterj you will still need an update in this PR to add the `required-badge` node in the XSD
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-04T20:15:25Z
+
+> It is just an observation, it might be out of scope for this PR but I would still ask if there is something we can/should do about this scenario.
+
+Thanks for reminding me :) After #40567, we can do this in a much "cleaner" way. PR updated

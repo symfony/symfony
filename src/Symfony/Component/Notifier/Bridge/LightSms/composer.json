@@ -1,5 +1,5 @@
 {
-    "name": "symfony/lightsms-notifier",
+    "name": "symfony/light-sms-notifier",
     "type": "symfony-bridge",
     "description": "Symfony LightSms Notifier Bridge",
     "keywords": ["sms", "light-sms", "notifier"],

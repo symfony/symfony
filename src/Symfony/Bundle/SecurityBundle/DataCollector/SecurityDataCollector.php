@@ -367,7 +367,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * Returns the configuration of the current firewall context.
      *
-     * @return array|Data
+     * @return array|Data|null
      */
     public function getFirewall()
     {

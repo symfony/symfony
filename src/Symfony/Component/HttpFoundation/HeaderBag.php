@@ -230,7 +230,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a Cache-Control directive value by name.
      *
-     * @return mixed|null The directive value if defined, null otherwise
+     * @return mixed The directive value if defined, null otherwise
      */
     public function getCacheControlDirective(string $key)
     {

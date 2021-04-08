@@ -75,7 +75,7 @@ final class Headers
     }
 
     /**
-     * @param (Address|string)[] $addresses
+     * @param array<Address|string> $addresses
      *
      * @return $this
      */

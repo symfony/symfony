@@ -114,7 +114,7 @@ final class Address
     }
 
     /**
-     * @param (Address|string)[] $addresses
+     * @param array<Address|string> $addresses
      *
      * @return Address[]
      */

@@ -69,8 +69,8 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     private $normalizerCache = [];
 
     /**
-     * @param (NormalizerInterface|DenormalizerInterface)[] $normalizers
-     * @param (EncoderInterface|DecoderInterface)[]         $encoders
+     * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
+     * @param array<EncoderInterface|DecoderInterface>         $encoders
      */
     public function __construct(array $normalizers = [], array $encoders = [])
     {

@@ -84,7 +84,7 @@ final class Response
     /**
      * Gets a response header.
      *
-     * @return string|array The first header value if $first is true, an array of values otherwise
+     * @return string|array|null The first header value if $first is true, an array of values otherwise
      */
     public function getHeader(string $header, bool $first = true)
     {

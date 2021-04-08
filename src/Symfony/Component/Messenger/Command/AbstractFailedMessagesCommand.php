@@ -76,7 +76,7 @@ abstract class AbstractFailedMessagesCommand extends Command
     }
 
     /**
-     * @return mixed|null
+     * @return mixed
      */
     protected function getMessageId(Envelope $envelope)
     {

@@ -124,8 +124,8 @@ final class LightSmsTransport extends AbstractTransport
 
         $content = $response->toArray(false);
 
-        if (0 !== (int) ($content['error'] ?? $content['']['error'] ?? $content[$phone]['error']) ?? -1) {
-            $errorCode = (int) ($content['error'] ?? $content['']['error'] ?? $content[$phone]['error']) ?? -1;
+        $errorCode = (int) ($content['error'] ?? $content['']['error'] ?? $content[$phone]['error']) ?? -1;
+        if (0 !== $errorCode) {
             if (-1 === $errorCode) {
                 throw new TransportException('Unable to send the SMS.', $response);
             }

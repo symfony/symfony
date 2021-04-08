@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-03T13:23:08Z
+
+From https://semver.org/#spec-item-7
+> Minor version Y (x.Y.z | x > 0) MUST be incremented if new, backwards compatible functionality is introduced to the public API
+
+Should we mark the new methods as `@internal` until 5.3?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T14:09:01Z
+
+Oh, thank you. The PR is updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-05T13:16:00Z
+
+about the name, what about length() and width()?
+
+On 5.x, I'd be in favor of deprecating the current methods, including strlenWithoutDecoration(), and tell ppl to use removeDecoration instead.
+
+if you agree with this plan, we could skip using strlenWithoutDecoration() in this PR.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-05T13:21:49Z
+
+Agree 👍
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-05T19:42:35Z
+
+Thank you for the reviews. The PR is updated.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-04-05T21:08:52Z
+
+If we deprecated `strlen`, then replacement methods should not be internal. right?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-05T21:13:38Z
+
+They will no longer be internal as soon as they will be publicly introduced in 5.3, at the same time we will deprecate `strlen()` (this is a 5.2 bugfix)

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-07T18:47:28Z
+
+Thank you @fancyweb.
+
+I see that a similar PR was approved and merged. Im happy to merge this to, but could you help me understand the benefit of this change?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-07T21:30:11Z
+
+> but could you help me understand the benefit of this change?
+
+`??` is more precise than `?:`. With `$foo ?: $bar`, we tell PHP, "Check if `$foo` contains some truthy value and if not, fall back to `$bar` instead". With `$foo ?? $bar`, we explicitly check for `$foo === null` and nothing else.
+
+If possible, we should prefer `??` over `?:` – just as we should prefer `===` over `==`. Less edge cases and the intention of the code is made clearer to the reader.
+
+Moreover, one fine day, when we don't have to support PHP < 7.4 anymore, wen can simplify `$foo = $foo ?? $bar` to `$foo ??= $bar`. 🎉

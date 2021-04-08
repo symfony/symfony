@@ -128,6 +128,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,
             'package' => 'symfony/lightsms-notifier',
         ],
+        'microsoftteams' => [
+            'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
+            'package' => 'symfony/microsoft-teams-notifier',
+        ],
     ];
 
     /**

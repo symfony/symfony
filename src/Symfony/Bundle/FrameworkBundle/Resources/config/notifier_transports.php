@@ -28,6 +28,7 @@ use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
+use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
@@ -147,6 +148,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.discord', DiscordTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('chatter.transport_factory')
+
+        ->set('notifier.transport_factory.microsoftteams', MicrosoftTeamsTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('chatter.transport_factory')
 

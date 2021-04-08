@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2020-12-08T13:06:58Z
+
+What do you think of renaming the bridge to `MicrosoftTeams` or `MsTeams`?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-06T20:05:28Z
+
+Hi @idetox  👋
+
+Are you interested in finishing this PR or am I allowed to take over?
+
+Cheers Oskar
+
+---------------------------------------------------------------------------
+
+by idetox at 2021-01-06T20:46:39Z
+
+Hey sry @OskarStark , been busy with the end of the year at work & family, should have more time soon (i should be able to do it nxt week), if the changes need to be done fast you can take over, let me know !
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-06T21:32:04Z
+
+Hi 👋  thank you for the feedback, next week would be super 👌🏻👍🏻
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-06T12:32:24Z
+
+I fixed my open comments myself.
+Tests are now passing, Doc and Recipe PR created 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-07T06:51:08Z
+
+> Do we really need "MicrosoftTeamsAction" to be in most class names?
+>
+> I dont think so. The namespace is enough.
+
+We use it differently across the bridges:
+![CleanShot 2021-04-07 at 08 47 11](https://user-images.githubusercontent.com/995707/113822969-60c30880-977e-11eb-9a34-23ddc7208858.png)
+![CleanShot 2021-04-07 at 08 47 25](https://user-images.githubusercontent.com/995707/113822971-615b9f00-977e-11eb-8b08-1a20b6487273.png)
+![CleanShot 2021-04-07 at 08 47 44](https://user-images.githubusercontent.com/995707/113822973-61f43580-977e-11eb-9e63-0225f57147f5.png)
+![CleanShot 2021-04-07 at 08 48 08](https://user-images.githubusercontent.com/995707/113822974-61f43580-977e-11eb-912a-a83b067e68cb.png)
+
+🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-07T07:00:19Z
+
+As we are lacking tests for the many new classes I would like to introduce the bridge without custom options and rework the options part in another follow up PR.
+
+In this case we have a bridge which can send chat messages to MicrosoftTeams, which is more than we are supporting right now.
+
+WDYT @Nyholm @jderusse ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-04-07T07:05:19Z
+
+Adding options in another PR works for me, that's what we did in the past for another provider (I don't remember which one though).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-07T07:30:55Z
+
+Dont forget the `.gitignore` =)
+
+Wink wink https://github.com/symfony/symfony/pull/40700
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-07T07:37:42Z
+
+> Dont forget the .gitignore =)
+
+Added
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-07T08:45:54Z
+
+All green now 👍
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-08T06:45:30Z
+
+Could you do a quick rebase before merge?

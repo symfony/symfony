@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
  * Add normalization formats to `UidNormalizer`
  * Add `CsvEncoder::END_OF_LINE` context option
+ * Deprecate creating instances of the annotation classes by passing an array of parameters, use named arguments instead
 
 5.2.0
 -----

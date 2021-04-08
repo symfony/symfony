@@ -305,6 +305,7 @@ Serializer
 
  * Removed `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead.
  * `ArrayDenormalizer` does not implement `SerializerAwareInterface` anymore.
+ * The annotation classes cannot be constructed by passing an array of parameters as first argument anymore, use named arguments instead
 
 TwigBundle
 ----------

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -20,6 +21,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class MaxDepthTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testNotSetMaxDepthParameter()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -44,11 +50,22 @@ class MaxDepthTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" must be a positive integer.');
-        new MaxDepth(['value' => $value]);
+        new MaxDepth($value);
     }
 
     public function testMaxDepthParameters()
     {
+        $maxDepth = new MaxDepth(3);
+        $this->assertEquals(3, $maxDepth->getMaxDepth());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testMaxDepthParametersLegacy()
+    {
+        $this->expectDeprecation('Since symfony/serializer 5.3: Passing an array as first argument to "Symfony\Component\Serializer\Annotation\MaxDepth::__construct" is deprecated. Use named arguments instead.');
+
         $maxDepth = new MaxDepth(['value' => 3]);
         $this->assertEquals(3, $maxDepth->getMaxDepth());
     }

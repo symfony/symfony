@@ -92,7 +92,7 @@ PropertyInfo
 Routing
 -------
 
- * Deprecated creating instances of the `Route` annotation class by passing an array of parameters, use named arguments instead
+ * Deprecate creating instances of the `Route` annotation class by passing an array of parameters, use named arguments instead
 
 Security
 --------
@@ -209,7 +209,8 @@ SecurityBundle
 Serializer
 ----------
 
- * Deprecated `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Deprecate `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Deprecate creating instances of the annotation classes by passing an array of parameters, use named arguments instead
 
 Uid
 ---

@@ -22,7 +22,7 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "doctrine/annotations": "^1.10.4",
+        "doctrine/annotations": "^1.12",
         "doctrine/cache": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.2|^4.0|^5.0",
         "symfony/cache": "^4.4|^5.0",
@@ -43,6 +43,7 @@
         "symfony/yaml": "^4.4|^5.0"
     },
     "conflict": {
+        "doctrine/annotations": "<1.12",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<4.4",

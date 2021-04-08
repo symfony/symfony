@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Annotation class for @Context().
  *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
@@ -30,18 +31,25 @@ final class Context
     private $groups;
 
     /**
+     * @param string|string[] $groups
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $options = [], array $context = [], array $normalizationContext = [], array $denormalizationContext = [], array $groups = [])
+    public function __construct(array $options = [], array $context = [], array $normalizationContext = [], array $denormalizationContext = [], $groups = [])
     {
         if (!$context) {
             if (!array_intersect((array_keys($options)), ['normalizationContext', 'groups', 'context', 'value', 'denormalizationContext'])) {
                 // gracefully supports context as first, unnamed attribute argument if it cannot be confused with Doctrine-style options
                 $context = $options;
             } else {
+                trigger_deprecation('symfony/serializer', '5.3', 'Passing an array of properties as first argument to "%s" is deprecated. Use named arguments instead.', __METHOD__);
+
                 // If at least one of the options match, it's likely to be Doctrine-style options. Search for the context inside:
                 $context = $options['value'] ?? $options['context'] ?? [];
             }
+        }
+        if (!\is_string($groups) && !\is_array($groups)) {
+            throw new \TypeError(sprintf('"%s": Expected parameter $groups to be a string or an array of strings, got "%s".', __METHOD__, get_debug_type($groups)));
         }
 
         $normalizationContext = $options['normalizationContext'] ?? $normalizationContext;

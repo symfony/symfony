@@ -32,6 +32,11 @@ $container->loadFromExtension('framework', [
                     'redis://foo' => 'cache.adapter.redis',
                 ],
             ],
+            'cache.ccc' => [
+                'adapter' => 'cache.adapter.array',
+                'default_lifetime' => 410,
+                'tags' => true,
+            ],
         ],
     ],
 ]);

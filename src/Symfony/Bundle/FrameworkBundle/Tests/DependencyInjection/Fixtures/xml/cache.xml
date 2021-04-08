@@ -17,6 +17,7 @@
                 <framework:adapter name="cache.adapter.filesystem" />
                 <framework:adapter name="cache.adapter.redis" provider="redis://foo" />
             </framework:pool>
+            <framework:pool name="cache.ccc" adapter="cache.adapter.array" default-lifetime="410" tags="true" />
         </framework:cache>
     </framework:config>
 </container>

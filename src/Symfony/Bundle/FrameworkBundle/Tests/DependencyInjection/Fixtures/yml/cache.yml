@@ -23,3 +23,7 @@ framework:
                     - cache.adapter.array
                     - cache.adapter.filesystem
                     - {name: cache.adapter.redis, provider: 'redis://foo'}
+            cache.ccc:
+                adapter: cache.adapter.array
+                default_lifetime: 410
+                tags: true

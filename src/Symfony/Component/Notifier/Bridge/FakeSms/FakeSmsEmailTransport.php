@@ -24,9 +24,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
+ * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class FakeSmsEmailTransport extends AbstractTransport
 {
+    protected const HOST = 'default';
+
     private $mailer;
     private $to;
     private $from;
@@ -67,6 +70,10 @@ final class FakeSmsEmailTransport extends AbstractTransport
             ->subject(sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())
             ->text($message->getSubject());
+
+        if ('default' !== $transportName = $this->getEndpoint()) {
+            $email->getHeaders()->addTextHeader('X-Transport', $transportName);
+        }
 
         $this->mailer->send($email);
 

@@ -6,13 +6,17 @@ Provides Fake Chat (as email during development) integration for Symfony Notifie
 #### DSN example
 
 ```
-FAKE_CHAT_DSN=fakechat+email://MAILER_SERVICE_ID?to=TO&from=FROM
+FAKE_CHAT_DSN=fakechat+email://default?to=TO&from=FROM
 ```
 
 where:
- - `MAILER_SERVICE_ID` is mailer service id (use `mailer` by default)
  - `TO` is email who receive Chat message during development
  - `FROM` is email who send Chat message during development
+
+To use a custom mailer transport:
+```
+FAKE_CHAT_DSN=fakechat+email://mailchimp?to=TO&from=FROM
+```
 
 Resources
 ---------

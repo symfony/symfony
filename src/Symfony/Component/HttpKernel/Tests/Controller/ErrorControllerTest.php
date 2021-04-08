@@ -20,7 +20,6 @@ use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ErrorControllerTest extends TestCase
 {
@@ -53,7 +52,7 @@ class ErrorControllerTest extends TestCase
         ];
 
         yield 'test 404 with previous' => [
-            new NotFoundHttpException('Page not found.', new AccessDeniedException()),
+            new NotFoundHttpException('Page not found.', new Exception()),
             404,
             'The server returned a "404 Not Found".',
         ];

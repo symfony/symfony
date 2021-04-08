@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -74,7 +75,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, [$this, 'onKernelException'], -130);
+        $dispatcher->addListener(KernelEvents::EXCEPTION, [$this, 'onKernelException'], 1);
     }
 
     /**
@@ -91,6 +92,11 @@ class ExceptionListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getThrowable();
+
+        if ($exception instanceof NotFoundHttpException) {
+            return;
+        }
+
         do {
             if ($exception instanceof AuthenticationException) {
                 $this->handleAuthenticationException($event, $exception);

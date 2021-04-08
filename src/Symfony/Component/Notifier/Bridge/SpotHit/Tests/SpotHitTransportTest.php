@@ -26,7 +26,7 @@ final class SpotHitTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return (new SpotHitTransport('api_token', 'MyCompany', $client ?: $this->createMock(HttpClientInterface::class)))->setHost('host.test');
+        return (new SpotHitTransport('api_token', 'MyCompany', $client ?? $this->createMock(HttpClientInterface::class)))->setHost('host.test');
     }
 
     public function toStringProvider(): iterable

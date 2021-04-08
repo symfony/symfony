@@ -26,7 +26,7 @@ final class IqsmsTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new IqsmsTransport('login', 'password', 'sender', $client ?: $this->createMock(HttpClientInterface::class));
+        return new IqsmsTransport('login', 'password', 'sender', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

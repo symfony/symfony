@@ -26,7 +26,7 @@ final class OctopushTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?: $this->createMock(HttpClientInterface::class));
+        return new OctopushTransport('userLogin', 'apiKey', 'from', 'type', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

@@ -24,7 +24,7 @@ final class GatewayApiTransportTest extends TransportTestCase
      */
     public function createTransport(?HttpClientInterface $client = null): TransportInterface
     {
-        return new GatewayApiTransport('authtoken', 'Symfony', $client ?: $this->createMock(HttpClientInterface::class));
+        return new GatewayApiTransport('authtoken', 'Symfony', $client ?? $this->createMock(HttpClientInterface::class));
     }
 
     public function toStringProvider(): iterable

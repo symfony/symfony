@@ -16,3 +16,5 @@ security:
             pattern: ^/
             anonymous: true
             stateless: true
+    access_control:
+        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }

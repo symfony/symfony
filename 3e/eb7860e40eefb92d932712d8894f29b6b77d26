@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-04-07T09:40:56Z
+
+Adding the parameter in the interface is a BC break. The fact that the interface is experimental allows us to do that in 5.x for the 5.3 release, but I don't think it allows BC breaks in patch releases.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-04-07T09:56:57Z
+
+> Adding the parameter in the interface is a BC break. The fact that the interface is experimental allows us to do that in 5.x for the 5.3 release, but I don't think it allows BC breaks in patch releases.
+
+Thank you very much for your explanation. I added the BC break line in `UPGRADE-5.3.md`.

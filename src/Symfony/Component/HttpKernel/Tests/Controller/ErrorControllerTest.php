@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,13 +20,14 @@ use Symfony\Component\HttpKernel\Controller\ErrorController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ErrorControllerTest extends TestCase
 {
     /**
      * @dataProvider getInvokeControllerDataProvider
      */
-    public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
+    public function testInvokeController(Exception $exception, int $statusCode, string $content)
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
@@ -39,23 +41,24 @@ class ErrorControllerTest extends TestCase
     public function getInvokeControllerDataProvider()
     {
         yield 'default status code and HTML format' => [
-            new Request(),
-            new \Exception(),
+            new Exception(),
             500,
             'The server returned a "500 Internal Server Error".',
         ];
 
         yield 'custom status code' => [
-            new Request(),
             new NotFoundHttpException('Page not found.'),
             404,
             'The server returned a "404 Not Found".',
         ];
 
-        $request = new Request();
-        $request->attributes->set('_format', 'unknown');
+        yield 'test 404 with previous' => [
+            new NotFoundHttpException('Page not found.', new AccessDeniedException()),
+            404,
+            'The server returned a "404 Not Found".',
+        ];
+
         yield 'default HTML format for unknown formats' => [
-            $request,
             new HttpException(405, 'Invalid request.'),
             405,
             'The server returned a "405 Method Not Allowed".',

@@ -399,7 +399,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class]);
+        $resolver->setAllowedTypes('choices', ['null', 'array', \Traversable::class, 'callable']);
         $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
         $resolver->setAllowedTypes('choice_loader', ['null', ChoiceLoaderInterface::class, ChoiceLoader::class]);
         $resolver->setAllowedTypes('choice_filter', ['null', 'callable', 'string', PropertyPath::class, ChoiceFilter::class]);
@@ -475,8 +475,7 @@ class ChoiceType extends AbstractType
             );
         }
 
-        // Harden against NULL values (like in EntityType and ModelType)
-        $choices = null !== $options['choices'] ? $options['choices'] : [];
+        $choices = \is_callable($options['choices']) ? $options['choices']() : ($options['choices'] ?? []);
 
         return $this->choiceListFactory->createListFromChoices(
             $choices,

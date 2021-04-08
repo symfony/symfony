@@ -15,6 +15,7 @@ CHANGELOG
  * Added a `choice_translation_parameters` option to `ChoiceType`
  * Add `UuidType` and `UlidType`
  * Dependency on `symfony/intl` was removed. Install `symfony/intl` if you are using `LocaleType`, `CountryType`, `CurrencyType`, `LanguageType` or `TimezoneType`.
+ * Add `callable` as allowed types for `choices` option of `ChoiceType`
 
 5.2.0
 -----

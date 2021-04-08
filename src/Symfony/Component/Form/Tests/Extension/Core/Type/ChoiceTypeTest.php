@@ -68,6 +68,24 @@ class ChoiceTypeTest extends BaseTypeTest
         ],
     ];
 
+    protected function choicesGenerator(): \Generator
+    {
+        yield 'Bernhard' => 'a';
+        yield 'Fabien' => 'b';
+        yield 'Kris' => 'c';
+        yield 'Alex' => 'd';
+    }
+
+    protected function choicesFromArray(): array
+    {
+        return [
+            'Bernhard' => 'a',
+            'Fabien' => 'b',
+            'Kris' => 'c',
+            'Alex' => 'd',
+        ];
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -2224,6 +2242,40 @@ class ChoiceTypeTest extends BaseTypeTest
             new ChoiceView('a', 'a', 'Bernhard'),
             new ChoiceView('b', 'b', 'Fabien'),
             new ChoiceView('c', 'c', 'Kris'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    public function testChoicesFromGenerator()
+    {
+        $self = $this;
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => static function () use ($self) {
+                yield from $self->choicesGenerator();
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+            new ChoiceView('d', 'd', 'Alex'),
+        ], $form->createView()->vars['choices']);
+    }
+
+    public function testChoicesFromCallable()
+    {
+        $self = $this;
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => static function () use ($self) {
+                return $self->choicesFromArray();
+            },
+        ]);
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'Bernhard'),
+            new ChoiceView('b', 'b', 'Fabien'),
+            new ChoiceView('c', 'c', 'Kris'),
+            new ChoiceView('d', 'd', 'Alex'),
         ], $form->createView()->vars['choices']);
     }
 

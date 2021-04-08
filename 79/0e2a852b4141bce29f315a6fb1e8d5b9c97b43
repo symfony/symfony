@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-03T14:35:56Z
+
+I think I'd prefer making this part of an existing CI file. I don't like the multiplication of eg initialization steps. That'd be better for the planet... :) Doable?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-03T14:36:53Z
+
+Nice 😀😃
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-03T14:37:04Z
+
+About getting the modified packages, maybe it's not worth it? maintaining these is always costly on the long run.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-03T16:56:09Z
+
+` find src/ -mindepth 3 -maxdepth 3 -type d '!' -exec test -e "{}/LICENSE" ';' -print` minus the false positives?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-05T08:56:02Z
+
+Thank you for the feedback.
+
+Instead of having one job per changed component +1 I now do all the checks in a single job. It means a bit more bash and we have to deal with json objects.
+
+I do some grouping and I show clear errors what is wrong.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-07T15:23:32Z
+
+I think this job is a good idea. It's a common mistake to forget adding these files when contributing a new bridge package.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-07T18:50:01Z
+
+I removed the debug code. This PR is ready to be merged.

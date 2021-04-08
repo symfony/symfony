@@ -50,11 +50,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     private $eraseCredentials;
     private $logger;
     private $firewallName;
+    private $requiredBadges;
 
     /**
      * @param AuthenticatorInterface[] $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true)
+    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, array $requiredBadges = [])
     {
         $this->authenticators = $authenticators;
         $this->tokenStorage = $tokenStorage;
@@ -62,6 +63,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->firewallName = $firewallName;
         $this->logger = $logger;
         $this->eraseCredentials = $eraseCredentials;
+        $this->requiredBadges = $requiredBadges;
     }
 
     /**
@@ -170,10 +172,18 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $this->eventDispatcher->dispatch($event);
 
             // check if all badges are resolved
+            $resolvedBadges = [];
             foreach ($passport->getBadges() as $badge) {
                 if (!$badge->isResolved()) {
                     throw new BadCredentialsException(sprintf('Authentication failed: Security badge "%s" is not resolved, did you forget to register the correct listeners?', get_debug_type($badge)));
                 }
+
+                $resolvedBadges[] = \get_class($badge);
+            }
+
+            $missingRequiredBadges = array_diff($this->requiredBadges, $resolvedBadges);
+            if ($missingRequiredBadges) {
+                throw new BadCredentialsException(sprintf('Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "%s".', implode('", "', $missingRequiredBadges)));
             }
 
             // create the authenticated token

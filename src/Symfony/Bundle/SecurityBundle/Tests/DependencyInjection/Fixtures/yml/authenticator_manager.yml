@@ -2,6 +2,9 @@ security:
     enable_authenticator_manager: true
     firewalls:
         main:
+            required_badges:
+                - 'Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge'
+                - RememberMeBadge
             login_link:
                 check_route: login_check
                 check_post_only: true

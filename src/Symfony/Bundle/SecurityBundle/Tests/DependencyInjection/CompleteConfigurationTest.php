@@ -26,6 +26,8 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
@@ -37,7 +39,11 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('authenticator_manager');
 
-        $this->assertEquals(AuthenticatorManager::class, $container->getDefinition('security.authenticator.manager.main')->getClass());
+        $authenticatorManager = $container->getDefinition('security.authenticator.manager.main');
+        $this->assertEquals(AuthenticatorManager::class, $authenticatorManager->getClass());
+
+        // required badges
+        $this->assertEquals([CsrfTokenBadge::class, RememberMeBadge::class], $authenticatorManager->getArgument(6));
 
         // login link
         $expiredStorage = $container->getDefinition($expiredStorageId = 'security.authenticator.expired_login_link_storage.main');

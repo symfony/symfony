@@ -10,9 +10,6 @@ framework:
         storage_id: session.storage.mock_file
     profiler: { only_exceptions: false }
 
-services:
-    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AnonymousBundle\AppCustomAuthenticator: ~
-
 security:
     firewalls:
         secure:

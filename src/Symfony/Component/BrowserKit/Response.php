@@ -123,7 +123,7 @@ class Response
      * @param string $header The header name
      * @param bool   $first  Whether to return the first value or all header values
      *
-     * @return string|array The first header value if $first is true, an array of values otherwise
+     * @return string|array|null The first header value if $first is true, an array of values otherwise
      */
     public function getHeader($header, $first = true)
     {

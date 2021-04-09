@@ -1225,6 +1225,10 @@ class Parser
         $offset = $cursor;
         $cursor += strcspn($this->currentLine, '[]{},: ', $cursor);
 
+        if ($cursor === $offset) {
+            throw new ParseException('Malformed unquoted YAML string.');
+        }
+
         return substr($this->currentLine, $offset, $cursor - $offset);
     }
 

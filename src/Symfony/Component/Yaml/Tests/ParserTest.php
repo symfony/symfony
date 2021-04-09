@@ -2676,6 +2676,25 @@ YAML;
         );
     }
 
+    public function testThrowExceptionIfInvalidAdditionalClosingTagOccurs()
+    {
+        $yaml = '{
+            "object": {
+                    "array": [
+                        "a",
+                        "b",
+                        "c"
+                    ]
+                ],
+            }
+        }';
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Malformed unquoted YAML string at line 8 (near "                ],").');
+
+        $this->parser->parse($yaml);
+    }
+
     public function testWhitespaceAtEndOfLine()
     {
         $yaml = "\nfoo:\n    arguments: [ '@bar' ]  \n";

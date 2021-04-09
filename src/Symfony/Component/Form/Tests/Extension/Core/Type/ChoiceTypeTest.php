@@ -1849,6 +1849,32 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('name[]', $view->vars['full_name']);
     }
 
+    public function testInvalidMessageAwarenessForMultiple()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(['My invalid choice']);
+        $this->assertEquals("ERROR: You are not able to use value \"My invalid choice\"\n", (string) $form->getErrors(true));
+    }
+
+    public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'invalid_message' => 'You are not able to use value "{{ value }}"',
+        ]);
+
+        $form->submit(new \stdClass());
+        $this->assertEquals("ERROR: You are not able to use value \"stdClass\"\n", (string) $form->getErrors(true));
+    }
+
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {

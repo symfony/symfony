@@ -244,8 +244,12 @@ class RequestTest extends TestCase
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
         $this->assertEquals('http://test.com/foo', $request->getUri());
+    }
 
+    public function testIndexDotPhpPathInfo()
+    {
         // assume no rewrite rule: /index.php --> /
+        // assume rewrite rule: /index.php/something --> /something
         $request = Request::create('http://test.com/index.php.php', 'GET', [], [], [],
             [
                 'DOCUMENT_ROOT' => '/var/www/www.test.com',

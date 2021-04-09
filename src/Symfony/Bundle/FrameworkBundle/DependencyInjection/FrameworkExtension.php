@@ -1213,7 +1213,9 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
         }
 
-        if ($container->fileExists($defaultDir)) {
+        if (null === $defaultDir) {
+            // allow null
+        } elseif ($container->fileExists($defaultDir)) {
             $dirs[] = $defaultDir;
         } else {
             $nonExistingDirs[] = $defaultDir;

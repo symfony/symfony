@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-03T11:25:23Z
+
+We cannot deprecate something in 5.2 as it's a maintenance branch, it should be done on 5.x.
+For 5.2, the breaking change made to `Helper::strlen()` should probably be reverted
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T11:29:04Z
+
+Thank you. I was hesitant about this.
+
+Are we okey with reverting https://github.com/symfony/symfony/pull/40524, adding that PR as a feature to 5.x and then merge this PR in 5.x?

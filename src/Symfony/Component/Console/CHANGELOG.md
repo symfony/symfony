@@ -11,6 +11,7 @@ CHANGELOG
  * Add option `--short` to the `list` command
  * Add support for bright colors
  * Add `#[AsCommand]` attribute for declaring commands on PHP 8
+ * Add `Helper::width()` and `Helper::length()`
 
 5.2.0
 -----

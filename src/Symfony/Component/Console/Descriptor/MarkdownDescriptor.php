@@ -125,7 +125,7 @@ class MarkdownDescriptor extends Descriptor
         if ($options['short'] ?? false) {
             $this->write(
                 '`'.$command->getName()."`\n"
-                .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+                .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
                 .array_reduce($command->getAliases(), function ($carry, $usage) {
@@ -140,7 +140,7 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(
             '`'.$command->getName()."`\n"
-            .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
+            .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
             .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
@@ -169,7 +169,7 @@ class MarkdownDescriptor extends Descriptor
         $description = new ApplicationDescription($application, $describedNamespace);
         $title = $this->getApplicationTitle($application);
 
-        $this->write($title."\n".str_repeat('=', Helper::strlen($title)));
+        $this->write($title."\n".str_repeat('=', Helper::width($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {

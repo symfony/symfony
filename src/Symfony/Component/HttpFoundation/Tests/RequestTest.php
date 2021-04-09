@@ -249,7 +249,9 @@ class RequestTest extends TestCase
     public function testIndexDotPhpPathInfo()
     {
         // assume no rewrite rule: /index.php --> /
-        // assume rewrite rule: /index.php/something --> /something
+        // assume index.php is a real file.
+        // assume rewrite rule passes all requests not referring directly to
+        // files in the filesystem to index.php.
         $request = Request::create('http://test.com/index.php.php', 'GET', [], [], [],
             [
                 'DOCUMENT_ROOT' => '/var/www/www.test.com',

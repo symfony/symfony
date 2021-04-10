@@ -122,8 +122,8 @@ class TimezoneType extends AbstractType
                 continue;
             }
 
-            if ($grouping && dirname($timezone) != '.') {
-                $timezones[str_replace(['/', '_'], [' / ', ' '], dirname($timezone))][str_replace('_', ' ', basename($timezone))] = $timezone;
+            if ($grouping) {
+                $timezones[strpos($timezone, '/') ? str_replace(['/', '_'], [' / ', ' '], dirname($timezone)) : 'Other'][str_replace('_', ' ', basename($timezone))] = $timezone;
             } else {
                 $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
             }
@@ -140,9 +140,9 @@ class TimezoneType extends AbstractType
             foreach ($timezones as $name => $timezone) {
                 if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
                     unset($timezones[$name]);
-                } elseif ($grouping && dirname($timezone) != '.') {
+                } elseif ($grouping) {
                     unset($timezones[$name]);
-                    $timezones[str_replace(['/', '_'], [' / ', ' '], dirname($timezone))][$name] = $timezone;
+                    $timezones[strpos($timezone, '/') ? str_replace(['/', '_'], [' / ', ' '], dirname($timezone)) : 'Other'][$name] = $timezone;
                 }
             }
         }

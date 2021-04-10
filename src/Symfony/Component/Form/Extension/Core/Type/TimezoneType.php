@@ -55,8 +55,8 @@ class TimezoneType extends AbstractType
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale) {
-                        return self::getIntlTimezones($input, $choiceTranslationLocale);
+                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(function () use ($input, $choiceTranslationLocale, $grouping) {
+                        return self::getIntlTimezones($input, $choiceTranslationLocale, $grouping);
                     }), [$input, $choiceTranslationLocale]);
                 }
 
@@ -122,7 +122,7 @@ class TimezoneType extends AbstractType
                 continue;
             }
 
-            if ($grouping && $timezone != 'UTC') {
+            if ($grouping && dirname($timezone) != '.') {
                 $timezones[str_replace(['/', '_'], [' / ', ' '], dirname($timezone))][str_replace('_', ' ', basename($timezone))] = $timezone;
             } else {
                 $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
@@ -132,14 +132,17 @@ class TimezoneType extends AbstractType
         return $timezones;
     }
 
-    private static function getIntlTimezones(string $input, string $locale = null): array
+    private static function getIntlTimezones(string $input, string $locale = null, bool $grouping = false): array
     {
         $timezones = array_flip(Timezones::getNames($locale));
 
-        if ('intltimezone' === $input) {
+        if ('intltimezone' === $input || $grouping) {
             foreach ($timezones as $name => $timezone) {
-                if ('Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
+                if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
                     unset($timezones[$name]);
+                } elseif ($grouping && dirname($timezone) != '.') {
+                    unset($timezones[$name]);
+                    $timezones[str_replace(['/', '_'], [' / ', ' '], dirname($timezone))][$name] = $timezone;
                 }
             }
         }

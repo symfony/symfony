@@ -33,7 +33,7 @@ class NullToken implements TokenInterface
 
     public function getUser()
     {
-        return null;
+        return '';
     }
 
     public function setUser($user)

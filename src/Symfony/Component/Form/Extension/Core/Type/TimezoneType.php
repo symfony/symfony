@@ -46,6 +46,7 @@ class TimezoneType extends AbstractType
             'intl' => false,
             'choice_loader' => function (Options $options) {
                 $input = $options['input'];
+                $grouping = $options['grouping'];
 
                 if ($options['intl']) {
                     if (!class_exists(Intl::class)) {
@@ -59,13 +60,14 @@ class TimezoneType extends AbstractType
                     }), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, function () use ($input) {
-                    return self::getPhpTimezones($input);
+                return ChoiceList::lazy($this, function () use ($input, $grouping) {
+                    return self::getPhpTimezones($input, $grouping);
                 }, $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
+            'grouping' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true)
                     ? $previousValue
@@ -111,7 +113,7 @@ class TimezoneType extends AbstractType
         return 'timezone';
     }
 
-    private static function getPhpTimezones(string $input): array
+    private static function getPhpTimezones(string $input, bool $grouping = false): array
     {
         $timezones = [];
 
@@ -120,7 +122,11 @@ class TimezoneType extends AbstractType
                 continue;
             }
 
-            $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
+            if ($grouping && $timezone != 'UTC') {
+                $timezones[str_replace(['/', '_'], [' / ', ' '], dirname($timezone))][str_replace('_', ' ', basename($timezone))] = $timezone;
+            } else {
+                $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
+            }
         }
 
         return $timezones;

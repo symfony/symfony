@@ -1948,6 +1948,12 @@ class FrameworkExtension extends Extension
                     ->setPublic($pool['public'])
                 ;
 
+                if (method_exists(TagAwareAdapter::class, 'setLogger')) {
+                    $container
+                        ->getDefinition($name)
+                        ->addMethodCall('setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
+                }
+
                 $pool['name'] = $name;
                 $pool['public'] = false;
                 $name = '.'.$name.'.inner';

@@ -81,7 +81,7 @@ final class LockRegistry
 
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata = null, LoggerInterface $logger = null)
     {
-        $key = self::$files ? crc32($item->getKey()) % \count(self::$files) : -1;
+        $key = self::$files ? abs(crc32($item->getKey())) % \count(self::$files) : -1;
 
         if ($key < 0 || (self::$lockedFiles[$key] ?? false) || !$lock = self::open($key)) {
             return $callback($item, $save);

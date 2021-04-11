@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
-class BindTaggedIterator
+class TaggedIterator
 {
     public function __construct(
         public string $tag,

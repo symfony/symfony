@@ -46,6 +46,7 @@ class ProjectServiceContainer extends Container
         return [
             '.service_locator.DlIAmAe' => true,
             '.service_locator.DlIAmAe.foo_service' => true,
+            '.service_locator.t5IGRMW' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,

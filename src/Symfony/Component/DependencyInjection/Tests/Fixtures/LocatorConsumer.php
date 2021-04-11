@@ -12,12 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\Attribute\BindTaggedLocator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 
 final class LocatorConsumer
 {
     public function __construct(
-        #[BindTaggedLocator('foo_bar', indexAttribute: 'foo')]
+        #[TaggedLocator('foo_bar', indexAttribute: 'foo')]
         private ContainerInterface $locator,
     ) {
     }

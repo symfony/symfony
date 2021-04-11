@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\Attribute\BindTaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class IteratorConsumer
 {
     public function __construct(
-        #[BindTaggedIterator('foo_bar', indexAttribute: 'foo')]
+        #[TaggedIterator('foo_bar', indexAttribute: 'foo')]
         private iterable $param,
     ) {
     }

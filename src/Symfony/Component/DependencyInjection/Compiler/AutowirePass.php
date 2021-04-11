@@ -12,6 +12,10 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
@@ -123,7 +127,8 @@ class AutowirePass extends AbstractRecursivePass
             array_unshift($this->methodCalls, [$constructor, $value->getArguments()]);
         }
 
-        $this->methodCalls = $this->autowireCalls($reflectionClass, $isRoot);
+        $checkAttributes = 80000 <= \PHP_VERSION_ID && !$value->hasTag('container.ignore_attributes');
+        $this->methodCalls = $this->autowireCalls($reflectionClass, $isRoot, $checkAttributes);
 
         if ($constructor) {
             [, $arguments] = array_shift($this->methodCalls);
@@ -140,7 +145,7 @@ class AutowirePass extends AbstractRecursivePass
         return $value;
     }
 
-    private function autowireCalls(\ReflectionClass $reflectionClass, bool $isRoot): array
+    private function autowireCalls(\ReflectionClass $reflectionClass, bool $isRoot, bool $checkAttributes): array
     {
         $this->decoratedId = null;
         $this->decoratedClass = null;
@@ -168,7 +173,7 @@ class AutowirePass extends AbstractRecursivePass
                 }
             }
 
-            $arguments = $this->autowireMethod($reflectionMethod, $arguments);
+            $arguments = $this->autowireMethod($reflectionMethod, $arguments, $checkAttributes);
 
             if ($arguments !== $call[1]) {
                 $this->methodCalls[$i][1] = $arguments;
@@ -185,7 +190,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @throws AutowiringFailedException
      */
-    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments): array
+    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments, bool $checkAttributes): array
     {
         $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
@@ -200,6 +205,26 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $type = ProxyHelper::getTypeHint($reflectionMethod, $parameter, true);
+
+            if ($checkAttributes) {
+                foreach ($parameter->getAttributes() as $attribute) {
+                    if (TaggedIterator::class === $attribute->getName()) {
+                        $attribute = $attribute->newInstance();
+                        $arguments[$index] = new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute);
+                        break;
+                    }
+
+                    if (TaggedLocator::class === $attribute->getName()) {
+                        $attribute = $attribute->newInstance();
+                        $arguments[$index] = new ServiceLocatorArgument(new TaggedIteratorArgument($attribute->tag, $attribute->indexAttribute));
+                        break;
+                    }
+                }
+
+                if ('' !== ($arguments[$index] ?? '')) {
+                    continue;
+                }
+            }
 
             if (!$type) {
                 if (isset($arguments[$index])) {

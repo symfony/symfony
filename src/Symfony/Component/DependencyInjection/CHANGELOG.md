@@ -9,7 +9,7 @@ CHANGELOG
  * Add support for loading autoconfiguration rules via the `#[Autoconfigure]` and `#[AutoconfigureTag]` attributes on PHP 8
  * Add `#[AsTaggedItem]` attribute for defining the index and priority of classes found in tagged iterators/locators
  * Add autoconfigurable attributes
- * Add support for binding tagged iterators and locators to constructor arguments via attributes
+ * Add support for autowiring tagged iterators and locators via attributes on PHP 8
  * Add support for per-env configuration in loaders
  * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
  * Add support an integer return value for default_index_method

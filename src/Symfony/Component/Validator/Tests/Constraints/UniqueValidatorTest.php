@@ -13,12 +13,13 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): UniqueValidator
     {
         return new UniqueValidator();
     }
@@ -153,15 +154,15 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function getCallback()
+    public function getCallback(): array
     {
         return [
-            yield 'static function' => [static function (\stdClass $object) {
+            'static function' => [static function (\stdClass $object) {
                 return [$object->name, $object->email];
             }],
-            yield 'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
-            yield 'callable with static notation' => [[CallableClass::class, 'execute']],
-            yield 'callable with object' => [[new CallableClass(), 'execute']],
+            'callable with string notation' => ['Symfony\Component\Validator\Tests\Constraints\CallableClass::execute'],
+            'callable with static notation' => [[CallableClass::class, 'execute']],
+            'callable with object' => [[new CallableClass(), 'execute']],
         ];
     }
 
@@ -219,6 +220,67 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ]));
 
         $this->assertNoViolation();
+    }
+
+    public function testCollectionFieldsAreOptional()
+    {
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getInvalidFieldNames
+     */
+    public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf('Expected argument of type "string", "%s" given', $type));
+
+        $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: [$field]));
+    }
+
+    public function getInvalidFieldNames(): array
+    {
+        return [
+            ['stdClass', new \stdClass()],
+            ['int', 2],
+            ['bool', false],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidCollectionValues
+     */
+    public function testInvalidCollectionValues(array $value, array $fields)
+    {
+        $this->validator->validate($value, new Unique([
+            'message' => 'myMessage',
+        ], fields: $fields));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->setCode(Unique::IS_NOT_UNIQUE)
+            ->assertRaised();
+    }
+
+    public function getInvalidCollectionValues(): array
+    {
+        return [
+            'unique string' => [[
+                ['lang' => 'eng', 'translation' => 'hi'],
+                ['lang' => 'eng', 'translation' => 'hello'],
+            ], ['lang']],
+            'unique floats' => [[
+                ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
+                ['latitude' => 52.520008, 'longitude' => 13.404954],
+                ['latitude' => 51.509865, 'longitude' => -0.118092],
+            ], ['latitude', 'longitude']],
+            'unique int' => [[
+                ['id' => 1, 'email' => 'bar@email.com'],
+                ['id' => 1, 'email' => 'foo@email.com'],
+            ], ['id']],
+        ];
     }
 }
 

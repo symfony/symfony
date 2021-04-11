@@ -25,6 +25,8 @@ class Unique extends Constraint
 {
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
+    public $fields = [];
+
     protected const ERROR_NAMES = [
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
@@ -37,13 +39,25 @@ class Unique extends Constraint
     public $message = 'This collection should contain only unique elements.';
     public $normalizer;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param array|string $fields the combination of fields that must contain unique values or a set of options
+     */
     public function __construct(
         array $options = null,
         string $message = null,
         callable $normalizer = null,
         array $groups = null,
-        mixed $payload = null
+        mixed $payload = null,
+        $fields = null,
     ) {
+        if (\is_array($fields) && \is_string(key($fields))) {
+            $options = array_merge($fields, $options);
+        } elseif (null !== $fields) {
+            $options['fields'] = $fields;
+        }
+
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
@@ -52,5 +66,15 @@ class Unique extends Constraint
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
+    }
+
+    public function getOptions()
+    {
+        return ['fields'];
+    }
+
+    public function getDefaultOption()
+    {
+        return 'fields';
     }
 }

@@ -30,6 +30,12 @@ class UniqueValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Unique::class);
         }
 
+        if (!\is_array($constraint->fields) && !\is_string($constraint->fields)) {
+            throw new UnexpectedTypeException($constraint->fields, 'array');
+        }
+
+        $fields = (array) $constraint->fields;
+
         if (null === $value) {
             return;
         }

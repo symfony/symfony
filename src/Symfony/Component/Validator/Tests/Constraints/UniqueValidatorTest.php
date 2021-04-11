@@ -220,6 +220,35 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertNoViolation();
     }
+
+    /**
+     * @dataProvider getValidCollectionValues
+     */
+    public function testValidCollectionValues($value, $fields)
+    {
+        $this->validator->validate($value, new Unique($fields));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidCollectionValues()
+    {
+        return [
+            yield 'single string' => [[['letter' => 'a']], 'letter'],
+            yield 'unique strings' => [[['language' => 'eng'], ['language' => 'fra'], ['language' => 'pol']], 'language'],
+            yield 'unique floats' => [[
+                ['latitude' => 51.509865, 'longitude' => -0.118092],
+                ['latitude' => 48.864716, 'longitude' => 2.349014],
+                ['latitude' => 52.520008, 'longitude' => 13.404954],
+            ], ['latitude', 'longitude']],
+            yield 'unique int and string' => [[
+                ['id' => 1, 'email' => 'bar@email.com'], ['id' => 2, 'email' => 'foo@email.com'],
+            ], ['id', 'name']],
+            yield 'unique arrays' => [[['vector' => [1, 2]], ['vector' => [2, 4]], ['vector' => [4, 6]]
+            ], ['vector']],
+            yield 'unique objects' => [[['object' => new \stdClass()], ['object' => new \stdClass()]], ['object']],
+        ];
+    }
 }
 
 class CallableClass

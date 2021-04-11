@@ -147,6 +147,15 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
     }
 
+    public function testEnvConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
+        $loader->load('env_configurator.php');
+
+        $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
+    }
+
     /**
      * @group legacy
      */

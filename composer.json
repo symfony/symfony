@@ -39,7 +39,7 @@
         "doctrine/persistence": "^2",
         "twig/twig": "^2.13|^3.0.4",
         "psr/cache": "^1.0|^2.0",
-        "psr/container": "^1.0",
+        "psr/container": "^1.0|^2.0",
         "psr/event-dispatcher": "^1.0",
         "psr/link": "^1.0",
         "psr/log": "~1.0",

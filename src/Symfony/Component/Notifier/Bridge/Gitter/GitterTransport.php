@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Gitter;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -69,7 +68,7 @@ final class GitterTransport extends AbstractTransport
 
         $result = $response->toArray(false);
 
-        if (Response::HTTP_OK !== $response->getStatusCode()) {
+        if (200 !== $response->getStatusCode()) {
             throw new TransportException(sprintf('Unable to post the Gitter message: "%s".', $result['error']), $response);
         }
 

@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Tests\LoginLink;
+namespace Symfony\Component\Security\Core\Tests\Signature;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Security\Http\LoginLink\ExpiredLoginLinkStorage;
+use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
 
-class ExpiredLoginLinkStorageTest extends TestCase
+class ExpiredSignatureStorageTest extends TestCase
 {
     public function testUsage()
     {
         $cache = new ArrayAdapter();
-        $storage = new ExpiredLoginLinkStorage($cache, 600);
+        $storage = new ExpiredSignatureStorage($cache, 600);
 
         $this->assertSame(0, $storage->countUsages('hash+more'));
         $storage->incrementUsages('hash+more');

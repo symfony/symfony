@@ -334,9 +334,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="remember_me">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="user-provider" type="xsd:string" />
-        </xsd:choice>
+        <xsd:sequence minOccurs="0">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="user-provider" type="xsd:string" />
+            </xsd:choice>
+            <xsd:element name="token-provider" type="remember_me_token_provider" />
+        </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="path" type="xsd:string" />
@@ -350,6 +353,18 @@
         <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
         <xsd:attribute name="secure" type="remember_me_secure" />
         <xsd:attribute name="samesite" type="remember_me_samesite" />
+    </xsd:complexType>
+
+    <xsd:complexType name="remember_me_token_provider">
+        <xsd:sequence>
+            <xsd:element name="doctrine" type="remember_me_token_provider_doctrine" />
+        </xsd:sequence>
+        <xsd:attribute name="service" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="remember_me_token_provider_doctrine">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="connection" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:simpleType name="remember_me_secure">

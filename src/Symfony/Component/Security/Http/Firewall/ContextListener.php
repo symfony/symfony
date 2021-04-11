@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
+use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -94,6 +95,8 @@ class ContextListener extends AbstractListener
         $request = $event->getRequest();
         $session = $request->hasPreviousSession() && $request->hasSession() ? $request->getSession() : null;
 
+        $request->attributes->set('_security_firewall_run', true);
+
         if (null !== $session) {
             $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
             $usageIndexReference = \PHP_INT_MIN;
@@ -128,10 +131,17 @@ class ContextListener extends AbstractListener
         }
 
         if ($token instanceof TokenInterface) {
+            $originalToken = $token;
             $token = $this->refreshUser($token);
 
-            if (!$token && $this->rememberMeServices) {
-                $this->rememberMeServices->loginFail($request);
+            if (!$token) {
+                if ($this->dispatcher) {
+                    $this->dispatcher->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
+                }
+
+                if ($this->rememberMeServices) {
+                    $this->rememberMeServices->loginFail($request);
+                }
             }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
@@ -159,11 +169,13 @@ class ContextListener extends AbstractListener
 
         $request = $event->getRequest();
 
-        if (!$request->hasSession()) {
+        if (!$request->hasSession() || !$request->attributes->get('_security_firewall_run', false)) {
             return;
         }
 
-        $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
+        if ($this->dispatcher) {
+            $this->dispatcher->removeListener(KernelEvents::RESPONSE, [$this, 'onKernelResponse']);
+        }
         $this->registered = false;
         $session = $request->getSession();
         $sessionId = $session->getId();
@@ -260,7 +272,7 @@ class ContextListener extends AbstractListener
                 $this->logger->debug('Token was deauthenticated after trying to refresh it.');
             }
 
-            if (null !== $this->dispatcher) {
+            if ($this->dispatcher) {
                 $this->dispatcher->dispatch(new DeauthenticatedEvent($token, $newToken), DeauthenticatedEvent::class);
             }
 

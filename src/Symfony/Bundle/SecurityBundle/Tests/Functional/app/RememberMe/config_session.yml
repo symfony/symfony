@@ -1,0 +1,6 @@
+security:
+    firewalls:
+        default:
+            remember_me:
+                always_remember_me: true
+                secret: key

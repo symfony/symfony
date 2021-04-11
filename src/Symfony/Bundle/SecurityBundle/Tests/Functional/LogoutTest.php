@@ -23,29 +23,6 @@ class LogoutTest extends AbstractWebTestCase
     /**
      * @dataProvider provideSecuritySystems
      */
-    public function testSessionLessRememberMeLogout(array $options)
-    {
-        $client = $this->createClient($options + ['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
-
-        $client->request('POST', '/login', [
-            '_username' => 'johannes',
-            '_password' => 'test',
-        ]);
-
-        $cookieJar = $client->getCookieJar();
-        $cookieJar->expire(session_name());
-
-        $this->assertNotNull($cookieJar->get('REMEMBERME'));
-        $this->assertSame('lax', $cookieJar->get('REMEMBERME')->getSameSite());
-
-        $client->request('GET', '/logout');
-
-        $this->assertNull($cookieJar->get('REMEMBERME'));
-    }
-
-    /**
-     * @dataProvider provideSecuritySystems
-     */
     public function testCsrfTokensAreClearedOnLogout(array $options)
     {
         $client = $this->createClient($options + ['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);

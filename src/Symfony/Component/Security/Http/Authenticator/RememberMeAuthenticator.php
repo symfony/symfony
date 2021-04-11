@@ -11,22 +11,28 @@
 
 namespace Symfony\Component\Security\Http\Authenticator;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CookieTheftException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
+use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
+use Symfony\Component\Security\Http\RememberMe\ResponseListener;
 
 /**
  * The RememberMe *Authenticator* performs remember me authentication.
  *
  * This authenticator is executed whenever a user's session
- * expired and a remember me cookie was found. This authenticator
+ * expired and a remember-me cookie was found. This authenticator
  * then "re-authenticates" the user using the information in the
  * cookie.
  *
@@ -37,17 +43,19 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private $rememberMeServices;
+    private $rememberMeHandler;
     private $secret;
     private $tokenStorage;
-    private $options = [];
+    private $cookieName;
+    private $logger;
 
-    public function __construct(RememberMeServicesInterface $rememberMeServices, string $secret, TokenStorageInterface $tokenStorage, array $options)
+    public function __construct(RememberMeHandlerInterface $rememberMeHandler, string $secret, TokenStorageInterface $tokenStorage, string $cookieName, LoggerInterface $logger = null)
     {
-        $this->rememberMeServices = $rememberMeServices;
+        $this->rememberMeHandler = $rememberMeHandler;
         $this->secret = $secret;
         $this->tokenStorage = $tokenStorage;
-        $this->options = $options;
+        $this->cookieName = $cookieName;
+        $this->logger = $logger;
     }
 
     public function supports(Request $request): ?bool
@@ -57,19 +65,17 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
             return false;
         }
 
-        // if the attribute is set, this is a lazy firewall. The previous
-        // support call already indicated support, so return null and avoid
-        // recreating the cookie
-        if ($request->attributes->has('_remember_me_token')) {
-            return null;
-        }
-
-        $token = $this->rememberMeServices->autoLogin($request);
-        if (null === $token) {
+        if (($cookie = $request->attributes->get(ResponseListener::COOKIE_ATTR_NAME)) && null === $cookie->getValue()) {
             return false;
         }
 
-        $request->attributes->set('_remember_me_token', $token);
+        if (!$request->cookies->has($this->cookieName)) {
+            return false;
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->debug('Remember-me cookie detected.');
+        }
 
         // the `null` return value indicates that this authenticator supports lazy firewalls
         return null;
@@ -77,13 +83,16 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function authenticate(Request $request): PassportInterface
     {
-        $token = $request->attributes->get('_remember_me_token');
-        if (null === $token) {
-            throw new \LogicException('No remember me token is set.');
+        $rawCookie = $request->cookies->get($this->cookieName);
+        if (!$rawCookie) {
+            throw new \LogicException('No remember-me cookie is found.');
         }
 
-        // @deprecated since 5.3, change to $token->getUserIdentifier() in 6.0
-        return new SelfValidatingPassport(new UserBadge(method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername(), [$token, 'getUser']));
+        $rememberMeCookie = RememberMeDetails::fromRawCookie($rawCookie);
+
+        return new SelfValidatingPassport(new UserBadge($rememberMeCookie->getUserIdentifier(), function () use ($rememberMeCookie) {
+            return $this->rememberMeHandler->consumeRememberMeCookie($rememberMeCookie);
+        }));
     }
 
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
@@ -98,7 +107,15 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $this->rememberMeServices->loginFail($request, $exception);
+        if (null !== $this->logger) {
+            if ($exception instanceof UsernameNotFoundException) {
+                $this->logger->info('User for remember-me cookie not found.', ['exception' => $exception]);
+            } elseif ($exception instanceof UnsupportedUserException) {
+                $this->logger->warning('User class for remember-me cookie not supported.', ['exception' => $exception]);
+            } elseif (!$exception instanceof CookieTheftException) {
+                $this->logger->debug('Remember me authentication failed.', ['exception' => $exception]);
+            }
+        }
 
         return null;
     }

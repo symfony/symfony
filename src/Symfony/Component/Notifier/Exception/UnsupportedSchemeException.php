@@ -132,6 +132,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
             'package' => 'symfony/microsoft-teams-notifier',
         ],
+        'smsbiuras' => [
+            'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
+            'package' => 'symfony/sms-biuras-notifier',
+        ],
     ];
 
     /**

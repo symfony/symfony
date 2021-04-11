@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-08T12:40:50Z
+
+Do we want to bump the required minimum symfony/cache version in FWB for this or add a runtime check?
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-09T08:19:37Z
+
+Hey!
+
+I think @v-m-i has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-11T17:14:49Z
+
+Tests are green :tada:

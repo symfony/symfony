@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -195,6 +196,20 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $item = $anotherPool->getItem($itemKey);
         $this->assertFalse($item->isHit());
+    }
+
+    public function testLog()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->atLeastOnce())
+            ->method($this->anything());
+
+        $cache = new TagAwareAdapter(new ArrayAdapter());
+        $cache->setLogger($logger);
+
+        // Computing will produce at least one log
+        $cache->get('foo', static function (): string { return 'ccc'; });
     }
 
     /**

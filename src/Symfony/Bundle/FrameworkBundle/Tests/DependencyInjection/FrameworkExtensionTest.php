@@ -30,6 +30,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -1537,6 +1538,17 @@ abstract class FrameworkExtensionTest extends TestCase
             12,
         ];
         $this->assertEquals($expected, $chain->getArguments());
+
+        // Test "tags: true" wrapping logic
+        $tagAwareDefinition = $container->getDefinition('cache.ccc');
+        $this->assertSame(TagAwareAdapter::class, $tagAwareDefinition->getClass());
+        $this->assertCachePoolServiceDefinitionIsCreated($container, (string) $tagAwareDefinition->getArgument(0), 'cache.adapter.array', 410);
+
+        if (method_exists(TagAwareAdapter::class, 'setLogger')) {
+            $this->assertEquals([
+                ['setLogger', [new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]],
+            ], $tagAwareDefinition->getMethodCalls());
+        }
     }
 
     public function testRedisTagAwareAdapter()
@@ -1947,6 +1959,9 @@ abstract class FrameworkExtensionTest extends TestCase
                 break;
             case 'cache.adapter.redis':
                 $this->assertSame(RedisAdapter::class, $parentDefinition->getClass());
+                break;
+            case 'cache.adapter.array':
+                $this->assertSame(ArrayAdapter::class, $parentDefinition->getClass());
                 break;
             default:
                 $this->fail('Unresolved adapter: '.$adapter);

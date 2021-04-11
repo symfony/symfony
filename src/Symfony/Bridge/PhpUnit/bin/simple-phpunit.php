@@ -158,8 +158,8 @@ if ('disabled' === $getEnvVar('SYMFONY_DEPRECATIONS_HELPER')) {
 }
 
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar')
-    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))
-    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer`) : `which composer 2> /dev/null`))
+    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar 2> NUL`) : `which composer.phar 2> /dev/null`))
+    || ($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer 2> NUL`) : `which composer 2> /dev/null`))
     || file_exists($COMPOSER = rtrim('\\' === \DIRECTORY_SEPARATOR ? `git rev-parse --show-toplevel 2> NUL` : `git rev-parse --show-toplevel 2> /dev/null`).\DIRECTORY_SEPARATOR.'composer.phar')
     ? ('#!/usr/bin/env php' === file_get_contents($COMPOSER, false, null, 0, 18) ? $PHP : '').' '.escapeshellarg($COMPOSER) // detect shell wrappers by looking at the shebang
     : 'composer';
@@ -185,9 +185,9 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     @mkdir($PHPUNIT_DIR, 0777, true);
     chdir($PHPUNIT_DIR);
     if (file_exists("$PHPUNIT_VERSION_DIR")) {
-        passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s > NUL' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
+        passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s 2> NUL' : 'rm -rf %s', escapeshellarg("$PHPUNIT_VERSION_DIR.old")));
         rename("$PHPUNIT_VERSION_DIR", "$PHPUNIT_VERSION_DIR.old");
-        passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', "$PHPUNIT_VERSION_DIR.old"));
+        passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s' : 'rm -rf %s', escapeshellarg("$PHPUNIT_VERSION_DIR.old")));
     }
 
     $info = [];
@@ -313,10 +313,15 @@ EOPHP
 // This is useful for static analytics tools such as PHPStan having to load PHPUnit's classes
 // and for other testing libraries such as Behat using PHPUnit's assertions.
 chdir($PHPUNIT_DIR);
-if (file_exists('phpunit')) {
-    @unlink('phpunit');
+if ('\\' === \DIRECTORY_SEPARATOR) {
+    passthru('rmdir /S /Q phpunit 2> NUL');
+    passthru(sprintf('mklink /j phpunit %s > NUL 2>&1', escapeshellarg($PHPUNIT_VERSION_DIR)));
+} else {
+    if (file_exists('phpunit')) {
+        @unlink('phpunit');
+    }
+    @symlink($PHPUNIT_VERSION_DIR, 'phpunit');
 }
-@symlink($PHPUNIT_VERSION_DIR, 'phpunit');
 chdir($oldPwd);
 
 if ($PHPUNIT_VERSION < 8.0) {

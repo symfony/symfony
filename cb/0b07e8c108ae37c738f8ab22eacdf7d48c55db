@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-02T12:15:54Z
+
+Thank you. I like the idea.
+
+Having `env()` is also away to keep people from doing `getenv()`.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-02T16:26:55Z
+
+~~this misses a way to add custom processors in the env configuration. Symfony allows extending the system.~~ I missed the `custom()` method
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-02T16:35:35Z
+
+Concerning custom env var processor and extension, WDYT of making `$stack` protected, to allow userland to extend the base EnvConfigurator, to allow custom methods. Obviously you would have to instantiate it manually instead of using `env()`. Though I really wonder if people would actually use it :thinking:.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-02T16:42:52Z
+
+@fancyweb no need to make it protected (which would then forbid refactoring it). Your own method could call `$this->custom('my_processor')` already

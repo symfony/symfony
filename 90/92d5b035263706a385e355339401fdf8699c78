@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T07:47:47Z
+
+@Nyholm any idea what's wrong here?
+![CleanShot 2021-04-09 at 09 47 24](https://user-images.githubusercontent.com/995707/114147081-9ef42f80-9918-11eb-8fb0-847cf4b3f510.png)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T11:14:17Z
+
+I tested this in my project with the following command:
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Command;
+
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Notifier\ChatterInterface;
+use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\SmsMessage;
+use Symfony\Component\Notifier\Tests\Fixtures\TestOptions;
+use Symfony\Component\Notifier\TexterInterface;
+
+final class TestFakeBridgesCommand extends Command
+{
+    protected static $defaultName = 'test:fake-bridges';
+
+    public function __construct(
+        private ChatterInterface $chatter,
+        private TexterInterface $texter,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Test FakeSms and FakeChat bridge');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        // SMS
+        $message = new SmsMessage('1234567', 'Hi Symfony');
+        $this->texter->send($message);
+
+        // ChatMessage without recipient
+        $message = new ChatMessage('Hi Symfony!');
+        $this->chatter->send($message);
+
+        // Chat Message with recipient
+        $message = new ChatMessage('Hi Symfony!', new TestOptions(['recipient_id' => 'Oskar']));
+        $this->chatter->send($message);
+
+        return Command::SUCCESS;
+    }
+}
+```
+
+### Results 👍
+![CleanShot 2021-04-09 at 13 11 27](https://user-images.githubusercontent.com/995707/114172080-79c1ea00-9935-11eb-8717-58ee50201671.png)
+![CleanShot 2021-04-09 at 13 11 54](https://user-images.githubusercontent.com/995707/114172087-7af31700-9935-11eb-89c4-b8f1648d7580.png)
+![CleanShot 2021-04-09 at 13 12 23](https://user-images.githubusercontent.com/995707/114172088-7b8bad80-9935-11eb-972f-d7c759974592.png)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-09T11:25:01Z
+
+Yes, you are missing `.gitignore`
+
+![Screenshot 2021-04-09 at 13 24 32](https://user-images.githubusercontent.com/1275206/114173153-f86b5700-9936-11eb-82b1-ff2ebf9b9235.png)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T11:55:59Z
+
+Oh I overlooked this, thanks `.gitignore` added

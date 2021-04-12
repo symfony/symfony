@@ -49,8 +49,10 @@ final class HttplugPromise implements HttplugPromiseInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return Psr7ResponseInterface|mixed
      */
-    public function wait($unwrap = true): ?Psr7ResponseInterface
+    public function wait($unwrap = true)
     {
         $result = $this->promise->wait($unwrap);
 

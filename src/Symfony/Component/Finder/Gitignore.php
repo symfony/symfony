@@ -52,6 +52,36 @@ class Gitignore
         return '~^(?:'.$res.')~s';
     }
 
+    public static function relativize(string $gitignoreFileContent, string $gitignoreFileRelativePath = ''): string
+    {
+        if ('/' === substr($gitignoreFileRelativePath, -1)) {
+            $gitignoreFileRelativePath = substr($gitignoreFileRelativePath, 0, -1);
+        }
+
+        if ('' === $gitignoreFileRelativePath) {
+            return $gitignoreFileContent;
+        }
+
+        $pathQuoted = str_replace('\\', '/', $gitignoreFileRelativePath);
+
+        return preg_replace_callback('~(?<=^|[\r\n])(!?+)((?:[^\r\n# \t]|(?<=\\\\)[# \t]|[ \t]+(?=[^\r\n# \t]))+)~', function ($matches) use ($pathQuoted) {
+            $gitignoreLine = $matches[2];
+
+            $slashPos = strpos($gitignoreLine, '/');
+            if (false !== $slashPos && \strlen($gitignoreLine) - 1 !== $slashPos) {
+                if (0 === $slashPos) {
+                    $gitignoreLine = substr($gitignoreLine, 1);
+                }
+                $isAbsolute = true;
+            } else {
+                $isAbsolute = false;
+            }
+
+            return $matches[1].'/'.$pathQuoted.'/'.$gitignoreLine
+                .($isAbsolute ? '' : "\n".$matches[1].'/'.$pathQuoted.'/**/'.$gitignoreLine);
+        }, $gitignoreFileContent);
+    }
+
     private static function lineToRegex(string $gitignoreLine): string
     {
         if ('' === $gitignoreLine) {

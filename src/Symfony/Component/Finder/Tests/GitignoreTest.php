@@ -18,9 +18,20 @@ use Symfony\Component\Finder\Gitignore;
  */
 class GitignoreTest extends TestCase
 {
+    public function testRelativize()
+    {
+        $this->assertSame('a', Gitignore::relativize('a', ''));
+        $this->assertSame('/u/a', Gitignore::relativize('/a', 'u'));
+        $this->assertSame('/u/a'."\n".'/u/**/a', Gitignore::relativize('a', 'u'));
+        $this->assertSame('!/u/a'."\n".'!/u/**/a', Gitignore::relativize('!a', 'u'));
+        $this->assertSame('/u/a'."\n".'/u/**/a#x', Gitignore::relativize('a#x', 'u/'));
+        $this->assertSame('/u/a\#x'."\n".'/u/**/a\#x', Gitignore::relativize('a\#x', 'u/'));
+    }
+
     /**
      * @dataProvider provider
      * @dataProvider providerExtended
+     * @dataProvider providerRelativized
      */
     public function testToRegex(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
     {
@@ -332,6 +343,30 @@ class GitignoreTest extends TestCase
                 $case[1],
                 $case[2],
             ];
+        }
+
+        return $cases;
+    }
+
+    public function providerRelativized(): array
+    {
+        $basicCases = $this->provider();
+
+        $cases = [];
+        foreach (['a', 'a/b', str_repeat('super !*? path/', 30)] as $p) {
+            foreach ($basicCases as $case) {
+                $cases[] = [
+                    array_map(function ($v) use ($p) {
+                        return Gitignore::relativize($v, $p);
+                    }, $case[0]),
+                    array_map(function ($v) use ($p) {
+                        return rtrim($p, '/').'/'.$v;
+                    }, $case[1]),
+                    array_map(function ($v) use ($p) {
+                        return rtrim($p, '/').'/'.$v;
+                    }, $case[2]),
+                ];
+            }
         }
 
         return $cases;

@@ -156,7 +156,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
     }
 
-    public function testRespondsWith304OnlyIfIfNoneMatchAndIfModifiedSinceBothMatch()
+    public function testRespondsWith304WhenIfNoneMatchAndIfModifiedSinceBothMatch()
     {
         $time = \DateTime::createFromFormat('U', time());
 

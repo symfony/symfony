@@ -154,13 +154,15 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     continue;
                 }
 
-                if (!$p->isDefaultValueConstant() || \defined($p->getDefaultValueConstantName())) {
+                $defaultValueConstantName = preg_replace('/^parent::/', 'pimax\Messages\Message::', $p->getDefaultValueConstantName());
+
+                if (!$p->isDefaultValueConstant() || \defined($defaultValueConstantName)) {
                     $defaults[$p->name] = $p->getDefaultValue();
 
                     continue;
                 }
 
-                $defaults[$p->name] = $p->getDefaultValueConstantName();
+                $defaults[$p->name] = $defaultValueConstantName;
                 $parametersWithUndefinedConstants[$p->name] = true;
             }
 

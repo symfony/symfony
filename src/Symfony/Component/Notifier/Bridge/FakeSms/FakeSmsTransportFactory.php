@@ -11,24 +11,25 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author James Hemery <james@yieldstudio.fr>
+ * @author Oskar Stark <oskarstark@googlemail.com>
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {
-    protected $serviceProvider;
+    protected $mailer;
 
-    public function __construct(ServiceProviderInterface $serviceProvider)
+    public function __construct(MailerInterface $mailer)
     {
         parent::__construct();
 
-        $this->serviceProvider = $serviceProvider;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -43,11 +44,11 @@ final class FakeSmsTransportFactory extends AbstractTransportFactory
         }
 
         if ('fakesms+email' === $scheme) {
-            $serviceId = $dsn->getHost();
+            $mailerTransport = $dsn->getHost();
             $to = $dsn->getRequiredOption('to');
             $from = $dsn->getRequiredOption('from');
 
-            return (new FakeSmsEmailTransport($this->serviceProvider->get($serviceId), $to, $from))->setHost($serviceId);
+            return (new FakeSmsEmailTransport($this->mailer, $to, $from))->setHost($mailerTransport);
         }
     }
 

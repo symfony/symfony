@@ -6,13 +6,17 @@ Provides Fake SMS (as email during development) integration for Symfony Notifier
 #### DSN example
 
 ```
-FAKE_SMS_DSN=fakesms+email://MAILER_SERVICE_ID?to=TO&from=FROM
+FAKE_SMS_DSN=fakesms+email://default?to=TO&from=FROM
 ```
 
 where:
- - `MAILER_SERVICE_ID` is mailer service id (use `mailer` by default)
  - `TO` is email who receive SMS during development
  - `FROM` is email who send SMS during development
+
+To use a custom mailer transport:
+```
+FAKE_SMS_DSN=fakesms+email://mailchimp?to=TO&from=FROM
+```
 
 Resources
 ---------

@@ -707,6 +707,34 @@ class Finder implements \IteratorAggregate, \Countable
         return iterator_count($this->getIterator());
     }
 
+    private function searchGitignoreFiles(string $dir): self
+    {
+        $finder = self::create()
+            ->in($dir)
+            ->ignoreDotFiles(false)
+            ->name('.gitignore');
+        if ($this->followLinks) {
+            $finder->followLinks();
+        }
+
+        return $finder;
+    }
+
+    private function buildGitignoreRegexes(string $dir): array
+    {
+        return array_map(function (SplFileInfo $file) {
+            try {
+                $data = $file->getContents();
+            } catch (\RuntimeException $e) {
+                throw new \RuntimeException(sprintf('Failed to read ".gitignore" "%s" file.', $file->getPathname()), 0, $e);
+            }
+
+            $dataRelativized = Gitignore::relativize($data, $file->getRelativePath());
+
+            return Gitignore::toRegex($dataRelativized);
+        }, iterator_to_array($this->searchGitignoreFiles($dir)));
+    }
+
     private function searchInDirectory(string $dir): \Iterator
     {
         $exclude = $this->exclude;
@@ -721,11 +749,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (static::IGNORE_VCS_IGNORED_FILES === (static::IGNORE_VCS_IGNORED_FILES & $this->ignore)) {
-            $gitignoreFilePath = sprintf('%s/.gitignore', $dir);
-            if (!is_readable($gitignoreFilePath)) {
-                throw new \RuntimeException(sprintf('The "ignoreVCSIgnored" option cannot be used by the Finder as the "%s" file is not readable.', $gitignoreFilePath));
-            }
-            $notPaths = array_merge($notPaths, [Gitignore::toRegex(file_get_contents($gitignoreFilePath))]);
+            $notPaths = array_merge($notPaths, $this->buildGitignoreRegexes($dir));
         }
 
         $minDepth = 0;

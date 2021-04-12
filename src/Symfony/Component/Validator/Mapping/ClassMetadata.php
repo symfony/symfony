@@ -237,7 +237,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      * Adds a constraint to the getter of the given property.
      *
      * The name of the getter is assumed to be the name of the property with an
-     * uppercased first letter and either the prefix "get" or "is".
+     * uppercased first letter and the prefix "get", "is" or "has".
      *
      * @param string $property The name of the property
      *

@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Login Link functionality is no longer experimental
  * Add `RememberMeConditionsListener` to check if remember me is requested and supported, and set priority of `RememberMeListener` to -63
  * Add `RememberMeHandlerInterface` and implementations, used as a replacement of `RememberMeServicesInterface` when using the AuthenticatorManager
  * Add `TokenDeauthenticatedEvent` that is dispatched when the current security token is deauthenticated

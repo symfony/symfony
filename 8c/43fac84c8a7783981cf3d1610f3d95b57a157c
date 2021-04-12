@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-12T10:16:22Z
+
+While I do prefer the proposed behavior, I'm unsure if we should simply change it in a bugfix release. Chances are that there are applications out there that rely on the current behavior.
+
+The current behavior is not completely unreasonable either: The cache never persists the passed value, which is what `false` indicates. My preference would be to leave the adapter untouched on 4.4 and rather make the return value configurable on 5.x.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-12T10:28:06Z
+
+On my side, I think this is a really bug fix. The cache basically says: "`true`, I saved that item", then it expired it immediately, as it is allowed to do. No implementation should rely on the precise behavior of `NullAdapter` anyway - and making this configurable would only increase complexity IMHO.
+
+---------------------------------------------------------------------------
+
+by roukmoute at 2021-04-12T10:28:16Z
+
+> The cache never persists the passed value, which is what `false` indicates
+
+If I follow [PSR-6](https://www.php-fig.org/psr/psr-6/), `false` on the method `save()` indicates an error not it was not persisted.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-12T10:52:04Z
+
+> No implementation should rely on the precise behavior of NullAdapter anyway
+
+yet here we are :)
+
+> it expired it immediately
+
+works for me :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-12T10:55:43Z
+
+> > No implementation should rely on the precise behavior of NullAdapter anyway
+>
+> yet here we are :)
+
+the change here is precisely about enabling that, by making sure that NullAdapter does not report an error for its expected behavior.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-12T13:11:08Z
+
+> If I follow [PSR-6](https://www.php-fig.org/psr/psr-6/), `false` on the method `save()` indicates an error not it was not persisted.
+
+`true` indicates that the items was persisted successfully, `false` indicates an error. Neither fully applies here, so we have to pick one. And I fully agree that `true` feels more correct, given Nicolas' explanation:
+
+> then it expired it immediately, as it is allowed to do
+
+Then again, that does not render the current behavior inherently wrong. And we're talking about changing the existing behavior in a bug fix.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-12T13:38:42Z
+
+@derrabus the current code reports NullAdapter as always having errors when trying to save, which then forces you to do a special case for NullAdapter in any code wanting to report failures loudly, because not persisting the value in NullAdapter is not a failure. It is the expected behavior of the adapter to always miss the cache. See the PR description for such a code.
+So to me, this indeed qualifies as a bugfix.

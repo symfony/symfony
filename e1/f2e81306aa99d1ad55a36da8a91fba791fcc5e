@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-01T09:48:55Z
+
+Thank you for creating this PR including tests and a reproducer, @monteiro! That's perfect!
+
+After looking at the changes, I'm wondering whether we qualify this as a BC break. More precisely, people may have been using the "empty attributes" feature to exclude some routes from the access control (e.g. a login form). However, this was never documented behavior.
+
+Let's wait a bit for more comments from the core team whether or not this is a BC break. If we qualify it as such, I think it makes all sense to deprecate this in 5.x instead (and introducing this exception in 6.0). `IS_AUTHENTICATED_ANONYMOUSLY` or `PUBLIC_ACCESS` should be used instead of an empty array of attributes imho.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-01T10:38:58Z
+
+> After looking at the changes, I'm wondering whether we qualify this as a BC break.
+
+I thought about that as well and could live with going through the deprecation process for that.
+
+> More precisely, people may have been using the "empty attributes" feature to exclude some routes from the access control (e.g. a login form). However, this was never documented behavior.
+
+My current understanding of the behavior (please correct me if I'm wrong) is that the empty line simply matches every request without applying any access restrictions. The result is effectively that any subsequent line would become unreachable. That behavior is dangerously surprising imho.
+
+Can we come up with a scenario where this change breaks an application that is not dangerously misconfigured?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-01T10:56:22Z
+
+> Can we come up with a scenario where this change breaks an application that is not dangerously misconfigured?
+
+```yaml
+access_control:
+  - { path: ^/login }
+  - { path: ^/, roles: ROLE_USER }
+```
+
+I haven't verified it, but as far as I understand the code, this yaml file is equal to doing `- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }`.
+
+The diff is checking `$attributes`, which are the `roles` + `allow_if` statements from access control.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-01T12:16:13Z
+
+@wouterj With your example, the exception in this PR should not be triggered. The case that is caught here is this one:
+
+```YAML
+access_control:
+  -
+  - { path: ^/, roles: ROLE_USER }
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-01T12:26:31Z
+
+@derrabus as indicated with my last sentence, this case *is* caught by this PR, as the check is done over `$attributes`, which only contains the values of `roles` and `allow_if`. So maybe we should do this check over `$access`? (not sure how that works, as most options have a default value of `null`.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-01T13:45:19Z
+
+> @derrabus as indicated with my last sentence, this case _is_ caught by this PR
+
+Okay, that's indeed an issue then.
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-04-01T12:04:48Z
+
+Following @xabbuh advice I fixed this specific edge case and added @wouterj example to the test, so we are sure it is not breaking old behaviour. Let me know what you think.
+
+Thanks for the help!
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-04-12T14:17:37Z
+
+Let me know if there is anything I can do to help here.

@@ -102,6 +102,9 @@ Routing
 Security
 --------
 
+ * Deprecate using `UsageTrackingTokenStorage` with tracking enabled without a main request. Use the untracked token
+   storage (service ID: `security.untracked_token_storage`) instead, or disable usage tracking
+   completely using `UsageTrackingTokenStorage::disableUsageTracking()`.
  * [BC BREAK] Remove method `checkIfCompletelyResolved()` from `PassportInterface`, checking that passport badges are
    resolved is up to `AuthenticatorManager`
  * Deprecate class `User`, use `InMemoryUser` or your own implementation instead.

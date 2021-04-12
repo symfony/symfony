@@ -13,6 +13,7 @@ CHANGELOG
  * Add support for per-env configuration in XML and Yaml loaders
  * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
  * Add support an integer return value for default_index_method
+ * Add `#[When(env: 'foo')]` to skip autoregistering a class when the env doesn't match
  * Add `env()` and `EnvConfigurator` in the PHP-DSL
  * Add support for `ConfigBuilder` in the `PhpFileLoader`
  * Add `ContainerConfigurator::env()` to get the current environment

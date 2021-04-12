@@ -17,6 +17,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
+use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -98,11 +99,26 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
-        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null);
+        $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
+        $classes = $this->findClasses($namespace, $resource, (array) $exclude, $autoconfigureAttributes);
         // prepare for deep cloning
         $serializedPrototype = serialize($prototype);
 
         foreach ($classes as $class => $errorMessage) {
+            if ($autoconfigureAttributes && $this->env) {
+                $r = $this->container->getReflectionClass($class);
+                $attribute = null;
+                foreach ($r->getAttributes(When::class) as $attribute) {
+                    if ($this->env === $attribute->newInstance()->env) {
+                        $attribute = null;
+                        break;
+                    }
+                }
+                if (null !== $attribute) {
+                    continue;
+                }
+            }
+
             if (interface_exists($class, false)) {
                 $this->interfaces[] = $class;
             } else {

@@ -243,6 +243,27 @@ class FileLoaderTest extends TestCase
             'yaml/*'
         );
     }
+
+    /**
+     * @requires PHP 8
+     *
+     * @testWith ["prod", true]
+     *           ["dev", true]
+     *           ["bar", false]
+     *           [null, true]
+     */
+    public function testRegisterClassesWithWhenEnv(?string $env, bool $expected)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), $env);
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/{Foo.php}'
+        );
+
+        $this->assertSame($expected, $container->has(Foo::class));
+    }
 }
 
 class TestFileLoader extends FileLoader

@@ -39,6 +39,13 @@ interface PassportInterface
 
     public function hasBadge(string $badgeFqcn): bool;
 
+    /**
+     * @template T of BadgeInterface
+     *
+     * @param class-string<T> $badgeFqcn
+     *
+     * @return T|null
+     */
     public function getBadge(string $badgeFqcn): ?BadgeInterface;
 
     /**

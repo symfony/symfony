@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
+use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 
 /**
  * @author Roland Franssen <franssen.roland@gmail.com>
@@ -47,7 +47,7 @@ abstract class ResourceBundle
     {
         if (null === self::$entryReader) {
             self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
-                new JsonBundleReader(),
+                new PhpBundleReader(),
                 Intl::BUFFER_SIZE
             ));
 

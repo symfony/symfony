@@ -148,7 +148,12 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     * @template TValue of array<array|scalar>|scalar
+     *
+     * @param TValue $value
+     * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
+     *
+     * @return (TValue is scalar ? array|scalar : array<array|scalar>)
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected

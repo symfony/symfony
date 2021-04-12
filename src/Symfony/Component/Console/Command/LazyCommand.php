@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -176,7 +177,7 @@ final class LazyCommand extends Command
         return $this->getCommand()->getUsages();
     }
 
-    public function getHelper(string $name): mixed
+    public function getHelper(string $name): HelperInterface
     {
         return $this->getCommand()->getHelper($name);
     }

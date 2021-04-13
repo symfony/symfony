@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-12T18:00:25Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-12T18:05:17Z
+
+I believe we have to remove the `@experimental` annotation in the `LoginLinkFactory` for `SecurityBundle`.
+
+ https://github.com/symfony/symfony/blob/9092d5b035263706a385e355339401fdf8699c78/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/LoginLinkFactory.php#L27
+
+Can we do that under this PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T07:25:13Z
+
+> I believe we have to remove the @experimental annotation in the LoginLinkFactory for SecurityBundle.
+
+sure, please do
+
+/cc @Nyholm the failure on the "Package" job is a false positive
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-13T11:33:21Z
+
+well, it is a false positive because we manage the changelog in the Security component folder rather than in the dedicated subcomponents. But as we recommend installing the dedicated components, we might need to revisit that.
+and in the meantime, we might want to hardcode an exception in the verification script to avoid reporting it to every PR contributing to security components.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-13T11:34:34Z
+
+Off topic:
+I agree. See https://github.com/symfony/symfony/pull/40792
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-13T11:47:41Z
+
+> Can you update the changelog to mention that this is no longer experimental?
+
+done

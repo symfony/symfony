@@ -45,6 +45,7 @@ class AmazonSqsSender implements SenderInterface
 
         $messageGroupId = null;
         $messageDeduplicationId = null;
+        $xrayTraceId = null;
 
         /** @var AmazonSqsFifoStamp|null $amazonSqsFifoStamp */
         $amazonSqsFifoStamp = $envelope->last(AmazonSqsFifoStamp::class);
@@ -53,13 +54,20 @@ class AmazonSqsSender implements SenderInterface
             $messageDeduplicationId = $amazonSqsFifoStamp->getMessageDeduplicationId();
         }
 
+        /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */
+        $amazonSqsXrayTraceHeaderStamp = $envelope->last(AmazonSqsXrayTraceHeaderStamp::class);
+        if (null !== $amazonSqsXrayTraceHeaderStamp) {
+            $xrayTraceId = $amazonSqsXrayTraceHeaderStamp->getTraceId();
+        }
+
         try {
             $this->connection->send(
                 $encodedMessage['body'],
                 $encodedMessage['headers'] ?? [],
                 $delay,
                 $messageGroupId,
-                $messageDeduplicationId
+                $messageDeduplicationId,
+                $xrayTraceId
             );
         } catch (HttpException $e) {
             throw new TransportException($e->getMessage(), 0, $e);

@@ -11,6 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
+use Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 /**
@@ -24,6 +33,13 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 class PhpFileLoader extends FileLoader
 {
     protected $autoRegisterAliasesForSinglyImplementedInterfaces = false;
+    private $generator;
+
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, string $env = null, ?ConfigBuilderGeneratorInterface $generator = null)
+    {
+        parent::__construct($container, $locator, $env);
+        $this->generator = $generator;
+    }
 
     /**
      * {@inheritdoc}
@@ -47,7 +63,7 @@ class PhpFileLoader extends FileLoader
             $callback = $load($path);
 
             if (\is_object($callback) && \is_callable($callback)) {
-                $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $this->container, $this);
+                $this->executeCallback($callback, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
             }
         } finally {
             $this->instanceof = [];
@@ -69,6 +85,97 @@ class PhpFileLoader extends FileLoader
         }
 
         return 'php' === $type;
+    }
+
+    /**
+     * Resolve the parameters to the $callback and execute it.
+     */
+    private function executeCallback(callable $callback, ContainerConfigurator $containerConfigurator, string $path)
+    {
+        if (!$callback instanceof \Closure) {
+            $callback = \Closure::fromCallable($callback);
+        }
+
+        $arguments = [];
+        $configBuilders = [];
+        $parameters = (new \ReflectionFunction($callback))->getParameters();
+        foreach ($parameters as $parameter) {
+            $reflectionType = $parameter->getType();
+            if (!$reflectionType instanceof \ReflectionNamedType) {
+                throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $parameter->getName(), $path));
+            }
+            $type = $reflectionType->getName();
+
+            switch ($type) {
+                case ContainerConfigurator::class:
+                    $arguments[] = $containerConfigurator;
+                    break;
+                case ContainerBuilder::class:
+                    $arguments[] = $this->container;
+                    break;
+                case FileLoader::class:
+                case self::class:
+                    $arguments[] = $this;
+                    break;
+                default:
+                    try {
+                        $configBuilder = $this->configBuilder($type);
+                    } catch (InvalidArgumentException | \LogicException $e) {
+                        throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type.' '.$parameter->getName(), $path), 0, $e);
+                    }
+                    $configBuilders[] = $configBuilder;
+                    $arguments[] = $configBuilder;
+            }
+        }
+
+        $callback(...$arguments);
+
+        /** @var ConfigBuilderInterface $configBuilder */
+        foreach ($configBuilders as $configBuilder) {
+            $containerConfigurator->extension($configBuilder->getExtensionAlias(), $configBuilder->toArray());
+        }
+    }
+
+    /**
+     * @param string $namespace FQCN string for a class implementing ConfigBuilderInterface
+     */
+    private function configBuilder(string $namespace): ConfigBuilderInterface
+    {
+        if (!class_exists(ConfigBuilderGenerator::class)) {
+            throw new \LogicException('You cannot use the config builder as the Config component is not installed. Try running "composer require symfony/config".');
+        }
+
+        if (null === $this->generator) {
+            throw new \LogicException('You cannot use the ConfigBuilders without providing a class implementing ConfigBuilderGeneratorInterface.');
+        }
+
+        // If class exists and implements ConfigBuilderInterface
+        if (class_exists($namespace) && is_subclass_of($namespace, ConfigBuilderInterface::class)) {
+            return new $namespace();
+        }
+
+        // If it does not start with Symfony\Config\ we dont know how to handle this
+        if ('Symfony\\Config\\' !== substr($namespace, 0, 15)) {
+            throw new InvalidargumentException(sprintf('Could not find or generate class "%s".', $namespace));
+        }
+
+        // Try to get the extension alias
+        $alias = Container::underscore(substr($namespace, 15, -6));
+
+        if (!$this->container->hasExtension($alias)) {
+            $extensions = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
+            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
+        }
+
+        $extension = $this->container->getExtension($alias);
+        if (!$extension instanceof ConfigurationExtensionInterface) {
+            throw new \LogicException(sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
+        }
+
+        $configuration = $extension->getConfiguration([], $this->container);
+        $loader = $this->generator->build($configuration);
+
+        return $loader();
     }
 }
 

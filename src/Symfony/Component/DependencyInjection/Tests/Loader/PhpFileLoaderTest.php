@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+require_once __DIR__.'/../Fixtures/includes/AcmeExtension.php';
+
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -60,7 +63,9 @@ class PhpFileLoaderTest extends TestCase
     public function testConfig($file)
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
-        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \AcmeExtension());
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
         $loader->load($fixtures.'/config/'.$file.'.php');
 
         $container->compile();
@@ -82,6 +87,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['anonymous'];
         yield ['lazy_fqcn'];
         yield ['remove'];
+        yield ['config_builder'];
     }
 
     public function testAutoConfigureAndChildDefinition()

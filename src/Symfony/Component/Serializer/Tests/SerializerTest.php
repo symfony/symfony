@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -55,6 +56,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedClassDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedDummy;
 
 class SerializerTest extends TestCase
 {
@@ -644,6 +647,30 @@ class SerializerTest extends TestCase
             $expectedData,
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model', 'json', [UnwrappingDenormalizer::UNWRAP_PATH => '[baz][inner]'])
         );
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testSerializeBackedEnum()
+    {
+        $serializer = new Serializer([new BackedEnumNormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $card = new EnumBackedClassDummy(EnumBackedDummy::Diamonds);
+        $serialized = $serializer->serialize($card, 'json');
+
+        $this->assertEquals('{"suit":"D"}', $serialized);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testDeserializeBackedEnum()
+    {
+        $serialized = '{"suit": "D"}';
+        $serializer = new Serializer([new BackedEnumNormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        $card = $serializer->deserialize($serialized, EnumBackedClassDummy::class, 'json');
+
+        $this->assertEquals(EnumBackedDummy::Diamonds, $card->suit);
     }
 }
 

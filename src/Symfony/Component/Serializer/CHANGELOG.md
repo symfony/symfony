@@ -9,6 +9,7 @@ CHANGELOG
  * Add normalization formats to `UidNormalizer`
  * Add `CsvEncoder::END_OF_LINE` context option
  * Deprecate creating instances of the annotation classes by passing an array of parameters, use named arguments instead
+ * Added `BackedEnumNormalizer`
 
 5.2.0
 -----

@@ -10,11 +10,12 @@ CHANGELOG
  * Add `#[AsTaggedItem]` attribute for defining the index and priority of classes found in tagged iterators/locators
  * Add autoconfigurable attributes
  * Add support for autowiring tagged iterators and locators via attributes on PHP 8
- * Add support for per-env configuration in loaders
+ * Add support for per-env configuration in XML and Yaml loaders
  * Add `ContainerBuilder::willBeAvailable()` to help with conditional configuration
  * Add support an integer return value for default_index_method
  * Add `env()` and `EnvConfigurator` in the PHP-DSL
  * Add support for `ConfigBuilder` in the `PhpFileLoader`
+ * Add `ContainerConfigurator::env()` to get the current environment
 
 5.2.0
 -----

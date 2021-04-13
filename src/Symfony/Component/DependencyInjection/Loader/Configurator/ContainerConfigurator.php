@@ -74,20 +74,11 @@ class ContainerConfigurator extends AbstractConfigurator
     }
 
     /**
-     * @return static
+     * Get the current environment to be able to write conditional configuration.
      */
-    final public function when(string $env): self
+    final public function env(): ?string
     {
-        if ($env === $this->env) {
-            return clone $this;
-        }
-
-        $instanceof = $this->instanceof;
-        $clone = clone $this;
-        $clone->container = new ContainerBuilder(clone $this->container->getParameterBag());
-        $clone->instanceof = &$instanceof;
-
-        return $clone;
+        return $this->env;
     }
 
     /**

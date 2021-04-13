@@ -30,7 +30,6 @@ use Symfony\Component\Config\Definition\VariableNode;
 class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 {
     private $classes;
-
     private $outputDir;
 
     public function __construct(string $outputDir)
@@ -47,22 +46,25 @@ class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
         $rootClass = new ClassBuilder('Symfony\\Config', $rootNode->getName());
-        $rootClass->addImplements(ConfigBuilderInterface::class);
-        $this->classes[] = $rootClass;
 
-        $this->buildNode($rootNode, $rootClass, $this->getSubNamespace($rootClass));
-        $rootClass->addMethod('getExtensionAlias', '
+        $path = $this->getFullPath($rootClass);
+        if (!is_file($path)) {
+            // Generate the class if the file not exists
+            $this->classes[] = $rootClass;
+            $this->buildNode($rootNode, $rootClass, $this->getSubNamespace($rootClass));
+            $rootClass->addImplements(ConfigBuilderInterface::class);
+            $rootClass->addMethod('getExtensionAlias', '
 public function NAME(): string
 {
     return \'ALIAS\';
 }
         ', ['ALIAS' => $rootNode->getPath()]);
 
-        $this->writeClasses($outputDir = $this->outputDir);
-        $loader = \Closure::fromCallable(function () use ($outputDir, $rootClass) {
-            $str = $outputDir.\DIRECTORY_SEPARATOR.$rootClass->getDirectory().\DIRECTORY_SEPARATOR.$rootClass->getFilename();
-            require_once $str;
+            $this->writeClasses();
+        }
 
+        $loader = \Closure::fromCallable(function () use ($path, $rootClass) {
+            require_once $path;
             $className = $rootClass->getFqcn();
 
             return new $className();
@@ -71,14 +73,23 @@ public function NAME(): string
         return $loader;
     }
 
-    private function writeClasses(string $outputDir)
+    private function getFullPath(ClassBuilder $class): string
+    {
+        $directory = $this->outputDir.\DIRECTORY_SEPARATOR.$class->getDirectory();
+        if (!is_dir($directory)) {
+            @mkdir($directory, 0777, true);
+        }
+
+        return $directory.\DIRECTORY_SEPARATOR.$class->getFilename();
+    }
+
+    private function writeClasses()
     {
         foreach ($this->classes as $class) {
             $this->buildConstructor($class);
             $this->buildToArray($class);
-            $dir = $outputDir.\DIRECTORY_SEPARATOR.$class->getDirectory();
-            @mkdir($dir, 0777, true);
-            file_put_contents($dir.\DIRECTORY_SEPARATOR.$class->getFilename(), $class->build());
+
+            file_put_contents($this->getFullPath($class), $class->build());
         }
 
         $this->classes = [];

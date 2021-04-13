@@ -61,7 +61,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Checks if the given class has any get{Property} method.
+     * Checks if the given class has any getter method.
      */
     private function supports(string $class): bool
     {
@@ -77,7 +77,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Checks if a method's name is get.* or is.*, and can be called without parameters.
+     * Checks if a method's name matches /^(get|is|has).+$/ and can be called non-statically without parameters.
      */
     private function isGetMethod(\ReflectionMethod $method): bool
     {

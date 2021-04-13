@@ -113,7 +113,7 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($item->isHit());
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertFalse($adapter->save($item));
+        $this->assertTrue($adapter->save($item));
     }
 
     public function testDeferredSave()
@@ -124,7 +124,7 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($item->isHit());
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertFalse($adapter->saveDeferred($item));
+        $this->assertTrue($adapter->saveDeferred($item));
     }
 
     public function testCommit()
@@ -135,7 +135,7 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($item->isHit());
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
 
-        $this->assertFalse($adapter->saveDeferred($item));
-        $this->assertFalse($this->createCachePool()->commit());
+        $this->assertTrue($adapter->saveDeferred($item));
+        $this->assertTrue($this->createCachePool()->commit());
     }
 }

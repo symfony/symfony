@@ -432,6 +432,56 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
     }
 
+    public function testInvalidAccessControlWithEmptyRow()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                [],
+                ['path' => '/admin', 'roles' => 'ROLE_ADMIN'],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('One or more access control items are empty. Did you accidentally add lines only containing a "-" under "security.access_control"?');
+        $container->compile();
+    }
+
+    public function testValidAccessControlWithEmptyRow()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['path' => '^/login'],
+                ['path' => '^/', 'roles' => 'ROLE_USER'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue(true, 'extension throws an InvalidConfigurationException if there is one more more empty access control items');
+    }
+
     /**
      * @dataProvider provideEntryPointFirewalls
      */

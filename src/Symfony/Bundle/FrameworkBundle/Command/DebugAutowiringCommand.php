@@ -81,8 +81,9 @@ EOF
         $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
         if ($search = $input->getArgument('search')) {
-            $serviceIds = array_filter($serviceIds, function ($serviceId) use ($search) {
-                return false !== stripos(str_replace('\\', '', $serviceId), $search) && 0 !== strpos($serviceId, '.');
+            $searchNormalized = preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', '', $search);
+            $serviceIds = array_filter($serviceIds, function ($serviceId) use ($searchNormalized) {
+                return false !== stripos(str_replace('\\', '', $serviceId), $searchNormalized) && 0 !== strpos($serviceId, '.');
             });
 
             if (empty($serviceIds)) {

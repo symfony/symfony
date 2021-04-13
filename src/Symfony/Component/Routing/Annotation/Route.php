@@ -41,8 +41,8 @@ class Route
      * @param array|string      $data         data array managed by the Doctrine Annotations library or the path
      * @param array|string|null $path
      * @param string[]          $requirements
-     * @param string[]          $methods
-     * @param string[]          $schemes
+     * @param string[]|string   $methods
+     * @param string[]|string   $schemes
      *
      * @throws \BadMethodCallException
      */
@@ -54,8 +54,8 @@ class Route
         array $options = [],
         array $defaults = [],
         string $host = null,
-        array $methods = [],
-        array $schemes = [],
+        $methods = [],
+        $schemes = [],
         string $condition = null,
         int $priority = null,
         string $locale = null,

@@ -1,0 +1,239 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-27T21:03:28Z
+
+Hm.. I don't understand the psalm error..
+
+https://psalm.dev/r/f2f527484f
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-03-27T22:44:48Z
+
+I really love this feature that remind me the work from @HeahDude .
+I'm super happy and excited about it!!
+
+I worry about edge cases that will not be handled (ie. all our `beforeNormalize` code)
+
+A small detail, I would remove the `set` and `add` prefixes (as we go for router and service configuration)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-27T23:17:59Z
+
+> Hm.. I don't understand the psalm error..
+
+Seems like an issue with psalm: https://psalm.dev/r/c97a88395d `ArrayNode::getChildren()` (and `ArrayNode::$children`) have no type information other than `array`. Seems like Psalm does something weird in the case statements when there is no type information for that variable.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T10:05:35Z
+
+> A small detail, I would remove the set and add prefixes (as we go for router and service configuration)
+
+How about removing the `add` and `set` prefixes for all method but not the ones that add a new node. Ie we keep ` addAccessControl()` and `addAnonymous()`
+
+---------------------------------------------------------------------------
+
+by azjezz at 2021-03-28T11:13:03Z
+
+> Seems like Psalm does something weird in the case statements when there is no type information for that variable.
+
+no, the code contains a bug :) you are switching `$object`, not `true`.
+
+see: https://psalm.dev/r/92bdc7be90
+
+---
+
+however, psalm should probably provide a better trace for this scenario.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T11:46:42Z
+
+Just note about the method names. We have a few different scenarios.
+
+| Example | Description |
+| ---------| ------------|
+| `->setFoo(type $value): self` | Set a simple value to "Foo"
+| `->setFoo($value): self` | Set a simple value to "Foo" with no type (VariableNode)
+| `->addFoo(type $value): self` | Add a value to the list of "foo". (No `type` when VariableNode)
+| `->addFoo(string $key, type $value): self` | Add a value to the list of "foo" with a key  (No `type` when VariableNode)
+| `->addFoo(array $value): Foo` | Add a new "Foo" node with some initial values
+| `->addFoo(array $value): Foo` | Add a new "Foo" node with some initial values (using prototype)
+| `->addFoo(string $key, array $value): Foo` | Add a new "Foo" node with key and some initial values (using prototype)
+
+**EDIT**: This is updated, we have dropped all `add` and `set` prefixes.
+
+---------------------------------------------------------------------------
+
+by muglug at 2021-03-28T14:40:50Z
+
+> however, psalm should probably provide a better trace for this scenario.
+
+It actually cannot when `$object`'s type is wide open – the code is identical to this, but passing `takesAll(false)` would pass that check:
+
+```
+function takesAll($object): void {
+    if ($object == ($object instanceof Foo)) {
+        takesFoo($object);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-03-28T18:00:55Z
+
+This is brilliant :) IIUC the generated types are problematic for env values (aka string placeholders in Config)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-28T18:42:30Z
+
+Using environment variables are fine. Just remember:
+
+### Correct
+
+```php
+  /** @var \Config\Framework\FrameworkConfig $framework */
+    $framework = $container->extensionBuilder('framework');
+    $framework->addLock()
+        ->addResource('acme', ['%env(LOCK_DSN)%']);
+```
+
+### Wrong way
+```php
+  /** @var \Config\Framework\FrameworkConfig $framework */
+    $framework = $container->extensionBuilder('framework');
+    $framework->addLock()
+         // This shows the wrong way. Dont do this.
+        ->addResource('acme', [getenv('LOCK_DSN')]);
+
+```
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-03-28T19:15:33Z
+
+@Nyholm also for `BooleanNodes` (e.g. `setDebug('%env(bool:APP_DEBUG)%')`)?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-03-28T19:48:20Z
+
+See `ValidateEnvPlaceholdersPassTest`, the generated class should be compatible with current tests for `EnvConfiguration`.
+
+I think it needs eg. `bool|Env $value`. With #28896 we'd know a a bit more, ie. which nodes support such a type.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-02T09:50:52Z
+
+I've updated the PR with a lot of tests and docs.
+I've also followed Nicolas suggestion.
+
+The PR description is updated. I would like to have a final round of reviews, merge and then follow up with PRs for specific features like cache warmer. This PR is large and complex enough as it is.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T21:18:20Z
+
+Awesome. Thank you.
+
+1. I'll follow up this PR with a cache warmer so it gets a bit better experience.
+3. That is strange... I get the same error if I copy the config from the [docs](https://symfony.com/doc/current/logging/monolog_exclude_http_codes.html):
+
+```php
+return static function (ContainerBuilder $container) {
+    $container->loadFromExtension('monolog', [
+        'handlers' => [
+            'main' => [
+                'type' => 'fingers_crossed',
+                'excluded_http_codes' => [404, 404],
+            ],
+        ],
+    ]);
+};
+```
+
+4. Great idea. I missed that
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T21:38:30Z
+
+Thank you for the review. I really appreciate you taking the time to test and experiment with this.
+
+I'll double check the monolog config thing later.
+I'll also update the namespace to something a bit simpler. Maybe just `Symfony\Config\DoctrineMigrations` and `Symfony\Config\Monolog`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-07T18:55:26Z
+
+I found the issue with the monolog config. When you use `fingers_crossed`, you need to specify what handler it is wrapping. Or it will change to "stream" without telling you...
+
+```php
+
+use Symfony\Config\MonologConfig;
+
+return static function (MonologConfig $monolog) {
+
+    $handler = $monolog->handler('main')
+        ->type('fingers_crossed')
+        ->handler('nested')
+    ;
+    $handler->excludedHttpCode()->code('404');
+    $handler->excludedHttpCode()->code('405');
+
+    $monolog->handler('nested')
+        ->type('stream')
+        ->path('php://strerr')
+        ->level('debug')
+        ->channels(['elements' => ['!event']]);
+};
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-08T09:37:45Z
+
+I've updated the namespace.
+
+```diff
+- use Symfony\Config\Monolog\MonologConfig;
++ use Symfony\Config\MonologConfig;
+```
+
+This PR is ready for a final review.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-08T10:57:02Z
+
+> Or it will change to "stream" without telling you...
+
+that's probably something we need to change in MonologBundle
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-04-10T19:52:47Z
+
+> > Or it will change to "stream" without telling you...
+>
+> that's probably something we need to change in MonologBundle
+
+After hours of debugging, I figured out that it was a bug in my project (I declared 2 monolog configurations in both `packages` and `packages/dev` that conflict) so nothing related to this PR nor Monolog
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-12T11:02:43Z
+
+> I just realized one more thing: following #40214, the generated builders should have a when() method, for the same purpose.
+
+I agree. I will be happy to work on this as soon as this PR is merged. Not adding that feature in this PR would allow to quicker move forward.
+
+I've update the PR. It is ready for a review.
+
+status: need review

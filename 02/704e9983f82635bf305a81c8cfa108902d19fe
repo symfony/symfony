@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-02-12T18:59:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-12T19:24:02Z
+
+There is a single dumper output here, while other dumpers have different output for the state machine vs workflow cases, because the behavior of transitions is different. In full-fledged workflows, each transition can have multiple `from` and multiple `to`. Representing them as separate arrows would not reflect the actual workflow.
+
+---------------------------------------------------------------------------
+
+by eFrane at 2021-02-13T13:05:33Z
+
+@stof There is an explicit diagram syntax for [state machines in Mermaid](https://mermaid-js.github.io/mermaid/#/stateDiagram). However, that does not support styling the same way the flowchart syntax does. I can see two ways forward here: Either go the same route as the PlantUML Dumper and just use a different line style for state machines or choose the Graphviz strategy of having another class handling the specifics of state machines. I currently favour the latter, am however unsure because of the styling restrictions.
+
+EDIT: I had to push my current state, but it is not ready for review yet (in my opinion), just may have to switch machines.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-02-15T10:33:13Z
+
+@eFrane actually, I would say that the work you did at the time of my previous review was actually more appropriate for the dumping of state machines (look at the graphviz and PlantUML outputs for both cases). so I think the dumper should keep using `flowchart` in both cases.
+
+Regarding 1 class vs 2 classes for the dumping, I would say that it depends how much code depends on the cases and how much is shared between them.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-03-04T10:45:22Z
+
+Hello @eFrane ; Thanks for your first contribution 💛
+
+Could you take care of @stof comments? I would be very happy to merge your PR.
+
+---------------------------------------------------------------------------
+
+by eFrane at 2021-03-07T17:01:06Z
+
+@stof After having an embarrassingly long stare at the existing dumpers and the documentation, I finally understood your point about the differing dumping styles for workflows and state machines. As there was quite a bit of added code, there may be new non-symfony ways I did things.
+
+Apart from that, I also added support for markings. ~I am not sure if it is okay to go the metadata route for that, but that would be an easy fix.~
+
+In the meantime, I will (finally) start on the documentation update PR for this.
+
+---------------------------------------------------------------------------
+
+by eFrane at 2021-03-25T15:06:29Z
+
+From my end, this feels done. Is there anything I can do to move this along? @lyrixx @stof

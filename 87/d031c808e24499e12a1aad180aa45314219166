@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nesk at 2021-03-02T17:14:52Z
+
+I have rebased the code on the latest commits of the `5.x` branch and resolved all the conversations.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-02T17:19:57Z
+
+Hey.
+
+I really like this feature. Well done.
+If you look at the Cache component and the RedisAdapter (and trait) you see that it already supports clusters and multiple hosts in DSN. I suggest we use the same format. See https://symfony.com/doc/current/components/cache/adapters/redis_adapter.html
+
+```
+    'redis:?host[localhost]&host[localhost:6379]&host[/var/run/redis.sock:]&auth=my-password&redis_cluster=1'
+```
+
+Im not saying your format is better or worse, Im just saying we should be consistent.

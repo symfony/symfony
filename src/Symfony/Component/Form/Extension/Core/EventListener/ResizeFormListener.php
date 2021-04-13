@@ -30,19 +30,22 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $allowDelete;
 
     private $deleteEmpty;
+    private $keepAsList;
 
     /**
      * @param bool          $allowAdd    Whether children could be added to the group
      * @param bool          $allowDelete Whether children could be removed from the group
      * @param bool|callable $deleteEmpty
+     * @param bool          $keepAsList  Whether children should be renamed with sequential keys after submit
      */
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
+    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false, $keepAsList = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
         $this->deleteEmpty = $deleteEmpty;
+        $this->keepAsList = $keepAsList;
     }
 
     public static function getSubscribedEvents()
@@ -162,6 +165,20 @@ class ResizeFormListener implements EventSubscriberInterface
             foreach ($toDelete as $name) {
                 unset($data[$name]);
             }
+        }
+
+        if ($this->keepAsList) {
+            $formReindex = [];
+            foreach ($form as $name => $child) {
+                $formReindex[] = $child;
+                $form->remove($name);
+            }
+            foreach ($formReindex as $index => $child) {
+                $form->add($index, $this->type, array_replace([
+                    'property_path' => '['.$index.']',
+                ], $this->options));
+            }
+            $data = array_values($data);
         }
 
         $event->setData($data);

@@ -31,5 +31,6 @@ final class EnvConfiguratorTest extends TestCase
         yield ['%env(string:FOO)%', (new EnvConfigurator('FOO'))->string()];
         yield ['%env(key:path:url:FOO)%', (new EnvConfigurator('FOO'))->url()->key('path')];
         yield ['%env(default:fallback:bar:arg1:FOO)%', (new EnvConfigurator('FOO'))->custom('bar', 'arg1')->default('fallback')];
+        yield ['%env(my_processor:my_argument:FOO)%', (new EnvConfigurator('FOO'))->myProcessor('my_argument')];
     }
 }

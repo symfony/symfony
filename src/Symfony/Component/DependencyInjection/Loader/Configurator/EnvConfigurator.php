@@ -34,6 +34,18 @@ class EnvConfigurator
     /**
      * @return $this
      */
+    public function __call(string $name, array $arguments): self
+    {
+        $processor = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', $name));
+
+        $this->custom($processor, ...$arguments);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function custom(string $processor, ...$args): self
     {
         array_unshift($this->stack, $processor, ...$args);

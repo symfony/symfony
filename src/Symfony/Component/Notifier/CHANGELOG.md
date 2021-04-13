@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add `push` channel
+
 5.3
 ---
 
@@ -12,7 +17,6 @@ CHANGELOG
  * [BC BREAK] Remove `Dsn::fromString()` method
  * [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
  * Added `DSN::getRequiredOption` method which throws a new `MissingRequiredOptionException`.
- * Add `push` channel to notifier
 
 5.2.0
 -----

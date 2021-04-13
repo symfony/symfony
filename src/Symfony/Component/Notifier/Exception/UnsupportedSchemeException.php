@@ -116,6 +116,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Octopush\OctopushTransportFactory::class,
             'package' => 'symfony/octopush-notifier',
         ],
+        'onesignal' => [
+            'class' => Bridge\OneSignal\OneSignalTransportFactory::class,
+            'package' => 'symfony/one-signal-notifier',
+        ],
         'ovhcloud' => [
             'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
             'package' => 'symfony/ovh-cloud-notifier',

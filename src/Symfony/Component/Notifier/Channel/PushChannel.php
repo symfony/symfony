@@ -14,7 +14,6 @@ namespace Symfony\Component\Notifier\Channel;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Notification\PushNotificationInterface;
-use Symfony\Component\Notifier\Recipient\PushRecipientInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
@@ -30,7 +29,7 @@ class PushChannel extends AbstractChannel
         }
 
         if (null === $message) {
-            $message = PushMessage::fromNotification($notification, $recipient);
+            $message = PushMessage::fromNotification($notification);
         }
 
         if (null !== $transportName) {
@@ -46,6 +45,6 @@ class PushChannel extends AbstractChannel
 
     public function supports(Notification $notification, RecipientInterface $recipient): bool
     {
-        return $recipient instanceof PushRecipientInterface;
+        return true;
     }
 }

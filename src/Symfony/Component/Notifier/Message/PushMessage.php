@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Notifier\Message;
 
-use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\PushRecipientInterface;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
@@ -21,46 +19,29 @@ use Symfony\Component\Notifier\Recipient\PushRecipientInterface;
 final class PushMessage implements MessageInterface
 {
     private $transport;
-    private $recipientId;
     private $subject;
     private $content;
     private $options;
     private $notification;
 
-    public function __construct(string $recipientId, string $subject, string $content, MessageOptionsInterface $options = null)
+    public function __construct(string $subject, string $content, MessageOptionsInterface $options = null)
     {
-        if ('' === $recipientId) {
-            throw new InvalidArgumentException(sprintf('"%s" needs a recipient id, it cannot be empty.', static::class));
-        }
-
-        $this->recipientId = $recipientId;
         $this->subject = $subject;
         $this->content = $content;
         $this->options = $options;
     }
 
-    public static function fromNotification(Notification $notification, PushRecipientInterface $recipient): self
+    public static function fromNotification(Notification $notification): self
     {
-        $message = new self($recipient->getPushId(), $notification->getSubject(), $notification->getContent());
+        $message = new self($notification->getSubject(), $notification->getContent());
         $message->notification = $notification;
 
         return $message;
     }
 
-    public function recipientId(string $recipientId): self
+    public function getRecipientId(): ?string
     {
-        if ('' === $recipientId) {
-            throw new InvalidArgumentException(sprintf('"%s" needs a recipient id, it cannot be empty.', static::class));
-        }
-
-        $this->recipientId = $recipientId;
-
-        return $this;
-    }
-
-    public function getRecipientId(): string
-    {
-        return $this->recipientId;
+        return $this->options ? $this->options->getRecipientId() : null;
     }
 
     public function subject(string $subject): self

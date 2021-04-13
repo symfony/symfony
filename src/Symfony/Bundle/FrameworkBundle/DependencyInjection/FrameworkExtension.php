@@ -133,6 +133,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFact
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
 use Symfony\Component\Notifier\Bridge\Octopush\OctopushTransportFactory;
+use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalTransportFactory;
 use Symfony\Component\Notifier\Bridge\OvhCloud\OvhCloudTransportFactory;
 use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatTransportFactory;
 use Symfony\Component\Notifier\Bridge\Sendinblue\SendinblueTransportFactory as SendinblueNotifierTransportFactory;
@@ -2443,6 +2444,7 @@ class FrameworkExtension extends Extension
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
             OctopushTransportFactory::class => 'notifier.transport_factory.octopush',
+            OneSignalTransportFactory::class => 'notifier.transport_factory.onesignal',
             OvhCloudTransportFactory::class => 'notifier.transport_factory.ovhcloud',
             RocketChatTransportFactory::class => 'notifier.transport_factory.rocketchat',
             SendinblueNotifierTransportFactory::class => 'notifier.transport_factory.sendinblue',
@@ -2470,6 +2472,7 @@ class FrameworkExtension extends Extension
                 case 'messagebird': $package = 'message-bird'; break;
                 case 'messagemedia': $package = 'message-media'; break;
                 case 'microsoftteams': $package = 'microsoft-teams'; break;
+                case 'onesignal': $package = 'one-signal'; break;
                 case 'ovhcloud': $package = 'ovh-cloud'; break;
                 case 'rocketchat': $package = 'rocket-chat'; break;
                 case 'smsbiuras': $package = 'sms-biuras'; break;

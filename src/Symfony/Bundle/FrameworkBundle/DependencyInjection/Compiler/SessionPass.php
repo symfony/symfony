@@ -26,20 +26,22 @@ class SessionPass implements CompilerPassInterface
             return;
         }
 
-        // BC layer: Make "session" an alias of ".session.do-not-use" when not overriden by the user
+        // BC layer: Make "session" an alias of ".session.do-not-use" when not overridden by the user
         if (!$container->has('session')) {
             $alias = $container->setAlias('session', '.session.do-not-use');
-            $alias->setDeprecated('symfony/framework-bundle', '5.3', 'The "%alias_id%" service is deprecated, use "$requestStack->getSession()" instead.');
+            $alias->setDeprecated('symfony/framework-bundle', '5.3', 'The "%alias_id%" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
+            // restore previous behavior
+            $alias->setPublic(true);
 
             return;
         }
 
         if ($container->hasDefinition('session')) {
             $definition = $container->getDefinition('session');
-            $definition->setDeprecated('symfony/framework-bundle', '5.3', 'The "%service_id%" service is deprecated, use "$requestStack->getSession()" instead.');
+            $definition->setDeprecated('symfony/framework-bundle', '5.3', 'The "%service_id%" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
         } else {
             $alias = $container->getAlias('session');
-            $alias->setDeprecated('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "$requestStack->getSession()" instead.');
+            $alias->setDeprecated('symfony/framework-bundle', '5.3', 'The "%alias_id%" and "SessionInterface" aliases are deprecated, use "$requestStack->getSession()" instead.');
             $definition = $container->findDefinition('session');
         }
 

@@ -105,7 +105,7 @@ class SessionTest extends AbstractWebTestCase
      */
     public function testSessionServiceTriggerDeprecation($config, $insulate)
     {
-        $this->expectDeprecation('Since symfony/framework-bundle 5.3: The "session" service is deprecated, use "$requestStack->getSession()" instead.');
+        $this->expectDeprecation('Since symfony/framework-bundle 5.3: The "session" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
 
         $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {

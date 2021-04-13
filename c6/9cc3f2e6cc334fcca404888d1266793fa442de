@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-04-13T11:51:16Z
+
+why not switching to separate changelogs in 5.4 already ? That will actually be easier for contributors as 5.4 and 6.0 are developed in parallel, with any new feature being added in 5.4 instead (meaning that the 6.0 changelog only contains removals and any new feature of 6.0 is actually a new feature of 5.4)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-13T11:52:47Z
+
+That is true. I was thinking that 6.0 was new and shiny. But your argument makes more sense.
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-13T12:01:05Z
+
+We should have some mention of these new changelogs in the contributing docs.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-13T12:06:31Z
+
+Great suggestion @jrushlow, but I dont think that is needed. The special "security setup" is not described in the contribution docs: https://symfony.com/doc/current/contributing/code/pull_requests.html#prepare-your-pull-request-for-submission
+
+It "just" mentions how and when to write to **a** changelog.

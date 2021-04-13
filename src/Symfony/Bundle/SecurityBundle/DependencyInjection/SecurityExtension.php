@@ -231,6 +231,12 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $attributes[] = $this->createExpression($container, $access['allow_if']);
             }
 
+            $emptyAccess = 0 === \count(array_filter($access));
+
+            if ($emptyAccess) {
+                throw new InvalidConfigurationException('One or more access control items are empty. Did you accidentally add lines only containing a "-" under "security.access_control"?');
+            }
+
             $container->getDefinition('security.access_map')
                       ->addMethodCall('add', [$matcher, $attributes, $access['requires_channel']]);
         }

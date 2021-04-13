@@ -110,7 +110,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      */
     public function save(CacheItemInterface $item)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -120,7 +120,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -130,7 +130,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      */
     public function commit()
     {
-        return false;
+        return true;
     }
 
     /**

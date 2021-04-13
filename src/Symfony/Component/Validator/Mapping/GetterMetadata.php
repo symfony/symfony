@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  * method.
  *
  * A property getter is any method that is equal to the property's name,
- * prefixed with either "get" or "is". That method will be used to access the
+ * prefixed with "get", "is" or "has". That method will be used to access the
  * property's value.
  *
  * The getter will be invoked by reflection, so the access of private and

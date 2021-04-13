@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\LoginLink\Exception;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.3
  */
 interface InvalidLoginLinkExceptionInterface extends \Throwable
 {

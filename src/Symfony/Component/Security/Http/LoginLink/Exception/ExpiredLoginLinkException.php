@@ -15,7 +15,6 @@ use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureExceptio
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- * @experimental in 5.3
  */
 class ExpiredLoginLinkException extends ExpiredSignatureException implements InvalidLoginLinkExceptionInterface
 {

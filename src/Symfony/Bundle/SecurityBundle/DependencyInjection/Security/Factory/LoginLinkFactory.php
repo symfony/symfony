@@ -24,7 +24,6 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 
 /**
  * @internal
- * @experimental in 5.3
  */
 class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {

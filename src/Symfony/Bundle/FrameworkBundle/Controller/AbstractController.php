@@ -291,15 +291,28 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Renders a form.
+     * Handles a form.
      *
-     * The FormView instance is passed to the template in a variable named "form".
-     * If the form is invalid, a 422 status code is returned.
+     * * if the form is not submitted, $render is called
+     * * if the form is submitted but invalid, $render is called and a 422 HTTP status code is set if the current status hasn't been customized
+     * * if the form is submitted and valid, $onSuccess is called, usually this method saves the data and returns a 303 HTTP redirection
+     *
+     * @param callable(FormInterface, mixed): Response $onSuccess
+     * @param callable(FormInterface, mixed): Response $render
      */
-    public function renderForm(string $view, FormInterface $form, array $parameters = [], Response $response = null): Response
+    public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render): Response
     {
-        $response = $this->render($view, ['form' => $form->createView()] + $parameters, $response);
-        if ($form->isSubmitted() && !$form->isValid()) {
+        $form->handleRequest($request);
+
+        $submitted = $form->isSubmitted();
+
+        $data = $form->getData();
+        if ($submitted && $form->isValid()) {
+            return $onSuccess($form, $data);
+        }
+
+        $response = $render($form, $data);
+        if ($submitted && 200 === $response->getStatusCode()) {
             $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

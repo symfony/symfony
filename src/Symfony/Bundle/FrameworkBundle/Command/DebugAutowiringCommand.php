@@ -76,7 +76,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
-        $builder = $this->getContainerBuilder();
+        $builder = $this->getContainerBuilder($this->getApplication()->getKernel());
         $serviceIds = $builder->getServiceIds();
         $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
@@ -155,7 +155,7 @@ EOF
     private function getFileLink(string $class): string
     {
         if (null === $this->fileLinkFormatter
-            || (null === $r = $this->getContainerBuilder()->getReflectionClass($class, false))) {
+            || (null === $r = $this->getContainerBuilder($this->getApplication()->getKernel())->getReflectionClass($class, false))) {
             return '';
         }
 

@@ -123,7 +123,7 @@ EOF
         $errorIo = $io->getErrorStyle();
 
         $this->validateInput($input);
-        $object = $this->getContainerBuilder();
+        $object = $this->getContainerBuilder($this->getApplication()->getKernel());
 
         if ($input->getOption('env-vars')) {
             $options = ['env-vars' => true];

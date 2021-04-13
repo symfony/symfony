@@ -82,7 +82,12 @@ EOF
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper($this->fileLinkFormatter);
         $routes = $this->router->getRouteCollection();
-        $container = $this->fileLinkFormatter ? \Closure::fromCallable([$this, 'getContainerBuilder']) : null;
+        $container = null;
+        if ($this->fileLinkFormatter) {
+            $container = function () {
+                return $this->getContainerBuilder($this->getApplication()->getKernel());
+            };
+        }
 
         if ($name) {
             if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {

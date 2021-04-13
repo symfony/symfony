@@ -78,7 +78,7 @@ final class LazyResponseEvent extends RequestEvent
      */
     public function isMasterRequest(): bool
     {
-        trigger_deprecation('symfony/security-http', '5.3', '"%s()" is deprecated, use "isMainRequest()" instead.');
+        trigger_deprecation('symfony/security-http', '5.3', '"%s()" is deprecated, use "isMainRequest()" instead.', __METHOD__);
 
         return $this->event->isMainRequest();
     }

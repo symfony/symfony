@@ -85,7 +85,7 @@ class KernelEvent extends Event
      */
     public function isMasterRequest()
     {
-        trigger_deprecation('symfony/http-kernel', '5.3', '"%s()" is deprecated, use "isMainRequest()" instead.');
+        trigger_deprecation('symfony/http-kernel', '5.3', '"%s()" is deprecated, use "isMainRequest()" instead.', __METHOD__);
 
         return $this->isMainRequest();
     }

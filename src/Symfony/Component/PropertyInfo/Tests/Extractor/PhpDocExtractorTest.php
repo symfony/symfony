@@ -296,6 +296,23 @@ class PhpDocExtractorTest extends TestCase
     }
 
     /**
+     * @dataProvider methodsDefinedByTraitsProvider
+     */
+    public function testMethodsDefinedByTraits(string $property, Type $type)
+    {
+        $this->assertEquals([$type], $this->extractor->getTypes(DummyUsingTrait::class, $property));
+    }
+
+    public function methodsDefinedByTraitsProvider(): array
+    {
+        return [
+            ['methodInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
+            ['methodInTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
+            ['methodInTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+        ];
+    }
+
+    /**
      * @dataProvider propertiesStaticTypeProvider
      */
     public function testPropertiesStaticType(string $class, string $property, Type $type)

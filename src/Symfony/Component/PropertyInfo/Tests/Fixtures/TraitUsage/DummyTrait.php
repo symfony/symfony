@@ -29,4 +29,28 @@ trait DummyTrait
      * @var Dummy
      */
     private $propertyInTraitObjectDifferentNamespace;
+
+    /**
+     * @return string
+     */
+    public function getMethodInTraitPrimitiveType()
+    {
+        return 'value';
+    }
+
+    /**
+     * @return DummyUsedInTrait
+     */
+    public function getMethodInTraitObjectSameNamespace()
+    {
+        return new DummyUsedInTrait();
+    }
+
+    /**
+     * @return Dummy
+     */
+    public function getMethodInTraitObjectDifferentNamespace()
+    {
+        return new Dummy();
+    }
 }

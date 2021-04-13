@@ -45,7 +45,8 @@ class CollectionType extends AbstractType
             $options['allow_add'],
             $options['allow_delete'],
             $options['delete_empty'],
-            $resizePrototypeOptions
+            $resizePrototypeOptions,
+            $options['keep_as_list']
         );
 
         $builder->addEventSubscriber($resizeListener);
@@ -114,12 +115,14 @@ class CollectionType extends AbstractType
             'prototype_options' => [],
             'delete_empty' => false,
             'invalid_message' => 'The collection is invalid.',
+            'keep_as_list' => false,
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
 
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('prototype_options', 'array');
+        $resolver->setAllowedTypes('keep_as_list', ['bool']);
     }
 
     public function getBlockPrefix(): string

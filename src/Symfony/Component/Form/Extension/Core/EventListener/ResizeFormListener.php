@@ -31,8 +31,9 @@ class ResizeFormListener implements EventSubscriberInterface
     protected bool $allowDelete;
 
     private \Closure|bool $deleteEmpty;
+    private bool $keepAsList;
 
-    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false, array $prototypeOptions = null)
+    public function __construct(string $type, array $options = [], bool $allowAdd = false, bool $allowDelete = false, bool|callable $deleteEmpty = false, array $prototypeOptions = null, bool $keepAsList = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -40,6 +41,7 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->options = $options;
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = $prototypeOptions ?? $options;
+        $this->keepAsList = $keepAsList;
     }
 
     public static function getSubscribedEvents(): array
@@ -151,6 +153,20 @@ class ResizeFormListener implements EventSubscriberInterface
             foreach ($toDelete as $name) {
                 unset($data[$name]);
             }
+        }
+
+        if ($this->keepAsList) {
+            $formReindex = [];
+            foreach ($form as $name => $child) {
+                $formReindex[] = $child;
+                $form->remove($name);
+            }
+            foreach ($formReindex as $index => $child) {
+                $form->add($index, $this->type, array_replace([
+                    'property_path' => '['.$index.']',
+                ], $this->options));
+            }
+            $data = array_values($data);
         }
 
         $event->setData($data);

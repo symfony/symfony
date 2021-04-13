@@ -6,6 +6,8 @@ CHANGELOG
 
  * Add `rediss://` DSN scheme support for TLS protocol
  * Deprecate TLS option, use `rediss://127.0.0.1` instead of `redis://127.0.0.1?tls=1`
+ * Add support for `\RedisCluster` instance in `Connection` constructor
+ * Add support for Redis Cluster in DSN
 
 5.2.0
 -----

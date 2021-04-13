@@ -12,20 +12,19 @@
 namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 /**
- * Allow to delay connection to Redis.
+ * Allow to delay connection to Redis Cluster.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+ * @author Johann Pardanaud <johann@pardanaud.com>
  *
  * @internal
  */
-class RedisProxy
+class RedisClusterProxy
 {
     private $redis;
     private $initializer;
     private $ready = false;
 
-    public function __construct(\Redis $redis, \Closure $initializer)
+    public function __construct(?\RedisCluster $redis, \Closure $initializer)
     {
         $this->redis = $redis;
         $this->initializer = $initializer;

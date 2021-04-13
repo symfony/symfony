@@ -56,7 +56,10 @@ class Connection
     private $deleteAfterReject;
     private $couldHavePendingMessages = true;
 
-    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
+    /**
+     * @param \Redis|\RedisCluster|null $redis
+     */
+    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -71,29 +74,19 @@ class Connection
             $auth = null;
         }
 
-        $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
-            $redis->connect($host, $port);
-            $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
-
-            if (null !== $auth && !$redis->auth($auth)) {
-                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
-            }
-
-            if ($dbIndex && !$redis->select($dbIndex)) {
-                throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
-            }
-
-            return true;
-        };
-
-        if (null === $redis) {
-            $redis = new \Redis();
-        }
-
-        if ($configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy']) {
-            $redis = new RedisProxy($redis, $initializer);
+        $lazy = $configuration['lazy'] ?? self::DEFAULT_OPTIONS['lazy'];
+        if (\is_array($host) || $redis instanceof \RedisCluster) {
+            $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
+            $initializer = static function ($redis) use ($hosts, $auth, $serializer) {
+                return self::initializeRedisCluster($redis, $hosts, $auth, $serializer);
+            };
+            $redis = $lazy ? new RedisClusterProxy($redis, $initializer) : $initializer($redis);
         } else {
-            $initializer($redis);
+            $redis = $redis ?? new \Redis();
+            $initializer = static function ($redis) use ($host, $port, $auth, $serializer, $dbIndex) {
+                return self::initializeRedis($redis, $host, $port, $auth, $serializer, $dbIndex);
+            };
+            $redis = $lazy ? new RedisProxy($redis, $initializer) : $initializer($redis);
         }
 
         $this->connection = $redis;
@@ -116,21 +109,57 @@ class Connection
         $this->claimInterval = $configuration['claim_interval'] ?? self::DEFAULT_OPTIONS['claim_interval'];
     }
 
-    public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
+    private static function initializeRedis(\Redis $redis, string $host, int $port, ?string $auth, int $serializer, int $dbIndex): \Redis
     {
-        $url = $dsn;
-        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
+        $redis->connect($host, $port);
+        $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
 
-        if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
-            $url = str_replace($scheme.':', 'file:', $dsn);
+        if (null !== $auth && !$redis->auth($auth)) {
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
 
-        if (false === $parsedUrl = parse_url($url)) {
-            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
+        if ($dbIndex && !$redis->select($dbIndex)) {
+            throw new InvalidArgumentException('Redis connection failed: '.$redis->getLastError());
         }
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $dsnOptions);
-            $redisOptions = array_merge($redisOptions, $dsnOptions);
+
+        return $redis;
+    }
+
+    private static function initializeRedisCluster(?\RedisCluster $redis, array $hosts, ?string $auth, int $serializer): \RedisCluster
+    {
+        if (null === $redis) {
+            $redis = new \RedisCluster(null, $hosts, 0.0, 0.0, false, $auth);
+        }
+
+        $redis->setOption(\Redis::OPT_SERIALIZER, $serializer);
+
+        return $redis;
+    }
+
+    /**
+     * @param \Redis|\RedisCluster|null $redis
+     */
+    public static function fromDsn(string $dsn, array $redisOptions = [], $redis = null): self
+    {
+        if (false === strpos($dsn, ',')) {
+            $parsedUrl = self::parseDsn($dsn, $redisOptions);
+        } else {
+            $dsns = explode(',', $dsn);
+            $parsedUrls = array_map(function ($dsn) use (&$redisOptions) {
+                return self::parseDsn($dsn, $redisOptions);
+            }, $dsns);
+
+            // Merge all the URLs, the last one overrides the previous ones
+            $parsedUrl = array_merge(...$parsedUrls);
+
+            // Regroup all the hosts in an array interpretable by RedisCluster
+            $parsedUrl['host'] = array_map(function ($parsedUrl, $dsn) {
+                if (!isset($parsedUrl['host'])) {
+                    throw new InvalidArgumentException(sprintf('Missing host in DSN part "%s", it must be defined when using Redis Cluster.', $dsn));
+                }
+
+                return $parsedUrl['host'].':'.($parsedUrl['port'] ?? 6379);
+            }, $parsedUrls, $dsns);
         }
 
         self::validateOptions($redisOptions);
@@ -165,7 +194,7 @@ class Connection
             unset($redisOptions['dbindex']);
         }
 
-        $tls = 'rediss' === $scheme;
+        $tls = 'rediss' === $parsedUrl['scheme'];
         if (\array_key_exists('tls', $redisOptions)) {
             trigger_deprecation('symfony/redis-messenger', '5.3', 'Providing "tls" parameter is deprecated, use "rediss://" DSN scheme instead');
             $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
@@ -221,6 +250,26 @@ class Connection
         }
 
         return new self($configuration, $connectionCredentials, $redisOptions, $redis);
+    }
+
+    private static function parseDsn(string $dsn, array &$redisOptions): array
+    {
+        $url = $dsn;
+        $scheme = 0 === strpos($dsn, 'rediss:') ? 'rediss' : 'redis';
+
+        if (preg_match('#^'.$scheme.':///([^:@])+$#', $dsn)) {
+            $url = str_replace($scheme.':', 'file:', $dsn);
+        }
+
+        if (false === $parsedUrl = parse_url($url)) {
+            throw new InvalidArgumentException(sprintf('The given Redis DSN "%s" is invalid.', $dsn));
+        }
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $dsnOptions);
+            $redisOptions = array_merge($redisOptions, $dsnOptions);
+        }
+
+        return $parsedUrl;
     }
 
     private static function validateOptions(array $options): void

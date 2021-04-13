@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-11T20:06:16Z
+
+>  Also I do have a question, do Symfony uses the https://getcomposer.org/doc/04-schema.md#abandoned feature?
+
+Yes, we are. However, it's not abandoned yet (the reason you can make this PR is because we still maintain the 4.4 version). It'll receive this flag once 4.4 reaches end of life.

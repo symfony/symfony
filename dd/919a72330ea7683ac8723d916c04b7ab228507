@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by rvanlaak at 2021-03-08T09:35:13Z
+
+Any ideas on an `instanceof` tagged iterator? That would prevent the need for tagging these services first.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T09:38:16Z
+
+> Any ideas on an `instanceof` tagged iterator? That would prevent the need for tagging these services first.
+
+```php
+$container->registerForAutoconfiguration(YourInterface::class)
+    ->addTag('your_tag');
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-08T09:47:07Z
+
+> $container->registerForAutoconfiguration(YourInterface::class)->addTag('your_tag');
+
+:100:
+
+or https://github.com/symfony/symfony/pull/39804 on 5.3+PHP8 :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-08T21:17:21Z
+
+> This approach means that for arguments, we don't provide extensibility similar to `registerAttributeForAutoconfiguration()`. But maybe we don't need it. I can't think of an obvious use case anyway.
+
+Me neither. I started using the same mechanism first, but I wasn‘t happy with it.
+
+In the configurators, I always accessed the bindings, fetched the parameter name from the reflector, prepended it with a `$`, configured an argument object, added it to the bindings as stuffed the new bindings arrays back into the definition. This felt like a lot of unnecessary, error-prone boilerplate.
+
+And in the end, constructing the argument object was the only operation that is different in each configurator. So my next attempt was to reuse an existing data structure for arguments and I somewhat liked who easy it was to implement that. But I already noticed that you‘re not sharing my enthusiasm here and that‘s fine. I‘m going to build dedicated attributes for constructor parameters. 🙂
+
+> What else should we support? I can think of:
+>
+> * `#[Value('%foo% bar %env(baz)%')]`
+
+`Value` is probably a good idea, though I‘d like to have simplified versions of it as well: `Parameter` and `EnvVariable`.
+
+> We could add a way to reference services by identifier, but I don't think it's a good idea, since autowiring provides better decoupling and the code should not know about service ids.
+
+I don‘t think that it‘s inherently bad to have that attribute. However I can imagine more bad than good use-cases for it. But I‘ll leave it out of this PR for the moment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-09T00:05:29Z
+
+> Value is probably a good idea, though I‘d like to have simplified versions of it as well: Parameter and EnvVariable.
+
+I'm mixed on this: it'd mean teaching something that would be a dead-end once ppl want to append/prepend any string next to a param/env. I think I'd prefer not to add them.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-13T19:17:45Z
+
+Please have another look. The PR now uses new dedicated attribute classes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-03-14T00:03:53Z
+
+I've switched the pass to `AbstractRecursivePass` and added tests for a nested definition and a factory service.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-16T09:12:26Z
+
+(please rebase to account for #40468)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-02T19:16:38Z
+
+ I have explored a bit if we can extend that feature to setters, but I'm a bit afraid of the edge cases that we get here.
+
+Is the idea to browse all public methods for those attributes? If yes:
+* If we find one of the attributes on a parameter of a public method other than the constructor: Do we add a method call for that method?
+* What if there already is a method call configured for that very method?
+* What if the method has more parameters than the one with the attribute?
+
+Or should we only browse methods that are already configured to be called?
+* What if a call is added later, via a userland compiler pass?
+* Is this behavior comprehesible for a developer or would they expect the attribute to act as a marker for "call this method"?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-11T17:14:48Z
+
+I submitted https://github.com/derrabus/symfony/pull/1 on your fork to help implement this in a simpler yet more powerful way.
+The core idea is that this is a matter related to autowiring - *not* to autoconfiguration.
+Once we acknowledge this, the implementation becomes simpler and more powerful, have a look.
+
+The implementation in AutowirePass also hints about two improvements that we could make after this:
+1. we could add a new attribute to tell where a decorated service should be injected when using decoration. The current logic in AutowirePass is a bit fragile (it can detect the injection point only when a single argument is compatible with the decorated class.)
+2. instead of harcoding how TaggedIterator/TaggedLocator are wired, we can make this generic thanks to a new `$container->registerAttributeForAutowiring()` method.

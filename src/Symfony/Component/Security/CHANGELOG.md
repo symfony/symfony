@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+The CHANGELOG for version 5.4 and newer can be found in the security sub-packages (e.g. `Http/`).
+
 5.3
 ---
 

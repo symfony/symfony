@@ -144,15 +144,6 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expected, $container->get('stack_d'));
     }
 
-    public function testWhenEnv()
-    {
-        $container = new ContainerBuilder();
-        $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
-        $loader->load('when-env.php');
-
-        $this->assertSame(['foo' => 234, 'bar' => 345], $container->getParameterBag()->all());
-    }
-
     public function testEnvConfigurator()
     {
         $container = new ContainerBuilder();

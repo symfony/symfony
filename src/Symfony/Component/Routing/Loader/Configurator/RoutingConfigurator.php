@@ -61,18 +61,11 @@ class RoutingConfigurator
     }
 
     /**
-     * @return static
+     * Get the current environment to be able to write conditional configuration.
      */
-    final public function when(string $env): self
+    final public function env(): ?string
     {
-        if ($env === $this->env) {
-            return clone $this;
-        }
-
-        $clone = clone $this;
-        $clone->collection = new RouteCollection();
-
-        return $clone;
+        return $this->env;
     }
 
     /**

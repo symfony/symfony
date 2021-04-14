@@ -5,8 +5,9 @@ CHANGELOG
 ---
 
  * Already encoded slashes are not decoded nor double-encoded anymore when generating URLs
- * Add support for per-env configuration in loaders
+ * Add support for per-env configuration in XML and Yaml loaders
  * Deprecate creating instances of the `Route` annotation class by passing an array of parameters
+ * Add `RoutingConfigurator::env()` to get the current environment
 
 5.2.0
 -----

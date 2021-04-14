@@ -14,6 +14,8 @@ namespace Symfony\Component\Yaml\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Reference\Anchor;
+use Symfony\Component\Yaml\Reference\Reference;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 
@@ -1043,6 +1045,35 @@ list_in_map: { key: [*var] }
 map_in_map: { foo: { bar: *var } }
 EOF
         ));
+    }
+
+    public function testReferenceAsObjectInInlineStrings()
+    {
+        $anchor = new Anchor('var', 'var-value');
+        $reference = new Reference('var', $anchor);
+
+        $this->assertEquals([
+            'var' => $anchor,
+            'scalar' => $reference,
+            'list' => [$reference],
+            'list_in_list' => [[$reference]],
+            'map_in_list' => [['key' => $reference]],
+            'embedded_mapping' => [['key' => $reference]],
+            'map' => ['key' => $reference],
+            'list_in_map' => ['key' => [$reference]],
+            'map_in_map' => ['foo' => ['bar' => $reference]],
+        ], Yaml::parse(<<<'EOF'
+var:  &var var-value
+scalar: *var
+list: [ *var ]
+list_in_list: [[ *var ]]
+map_in_list: [ { key: *var } ]
+embedded_mapping: [ key: *var ]
+map: { key: *var }
+list_in_map: { key: [*var] }
+map_in_map: { foo: { bar: *var } }
+EOF,
+        Yaml::PARSE_REFERENCES_AS_OBJECTS));
     }
 
     public function testYamlDirective()
@@ -2402,6 +2433,41 @@ YAML;
         $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
+    public function testMergeKeysWhenMappingsAreParsedAsObjectsWithReferencesAsObjects()
+    {
+        $fooAnchor = new Anchor('FOO', (object) ['bar' => 1]);
+        $barAnchor = new Anchor('BAR', (object) ['baz' => 2, 'bar' => 1]);
+
+        $yaml = <<<YAML
+foo: &FOO
+    bar: 1
+bar: &BAR
+    baz: 2
+    <<: *FOO
+baz:
+    baz_foo: 3
+    <<:
+        baz_bar: 4
+foobar:
+    bar: ~
+    <<: [*FOO, *BAR]
+YAML;
+        $expected = (object) [
+            'foo' => $fooAnchor,
+            'bar' => $barAnchor,
+            'baz' => (object) [
+                'baz_foo' => 3,
+                'baz_bar' => 4,
+            ],
+            'foobar' => (object) [
+                'bar' => null,
+                'baz' => 2,
+            ],
+        ];
+
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP | Yaml::PARSE_REFERENCES_AS_OBJECTS));
+    }
+
     public function testFilenamesAreParsedAsStringsWithoutFlag()
     {
         $file = __DIR__.'/Fixtures/index.yml';
@@ -2465,6 +2531,7 @@ YAML;
         ];
 
         $this->assertSame($expected, $this->parser->parse($yaml));
+        $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_REFERENCES_AS_OBJECTS));
     }
 
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
@@ -2493,6 +2560,7 @@ YAML;
         ];
 
         $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP | Yaml::PARSE_REFERENCES_AS_OBJECTS));
     }
 
     public function testEvalRefException()
@@ -2766,6 +2834,27 @@ YAML;
             'within_string' => 'a　b',
             'regular_space' => 'a b',
         ], $this->parser->parse($expected));
+    }
+
+    public function testParsePreservingReferences()
+    {
+        $yaml = <<<YAML
+some_reference: &refname "refValue"
+referenced_value: *refname
+YAML;
+
+        $this->assertEquals([
+            'some_reference' => 'refValue',
+            'referenced_value' => 'refValue',
+        ], $this->parser->parse($yaml));
+
+        $anchor = new Anchor('refname', 'refValue');
+        $reference = new Reference('refname', $anchor);
+
+        $this->assertEquals([
+            'some_reference' => $anchor,
+            'referenced_value' => $reference,
+        ], $this->parser->parse($yaml, Yaml::PARSE_REFERENCES_AS_OBJECTS));
     }
 }
 

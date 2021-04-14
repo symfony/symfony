@@ -33,6 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * and comparing them with the fallback ones.
  *
  * @author Florian Voutzinos <florian@voutzinos.com>
+ * @author Sidi Said Redouane <sidisaidredouane@live.com>
  *
  * @final
  */
@@ -80,6 +81,7 @@ class TranslationDebugCommand extends Command
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
+                new InputOption('compare', null, InputOption::VALUE_OPTIONAL, 'The locale to compare'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
@@ -97,6 +99,10 @@ You can display information about bundle translations in a specific locale:
 You can also specify a translation domain for the search:
 
   <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+
+You can also specify locale comparison to display the difference of locales messages:
+
+  <info>php %command.full_name% --compare=fr en</info>
 
 You can only display missing messages:
 
@@ -176,7 +182,43 @@ EOF
                 $codePaths[] = is_dir($bundleDir.'/Resources/views') ? $bundleDir.'/Resources/views' : $bundle->getPath().'/templates';
             }
         }
+        
+        // If computes the difference of locales
+        if ($locale_compare = $input->getOption('compare')) {
 
+            // Load defined messages
+            $compares = [$this->loadCurrentMessages($locales[] = $locale, $transPaths)->all($domain), $this->loadCurrentMessages($locales[] = $locale_compare, $transPaths)->all($domain)];
+            !$domain ?: $compares = array_map(function ($compare) use($domain) {
+                        return [$domain => $compare];
+                    }, $compares);
+
+            // No defined or extracted messages
+            if (empty($compares[0]) || empty($compares[1])) {
+                $io->warning(implode("\n", array_filter(array_map(function ($locale, $compare) use($domain) {
+                                            return $compare ? [] : sprintf('No defined or extracted messages for locale "%s"', $locale) . ($domain ? sprintf(' and domain "%s"', $domain) : '');
+                                        }, $locales, $compares))));
+                return self::EXIT_CODE_GENERAL_ERROR;
+            }
+
+            // Iterate all domains and determine difference
+            foreach ($domain ? [$domain] : array_unique(array_merge(array_keys($compares[0]), array_keys($compares[1]))) as $domain) {
+                if (!isset($compares[0][$domain]) || !isset($compares[1][$domain])) {
+                    $io->note(sprintf('No defined or extracted messages for locale "%1$s" and domain "%2$s"', isset($compares[0][$domain]) ? $locales[1] : $locales[0], $domain));
+                    continue;
+                }
+                for ($index = 0; $index < 2; $index++) {
+                    $diffs = array_diff(array_keys($compares[$index][$domain]), array_keys($compares[abs($index - 1)][$domain]));
+                    $io->text(sprintf('"<fg=green>%1$s</>" total of messages in locale "<fg=yellow>%2$s</>" that are not present in locale "<fg=yellow>%3$s</>", with domain "<fg=yellow>%4$s</>".', count($diffs), $locales[$index], $locales[abs($index - 1)], $domain));
+                    foreach ($diffs as $diff) {
+                        $text = sprintf('<fg=yellow>%1$s</> <fg=white>to</> <fg=yellow>%2$s</> <fg=white>in</> <fg=yellow>%3$s</> <fg=white>: "%4$s"</>', $locales[$index], $locales[abs($index - 1)], $domain, $diff);
+                        $all ?? false == true ? $io->text($text) : $all = $io->confirm($text.', show all?', false);
+                    }
+                }
+            }
+
+            return $exitCode;
+        }
+        
         // Extract used messages
         $extractedCatalogue = $this->extractMessages($locale, $codePaths);
 

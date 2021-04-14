@@ -16,6 +16,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @internal
@@ -32,13 +33,11 @@ trait BuildDebugContainerTrait
      *
      * @throws \LogicException
      */
-    protected function getContainerBuilder(): ContainerBuilder
+    protected function getContainerBuilder(KernelInterface $kernel): ContainerBuilder
     {
         if ($this->containerBuilder) {
             return $this->containerBuilder;
         }
-
-        $kernel = $this->getApplication()->getKernel();
 
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
             $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));

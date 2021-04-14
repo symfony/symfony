@@ -123,7 +123,8 @@ EOF
         $errorIo = $io->getErrorStyle();
 
         $this->validateInput($input);
-        $object = $this->getContainerBuilder($this->getApplication()->getKernel());
+        $kernel = $this->getApplication()->getKernel();
+        $object = $this->getContainerBuilder($kernel);
 
         if ($input->getOption('env-vars')) {
             $options = ['env-vars' => true];
@@ -160,12 +161,12 @@ EOF
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
-        $options['is_debug'] = $this->getApplication()->getKernel()->isDebug();
+        $options['is_debug'] = $kernel->isDebug();
 
         try {
             $helper->describe($io, $object, $options);
 
-            if (isset($options['id']) && isset($this->getApplication()->getKernel()->getContainer()->getRemovedIds()[$options['id']])) {
+            if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }
         } catch (ServiceNotFoundException $e) {

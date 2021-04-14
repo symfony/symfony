@@ -13,6 +13,8 @@ namespace Symfony\Component\Yaml;
 
 use Symfony\Component\Yaml\Exception\DumpException;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Reference\Anchor;
+use Symfony\Component\Yaml\Reference\Reference;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
@@ -125,6 +127,10 @@ class Inline
                 }
 
                 return self::dumpNull($flags);
+            case $value instanceof Anchor:
+                return '&'.$value->getName().' '.self::dump($value->getValue(), $flags);
+            case $value instanceof Reference:
+                return '*'.$value->getName();
             case $value instanceof \DateTimeInterface:
                 return $value->format('c');
             case \is_object($value):

@@ -84,9 +84,9 @@ EOF
         $routes = $this->router->getRouteCollection();
         $container = null;
         if ($this->fileLinkFormatter) {
-            $container = \Closure::fromCallable(function () {
+            $container = function () {
                 return $this->getContainerBuilder($this->getApplication()->getKernel());
-            });
+            };
         }
 
         if ($name) {

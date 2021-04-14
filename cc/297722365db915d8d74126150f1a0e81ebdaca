@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-03T13:52:30Z
+
+TODO: https://github.com/symfony/symfony/pull/40696
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-04T15:56:15Z
+
+![Screenshot_2021-04-04-18-55-33-022_com android chrome](https://user-images.githubusercontent.com/2715254/113514449-67cbfa00-9577-11eb-8706-d174fd300491.jpg)
+Yes it is get 😏
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-08T06:43:09Z
+
+There has been some recent changes in the CI flow that will be good for this PR. Could I ask you to rebase this PR please?
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-08T10:16:57Z
+
+@Nyholm made rebase, but see now too much commits.
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-08T18:55:08Z
+
+Finally return "home" to the good branch :+1: Do I need to make something with license headers? :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T12:11:51Z
+
+CHANGELOG file is missing
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-11T05:38:26Z
+
+![image](https://user-images.githubusercontent.com/995707/114293742-e1447a80-9a98-11eb-87bd-6792c7248dcd.png)
+
+This commit looks weird 🧐
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-11T06:17:42Z
+
+Tried to solve weird commit :)
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-14T07:01:08Z
+
+@jderusse fixed. Thanks ;)

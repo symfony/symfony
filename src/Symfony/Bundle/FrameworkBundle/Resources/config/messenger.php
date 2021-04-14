@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -101,7 +102,7 @@ return static function (ContainerConfigurator $container) {
             ])
 
         // Discovery
-        ->set('messenger.receiver_locator')
+        ->set('messenger.receiver_locator', ServiceLocator::class)
             ->args([
                 [],
             ])
@@ -132,7 +133,7 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.transport.beanstalkd.factory', BeanstalkdTransportFactory::class)
 
         // retry
-        ->set('messenger.retry_strategy_locator')
+        ->set('messenger.retry_strategy_locator', ServiceLocator::class)
             ->args([
                 [],
             ])

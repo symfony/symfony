@@ -35,7 +35,7 @@ class DeprecatedSessionFactory
 
     public function getSession(): ?SessionInterface
     {
-        trigger_deprecation('symfony/framework-bundle', '5.3', 'The "session" service is deprecated, use "$requestStack->getSession()" instead.');
+        trigger_deprecation('symfony/framework-bundle', '5.3', 'The "session" service and "SessionInterface" alias are deprecated, use "$requestStack->getSession()" instead.');
 
         try {
             return $this->requestStack->getSession();

@@ -88,7 +88,7 @@ return static function (ContainerConfigurator $container) {
         ->set('.session.deprecated', SessionInterface::class) // to be removed in 6.0
             ->factory([inline_service(DeprecatedSessionFactory::class)->args([service('request_stack')]), 'getSession'])
         ->alias(SessionInterface::class, '.session.do-not-use')
-            ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "$requestStack->getSession()" instead.')
+            ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" and "SessionInterface" aliases are deprecated, use "$requestStack->getSession()" instead.')
         ->alias(SessionStorageInterface::class, 'session.storage')
             ->deprecate('symfony/framework-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use "session.storage.factory" instead.')
         ->alias(\SessionHandlerInterface::class, 'session.handler')

@@ -184,10 +184,10 @@ EOF
         }
         
         // If computes the difference of locales
-        if ($locale_compare = $input->getOption('compare')) {
+        if ($input->getOption('compare')) {
 
             // Load defined messages
-            $compares = [$this->loadCurrentMessages($locales[] = $locale, $transPaths)->all($domain), $this->loadCurrentMessages($locales[] = $locale_compare, $transPaths)->all($domain)];
+            $compares = [$this->loadCurrentMessages($locales[] = $locale, $transPaths)->all($domain), $this->loadCurrentMessages($locales[] = $input->getOption('compare'), $transPaths)->all($domain)];
             !$domain ?: $compares = array_map(function ($compare) use($domain) {
                         return [$domain => $compare];
                     }, $compares);

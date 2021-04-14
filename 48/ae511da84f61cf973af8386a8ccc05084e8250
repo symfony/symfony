@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-13T20:59:13Z
+
+I will actually work on remove the `when()` method. It is not really needed in PHP, right?
+
+I like it in yaml and XML because it allows me to write simple logic, however, in PHP I do not need a feature to "help me with simple logic".
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-13T21:09:13Z
+
+I was thinking about this config based on your example:
+```php
+use Symfony\Config\FrameworkConfig;
+
+return static function (FrameworkConfig $framework)
+{
+    $framework->when('test')
+        ->test(true)
+        ->session()->storageFactoryId('session.storage.mock_file')
+    ;
+};
+```
+Not sure if possible though (I didn't check if the generated Config is fluent).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-13T21:14:09Z
+
+Yes, That is the alternative way of doing things. The implementation is more difficult and it is less obvious what is happening.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-14T06:43:15Z
+
+Hm.. So we are loading callbacks on 4 places.
+
+1) DI: Microkernel trait
+2) DI: PhpFileLoader
+3) Router: Microkernel trait
+4) Router: PhpFileLoader
+
+For 2, we have a fancy resolver of the parameters. So order does not matter, but parameter name does. For the others, order does matter but not parameter name.
+
+The fancy resolver is needed for the ConfigBuilders. I would like to use fancy resolving for all of these, but either I write (almost) the same code on 3 more places or I try to do something complex...
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-14T07:16:34Z
+
+So, instead of doing fancy argument resolving on all places. I added `ContainerConfigurator::env(): ?string` and `RoutingConfigurator::env(): ?string`.
+
+I've updated the description. This PR is ready for a review.

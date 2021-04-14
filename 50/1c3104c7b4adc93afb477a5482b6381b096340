@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T07:19:40Z
+
+In `PhpBundleReader`, I think we should remove the `file_exists()` check and keep only the `is_file()` one, for perf.
+
+:+1: otherwise
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-13T09:34:52Z
+
+do we fancy cleaning up other readers/writers while at it? e.g.TextBundleWriter only receives cs fixes as of 2014 :}
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-04-13T20:01:36Z
+
+RFR
+Version bumped to 69.1,
+Optimization suggested by @nicolas-grekas applied
+tested fixed

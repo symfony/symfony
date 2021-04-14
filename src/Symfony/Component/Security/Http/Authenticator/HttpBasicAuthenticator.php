@@ -17,9 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -33,7 +31,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.3
  */
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {

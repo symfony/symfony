@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * The authenticator system is no longer experimental
  * Added caseSensitive option for attribute keys in the Entry class.
 
 5.1.0

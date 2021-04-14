@@ -28,7 +28,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.1
  */
 class LdapAuthenticator implements AuthenticatorInterface
 {

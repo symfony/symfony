@@ -23,8 +23,6 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  * Decorates {@see RememberMeHandlerInterface} for the current firewall.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class FirewallAwareRememberMeHandler implements RememberMeHandlerInterface
 {

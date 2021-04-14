@@ -21,8 +21,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  * passport.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface PassportInterface
 {

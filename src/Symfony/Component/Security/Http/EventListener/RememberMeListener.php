@@ -32,7 +32,6 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class RememberMeListener implements EventSubscriberInterface
 {

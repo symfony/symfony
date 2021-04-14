@@ -19,8 +19,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
  * API token authentication).
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class SelfValidatingPassport extends Passport
 {

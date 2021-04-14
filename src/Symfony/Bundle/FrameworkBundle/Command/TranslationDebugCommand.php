@@ -208,9 +208,9 @@ EOF
                 }
                 for ($index = 0; $index < 2; $index++) {
                     $diffs = array_diff(array_keys($compares[$index][$domain]), array_keys($compares[abs($index - 1)][$domain]));
-                    $io->text(sprintf('"<fg=green>%1$s</>" total of messages in locale "<fg=yellow>%2$s</>" that are not present in locale "<fg=yellow>%3$s</>", with domain "<fg=yellow>%4$s</>".', count($diffs), $locales[$index], $locales[abs($index - 1)], $domain));
+                    $io->text(sprintf('"%1$s" total of messages in locale "%2$s" that are not present in locale "%3$s", with domain "%4$s".', $this->formatId(count($diffs)), $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain)));
                     foreach ($diffs as $diff) {
-                        $text = sprintf('<fg=yellow>%1$s</> <fg=white>to</> <fg=yellow>%2$s</> <fg=white>in</> <fg=yellow>%3$s</> <fg=white>: "%4$s"</>', $locales[$index], $locales[abs($index - 1)], $domain, $diff);
+                        $text = sprintf('%1$s <fg=white>to</> %2$s <fg=white>in</> %3$s <fg=white>: "%4$s"</>', $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain), $diff);
                         $all ?? false == true ? $io->text($text) : $all = $io->confirm($text.', show all?', false);
                     }
                 }

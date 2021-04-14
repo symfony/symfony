@@ -35,6 +35,7 @@
             "mapped",
             "method",
             "post_max_size_message",
+            "priority",
             "property_path",
             "required",
             "row_attr",

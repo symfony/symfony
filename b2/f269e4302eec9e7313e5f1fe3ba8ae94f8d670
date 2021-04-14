@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-03T08:37:52Z
+
+I like that this diff is only (+53 -2). I agree that this could be a simple way to control the rendering of the form. It will allow me to render more forms as `{{ form(form) }}`.
+
+On most other places we use the word `priority` where a high priority means that it is handled first. Does it make sense to reuse that terminology?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-03T09:15:40Z
+
+Nice proposal Yonel 😃🎉
+
+I thought about the priority too but the explanation with "weight" and "sink down" is super power. I find myself asking the question quite often: negative or positive priority, but if I think of a weight it makes things much easier and more clear.
+
+I like the wording, plus it's a setting for something "visual", which is not the case for priority 🙂
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-03T15:32:45Z
+
+Wow! thanks for your fast review :)
+
+I find "the field weight" pretty clear, but I'm open to change it if we all agree with another name.
+
+>On most other places we use the word priority where a high priority means that it is handled first. Does it make sense to reuse that terminology?
+
+Yes, "priority" could be another name and it should be interpreted as "the field rendering priority". Let's way for other opinions if it's really clearer than "weight" or for terminology consistency.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T08:04:57Z
+
+We use "priority" more commonly, I think it would be more consistent to use it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-13T17:41:39Z
+
+PR updated with `priority` option instead (for consistency).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-13T18:12:13Z
+
+Comments addressed, thanks!
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2021-04-14T09:04:51Z
+
+This is a really great proposal and a non-invasive implementation. Great work! 🎉
+
+I had this functionality in an external bundle in use for several years now and the most common use case for me was a `before field X`, `after field Y` (and maybe `first` and `last`).
+This covered basically 99% of use cases and shifted the work to the sorter instead of the developer to need to manually come up with proper priority values.
+
+Is that a feature that is possible to add / planned?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-14T09:08:30Z
+
+> Is that a feature that is possible to add / planned?
+
+That feature is not currently in the pipe and it will not be covered in this PR.
+I do see some value in it. I suggest to create a new issue for that.
+
+---------------------------------------------------------------------------
+
+by keichinger at 2021-04-14T09:09:22Z
+
+The bundle @apfelbox is talking about is https://github.com/becklyn/OrderedFormBundle. Yes, I'm biased in this regards since this is our company's bundle, but I still vastly prefer a more explicit and relative API (the one from our bundle) over a `priority` number option.

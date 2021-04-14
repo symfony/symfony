@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * {@see AbstractRememberMeHandler} instead.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface RememberMeHandlerInterface
 {

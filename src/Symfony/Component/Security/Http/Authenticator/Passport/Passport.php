@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\Credentia
  * The default implementation for passports.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class Passport implements UserPassportInterface
 {

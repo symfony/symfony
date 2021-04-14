@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * The authenticator system is no longer experimental
  * Login Link functionality is no longer experimental
  * Add `required_badges` firewall config option
  * [BC break] Add `login_throttling.lock_factory` setting defaulting to `null` (instead of `lock.factory`)

@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Represents a passport for a Security User.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 interface UserPassportInterface extends PassportInterface
 {

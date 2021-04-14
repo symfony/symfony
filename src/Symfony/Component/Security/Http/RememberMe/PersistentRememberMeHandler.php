@@ -28,8 +28,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * {@see SignatureRememberMeHandler} if you don't want to use a database.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {

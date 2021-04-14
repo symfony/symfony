@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @final
- * @experimental in 5.3
  */
 class CustomCredentials implements CredentialsInterface
 {

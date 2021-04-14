@@ -6,6 +6,7 @@ The CHANGELOG for version 5.4 and newer can be found in the security sub-package
 5.3
 ---
 
+ * The authenticator system is no longer experimental
  * Login Link functionality is no longer experimental
  * Add `RememberMeConditionsListener` to check if remember me is requested and supported, and set priority of `RememberMeListener` to -63
  * Add `RememberMeHandlerInterface` and implementations, used as a replacement of `RememberMeServicesInterface` when using the AuthenticatorManager

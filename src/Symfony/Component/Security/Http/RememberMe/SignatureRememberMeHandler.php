@@ -29,8 +29,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * if you need this.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {

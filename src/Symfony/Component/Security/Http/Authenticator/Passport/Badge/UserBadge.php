@@ -22,8 +22,6 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
  * "user loader" to load the related User object.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class UserBadge implements BadgeInterface
 {
@@ -67,7 +65,7 @@ class UserBadge implements BadgeInterface
 
             $this->user = ($this->userLoader)($this->userIdentifier);
             if (!$this->user instanceof UserInterface) {
-                throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', \get_debug_type($this->user)));
+                throw new AuthenticationServiceException(sprintf('The user provider must return a UserInterface object, "%s" given.', get_debug_type($this->user)));
             }
         }
 

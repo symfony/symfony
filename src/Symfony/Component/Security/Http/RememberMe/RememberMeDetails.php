@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
- *
- * @experimental in 5.3
  */
 class RememberMeDetails
 {

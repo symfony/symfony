@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
@@ -208,5 +209,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('container.getenv'),
             ])
+        ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
+            ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
+            ->tag('kernel.cache_warmer')
     ;
 };

@@ -57,7 +57,7 @@
         </service>
 
         <!-- Discovery -->
-        <service id="messenger.receiver_locator">
+        <service id="messenger.receiver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <tag name="container.service_locator" />
             <argument type="collection" />
         </service>
@@ -82,7 +82,7 @@
         </service>
 
         <!-- retry -->
-        <service id="messenger.retry_strategy_locator">
+        <service id="messenger.retry_strategy_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <tag name="container.service_locator" />
             <argument type="collection" />
         </service>

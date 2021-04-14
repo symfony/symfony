@@ -210,7 +210,7 @@ EOF
                     $diffs = array_diff(array_keys($compares[$index][$domain]), array_keys($compares[abs($index - 1)][$domain]));
                     $io->text(sprintf('"%1$s" total of messages in locale "%2$s" that are not present in locale "%3$s", with domain "%4$s".', $this->formatId(count($diffs)), $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain)));
                     foreach ($diffs as $diff) {
-                        $text = sprintf('%1$s <fg=white>to</> %2$s <fg=white>in</> %3$s <fg=white>: "%4$s"</>', $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain), $diff);
+                        $text = sprintf('<fg=white>%1$s to %2$s in %3$s : "%4$s"</>', $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain), $diff);
                         $all ?? false == true ? $io->text($text) : $all = $io->confirm($text.', show all?', false);
                     }
                 }

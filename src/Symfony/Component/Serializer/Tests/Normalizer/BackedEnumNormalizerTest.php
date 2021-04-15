@@ -3,10 +3,8 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
-
-use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumPureDummy;
 

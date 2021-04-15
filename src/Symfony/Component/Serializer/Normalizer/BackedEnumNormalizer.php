@@ -30,7 +30,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
      */
     public function supportsNormalization($data, string $format = null)
     {
-        if (\version_compare(\PHP_VERSION, '8.1', '<')) {
+        if (version_compare(\PHP_VERSION, '8.1', '<')) {
             return false;
         }
 
@@ -44,7 +44,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
     {
         $denormalized = $type::tryFrom($data);
 
-        if (is_null($denormalized)) {
+        if (null === $denormalized) {
             throw new NotNormalizableValueException(sprintf('The data is not a valid "%s" value.', $type));
         }
 
@@ -56,7 +56,7 @@ final class BackedEnumNormalizer implements NormalizerInterface, DenormalizerInt
      */
     public function supportsDenormalization($data, string $type, string $format = null)
     {
-        if (\version_compare(\PHP_VERSION, '8.1', '<')) {
+        if (version_compare(\PHP_VERSION, '8.1', '<')) {
             return false;
         }
 

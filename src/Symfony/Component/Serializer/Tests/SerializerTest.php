@@ -53,11 +53,11 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedClassDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
-use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedClassDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\Normalizer\EnumBackedDummy;
 
 class SerializerTest extends TestCase
 {

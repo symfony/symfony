@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-03-31T12:07:55Z
+
+![CleanShot 2021-03-31 at 14 07 03](https://user-images.githubusercontent.com/995707/113141776-6b374c80-922a-11eb-8a21-01f671944e26.png)
+
+It looks like your commiter email is not associated with your Github account 🤔
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-01T14:45:33Z
+
+Added recipes for message bird https://github.com/symfony/symfony/pull/40646
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-01T14:53:04Z
+
+Added docs for message bird https://github.com/symfony/symfony-docs/pull/15180
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-02T05:46:02Z
+
+MessageBird documentation issue solved :+1:
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-02T07:52:24Z
+
+@fabpot updated composer.json
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-03T13:52:56Z
+
+TODO: https://github.com/symfony/symfony/pull/40696
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-09T12:05:17Z
+
+<img width="635" alt="CleanShot 2021-04-09 at 14 05 00@2x" src="https://user-images.githubusercontent.com/995707/114177353-99104580-993c-11eb-8d30-068cff94b041.png">
+
+Please add CHANGELOG file
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-09T14:17:32Z
+
+Documentation too prepared https://github.com/symfony/symfony-docs/pull/15180 :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-14T07:35:09Z
+
+Please rebase, thanks
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-14T08:21:41Z
+
+@OskarStark rebase, but still get the same strange error
+
+```
+Run ./vendor/bin/psalm.phar --output-format=github --no-progress
+Error: Too few arguments for Symfony\Component\Notifier\Exception\TransportException::__construct - expecting 2 but saw 1
+Error: Process completed with exit code 2.
+```
+
+---------------------------------------------------------------------------
+
+by StaffNowa at 2021-04-14T08:51:00Z
+
+Travis CI show errors @OskarStark

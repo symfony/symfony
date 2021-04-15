@@ -136,6 +136,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
             'package' => 'symfony/sms-biuras-notifier',
         ],
+        'messagebird' => [
+            'class' => Bridge\MessageBird\MessageBirdTransportFactory::class,
+            'package' => 'symfony/message-bird-notifier',
+        ],
     ];
 
     /**

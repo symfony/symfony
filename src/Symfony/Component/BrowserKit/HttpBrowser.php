@@ -82,7 +82,11 @@ class HttpBrowser extends AbstractBrowser
         $fields = $request->getParameters();
 
         if ($uploadedFiles = $this->getUploadedFiles($request->getFiles())) {
-            $part = new FormDataPart(array_merge($fields, $uploadedFiles));
+            if (\count($fields) !== \count($fields, \COUNT_RECURSIVE)) {
+                $part = new FormDataPart(array_merge_recursive($fields, $uploadedFiles));
+            } else {
+                $part = new FormDataPart(array_merge($fields, $uploadedFiles));
+            }
 
             return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
         }

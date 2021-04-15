@@ -188,9 +188,11 @@ EOF
 
             // Load defined messages
             $compares = [$this->loadCurrentMessages($locales[] = $locale, $transPaths)->all($domain), $this->loadCurrentMessages($locales[] = $input->getOption('compare'), $transPaths)->all($domain)];
-            !$domain ?: $compares = array_map(function ($compare) use($domain) {
-                        return [$domain => $compare];
-                    }, $compares);
+            if (null !== $domain) {
+                $compares = array_map(function ($compare) use($domain) {
+                    return [$domain => $compare];
+                }, $compares);
+            }
 
             // No defined or extracted messages
             if (empty($compares[0]) || empty($compares[1])) {
@@ -211,7 +213,7 @@ EOF
                     $io->text(sprintf('"%1$s" total of messages in locale "%2$s" that are not present in locale "%3$s", with domain "%4$s".', $this->formatId(count($diffs)), $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain)));
                     foreach ($diffs as $diff) {
                         $text = sprintf('<fg=white>%1$s to %2$s in %3$s : "%4$s"</>', $this->formatId($locales[$index]), $this->formatId($locales[abs($index - 1)]), $this->formatId($domain), $diff);
-                        $all ?? false == true ? $io->text($text) : $all = $io->confirm($text.', show all?', false);
+                        true == $all ?? false ? $io->text($text) : $all = $io->confirm($text.', show all?', false);
                     }
                 }
             }

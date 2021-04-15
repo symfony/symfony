@@ -163,4 +163,17 @@ class RequestMatcherTest extends TestCase
         $matcher->matchAttribute('foo', 'babar');
         $this->assertFalse($matcher->matches($request));
     }
+
+    public function testAttributesWithClosure()
+    {
+        $matcher = new RequestMatcher();
+
+        $request = Request::create('/admin/foo');
+        $request->attributes->set('_controller', function () {
+            return new Response('foo');
+        });
+
+        $matcher->matchAttribute('_controller', 'babar');
+        $this->assertFalse($matcher->matches($request));
+    }
 }

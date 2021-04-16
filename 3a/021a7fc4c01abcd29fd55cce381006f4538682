@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-13T21:44:31Z
+
+This is a duplicate of https://github.com/symfony/doctrine-bridge/pull/10 (but this one looks incomplete).
+I missed that this PR wasn't targeting the main repository.

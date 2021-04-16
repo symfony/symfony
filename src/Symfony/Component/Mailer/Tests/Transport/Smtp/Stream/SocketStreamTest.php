@@ -20,7 +20,7 @@ class SocketStreamTest extends TestCase
     public function testSocketErrorNoConnection()
     {
         $this->expectException(TransportException::class);
-        $this->expectExceptionMessageMatches('/Connection refused|unable to connect/');
+        $this->expectExceptionMessageMatches('/Connection refused|unable to connect/i');
         $s = new SocketStream();
         $s->setTimeout(0.1);
         $s->setPort(9999);

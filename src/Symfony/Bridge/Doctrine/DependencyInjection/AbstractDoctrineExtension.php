@@ -146,7 +146,7 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         if (!$bundleConfig['dir']) {
-            if (\in_array($bundleConfig['type'], ['annotation', 'staticphp'])) {
+            if (\in_array($bundleConfig['type'], ['annotation', 'staticphp', 'attribute'])) {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
                 $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
@@ -186,6 +186,10 @@ abstract class AbstractDoctrineExtension extends Extension
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
                 $mappingDriverDef->setArguments($args);
+            } elseif ('attribute' === $driverType) {
+                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                    array_values($driverPaths),
+                ]);
             } elseif ('annotation' == $driverType) {
                 $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
@@ -227,8 +231,8 @@ abstract class AbstractDoctrineExtension extends Extension
             throw new \InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (!\in_array($mappingConfig['type'], ['xml', 'yml', 'annotation', 'php', 'staticphp'])) {
-            throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php" or "staticphp" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'_metadata_driver')));
+        if (!\in_array($mappingConfig['type'], ['xml', 'yml', 'annotation', 'php', 'staticphp', 'attribute'])) {
+            throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'_metadata_driver')));
         }
     }
 

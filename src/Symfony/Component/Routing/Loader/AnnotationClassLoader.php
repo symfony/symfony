@@ -108,7 +108,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    public function load($class, string $type = null)
+    public function load($class)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));

@@ -1,0 +1,432 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-13T14:12:38Z
+
+I think we should make the persistence part optional
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-13T16:34:04Z
+
+Here is a new closure-based proposal based on the feedback in this PR:
+
+```php
+    #[Route('/{id}/edit', name: 'conference_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Conference $conference): Response
+    {
+        return $this->handleForm(
+            $request,
+            $this->createForm(ConferenceType::class, $conference),
+            function (FormInterface $form) use ($conference) {
+                $this->getDoctrine()->getManager()->flush();
+
+                return $this->redirectToRoute(
+                    'conference_show',
+                    ['id' => $conference->getId()],
+                    Response::HTTP_SEE_OTHER
+                );
+            },
+            function (FormInterface $form) {
+                return $this->render('conference/edit.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+        );
+    }
+```
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-13T19:48:43Z
+
+Question:
+
+wouldn't it be better if ``onSuccess`` callback also receives ``Conference`` entity?
+
+Reasons:
+- when the form is valid, it is more likely we need data from form, not form itself. Form can be second parameter.
+- static analysis: we still can't use generics like ```FormInterface<Conference> $form```. Even if we could, it would still return [nullable value](https://github.com/psalm/psalm-plugin-symfony/commit/a56f44a3f4fdca8c96726aea602b54a7b6f92a8c#diff-a6a03f2a1936278071f0b0e2734be7cbef9c6f222e356b59b7ad8385e3e3424bR11)
+- it also makes things easier when Conference is created via ``empty_data`` like this:
+
+```php
+$this->createForm(ConferenceType::class) // no $data
+```
+
+Otherwise we have to write this:
+
+```php
+function (FormInterface $form) {
+    /** @var Conference $conference */
+    $conference = $form->getData();            // 2 extra lines needed, with @var as tricking SA tools
+    // ...
+},
+```
+
+instead of simpler:
+
+```php
+function (FormInterface $form, Conference $conference) {
+    // ...
+},
+```
+
+- more on static analysis; it would be trivial to add stubs for ``handleForm`` callbacks; psalm would detect incorrect signature early in the controller.
+
+Similar for ``render`` callback but nullable Conference also in callback.
+
+---------------------------------------------------------------------------
+
+by scuben at 2021-04-13T19:50:39Z
+
+Based on https://github.com/symfony/symfony/pull/40799#issuecomment-818876524 I'd like to suggest this changes:
+
+```php
+    #[Route('/{id}/edit', name: 'conference_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Conference $conference): Response
+    {
+        return $this->handleForm(
+            FormHandler::create($request)
+                ->withFormType(ConferenceType::class)
+                ->withFormData($conference)
+                ->withHandleRequestCallback(function (FormInterface $form) use ($conference) {
+                    $this->getDoctrine()->getManager()->flush();
+
+                    return $this->redirectToRoute(
+                        'conference_show',
+                        ['id' => $conference->getId()],
+                        Response::HTTP_SEE_OTHER
+                    );
+                })
+                ->withCallback(function (FormInterface $form) {
+                    return $this->render('conference/edit.html.twig', [
+                        'form' => $form->createView(),
+                    ]);
+                })
+            ;
+        );
+    }
+```
+
+- Using a builder object keeps it more flexible as the 4 parameters solution. This is also more verbose which I think will help developers using this way of form handling.
+- This will also allow to enhance the public api of the FormBuilder object in the future without dealing with named parameters or parameter order.
+- Naming of course up in the air :)
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-13T19:58:52Z
+
+@zmitic this preserves the type info and works already: `function (FormInterface $form) use ($conference) {`, no need for adding as argument IMHO.
+
+@scuben I'd be :-1: on my side: this would require a pile of code for something that arguments already provide.
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-13T20:09:10Z
+
+@nicolas-grekas
+
+>this preserves the type info and works already: function (FormInterface $form) use ($conference) {, no need for adding as argument IMHO
+
+It doesn't when Conference is created with ``empty_data``; check the example, there is no Conference before the callback.
+
+Full example to **create** entity from data in form: https://symfony.com/doc/current/form/use_empty_data.html#option-2-provide-a-closure
+
+```php
+    #[Route('/create', name: 'conference_create', methods: ['GET', 'POST'])]
+    public function create(Request $request): Response
+    {
+        return $this->handleForm(
+            $request,
+            $this->createForm(ConferenceType::class),    // null for $data
+            function (FormInterface $form) {
+                /** @var Conference $conference */
+                $conference = $form->getData();          // extra 2 lines, one used to trick static analysis
+
+               // the rest
+            },
+            function (FormInterface $form) {
+                return $this->render('conference/edit.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+        );
+    }
+```
+
+**UPDATED:**
+
+Most likely users will use one file for both ``create`` and ``edit`` and have a title. For this case, ``render`` callback should also get Conference:
+
+```php
+function (FormInterface $form, ?Conference $conference) {
+    return $this->render('conference/form.html.twig', [
+         'form' => $form->createView(),
+
+         // changing page title via reusable ``form.html.twig``
+         'page_title' => $conference ? 'Editing ' . $conference->getName() : 'Create new conference',
+    ]);
+}
+```
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2021-04-13T20:12:19Z
+
+Might be considered unrelated but the fact that we always assume the auto persist stress me out. Even if it's not needed with the default doctrine configuration, could we start adding it to examples ?
+
+---------------------------------------------------------------------------
+
+by scuben at 2021-04-13T20:13:44Z
+
+> Might be considered unrelated but the fact that we always assume the auto persist stress me out. Even if it's not needed with the default doctrine configuration, could we start adding it to examples ?
+
+I totally feel you! :) But the solution is to accept its not needed :)
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2021-04-13T21:42:18Z
+
+> > Might be considered unrelated but the fact that we always assume the auto persist stress me out. Even if it's not needed with the default doctrine configuration, could we start adding it to examples ?
+>
+> I totally feel you! :) But the solution is to accept its not needed :)
+
+Not really true. If you want performance then change the tracking policy and persist will be required. That's why. It seems a bit unrelated but if symfony wants to tie things harder with doctrine we need this kind of control / performance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-14T17:05:55Z
+
+Oh btw, I'd be fine also with @zmitic's proposal to pass the form's data as 2nd argument to the closures.
+
+---------------------------------------------------------------------------
+
+by bOmBeLq at 2021-04-15T16:10:29Z
+
+Would service instead of method in controller class be considerable?
+```
+ #[Route('/{id}/edit', name: 'conference_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Conference $conference, FormHandlerFactoryInterface $formHandlerFactory): Response
+    {
+        return $formHandlerFactory
+            ->create(SomeType::class, $conference, $typeOptions)
+            ->setTemplate($template, $params)
+            /// or
+            ->setRenderCallback(function($conference) {... })
+            ->onSuccess(function($conference ) {return $this->redirectToRoute(...)})
+            ->handle( $request)
+    }
+```
+could even get request form request stack in service or would it be bad practice?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-16T13:34:44Z
+
+I swapped the `$form` and `$request` arguments.
+
+Regarding @zmitic's proposal, it will not be necessary anymore with #40783 (I described why here: https://github.com/symfony/symfony/pull/40783#issuecomment-821167149) so I suggest keeping the code simple for now and to not add a new argument.
+
+Regarding the service, I don't think it is worth it yet. It's just a tiny helper method.
+
+I think that this PR is now ready to be merged.
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T14:15:44Z
+
+@dunglas Is it possible to rediscuss this decision? Template for ``FormInterface::getData()`` returns ``?T``  (i.e. nullable), that's is why I asked to add the value to callbacks.
+
+If there was a method like ``getDataOrThrowException(): T``, it wouldn't be a problem.
+
+I already made stubs for almost entire form component, [including FormInterface](https://github.com/psalm/psalm-plugin-symfony/commit/a56f44a3f4fdca8c96726aea602b54a7b6f92a8c#diff-a6a03f2a1936278071f0b0e2734be7cbef9c6f222e356b59b7ad8385e3e3424b).
+
+Current usage that allows psalm to know the type:
+
+```php
+/** @extends AbstractType<User> */
+class UserType extends AbstractType{}
+```
+
+Real example from my current project, relevant parts are selected:
+
+![image](https://user-images.githubusercontent.com/1964158/115035361-ccb71680-9ecc-11eb-9f99-92dcba9f165b.png)
+
+Even events are covered, example for PRE_SET_DATA:
+
+![image](https://user-images.githubusercontent.com/1964158/115036628-fae92600-9ecd-11eb-8751-9363258c76a4.png)
+
+All of them depends on ``FormInterface::getData(): ?T``.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-16T14:45:44Z
+
+@zmitic I'm not sure to follow. Adding the proper types to the closures in #40783 should do the trick, isn't it? The data passed in the closure would be nullable too or am I missing something?
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T14:51:11Z
+
+>Adding the proper types to the closures in #40783 should do the trick, isn't it?
+
+It won't for forms. ``FormInterface::getData()`` returns nullable type which is correct. So to remedy the issue, users will have to add 2 extra lines if $data is needed (and most likely will).
+
+Let me refer to this:
+
+>will allow to not introduce "useless" code just to have autocompletion working properly
+
+My argument wasn't about autocompletion but about static analysis. With LSP+psalm, I already have autocompletion using generics:
+
+![image](https://user-images.githubusercontent.com/1964158/115041433-c75cca80-9ed2-11eb-81c3-c9cc8f2ad129.png)
+
+Notice that there is no ``use App\Entity\User\User;`` on top, yet autocomplete works without any help from PHPStorm itself.
+
+---
+
+I use psalm on level 1 for almost two years so I am ready to help if needed. I am not skilled enough to contribute to Symfony core itself but for this idea, I am 99% sure.
+
+Let me know if you need more examples.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-16T14:57:51Z
+
+But the data passed to the closure could be `null` to isn't it? So I don't understand how it will help regarding static analysis.
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T15:03:32Z
+
+@dunglas
+>But the data passed to the closure could be null to isn't it?
+
+If the form is valid, it means that value will **not** be null so users will typehint ``Conference $data`` instead of ``?Conference $data``.
+
+And ``onSuccess`` is called **only** when form is valid so it will not be null, and users will **not** need to typehint nullable value.
+
+Unlike ``FormInterface::getData()`` which always return nullable value, and force us to write those 2 extra lines.
+
+Side note:
+To avoid any confusion; psalm plugin for PHPStorm is not working. It doesn't recognize anything more than most simple generics so I had to turn it off.
+
+However LSP works great. It does have few bugs but once you learn how to avoid them, it is absolute joy to work with generics and having autocomplete for them.
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T15:11:33Z
+
+Let me explain with example. The code in ``handleForm`` [is this](https://github.com/symfony/symfony/pull/40799/files#diff-af6672a1436a317ff73aea4f4bb77153b29876d8b9df1fe778425dba20bcd1c9R303):
+
+```php
+if ($submitted && $form->isValid()) {
+    return $onSuccess($form);
+}
+```
+
+what I am proposing is this:
+
+```php
+ if ($submitted && $form->isValid() && $data = $form->getData()) {
+    return $onSuccess($form, $data);
+}
+```
+
+with this change, we could write code like this:
+
+```php
+$this->handleForm(
+    onSuccess: function (FormInterface $form, Conference $conference) {
+       // we can render form, and we KNOW that $conference is an entity, NOT null
+   }
+);
+```
+
+but without that second parameter:
+
+```php
+$this->handleForm(
+    onSuccess: function (FormInterface $form) {
+        /** @var Conference $conference */
+        $conference = $form->getData();
+   }
+);
+```
+
+The second example requires 2 extra lines. And that ``@var`` annotation is only to trick psalm; without it, even with stubs, psalm would think it is nullable Conference because of FormInterface.
+
+---
+
+I hope it is more clear now, if not, I will provide more.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-16T15:13:06Z
+
+> If the form is valid, it means that value will not be null so users will typehint Conference $data instead of ?Conference $data.
+
+Here is what the interface says:
+
+```
+    /**
+     * Returns the model data in the format needed for the underlying object.
+     *
+     * @return mixed When the field is not submitted, the default data is returned.
+     *               When the field is submitted, the default data has been bound
+     *               to the submitted view data.
+     *
+     * @throws Exception\RuntimeException If the form inherits data but has no parent
+     */
+    public function getData();
+```
+
+AFAIU it's not guaranteed by the interface that a `null` value will not be returned even if it's what does the default implementation provided by the Form component. This new helper method depends on the interface, not on the implementation, so we cannot be sure that the data will not be null.
+
+I've no strong opinion on this TBH. If we pass the data object as a second parameter, then we should also clarify the interface to make it clear that `null` will never be returned after a submission. But is it really the case in all existing implementations? I don't know this component enough to decide here. WDYT @symfony/mergers?
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2021-04-16T15:16:13Z
+
+In my opinion it returns `mixed` so any value can be returned and can considered valid. `null` as well as `[]` or `0` for that matter. Adding an opinionated check on this directly in the framework would be quite a risk. If it is a helper it shouldn't do anything more than to help people. And some people will just go by submitter & valid and will never check if their data is null or not. Because it might be (for some odd reason I agree) considered valid ?
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T15:23:25Z
+
+> This new helper method depends on the interface
+
+Exactly, my stubs cover FormInterface, AbstractType and others; I was super-careful to not make **any** problems, took me lots of time to make them. Even had to annoy muglug many times https://github.com/vimeo/psalm/issues/4136 :smile:
+
+Typehint ``mixed`` in original code is put because generics where not even an idea before, but now we can use them.
+
+>And some people will just go by submitter & valid and will never check if their data is null or not.
+
+This is also one of the reasons why I ask for this change. If we could use
+
+```php
+$this->handleForm(
+    onSuccess: function (FormInterface $form, Conference $conference) {
+       // we can render form, and we KNOW that $conference is an entity, NOT null
+   }
+);
+```
+
+there would never be any confusion; at this point, we **know** it is not null, no need for ``@var`` or ``instance of``. But without second parameter: extra code to trick psalm.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2021-04-16T15:25:28Z
+
+Ok got it. This makes sense. +1 for me. Thanks for taking the time to explain this in depth @zmitic!
+
+---------------------------------------------------------------------------
+
+by zmitic at 2021-04-16T15:30:20Z
+
+@dunglas  Glad I could help and sorry if I didn't explain it simpler.
+
+Once merged, I will add stubs for ``handleForm``. With them, it would be possible to detect incorrect usage in controllers.
+
+Example would be using ``UserType`` but typehinting ``Customer``.

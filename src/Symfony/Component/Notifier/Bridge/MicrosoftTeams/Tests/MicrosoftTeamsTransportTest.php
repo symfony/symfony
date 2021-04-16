@@ -79,7 +79,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
     {
         $message = 'testMessage';
 
-        $expectedBody = json_encode(['title' => $message]);
+        $expectedBody = json_encode(['text' => $message]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);

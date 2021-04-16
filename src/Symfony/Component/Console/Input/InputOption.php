@@ -40,6 +40,10 @@ class InputOption
      * The option accepts multiple values (e.g. --dir=/foo --dir=/bar).
      */
     public const VALUE_IS_ARRAY = 8;
+
+    /**
+     * The option accepts multiple values (e.g. --dir=/foo --dir=/bar).
+     */
     public const VALUE_NEGATABLE = 16;
 
     private $name;

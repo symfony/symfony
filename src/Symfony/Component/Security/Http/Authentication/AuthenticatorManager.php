@@ -74,7 +74,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $token = $authenticator->createAuthenticatedToken($passport = new SelfValidatingPassport(new UserBadge(method_exists($user, 'getUserIdentifier') ? $user->getUserIdentifier() : $user->getUsername(), function () use ($user) { return $user; }), $badges), $this->firewallName);
 
         // announce the authenticated token
-        $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token))->getAuthenticatedToken();
+        $token = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($token, $passport))->getAuthenticatedToken();
 
         // authenticate this in the system
         return $this->handleAuthenticationSuccess($token, $passport, $request, $authenticator);
@@ -188,7 +188,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
             $authenticatedToken = $authenticator->createAuthenticatedToken($passport, $this->firewallName);
 
             // announce the authenticated token
-            $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken))->getAuthenticatedToken();
+            $authenticatedToken = $this->eventDispatcher->dispatch(new AuthenticationTokenCreatedEvent($authenticatedToken, $passport))->getAuthenticatedToken();
 
             if (true === $this->eraseCredentials) {
                 $authenticatedToken->eraseCredentials();

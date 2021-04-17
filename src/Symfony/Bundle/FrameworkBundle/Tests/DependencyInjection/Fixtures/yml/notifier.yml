@@ -1,5 +1,6 @@
 framework:
-    messenger: ~
+    messenger:
+        enabled: true
     mailer:
         dsn: 'smtp://example.com'
     notifier:

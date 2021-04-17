@@ -4,7 +4,9 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
 
 $container->loadFromExtension('framework', [
-    'messenger' => null,
+    'messenger' => [
+        'enabled' => true
+    ],
     'mailer' => [
         'dsn' => 'smtp://example.com',
     ],

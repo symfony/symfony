@@ -45,6 +45,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
@@ -1871,6 +1872,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('notifier'));
         $this->assertFalse($container->hasDefinition('chatter'));
         $this->assertFalse($container->hasDefinition('texter'));
+    }
+
+    public function testIfNotifierTransportsAreKnownByFrameworkExtension()
+    {
+        $container = $this->createContainerFromFile('notifier');
+
+        foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
+            $transportFactoryName = strtolower($bridgeDirectory->getFilename());
+            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the TransportFactory: "%s" to the $classToServices array in the FrameworkBundleExtension?', $bridgeDirectory->getFilename()));
+        }
     }
 
     protected function createContainer(array $data = [])

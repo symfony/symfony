@@ -33,6 +33,7 @@ class AutowirePass extends AbstractRecursivePass
 {
     private $types;
     private $ambiguousServiceTypes;
+    private $autowiringAliases;
     private $lastFailure;
     private $throwOnAutowiringException;
     private $decoratedClass;
@@ -343,9 +344,14 @@ class AutowirePass extends AbstractRecursivePass
     {
         $this->types = [];
         $this->ambiguousServiceTypes = [];
+        $this->autowiringAliases = [];
 
         foreach ($container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($container, $id, $definition);
+        }
+
+        foreach ($container->getAliases() as $id => $alias) {
+            $this->populateAutowiringAlias($id);
         }
     }
 
@@ -370,6 +376,8 @@ class AutowirePass extends AbstractRecursivePass
         do {
             $this->set($reflectionClass->name, $id);
         } while ($reflectionClass = $reflectionClass->getParentClass());
+
+        $this->populateAutowiringAlias($id);
     }
 
     /**
@@ -459,6 +467,10 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $servicesAndAliases = $container->getServiceIds();
+        if (null !== ($autowiringAliases = $this->autowiringAliases[$type] ?? null) && !isset($autowiringAliases[''])) {
+            return sprintf(' Available autowiring aliases for this %s are: "$%s".', class_exists($type, false) ? 'class' : 'interface', implode('", "$', $autowiringAliases));
+        }
+
         if (!$container->has($type) && false !== $key = array_search(strtolower($type), array_map('strtolower', $servicesAndAliases))) {
             return sprintf(' Did you mean "%s"?', $servicesAndAliases[$key]);
         } elseif (isset($this->ambiguousServiceTypes[$type])) {
@@ -496,5 +508,19 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return null;
+    }
+
+    private function populateAutowiringAlias(string $id): void
+    {
+        if (!preg_match('/(?(DEFINE)(?<V>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+))^((?&V)(?:\\\\(?&V))*+)(?: \$((?&V)))?$/', $id, $m)) {
+            return;
+        }
+
+        $type = $m[2];
+        $name = $m[3] ?? '';
+
+        if (class_exists($type, false) || interface_exists($type, false)) {
+            $this->autowiringAliases[$type][$name] = $name;
+        }
     }
 }

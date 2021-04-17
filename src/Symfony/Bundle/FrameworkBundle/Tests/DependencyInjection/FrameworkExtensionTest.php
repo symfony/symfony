@@ -1836,6 +1836,43 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $container->getParameter('container.behavior_describing_tags'));
     }
 
+    public function testNotifierWithoutMailer()
+    {
+        $container = $this->createContainerFromFile('notifier_without_mailer');
+
+        $this->assertFalse($container->hasDefinition('notifier.channel.email'));
+    }
+
+    public function testNotifierWithoutMessenger()
+    {
+        $container = $this->createContainerFromFile('notifier_without_messenger');
+
+        $this->assertFalse($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
+    }
+
+    public function testNotifierWithMailerAndMessenger()
+    {
+        $container = $this->createContainerFromFile('notifier');
+
+        $this->assertTrue($container->hasDefinition('notifier'));
+        $this->assertTrue($container->hasDefinition('chatter'));
+        $this->assertTrue($container->hasDefinition('texter'));
+        $this->assertTrue($container->hasDefinition('notifier.channel.chat'));
+        $this->assertTrue($container->hasDefinition('notifier.channel.email'));
+        $this->assertTrue($container->hasDefinition('notifier.channel.sms'));
+        $this->assertTrue($container->hasDefinition('notifier.channel_policy'));
+        $this->assertTrue($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
+    }
+
+    public function testNotifierWithoutTransports()
+    {
+        $container = $this->createContainerFromFile('notifier_without_transports');
+
+        $this->assertTrue($container->hasDefinition('notifier'));
+        $this->assertFalse($container->hasDefinition('chatter'));
+        $this->assertFalse($container->hasDefinition('texter'));
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

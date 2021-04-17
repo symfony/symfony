@@ -50,6 +50,7 @@
         "symfony/mailer": "^5.2",
         "symfony/messenger": "^5.2",
         "symfony/mime": "^4.4|^5.0",
+        "symfony/notifier": "^5.3",
         "symfony/process": "^4.4|^5.0",
         "symfony/rate-limiter": "^5.2",
         "symfony/security-bundle": "^5.3",

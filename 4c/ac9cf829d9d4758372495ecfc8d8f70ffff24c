@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-12T15:23:11Z
+
+Would it make sense to also take the debug flag into account?
+
+```php
+#[When(debug: true)]
+```
+
+```php
+class When
+{
+    public function __construct(
+        public ?string $environment = null,
+        public ?bool $debug = null,
+    ) {
+    }
+}
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-12T15:48:32Z
+
+I considered adding debug when working on #40214 but in the end, this I decided against. The reason is that we have no use case for loading configuration conditionally based on debug/non-debug without corresponding complex logic. debug is useful for two things: logic in DI extensions, and runtime logic of services. Adding it here would increase complexity by a lot for no practical benefit.
+
+About `environment` vs `env`, #40214 uses `env` (see examples in the description, also `#[Route(env: 'foo')]`. We could change, but this PR at least is consistent :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-12T16:11:25Z
+
+> About `environment` vs `env`, #40214 uses `env` (see examples in the description, also `#[Route(env: 'foo')]`. We could change, but this PR at least is consistent :)
+
+Oh, that slipped me. Yes, I would be very much in favor of changing the property to `environment` for `Route` as well. 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-12T16:19:33Z
+
+Argh, I very much prefer `env` on my side :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-14T18:03:49Z
+
+I'm also prefer `env` for short.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2021-04-14T18:14:34Z
+
+👍🏻 `env` for me as well
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-16T08:55:39Z
+
+We do this very often actually, but we do this through bundles, which are the parts that are conditionally loaded by env. In apps, there are no bundles usually, and ppl have to resort to writing explicit config, by 1. excluding the corresponding classes from discovery and 2. loading them only in the appropriate env. I've talked to several ppl that do this.
+
+A typical example is an event listener that should be enabled only for prod/dev/etc.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-16T09:49:19Z
+
+@weaverryan Here is a real use case from a real project, defining a command only for the dev env:
+
+I define my services in PHP files in `config/services`. When I want something for a particular env, I define it in a sub directory, eg: `config/services/dev`.
+```php
+// Kernel.php
+$container->import(__DIR__.'/../config/services/*.php');
+$container->import(__DIR__.'/../config/{services}/'.$this->environment.'/*.php');
+```
+
+Before:
+```php
+// config/services/commands.php
+$services
+    ->load(
+        'App\\Command\\',
+        '../../src/Command'
+    )
+    ->exclude([
+        '../../src/Command/Dev',
+    ]);
+```
+```php
+//config/services/dev/commands.php
+$services
+    ->load(
+        'App\\Command\\Dev\\',
+        '../../../src/Command/Dev'
+    );
+```
+
+After:
+```php
+// config/services/commands.php
+$services
+    ->load(
+        'App\\Command\\',
+        '../../src/Command'
+    );
+```
+```php
+// src/Command/Dev/MyDevCommand.php
+#[When(env: 'dev')]
+final class MyDevCommand extends Command
+```
+
+Logically, I won't need those env sub directories anymore.

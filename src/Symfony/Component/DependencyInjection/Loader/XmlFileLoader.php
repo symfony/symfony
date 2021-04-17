@@ -50,7 +50,13 @@ class XmlFileLoader extends FileLoader
 
         $this->container->fileExists($path);
 
-        $this->loadXml($xml, $path);
+        $env = $this->env;
+        $this->env = null;
+        try {
+            $this->loadXml($xml, $path);
+        } finally {
+            $this->env = $env;
+        }
 
         if ($this->env) {
             $xpath = new \DOMXPath($xml);

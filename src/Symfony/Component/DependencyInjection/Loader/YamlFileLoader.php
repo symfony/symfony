@@ -129,7 +129,13 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
-        $this->loadContent($content, $path);
+        $env = $this->env;
+        $this->env = null;
+        try {
+            $this->loadContent($content, $path);
+        } finally {
+            $this->env = $env;
+        }
 
         // per-env configuration
         if ($this->env && isset($content['when@'.$this->env])) {

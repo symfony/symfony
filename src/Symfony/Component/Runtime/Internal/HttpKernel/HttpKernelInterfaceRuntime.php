@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Runtime\Symfony\Component\HttKernel;
+namespace Symfony\Runtime\Symfony\Component\HttpKernel;
 
 use Symfony\Component\Runtime\SymfonyRuntime;
 

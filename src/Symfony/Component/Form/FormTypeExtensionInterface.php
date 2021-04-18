@@ -40,7 +40,7 @@ interface FormTypeExtensionInterface
      *
      * @see FormTypeInterface::buildView()
      *
-     * @param FormView<T> $view
+     * @param FormView<T>      $view
      * @param FormInterface<T> $form
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
@@ -53,7 +53,7 @@ interface FormTypeExtensionInterface
      *
      * @see FormTypeInterface::finishView()
      *
-     * @param FormView<T> $view
+     * @param FormView<T>      $view
      * @param FormInterface<T> $form
      */
     public function finishView(FormView $view, FormInterface $form, array $options);

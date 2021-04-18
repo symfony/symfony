@@ -24,7 +24,7 @@ interface FormFactoryInterface
      * @see createBuilder()
      *
      * @param class-string<FormTypeInterface>|'Symfony\Component\Form\Extension\Core\Type\FormType' $type
-     * @param mixed $data The initial data
+     * @param mixed                                                                                 $data The initial data
      *
      * @return FormInterface The form named after the type
      *
@@ -38,7 +38,7 @@ interface FormFactoryInterface
      * @see createNamedBuilder()
      *
      * @param class-string<FormTypeInterface>|'Symfony\Component\Form\Extension\Core\Type\FormType' $type
-     * @param mixed $data The initial data
+     * @param mixed                                                                                 $data The initial data
      *
      * @return FormInterface The form
      *
@@ -65,7 +65,7 @@ interface FormFactoryInterface
      * Returns a form builder.
      *
      * @param class-string<FormTypeInterface>|'Symfony\Component\Form\Extension\Core\Type\FormType' $type
-     * @param mixed $data The initial data
+     * @param mixed                                                                                 $data The initial data
      *
      * @return FormBuilderInterface The form builder
      *
@@ -77,7 +77,7 @@ interface FormFactoryInterface
      * Returns a form builder.
      *
      * @param class-string<FormTypeInterface>|'Symfony\Component\Form\Extension\Core\Type\FormType' $type
-     * @param mixed $data The initial data
+     * @param mixed                                                                                 $data The initial data
      *
      * @return FormBuilderInterface The form builder
      *

@@ -35,7 +35,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
     /**
      * Creates a form builder.
      *
-     * @param string      $name The name of the form or the name of the property
+     * @param string                               $name The name of the form or the name of the property
      * @param class-string<FormTypeInterface>|null $type The type of the form or null if name is a property
      *
      * @return self

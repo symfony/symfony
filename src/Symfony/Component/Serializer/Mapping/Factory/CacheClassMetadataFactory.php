@@ -59,7 +59,6 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
         if ($item->isHit()) {
             return $this->loadedClasses[$class] = $item->get();
         }
-        
         $this->cacheItemPool->save($item->set($metadata));
 
         return $this->loadedClasses[$class] = $metadata;

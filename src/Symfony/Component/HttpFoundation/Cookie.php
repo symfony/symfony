@@ -71,6 +71,19 @@ class Cookie
         return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite']);
     }
 
+    /**
+     * @param string                        $name     The name of the cookie
+     * @param string|null                   $value    The value of the cookie
+     * @param int|string|\DateTimeInterface $expire   The time the cookie expires
+     * @param string                        $path     The path on the server in which the cookie will be available on
+     * @param string|null                   $domain   The domain that the cookie is available to
+     * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
+     * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
+     * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
+     *
+     * @throws \InvalidArgumentException
+     */
     public static function create(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): self
     {
         return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
@@ -85,11 +98,11 @@ class Cookie
      * @param bool|null                     $secure   Whether the client should send back the cookie only over HTTPS or null to auto-enable this when the request is already using HTTPS
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
-     * @param string|null                   $sameSite Whether the cookie will be available for cross-site requests
+     * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = 'lax')
+    public function __construct(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX)
     {
         // from PHP source code
         if ($raw && false !== strpbrk($name, self::$reservedCharsList)) {
@@ -233,6 +246,8 @@ class Cookie
 
     /**
      * Creates a cookie copy with SameSite attribute.
+     *
+     * @param self::SAMESITE_*|null $sameSite
      *
      * @return static
      */
@@ -407,7 +422,7 @@ class Cookie
     /**
      * Gets the SameSite attribute.
      *
-     * @return string|null
+     * @return self::SAMESITE_*|null
      */
     public function getSameSite()
     {

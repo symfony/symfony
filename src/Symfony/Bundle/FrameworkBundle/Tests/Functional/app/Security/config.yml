@@ -1,6 +1,12 @@
 imports:
     - { resource: ./../config/default.yml }
 
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SecurityController:
+        public: true
+        tags:
+            - container.service_subscriber
+
 security:
     providers:
         main:

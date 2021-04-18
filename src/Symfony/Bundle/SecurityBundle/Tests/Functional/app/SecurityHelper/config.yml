@@ -7,6 +7,10 @@ services:
         alias: security.helper
         public: true
 
+    functional.test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
 security:
     providers:
         in_memory:

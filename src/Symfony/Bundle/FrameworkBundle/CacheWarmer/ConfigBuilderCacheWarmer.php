@@ -69,12 +69,19 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 
     private function dumpExtension(ExtensionInterface $extension, ConfigBuilderGeneratorInterface $generator): void
     {
+        $configuration = null;
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } elseif ($extension instanceof ConfigurationExtensionInterface) {
             $configuration = $extension->getConfiguration([], $this->getContainerBuilder($this->kernel));
-        } else {
-            throw new \LogicException(sprintf('Could not get configuration for extension "%s".', \get_class($extension)));
+        }
+
+        if (!$configuration) {
+            if ($this->logger) {
+                $this->logger->info('No configuration found for extension {extensionClass}.', ['extensionClass' => \get_class($extension)]);
+            }
+
+            return;
         }
 
         $generator->build($configuration);

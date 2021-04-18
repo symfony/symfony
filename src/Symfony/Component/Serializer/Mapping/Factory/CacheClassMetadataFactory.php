@@ -53,8 +53,8 @@ class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
 
         $metadata = $this->decorated->getMetadataFor($value);
         $metadataHash = hash('sha256', serialize($metadata->getAttributesMetadata()));
-        $key = rawurlencode(strtr($class, '\\', '_')) . '_' . $metadataHash;
-        
+        $key = rawurlencode(strtr($class, '\\', '_')).'_'.$metadataHash;
+
         $item = $this->cacheItemPool->getItem($key);
         if ($item->isHit()) {
             return $this->loadedClasses[$class] = $item->get();

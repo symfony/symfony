@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @implements DataTransformerInterface<mixed, mixed>
+ */
 class CallbackTransformer implements DataTransformerInterface
 {
     private $transform;

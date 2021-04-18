@@ -14,6 +14,12 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
+/**
+ * @template T
+ * @template R
+ *
+ * @implements DataTransformerInterface<T, R>
+ */
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
     protected static $formats = [

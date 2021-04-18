@@ -18,6 +18,8 @@ namespace Symfony\Component\Form;
  * reverseTransform() method is called and vice versa.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<mixed, mixed>
  */
 class ReversedTransformer implements DataTransformerInterface
 {

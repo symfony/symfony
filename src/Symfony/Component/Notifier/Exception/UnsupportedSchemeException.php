@@ -140,6 +140,18 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\MessageBird\MessageBirdTransportFactory::class,
             'package' => 'symfony/message-bird-notifier',
         ],
+        'mobyt' => [
+            'class' => Bridge\Mobyt\MobytTransportFactory::class,
+            'package' => 'symfony/mobyt-notifier',
+        ],
+        'linkedin' => [
+            'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
+            'package' => 'symfony/linked-in-notifier',
+        ],
+        'sendinblue' => [
+            'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
+            'package' => 'symfony/sendinblue-notifier',
+        ],
     ];
 
     /**

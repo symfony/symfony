@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess;
  * A sequence of property names or array indices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @extends \Traversable<int, string>
  */
 interface PropertyPathInterface extends \Traversable
 {

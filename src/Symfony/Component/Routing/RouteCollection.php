@@ -22,6 +22,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @implements \IteratorAggregate<Route>
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {
@@ -54,7 +56,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @see all()
      *
-     * @return \ArrayIterator|Route[] An \ArrayIterator object for iterating over routes
+     * @return \Traversable<Route> An \ArrayIterator object for iterating over routes
      */
     public function getIterator()
     {

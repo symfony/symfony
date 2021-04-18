@@ -63,6 +63,12 @@ namespace Symfony\Component\Form\Util;
  *     }
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template TKey
+ * @template TValue
+ *
+ * @implements \IteratorAggregate<TKey, TValue>
+ * @implements \ArrayAccess<TKey, TValue>
  */
 class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 {

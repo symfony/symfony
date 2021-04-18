@@ -67,7 +67,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @template T
+ *
  * @implements FormInterface<T>
+ * @implements \IteratorAggregate<FormInterface>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
@@ -82,7 +84,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $parent;
 
     /**
-     * @var FormInterface[]|OrderedHashMap A map of FormInterface instances
+     * @var OrderedHashMap<string, FormInterface> A map of FormInterface instances
      */
     private $children;
 
@@ -1007,7 +1009,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable|FormInterface[]
+     * @return OrderedHashMap<string, FormInterface>
      */
     public function getIterator()
     {

@@ -30,9 +30,12 @@ interface SerializerInterface
     /**
      * Deserializes data into the given type.
      *
-     * @param mixed $data
+     * @template TObject of object
      *
-     * @return mixed
+     * @param mixed                        $data
+     * @param string|class-string<TObject> $type
+     *
+     * @return TObject|mixed
      */
     public function deserialize($data, string $type, string $format, array $context = []);
 }

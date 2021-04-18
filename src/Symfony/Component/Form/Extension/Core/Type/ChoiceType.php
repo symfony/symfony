@@ -287,7 +287,7 @@ class ChoiceType extends AbstractType
             $view->vars['placeholder'] = $options['placeholder'];
         }
 
-        if ($options['multiple'] && !$options['expanded']) {
+        if ($options['multiple'] && !$options['expanded'] && isset($view->vars['full_name'])) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.

@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
  */
 interface FormTypeExtensionInterface
 {
@@ -25,6 +27,8 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::buildForm()
+     *
+     * @param FormBuilderInterface<T> $builder
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -35,6 +39,9 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::buildView()
+     *
+     * @param FormView<T> $view
+     * @param FormInterface<T> $form
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -45,6 +52,9 @@ interface FormTypeExtensionInterface
      * further modify it.
      *
      * @see FormTypeInterface::finishView()
+     *
+     * @param FormView<T> $view
+     * @param FormInterface<T> $form
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
@@ -53,7 +63,7 @@ interface FormTypeExtensionInterface
     /**
      * Gets the extended types.
      *
-     * @return string[]
+     * @return iterable<class-string<FormTypeInterface>>
      */
     public static function getExtendedTypes(): iterable;
 }

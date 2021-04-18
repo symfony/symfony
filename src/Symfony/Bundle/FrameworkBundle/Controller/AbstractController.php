@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -338,6 +339,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Creates and returns a Form instance from the type of the form.
+     *
+     * @template TData
+     * @template TFormType of FormTypeInterface<TData>
+     *
+     * @param class-string<TFormType> $type
+     *
+     * @return FormInterface<TData>
      */
     protected function createForm(string $type, $data = null, array $options = []): FormInterface
     {

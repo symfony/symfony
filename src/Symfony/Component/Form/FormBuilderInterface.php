@@ -13,6 +13,9 @@ namespace Symfony\Component\Form;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @extends FormConfigBuilderInterface<T>
  */
 interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {
@@ -33,7 +36,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * Creates a form builder.
      *
      * @param string      $name The name of the form or the name of the property
-     * @param string|null $type The type of the form or null if name is a property
+     * @param class-string<FormTypeInterface>|null $type The type of the form or null if name is a property
      *
      * @return self
      */
@@ -72,7 +75,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
     /**
      * Creates the form.
      *
-     * @return FormInterface The form
+     * @return FormInterface<T> The form
      */
     public function getForm();
 }

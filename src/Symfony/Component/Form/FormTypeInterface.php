@@ -15,6 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
  */
 interface FormTypeInterface
 {
@@ -25,6 +27,8 @@ interface FormTypeInterface
      * top most type. Type extensions can further modify the form.
      *
      * @see FormTypeExtensionInterface::buildForm()
+     *
+     * @param FormBuilderInterface<T> $builder
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -39,6 +43,9 @@ interface FormTypeInterface
      * to do so, move your logic to {@link finishView()} instead.
      *
      * @see FormTypeExtensionInterface::buildView()
+     *
+     * @param FormView<T> $view
+     * @param FormInterface<T> $form
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -54,6 +61,9 @@ interface FormTypeInterface
      * else you are recommended to implement {@link buildView()} instead.
      *
      * @see FormTypeExtensionInterface::finishView()
+     *
+     * @param FormView<T> $view
+     * @param FormInterface<T> $form
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 

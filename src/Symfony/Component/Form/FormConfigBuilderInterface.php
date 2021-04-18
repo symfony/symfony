@@ -12,10 +12,17 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PreSubmitEvent;
+use Symfony\Component\Form\Event\SubmitEvent;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @extends FormConfigInterface<T>
  *
  * @method $this setIsEmptyCallback(callable|null $isEmptyCallback) Sets the callback that will be called to determine if the model data of the form is empty or not - not implementing it is deprecated since Symfony 5.1
  */
@@ -24,6 +31,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Adds an event listener to an event on this form.
      *
+     * @param FormEvents::* $eventName
+     * @param callable(PreSetDataEvent<T>)|callable(PostSetDataEvent<T>)|callable(PreSubmitEvent)|callable(SubmitEvent<T>) $listener
      * @param int $priority The priority of the listener. Listeners
      *                      with a higher priority are called before
      *                      listeners with a lower priority.
@@ -248,7 +257,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Builds and returns the form configuration.
      *
-     * @return FormConfigInterface
+     * @return FormConfigInterface<T>
      */
     public function getFormConfig();
 }

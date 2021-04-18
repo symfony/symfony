@@ -15,6 +15,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
  */
 class FormEvent extends Event
 {
@@ -33,7 +35,7 @@ class FormEvent extends Event
     /**
      * Returns the form at the source of the event.
      *
-     * @return FormInterface
+     * @return FormInterface<T>
      */
     public function getForm()
     {
@@ -43,7 +45,7 @@ class FormEvent extends Event
     /**
      * Returns the data associated with this event.
      *
-     * @return mixed
+     * @return T|null
      */
     public function getData()
     {

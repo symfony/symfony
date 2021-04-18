@@ -17,6 +17,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Transforms a value between different representations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @template R
  */
 interface DataTransformerInterface
 {
@@ -53,9 +56,9 @@ interface DataTransformerInterface
      * of the first data transformer outputs NULL, the second must be able to
      * process that value.
      *
-     * @param mixed $value The value in the original representation
+     * @param T|null $value The value in the original representation
      *
-     * @return mixed The value in the transformed representation
+     * @return R|null The value in the transformed representation
      *
      * @throws TransformationFailedException when the transformation fails
      */
@@ -82,9 +85,9 @@ interface DataTransformerInterface
      * By convention, reverseTransform() should return NULL if an empty string
      * is passed.
      *
-     * @param mixed $value The value in the transformed representation
+     * @param R|null $value The value in the transformed representation
      *
-     * @return mixed The value in the original representation
+     * @return T|null The value in the original representation
      *
      * @throws TransformationFailedException when the transformation fails
      */

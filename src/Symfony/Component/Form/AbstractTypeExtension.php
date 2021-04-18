@@ -15,6 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @implements FormTypeExtensionInterface<T>
  */
 abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 {

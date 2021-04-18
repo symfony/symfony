@@ -19,6 +19,8 @@ use Symfony\Component\Form\FormEvent;
  * It can be used to:
  *  - Change data from the request, before submitting the data to the form.
  *  - Add or remove form fields, before submitting the data to the form.
+ *
+ * @extends FormEvent<array<string, mixed>>
  */
 final class PreSubmitEvent extends FormEvent
 {

@@ -65,6 +65,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @implements FormInterface<T>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {

@@ -14,6 +14,7 @@ namespace Symfony\Component\VarDumper\Tests\Cloner;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php74;
+use Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -428,7 +429,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [attr] => Array
                                 (
                                     [file] => %a%eVarClonerTest.php
-                                    [line] => 21
+                                    [line] => 22
                                 )
 
                         )
@@ -511,6 +512,108 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
                         )
 
+                )
+
+        )
+
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [context:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+        )
+
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testPhp81Enums()
+    {
+        $data = new Php81Enums();
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<'EOTXT'
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 1
+                            [attr] => Array
+                                (
+                                    [file] => %s
+                                    [line] => 5
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [e1] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\UnitEnumFixture
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 2
+                            [attr] => Array
+                                (
+                                    [file] => %s
+                                    [line] => 5
+                                )
+
+                        )
+
+                    [e2] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => 4
+                            [class] => Symfony\Component\VarDumper\Tests\Fixtures\BackedEnumFixture
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 3
+                            [attr] => Array
+                                (
+                                    [file] => %s
+                                    [line] => 5
+                                )
+
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [name] => Hearts
+                )
+
+            [3] => Array
+                (
+                    [name] => Diamonds
+                    [value] => D
                 )
 
         )

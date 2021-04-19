@@ -19,6 +19,9 @@
         "php": ">=7.2.5",
         "psr/container": "^1.1"
     },
+    "conflict": {
+        "ext-psr": "<1.1|>=2"
+    },
     "suggest": {
         "symfony/service-implementation": ""
     },

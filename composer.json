@@ -151,6 +151,7 @@
         "twig/markdown-extra": "^2.12|^3"
     },
     "conflict": {
+        "ext-psr": "<1.1|>=2",
         "async-aws/core": "<1.5",
         "doctrine/annotations": "<1.12",
         "doctrine/dbal": "<2.10",

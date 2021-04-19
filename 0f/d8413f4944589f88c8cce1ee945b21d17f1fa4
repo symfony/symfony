@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-18T19:52:00Z
+
+@Nyholm yes, I did (an Error though):
+```
+§ sf console cache:clear
+
+ // Clearing the cache for the dev environment with debug true
+
+19:51:33 CRITICAL  [php] Uncaught Error: Argument 1 passed to Symfony\Component\Config\Builder\ConfigBuilderGenerator::build() must implement interface Symfony\Component\Config\Definition\ConfigurationInterface, null given, called in /.../vendor/symfony/framework-bundle/CacheWarmer/ConfigBuilderCacheWarmer.php on line 80 ["exception" => TypeError { …}]
+
+In ConfigBuilderGenerator.php line 43:
+
+  Argument 1 passed to Symfony\Component\Config\Builder\ConfigBuilderGenerator::build() must implement interface Symfony\Component\Config\Definition\Configu
+  rationInterface, null given, called in /.../vendor/symfony/framework-bundle/CacheWarmer/ConfigBuil
+  derCacheWarmer.php on line 80
+
+cache:clear [--no-warmup] [--no-optional-warmers]
+
+exit status 255
+
+```

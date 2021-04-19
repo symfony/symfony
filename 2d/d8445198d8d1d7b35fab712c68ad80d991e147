@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by shiftby at 2021-04-19T13:08:23Z
+
+Fabbot tries to remove trailing spaces, but it won't pass tests then. My IDE tried to do the same thing
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-19T13:09:29Z
+
+Can you please rebase your changes onto the 4.4 branch?
+
+---------------------------------------------------------------------------
+
+by shiftby at 2021-04-19T13:48:00Z
+
+> Can you please rebase your changes onto the 4.4 branch?
+
+Rebased and fixed tests.

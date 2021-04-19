@@ -172,17 +172,20 @@ public function NAME($valueDEFAULT): self
         if (null !== $parameterType || $prototype instanceof ScalarNode) {
             $property = $class->addProperty($node->getName());
             if (null === $key = $node->getKeyAttribute()) {
+                // This is an array of values; don't use singular name
                 $body = '
 /**
+ * @param list<TYPE> $value
  * @return $this
  */
-public function NAME(TYPE$value): self
+public function NAME(array $value): self
 {
     $this->PROPERTY = $value;
 
     return $this;
 }';
-                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? '' : $parameterType.' ']);
+
+                $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : $parameterType]);
             } else {
                 $body = '
 /**

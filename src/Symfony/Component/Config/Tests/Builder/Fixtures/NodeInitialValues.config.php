@@ -11,5 +11,5 @@ return static function (NodeInitialValuesConfig $config) {
     $config->messenger()
         ->transports('slow_queue')
         ->dsn('doctrine://')
-        ->option(['table'=>'my_messages']);
+        ->options(['table'=>'my_messages']);
 };

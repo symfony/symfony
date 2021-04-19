@@ -104,7 +104,8 @@ class GeneratedConfigTest extends TestCase
             return new $fqcn();
         }
 
-        $outputDir = sys_get_temp_dir();
+        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+
         // This line is helpful for debugging
         // $outputDir = __DIR__.'/.build';
 

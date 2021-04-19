@@ -1,0 +1,307 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-14T11:14:30Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2021-04-14T19:26:01Z
+
+Hi!
+
+Thanks for always thinking of new ways to frame & solve these problems :).
+
+```php
+function __construct(#[Purpose('review.state_machine')] WorkflowInterface $workflow)
+```
+
+It looks like `Purpose` is really just a `WireThisServiceId`. I mean that this is what it looks like to an end-user. It makes me wonder if I could do this (no type-hint):
+
+```php
+function __construct(#[Purpose('review.state_machine')] $workflow)
+```
+
+I... think I "get" what the idea is... but it doesn't feel happy to me yet. I would still prefer to configure this in my service config... especially if that config is written in PHP :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-14T19:36:38Z
+
+> It looks like Purpose is really just a WireThisServiceId
+
+Except that the corresponding service identifier is *not* necessarily `review.state_machine`. That's because named autowiring aliases are decoupled from service ids. So no, this is not the same. You can also target only named autowiring aliases, not *any* service.
+
+> I would still prefer to configure this in my service config
+
+Right now, this is *not* something that is configured in any of these files: bundles declare named autowiring aliases with `$container->registerAliasForAutowiring()`, and then, you name your arguments accordingly - and bam, the match happens.
+
+:)
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-15T10:40:42Z
+
+I love the idea. TBH, I never use argument name autowiring because I want my constructor argument to be `$logger` and not `$appLogger`: I don't want the code to rely on variable names. Relying on the attribute value seems better. So from the user side, it's a feature I will use.
+
+However, I have a concern about the attribute name too. Purpose seems vague. Could it be something more explicit?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-04-15T11:11:31Z
+
+I like this proposal! Thank you!
+
+The name `Purpose` feels a bit odd, probably because it's so new in Symfony codebase. Here's another name proposal for your consideration:
+
+```php
+function __construct(#[Purpose('review.state_machine')] WorkflowInterface $workflow) {}
+
+function __construct(#[Inject('review.state_machine')] WorkflowInterface $workflow) {}
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-15T12:52:12Z
+
+The `Inject` name would make me think that it is the id of the service to inject (which it is not)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-15T13:39:09Z
+
+Naming things... :)
+I had a look at https://www.thesaurus.com/browse/purpose and here are some alternatives:
+- Purpose
+- Intent
+- Target
+- etc
+
+Purpose is the most accurate to me, but the 2 others found fit also.
+This has to be description IMHO, in a way that decouples the description from *a* use case we have for this in Symfony (matching a named autowiring aliases that uses the same "purpose" name).
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-15T13:43:40Z
+
+> in a way that decouples the description from a use case we do with this in Symfony
+
+Why? We could use the same attribute for another feature?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-15T13:47:46Z
+
+Because that's what "description" means... :)
+What would be your proposal?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-15T13:59:27Z
+
+Could we correlate the attribute name with how we use it, for example `NamedAutowiringAlias`? Or is it too technical? What are the disadvantages of this name? I'm here to learn :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-15T15:20:15Z
+
+I think that's too technical yes (and not accurate enough also: this is not a named autowiring alias).
+
+When you decide to name an argument `$imageStorage` instead of just `$storage`, you improved the way that a class describes itself. This is something that adds value to the class and is completely decoupled from named autowiring aliases. It happens that when both 1. a class is descriptive enough and 2. a corresponding named autowiring alias exists, then something new can happen. But at the origin, and conceptually, these two things are decoupled.
+
+I think that this attribute should keep that conceptual decoupling. Ie we should provide a way for class authors to make their classes more descriptive. Then, later on, if this added description is useful to autowiring, that's a match and a win.
+
+If we don't do this, we miss all the conceptual benefits of descriptive programming IMHO.
+Aka true decoupling.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2021-04-15T15:57:33Z
+
+Thank you for the explanation. I understand it better now but there is still a difference for me. Originally, there is a decoupling because having an argument, whatever its name, is something required. However, using the attribute is optional. As a Symfony user, I'm not going to use the attribute to describe my argument, I have PHP comments for that. If I use the attribute, it's because I know something precise will happen.
+
+I like the idea of the conceptual decoupling though because we could maybe reuse it for another future feature and then describing one time the arg for many benefits would be awesome. But atm, IMHO, it will be easier for a random Symfony user to understand what the attribute is doing if its name is less generic.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-15T16:03:18Z
+
+@fancyweb PHP comments are only about describing it for humans (as they are unstructured). PHP 8 attributes are precisely about describing the code for machines
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-15T18:35:54Z
+
+> But atm, IMHO, it will be easier for a random Symfony user to understand what the attribute is doing if its name is less generic.
+
+a generic concept cannot have a less generic name :) to me being able to use local naming, eg. `class Review { __contruct(private WorkflowInterface $workflow) {}}` in a decoupled manner is a worhty goal on itself.
+
+we can argue the attr should be moved to the service contract layer eventually to convey decoupled concepts, rather than being Symfony/DI specific still.
+
+What i like to propose is to make the list of "purposes" explicit. Eg. `bin/console debug:autowiring --purpose` (reducing the default list as well)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-15T19:39:35Z
+
+im also curious if registerAliasForAutowiring should be called registerPurposeForAutowiring with optin to aliasing (thus have both)
+
+edit: it's called registerAliasForArgument and $name can be the purpose name, never mind -_-
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-15T21:01:08Z
+
+see also https://english.stackexchange.com/questions/323400/intention-vs-purpose
+
+i tend to agree "purpose" sounds more explicit towards _the_ outcome, whereas "intended" would only imply _a_ certain outcome
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2021-04-16T01:02:24Z
+
+> the corresponding service identifier is not necessarily `review.state_machine`.
+
+Where can a user "look up" the possible values (e.g. `review.state_machine`) that could be used? Is this what @ro0NL  `bin/console debug:autowiring --purpose` suggested?
+
+A lot of people seem to dislike `Purpose` (including me)... but none of us have come up with an alternative (including me)... though many people like this idea :). `
+
+Also, what error would I get if I passed an incorrect value? And what error would I get if I used this in a totally inappropriate spot, like for an argument that has no type-hint at all... or an argument that *does* have a type-hint, but where there is only one autowireable "type"?
+
+> I think that this attribute should keep that conceptual decoupling. Ie we should provide a way for class authors to make their classes more descriptive. Then, later on, if this added description is useful to autowiring, that's a match and a win.
+
+For "humans", we can just describe the documentation in phpdoc. I understand that this attribute is specifically so that we can describe the purpose of an argument in a machine-readable language. And so, is there any other concrete usage of `Purpose` (beyond named arguments) that we were imagining?
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-04-16T06:05:59Z
+
+purpose: i shall use this workflow for reviewing only
+intend: i will likely use this workflow for reviewing, but may decide otherwise while at at
+
+personally, as a class author, i'd like to convey the first: "i cannot use this workflow for anything but reviewing" regardless of how i name my arguments ($flow, $workfFlow, $service, $totallyUnrelated).
+
+if the system injects a single autowireble type which should not be used for "some purpose", that's a user's config bug IMHO. At this point it couldnt provide anything else, and the user's config may very well be implying a single worflow fits all purposes :shrug:
+
+i think purpose + arg without typehint can be a compile error yes :thinking:
+
+i've no other use cases in mind yet, but `#[Purpose('debug')] - i shall use this for debugging only` could have potential.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-04-16T06:43:52Z
+
+I would still use `Inject` because of these reasons:
+
+(1) `Purpose` is too generic ... and it'd introduce yet another term/concept to DI (which is already pretty complex).
+
+(2) If you run `debug:container` service, you can see this:
+
+```
+Symfony Container Services
+==========================
+
+--------------------  ---------------------------------------
+Service ID            Class name
+--------------------  ---------------------------------------
+[...]
+review.state_machine  Symfony\Component\Workflow\StateMachine
+--------------------  ---------------------------------------
+```
+
+(3) In the Symfony Docs (https://symfony.com/doc/current/workflow.html#accessing-the-workflow-in-a-class) we say this:
+
+```php
+use App\Entity\BlogPost;
+use Symfony\Component\Workflow\WorkflowInterface;
+
+class MyClass
+{
+    private $blogPublishingWorkflow;
+
+    // this injects the blog_publishing workflow configured before
+    public function __construct(WorkflowInterface $blogPublishingWorkflow)
+    {
+        $this->blogPublishingWorkflow = $blogPublishingWorkflow;
+    }
+
+    // ...
+}
+```
+
+Summary:
+
+* Symfony code says that `review.state_machine` is a service ID
+* Symfony docs say that `WorkflowInterface $blogPublishingWorkflow` is "service injecting"
+* So, the following looks the more precise way of defining that:
+
+```php
+function __construct(#[Inject('review.state_machine')] WorkflowInterface $workflow) {}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-16T11:26:07Z
+
+We should still be true to SOLID, and to "Inversion of Control".
+Naming this `Inject` feels wrong to me, like in "breaking IoC".
+
+> // this injects the blog_publishing workflow configured before
+
+This comment would be wrong. This does not inject anything. Symfony injects (IoC rules), and Symfony might read that attribute, but only if instructed to do so.
+
+I hope the doc will be careful into explaining things in the correct order, which is: classes declare their dependencies, and the outside world is responsible for providing the appropriate dependencies that fit both the need of the class, and the need of that outside world.
+
+A better wording would be "Symfony will inject the blog_publishing workflow configured before".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-16T11:26:40Z
+
+I updated the PR to use `Target`, because I feel like this might be the word that most of you might prefer.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-16T11:36:40Z
+
+Im happy with using `Target`. :+1:
+
+From my (the users) point of view: Im writing a class, I need some dependencies and I do want my arguments to map/target another service I've written. I can define that an argument will "target" a specific service.
+
+I understand that it is wrong, but this is my mindset when I write a service.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-16T11:37:44Z
+
+@javiereguiluz `debug:container` shows you the service ids, but that's not what is used in this attribute (btw, the actual service id for the workflow will be something like `workflow.review.state_machine`)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-16T16:42:37Z
+
+> Where can a user "look up" the possible values (e.g. review.state_machine) that could be used? Is this what @ro0NL bin/console debug:autowiring --purpose suggested?
+
+`debug:autowiring`, this did not change, it's still the command to use for that. There is no need to add `--purpose` or anything as the command already has a "search" attribute that works just fine.
+
+> Also, what error would I get if I passed an incorrect value? [...] or an argument that does have a type-hint, but where there is only one autowireable "type"?
+
+The exact same errors that you get when using named autowiring aliases already. That is: if a default autorwiring alias exists you'll get the corresponding service and no error, otherwise you'll get the suggestions computed by AutowiringPass. @lyrixx mentioned that these suggestions could be improved and he's right, but that's unrelated to this PR.
+
+> And what error would I get if I used this in a totally inappropriate spot, like for an argument that has no type-hint at all...
+
+Nothing, as expected, because declarative programming means that.
+
+> I understand that this attribute is specifically so that we can describe the purpose of an argument in a machine-readable language. And so, is there any other concrete usage of Purpose (beyond named arguments) that we were imagining?
+
+Not yet, future will tell :)
+
+I think `Target` works, both conceptually ("I hereby declare the target use case - eg an image.storage") and practically ("I want an image.storage").

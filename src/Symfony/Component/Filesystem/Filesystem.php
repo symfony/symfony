@@ -416,14 +416,14 @@ class Filesystem
                 return null;
             }
 
-            if ('\\' === \DIRECTORY_SEPARATOR) {
+            if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70410) {
                 $path = readlink($path);
             }
 
             return realpath($path);
         }
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        if ('\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 70400) {
             return realpath($path);
         }
 

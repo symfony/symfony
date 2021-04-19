@@ -12,9 +12,12 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage;
 
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyTraitExternal;
 
 trait DummyTrait
 {
+    use DummyTraitExternal;
+
     /**
      * @var string
      */

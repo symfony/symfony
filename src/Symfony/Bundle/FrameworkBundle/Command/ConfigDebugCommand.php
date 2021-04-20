@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -44,6 +45,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
+                new InputOption('resolve-env', null, InputOption::VALUE_NONE, 'Resolve the value of environment variables'),
             ])
             ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
@@ -105,7 +107,21 @@ EOF
             throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
         }
 
-        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias]);
+        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias], null, $usedEnvs);
+
+        if ($input->getOption('resolve-env')) {
+            $resolvedEnvVars = [];
+            foreach ($usedEnvs as $env) {
+                $resolvedEnvVars[$env] = $this->resolveEnvironmentVariableValue($env, $container);
+            }
+
+            array_walk_recursive($config, function (&$value) use ($resolvedEnvVars) {
+                preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $value, $envVars);
+                $name = current($envVars[1]);
+
+                $value = $name ? $resolvedEnvVars[$name] : $value;
+            });
+        }
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
@@ -165,5 +181,33 @@ EOF
         }
 
         return $config;
+    }
+
+    /**
+     * Returns and resolves the value of a given environment variable.
+     *
+     * @return string|null
+     */
+    private function resolveEnvironmentVariableValue(string $env, ContainerBuilder $container)
+    {
+        $bag = $container->getParameterBag();
+        $getDefaultParameter = function (string $name) {
+            return parent::get($name);
+        };
+        $getDefaultParameter = $getDefaultParameter->bindTo($bag, \get_class($bag));
+
+        $getEnvReflection = new \ReflectionMethod($container, 'getEnv');
+        $getEnvReflection->setAccessible(true);
+
+        if (false !== $i = strrpos($name = $env, ':')) {
+            $name = substr($env, $i + 1);
+        }
+        $defaultValue = ($hasDefault = $container->hasParameter("env($name)")) ? $getDefaultParameter("env($name)") : null;
+        if (false === ($runtimeValue = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name))) {
+            $runtimeValue = null;
+        }
+        $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+
+        return $processedValue ?? $runtimeValue ?? $defaultValue;
     }
 }

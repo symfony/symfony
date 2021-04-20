@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -21,6 +22,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class CountValidator extends ConstraintValidator
 {
+    private $expressionLanguage;
+
+    public function __construct(ExpressionLanguage $expressionLanguage = null)
+    {
+        $this->expressionLanguage = $expressionLanguage;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -34,11 +42,25 @@ class CountValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_array($value) && !$value instanceof \Countable) {
-            throw new UnexpectedValueException($value, 'array|\Countable');
-        }
+        if (null !== $constraint->conditionExpression) {
+            if (!\is_iterable($value)) {
+                throw new UnexpectedValueException($value, 'array|iterable');
+            }
 
-        $count = \count($value);
+            $count = 0;
+            $expressionLanguage = $this->expressionLanguage ?? new ExpressionLanguage();
+            foreach ($value as $item) {
+                if (true === (bool)$expressionLanguage->evaluate($constraint->conditionExpression, ['item' => $item])) {
+                    ++$count;
+                }
+            }
+        } else {
+            if (!\is_array($value) && !$value instanceof \Countable) {
+                throw new UnexpectedValueException($value, 'array|\Countable');
+            }
+
+            $count = \count($value);
+        }
 
         if (null !== $constraint->max && $count > $constraint->max) {
             $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)

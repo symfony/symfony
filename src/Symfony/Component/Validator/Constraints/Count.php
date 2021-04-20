@@ -40,6 +40,7 @@ class Count extends Constraint
     public $min;
     public $max;
     public $divisibleBy;
+    public $conditionExpression;
 
     /**
      * {@inheritdoc}
@@ -55,6 +56,7 @@ class Count extends Constraint
         string $minMessage = null,
         string $maxMessage = null,
         string $divisibleByMessage = null,
+        string $conditionExpression = null,
         array $groups = null,
         $payload = null,
         array $options = []
@@ -82,6 +84,7 @@ class Count extends Constraint
         $this->minMessage = $minMessage ?? $this->minMessage;
         $this->maxMessage = $maxMessage ?? $this->maxMessage;
         $this->divisibleByMessage = $divisibleByMessage ?? $this->divisibleByMessage;
+        $this->conditionExpression = $conditionExpression ?? $this->conditionExpression;
 
         if (null === $this->min && null === $this->max && null === $this->divisibleBy) {
             throw new MissingOptionsException(sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);

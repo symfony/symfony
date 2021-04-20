@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Andreas Linden <linden.andreas@gmx.de>
  */
-class CountValidatorArrayTest extends CountValidatorIterableTest
+class CountValidatorCollectionTest extends CountValidatorIterableTest
 {
     protected function createCollection(array $content)
     {
-        return $content;
+        return new ArrayCollection($content);
     }
 }

@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\CountValidator;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Fixtures\Countable;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -42,6 +43,17 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(new \stdClass(), new Count(5));
     }
 
+    public function testConditionExpressionExpectsIterableType()
+    {
+        $constraint = new Count([
+            'min' => 1,
+            'conditionExpression' => 'true',
+        ]);
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->validator->validate(new Countable([]), $constraint);
+    }
+
     public function getThreeOrLessElements()
     {
         return [
@@ -57,6 +69,38 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         return [
             [$this->createCollection([1, 2, 3, 4])],
             [$this->createCollection(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4])],
+        ];
+    }
+
+    public function getFourObjectElements()
+    {
+        return [
+            [$this->createCollection([
+                new class {
+                    function getValue()
+                    {
+                        return 'value_1';
+                    }
+                },
+                new class {
+                    function getValue()
+                    {
+                        return 'value_2';
+                    }
+                },
+                new class {
+                    function getValue()
+                    {
+                        return 'value_1';
+                    }
+                },
+                new class {
+                    function getValue()
+                    {
+                        return 'value_3';
+                    }
+                },
+            ])],
         ];
     }
 

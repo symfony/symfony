@@ -85,6 +85,39 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
     return $default;
 };
 
+$getRelativePath = function ($from, $to) {
+    // some compatibility fixes for Windows paths
+    $from = is_dir($from) ? rtrim($from, '\/').'/' : $from;
+    $to = is_dir($to) ? rtrim($to, '\/').'/' : $to;
+    $from = str_replace('\\', '/', $from);
+    $to = str_replace('\\', '/', $to);
+
+    $from = explode('/', $from);
+    $to = explode('/', $to);
+    $relPath = $to;
+
+    foreach ($from as $depth => $dir) {
+        // find first non-matching dir
+        if ($dir === $to[$depth]) {
+            // ignore this directory
+            array_shift($relPath);
+        } else {
+            // get number of remaining dirs to $from
+            $remaining = count($from) - $depth;
+            if ($remaining > 1) {
+                // add traversals up to first matching dir
+                $padLength = (count($relPath) + $remaining - 1) * -1;
+                $relPath = array_pad($relPath, $padLength, '..');
+                break;
+            } else {
+                $relPath[0] = './'.$relPath[0];
+            }
+        }
+    }
+
+    return implode('/', $relPath);
+};
+
 $passthruOrFail = function ($command) {
     passthru($command, $status);
 
@@ -238,8 +271,10 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         $passthruOrFail("$COMPOSER config --unset platform.php");
     }
     if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
+        $relativePath = rtrim($getRelativePath("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR", $path), '/');
+
         $passthruOrFail("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
-        $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', \DIRECTORY_SEPARATOR, $path)));
+        $passthruOrFail("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', \DIRECTORY_SEPARATOR, $relativePath)));
         if ('\\' === \DIRECTORY_SEPARATOR) {
             file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge": \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
         }

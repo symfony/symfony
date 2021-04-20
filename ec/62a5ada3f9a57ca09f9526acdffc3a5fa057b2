@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-19T17:22:56Z
+
+> What's about `psr/cache`
+
+Nothing to do here. We haven't implemented the property type declarations of `psr/cache` 2 because that would have forced all users of `symfony/cache` to bump to `psr/cache` 2 which requires PHP 8.
+
+In other words: `ext-psr` does not break our cache implementation (yet).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-19T17:27:02Z
+
+Shouldn't this target 5.2 (or 4.4), as it's a bugfix? (the previous bug reports fixed by this change were also about 5.2)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-19T17:29:53Z
+
+@wouterj No, because the change on our side that causes the compatibility problems with `ext-psr` was introduced with #40384. DependencyInjection < 5.3 and ServiceContracts < 2.4 are unaffected.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-19T20:22:43Z
+
+I have implemented @stof's suggestion. This means we're basically only allowing `^1.1` of the extension.

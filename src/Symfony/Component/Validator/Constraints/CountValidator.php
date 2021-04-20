@@ -43,14 +43,14 @@ class CountValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->conditionExpression) {
-            if (!\is_iterable($value)) {
+            if (!is_iterable($value)) {
                 throw new UnexpectedValueException($value, 'array|iterable');
             }
 
             $count = 0;
             $expressionLanguage = $this->expressionLanguage ?? new ExpressionLanguage();
             foreach ($value as $item) {
-                if (true === (bool)$expressionLanguage->evaluate($constraint->conditionExpression, ['item' => $item])) {
+                if (true === (bool) $expressionLanguage->evaluate($constraint->conditionExpression, ['item' => $item])) {
                     ++$count;
                 }
             }

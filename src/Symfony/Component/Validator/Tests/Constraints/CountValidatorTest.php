@@ -76,26 +76,26 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             [$this->createCollection([
-                new class {
-                    function getValue()
+                new class() {
+                    public function getValue()
                     {
                         return 'value_1';
                     }
                 },
-                new class {
-                    function getValue()
+                new class() {
+                    public function getValue()
                     {
                         return 'value_2';
                     }
                 },
-                new class {
-                    function getValue()
+                new class() {
+                    public function getValue()
                     {
                         return 'value_1';
                     }
                 },
-                new class {
-                    function getValue()
+                new class() {
+                    public function getValue()
                     {
                         return 'value_3';
                     }

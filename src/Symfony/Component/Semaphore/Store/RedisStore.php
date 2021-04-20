@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Predis\Response\ServerException;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
+use Symfony\Component\Semaphore\Exception\RuntimeException;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Key;
@@ -60,8 +62,12 @@ class RedisStore implements PersistingStoreInterface
             $key->getWeight(),
         ];
 
-        if (!$this->evaluate($script, sprintf('{%s}', $key), $args)) {
-            throw new SemaphoreAcquiringException($key, 'the script return false');
+        try {
+            if (!$this->evaluate($script, sprintf('{%s}', $key), $args)) {
+                throw new SemaphoreAcquiringException($key, 'the script return false');
+            }
+        } catch (\Exception $e) {
+            throw new SemaphoreAcquiringException($key, 'the script failed', $e);
         }
     }
 
@@ -76,7 +82,11 @@ class RedisStore implements PersistingStoreInterface
 
         $script = file_get_contents(__DIR__.'/Resources/redis_put_off_expiration.lua');
 
-        $ret = $this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
+        try {
+            $ret = $this->evaluate($script, sprintf('{%s}', $key), [time() + $ttlInSecond, $this->getUniqueToken($key)]);
+        } catch (\Exception $e) {
+            throw new SemaphoreAcquiringException($key, 'the script failed', $e);
+        }
 
         // Occurs when redis has been reset
         if (false === $ret) {
@@ -96,7 +106,11 @@ class RedisStore implements PersistingStoreInterface
     {
         $script = file_get_contents(__DIR__.'/Resources/redis_delete.lua');
 
-        $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
+        try {
+            $this->evaluate($script, sprintf('{%s}', $key), [$this->getUniqueToken($key)]);
+        } catch (\Exception $e) {
+            throw new SemaphoreAcquiringException($key, 'the script failed', $e);
+        }
     }
 
     /**
@@ -114,21 +128,49 @@ class RedisStore implements PersistingStoreInterface
      */
     private function evaluate(string $script, string $resource, array $args)
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
-            return $this->redis->eval($script, array_merge([$resource], $args), 1);
-        }
+        $sha = sha1($script);
 
         if ($this->redis instanceof \RedisArray) {
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
+            $client = $this->redis->_instance($this->redis->_target($resource));
+        } else {
+            $client = $this->redis;
         }
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
-            return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+        if (
+            $client instanceof \Redis ||
+            $client instanceof \RedisCluster ||
+            $client instanceof RedisProxy ||
+            $client instanceof RedisClusterProxy
+        ) {
+            $client->clearLastError();
+            $result = $client->evalSha($sha, array_merge([$resource], $args), 1);
+            $err = $client->getLastError();
+            if (false === $result && 0 === strpos($err, 'NOSCRIPT')) {
+                $client->clearLastError();
+                $result = $client->eval($script, array_merge([$resource], $args), 1);
+                $err = $client->getLastError();
+            }
+
+            if (null !== $err) {
+                throw new RuntimeException($err);
+            }
+
+            return $result;
+        }
+
+        if ($client instanceof \Predis\ClientInterface) {
+            try {
+                return $client->evalSha($sha, 1, $resource, ...$args);
+            } catch (ServerException $e) {
+                if (0 !== strpos($e->getMessage(), 'NOSCRIPT')) {
+                    throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+                }
+            }
+            try {
+                return $client->eval($script, 1, $resource, ...$args);
+            } catch (ServerException $e) {
+                throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));

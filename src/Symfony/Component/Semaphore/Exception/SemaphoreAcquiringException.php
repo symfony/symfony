@@ -21,8 +21,8 @@ use Symfony\Component\Semaphore\Key;
  */
 class SemaphoreAcquiringException extends \RuntimeException implements ExceptionInterface
 {
-    public function __construct(Key $key, string $message)
+    public function __construct(Key $key, string $message, \Throwable $e = null)
     {
-        parent::__construct(sprintf('The semaphore "%s" could not be acquired: %s.', $key, $message));
+        parent::__construct(sprintf('The semaphore "%s" could not be acquired: %s.', $key, $message), 0, $e);
     }
 }

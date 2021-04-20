@@ -19,7 +19,6 @@ use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
@@ -257,37 +256,46 @@ class RedisStore implements SharedLockStoreInterface
      */
     private function evaluate(string $script, string $resource, array $args)
     {
-        if (
-            $this->redis instanceof \Redis ||
-            $this->redis instanceof \RedisCluster ||
-            $this->redis instanceof RedisProxy ||
-            $this->redis instanceof RedisClusterProxy
-        ) {
-            $this->redis->clearLastError();
-            $result = $this->redis->eval($script, array_merge([$resource], $args), 1);
-            if (null !== $err = $this->redis->getLastError()) {
-                throw new LockStorageException($err);
-            }
-
-            return $result;
-        }
+        $sha = sha1($script);
 
         if ($this->redis instanceof \RedisArray) {
             $client = $this->redis->_instance($this->redis->_target($resource));
+        } else {
+            $client = $this->redis;
+        }
+
+        if (
+            $client instanceof \Redis ||
+            $client instanceof \RedisCluster ||
+            $client instanceof RedisProxy ||
+            $client instanceof RedisClusterProxy
+        ) {
             $client->clearLastError();
-            $result = $client->eval($script, array_merge([$resource], $args), 1);
-            if (null !== $err = $client->getLastError()) {
+            $result = $client->evalSha($sha, array_merge([$resource], $args), 1);
+            $err = $client->getLastError();
+            if (false === $result && 0 === strpos($err, 'NOSCRIPT')) {
+                $client->clearLastError();
+                $result = $client->eval($script, array_merge([$resource], $args), 1);
+                $err = $client->getLastError();
+            }
+
+            if (null !== $err) {
                 throw new LockStorageException($err);
             }
 
             return $result;
-
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
         }
 
-        if ($this->redis instanceof \Predis\ClientInterface) {
+        if ($client instanceof \Predis\ClientInterface) {
             try {
-                return $this->redis->eval(...array_merge([$script, 1, $resource], $args));
+                return $client->evalSha($sha, 1, $resource, ...$args);
+            } catch (ServerException $e) {
+                if (0 !== strpos($e->getMessage(), 'NOSCRIPT')) {
+                    throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
+                }
+            }
+            try {
+                return $client->eval($script, 1, $resource, ...$args);
             } catch (ServerException $e) {
                 throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
             }

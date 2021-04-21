@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-04-19T19:56:53Z
+
+or just use `/` all the time ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-20T08:09:19Z
+
+> or just use / all the time ?
+
+We use DIRECTORY_SEPARATOR also in the dumped container. I think this saves a lookup in the realpath_cache.
+
+See eg https://github.com/symfony/symfony/pull/38139

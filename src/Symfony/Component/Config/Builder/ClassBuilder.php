@@ -64,7 +64,7 @@ class ClassBuilder
                 }
                 unset($path[$key]);
             }
-            $require .= sprintf('require_once __DIR__.\'%s\';', \DIRECTORY_SEPARATOR.implode(\DIRECTORY_SEPARATOR, $path))."\n";
+            $require .= sprintf('require_once __DIR__.\DIRECTORY_SEPARATOR.\'%s\';', implode('\'.\DIRECTORY_SEPARATOR.\'', $path))."\n";
         }
 
         $implements = [] === $this->implements ? '' : 'implements '.implode(', ', $this->implements);

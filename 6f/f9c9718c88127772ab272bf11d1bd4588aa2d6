@@ -1,0 +1,154 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2020-12-17T14:10:43Z
+
+@fabpot @nicolas-grekas @Nyholm
+
+I've continued this PR this week and I've reached a level where I think a first code review seems necessary.
+
+What has been done:
+- Added 2 new commands `translation:push` and `translation:pull` with the options to choose the locales and domains to be processed, and 2 flags `--force` and `--delete-obsolete`.
+- 3 Providers: [Loco](https://localise.biz/), [PoEditor](https://poeditor.com) and [Lokalise](https://lokalise.com/).
+- The internal mechanics for Providers creation via a Factory. (thank you @odolbeau)
+
+What I have a doubt about:
+- The relevance of the `--force` flag for the push command. It forces the update of remote translations from the local translations. However, in my last conference at SymfonyWorld, I recommended never to update local translations, directly in the XLIFF files, but to always use the SaaS UI and pull to update local files. What do you think about removing the flag and therefore not allowing remote translations to be updated from local files?
+
+- The number of API calls for Loco: the initial creation of all translation keys will make one API call per key. This can quickly lead to a scaling problem.
+
+- The division of Providers into Bridges, as it is done for Notifier and Mailer. I simply reproduced what was done, but I'm not sure I did everything correctly.
+
+I'm listening to comments and feedback to move this feature forward, in order to make it available for 5.3.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-03-23T14:58:44Z
+
+I'm still working on tests suites, almost every end of day. Be sure that the motivation to finish this PR is still here, and I will do my best to make it merged for 5.3 :+1:
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-03-26T13:00:06Z
+
+After discussing it with @nicolas-grekas, I removed from this PR the 3 providers for Lokalise, PoEditor, and Crowdin. Temporarily, because the goal is to merge this feature for which only Loco Provider is fully completed and tested. Then, quickly in April, I will re add the 3 other providers for which the test suites are currently missing.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-03-29T13:46:16Z
+
+So what is the current state of this PR?
+Is it ready for a final round of reviews and testing?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-29T14:21:30Z
+
+yes, it is ready for final review.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-02T12:55:08Z
+
+When I install the loco bridge and using it, I get this error message:
+
+```
+❯ sf translation:push
+#!/usr/bin/env php
+
+In TranslationProviderCollectionFactory.php line 62:
+
+  The "loco" scheme is not supported.
+
+```
+
+That is because the `translation.provider_factory.loco` service is removed in the FrameworkExtension because I don't have a service named `http_client`. Could we improve the user experience?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-02T13:21:43Z
+
+Im generally very happy. Just a few things I discovered when testing.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-08T11:27:00Z
+
+Thank you @Nyholm, I will fix your comments tomorrow morning
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-09T14:06:16Z
+
+> When I install the loco bridge and using it, I get this error message:
+>
+> ```
+> ❯ sf translation:push
+> #!/usr/bin/env php
+>
+> In TranslationProviderCollectionFactory.php line 62:
+>
+>   The "loco" scheme is not supported.
+>
+> ```
+>
+> That is because the `translation.provider_factory.loco` service is removed in the FrameworkExtension because I don't have a service named `http_client`. Could we improve the user experience?
+
+To fix this, I guess that we need to add symfony/http-client as hard dependency of symfony/translation right @nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-14T11:59:32Z
+
+To clarify the status of this PR :
+
+- The only fully implemented Provider is Loco ;
+- 3 others are almost ready (they miss complete tests suite) ;
+- The internal API and the ProviderInterface are ok ;
+
+For me, this PR is complete and one it will be merged, I will open 3 new PRs, one for each Provider (Lokalise, PoEditor, and Crowdin)
+
+Is it ok for you @nicolas-grekas @fabpot @Nyholm?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-19T13:48:27Z
+
+Is this ready for another review?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-19T14:00:14Z
+
+@Nyholm Not yet, I'm finishing integration tests for pull and push commands. I went in the wrong direction yesterday (I was mocking HTTP responses instead of the Provider itself). I'll push a review ready commit this evening, at least for the push command. For the pull command, I have to rewrite the tests suite.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-19T17:29:55Z
+
+@Nyholm @nicolas-grekas @fabpot It is ready for a final review. Since the last one I had:
+
+- Addressed all comments ;
+- Added integration tests for `TranslationPullCommand` and `TranslationPushCommand` ;
+- Added unit tests for `TranslatorBag` class (not all methods, as they are already tested elsewhere, or they are really obvious)
+
+Let me know if there is something I have to do before the merge. Then, I will open next PRs for the 3 others Providers this week.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-20T09:21:23Z
+
+@fabpot @Nyholm @nicolas-grekas All comments have been addressed, the CI failures on AppVeyor are unrelated to this PR. Thank you all for your reviews and your help to fix it.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-20T10:11:20Z
+
+Thank you @fabpot, I've addressed your last comments
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-21T09:12:57Z
+
+I've just rebased the branch on 5.x

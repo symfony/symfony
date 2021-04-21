@@ -46,7 +46,7 @@ final class LegacyEventProxy extends Event
         return $this->event->isPropagationStopped();
     }
 
-    public function stopPropagation()
+    public function stopPropagation(): void
     {
         if (!$this->event instanceof ContractsEvent) {
             return;

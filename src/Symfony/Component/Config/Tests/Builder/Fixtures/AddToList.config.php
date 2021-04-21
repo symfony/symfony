@@ -3,7 +3,7 @@
 use Symfony\Config\AddToListConfig;
 
 return static function (AddToListConfig $config) {
-    $config->translator()->fallback(['sv', 'fr', 'es']);
+    $config->translator()->fallbacks(['sv', 'fr', 'es']);
     $config->translator()->source('\\Acme\\Foo', 'yellow');
     $config->translator()->source('\\Acme\\Bar', 'green');
 

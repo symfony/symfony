@@ -46,6 +46,8 @@ use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
+use Symfony\Component\Translation\Command\TranslationPullCommand;
+use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
 
@@ -231,6 +233,26 @@ return static function (ContainerConfigurator $container) {
                 service('validator'),
             ])
             ->tag('console.command')
+
+        ->set('console.command.translation_pull', TranslationPullCommand::class)
+            ->args([
+                service('translation.provider_collection'),
+                service('translation.writer'),
+                service('translation.reader'),
+                param('kernel.default_locale'),
+                [], // Translator paths
+                [], // Enabled locales
+            ])
+            ->tag('console.command', ['command' => 'translation:pull'])
+
+        ->set('console.command.translation_push', TranslationPushCommand::class)
+            ->args([
+                service('translation.provider_collection'),
+                service('translation.reader'),
+                [], // Translator paths
+                [], // Enabled locales
+            ])
+            ->tag('console.command', ['command' => 'translation:push'])
 
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->tag('console.command')

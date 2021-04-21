@@ -86,6 +86,8 @@ FrameworkBundle
  * Removed the `lock.RESOURCE_NAME` and `lock.RESOURCE_NAME.store` services and the `lock`, `LockInterface`, `lock.store` and `PersistingStoreInterface` aliases, use `lock.RESOURCE_NAME.factory`, `lock.factory` or `LockFactory` instead.
  * Remove the `KernelTestCase::$container` property, use `KernelTestCase::getContainer()` instead
  * Registered workflow services are now private
+ * Remove option `--xliff-version` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
+ * Remove option `--output-format` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
 
 HttpFoundation
 --------------

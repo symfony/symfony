@@ -169,6 +169,7 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Translation\Bridge\Loco\Provider\LocoProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1222,11 +1223,14 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
             $container->removeDefinition('console.command.translation_update');
+            $container->removeDefinition('console.command.translation_pull');
+            $container->removeDefinition('console.command.translation_push');
 
             return;
         }
 
         $loader->load('translation.php');
+        $loader->load('translation_providers.php');
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);
@@ -1348,6 +1352,46 @@ class FrameworkExtension extends Extension
                     $options,
                 ]);
         }
+
+        $classToServices = [
+            LocoProviderFactory::class => 'translation.provider_factory.loco',
+        ];
+
+        $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
+
+        foreach ($classToServices as $class => $service) {
+            $package = sprintf('symfony/%s-translation', substr($service, \strlen('translation.provider_factory.')));
+
+            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
+                $container->removeDefinition($service);
+            }
+        }
+
+        if (!$config['providers']) {
+            return;
+        }
+
+        foreach ($config['providers'] as $name => $provider) {
+            if (!$config['enabled_locales'] && !$provider['locales']) {
+                throw new LogicException(sprintf('You must specify one of "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" in order to use translation providers.', $name));
+            }
+        }
+
+        $container->getDefinition('console.command.translation_pull')
+            ->replaceArgument(4, array_merge($transPaths, [$config['default_path']]))
+            ->replaceArgument(5, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('console.command.translation_push')
+            ->replaceArgument(2, array_merge($transPaths, [$config['default_path']]))
+            ->replaceArgument(3, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('translation.provider_collection_factory')
+            ->replaceArgument(1, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
     }
 
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)

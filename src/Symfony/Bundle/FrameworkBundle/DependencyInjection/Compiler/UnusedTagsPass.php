@@ -85,6 +85,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'translation.dumper',
         'translation.extractor',
         'translation.loader',
+        'translation.provider_factory',
         'twig.extension',
         'twig.loader',
         'twig.runtime',

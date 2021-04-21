@@ -71,7 +71,7 @@ class TargetOperationTest extends AbstractOperationTest
     {
         $this->assertEquals(
             new MessageCatalogue('en', [
-                'messages+intl-icu' => ['a' => 'old_a'],
+                'messages' => ['a' => 'old_a'],
             ]),
             $this->createOperation(
                 new MessageCatalogue('en', ['messages' => ['a' => 'old_a']]),

@@ -77,8 +77,38 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 
         $this->twig->parse($this->twig->tokenize(new Source($template, '')));
 
-        foreach ($visitor->getMessages() as $message) {
-            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
+        foreach ($visitor->getMessages() as $extractedMessage) {
+            $message = trim($extractedMessage[0]);
+            $domain = $extractedMessage[1] ?: $this->defaultDomain;
+
+            $catalogue->set($message, $this->prefix.$message, $domain);
+
+            // Are there any variables available for the current message?
+            if (\count($extractedMessage[2]) > 0) {
+                $metadata = $catalogue->getMetadata($message, $domain);
+                $variablesNote = [
+                    'category' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY,
+                    'content' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_PREFIX.implode(', ', $extractedMessage[2]),
+                ];
+
+                // Update old variables note (if any)
+                if (isset($metadata['notes'])) {
+                    foreach ($metadata['notes'] as $index => $note) {
+                        if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
+                            // Keep the highest variables count
+                            if (\count($extractedMessage[2]) > substr_count($note['content'], ',')) {
+                                $metadata['notes'][$index] = $variablesNote;
+                            }
+
+                            break;
+                        }
+                    }
+                } else {
+                    $metadata['notes'][] = $variablesNote;
+                }
+
+                $catalogue->setMetadata($message, $metadata, $domain);
+            }
         }
 
         $visitor->disable();

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
+use ArrayIterator;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Environment;
 use Twig\Node\Expression\Binary\ConcatBinary;
@@ -30,6 +31,33 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
     public const UNDEFINED_DOMAIN = '_undefined';
 
     private $enabled = false;
+
+    /**
+     * This class cannot read nodes backwards.
+     * We need a way to track when we encounter a "|trans()" filter containing
+     * a "t()" function in order to avoid processing that same function again
+     * as if it was used alone.
+     */
+    private $skipTFunctionAfterFilter = false;
+
+    /**
+     * This array stores found messages.
+     *
+     * The data structure of this array is as follows:
+     *
+     *     [
+     *         0 => [
+     *             0 => 'message',
+     *             1 => 'domain',
+     *             2 => [
+     *                 0 => 'variable1',
+     *                 1 => 'variable2',
+     *                 ...
+     *             ]
+     *         ],
+     *         ...
+     *     ]
+     */
     private $messages = [];
 
     public function enable(): void
@@ -67,6 +95,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $this->messages[] = [
                 $node->getNode('node')->getAttribute('value'),
                 $this->getReadDomainFromArguments($node->getNode('arguments'), 1),
+                $this->getReadVariablesFromArguments($node->getNode('arguments'), 0),
             ];
         } elseif (
             $node instanceof FilterExpression &&
@@ -74,12 +103,41 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $node->getNode('node') instanceof FunctionExpression &&
             't' === $node->getNode('node')->getAttribute('name')
         ) {
-            $nodeArguments = $node->getNode('node')->getNode('arguments');
+            // extract t() nodes with a trans filter applied
+            $functionNodeArguments = $node->getNode('node')->getNode('arguments');
+            /** @var ArrayIterator $iterator */
+            $iterator = $functionNodeArguments->getIterator();
 
-            if ($nodeArguments->getIterator()->current() instanceof ConstantExpression) {
+            if ($iterator->current() instanceof ConstantExpression) {
                 $this->messages[] = [
-                    $this->getReadMessageFromArguments($nodeArguments, 0),
-                    $this->getReadDomainFromArguments($nodeArguments, 2),
+                    $this->getReadMessageFromArguments($functionNodeArguments, 0),
+                    $this->getReadDomainFromArguments($functionNodeArguments, 2),
+                    $this->getReadVariablesFromArguments($functionNodeArguments, 1),
+                ];
+
+                // Avoid processing this "t()" function twice
+                $this->skipTFunctionAfterFilter = true;
+            }
+        } elseif (
+            $node instanceof FunctionExpression &&
+            't' === $node->getAttribute('name')
+        ) {
+            // extract t() nodes without a trans filter applied
+            if ($this->skipTFunctionAfterFilter) {
+                $this->skipTFunctionAfterFilter = false;
+
+                return $node;
+            }
+
+            $functionNodeArguments = $node->getNode('arguments');
+            /** @var ArrayIterator $iterator */
+            $iterator = $functionNodeArguments->getIterator();
+
+            if ($iterator->current() instanceof ConstantExpression) {
+                $this->messages[] = [
+                    $this->getReadMessageFromArguments($functionNodeArguments, 0),
+                    $this->getReadDomainFromArguments($functionNodeArguments, 2),
+                    $this->getReadVariablesFromArguments($functionNodeArguments, 1),
                 ];
             }
         } elseif ($node instanceof TransNode) {
@@ -87,6 +145,7 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
             $this->messages[] = [
                 $node->getNode('body')->getAttribute('data'),
                 $node->hasNode('domain') ? $this->getReadDomainFromNode($node->getNode('domain')) : null,
+                $this->getReadVariablesFromArguments($node, 0),
             ];
         } elseif (
             $node instanceof FilterExpression &&
@@ -139,6 +198,51 @@ final class TranslationNodeVisitor extends AbstractNodeVisitor
         }
 
         return null;
+    }
+
+    /**
+     * Extracts variable names from a @Node containing all arguments passed to
+     * a Twig function/filter.
+     */
+    private function getReadVariablesFromArguments(Node $arguments, int $index): array
+    {
+        if ($arguments->hasNode('vars')) {
+            $argument = $arguments->getNode('vars');
+        } elseif ($arguments->hasNode($index)) {
+            $argument = $arguments->getNode($index);
+        } else {
+            return [];
+        }
+
+        return $this->getReadVariablesFromNode($argument);
+    }
+
+    /**
+     * Extracts variable names from a @Node representing the array of
+     * parameters passed to the translation function/filter.
+     */
+    private function getReadVariablesFromNode(Node $node): array
+    {
+        if (\count($node) <= 0) {
+            return [];
+        }
+
+        $variables = [];
+        $isVariableName = true;
+
+        foreach ($node as $parameterToken) {
+            /*
+             * Variable names and values are direct children of the parent node (e.g. ['var1', 'value1', 'var2',
+             * 'value2', 'var3', 'value3']), so we can get all names by skipping the values every two cycles.
+             */
+            if ($isVariableName ^= 1) {
+                continue;
+            }
+
+            $variables[] = $parameterToken->getAttribute('value');
+        }
+
+        return $variables;
     }
 
     private function getReadDomainFromArguments(Node $arguments, int $index): ?string

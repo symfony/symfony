@@ -182,25 +182,66 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    private function skipMethodArgument(\Iterator $tokenIterator)
+    /**
+     * @return string[]
+     */
+    private function getArrayKeys(\Iterator $tokenIterator)
     {
-        $openBraces = 0;
+        $keys = [];
+        $isShortArray = '[' === $this->normalizeToken($tokenIterator->current());
+        $mainClosingSymbol = $isShortArray ? ']' : ')';
 
-        for (; $tokenIterator->valid(); $tokenIterator->next()) {
+        if ($isShortArray) {
+            // Skip opening "["
+            $tokenIterator->next();
+        } else {
+            // Skip opening "array("
+            $tokenIterator->next();
+            $tokenIterator->next();
+        }
+
+        while ($tokenIterator->valid()) {
+            $this->seekToNextRelevantToken($tokenIterator);
             $t = $tokenIterator->current();
 
-            if ('[' === $t[0] || '(' === $t[0]) {
-                ++$openBraces;
+            // End of main array
+            if ($mainClosingSymbol === $t[0]) {
+                // Skip following ","
+                $tokenIterator->next();
+
+                return $keys;
             }
 
-            if (']' === $t[0] || ')' === $t[0]) {
-                --$openBraces;
-            }
+            // Get array key
+            $keys[] = $this->getValue($tokenIterator);
 
-            if ((0 === $openBraces && ',' === $t[0]) || (-1 === $openBraces && ')' === $t[0])) {
-                break;
+            // Skip value
+            $openBraces = 0;
+            for (; $tokenIterator->valid(); $tokenIterator->next()) {
+                $t = $tokenIterator->current();
+
+                if ('[' === $t[0] || '(' === $t[0]) {
+                    ++$openBraces;
+                }
+
+                if (']' === $t[0] || ')' === $t[0]) {
+                    --$openBraces;
+                }
+
+                if (0 === $openBraces && ',' === $t[0]) {
+                    // Skip following ","
+                    $tokenIterator->next();
+
+                    break;
+                }
+
+                if (-1 === $openBraces && $mainClosingSymbol === $t[0]) {
+                    break;
+                }
             }
         }
+
+        return $keys;
     }
 
     /**
@@ -274,6 +315,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             foreach ($this->sequences as $sequence) {
                 $message = '';
                 $domain = 'messages';
+                $variables = [];
                 $tokenIterator->seek($key);
 
                 foreach ($sequence as $sequenceKey => $item) {
@@ -289,7 +331,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                             break;
                         }
                     } elseif (self::METHOD_ARGUMENTS_TOKEN === $item) {
-                        $this->skipMethodArgument($tokenIterator);
+                        $variables = $this->getArrayKeys($tokenIterator);
                     } elseif (self::DOMAIN_TOKEN === $item) {
                         $domainToken = $this->getValue($tokenIterator);
                         if ('' !== $domainToken) {
@@ -307,7 +349,32 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     $metadata = $catalog->getMetadata($message, $domain) ?? [];
                     $normalizedFilename = preg_replace('{[\\\\/]+}', '/', $filename);
                     $metadata['sources'][] = $normalizedFilename.':'.$tokens[$key][2];
+
+                    if (\count($variables) > 0) {
+                        $variablesNote = [
+                                'category' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY,
+                                'content' => MessageCatalogue::METADATA_AVAILABLE_VARIABLES_PREFIX.implode(', ', $variables),
+                        ];
+
+                        // Update old variables note (if any)
+                        if (isset($metadata['notes'])) {
+                            foreach ($metadata['notes'] as $index => $note) {
+                                if (isset($note['category']) && MessageCatalogue::METADATA_AVAILABLE_VARIABLES_KEY === $note['category']) {
+                                    // Keep the highest variables count
+                                    if (\count($variables) > substr_count($note['content'], ',')) {
+                                        $metadata['notes'][$index] = $variablesNote;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        } else {
+                            $metadata['notes'][] = $variablesNote;
+                        }
+                    }
+
                     $catalog->setMetadata($message, $metadata, $domain);
+
                     break;
                 }
             }

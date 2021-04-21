@@ -863,6 +863,10 @@ class FrameworkExtension extends Extension
             $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
+            $workflowDefinition->addTag('container.private', [
+                'package' => 'symfony/framework-bundle',
+                'version' => '5.3',
+            ]);
 
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);

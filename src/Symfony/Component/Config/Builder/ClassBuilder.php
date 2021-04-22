@@ -32,6 +32,7 @@ class ClassBuilder
     /** @var Method[] */
     private $methods = [];
     private $require = [];
+    private $use = [];
     private $implements = [];
 
     public function __construct(string $namespace, string $name)
@@ -66,6 +67,10 @@ class ClassBuilder
             }
             $require .= sprintf('require_once __DIR__.\DIRECTORY_SEPARATOR.\'%s\';', implode('\'.\DIRECTORY_SEPARATOR.\'', $path))."\n";
         }
+        $use = '';
+        foreach (array_keys($this->use) as $statement) {
+            $use .= sprintf('use %s;', $statement)."\n";
+        }
 
         $implements = [] === $this->implements ? '' : 'implements '.implode(', ', $this->implements);
         $body = '';
@@ -84,6 +89,7 @@ class ClassBuilder
 namespace NAMESPACE;
 
 REQUIRE
+USE
 
 /**
  * This class is automatically generated to help creating config.
@@ -94,17 +100,22 @@ class CLASS IMPLEMENTS
 {
 BODY
 }
-', ['NAMESPACE' => $this->namespace, 'REQUIRE' => $require, 'CLASS' => $this->getName(), 'IMPLEMENTS' => $implements, 'BODY' => $body]);
+', ['NAMESPACE' => $this->namespace, 'REQUIRE' => $require, 'USE' => $use, 'CLASS' => $this->getName(), 'IMPLEMENTS' => $implements, 'BODY' => $body]);
 
         return $content;
     }
 
-    public function addRequire(self $class)
+    public function addRequire(self $class): void
     {
         $this->require[] = $class;
     }
 
-    public function addImplements(string $interface)
+    public function addUse(string $class): void
+    {
+        $this->use[$class] = true;
+    }
+
+    public function addImplements(string $interface): void
     {
         $this->implements[] = '\\'.ltrim($interface, '\\');
     }
@@ -148,7 +159,7 @@ BODY
         return $this->namespace;
     }
 
-    public function getFqcn()
+    public function getFqcn(): string
     {
         return '\\'.$this->namespace.'\\'.$this->name;
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -96,9 +97,9 @@ class ContainerConfigurator extends AbstractConfigurator
 /**
  * Creates a parameter.
  */
-function param(string $name): string
+function param(string $name): ParamConfigurator
 {
-    return '%'.$name.'%';
+    return new ParamConfigurator($name);
 }
 
 /**

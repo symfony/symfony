@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-class EnvConfigurator
+use Symfony\Component\Config\Loader\ParamConfigurator;
+
+class EnvConfigurator extends ParamConfigurator
 {
     /**
      * @var string[]
@@ -23,10 +25,7 @@ class EnvConfigurator
         $this->stack = explode(':', $name);
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return '%env('.implode(':', $this->stack).')%';
     }

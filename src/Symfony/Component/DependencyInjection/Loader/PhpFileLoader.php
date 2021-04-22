@@ -128,6 +128,9 @@ class PhpFileLoader extends FileLoader
             }
         }
 
+        // Force load ContainerConfigurator to make env(), param() etc available.
+        class_exists(ContainerConfigurator::class);
+
         $callback(...$arguments);
 
         /** @var ConfigBuilderInterface $configBuilder */

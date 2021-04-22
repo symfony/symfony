@@ -9,6 +9,8 @@ use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Tests\Builder\Fixtures\AddToList;
 use Symfony\Component\Config\Tests\Builder\Fixtures\NodeInitialValues;
+use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Config\AddToListConfig;
 
 /**
@@ -30,6 +32,14 @@ class GeneratedConfigTest extends TestCase
         foreach ($array as $name => $alias) {
             yield $name => [$name, $alias];
         }
+
+        /*
+         * Force load ContainerConfigurator to make env(), param() etc available
+         * and also check if symfony/dependency-injection is installed
+         */
+        if (class_exists(ContainerConfigurator::class)) {
+            yield 'Placeholders' => ['Placeholders', 'placeholders'];
+        }
     }
 
     /**
@@ -45,7 +55,11 @@ class GeneratedConfigTest extends TestCase
 
         $this->assertInstanceOf(ConfigBuilderInterface::class, $configBuilder);
         $this->assertSame($alias, $configBuilder->getExtensionAlias());
-        $this->assertSame($expectedOutput, $configBuilder->toArray());
+        $output = $configBuilder->toArray();
+        if (class_exists(AbstractConfigurator::class)) {
+            $output = AbstractConfigurator::processValue($output);
+        }
+        $this->assertSame($expectedOutput, $output);
     }
 
     /**

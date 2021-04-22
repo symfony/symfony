@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package
+
 5.3
 ---
 

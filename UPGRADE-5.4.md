@@ -1,6 +1,11 @@
 UPGRADE FROM 5.3 to 5.4
 =======================
 
+Cache
+-----
+
+ * Deprecate `DoctrineProvider` because this class has been added to the `doctrine/cache` package`
+
 FrameworkBundle
 ---------------
 

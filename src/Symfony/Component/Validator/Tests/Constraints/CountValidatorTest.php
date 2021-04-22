@@ -47,7 +47,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Count([
             'min' => 1,
-            'conditionExpression' => 'true',
+            'condition' => 'true',
         ]);
 
         $this->expectException(UnexpectedValueException::class);

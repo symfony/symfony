@@ -42,7 +42,7 @@ class Count extends Constraint
     public $min;
     public $max;
     public $divisibleBy;
-    public $conditionExpression;
+    public $condition;
 
     /**
      * {@inheritdoc}
@@ -58,17 +58,17 @@ class Count extends Constraint
         string $minMessage = null,
         string $maxMessage = null,
         string $divisibleByMessage = null,
-        string $conditionExpression = null,
         array $groups = null,
         $payload = null,
-        array $options = []
+        array $options = [],
+        string $condition = null
     ) {
         if (\is_array($exactly)) {
             $options = array_merge($exactly, $options);
             $exactly = $options['value'] ?? null;
         }
 
-        if (null !== $conditionExpression && !class_exists(ExpressionLanguage::class)) {
+        if (null !== $condition && !class_exists(ExpressionLanguage::class)) {
             throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint with a condition expression.', __CLASS__));
         }
 
@@ -90,7 +90,7 @@ class Count extends Constraint
         $this->minMessage = $minMessage ?? $this->minMessage;
         $this->maxMessage = $maxMessage ?? $this->maxMessage;
         $this->divisibleByMessage = $divisibleByMessage ?? $this->divisibleByMessage;
-        $this->conditionExpression = $conditionExpression ?? $this->conditionExpression;
+        $this->condition = $$condition ?? $this->condition;
 
         if (null === $this->min && null === $this->max && null === $this->divisibleBy) {
             throw new MissingOptionsException(sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);

@@ -27,7 +27,7 @@ abstract class CountValidatorIterableTest extends CountValidatorTest
             'min' => 2,
             'max' => 2,
             'exactMessage' => 'myMessage',
-            'conditionExpression' => 'item > 2',
+            'condition' => 'item > 2',
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -44,7 +44,7 @@ abstract class CountValidatorIterableTest extends CountValidatorTest
             'min' => 2,
             'max' => 2,
             'exactMessage' => 'myMessage',
-            'conditionExpression' => 'item > 42',
+            'condition' => 'item > 42',
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -67,7 +67,7 @@ abstract class CountValidatorIterableTest extends CountValidatorTest
             'min' => 2,
             'max' => 2,
             'exactMessage' => 'myMessage',
-            'conditionExpression' => 'item.getValue() === "value_1"',
+            'condition' => 'item.getValue() === "value_1"',
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -84,7 +84,7 @@ abstract class CountValidatorIterableTest extends CountValidatorTest
             'min' => 2,
             'max' => 2,
             'exactMessage' => 'myMessage',
-            'conditionExpression' => 'item.getValue() === "value_42"',
+            'condition' => 'item.getValue() === "value_42"',
         ]);
 
         $this->validator->validate($value, $constraint);

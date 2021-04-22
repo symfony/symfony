@@ -90,7 +90,7 @@ class Count extends Constraint
         $this->minMessage = $minMessage ?? $this->minMessage;
         $this->maxMessage = $maxMessage ?? $this->maxMessage;
         $this->divisibleByMessage = $divisibleByMessage ?? $this->divisibleByMessage;
-        $this->condition = $$condition ?? $this->condition;
+        $this->condition = $condition ?? $this->condition;
 
         if (null === $this->min && null === $this->max && null === $this->divisibleBy) {
             throw new MissingOptionsException(sprintf('Either option "min", "max" or "divisibleBy" must be given for constraint "%s".', __CLASS__), ['min', 'max', 'divisibleBy']);

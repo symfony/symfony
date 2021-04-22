@@ -4,7 +4,7 @@ namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 
 use Symfony\Component\Translation\Bridge\Loco\Provider\LocoProviderFactory;
 use Symfony\Component\Translation\Provider\ProviderFactoryInterface;
-use Symfony\Component\Translation\Tests\ProviderFactoryTestCase;
+use Symfony\Component\Translation\Test\ProviderFactoryTestCase;
 
 class LocoProviderFactoryTest extends ProviderFactoryTestCase
 {

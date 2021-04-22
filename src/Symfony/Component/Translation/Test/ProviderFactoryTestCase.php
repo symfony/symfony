@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests;
+namespace Symfony\Component\Translation\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -26,6 +26,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * A test case to ease testing a translation provider factory.
  *
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
+ *
+ * @internal
  */
 abstract class ProviderFactoryTestCase extends TestCase
 {

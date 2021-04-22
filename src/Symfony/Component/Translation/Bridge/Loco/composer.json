@@ -20,6 +20,9 @@
         "symfony/http-client": "^5.3",
         "symfony/translation": "^5.3"
     },
+    "require-dev": {
+        "symfony/config": "^4.4|^5.2"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Loco\\": "" },
         "exclude-from-classmap": [

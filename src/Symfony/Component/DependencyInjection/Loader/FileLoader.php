@@ -166,8 +166,8 @@ abstract class FileLoader extends BaseFileLoader
                     $excludePrefix = $resource->getPrefix();
                 }
 
-                // normalize Windows slashes
-                $excludePaths[str_replace('\\', '/', $path)] = true;
+                // normalize Windows slashes and remove trailing slashes
+                $excludePaths[rtrim(str_replace('\\', '/', $path), '/')] = true;
             }
         }
 

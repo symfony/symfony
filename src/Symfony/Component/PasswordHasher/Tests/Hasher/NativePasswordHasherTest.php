@@ -89,13 +89,22 @@ class NativePasswordHasherTest extends TestCase
         $this->assertStringStartsWith('$2', $result);
     }
 
-    public function testCheckPasswordLength()
+    public function testBcryptWithLongPassword()
     {
-        $hasher = new NativePasswordHasher(null, null, 4);
-        $result = password_hash(str_repeat('a', 72), \PASSWORD_BCRYPT, ['cost' => 4]);
+        $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
+        $plainPassword = str_repeat('a', 100);
 
-        $this->assertFalse($hasher->verify($result, str_repeat('a', 73), 'salt'));
-        $this->assertTrue($hasher->verify($result, str_repeat('a', 72), 'salt'));
+        $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword, 'salt'));
+        $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword, 'salt'));
+    }
+
+    public function testBcryptWithNulByte()
+    {
+        $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
+        $plainPassword = "a\0b";
+
+        $this->assertFalse($hasher->verify(password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]), $plainPassword, 'salt'));
+        $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword, 'salt'));
     }
 
     public function testNeedsRehash()

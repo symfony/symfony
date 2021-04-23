@@ -80,8 +80,12 @@ final class SodiumPasswordHasher implements PasswordHasherInterface
         }
 
         if (0 !== strpos($hashedPassword, '$argon')) {
+            if (0 === strpos($hashedPassword, '$2') && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+                $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
+            }
+
             // Accept validating non-argon passwords for seamless migrations
-            return (72 >= \strlen($plainPassword) || 0 !== strpos($hashedPassword, '$2')) && password_verify($plainPassword, $hashedPassword);
+            return password_verify($plainPassword, $hashedPassword);
         }
 
         if (\function_exists('sodium_crypto_pwhash_str_verify')) {

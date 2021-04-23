@@ -53,11 +53,11 @@ final class NativePasswordHasher implements PasswordHasherInterface
             $algorithms = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
 
             if (\defined('PASSWORD_ARGON2I')) {
-                $algorithms[2] = $algorithms['argon2i'] = (string) \PASSWORD_ARGON2I;
+                $algorithms[2] = $algorithms['argon2i'] = \PASSWORD_ARGON2I;
             }
 
             if (\defined('PASSWORD_ARGON2ID')) {
-                $algorithms[3] = $algorithms['argon2id'] = (string) \PASSWORD_ARGON2ID;
+                $algorithms[3] = $algorithms['argon2id'] = \PASSWORD_ARGON2ID;
             }
 
             $this->algorithm = $algorithms[$algorithm] ?? $algorithm;
@@ -73,8 +73,12 @@ final class NativePasswordHasher implements PasswordHasherInterface
 
     public function hash(string $plainPassword): string
     {
-        if ($this->isPasswordTooLong($plainPassword) || ((string) \PASSWORD_BCRYPT === $this->algorithm && 72 < \strlen($plainPassword))) {
+        if ($this->isPasswordTooLong($plainPassword)) {
             throw new InvalidPasswordException();
+        }
+
+        if (\PASSWORD_BCRYPT === $this->algorithm && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+            $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
         }
 
         return password_hash($plainPassword, $this->algorithm, $this->options);
@@ -87,8 +91,12 @@ final class NativePasswordHasher implements PasswordHasherInterface
         }
 
         if (0 !== strpos($hashedPassword, '$argon')) {
-            // BCrypt encodes only the first 72 chars
-            return (72 >= \strlen($plainPassword) || 0 !== strpos($hashedPassword, '$2')) && password_verify($plainPassword, $hashedPassword);
+            // Bcrypt cuts on NUL chars and after 72 bytes
+            if (0 === strpos($hashedPassword, '$2') && (72 < \strlen($plainPassword) || false !== strpos($plainPassword, "\0"))) {
+                $plainPassword = base64_encode(hash('sha512', $plainPassword, true));
+            }
+
+            return password_verify($plainPassword, $hashedPassword);
         }
 
         if (\extension_loaded('sodium') && version_compare(\SODIUM_LIBRARY_VERSION, '1.0.14', '>=')) {

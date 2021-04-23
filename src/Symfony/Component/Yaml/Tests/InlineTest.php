@@ -187,7 +187,8 @@ class InlineTest extends TestCase
      */
     public function testParseReferences($yaml, $expected)
     {
-        $this->assertSame($expected, Inline::parse($yaml, 0, ['var' => 'var-value']));
+        $references = ['var' => 'var-value'];
+        $this->assertSame($expected, Inline::parse($yaml, 0, $references));
     }
 
     public function getDataForParseReferences()
@@ -211,7 +212,8 @@ class InlineTest extends TestCase
             'b' => 'Clark',
             'c' => 'Brian',
         ];
-        $this->assertSame([$foo], Inline::parse('[*foo]', 0, ['foo' => $foo]));
+        $references = ['foo' => $foo];
+        $this->assertSame([$foo], Inline::parse('[*foo]', 0, $references));
     }
 
     public function testParseUnquotedAsterisk()

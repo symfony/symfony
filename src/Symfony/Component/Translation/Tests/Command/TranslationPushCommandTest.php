@@ -26,6 +26,18 @@ use Symfony\Component\Translation\TranslatorBag;
  */
 class TranslationPushCommandTest extends TranslationProviderTestCase
 {
+    protected function setUp(): void
+    {
+        putenv('COLUMNS=121');
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        putenv('COLUMNS');
+    }
+
     public function testPushNewMessages()
     {
         $arrayLoader = new ArrayLoader();

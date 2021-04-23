@@ -58,7 +58,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New translations from "null"', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -134,7 +134,7 @@ XLIFF
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--format' => 'xlf20']);
 
-        $this->assertStringContainsString('[OK] New translations from "null" has been written locally (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New translations from "null"', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="en">
@@ -208,7 +208,7 @@ XLIFF
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Local translations has been updated from "null"', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
@@ -288,7 +288,7 @@ XLIFF
         $tester = $this->createCommandTester($provider, $locales, $domains);
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true, '--intl-icu' => true]);
 
-        $this->assertStringContainsString('[OK] Local translations has been updated from "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Local translations has been updated from "null"', trim($tester->getDisplay()));
         $this->assertXmlStringEqualsXmlString(<<<XLIFF
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">

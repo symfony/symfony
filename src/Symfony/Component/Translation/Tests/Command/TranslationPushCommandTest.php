@@ -69,7 +69,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages']]);
 
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New local translations has been sent to "null"', trim($tester->getDisplay()));
     }
 
     public function testPushForceMessages()
@@ -104,7 +104,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true]);
 
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All local translations has been sent to "null"', trim($tester->getDisplay()));
     }
 
     public function testDeleteMissingMessages()
@@ -165,8 +165,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--delete-missing' => true]);
 
-        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New local translations has been sent to "null"', trim($tester->getDisplay()));
     }
 
     public function testPushForceAndDeleteMissingMessages()
@@ -230,8 +230,8 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr'], '--domains' => ['messages'], '--force' => true, '--delete-missing' => true]);
 
-        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
-        $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] Missing translations on "null" has been deleted', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] All local translations has been sent to "null"', trim($tester->getDisplay()));
     }
 
     private function createCommandTester(ProviderInterface $provider, array $locales = ['en'], array $domains = ['messages']): CommandTester

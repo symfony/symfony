@@ -19,15 +19,18 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 class MoneyToLocalizedStringTransformerTest extends TestCase
 {
     private $previousLocale;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
         $this->previousLocale = setlocale(\LC_ALL, '0');
+        $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
         setlocale(\LC_ALL, $this->previousLocale);
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testTransform()

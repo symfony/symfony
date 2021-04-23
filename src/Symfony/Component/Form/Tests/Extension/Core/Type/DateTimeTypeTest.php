@@ -18,11 +18,18 @@ class DateTimeTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
+    private $defaultLocale;
+
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
-
         parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testSubmitDateTime()

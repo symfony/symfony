@@ -25,6 +25,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Loco\LocoProviderFactory::class,
             'package' => 'symfony/loco-translation-provider',
         ],
+        'lokalise' => [
+            'class' => Bridge\Lokalise\LokaliseProviderFactory::class,
+            'package' => 'symfony/lokalise-translation-provider',
+        ],
         'poeditor' => [
             'class' => Bridge\PoEditor\PoEditorProviderFactory::class,
             'package' => 'symfony/po-editor-translation-provider',

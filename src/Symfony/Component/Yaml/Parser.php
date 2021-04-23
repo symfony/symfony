@@ -212,7 +212,7 @@ class Parser
                     array_pop($this->refsBeingParsed);
                 }
             } elseif (
-                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?[^ \'"\[\{!].*?)) *\:( ++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
+                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|(?:!?!php/const:)?[^ \'"\[\{!].*?)) *\:(( |\t)++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
                 && (false === strpos($values['key'], ' #') || \in_array($values['key'][0], ['"', "'"]))
             ) {
                 if ($context && 'sequence' == $context) {
@@ -230,7 +230,7 @@ class Parser
                 }
 
                 if (!\is_string($key) && !\is_int($key)) {
-                    throw new ParseException(sprintf('%s keys are not supported. Quote your evaluable mapping keys instead.', is_numeric($key) ? 'Numeric' : 'Non-string'), $this->getRealCurrentLineNb() + 1, $this->currentLine);
+                    throw new ParseException((is_numeric($key) ? 'Numeric' : 'Non-string').' keys are not supported. Quote your evaluable mapping keys instead.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                 }
 
                 // Convert float keys to strings, to avoid being converted to integers by PHP
@@ -245,7 +245,7 @@ class Parser
                         $refName = substr(rtrim($values['value']), 1);
                         if (!\array_key_exists($refName, $this->refs)) {
                             if (false !== $pos = array_search($refName, $this->refsBeingParsed, true)) {
-                                throw new ParseException(sprintf('Circular reference [%s, %s] detected for reference "%s".', implode(', ', \array_slice($this->refsBeingParsed, $pos)), $refName, $refName), $this->currentLineNb + 1, $this->currentLine, $this->filename);
+                                throw new ParseException(sprintf('Circular reference [%s] detected for reference "%s".', implode(', ', array_merge(\array_slice($this->refsBeingParsed, $pos), [$refName])), $refName), $this->currentLineNb + 1, $this->currentLine, $this->filename);
                             }
 
                             throw new ParseException(sprintf('Reference "%s" does not exist.', $refName), $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
@@ -732,7 +732,7 @@ class Parser
 
             if (!\array_key_exists($value, $this->refs)) {
                 if (false !== $pos = array_search($value, $this->refsBeingParsed, true)) {
-                    throw new ParseException(sprintf('Circular reference [%s, %s] detected for reference "%s".', implode(', ', \array_slice($this->refsBeingParsed, $pos)), $value, $value), $this->currentLineNb + 1, $this->currentLine, $this->filename);
+                    throw new ParseException(sprintf('Circular reference [%s] detected for reference "%s".', implode(', ', array_merge(\array_slice($this->refsBeingParsed, $pos), [$value])), $value), $this->currentLineNb + 1, $this->currentLine, $this->filename);
                 }
 
                 throw new ParseException(sprintf('Reference "%s" does not exist.', $value), $this->currentLineNb + 1, $this->currentLine, $this->filename);
@@ -1225,7 +1225,7 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
-        throw new ParseException('Malformed inline YAML string');
+        throw new ParseException('Malformed inline YAML string.');
     }
 
     private function lexUnquotedString(int &$cursor): string
@@ -1296,7 +1296,7 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
-        throw new ParseException('Malformed inline YAML string');
+        throw new ParseException('Malformed inline YAML string.');
     }
 
     private function consumeWhitespaces(int &$cursor): bool

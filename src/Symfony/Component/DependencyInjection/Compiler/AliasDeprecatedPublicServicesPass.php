@@ -58,7 +58,7 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
 
             $definition = $container->getDefinition($id);
             if (!$definition->isPublic() || $definition->isPrivate()) {
-                throw new InvalidArgumentException(sprintf('The "%s" service is private: it cannot have the "%s" tag.', $id, $this->tagName));
+                continue;
             }
 
             $container

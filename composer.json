@@ -52,8 +52,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
-        "symfony/polyfill-uuid": "^1.15",
-        "symfony/runtime": "self.version"
+        "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -94,6 +93,7 @@
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/rate-limiter": "self.version",
         "symfony/routing": "self.version",
+        "symfony/runtime": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",

@@ -52,26 +52,67 @@ class ParserTest extends TestCase
         return $this->loadTestsFromFixtureFiles('nonStringKeys.yml');
     }
 
-    public function testTabsInYaml()
+    /**
+     * @dataProvider invalidIndentation
+     */
+    public function testTabsAsIndentationInYaml(string $given, string $expectedMessage)
     {
-        // test tabs in YAML
-        $yamls = [
-            "foo:\n	bar",
-            "foo:\n 	bar",
-            "foo:\n	 bar",
-            "foo:\n 	 bar",
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $this->parser->parse($given);
+    }
+
+    public function invalidIndentation(): array
+    {
+        return [
+            [
+                "foo:\n\tbar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\tbar\").",
+            ],
+            [
+                "foo:\n \tbar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\tbar\").",
+            ],
+            [
+                "foo:\n\t bar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\t bar\").",
+            ],
+            [
+                "foo:\n \t bar",
+                "A YAML file cannot contain tabs as indentation at line 2 (near \"\t bar\").",
+            ],
         ];
+    }
 
-        foreach ($yamls as $yaml) {
-            try {
-                $this->parser->parse($yaml);
+    /**
+     * @dataProvider validTokenSeparators
+     */
+    public function testValidTokenSeparation(string $given, array $expected)
+    {
+        $actual = $this->parser->parse($given);
+        $this->assertEquals($expected, $actual);
+    }
 
-                $this->fail('YAML files must not contain tabs');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf(\Exception::class, $e, 'YAML files must not contain tabs');
-                $this->assertEquals('A YAML file cannot contain tabs as indentation at line 2 (near "'.strpbrk($yaml, "\t").'").', $e->getMessage(), 'YAML files must not contain tabs');
-            }
-        }
+    public function validTokenSeparators(): array
+    {
+        return [
+            [
+                'foo: bar',
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo:\tbar",
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo: \tbar",
+                ['foo' => 'bar'],
+            ],
+            [
+                "foo:\t bar",
+                ['foo' => 'bar'],
+            ],
+        ];
     }
 
     public function testEndOfTheDocumentMarker()

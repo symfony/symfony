@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-20T19:08:00Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-20T19:21:44Z
+
+Sure. I think I can come up with tests.
+
+The issue this is addressing is that when you're using redis cluster, and getHosts gets called, it makes a new Redis object for each redis cluster node and runs commands intended just for that node via this secondary connection.
+
+The problem with that, is that when you call _masters on a RedisCluster, it does not indicate if tls is used or not. The secondary connections will be setup without tls. I've looked over the phpredis code and it does not expose in any way if its using tls or not.
+
+The easy fix for this is to just reuse the connections that RedisCluster already has to each node, using the method described in the phpredis documentation.
+
+RedisClusterNodeProxy provides a structure to encapsulate the method calls to \RedisCluster using the same interface that \Redis presents.
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-22T03:30:47Z
+
+Rebased against 4.4
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-22T18:55:07Z
+
+Very welcome!
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-22T18:55:31Z
+
+@nicolas-grekas What about psalm? I'm not sure what its upset about.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-22T18:56:30Z
+
+psalm is drunk here, it can be ignored :)
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-22T21:10:45Z
+
+What is remaining?
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-22T21:38:26Z
+
+Can someone approve workflows?
+
+---------------------------------------------------------------------------
+
+by jackthomasatl at 2021-04-23T00:06:51Z
+
+I switched the default value for ssl back to null. I start seeing client disconnects / timeouts when the value provided is an empty array. In the C++ code its default null. I think the presence of the array at all forces the driver into ssl mode.

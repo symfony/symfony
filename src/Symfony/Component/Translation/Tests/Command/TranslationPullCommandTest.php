@@ -27,6 +27,18 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
  */
 class TranslationPullCommandTest extends TranslationProviderTestCase
 {
+    protected function setUp(): void
+    {
+        putenv('COLUMNS=121');
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        putenv('COLUMNS');
+    }
+
     public function testPullNewXlf12Messages()
     {
         $arrayLoader = new ArrayLoader();

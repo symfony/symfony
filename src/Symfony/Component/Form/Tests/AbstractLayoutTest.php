@@ -26,6 +26,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected $csrfTokenManager;
     protected $testableFeatures = [];
+    private $defaultLocale;
 
     protected function setUp(): void
     {
@@ -33,6 +34,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             $this->markTestSkipped('Extension intl is required.');
         }
 
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
 
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -50,6 +52,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function tearDown(): void
     {
         $this->csrfTokenManager = null;
+        \Locale::setDefault($this->defaultLocale);
 
         parent::tearDown();
     }

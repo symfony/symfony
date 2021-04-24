@@ -725,11 +725,18 @@ abstract class ResourceBundleTestCase extends TestCase
     ];
 
     private static $rootLocales;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
+        $this->defaultLocale = \Locale::getDefault();
         Locale::setDefault('en');
         Locale::setDefaultFallback('en');
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function provideLocales()

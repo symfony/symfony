@@ -20,19 +20,17 @@ use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
  */
 final class NullProviderFactory extends AbstractProviderFactory
 {
-    const SCHEME = 'null';
-
     public function create(Dsn $dsn): ProviderInterface
     {
-        if (self::SCHEME === $dsn->getScheme()) {
+        if ('null' === $dsn->getScheme()) {
             return new NullProvider();
         }
 
-        throw new UnsupportedSchemeException($dsn, self::SCHEME, $this->getSupportedSchemes());
+        throw new UnsupportedSchemeException($dsn, 'null', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return [self::SCHEME];
+        return ['null'];
     }
 }

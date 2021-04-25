@@ -1,7 +1,7 @@
 {
-    "name": "symfony/loco-translation",
+    "name": "symfony/loco-translation-provider",
     "type": "symfony-bridge",
-    "description": "Symfony Loco Translation Bridge",
+    "description": "Symfony Loco Translation Provider Bridge",
     "keywords": ["loco", "translation", "provider"],
     "homepage": "https://symfony.com",
     "license": "MIT",

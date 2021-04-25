@@ -72,7 +72,18 @@ abstract class ProviderFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $this->assertSame($expected, $factory->supports(Dsn::fromString($dsn)));
+        $this->assertSame($expected, $factory->supports(new Dsn($dsn)));
+    }
+
+    /**
+     * @dataProvider createProvider
+     */
+    public function testCreate(string $expected, string $dsn)
+    {
+        $factory = $this->createFactory();
+        $provider = $factory->create(new Dsn($dsn));
+
+        $this->assertSame($expected, (string) $provider);
     }
 
     /**
@@ -82,7 +93,7 @@ abstract class ProviderFactoryTestCase extends TestCase
     {
         $factory = $this->createFactory();
 
-        $dsn = Dsn::fromString($dsn);
+        $dsn = new Dsn($dsn);
 
         $this->expectException(UnsupportedSchemeException::class);
         if (null !== $message) {
@@ -93,24 +104,13 @@ abstract class ProviderFactoryTestCase extends TestCase
     }
 
     /**
-     * @dataProvider createProvider
-     */
-    public function testCreate(string $expected, string $dsn)
-    {
-        $factory = $this->createFactory();
-        $provider = $factory->create(Dsn::fromString($dsn));
-
-        $this->assertSame($expected, (string) $provider);
-    }
-
-    /**
      * @dataProvider incompleteDsnProvider
      */
     public function testIncompleteDsnException(string $dsn, string $message = null)
     {
         $factory = $this->createFactory();
 
-        $dsn = Dsn::fromString($dsn);
+        $dsn = new Dsn($dsn);
 
         $this->expectException(IncompleteDsnException::class);
         if (null !== $message) {

@@ -14,7 +14,6 @@ namespace Symfony\Component\Translation\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Translation\Bridge\Loco\Provider\LocoProvider;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
@@ -45,7 +44,7 @@ abstract class ProviderTestCase extends TestCase
     /**
      * @dataProvider toStringProvider
      */
-    public function testToString(LocoProvider $provider, string $expected)
+    public function testToString(ProviderInterface $provider, string $expected)
     {
         $this->assertSame($expected, (string) $provider);
     }

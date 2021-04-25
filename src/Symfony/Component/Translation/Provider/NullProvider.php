@@ -23,7 +23,7 @@ class NullProvider implements ProviderInterface
 {
     public function __toString(): string
     {
-        return NullProviderFactory::SCHEME.'://default';
+        return 'null';
     }
 
     public function write(TranslatorBagInterface $translatorBag, bool $override = false): void

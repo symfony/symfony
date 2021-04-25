@@ -37,7 +37,7 @@ class TranslationProviderCollectionFactory
         $providers = [];
         foreach ($config as $name => $currentConfig) {
             $providers[$name] = $this->fromDsnObject(
-                Dsn::fromString($currentConfig['dsn']),
+                new Dsn($currentConfig['dsn']),
                 !$currentConfig['locales'] ? $this->enabledLocales : $currentConfig['locales'],
                 !$currentConfig['domains'] ? [] : $currentConfig['domains']
             );

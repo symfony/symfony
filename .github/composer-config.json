@@ -6,6 +6,7 @@
             "symfony/http-kernel": "source",
             "symfony/messenger": "source",
             "symfony/notifier": "source",
+            "symfony/translation": "source",
             "symfony/validator": "source",
             "*": "dist"
         }

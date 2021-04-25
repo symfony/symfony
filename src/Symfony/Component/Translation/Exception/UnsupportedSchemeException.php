@@ -17,6 +17,10 @@ use Symfony\Component\Translation\Provider\Dsn;
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [
+        'crowdin' => [
+            'class' => Bridge\Crowdin\CrowdinProviderFactory::class,
+            'package' => 'symfony/crowdin-translation-provider',
+        ],
         'loco' => [
             'class' => Bridge\Loco\LocoProviderFactory::class,
             'package' => 'symfony/loco-translation-provider',

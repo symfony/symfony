@@ -169,6 +169,7 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
@@ -1354,6 +1355,7 @@ class FrameworkExtension extends Extension
         }
 
         $classToServices = [
+            CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
             LocoProviderFactory::class => 'translation.provider_factory.loco',
         ];
 

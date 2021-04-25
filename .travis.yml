@@ -281,6 +281,7 @@ install:
           elif [[ $deps = low ]]; then
               echo "$COMPONENTS" | parallel --gnu "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'"
           else
+              composer require --no-update doctrine/persistence:2.1.*
               if [[ $PHP = 8.0* ]]; then
                   # add return types before running the test suite
                   sed -i 's/"\*\*\/Tests\/"//' composer.json

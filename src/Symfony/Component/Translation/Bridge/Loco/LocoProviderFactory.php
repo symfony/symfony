@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Loco\Provider;
+namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
@@ -21,22 +21,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
+ * @author Oskar Stark <oskarstark@googlemail.com>
  *
  * @experimental in 5.3
  */
 final class LocoProviderFactory extends AbstractProviderFactory
 {
-    public const SCHEME = 'loco';
-    private const HOST = 'localise.biz/api/';
-
-    private $client;
-    private $logger;
     private $defaultLocale;
     private $loader;
 
-    public function __construct(HttpClientInterface $client, LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
+    public function __construct(LoggerInterface $logger, string $defaultLocale, LoaderInterface $loader)
     {
-        $this->client = $client;
         $this->logger = $logger;
         $this->defaultLocale = $defaultLocale;
         $this->loader = $loader;
@@ -47,23 +42,19 @@ final class LocoProviderFactory extends AbstractProviderFactory
      */
     public function create(Dsn $dsn): ProviderInterface
     {
-        if (self::SCHEME !== $dsn->getScheme()) {
-            throw new UnsupportedSchemeException($dsn, self::SCHEME, $this->getSupportedSchemes());
+        if ('loco' !== $dsn->getScheme()) {
+            throw new UnsupportedSchemeException($dsn, 'loco', $this->getSupportedSchemes());
         }
 
-        $endpoint = sprintf('%s%s', 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost(), $dsn->getPort() ? ':'.$dsn->getPort() : '');
-        $client = $this->client->withOptions([
-            'base_uri' => 'https://'.$endpoint,
-            'headers' => [
-                'Authorization' => 'Loco '.$this->getUser($dsn),
-            ],
-        ]);
+        $apiKey = $this->getUser($dsn);
+        $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
+        $port = $dsn->getPort();
 
-        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint);
+        return (new LocoProvider($apiKey, $this->defaultLocale, $this->loader))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array
     {
-        return [self::SCHEME];
+        return ['loco'];
     }
 }

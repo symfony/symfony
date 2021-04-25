@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Loco\Provider;
+namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\ProviderException;
@@ -17,10 +17,12 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
+use Symfony\Component\Translaton\Provider\AbstractProvider;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
+ * @author Oskar Stark <oskarstark@googlemail.com>
  *
  * In Loco:
  *  * Tags refers to Symfony's translation domains
@@ -29,26 +31,34 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @experimental in 5.3
  */
-final class LocoProvider implements ProviderInterface
+final class LocoProvider extends AbstractProvider
 {
-    private $client;
-    private $loader;
-    private $logger;
-    private $defaultLocale;
-    private $endpoint;
+    protected const HOST = 'localise.biz';
 
-    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
+    private $defaultLocale;
+    private $loader;
+
+    public function __construct(string $apiKey, string $defaultLocale, LoaderInterface $loader, HttpClientInterface $client = null, LoggerInterface $logger = null)
     {
-        $this->client = $client;
-        $this->loader = $loader;
-        $this->logger = $logger;
+        parent::__construct($client, $logger);
+
         $this->defaultLocale = $defaultLocale;
-        $this->endpoint = $endpoint;
+        $this->loader = $loader;
+
+        $endpoint = 'https://'.$this->getEndpoint().'/api/';
+
+        $this->client->withOptions([
+            'base_uri' => $endpoint,
+            'headers' => [
+                'Authorization' => 'Loco '.$apiKey,
+            ],
+        ]);
+
     }
 
     public function __toString(): string
     {
-        return sprintf('%s://%s', LocoProviderFactory::SCHEME, $this->endpoint);
+        return sprintf('loco://%s', $this->getEndpoint());
     }
 
     public function write(TranslatorBagInterface $translatorBag): void

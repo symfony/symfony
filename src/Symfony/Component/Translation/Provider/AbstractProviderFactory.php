@@ -11,10 +11,21 @@
 
 namespace Symfony\Component\Translation\Provider;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\IncompleteDsnException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractProviderFactory implements ProviderFactoryInterface
 {
+    protected $client;
+    protected $logger;
+
+    public function __construct(HttpClientInterface $client = null, LoggerInterface $logger = null)
+    {
+        $this->client = $client;
+        $this->logger = $logger;
+    }
+
     public function supports(Dsn $dsn): bool
     {
         return \in_array($dsn->getScheme(), $this->getSupportedSchemes(), true);

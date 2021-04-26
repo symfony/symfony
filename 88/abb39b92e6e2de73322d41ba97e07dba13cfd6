@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-22T08:56:35Z
+
+This makes me realize that any `%param%` could also be allowed there, not only env ones.
+This means we need to add a ParamConfigurator, and that EnvConfigurator should extend it.
+Then, the param() function should return a ParamConfigurator.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-22T10:19:54Z
+
+I cannot figure out why I get this error:
+
+```
+1) Symfony\Component\Config\Tests\Builder\GeneratedConfigTest::testConfig with data set "Placeholders" ('Placeholders', 'placeholders')
+Error: Call to undefined function Symfony\Component\DependencyInjection\Loader\Configurator\env()
+
+src/Symfony/Component/Config/Tests/Builder/Fixtures/Placeholders.config.php:7
+src/Symfony/Component/Config/Tests/Builder/GeneratedConfigTest.php:50
+
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-22T12:51:54Z
+
+That's because the function is not autoloaded. This means that we should force-load ContainerConfigurator in the loader.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-22T13:03:01Z
+
+I tried that before, but I failed "force loading it". Hm.. it works now. I think I have to blame this on incompetence.
+
+But this means that a user will have the same issues. Before the ConfigBuilders, this was not an issue because the user would always use `ContainerConfigurator`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-24T17:46:23Z
+
+The PR is rebased. Travis and Fabbot are both reporting on unrelated issues.

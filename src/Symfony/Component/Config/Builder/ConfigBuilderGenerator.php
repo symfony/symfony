@@ -339,18 +339,18 @@ public function NAME(TYPE$value): self
     {
         $body = '$output = [];';
         foreach ($class->getProperties() as $p) {
-            $code = '$this->PROPERTY;';
+            $code = '$this->PROPERTY';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
-                    $code = 'array_map(function($v) { return $v->toArray(); }, $this->PROPERTY);';
+                    $code = 'array_map(function($v) { return $v->toArray(); }, $this->PROPERTY)';
                 } else {
-                    $code = '$this->PROPERTY->toArray();';
+                    $code = '$this->PROPERTY->toArray()';
                 }
             }
 
             $body .= strtr('
     if (null !== $this->PROPERTY) {
-        $output["ORG_NAME"] = '.$code.'
+        $output[\'ORG_NAME\'] = '.$code.';
     }', ['PROPERTY' => $p->getName(), 'ORG_NAME' => $p->getOriginalName()]);
         }
 
@@ -368,19 +368,19 @@ public function NAME(): array
     {
         $body = '';
         foreach ($class->getProperties() as $p) {
-            $code = '$value["ORG_NAME"]';
+            $code = '$value[\'ORG_NAME\']';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
-                    $code = 'array_map(function($v) { return new '.$p->getType().'($v); }, $value["ORG_NAME"]);';
+                    $code = 'array_map(function($v) { return new '.$p->getType().'($v); }, $value[\'ORG_NAME\'])';
                 } else {
-                    $code = 'new '.$p->getType().'($value["ORG_NAME"])';
+                    $code = 'new '.$p->getType().'($value[\'ORG_NAME\'])';
                 }
             }
 
             $body .= strtr('
-    if (isset($value["ORG_NAME"])) {
+    if (isset($value[\'ORG_NAME\'])) {
         $this->PROPERTY = '.$code.';
-        unset($value["ORG_NAME"]);
+        unset($value[\'ORG_NAME\']);
     }
 ', ['PROPERTY' => $p->getName(), 'ORG_NAME' => $p->getOriginalName()]);
         }

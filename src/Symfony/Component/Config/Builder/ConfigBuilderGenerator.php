@@ -15,12 +15,14 @@ use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\FloatNode;
 use Symfony\Component\Config\Definition\IntegerNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
+use Symfony\Component\Config\Loader\ParamConfigurator;
 
 /**
  * Generate ConfigBuilders to help create valid config.
@@ -83,7 +85,7 @@ public function NAME(): string
         return $directory.\DIRECTORY_SEPARATOR.$class->getFilename();
     }
 
-    private function writeClasses()
+    private function writeClasses(): void
     {
         foreach ($this->classes as $class) {
             $this->buildConstructor($class);
@@ -95,7 +97,7 @@ public function NAME(): string
         $this->classes = [];
     }
 
-    private function buildNode(NodeInterface $node, ClassBuilder $class, string $namespace)
+    private function buildNode(NodeInterface $node, ClassBuilder $class, string $namespace): void
     {
         if (!$node instanceof ArrayNode) {
             throw new \LogicException('The node was expected to be an ArrayNode. This Configuration includes an edge case not supported yet.');
@@ -121,7 +123,7 @@ public function NAME(): string
         }
     }
 
-    private function handleArrayNode(ArrayNode $node, ClassBuilder $class, string $namespace)
+    private function handleArrayNode(ArrayNode $node, ClassBuilder $class, string $namespace): void
     {
         $childClass = new ClassBuilder($namespace, $node->getName());
         $class->addRequire($childClass);
@@ -134,20 +136,22 @@ public function NAME(array $value = []): CLASS
     if (null === $this->PROPERTY) {
         $this->PROPERTY = new CLASS($value);
     } elseif ([] !== $value) {
-        throw new \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
+        throw new InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
     }
 
     return $this->PROPERTY;
 }';
+        $class->addUse(InvalidConfigurationException::class);
         $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn()]);
 
         $this->buildNode($node, $childClass, $this->getSubNamespace($childClass));
     }
 
-    private function handleVariableNode(VariableNode $node, ClassBuilder $class)
+    private function handleVariableNode(VariableNode $node, ClassBuilder $class): void
     {
         $comment = $this->getComment($node);
         $property = $class->addProperty($node->getName());
+        $class->addUse(ParamConfigurator::class);
 
         $body = '
 /**
@@ -162,7 +166,7 @@ public function NAME($valueDEFAULT): self
         $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(),  'COMMENT' => $comment, 'DEFAULT' => $node->hasDefaultValue() ? ' = '.var_export($node->getDefaultValue(), true) : '']);
     }
 
-    private function handlePrototypedArrayNode(PrototypedArrayNode $node, ClassBuilder $class, string $namespace)
+    private function handlePrototypedArrayNode(PrototypedArrayNode $node, ClassBuilder $class, string $namespace): void
     {
         $name = $this->getSingularName($node);
         $prototype = $node->getPrototype();
@@ -170,15 +174,16 @@ public function NAME($valueDEFAULT): self
 
         $parameterType = $this->getParameterType($prototype);
         if (null !== $parameterType || $prototype instanceof ScalarNode) {
+            $class->addUse(ParamConfigurator::class);
             $property = $class->addProperty($node->getName());
             if (null === $key = $node->getKeyAttribute()) {
                 // This is an array of values; don't use singular name
                 $body = '
 /**
- * @param list<TYPE> $value
+ * @param ParamConfigurator|list<TYPE|ParamConfigurator> $value
  * @return $this
  */
-public function NAME(array $value): self
+public function NAME($value): self
 {
     $this->PROPERTY = $value;
 
@@ -189,16 +194,17 @@ public function NAME(array $value): self
             } else {
                 $body = '
 /**
+ * @param ParamConfigurator|TYPE $value
  * @return $this
  */
-public function NAME(string $VAR, TYPE$VALUE): self
+public function NAME(string $VAR, $VALUE): self
 {
     $this->PROPERTY[$VAR] = $VALUE;
 
     return $this;
 }';
 
-                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? '' : $parameterType.' ', 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
+                $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? 'mixed' : $parameterType, 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
             }
 
             return;
@@ -227,31 +233,33 @@ public function NAME(string $VAR, array $VALUE = []): CLASS
         return $this->PROPERTY[$VAR];
     }
 
-    throw new \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
+    throw new InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
 }';
+            $class->addUse(InvalidConfigurationException::class);
             $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn(), 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
         }
 
         $this->buildNode($prototype, $childClass, $namespace.'\\'.$childClass->getName());
     }
 
-    private function handleScalarNode(ScalarNode $node, ClassBuilder $class)
+    private function handleScalarNode(ScalarNode $node, ClassBuilder $class): void
     {
         $comment = $this->getComment($node);
         $property = $class->addProperty($node->getName());
+        $class->addUse(ParamConfigurator::class);
 
         $body = '
 /**
 COMMENT * @return $this
  */
-public function NAME(TYPE$value): self
+public function NAME($value): self
 {
     $this->PROPERTY = $value;
 
     return $this;
 }';
-        $parameterType = $this->getParameterType($node) ?? '';
-        $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'TYPE' => '' === $parameterType ? '' : $parameterType.' ', 'COMMENT' => $comment]);
+
+        $class->addMethod($node->getName(), $body, ['PROPERTY' => $property->getName(), 'COMMENT' => $comment]);
     }
 
     private function getParameterType(NodeInterface $node): ?string
@@ -301,9 +309,15 @@ public function NAME(TYPE$value): self
         }
 
         if ($node instanceof EnumNode) {
-            $comment .= sprintf(' * @param %s $value', implode('|', array_map(function ($a) {
+            $comment .= sprintf(' * @param ParamConfigurator|%s $value', implode('|', array_map(function ($a) {
                 return var_export($a, true);
             }, $node->getValues()))).\PHP_EOL;
+        } else {
+            $parameterType = $this->getParameterType($node);
+            if (null === $parameterType || '' === $parameterType) {
+                $parameterType = 'mixed';
+            }
+            $comment .= ' * @param ParamConfigurator|'.$parameterType.' $value'.\PHP_EOL;
         }
 
         if ($node->isDeprecated()) {
@@ -387,9 +401,10 @@ public function NAME(): array
 
         $body .= '
     if ($value !== []) {
-        throw new \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException(sprintf(\'The following keys are not supported by "%s": \', __CLASS__) . implode(\', \', array_keys($value)));
+        throw new InvalidConfigurationException(sprintf(\'The following keys are not supported by "%s": \', __CLASS__) . implode(\', \', array_keys($value)));
     }';
 
+        $class->addUse(InvalidConfigurationException::class);
         $class->addMethod('__construct', '
 public function __construct(array $value = [])
 {

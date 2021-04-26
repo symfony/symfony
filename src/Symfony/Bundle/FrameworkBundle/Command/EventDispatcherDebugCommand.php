@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EventDispatcherDebugCommand extends Command
 {
-    private const DEFAULT_DISPATCHER = 'event_dispatcher';
+    private const DEFAULT_DISPATCHER = 'debug.event_dispatcher';
 
     protected static $defaultName = 'debug:event-dispatcher';
     protected static $defaultDescription = 'Display configured listeners for an application';

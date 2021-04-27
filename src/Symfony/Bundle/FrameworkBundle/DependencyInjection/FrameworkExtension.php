@@ -1360,7 +1360,7 @@ class FrameworkExtension extends Extension
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
 
         foreach ($classToServices as $class => $service) {
-            $package = sprintf('symfony/%s-translation', substr($service, \strlen('translation.provider_factory.')));
+            $package = sprintf('symfony/%s-translation-provider', substr($service, \strlen('translation.provider_factory.')));
 
             if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
                 $container->removeDefinition($service);

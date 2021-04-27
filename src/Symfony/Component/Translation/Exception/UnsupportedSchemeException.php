@@ -19,7 +19,7 @@ class UnsupportedSchemeException extends LogicException
     private const SCHEME_TO_PACKAGE_MAP = [
         'loco' => [
             'class' => Bridge\Loco\Provider\LocoProviderFactory::class,
-            'package' => 'symfony/loco-translation',
+            'package' => 'symfony/loco-translation-provider',
         ],
     ];
 
@@ -31,14 +31,14 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to synchronize translations via "%s" as the providers is not installed; try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(sprintf('Unable to synchronize translations via "%s" as the provider is not installed; try running "composer require %s".', $provider, $package['package']));
 
             return;
         }
 
         $message = sprintf('The "%s" scheme is not supported', $dsn->getScheme());
         if ($name && $supported) {
-            $message .= sprintf('; supported schemes for translation providers "%s" are: "%s"', $name, implode('", "', $supported));
+            $message .= sprintf('; supported schemes for translation provider "%s" are: "%s"', $name, implode('", "', $supported));
         }
 
         parent::__construct($message.'.');

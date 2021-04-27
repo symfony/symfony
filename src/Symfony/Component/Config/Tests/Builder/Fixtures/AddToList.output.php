@@ -10,6 +10,7 @@ return [
     ],
     'messenger' => [
         'routing' => [
+            'Foo\\MyArrayMessage'=> ['senders'=>['workqueue']],
             'Foo\\Message'=> ['senders'=>['workqueue']],
             'Foo\\DoubleMessage' => ['senders'=>['sync', 'workqueue']],
         ],

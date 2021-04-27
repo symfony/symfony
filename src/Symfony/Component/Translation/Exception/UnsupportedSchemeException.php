@@ -18,7 +18,7 @@ class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [
         'loco' => [
-            'class' => Bridge\Loco\Provider\LocoProviderFactory::class,
+            'class' => Bridge\Loco\LocoProviderFactory::class,
             'package' => 'symfony/loco-translation-provider',
         ],
     ];

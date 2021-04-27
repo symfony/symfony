@@ -4,7 +4,7 @@ namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\Translation\Bridge\Loco\Provider\LocoProvider;
+use Symfony\Component\Translation\Bridge\Loco\LocoProvider;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Loader\XliffFileLoader;

@@ -12,18 +12,10 @@
 namespace Symfony\Component\Translation\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\CommonResponseTrait;
-use Symfony\Component\Translation\Bridge\Loco\Provider\LocoProvider;
-use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Translation\Provider\FilteringProvider;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
-use Symfony\Component\Translation\TranslatorBag;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Mathieu Santostefano <msantostefano@protonmail.com>
@@ -61,7 +53,7 @@ abstract class TranslationProviderTestCase extends TestCase
 
     protected function createFile(array $messages = ['note' => 'NOTE'], $targetLanguage = 'en', $fileNamePattern = 'messages.%locale%.xlf', string $xlfVersion = 'xlf12'): string
     {
-        if ($xlfVersion === 'xlf12') {
+        if ('xlf12' === $xlfVersion) {
             $transUnits = '';
             foreach ($messages as $key => $value) {
                 $transUnits .= <<<XLIFF

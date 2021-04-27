@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Bridge\Loco\Provider;
+namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;

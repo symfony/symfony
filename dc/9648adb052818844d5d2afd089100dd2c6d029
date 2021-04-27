@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-04-27T14:55:19Z
+
+to me, that's a separate PR than changing the namespace (which could be considered ready)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-27T15:11:30Z
+
+There are still a few places that needs to be updated. Do a search for `Bridge\Loco\Provider` and you will find at least 3 hits.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-27T15:25:04Z
+
+Thanks Tobias 👍 fixed

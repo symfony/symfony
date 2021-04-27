@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-25T07:33:14Z
+
+Could you have a look at the psalm issues too?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-25T17:29:31Z
+
+We already mention it, but we have many DSN implementation in the core. @Nyholm wrote a Dsn Component. I could be better for us to work together for a single Dsn implementation for 6.0? cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-25T18:49:03Z
+
+Sure we can do this but the DSN on notifier fixed some issues which mailer DSN still has because of BC, so we should copy this one.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-26T07:40:10Z
+
+Ready to merge from my side
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-27T09:23:05Z
+
+Please see my comment: https://github.com/symfony/symfony/pull/40944/files#r621020058

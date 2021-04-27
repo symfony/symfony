@@ -79,7 +79,7 @@ class ClassBuilder
         }
         foreach ($this->methods as $method) {
             $lines = explode("\n", $method->getContent());
-            foreach ($lines as $i => $line) {
+            foreach ($lines as $line) {
                 $body .= '    '.$line."\n";
             }
         }

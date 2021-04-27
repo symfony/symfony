@@ -446,7 +446,7 @@ class RequestTest extends TestCase
     public function getFormatToMimeTypeMapProviderWithAdditionalNullFormat()
     {
         return array_merge(
-            [[null, [null, 'unexistent-mime-type']]],
+            [[null, ['unexistent-mime-type']]],
             $this->getFormatToMimeTypeMapProvider()
         );
     }

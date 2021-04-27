@@ -9,4 +9,4 @@ $str = '?*():@&+$/%#[]';
 $r->headers->setCookie(new Cookie($str, $str, 0, '/', null, false, false, true, null));
 $r->sendHeaders();
 
-setrawcookie($str, $str, 0, '/', null, false, false);
+setrawcookie($str, $str, 0, '/', '', false, false);

@@ -74,8 +74,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $tokenValue = base64_encode(random_bytes(64));
-        $this->tokenProvider->updateToken($series, $this->generateHash($tokenValue), new \DateTime());
+        // if a token was regenerated less than a minute ago, there is no need to regenerate it
+        // if multiple concurrent requests reauthenticate a user we do not want to update the token several times
+        if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
+            $tokenValue = base64_encode(random_bytes(64));
+            $this->tokenProvider->updateToken($series, $this->generateHash($tokenValue), new \DateTime());
+        }
 
         $this->createCookie($rememberMeDetails->withValue($tokenValue));
     }

@@ -13,6 +13,17 @@ CHANGELOG
  * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
  * Add `#[AsController]` attribute for declaring standalone controllers on PHP 8
  * Add `FragmentUriGeneratorInterface` and `FragmentUriGenerator` to generate the URI of a fragment
+ * Add HttpKernel Event Interfaces
+   * `ControllerArgumentsEventInterface`
+   * `ControllerEventInterface`
+   * `ExceptionEventInterface`
+   * `FinishRequestEventInterface`
+   * `KernelEventInterface`
+   * `RequestEventInterface`
+   * `ResponseEventInterface`
+   * `TerminateEventInterface`
+   * `ViewEventInterface`
+ * Add `KernelEventTest`
 
 5.2.0
 -----

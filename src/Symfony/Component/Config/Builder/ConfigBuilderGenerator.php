@@ -136,7 +136,7 @@ public function NAME(array $value = []): CLASS
     if (null === $this->PROPERTY) {
         $this->PROPERTY = new CLASS($value);
     } elseif ([] !== $value) {
-        throw new InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
+        throw new InvalidConfigurationException(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\');
     }
 
     return $this->PROPERTY;
@@ -233,7 +233,7 @@ public function NAME(string $VAR, array $VALUE = []): CLASS
         return $this->PROPERTY[$VAR];
     }
 
-    throw new InvalidConfigurationException(sprintf(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\'));
+    throw new InvalidConfigurationException(\'The node created by "NAME()" has already been initialized. You cannot pass values the second time you call NAME().\');
 }';
             $class->addUse(InvalidConfigurationException::class);
             $class->addMethod($methodName, $body, ['PROPERTY' => $property->getName(), 'CLASS' => $childClass->getFqcn(), 'VAR' => '' === $key ? 'key' : $key, 'VALUE' => 'value' === $key ? 'data' : 'value']);
@@ -300,7 +300,7 @@ public function NAME($value): self
             $comment .= ' * '.$info.\PHP_EOL;
         }
 
-        foreach (((array) $node->getExample() ?? []) as $example) {
+        foreach ((array) ($node->getExample() ?? []) as $example) {
             $comment .= ' * @example '.$example.\PHP_EOL;
         }
 
@@ -356,7 +356,7 @@ public function NAME($value): self
             $code = '$this->PROPERTY';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
-                    $code = 'array_map(function($v) { return $v->toArray(); }, $this->PROPERTY)';
+                    $code = 'array_map(function ($v) { return $v->toArray(); }, $this->PROPERTY)';
                 } else {
                     $code = '$this->PROPERTY->toArray()';
                 }
@@ -385,7 +385,7 @@ public function NAME(): array
             $code = '$value[\'ORG_NAME\']';
             if (null !== $p->getType()) {
                 if ($p->isArray()) {
-                    $code = 'array_map(function($v) { return new '.$p->getType().'($v); }, $value[\'ORG_NAME\'])';
+                    $code = 'array_map(function ($v) { return new '.$p->getType().'($v); }, $value[\'ORG_NAME\'])';
                 } else {
                     $code = 'new '.$p->getType().'($value[\'ORG_NAME\'])';
                 }
@@ -400,8 +400,8 @@ public function NAME(): array
         }
 
         $body .= '
-    if ($value !== []) {
-        throw new InvalidConfigurationException(sprintf(\'The following keys are not supported by "%s": \', __CLASS__) . implode(\', \', array_keys($value)));
+    if ([] !== $value) {
+        throw new InvalidConfigurationException(sprintf(\'The following keys are not supported by "%s": \', __CLASS__).implode(\', \', array_keys($value)));
     }';
 
         $class->addUse(InvalidConfigurationException::class);

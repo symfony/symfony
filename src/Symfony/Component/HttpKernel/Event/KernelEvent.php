@@ -20,7 +20,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class KernelEvent extends Event
+class KernelEvent extends Event implements KernelEventInterface
 {
     private $kernel;
     private $request;

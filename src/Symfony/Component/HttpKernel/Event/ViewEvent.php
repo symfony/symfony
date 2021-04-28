@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class ViewEvent extends RequestEvent
+final class ViewEvent extends RequestEvent implements ViewEventInterface
 {
     /**
      * The return value of the controller.

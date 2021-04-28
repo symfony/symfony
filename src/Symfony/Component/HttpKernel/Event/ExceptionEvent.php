@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class ExceptionEvent extends RequestEvent
+final class ExceptionEvent extends RequestEvent implements ExceptionEventInterface
 {
     private $throwable;
 

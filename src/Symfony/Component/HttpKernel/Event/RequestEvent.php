@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RequestEvent extends KernelEvent
+class RequestEvent extends KernelEvent implements RequestEventInterface
 {
     private $response;
 

@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\HttpFoundation\Response;
+
 /**
- * Triggered whenever a request is fully processed.
+ * Represents an event containing response.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Lukasz Goworko <info@lukaszgoworko.de>
  */
-final class FinishRequestEvent extends KernelEvent implements FinishRequestEventInterface
+interface ResponseEventInterface
 {
+    public function getResponse(): Response;
+
+    public function setResponse(Response $response): void;
 }

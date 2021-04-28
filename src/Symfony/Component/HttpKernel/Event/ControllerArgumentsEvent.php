@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-final class ControllerArgumentsEvent extends KernelEvent
+final class ControllerArgumentsEvent extends KernelEvent implements ControllerArgumentsEventInterface
 {
     private $controller;
     private $arguments;

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-final class TerminateEvent extends KernelEvent
+final class TerminateEvent extends KernelEvent implements TerminateEventInterface
 {
     private $response;
 

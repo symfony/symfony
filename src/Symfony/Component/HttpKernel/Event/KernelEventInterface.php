@@ -12,10 +12,17 @@
 namespace Symfony\Component\HttpKernel\Event;
 
 /**
- * Triggered whenever a request is fully processed.
+ * Represents an event containing a kernel and a request.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Lukasz Goworko <info@lukaszgoworko.de>
  */
-final class FinishRequestEvent extends KernelEvent implements FinishRequestEventInterface
+interface KernelEventInterface
 {
+    public function getKernel();
+
+    public function getRequest();
+
+    public function getRequestType();
+
+    public function isMainRequest(): bool;
 }

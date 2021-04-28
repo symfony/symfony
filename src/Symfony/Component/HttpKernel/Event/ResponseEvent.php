@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class ResponseEvent extends KernelEvent
+final class ResponseEvent extends KernelEvent implements ResponseEventInterface
 {
     private $response;
 

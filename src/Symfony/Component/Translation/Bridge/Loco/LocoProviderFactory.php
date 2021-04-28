@@ -26,7 +26,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProviderFactory extends AbstractProviderFactory
 {
-    public const SCHEME = 'loco';
     private const HOST = 'localise.biz/api/';
 
     private $client;
@@ -47,8 +46,8 @@ final class LocoProviderFactory extends AbstractProviderFactory
      */
     public function create(Dsn $dsn): ProviderInterface
     {
-        if (self::SCHEME !== $dsn->getScheme()) {
-            throw new UnsupportedSchemeException($dsn, self::SCHEME, $this->getSupportedSchemes());
+        if ('loco' !== $dsn->getScheme()) {
+            throw new UnsupportedSchemeException($dsn, 'loco', $this->getSupportedSchemes());
         }
 
         $endpoint = sprintf('%s%s', 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost(), $dsn->getPort() ? ':'.$dsn->getPort() : '');
@@ -64,6 +63,6 @@ final class LocoProviderFactory extends AbstractProviderFactory
 
     protected function getSupportedSchemes(): array
     {
-        return [self::SCHEME];
+        return ['loco'];
     }
 }

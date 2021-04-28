@@ -48,7 +48,7 @@ final class LocoProvider implements ProviderInterface
 
     public function __toString(): string
     {
-        return sprintf('%s://%s', LocoProviderFactory::SCHEME, $this->endpoint);
+        return sprintf('loco://%s', $this->endpoint);
     }
 
     public function write(TranslatorBagInterface $translatorBag): void

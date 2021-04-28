@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-27T11:50:19Z
+
+Oh, yes. The constructors!
+I missed that. Thank you.
+
+Could you add a small tests for this too? Have a look at `AddToList.php`, `AddToList.config.php`, `AddToList.output.php` and add something similar (but simpler) to that. I can help out if you need me to.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2021-04-27T15:20:57Z
+
+Well thank **you** for the ConfigBuilder 😁
+
+Could I just replace https://github.com/symfony/symfony/blob/63496dfdc665067bc13375ed4674d8095e39f657/src/Symfony/Component/Config/Tests/Builder/Fixtures/AddToList.config.php#L10-L13 by
+
+```php
+$config->messenger([
+    'routing' => [
+        'Foo\\Message' => [
+            'senders' => ['workqueue'],
+        ],
+        'Foo\\DoubleMessage' => [
+            'senders' => ['sync', 'workqueue'],
+        ],
+    ]
+]);
+```
+?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-27T15:32:14Z
+
+Sure, but dont replace anything. Just add a third message.
+
+```
+$config->messenger([
+    'routing' => [
+        'Foo\\MyArrayMessage' => [
+            'senders' => ['workqueue'],
+        ],
+    ]
+]);
+ $config->messenger()
+     ->routing('Foo\\Message')->senders(['workqueue']);
+ $config->messenger()
+     ->routing('Foo\\DoubleMessage')->senders(['sync', 'workqueue']);
+```
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2021-04-27T16:07:48Z
+
+Done :ok_hand:
+
+Travis failure seems unrelated.

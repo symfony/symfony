@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Lock\Exception;
 
+use Symfony\Component\Lock\Lock;
+
 /**
  * LockConflictedException is thrown when a lock is acquired by someone else.
  *

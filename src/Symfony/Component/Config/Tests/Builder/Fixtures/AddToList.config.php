@@ -7,6 +7,13 @@ return static function (AddToListConfig $config) {
     $config->translator()->source('\\Acme\\Foo', 'yellow');
     $config->translator()->source('\\Acme\\Bar', 'green');
 
+    $config->messenger([
+        'routing' => [
+            'Foo\\MyArrayMessage' => [
+                'senders' => ['workqueue'],
+            ],
+        ]
+    ]);
     $config->messenger()
         ->routing('Foo\\Message')->senders(['workqueue']);
     $config->messenger()

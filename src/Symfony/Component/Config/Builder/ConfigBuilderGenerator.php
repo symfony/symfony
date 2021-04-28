@@ -129,7 +129,7 @@ public function NAME(): string
         $class->addRequire($childClass);
         $this->classes[] = $childClass;
 
-        $property = $class->addProperty($node->getName(), $childClass->getName());
+        $property = $class->addProperty($node->getName(), $childClass->getFqcn());
         $body = '
 public function NAME(array $value = []): CLASS
 {
@@ -213,7 +213,7 @@ public function NAME(string $VAR, $VALUE): self
         $childClass = new ClassBuilder($namespace, $name);
         $class->addRequire($childClass);
         $this->classes[] = $childClass;
-        $property = $class->addProperty($node->getName(), $childClass->getName().'[]');
+        $property = $class->addProperty($node->getName(), $childClass->getFqcn().'[]');
 
         if (null === $key = $node->getKeyAttribute()) {
             $body = '

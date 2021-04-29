@@ -159,11 +159,15 @@ class PhpFileLoader extends FileLoader
 
         // If it does not start with Symfony\Config\ we dont know how to handle this
         if ('Symfony\\Config\\' !== substr($namespace, 0, 15)) {
-            throw new InvalidargumentException(sprintf('Could not find or generate class "%s".', $namespace));
+            throw new InvalidArgumentException(sprintf('Could not find or generate class "%s".', $namespace));
         }
 
         // Try to get the extension alias
         $alias = Container::underscore(substr($namespace, 15, -6));
+
+        if (false !== strpos($alias, '\\')) {
+            throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\\Config\\" namespace. Nested classes like "Symfony\\Config\\Framework\\CacheConfig" cannot be used.');
+        }
 
         if (!$this->container->hasExtension($alias)) {
             $extensions = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getAlias(); }, $this->container->getExtensions()));

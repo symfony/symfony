@@ -164,4 +164,16 @@ class PhpFileLoaderTest extends TestCase
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
         $loader->load($fixtures.'/config/deprecated_without_package_version.php');
     }
+
+    public function testNestedBundleConfigNotAllowed()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'prod', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^'.preg_quote('Could not resolve argument "Symfony\\Config\\AcmeConfig\\NestedConfig $config"', '/').'/');
+
+        $loader->load($fixtures.'/config/nested_bundle_config.php');
+    }
 }

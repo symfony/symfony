@@ -13,7 +13,6 @@ CHANGELOG
  * [BC BREAK] Changed the return type of `AbstractTransportFactory::getEndpoint()` from `?string` to `string`
  * Added `DSN::getRequiredOption` method which throws a new `MissingRequiredOptionException`.
  * Added `NotificationInterface` to enable composition for notifications 
- * Changed visibility of `Notification` properties to protected in order to make inheritance easier 
 
 5.2.0
 -----

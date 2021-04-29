@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class Notification implements NotificationInterface
 {
-    protected const LEVELS = [
+    private const LEVELS = [
         LogLevel::DEBUG => 100,
         LogLevel::INFO => 200,
         LogLevel::NOTICE => 250,
@@ -31,13 +31,13 @@ class Notification implements NotificationInterface
         LogLevel::EMERGENCY => 600,
     ];
 
-    protected $channels = [];
-    protected $subject = '';
-    protected $content = '';
-    protected $emoji = '';
-    protected $exception;
-    protected $exceptionAsString = '';
-    protected $importance = self::IMPORTANCE_HIGH;
+    private $channels = [];
+    private $subject = '';
+    private $content = '';
+    private $emoji = '';
+    private $exception;
+    private $exceptionAsString = '';
+    private $importance = self::IMPORTANCE_HIGH;
 
     public function __construct(string $subject = '', array $channels = [])
     {

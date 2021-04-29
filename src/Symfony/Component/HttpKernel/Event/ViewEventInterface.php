@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
-use Symfony\Component\HttpFoundation\Response;
-
 /**
  * Represents an event containing a controller result.
  *

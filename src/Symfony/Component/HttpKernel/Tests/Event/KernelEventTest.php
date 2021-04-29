@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class KernelEventTest extends TestCase
 {
-
     public function testIsMainRequestTrue()
     {
         $kernelEvent = new KernelEvent(new TestHttpKernel(), new Request(), HttpKernelInterface::MAIN_REQUEST);

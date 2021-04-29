@@ -28,9 +28,6 @@ interface NotificationInterface
      */
     public function setSubject(string $subject): self;
 
-    /**
-     * @return string
-     */
     public function getSubject(): string;
 
     /**
@@ -38,9 +35,6 @@ interface NotificationInterface
      */
     public function setContent(string $content): self;
 
-    /**
-     * @return string
-     */
     public function getContent(): string;
 
     /**
@@ -48,9 +42,6 @@ interface NotificationInterface
      */
     public function setImportance(string $importance): self;
 
-    /**
-     * @return string
-     */
     public function getImportance(): string;
 
     /**
@@ -58,10 +49,5 @@ interface NotificationInterface
      */
     public function setChannels(array $channels): self;
 
-    /**
-     * @param \Symfony\Component\Notifier\Recipient\RecipientInterface $recipient
-     *
-     * @return array
-     */
     public function getChannels(RecipientInterface $recipient): array;
 }

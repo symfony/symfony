@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Tests\Channel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Channel\AbstractChannel;
 use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
@@ -32,12 +32,12 @@ class AbstractChannelTest extends TestCase
 
 class DummyChannel extends AbstractChannel
 {
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(NotificationInterface $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         return;
     }
 
-    public function supports(Notification $notification, RecipientInterface $recipient): bool
+    public function supports(NotificationInterface $notification, RecipientInterface $recipient): bool
     {
         return false;
     }

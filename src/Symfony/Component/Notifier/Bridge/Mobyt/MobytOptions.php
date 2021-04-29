@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Mobyt;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 
 /**
  * @author Bastien Durand <bdurand-dev@outlook.com>
@@ -35,18 +35,18 @@ final class MobytOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public static function fromNotification(Notification $notification): self
+    public static function fromNotification(NotificationInterface $notification): self
     {
         $options = new self();
         switch ($notification->getImportance()) {
-            case Notification::IMPORTANCE_HIGH:
-            case Notification::IMPORTANCE_URGENT:
+            case NotificationInterface::IMPORTANCE_HIGH:
+            case NotificationInterface::IMPORTANCE_URGENT:
                 $options->messageType(self::MESSAGE_TYPE_QUALITY_HIGH);
                 break;
-            case Notification::IMPORTANCE_MEDIUM:
+            case NotificationInterface::IMPORTANCE_MEDIUM:
                 $options->messageType(self::MESSAGE_TYPE_QUALITY_MEDIUM);
                 break;
-            case Notification::IMPORTANCE_LOW:
+            case NotificationInterface::IMPORTANCE_LOW:
                 $options->messageType(self::MESSAGE_TYPE_QUALITY_LOW);
                 break;
             default:

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Message;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
 /**
@@ -34,7 +34,7 @@ final class SmsMessage implements MessageInterface
         $this->phone = $phone;
     }
 
-    public static function fromNotification(Notification $notification, SmsRecipientInterface $recipient): self
+    public static function fromNotification(NotificationInterface $notification, SmsRecipientInterface $recipient): self
     {
         return new self($recipient->getPhone(), $notification->getSubject());
     }

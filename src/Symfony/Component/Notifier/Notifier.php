@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Channel\ChannelInterface;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChannelPolicyInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
@@ -38,7 +38,7 @@ final class Notifier implements NotifierInterface
         $this->policy = $policy;
     }
 
-    public function send(Notification $notification, RecipientInterface ...$recipients): void
+    public function send(NotificationInterface $notification, RecipientInterface ...$recipients): void
     {
         if (!$recipients) {
             $recipients = [new NoRecipient()];
@@ -64,7 +64,7 @@ final class Notifier implements NotifierInterface
         return $this->adminRecipients;
     }
 
-    private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
+    private function getChannels(NotificationInterface $notification, RecipientInterface $recipient): iterable
     {
         $channels = $notification->getChannels($recipient);
         if (!$channels) {

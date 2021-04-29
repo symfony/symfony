@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\LogicException;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 
 /**
@@ -34,7 +34,7 @@ final class EmailMessage implements MessageInterface
         $this->envelope = $envelope;
     }
 
-    public static function fromNotification(Notification $notification, EmailRecipientInterface $recipient): self
+    public static function fromNotification(NotificationInterface $notification, EmailRecipientInterface $recipient): self
     {
         if ('' === $recipient->getEmail()) {
             throw new InvalidArgumentException(sprintf('"%s" needs an email, it cannot be empty.', static::class));

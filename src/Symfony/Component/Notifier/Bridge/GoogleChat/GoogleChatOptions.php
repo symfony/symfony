@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\GoogleChat;
 use Symfony\Component\Notifier\Bridge\GoogleChat\Component\Card;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 
 /**
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
@@ -29,7 +29,7 @@ final class GoogleChatOptions implements MessageOptionsInterface
         $this->options = $options;
     }
 
-    public static function fromNotification(Notification $notification): self
+    public static function fromNotification(NotificationInterface $notification): self
     {
         $options = new self();
 

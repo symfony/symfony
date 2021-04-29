@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\EmailMessage;
 use Symfony\Component\Notifier\Notification\EmailNotificationInterface;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
@@ -45,7 +45,7 @@ class EmailChannel implements ChannelInterface
         $this->envelope = $envelope;
     }
 
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(NotificationInterface $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof EmailNotificationInterface) {
@@ -83,7 +83,7 @@ class EmailChannel implements ChannelInterface
         }
     }
 
-    public function supports(Notification $notification, RecipientInterface $recipient): bool
+    public function supports(NotificationInterface $notification, RecipientInterface $recipient): bool
     {
         return $recipient instanceof EmailRecipientInterface;
     }

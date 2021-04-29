@@ -13,7 +13,7 @@ namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Notification\ChatNotificationInterface;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class ChatChannel extends AbstractChannel
 {
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(NotificationInterface $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof ChatNotificationInterface) {
@@ -43,7 +43,7 @@ class ChatChannel extends AbstractChannel
         }
     }
 
-    public function supports(Notification $notification, RecipientInterface $recipient): bool
+    public function supports(NotificationInterface $notification, RecipientInterface $recipient): bool
     {
         return true;
     }

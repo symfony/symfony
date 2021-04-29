@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\Share\LifecycleStateShare;
 use Symfony\Component\Notifier\Bridge\LinkedIn\Share\ShareContentShare;
 use Symfony\Component\Notifier\Bridge\LinkedIn\Share\VisibilityShare;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 
 /**
  * @author Smaïne Milianni <smaine.milianni@gmail.com>
@@ -40,7 +40,7 @@ final class LinkedInOptions implements MessageOptionsInterface
         return null;
     }
 
-    public static function fromNotification(Notification $notification): self
+    public static function fromNotification(NotificationInterface $notification): self
     {
         $options = new self();
         $options->specificContent(new ShareContentShare($notification->getSubject()));

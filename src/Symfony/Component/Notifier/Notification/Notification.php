@@ -18,9 +18,9 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Notification
+class Notification implements NotificationInterface
 {
-    private const LEVELS = [
+    protected const LEVELS = [
         LogLevel::DEBUG => 100,
         LogLevel::INFO => 200,
         LogLevel::NOTICE => 250,
@@ -31,18 +31,13 @@ class Notification
         LogLevel::EMERGENCY => 600,
     ];
 
-    public const IMPORTANCE_URGENT = 'urgent';
-    public const IMPORTANCE_HIGH = 'high';
-    public const IMPORTANCE_MEDIUM = 'medium';
-    public const IMPORTANCE_LOW = 'low';
-
-    private $channels = [];
-    private $subject = '';
-    private $content = '';
-    private $emoji = '';
-    private $exception;
-    private $exceptionAsString = '';
-    private $importance = self::IMPORTANCE_HIGH;
+    protected $channels = [];
+    protected $subject = '';
+    protected $content = '';
+    protected $emoji = '';
+    protected $exception;
+    protected $exceptionAsString = '';
+    protected $importance = self::IMPORTANCE_HIGH;
 
     public function __construct(string $subject = '', array $channels = [])
     {
@@ -66,7 +61,7 @@ class Notification
     /**
      * @return $this
      */
-    public function subject(string $subject): self
+    public function setSubject(string $subject): self
     {
         $this->subject = $subject;
 
@@ -81,7 +76,7 @@ class Notification
     /**
      * @return $this
      */
-    public function content(string $content): self
+    public function setContent(string $content): self
     {
         $this->content = $content;
 
@@ -96,7 +91,7 @@ class Notification
     /**
      * @return $this
      */
-    public function importance(string $importance): self
+    public function setImportance(string $importance): self
     {
         $this->importance = $importance;
 
@@ -149,7 +144,7 @@ class Notification
     /**
      * @return $this
      */
-    public function channels(array $channels): self
+    public function setChannels(array $channels): self
     {
         $this->channels = $channels;
 

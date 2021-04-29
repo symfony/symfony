@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
@@ -133,7 +134,7 @@ final class SlackOptionsTest extends TestCase
     /**
      * @dataProvider fromNotificationProvider
      */
-    public function testFromNotification(array $expected, Notification $notification)
+    public function testFromNotification(array $expected, NotificationInterface $notification)
     {
         $options = SlackOptions::fromNotification($notification);
 

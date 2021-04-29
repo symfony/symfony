@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\Notification\NotificationInterface;
 use Symfony\Component\Notifier\Notification\SmsNotificationInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  */
 class SmsChannel extends AbstractChannel
 {
-    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
+    public function notify(NotificationInterface $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof SmsNotificationInterface) {
@@ -44,7 +44,7 @@ class SmsChannel extends AbstractChannel
         }
     }
 
-    public function supports(Notification $notification, RecipientInterface $recipient): bool
+    public function supports(NotificationInterface $notification, RecipientInterface $recipient): bool
     {
         return $recipient instanceof SmsRecipientInterface;
     }

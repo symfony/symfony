@@ -1,6 +1,7 @@
 <?php
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use Symfony\Config\PlaceholdersConfig;
 
 return static function (PlaceholdersConfig $config) {

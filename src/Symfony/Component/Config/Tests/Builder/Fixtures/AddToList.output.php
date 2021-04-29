@@ -6,17 +6,17 @@ return [
         'sources' => [
             '\\Acme\\Foo' => 'yellow',
             '\\Acme\\Bar' => 'green',
-        ]
+        ],
     ],
     'messenger' => [
         'routing' => [
-            'Foo\\MyArrayMessage'=> ['senders'=>['workqueue']],
-            'Foo\\Message'=> ['senders'=>['workqueue']],
-            'Foo\\DoubleMessage' => ['senders'=>['sync', 'workqueue']],
+            'Foo\\MyArrayMessage' => ['senders' => ['workqueue']],
+            'Foo\\Message' => ['senders' => ['workqueue']],
+            'Foo\\DoubleMessage' => ['senders' => ['sync', 'workqueue']],
         ],
         'receiving' => [
-            ['priority'=>10, 'color'=>'blue'],
-            ['priority'=>5, 'color'=>'red'],
-        ]
+            ['priority' => 10, 'color' => 'blue'],
+            ['priority' => 5, 'color' => 'red'],
+        ],
     ],
 ];

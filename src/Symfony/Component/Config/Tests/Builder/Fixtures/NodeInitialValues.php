@@ -4,7 +4,6 @@ namespace Symfony\Component\Config\Tests\Builder\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Translation\Translator;
 
 class NodeInitialValues implements ConfigurationInterface
 {

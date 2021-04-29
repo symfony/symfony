@@ -46,8 +46,6 @@ class DataPart extends TextPart
 
     public static function fromPath(string $path, string $name = null, string $contentType = null): self
     {
-        // FIXME: if file is not readable, exception?
-
         if (null === $contentType) {
             $ext = strtolower(substr($path, strrpos($path, '.') + 1));
             if (null === self::$mimeTypes) {

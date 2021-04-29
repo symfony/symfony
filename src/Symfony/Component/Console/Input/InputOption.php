@@ -186,9 +186,6 @@ class InputOption
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
-        if (self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode) && null !== $default) {
-            throw new LogicException('Cannot set a default value when using InputOption::VALUE_NEGATABLE mode.');
-        }
 
         if ($this->isArray()) {
             if (null === $default) {
@@ -198,7 +195,7 @@ class InputOption
             }
         }
 
-        $this->default = $this->acceptValue() ? $default : false;
+        $this->default = $this->acceptValue() || $this->isNegatable() ? $default : false;
     }
 
     /**

@@ -92,4 +92,33 @@ class ResponseListenerTest extends TestCase
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
+
+    public function testPermissionsPolicy()
+    {
+        $listener = new ResponseListener('UTF-8', 'interest-cohort=()');
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse'], 1);
+        $request = Request::create('/');
+
+        $response = new Response('foo');
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+        $this->assertSame('interest-cohort=()', $response->headers->get('permissions-policy'));
+
+        $response = new Response('foo');
+        $response->headers->set('permissions-policy', 'geolocation=()');
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+        $this->assertSame('geolocation=()', $response->headers->get('permissions-policy'));
+
+        $response = new Response('foo');
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+        $this->assertFalse($response->headers->has('permissions-policy'));
+
+        $response = new Response('foo');
+        $response->headers->set('Content-Type', 'application/json');
+        $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch($event, KernelEvents::RESPONSE);
+        $this->assertFalse($response->headers->has('permissions-policy'));
+    }
 }

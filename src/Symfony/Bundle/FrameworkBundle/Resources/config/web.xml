@@ -59,6 +59,7 @@
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>
+            <argument>%kernel.permissions_policy%</argument>
         </service>
 
         <service id="streamed_response_listener" class="Symfony\Component\HttpKernel\EventListener\StreamedResponseListener">

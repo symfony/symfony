@@ -25,10 +25,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
+    private $permissionsPolicy;
 
-    public function __construct(string $charset)
+    public function __construct(string $charset, string $permissionsPolicy = null)
     {
         $this->charset = $charset;
+        $this->permissionsPolicy = $permissionsPolicy;
     }
 
     /**
@@ -47,6 +49,16 @@ class ResponseListener implements EventSubscriberInterface
         }
 
         $response->prepare($event->getRequest());
+
+        if (null === $this->permissionsPolicy || $response->headers->has('permissions-policy')) {
+            return;
+        }
+
+        $contentType = $response->headers->get('Content-Type');
+
+        if (false !== strpos($contentType, 'html') || false !== strpos($contentType, 'pdf')) {
+            $response->headers->set('permissions-policy', $this->permissionsPolicy);
+        }
     }
 
     public static function getSubscribedEvents()

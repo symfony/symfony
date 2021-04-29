@@ -8,6 +8,7 @@ CHANGELOG
  * Check for maximum number of buttons in Slack action block
  * Add HeaderBlock
  * Slack access tokens needs to start with "xox" (see https://api.slack.com/authentication/token-types)
+ * Add `SlackOptions::threadTs()` to send message as reply
 
 5.2.0
 -----

@@ -51,11 +51,11 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
         $algos = [1 => \PASSWORD_BCRYPT, '2y' => \PASSWORD_BCRYPT];
 
         if (\defined('PASSWORD_ARGON2I')) {
-            $this->algo = $algos[2] = $algos['argon2i'] = (string) \PASSWORD_ARGON2I;
+            $this->algo = $algos[2] = $algos['argon2i'] = \PASSWORD_ARGON2I;
         }
 
         if (\defined('PASSWORD_ARGON2ID')) {
-            $this->algo = $algos[3] = $algos['argon2id'] = (string) \PASSWORD_ARGON2ID;
+            $this->algo = $algos[3] = $algos['argon2id'] = \PASSWORD_ARGON2ID;
         }
 
         if (null !== $algo) {
@@ -75,7 +75,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
      */
     public function encodePassword($raw, $salt): string
     {
-        if (\strlen($raw) > self::MAX_PASSWORD_LENGTH || ((string) \PASSWORD_BCRYPT === $this->algo && 72 < \strlen($raw))) {
+        if (\strlen($raw) > self::MAX_PASSWORD_LENGTH || (\PASSWORD_BCRYPT === $this->algo && 72 < \strlen($raw))) {
             throw new BadCredentialsException('Invalid password.');
         }
 

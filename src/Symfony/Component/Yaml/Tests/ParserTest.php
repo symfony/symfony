@@ -1072,6 +1072,10 @@ EOF
             'map' => ['key' => 'var-value'],
             'list_in_map' => ['key' => ['var-value']],
             'map_in_map' => ['foo' => ['bar' => 'var-value']],
+            'foo' => ['bar' => 'baz'],
+            'bar' => ['foo' => 'baz'],
+            'baz' => ['foo'],
+            'foobar' => ['foo'],
         ], Yaml::parse(<<<'EOF'
 var:  &var var-value
 scalar: *var
@@ -1082,6 +1086,10 @@ embedded_mapping: [ key: *var ]
 map: { key: *var }
 list_in_map: { key: [*var] }
 map_in_map: { foo: { bar: *var } }
+foo: { bar: &baz baz }
+bar: { foo: *baz }
+baz: [ &foo foo ]
+foobar: [ *foo ]
 EOF
         ));
     }

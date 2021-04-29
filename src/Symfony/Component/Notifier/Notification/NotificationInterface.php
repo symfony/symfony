@@ -26,28 +26,28 @@ interface NotificationInterface
     /**
      * @return $this
      */
-    public function setSubject(string $subject): self;
+    public function setSubject(string $subject);
 
     public function getSubject(): string;
 
     /**
      * @return $this
      */
-    public function setContent(string $content): self;
+    public function setContent(string $content);
 
     public function getContent(): string;
 
     /**
      * @return $this
      */
-    public function setImportance(string $importance): self;
+    public function setImportance(string $importance);
 
     public function getImportance(): string;
 
     /**
      * @return $this
      */
-    public function setChannels(array $channels): self;
+    public function setChannels(array $channels);
 
     public function getChannels(RecipientInterface $recipient): array;
 }

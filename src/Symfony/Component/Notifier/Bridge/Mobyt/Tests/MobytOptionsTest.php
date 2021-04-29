@@ -14,7 +14,7 @@ final class MobytOptionsTest extends TestCase
      */
     public function testFromNotification(string $importance, string $expectedMessageType)
     {
-        $notification = (new Notification('Foo'))->importance($importance);
+        $notification = (new Notification('Foo'))->setImportance($importance);
 
         $options = (MobytOptions::fromNotification($notification))->toArray();
 
@@ -34,7 +34,7 @@ final class MobytOptionsTest extends TestCase
 
     public function testFromNotificationDefaultLevel()
     {
-        $notification = (new Notification('Foo'))->importance('Bar');
+        $notification = (new Notification('Foo'))->setImportance('Bar');
 
         $options = (MobytOptions::fromNotification($notification))->toArray();
 

@@ -183,7 +183,7 @@ final class SlackOptionsTest extends TestCase
                     ],
                 ],
             ],
-            (new Notification($subject))->emoji($emoji)->content($content),
+            (new Notification($subject))->emoji($emoji)->setContent($content),
         ];
     }
 }

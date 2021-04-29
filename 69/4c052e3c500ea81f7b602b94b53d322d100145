@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2021-04-29T13:30:49Z
+
+The main difference is about "What's a negatable option?"
+
+**(1)** A single option with two behaviors (yes/no)
+**(2)** Two different options (yes, no) but defined as a single one for convenience
+
+In **case (1)**, we need a tri-state to differentiate these cases:
+
+```php
+$useAnsi = $input->getOption('ansi');
+if (true === $useAnsi) {
+    // force ANSI usage
+} elseif (false === $useAnsi) {
+    // don't use ANSI
+} elseif (null === $useAnsi) {
+    // user didn't pass any ANSI preference;
+    // we must decide what to do
+}
+```
+
+In **case (2)**, you only need two cases (the third one happens automatically):
+
+```php
+$useAnsi = $input->getOption('ansi');
+$dontUseAnsi = $input->getOption('no-ansi');
+if ($useAnsi) {
+    // force ANSI usage
+} elseif ($dontUseAnsi) {
+    // don't use ANSI
+} else {
+    // user didn't pass any ANSI preference;
+    // we must decide what to do
+}
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-04-29T13:46:18Z
+
+The BC break has been solved by setting the default to `false` for OUR `--ansi` option.
+In that way:
+- using `getOption('ansi')` will still return false
+- people can use `InputOption::VALUE_NEGATABLE` with a default `null` value and leverage the 3 states of the option.

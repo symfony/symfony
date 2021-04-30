@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-29T10:14:46Z
+
+Hey!
+
+I think @mcfedr has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-04-29T12:27:20Z
+
+This should probably be done in 4.4 instead.
+
+---------------------------------------------------------------------------
+
+by flack at 2021-04-29T12:41:22Z
+
+hmm, I tried simply chaing the branch, but bad things have happened. Should I close this and create a new PR, or is there some way to fix it?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-29T12:52:47Z
+
+@flack the bad thing is that your feature branch is still based on 5.x
+
+---------------------------------------------------------------------------
+
+by flack at 2021-04-29T13:03:36Z
+
+@stof , thanks. I ran `rebase --onto` and that seems to have fixed it.
+
+Some day I hope I'll get the hang of the symfony git workflow, but it could take a while... :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-29T13:55:49Z
+
+@flack that's exactly how to solve that (the case of rebasing a feature branch on top of an older target branch is not specific to Symfony's git workflow, which is why `git rebase` has this `--onto` option)
+
+---------------------------------------------------------------------------
+
+by flack at 2021-04-29T15:58:40Z
+
+@stof yeah, I meant more the workflow of not merging to master and then downwards from there, but to the oldest applicable branch and then upwards (or something). But anyways, off-topic here I guess :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-29T16:16:13Z
+
+@flack you cannot *merge* downwards (as that would merge the whole 5.x history into 4.4). The Symfony process allows to maintian things with merges, meaning each commit exists only once in the history.
+the alternative model does not merge downwards. It backports the patch (with `git cherry-pick`) but that duplicates the commit in the history (each branch has separate commits doing that patch), making it a lot harder to see what commits are included in the maintenance branch as there is nothing relating the backported commits to the original one (Doctrine switched to the merging model due to that)

@@ -28,7 +28,7 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
      * Shortcut to create a PostAuthenticationToken for you, if you don't really
      * care about which authenticated token you're using.
      *
-     * @return PostAuthenticationToken
+     * @return TokenInterface
      */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {

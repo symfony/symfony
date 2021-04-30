@@ -85,7 +85,7 @@ YAML;
         }
 
         self::assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
-        self::assertStringMatchesFormat('%A::error file=%s, line=2, col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
+        self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
     }
 
     public function testLintAutodetectsGithubActionEnvironment()
@@ -109,7 +109,7 @@ YAML;
 
             $tester->execute(['filename' => $filename], ['decorated' => false]);
 
-            self::assertStringMatchesFormat('%A::error file=%s, line=2, col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
+            self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
         } finally {
             putenv('GITHUB_ACTIONS'.($prev ? "=$prev" : ''));
         }

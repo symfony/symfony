@@ -51,4 +51,13 @@ class FileLinkFormatterTest extends TestCase
 
         $this->assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
     }
+
+    public function testIdeFileLinkFormat()
+    {
+        $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
+
+        $sut = new FileLinkFormatter('atom');
+
+        $this->assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
+    }
 }

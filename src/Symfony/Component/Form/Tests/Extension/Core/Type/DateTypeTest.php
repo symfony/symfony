@@ -204,6 +204,32 @@ class DateTypeTest extends BaseTypeTest
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
+    public function testArrayDateWithReferenceDoesUseReferenceTimeOnZero()
+    {
+        // we test against "de_DE", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_DE');
+
+        $input = [
+            'day' => '0',
+            'month' => '0',
+            'year' => '0',
+        ];
+
+        $form = $this->factory->create(static::TESTED_TYPE, $input, [
+            'format' => \IntlDateFormatter::MEDIUM,
+            'html5' => false,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'Europe/Berlin',
+            'input' => 'array',
+            'widget' => 'single_text',
+        ]);
+
+        $this->assertSame($input, $form->getData());
+        $this->assertEquals('01.01.1970', $form->getViewData());
+    }
+
     public function testSubmitFromText()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

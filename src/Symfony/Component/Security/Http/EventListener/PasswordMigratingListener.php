@@ -50,6 +50,10 @@ class PasswordMigratingListener implements EventSubscriberInterface
         }
 
         $user = $passport->getUser();
+        if (null === $user->getPassword()) {
+            return;
+        }
+
         $passwordEncoder = $this->encoderFactory->getEncoder($user);
         if (!$passwordEncoder->needsRehash($user->getPassword())) {
             return;

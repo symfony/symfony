@@ -699,7 +699,7 @@ class Request
      * flexibility in controllers, it is better to explicitly get request parameters from the appropriate
      * public property instead (attributes, query, request).
      *
-     * Order of precedence: PATH (routing placeholders or custom attributes), GET, BODY
+     * Order of precedence: PATH (routing placeholders or custom attributes), GET, POST
      *
      * @param mixed $default The default value if the parameter key does not exist
      *

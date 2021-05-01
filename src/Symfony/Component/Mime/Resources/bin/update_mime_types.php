@@ -19,7 +19,7 @@ foreach ($data as $mimeType => $mimeTypeInformation) {
     $new[$mimeType] = $mimeTypeInformation['extensions'];
 }
 
-$xml = simplexml_load_string(file_get_contents('https://raw.github.com/minad/mimemagic/master/script/freedesktop.org.xml'));
+$xml = simplexml_load_string(file_get_contents('https://gitlab.freedesktop.org/xdg/shared-mime-info/-/raw/master/data/freedesktop.org.xml.in'));
 foreach ($xml as $node) {
     $exts = [];
     foreach ($node->glob as $glob) {
@@ -76,75 +76,56 @@ foreach ($forceExtensionInFirstPositionByMimeType as $mimeType => $extensionToRe
 }
 
 $data = $pre;
-foreach ($map as $mimeType => $exts) {
-    $data .= sprintf("        '%s' => ['%s'],\n", $mimeType, implode("', '", array_unique($exts)));
-}
-$data .= $post;
 
 // reverse map
 // we prefill the extensions with some preferences for content-types
 $exts = [
-    'aif' => ['audio/x-aiff'],
-    'aiff' => ['audio/x-aiff'],
-    'aps' => ['application/postscript'],
-    'avi' => ['video/avi'],
-    'bmp' => ['image/bmp'],
     'bz2' => ['application/x-bz2'],
-    'css' => ['text/css'],
     'csv' => ['text/csv'],
-    'dmg' => ['application/x-apple-diskimage'],
-    'doc' => ['application/msword'],
-    'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-    'eml' => ['message/rfc822'],
-    'exe' => ['application/x-ms-dos-executable'],
     'flv' => ['video/x-flv'],
     'gif' => ['image/gif'],
     'gz' => ['application/x-gzip'],
-    'hqx' => ['application/stuffit'],
     'htm' => ['text/html'],
     'html' => ['text/html'],
     'jar' => ['application/x-java-archive'],
-    'jpeg' => ['image/jpeg'],
     'jpg' => ['image/jpeg'],
     'js' => ['text/javascript'],
+    'key' => ['application/vnd.apple.keynote'],
     'm3u' => ['audio/x-mpegurl'],
     'm4a' => ['audio/mp4'],
     'mdb' => ['application/x-msaccess'],
     'mid' => ['audio/midi'],
-    'midi' => ['audio/midi'],
     'mov' => ['video/quicktime'],
     'mp3' => ['audio/mpeg'],
-    'mp4' => ['video/mp4'],
-    'mpeg' => ['video/mpeg'],
-    'mpg' => ['video/mpeg'],
     'ogg' => ['audio/ogg'],
     'pdf' => ['application/pdf'],
     'php' => ['application/x-php'],
-    'php3' => ['application/x-php'],
-    'php4' => ['application/x-php'],
-    'php5' => ['application/x-php'],
-    'png' => ['image/png'],
     'ppt' => ['application/vnd.ms-powerpoint'],
-    'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
-    'ps' => ['application/postscript'],
     'rar' => ['application/x-rar-compressed'],
-    'rtf' => ['application/rtf'],
-    'sit' => ['application/x-stuffit'],
+    'hqx' => ['application/stuffit'],
+    'sit' => ['application/x-stuffit', 'application/stuffit'],
     'svg' => ['image/svg+xml'],
     'tar' => ['application/x-tar'],
     'tif' => ['image/tiff'],
-    'tiff' => ['image/tiff'],
     'ttf' => ['application/x-font-truetype'],
-    'txt' => ['text/plain'],
     'vcf' => ['text/x-vcard'],
     'wav' => ['audio/wav'],
     'wma' => ['audio/x-ms-wma'],
     'wmv' => ['audio/x-ms-wmv'],
     'xls' => ['application/vnd.ms-excel'],
-    'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-    'xml' => ['application/xml'],
     'zip' => ['application/zip'],
 ];
+
+foreach ($map as $mimeType => $extensions) {
+    foreach ($exts as $ext => $types) {
+        if (in_array($mimeType, $types, true)) {
+            array_unshift($extensions, $ext);
+        }
+    }
+    $data .= sprintf("        '%s' => ['%s'],\n", $mimeType, implode("', '", array_unique($extensions)));
+}
+$data .= $post;
+
 foreach ($map as $mimeType => $extensions) {
     foreach ($extensions as $extension) {
         if ('application/octet-stream' === $mimeType && 'bin' !== $extension) {

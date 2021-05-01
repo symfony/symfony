@@ -110,6 +110,16 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener->onLoginSuccess($event);
     }
 
+    public function testUserWithoutPassword()
+    {
+        $this->user = new User('test', null);
+
+        $this->encoderFactory->expects($this->never())->method('getEncoder');
+
+        $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word')]));
+        $this->listener->onLoginSuccess($event);
+    }
+
     private function createPasswordUpgrader()
     {
         return $this->getMockForAbstractClass(TestMigratingUserProvider::class);

@@ -131,6 +131,16 @@ class OptionsResolver implements Options
     private $parentsOptions = [];
 
     /**
+     * Whether the whole options definition is marked as array prototype.
+     */
+    private $prototype;
+
+    /**
+     * The prototype array's index that is being read.
+     */
+    private $prototypeIndex;
+
+    /**
      * Sets the default value of a given option.
      *
      * If the default value should be set based on other options, you can pass
@@ -790,6 +800,33 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Marks the whole options definition as array prototype.
+     *
+     * @return $this
+     *
+     * @throws AccessException If called from a lazy option, a normalizer or a root definition
+     */
+    public function setPrototype(bool $prototype): self
+    {
+        if ($this->locked) {
+            throw new AccessException('The prototype property cannot be set from a lazy option or normalizer.');
+        }
+
+        if (null === $this->prototype && $prototype) {
+            throw new AccessException('The prototype property cannot be set from a root definition.');
+        }
+
+        $this->prototype = $prototype;
+
+        return $this;
+    }
+
+    public function isPrototype(): bool
+    {
+        return $this->prototype ?? false;
+    }
+
+    /**
      * Removes the option with the given name.
      *
      * Undefined options are ignored.
@@ -970,13 +1007,29 @@ class OptionsResolver implements Options
             $this->calling[$option] = true;
             try {
                 $resolver = new self();
+                $resolver->prototype = false;
                 $resolver->parentsOptions = $this->parentsOptions;
                 $resolver->parentsOptions[] = $option;
                 foreach ($this->nested[$option] as $closure) {
                     $closure($resolver, $this);
                 }
-                $value = $resolver->resolve($value);
+
+                if ($resolver->prototype) {
+                    $values = [];
+                    foreach ($value as $index => $prototypeValue) {
+                        if (!\is_array($prototypeValue)) {
+                            throw new InvalidOptionsException(sprintf('The value of the option "%s" is expected to be of type array of array, but is of type array of "%s".', $this->formatOptions([$option]), get_debug_type($prototypeValue)));
+                        }
+
+                        $resolver->prototypeIndex = $index;
+                        $values[$index] = $resolver->resolve($prototypeValue);
+                    }
+                    $value = $values;
+                } else {
+                    $value = $resolver->resolve($value);
+                }
             } finally {
+                $resolver->prototypeIndex = null;
                 unset($this->calling[$option]);
             }
         }
@@ -1284,6 +1337,10 @@ class OptionsResolver implements Options
             $prefix = array_shift($this->parentsOptions);
             if ($this->parentsOptions) {
                 $prefix .= sprintf('[%s]', implode('][', $this->parentsOptions));
+            }
+
+            if ($this->prototype && null !== $this->prototypeIndex) {
+                $prefix .= sprintf('[%s]', $this->prototypeIndex);
             }
 
             $options = array_map(static function (string $option) use ($prefix): string {

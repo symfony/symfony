@@ -2504,4 +2504,91 @@ class OptionsResolverTest extends TestCase
             ->setDeprecated('foo')
         ;
     }
+
+    public function testInvalidValueForPrototypeDefinition()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The value of the option "connections" is expected to be of type array of array, but is of type array of "string".');
+
+        $this->resolver
+            ->setDefault('connections', static function (OptionsResolver $resolver) {
+                $resolver
+                    ->setPrototype(true)
+                    ->setDefined(['table', 'user', 'password'])
+                ;
+            })
+        ;
+
+        $this->resolver->resolve(['connections' => ['foo']]);
+    }
+
+    public function testMissingOptionForPrototypeDefinition()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "connections[1][table]" is missing.');
+
+        $this->resolver
+            ->setDefault('connections', static function (OptionsResolver $resolver) {
+                $resolver
+                    ->setPrototype(true)
+                    ->setRequired('table')
+                ;
+            })
+        ;
+
+        $this->resolver->resolve(['connections' => [
+            ['table' => 'default'],
+            [], // <- missing required option "table"
+        ]]);
+    }
+
+    public function testAccessExceptionOnPrototypeDefinition()
+    {
+        $this->expectException(AccessException::class);
+        $this->expectExceptionMessage('The prototype property cannot be set from a root definition.');
+
+        $this->resolver->setPrototype(true);
+    }
+
+    public function testPrototypeDefinition()
+    {
+        $this->resolver
+            ->setDefault('connections', static function (OptionsResolver $resolver) {
+                $resolver
+                    ->setPrototype(true)
+                    ->setRequired('table')
+                    ->setDefaults(['user' => 'root', 'password' => null])
+                ;
+            })
+        ;
+
+        $actualOptions = $this->resolver->resolve([
+            'connections' => [
+                'default' => [
+                    'table' => 'default',
+                ],
+                'custom' => [
+                    'user' => 'foo',
+                    'password' => 'pa$$',
+                    'table' => 'symfony',
+                ],
+            ],
+        ]);
+        $expectedOptions = [
+            'connections' => [
+                'default' => [
+                    'user' => 'root',
+                    'password' => null,
+                    'table' => 'default',
+                ],
+                'custom' => [
+                    'user' => 'foo',
+                    'password' => 'pa$$',
+                    'table' => 'symfony',
+                ],
+            ],
+        ];
+
+        $this->assertSame($expectedOptions, $actualOptions);
+    }
 }

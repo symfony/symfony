@@ -77,10 +77,6 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
         }
 
         if (!$configuration) {
-            if ($this->logger) {
-                $this->logger->info('No configuration found for extension {extensionClass}.', ['extensionClass' => \get_class($extension)]);
-            }
-
             return;
         }
 

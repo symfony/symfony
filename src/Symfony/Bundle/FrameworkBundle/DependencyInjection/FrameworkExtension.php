@@ -294,20 +294,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$container->hasParameter('debug.file_link_format')) {
-            $links = [
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-                'sublime' => 'subl://open?url=file://%%f&line=%%l',
-                'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
-                'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
-                'vscode' => 'vscode://file/%%f:%%l',
-            ];
-            $ide = $config['ide'];
-            // mark any env vars found in the ide setting as used
-            $container->resolveEnvPlaceholders($ide);
-
-            $container->setParameter('debug.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: ($links[$ide] ?? $ide));
+            $container->setParameter('debug.file_link_format', $config['ide']);
         }
 
         if (!empty($config['test'])) {

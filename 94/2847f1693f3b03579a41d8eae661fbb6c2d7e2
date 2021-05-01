@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2021-04-30T13:38:56Z
+
+@nicolas-grekas I applied your suggestions on the 5.x branch where the `templating.helper.code.file_link_format` parameter no longer exists.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2021-04-30T13:48:38Z
+
+I take it from the approval I don’t have to add a case to `FrameworkExtensionTest`? :grin:

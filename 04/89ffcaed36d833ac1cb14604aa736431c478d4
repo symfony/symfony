@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-21T20:22:09Z
+
+Hey!
+
+I didn't know that was capable of this emotion. I really really like reviewing this PR. Well done.
+
+I think @lmillucci has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-01-28T20:21:28Z
+
+There is only one thing left to clarify here, because I'm guessing that prototyping shouldn't be supported as root definition (only for nested options) do we want to throw an exception in case someone tries to do it? I mean, having a prototyped root definition.
+
+---------------------------------------------------------------------------
+
+by azatyan at 2021-02-18T08:33:39Z
+
+Hi @yceruto hope, you're doing well bro.
+In my opinion, yes, adding an exception will help developers to understand faster this feature.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-18T13:46:43Z
+
+Done.

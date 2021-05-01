@@ -7,6 +7,33 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.22 (2021-05-01)
+
+ * bug #40993 [Security] [Security/Core] fix checking for bcrypt (nicolas-grekas)
+ * bug #40923 [Yaml] expose references detected in inline notation structures (xabbuh)
+ * bug #40964 [HttpFoundation] Fixes for PHP 8.1 deprecations (jrmajor)
+ * bug #40514 [Yaml] Allow tabs as separators between tokens (bertramakers)
+ * bug #40882 [Cache] phpredis: Added full TLS support for RedisCluster (jackthomasatl)
+ * bug #40793 [DoctrineBridge] Add support for a driver type "attribute" (beberlei)
+ * bug #40807 RequestMatcher issue when `_controller` is a closure (Plopix)
+ * bug #40811 [PropertyInfo] Use the right context for methods defined in traits (colinodell)
+ * bug #40330 [SecurityBundle] Empty line starting with dash under "access_control" causes all rules to be skipped (monteiro)
+ * bug #40780 [Cache] Apply NullAdapter as Null Object (roukmoute)
+ * bug #40740 [Cache][FrameworkBundle] Fix logging for TagAwareAdapter (fancyweb)
+ * bug #40755 [Routing] Better inline requirements and defaults parsing (Foxprodev)
+ * bug #40754 [PhpUnitBridge] Fix phpunit symlink on Windows (johnstevenson)
+ * bug #40707 [Yaml] Fixed infinite loop when parser goes through an additional and invalid closing tag (alexandre-daubois)
+ * bug #40679 [Debug][ErrorHandler] Avoid warning with Xdebug 3 with develop mode disabled (Jean85)
+ * bug #40702 [HttpClient] allow CurlHttpClient on Windows (n0rbyt3)
+ * bug #40503 [Yaml] fix parsing some block sequences (a1812)
+ * bug #40610 Fixed bugs found by psalm (Nyholm)
+ * bug #40603 [Config] Fixed support for nodes not extending BaseNode (Nyholm)
+ * bug #40645 [FrameworkBundle] Dont store cache misses on warmup (Nyholm)
+ * bug #40629 [DependencyInjection] Fix "url" env var processor behavior when the url has no path (fancyweb)
+ * bug #40655 [Cache] skip storing failure-to-save as misses in ArrayAdapter (nicolas-grekas)
+ * bug #40522 [Serializer] Allow AbstractNormalizer to use null for non-optional nullable constructor parameters without default value (Pierre Rineau)
+ * bug #40595 add missing queue_name to find(id) in doctrine messenger transport (monteiro)
+
 * 4.4.21 (2021-03-29)
 
  * bug #40598 [Form] error if the input string couldn't be parsed as a date (xabbuh)

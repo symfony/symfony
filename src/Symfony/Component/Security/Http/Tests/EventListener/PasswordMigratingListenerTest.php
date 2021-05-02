@@ -114,7 +114,7 @@ class PasswordMigratingListenerTest extends TestCase
     {
         $this->user = new User('test', null);
 
-        $this->encoderFactory->expects($this->never())->method('getEncoder');
+        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
 
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', function () { return $this->user; }), [new PasswordUpgradeBadge('pa$$word')]));
         $this->listener->onLoginSuccess($event);

@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Liên kết đăng nhập không hợp lệ hoặc quá hạn.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Quá nhiều lần thử đăng nhập không thành công, vui lòng thử lại sau %minutes% phút.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Quá nhiều lần thử đăng nhập không thành công, vui lòng thử lại sau %minutes% phút.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

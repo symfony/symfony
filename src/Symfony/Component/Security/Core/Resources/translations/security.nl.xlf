@@ -72,11 +72,11 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>Too many failed login attempts, please try again in %minutes% minute.</source>
-                <target>Te veel onjuiste inlogpogingen, probeer opnieuw over %minutes% minuut.</target>
+                <target>Te veel onjuiste inlogpogingen, probeer het opnieuw over %minutes% minuut.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
-                <target>Te veel onjuiste inlogpogingen, probeer opnieuw over %minutes% minuten.</target>
+                <target>Te veel onjuiste inlogpogingen, probeer het opnieuw over %minutes% minuten.</target>
             </trans-unit>
         </body>
     </file>

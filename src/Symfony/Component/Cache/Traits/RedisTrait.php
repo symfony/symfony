@@ -203,7 +203,11 @@ trait RedisTrait
                 }
 
                 try {
-                    @$redis->{$connect}($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ['stream' => $params['ssl'] ?? null]);
+                    $parameters = [$host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout']];
+                    if (true === version_compare('5.3.0', phpversion('redis'), '<=')) {
+                        $parameters[] = ['stream' => $params['ssl'] ?? null];
+                    }
+                    @$redis->{$connect}(...$parameters);
 
                     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
                     $isConnected = $redis->isConnected();

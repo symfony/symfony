@@ -599,11 +599,8 @@ YAML;
     {
         $data = [
             'clip 1' => new TaggedValue('my-tag', "one\ntwo\n"),
-            'clip 2' => new TaggedValue('my-tag', "one\ntwo\n"),
-            'keep 1' => new TaggedValue('my-tag', "one\ntwo\n"),
-            'keep 2' => new TaggedValue('my-tag', "one\ntwo\n\n"),
+            'keep 1' => new TaggedValue('my-tag', "one\ntwo\n\n"),
             'strip 1' => new TaggedValue('my-tag', "one\ntwo"),
-            'strip 2' => new TaggedValue('my-tag', "one\ntwo"),
         ];
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
@@ -611,20 +608,11 @@ YAML;
 'clip 1': !my-tag |
     one
     two
-'clip 2': !my-tag |
-    one
-    two
-'keep 1': !my-tag |
-    one
-    two
-'keep 2': !my-tag |+
+'keep 1': !my-tag |+
     one
     two
 
 'strip 1': !my-tag |-
-    one
-    two
-'strip 2': !my-tag |-
     one
     two
 YAML;
@@ -636,11 +624,8 @@ YAML;
     {
         $data = [
             'clip 1' => "one\ntwo\n",
-            'clip 2' => "one\ntwo\n",
-            'keep 1' => "one\ntwo\n",
-            'keep 2' => "one\ntwo\n\n",
+            'keep 1' => "one\ntwo\n\n",
             'strip 1' => "one\ntwo",
-            'strip 2' => "one\ntwo",
         ];
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
@@ -648,20 +633,11 @@ YAML;
 'clip 1': |
     one
     two
-'clip 2': |
-    one
-    two
-'keep 1': |
-    one
-    two
-'keep 2': |+
+'keep 1': |+
     one
     two
 
 'strip 1': |-
-    one
-    two
-'strip 2': |-
     one
     two
 YAML;

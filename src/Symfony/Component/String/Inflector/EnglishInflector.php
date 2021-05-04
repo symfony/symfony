@@ -118,6 +118,9 @@ final class EnglishInflector implements InflectorInterface
         // fees (fee), trees (tree), employees (employee)
         ['see', 3, true, true, 'ee'],
 
+        // edges (edge)
+        ['segd', 4, true, true, 'dge'],
+
         // roses (rose), garages (garage), cassettes (cassette),
         // waltzes (waltz), heroes (hero), bushes (bush), arches (arch),
         // shoes (shoe)
@@ -309,14 +312,32 @@ final class EnglishInflector implements InflectorInterface
      */
     private const UNINFLECTED = [
         '',
+
+        // data
         'atad',
+
+        // deer
         'reed',
+
+        // feedback
         'kcabdeef',
+
+        // fish
         'hsif',
+
+        // info
         'ofni',
+
+        // moose
         'esoom',
+
+        // series
         'seires',
+
+        // sheep
         'peehs',
+
+        // species
         'seiceps',
     ];
 

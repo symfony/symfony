@@ -14,6 +14,8 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 use Symfony\Component\PasswordHasher\Exception\LogicException;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordHasherAdapter;
 
 /**
  * A generic hasher factory implementation.
@@ -25,6 +27,9 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {
     private $passwordHashers;
 
+    /**
+     * @param array<string, PasswordHasherInterface|array> $passwordHashers
+     */
     public function __construct(array $passwordHashers)
     {
         $this->passwordHashers = $passwordHashers;
@@ -57,7 +62,10 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         }
 
         if (!$this->passwordHashers[$hasherKey] instanceof PasswordHasherInterface) {
-            $this->passwordHashers[$hasherKey] = $this->createHasher($this->passwordHashers[$hasherKey]);
+            $this->passwordHashers[$hasherKey] = $this->passwordHashers[$hasherKey] instanceof PasswordEncoderInterface
+                ? new PasswordHasherAdapter($this->passwordHashers[$hasherKey])
+                : $this->createHasher($this->passwordHashers[$hasherKey])
+            ;
         }
 
         return $this->passwordHashers[$hasherKey];
@@ -82,6 +90,9 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         }
 
         $hasher = new $config['class'](...$config['arguments']);
+        if (!$hasher instanceof PasswordHasherInterface && $hasher instanceof PasswordEncoderInterface) {
+            $hasher = new PasswordHasherAdapter($hasher);
+        }
 
         if ($isExtra || !\in_array($config['class'], [NativePasswordHasher::class, SodiumPasswordHasher::class], true)) {
             return $hasher;

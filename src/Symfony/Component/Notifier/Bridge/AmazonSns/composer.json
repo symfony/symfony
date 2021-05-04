@@ -2,7 +2,7 @@
     "name": "symfony/amazon-sns-notifier",
     "type": "symfony-bridge",
     "description": "Provides Amazon SNS integration for Symfony Notifier.",
-    "keywords": ["amazon", "sns", "notifier"],
+    "keywords": ["amazon", "sns", "notifier", "chat", "sms"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [

@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-05T08:19:26Z
+
+Not sure this should be fixed downstream. IMHao this should be reported to Kubernetes then, as the RFC talks about **MUST**
+
+🧐
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2021-05-05T08:43:51Z
+
+I'm not sure it's k8s' fault, because the call is probably in HTTP, but Nginx would be configured to receive traffic from somewhere else (the ingress and the service), so there's that.
+
+My point is, from a static analysis standpoint, that method CAN return null.  Hence the requested fix.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-05T08:55:59Z
+
+> My point is, from a static analysis standpoint, that method CAN return null. Hence the requested fix.
+
+The question is, what's the bug here. Is it expected that the function returns `null` in some cases? Or is the logic that determines the protocol version broken?
+
+I'd say that there are situations where the protocol version cannot be guessed (e.g. the `Request` object is created during a unit test), so returning `null` (as the method has always done) would be a valid thing to do. imho, the proposed fix is correct.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-05T09:20:48Z
+
+Fine then, thanks for your feedback @derrabus 👍🏻
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-05-05T10:30:43Z
+
+> I'd say that there are situations where the protocol version cannot be guessed (e.g. the Request object is created during a unit test),
+
+Shouldn't it throw an exception instead?
+Having a null value means, users have now to check the returned value.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-05T12:44:41Z
+
+> Shouldn't it throw an exception instead?
+
+Maybe, but that would be a breaking change now.
+
+> Having a null value means, users have now to check the returned value.
+
+They already do have to take `null` into account because that's how the method has always behaved.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-05-05T13:01:42Z
+
+would a default empty string be as reasonable? for ppl who took only contract into account ... and we have to anticipate strings either way.
+
+From the spec POV im not too fond of introducing nullability here as well.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-05T13:50:46Z
+
+> would a default empty string be as reasonable?
+
+How's that helping? We would break every application that checks for `null` right now.
+
+> From the spec POV im not too fond of introducing nullability here as well.
+
+Again, we're not introducing it. We're documenting the status quo.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-05-05T13:55:32Z
+
+fair enough. Can we go back to string in 5.x then? :grin:
+
+---------------------------------------------------------------------------
+
+by stof at 2021-05-05T15:48:53Z
+
+@ro0NL An empty string would still have to be handled. The nullable type actually makes it more likely that projects account for the unknown protocol version.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2021-05-05T16:30:18Z
+
+empty string could also mean "unknown protocol version" ;) so we'd reduce 2 cases to a single one. If that case ever concerns someone ....
+
+personally i think `echo "The protocol version is '{$request->getPV()}' :)";` is a lot more consise,  as for `main(string $pv)`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-05T16:48:44Z
+
+> empty string could also mean "unknown protocol version"
+
+That's what `null` currently means. As @stof said, that case needs to be handled anyway, whether we use `null` or any magic value like the empty string.
+
+You would only make your static analyzer happy, which in turn means that the static analyzer won't be able to detect anymore that a developer does **not** handle the error case properly.
+
+Yes, if we merge this PR, this error will probably bubble up in PHPStan/Psalm error logs in downstream projects and that is a good thing! @Jean85's use-case is the perfect example: Sentry had a bug that could have been detected by their static code analysis if our return type were correct.

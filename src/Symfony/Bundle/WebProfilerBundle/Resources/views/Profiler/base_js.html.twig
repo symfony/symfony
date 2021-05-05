@@ -37,10 +37,12 @@
             };
         }
 
-        var request = function(url, onSuccess, onError, payload, options) {
+        var request = function(url, onSuccess, onError, payload, options, tries) {
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
             options.maxTries = options.maxTries || 0;
+            tries = tries || 1;
+            var delay = Math.pow(2, tries - 1) * 1000;
             xhr.open(options.method || 'GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onreadystatechange = function(state) {
@@ -51,8 +53,8 @@
                 if (xhr.status == 404 && options.maxTries > 1) {
                     setTimeout(function(){
                         options.maxTries--;
-                        request(url, onSuccess, onError, payload, options);
-                    }, 1000);
+                        request(url, onSuccess, onError, payload, options, tries + 1);
+                    }, delay);
 
                     return null;
                 }

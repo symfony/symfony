@@ -10,7 +10,7 @@
  */
 
 // load new map
-$data = json_decode(file_get_contents('https://cdn.jsdelivr.net/gh/jshttp/mime-db@v1.44.0/db.json'), true);
+$data = json_decode(file_get_contents('https://cdn.jsdelivr.net/gh/jshttp/mime-db@v1.47.0/db.json'), true);
 $new = [];
 foreach ($data as $mimeType => $mimeTypeInformation) {
     if (!array_key_exists('extensions', $mimeTypeInformation)) {
@@ -60,28 +60,15 @@ foreach (explode("\n", $data) as $line) {
     $current[$matches[1]] = explode("', '", $matches[2]);
 }
 
-// we merge the 2 maps (we never remove old mime types)
-$map = array_replace_recursive($current, $new);
-ksort($map);
-
-// force an extension to be in the first position on the map
-$forceExtensionInFirstPositionByMimeType = [
-    'application/vnd.apple.keynote' => 'key',
-    'audio/mpeg' => 'mp3',
-    'text/markdown' => 'md',
-    'text/x-markdown' => 'md',
-];
-foreach ($forceExtensionInFirstPositionByMimeType as $mimeType => $extensionToRemove) {
-    $map[$mimeType] = array_unique(array_merge([$extensionToRemove], $map[$mimeType]));
-}
-
 $data = $pre;
 
 // reverse map
 // we prefill the extensions with some preferences for content-types
 $exts = [
+    'asice' => ['application/vnd.etsi.asic-e+zip'],
     'bz2' => ['application/x-bz2'],
     'csv' => ['text/csv'],
+    'ecma' => ['application/ecmascript'],
     'flv' => ['video/x-flv'],
     'gif' => ['image/gif'],
     'gz' => ['application/x-gzip'],
@@ -90,9 +77,11 @@ $exts = [
     'jar' => ['application/x-java-archive'],
     'jpg' => ['image/jpeg'],
     'js' => ['text/javascript'],
+    'keynote' => ['application/vnd.apple.keynote'],
     'key' => ['application/vnd.apple.keynote'],
     'm3u' => ['audio/x-mpegurl'],
     'm4a' => ['audio/mp4'],
+    'md' => ['text/markdown', 'text/x-markdown'],
     'mdb' => ['application/x-msaccess'],
     'mid' => ['audio/midi'],
     'mov' => ['video/quicktime'],
@@ -115,6 +104,18 @@ $exts = [
     'xls' => ['application/vnd.ms-excel'],
     'zip' => ['application/zip'],
 ];
+
+// we merge the 2 maps (we never remove old mime types)
+$map = array_replace_recursive($current, $new);
+
+foreach ($exts as $ext => $types) {
+    foreach ($types as $mt) {
+        if (!isset($map[$mt])) {
+            $map += [$mt => [$ext]];
+        }
+    }
+}
+ksort($map);
 
 foreach ($map as $mimeType => $extensions) {
     foreach ($exts as $ext => $types) {

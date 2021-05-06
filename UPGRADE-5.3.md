@@ -14,7 +14,7 @@ Console
 DoctrineBridge
 --------------
 
- * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
+ * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
  * Remove `UuidV*Generator` classes
 
 DomCrawler

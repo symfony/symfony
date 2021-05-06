@@ -202,6 +202,11 @@
     {%- endif -%}
 {%- endblock radio_widget %}
 
+{% block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed %}
+
 {% block choice_widget_expanded -%}
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form %}

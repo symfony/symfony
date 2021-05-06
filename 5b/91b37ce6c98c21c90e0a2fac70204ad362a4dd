@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2020-11-24T11:35:26Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ker0x at 2020-12-31T17:19:24Z
+
+I just updated the PR to add support for [floating labels](https://getbootstrap.com/docs/5.0/forms/floating-labels/) and to fix input-groups in the horizontal layout
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2021-01-13T17:27:28Z
+
+Hi,
+
+Would it be possible to get it in Symfony 5.2 when Bootstrap 5 is released?
+
+Best regards,
+Michal
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-13T20:37:42Z
+
+A new form theme is a new feature which means that it cannot go in any already released version. Thus, the earliest version this can be released in is 5.3.
+
+---------------------------------------------------------------------------
+
+by ker0x at 2021-01-26T19:43:49Z
+
+Some additional screenshot of the current result
+
+![bootstrap_5_layout_2](https://user-images.githubusercontent.com/5331654/105896442-13584b80-6017-11eb-8f06-f12aab62e7b5.png)
+![bootstrap_5_layout_2_errors](https://user-images.githubusercontent.com/5331654/105896457-16533c00-6017-11eb-8973-a2094f7a91fc.png)
+![bootstrap_5_layout_horizontal_2](https://user-images.githubusercontent.com/5331654/105896475-1ce1b380-6017-11eb-94f2-d2024298bc18.png)
+![bootstrap_5_layout_horizontal_2_errors](https://user-images.githubusercontent.com/5331654/105896487-20753a80-6017-11eb-9054-46c7c55b41bb.png)
+
+---------------------------------------------------------------------------
+
+by garak at 2021-03-15T14:32:54Z
+
+@ker0x it looks like you need to fix a conflict
+
+---------------------------------------------------------------------------
+
+by ker0x at 2021-03-15T15:21:23Z
+
+@garak yes I will looked into it this week!
+
+---------------------------------------------------------------------------
+
+by ker0x at 2021-03-15T21:31:31Z
+
+Tests are failing on Appveyor but it seems to be unrelated to my changes 😕
+
+---------------------------------------------------------------------------
+
+by ker0x at 2021-03-26T18:12:42Z
+
+PR for documentation is [open](https://github.com/symfony/symfony-docs/pull/15158)
+
+---------------------------------------------------------------------------
+
+by dd2424 at 2021-04-17T20:42:09Z
+
+I am new. If I understood correctly the tests were successful and the theme will be available in the next version? 5.3?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2021-04-17T22:44:43Z
+
+@dd2424 The v5.3 will be released in may, so if this PR is merged before yeah (but I do not know the stabilisation phase for such code), orherwise maybe v5.4
+
+@ker0x Having this with https://github.com/symfony/symfony/pull/40449 would be very nice :)
+Are you needing some help/reviews/local tests? Or just approval?
+
+---------------------------------------------------------------------------
+
+by ker0x at 2021-04-18T10:13:40Z
+
+@94noni Mostlycode review to see if I've done anything wrong and of course approvals from core members so that it can be merged. If needed, I can bootstrap a basic symfony project if people want to test it localy.
+
+@dd2424 It will depend on when bootstrap 5 will be fully released, which should happen very soon and then if this PR is merged. If both are done before 5.3 release, this will be available at this time, otherwise it should wait until 5.4!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2021-05-05T21:12:13Z
+
+FYI - it looks like bootstrap 5 HAS now been released. But I think we’re too late for 5.3.
+
+---------------------------------------------------------------------------
+
+by garak at 2021-05-06T08:10:38Z
+
+> FYI - it looks like bootstrap 5 HAS now been released. But I think we’re too late for 5.3.
+
+Why it's too late? 5.3 is not released yet
+
+---------------------------------------------------------------------------
+
+by cyrilverloop at 2021-05-06T08:27:50Z
+
+Bootstrap 5 support in Symfony 5.3 would be great. What can i do to help ?

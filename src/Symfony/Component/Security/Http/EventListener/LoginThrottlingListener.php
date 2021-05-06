@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthentication
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
  * @author Wouter de Jong <wouter@wouterj.nl>
@@ -51,10 +52,16 @@ final class LoginThrottlingListener implements EventSubscriberInterface
         }
     }
 
+    public function onSuccessfulLogin(LoginSuccessEvent $event): void
+    {
+        $this->limiter->reset($event->getRequest());
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             CheckPassportEvent::class => ['checkPassport', 2080],
+            LoginSuccessEvent::class => 'onSuccessfulLogin',
         ];
     }
 }

@@ -63,6 +63,12 @@ class LoginThrottlingListenerTest extends TestCase
             $this->listener->checkPassport($this->createCheckPassportEvent($passport));
         }
 
+        $this->listener->onSuccessfulLogin($this->createLoginSuccessfulEvent($passport));
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passport));
+        }
+
         $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
     }
@@ -87,12 +93,9 @@ class LoginThrottlingListenerTest extends TestCase
         return new SelfValidatingPassport(new UserBadge($username));
     }
 
-    private function createLoginSuccessfulEvent($passport, $username = 'wouter')
+    private function createLoginSuccessfulEvent($passport)
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())->method('getUsername')->willReturn($username);
-
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $token, $this->requestStack->getCurrentRequest(), null, 'main');
+        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->requestStack->getCurrentRequest(), null, 'main');
     }
 
     private function createCheckPassportEvent($passport)

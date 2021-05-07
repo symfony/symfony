@@ -44,7 +44,7 @@ final class VarExporter
     {
         $isStaticValue = true;
 
-        if (!\is_object($value) && !(\is_array($value) && $value) && !$value instanceof \__PHP_Incomplete_Class && !\is_resource($value)) {
+        if (!\is_object($value) && !(\is_array($value) && $value) && !\is_resource($value) || $value instanceof \UnitEnum) {
             return Exporter::export($value);
         }
 

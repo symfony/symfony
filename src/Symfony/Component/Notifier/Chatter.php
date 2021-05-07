@@ -49,9 +49,7 @@ final class Chatter implements ChatterInterface
     public function send(MessageInterface $message): ?SentMessage
     {
         if (null === $this->bus) {
-            $this->transport->send($message);
-
-            return null;
+            return $this->transport->send($message);
         }
 
         if (null !== $this->dispatcher) {

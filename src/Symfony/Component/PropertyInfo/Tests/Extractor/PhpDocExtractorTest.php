@@ -109,7 +109,11 @@ class PhpDocExtractorTest extends TestCase
             ['a', [new Type(Type::BUILTIN_TYPE_INT)], 'A.', null],
             ['b', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], 'B.', null],
             ['c', [new Type(Type::BUILTIN_TYPE_BOOL, true)], null, null],
+            ['ct', [new Type(Type::BUILTIN_TYPE_TRUE, true)], null, null],
+            ['cf', [new Type(Type::BUILTIN_TYPE_FALSE, true)], null, null],
             ['d', [new Type(Type::BUILTIN_TYPE_BOOL)], null, null],
+            ['dt', [new Type(Type::BUILTIN_TYPE_TRUE)], null, null],
+            ['df', [new Type(Type::BUILTIN_TYPE_FALSE)], null, null],
             ['e', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))], null, null],
             ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
@@ -341,6 +345,9 @@ class PhpDocExtractorTest extends TestCase
             ['propertyInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
             ['propertyInTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
             ['propertyInTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            ['propertyInExternalTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
+            ['propertyInExternalTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            ['propertyInExternalTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
     }
 
@@ -358,6 +365,9 @@ class PhpDocExtractorTest extends TestCase
             ['methodInTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
             ['methodInTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
             ['methodInTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            ['methodInExternalTraitPrimitiveType', new Type(Type::BUILTIN_TYPE_STRING)],
+            ['methodInExternalTraitObjectSameNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+            ['methodInExternalTraitObjectDifferentNamespace', new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyUsedInTrait::class)],
         ];
     }
 

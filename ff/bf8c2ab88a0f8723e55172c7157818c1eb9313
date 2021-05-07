@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2021-04-10T17:17:28Z
+
+https://github.com/symfony/symfony/blob/bb1e1e58aea5318e96d1c22cc8a91668ed7baaaa/src/Symfony/Component/Form/ChoiceList/View/ChoiceView.php#L40
+
+and yes, I would update the docblock to add TranslatableMessage too.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2021-04-11T18:08:57Z
+
+Thank you so much @yceruto for your advice. I updated the code thanks to your suggestions and edited the PR title as well.

@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-05T13:14:30Z
+
+Hey!
+
+I think @mamontovdmitriy has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mamontovdmitriy at 2021-05-05T17:59:58Z
+
+It can be a bit complicated because in this case we have the accusative plurals:
+
+```
+через 0 минут
+через 1 минуту
+через 2 минуты
+через 3 минуты
+через 4 минуты
+через 5 минут
+через 6 минут
+через 7 минут
+через 8 минут
+через 9 минут
+через 10 минут
+через 11 минут
+через 12 минут
+через 13 минут
+через 14 минут
+через 15 минут
+через 16 минут
+через 17 минут
+через 18 минут
+через 19 минут
+через 20 минут
+через 21 минуту
+через 22 минуты
+через 23 минуты
+через 24 минуты
+через 25 минут
+...
+```
+Note that the cases from 11 to 14 are exceptions. (and 111-114, (11)11-(11)14, ...  as well)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2021-05-06T12:34:03Z
+
+@a1812 , @mamontovdmitriy , since "мин." is really a common abbreviation, I approve using it for the `>1` case for the sake of simplicity.

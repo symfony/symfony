@@ -20,6 +20,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -177,7 +178,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             // If "choice_label" is set to false and "expanded" is true, the value false
             // should be passed on to the "label" option of the checkboxes/radio buttons
             $dynamicLabel = $label($choice, $key, $value);
-            $label = false === $dynamicLabel ? false : (string) $dynamicLabel;
+
+            if (false === $dynamicLabel) {
+                $label = false;
+            } elseif ($dynamicLabel instanceof TranslatableMessage) {
+                $label = $dynamicLabel;
+            } else {
+                $label = (string) $dynamicLabel;
+            }
         }
 
         $view = new ChoiceView(

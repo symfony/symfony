@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by loevgaard at 2021-05-06T09:52:51Z
+
+@stof: I have made a new backoff strategy that actually uses the number of request tries. What do you think? The sequence would now be 1, 2, 4, 8, 16 seconds.
+
+---------------------------------------------------------------------------
+
+by loevgaard at 2021-05-06T09:57:10Z
+
+I changed from `**` to `Math.pow` because of this: https://caniuse.com/mdn-javascript_operators_exponentiation
+
+---------------------------------------------------------------------------
+
+by loevgaard at 2021-05-07T12:59:38Z
+
+Cool, thank you :)

@@ -238,6 +238,35 @@ class FileLoaderTest extends TestCase
             'yaml/*'
         );
     }
+
+    /**
+     * @dataProvider excludeTrailingSlashConsistencyProvider
+     */
+    public function testExcludeTrailingSlashConsistency(string $exclude)
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            new Definition(),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\',
+            'Prototype/*',
+            $exclude
+        );
+
+        $this->assertTrue($container->has(Foo::class));
+        $this->assertFalse($container->has(DeeperBaz::class));
+    }
+
+    public function excludeTrailingSlashConsistencyProvider(): iterable
+    {
+        yield ['Prototype/OtherDir/AnotherSub/'];
+        yield ['Prototype/OtherDir/AnotherSub'];
+        yield ['Prototype/OtherDir/AnotherSub/*'];
+        yield ['Prototype/*/AnotherSub'];
+        yield ['Prototype/*/AnotherSub/'];
+        yield ['Prototype/*/AnotherSub/*'];
+        yield ['Prototype/OtherDir/AnotherSub/DeeperBaz.php'];
+    }
 }
 
 class TestFileLoader extends FileLoader

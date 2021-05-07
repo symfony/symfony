@@ -177,6 +177,7 @@ class GlobResourceTest extends TestCase
 
         $expected = [
             $dir.'/Exclude/ExcludeToo/AnotheExcludedFile.txt',
+            $dir.'/ExcludeTrailingSlash/exclude/baz.txt',
             $dir.'/foo.xml',
         ];
 

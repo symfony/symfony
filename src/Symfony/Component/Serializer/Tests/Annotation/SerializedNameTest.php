@@ -54,7 +54,7 @@ class SerializedNameTest extends TestCase
 
     public function testSerializedNameParameters()
     {
-        $maxDepth = new SerializedName(['value' => 'foo']);
+        $maxDepth = new SerializedName('foo');
         $this->assertEquals('foo', $maxDepth->getSerializedName());
     }
 

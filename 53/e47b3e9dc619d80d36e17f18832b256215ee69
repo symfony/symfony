@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-05T16:12:55Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-06T10:22:50Z
+
+Thanks for the PR.
+This should target the 4.4 branch as the logic is the same there. Can you rebase and change the PR base branch accordingly?
+
+---------------------------------------------------------------------------
+
+by orkan at 2021-05-06T11:36:30Z
+
+Well, at first I was thinking the same as the PR guide says all bug fixes should adress 4.4 branch, but here I'm fixing a method that was introduced later in 352aed3
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-06T14:03:10Z
+
+Ok got it, yet this patch changes somethig that exists on 4.4:
+https://github.com/symfony/symfony/blob/beca6894129ebf34165a10a08adcede3d8e5e750/src/Symfony/Component/Console/Helper/QuestionHelper.php#L111-L114.
+So I guess we need an equivalent PR for 4.4. It'd be great if you could submit one. Otherwise, no worries, someone else will do (maybe me).
+
+Also, can you fix the CS issues reported by fabbot (see failing CI builds)?
+
+---------------------------------------------------------------------------
+
+by orkan at 2021-05-06T15:20:11Z
+
+I think this is beyond my knowledge of git, but applying this fix against 4.4 will result in conflicts with 352aed3 changes... An equivalent would be to not change anything ;)
+
+Btw, I fixed CS issues but why fabbot wants me to remove these lines?
+```
+      *
+      * @param int    $cp Code page in IBM/EBCDIC format
+      * @param string $in User input
+-     *
+-     * @return string
+      */
+     private function resetIOCodepage(int $cp, string $in): string
+     {
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-06T15:37:12Z
+
+If Fabbot suggest to do CS fix on a unrelated line, you should just ignore it.
+
+---------------------------------------------------------------------------
+
+by orkan at 2021-05-06T15:43:14Z
+
+It's actually related but where's the problem? Should I add description to the returned string?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-06T15:46:18Z
+
+Symfony omits some annotations (@return, @param) when they don't provide more value that type declarations already provide.
+Here `@return string` states something already known thanks to the `string` return type, so the patch can be applied :)
+
+---------------------------------------------------------------------------
+
+by orkan at 2021-05-06T16:01:44Z
+
+OK. Got it! Thanks

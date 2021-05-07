@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-06T20:31:18Z
+
+No it makes it possible/easier to fix that issue of parallel reauth requests but this in itself is not enough to fix it. I'll try and send another PR to add event hooks or an optional interface perhaps allowing the remember me token storage to implement a fix, then we have a chance of fixing this by default in 6 perhaps.

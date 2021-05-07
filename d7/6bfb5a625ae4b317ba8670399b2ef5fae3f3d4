@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-27T14:53:36Z
+
+I would consider this a feature, it is working without the ID and must wait for `5.4`.
+
+cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by WaylandAce at 2021-04-27T17:21:23Z
+
+> I would consider this a feature, it is working without the ID and must wait for `5.4`.
+>
+> cc @nicolas-grekas
+
+I though to put this change as usual to 5.x branch, but checked "Maintenance" page (https://symfony.com/doc/current/contributing/code/maintenance.html) and it's sounds like it matches the rules.
+Also 1 point to include this featurefix to nearest release, is the fact, that we cant fetch message id to reply/start thread in slack and this can be seen as problem.

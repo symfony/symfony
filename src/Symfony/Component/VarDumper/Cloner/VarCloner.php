@@ -166,7 +166,6 @@ class VarCloner extends AbstractCloner
                         break;
 
                     case \is_object($v):
-                    case $v instanceof \__PHP_Incomplete_Class:
                         if (empty($objRefs[$h = spl_object_id($v)])) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;

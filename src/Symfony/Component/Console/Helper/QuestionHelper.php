@@ -512,7 +512,7 @@ class QuestionHelper extends Helper
             $cp = $this->setIOCodepage();
             $ret = fgets($inputStream, 4096);
 
-            return $this->resetIOCodepage($cp, $ret);
+            return false !== $ret ? $this->resetIOCodepage($cp, $ret) : false;
         }
 
         $multiLineStreamReader = $this->cloneInputStream($inputStream);

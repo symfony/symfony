@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-03T13:35:43Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by shiftby at 2021-04-04T09:24:07Z
+
+@derrabus, thank you for the review.
+
+I agree that currently `extractFromDefaultValue()` knows more than only how to get the type from the default value. I did that because after PHP 7.4 it's no longer possible to correctly get property nullability from the default value.
+
+Before this version, I tried to copy nullability from the `extractFromReflectionType()` result, but we can't do it since Type objects are not editable.
+
+Then I was thinking about the following code, but it's harder to understand and we would also need to change `extractFromDefaultValue()` method arguments. And even more, currently, we know that a nullability of all `Type`s in the `$fromReflectionType` is the same, but probably it can change in the future, so using the nullability of the first one is not the best option.
+```php
+public function getTypes($class, $property, array $context = []): ?array
+{
+    ...
+    $isNullable = false;
+    $fromReflectionType = null;
+    if (\PHP_VERSION_ID >= 70400) {
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+            $type = $reflectionProperty->getType();
+            if (null !== $type && $fromReflectionType = $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass())) {
+                $isNullable = isset($fromReflectionType[0]) && $fromReflectionType[0]->isNullable();
+            }
+        } catch (\ReflectionException $e) {
+            // noop
+        }
+    }
+
+    if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property, $isNullable)) {
+        return $fromDefaultValue;
+    }
+
+    if ($fromReflectionType) {
+        return $fromReflectionType;
+    }
+
+    return null;
+}
+```
+
+Another solution would be to replace part of the current version of `getTypes()`.
+```php
+...
+if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
+    return $fromDefaultValue;
+}
+
+if (\PHP_VERSION_ID >= 70400) {
+    ...
+    return $this->extractFromReflectionType($type, $reflectionProperty->getDeclaringClass())) {
+    ...
+}
+
+return null;
+```
+With
+```php
+...
+if ($fromPropertyDeclaration = $this->extractFromPropertyDeclaration($class, $property)) {
+    return $fromPropertyDeclaration;
+}
+
+return null;
+```
+and
+```php
+private function extractFromPropertyDeclaration(string $class, string $property): ?array
+{
+    // calculate nullability
+    // try to get from the default value
+    // try to get from the property type, if PHP >= 7.4
+    // else null
+}
+```
+
+What do you think about these solutions?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-04T12:41:02Z
+
+Okay, but if we have a typed property – why would we want to look at the default value at all? Wouldn't it be enough to prioritize the property type over the default value when extracting type information? Or am I missing something?
+
+---------------------------------------------------------------------------
+
+by shiftby at 2021-04-04T14:32:20Z
+
+I did some research on why typehint extraction is at the end. Typehint support was initially added in #34557, and it had the highest priority. And then in #38041 it was moved to the end of the method. After this issue was merged, in one of the comments, issue #38416 was mentioned.
+
+I'm not sure if in this issue we should focus on property type priority versus constructor, mutator, and accessor. But I believe we can change the code so it uses property typehint on PHP 7.4 (and default value if there's no typehint) and a default value for older versions.
+
+I don't think we're missing something, it's not possible to have a default value different from typehint.
+
+---------------------------------------------------------------------------
+
+by dpinheiro at 2021-04-05T11:19:28Z
+
+> I did some research on why typehint extraction is at the end. Typehint support was initially added in #34557, and it had the highest priority. And then in #38041 it was moved to the end of the method. After this issue was merged, in one of the comments, issue #38416 was mentioned.
+>
+> I'm not sure if in this issue we should focus on property type priority versus constructor, mutator, and accessor. But I believe we can change the code so it uses property typehint on PHP 7.4 (and default value if there's no typehint) and a default value for older versions.
+>
+> I don't think we're missing something, it's not possible to have a default value different from typehint.
+
+I would like to take this opportunity to discuss this priority if possible. In my point of view #38041 introduced a BC break as serializer started having a different behaviour, and currently this in an impediment for me to update some of my projects, as described in https://github.com/symfony/symfony/issues/38416. Do you think we could change this order? I'm available to help with that
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-07T15:32:29Z
+
+@dpinheiro I understand that the issue you've mentioned is important to you. But please let's leave the discussion on that ticket.

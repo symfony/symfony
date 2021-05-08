@@ -33,6 +33,7 @@ class TooManyLoginAttemptsAuthenticationException extends AuthenticationExceptio
     {
         return [
             '%minutes%' => $this->threshold,
+            '%count%' => (int) $this->threshold,
         ];
     }
 

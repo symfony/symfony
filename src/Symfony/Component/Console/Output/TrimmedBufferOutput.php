@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class TrimmedBufferOutput extends Output
+class TrimmedBufferOutput extends AbstractOutput
 {
     private $maxLength;
     private $buffer = '';

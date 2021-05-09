@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
  *
  * @author Wouter J <waldio.webdesign@gmail.com>
  */
-abstract class InputAwareHelper extends Helper implements InputAwareInterface
+abstract class AbstractInputAwareHelper extends AbstractHelper implements InputAwareInterface
 {
     protected $input;
 

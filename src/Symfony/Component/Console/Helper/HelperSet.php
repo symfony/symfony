@@ -22,13 +22,13 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class HelperSet implements \IteratorAggregate
 {
     /**
-     * @var Helper[]
+     * @var AbstractHelper[]
      */
     private $helpers = [];
     private $command;
 
     /**
-     * @param Helper[] $helpers An array of helper
+     * @param AbstractHelper[] $helpers An array of helper
      */
     public function __construct(array $helpers = [])
     {
@@ -89,7 +89,7 @@ class HelperSet implements \IteratorAggregate
     }
 
     /**
-     * @return Helper[]
+     * @return AbstractHelper[]
      */
     public function getIterator()
     {

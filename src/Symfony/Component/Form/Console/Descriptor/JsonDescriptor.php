@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @internal
  */
-class JsonDescriptor extends Descriptor
+class JsonDescriptor extends AbstractDescriptor
 {
     protected function describeDefaults(array $options)
     {

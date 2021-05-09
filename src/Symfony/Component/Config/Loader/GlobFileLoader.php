@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Loader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class GlobFileLoader extends FileLoader
+class GlobFileLoader extends AbstractFileLoader
 {
     /**
      * {@inheritdoc}

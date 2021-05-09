@@ -23,7 +23,7 @@ use Symfony\Component\Config\Resource\GlobResource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class FileLoader extends Loader
+abstract class AbstractFileLoader extends Loader
 {
     protected static $loading = [];
 

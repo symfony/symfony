@@ -23,7 +23,7 @@ use Symfony\Component\Process\Process;
  *
  * @final
  */
-class ProcessHelper extends Helper
+class ProcessHelper extends AbstractHelper
 {
     /**
      * Runs an external process.

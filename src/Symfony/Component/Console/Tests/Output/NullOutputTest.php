@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\NullOutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class NullOutputTest extends TestCase
@@ -59,8 +59,8 @@ class NullOutputTest extends TestCase
     public function testSetVerbosity()
     {
         $output = new NullOutput();
-        $output->setVerbosity(Output::VERBOSITY_NORMAL);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity());
+        $output->setVerbosity(AbstractOutput::VERBOSITY_NORMAL);
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity());
     }
 
     public function testSetDecorated()

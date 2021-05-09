@@ -14,21 +14,21 @@ namespace Symfony\Component\Console\Tests\Output;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 
 class ConsoleOutputTest extends TestCase
 {
     public function testConstructorWithoutFormatter()
     {
-        $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        $output = new ConsoleOutput(AbstractOutput::VERBOSITY_QUIET, true);
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertNotSame($output->getFormatter(), $output->getErrorOutput()->getFormatter(), 'ErrorOutput should use it own formatter');
     }
 
     public function testConstructorWithFormatter()
     {
-        $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true, $formatter = new OutputFormatter());
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        $output = new ConsoleOutput(AbstractOutput::VERBOSITY_QUIET, true, $formatter = new OutputFormatter());
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertSame($formatter, $output->getFormatter());
         $this->assertSame($formatter, $output->getErrorOutput()->getFormatter(), 'Output and ErrorOutput should use the same provided formatter');
     }
@@ -45,7 +45,7 @@ class ConsoleOutputTest extends TestCase
     public function testSetVerbosity()
     {
         $output = new ConsoleOutput();
-        $output->setVerbosity(Output::VERBOSITY_VERBOSE);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $output->getVerbosity());
+        $output->setVerbosity(AbstractOutput::VERBOSITY_VERBOSE);
+        $this->assertSame(AbstractOutput::VERBOSITY_VERBOSE, $output->getVerbosity());
     }
 }

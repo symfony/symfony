@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests\Tester;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -35,7 +35,7 @@ class ApplicationTesterTest extends TestCase
         ;
 
         $this->tester = new ApplicationTester($this->application);
-        $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
+        $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => AbstractOutput::VERBOSITY_VERBOSE]);
     }
 
     protected function tearDown(): void
@@ -48,7 +48,7 @@ class ApplicationTesterTest extends TestCase
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
         $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
+        $this->assertEquals(AbstractOutput::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
     public function testGetInput()

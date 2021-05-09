@@ -16,7 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -35,7 +35,7 @@ class CommandTesterTest extends TestCase
         $this->command->setCode(function ($input, $output) { $output->writeln('foo'); });
 
         $this->tester = new CommandTester($this->command);
-        $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
+        $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => AbstractOutput::VERBOSITY_VERBOSE]);
     }
 
     protected function tearDown(): void
@@ -48,7 +48,7 @@ class CommandTesterTest extends TestCase
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
         $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
+        $this->assertEquals(AbstractOutput::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
     public function testGetInput()

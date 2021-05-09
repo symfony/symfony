@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollection;
@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Nicolas grekas <p@tchwork.com>
  * @author Jules Pietri <jules@heahprod.com>
  */
-class PhpFileLoader extends FileLoader
+class PhpFileLoader extends AbstractFileLoader
 {
     /**
      * Loads a PHP file.

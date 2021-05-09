@@ -230,10 +230,10 @@ class ProgressIndicator
                 return $indicator->message;
             },
             'elapsed' => function (self $indicator) {
-                return Helper::formatTime(time() - $indicator->startTime);
+                return AbstractHelper::formatTime(time() - $indicator->startTime);
             },
             'memory' => function () {
-                return Helper::formatMemory(memory_get_usage(true));
+                return AbstractHelper::formatMemory(memory_get_usage(true));
             },
         ];
     }

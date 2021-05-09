@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Descriptor;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,7 +39,7 @@ class TextDescriptor extends AbstractDescriptor
             $default = '';
         }
 
-        $totalWidth = $options['total_width'] ?? Helper::width($argument->getName());
+        $totalWidth = $options['total_width'] ?? AbstractHelper::width($argument->getName());
         $spacingWidth = $totalWidth - \strlen($argument->getName());
 
         $this->writeText(sprintf('  <info>%s</info>  %s%s%s',
@@ -77,7 +77,7 @@ class TextDescriptor extends AbstractDescriptor
             sprintf($option->isNegatable() ? '--%1$s|--no-%1$s' : '--%1$s%2$s', $option->getName(), $value)
         );
 
-        $spacingWidth = $totalWidth - Helper::width($synopsis);
+        $spacingWidth = $totalWidth - AbstractHelper::width($synopsis);
 
         $this->writeText(sprintf('  <info>%s</info>  %s%s%s%s',
             $synopsis,
@@ -96,7 +96,7 @@ class TextDescriptor extends AbstractDescriptor
     {
         $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
         foreach ($definition->getArguments() as $argument) {
-            $totalWidth = max($totalWidth, Helper::width($argument->getName()));
+            $totalWidth = max($totalWidth, AbstractHelper::width($argument->getName()));
         }
 
         if ($definition->getArguments()) {
@@ -234,7 +234,7 @@ class TextDescriptor extends AbstractDescriptor
 
                 foreach ($namespace['commands'] as $name) {
                     $this->writeText("\n");
-                    $spacingWidth = $width - Helper::width($name);
+                    $spacingWidth = $width - AbstractHelper::width($name);
                     $command = $commands[$name];
                     $commandAliases = $name === $command->getName() ? $this->getCommandAliasesText($command) : '';
                     $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases.$command->getDescription()), $options);
@@ -304,12 +304,12 @@ class TextDescriptor extends AbstractDescriptor
 
         foreach ($commands as $command) {
             if ($command instanceof Command) {
-                $widths[] = Helper::width($command->getName());
+                $widths[] = AbstractHelper::width($command->getName());
                 foreach ($command->getAliases() as $alias) {
-                    $widths[] = Helper::width($alias);
+                    $widths[] = AbstractHelper::width($alias);
                 }
             } else {
-                $widths[] = Helper::width($command);
+                $widths[] = AbstractHelper::width($command);
             }
         }
 
@@ -324,11 +324,11 @@ class TextDescriptor extends AbstractDescriptor
         $totalWidth = 0;
         foreach ($options as $option) {
             // "-" + shortcut + ", --" + name
-            $nameLength = 1 + max(Helper::width($option->getShortcut()), 1) + 4 + Helper::width($option->getName());
+            $nameLength = 1 + max(AbstractHelper::width($option->getShortcut()), 1) + 4 + AbstractHelper::width($option->getName());
             if ($option->isNegatable()) {
-                $nameLength += 6 + Helper::width($option->getName()); // |--no- + name
+                $nameLength += 6 + AbstractHelper::width($option->getName()); // |--no- + name
             } elseif ($option->acceptValue()) {
-                $valueLength = 1 + Helper::width($option->getName()); // = + value
+                $valueLength = 1 + AbstractHelper::width($option->getName()); // = + value
                 $valueLength += $option->isValueOptional() ? 2 : 0; // [ + ]
 
                 $nameLength += $valueLength;

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class StreamOutputTest extends TestCase
@@ -31,8 +31,8 @@ class StreamOutputTest extends TestCase
 
     public function testConstructor()
     {
-        $output = new StreamOutput($this->stream, Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        $output = new StreamOutput($this->stream, AbstractOutput::VERBOSITY_QUIET, true);
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 

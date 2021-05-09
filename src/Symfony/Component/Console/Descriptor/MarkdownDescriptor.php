@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -125,7 +125,7 @@ class MarkdownDescriptor extends AbstractDescriptor
         if ($options['short'] ?? false) {
             $this->write(
                 '`'.$command->getName()."`\n"
-                .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
+                .str_repeat('-', AbstractHelper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
                 .array_reduce($command->getAliases(), function ($carry, $usage) {
@@ -140,7 +140,7 @@ class MarkdownDescriptor extends AbstractDescriptor
 
         $this->write(
             '`'.$command->getName()."`\n"
-            .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
+            .str_repeat('-', AbstractHelper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
             .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
@@ -169,7 +169,7 @@ class MarkdownDescriptor extends AbstractDescriptor
         $description = new ApplicationDescription($application, $describedNamespace);
         $title = $this->getApplicationTitle($application);
 
-        $this->write($title."\n".str_repeat('=', Helper::width($title)));
+        $this->write($title."\n".str_repeat('=', AbstractHelper::width($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {

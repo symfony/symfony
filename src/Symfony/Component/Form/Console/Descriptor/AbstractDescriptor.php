@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Console\Descriptor;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
+use Symfony\Component\Console\Style\AbstractOutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Util\OptionsResolverWrapper;
@@ -27,9 +27,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @internal
  */
-abstract class Descriptor implements DescriptorInterface
+abstract class AbstractDescriptor implements DescriptorInterface
 {
-    /** @var OutputStyle */
+    /** @var AbstractOutputStyle */
     protected $output;
     protected $type;
     protected $ownOptions = [];
@@ -45,7 +45,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     public function describe(OutputInterface $output, $object, array $options = [])
     {
-        $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput([]), $output);
+        $this->output = $output instanceof AbstractOutputStyle ? $output : new SymfonyStyle(new ArrayInput([]), $output);
 
         switch (true) {
             case null === $object:

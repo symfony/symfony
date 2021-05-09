@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class XmlFileLoader extends FileLoader
+class XmlFileLoader extends AbstractFileLoader
 {
     use HostTrait;
     use LocalizedRouteTrait;

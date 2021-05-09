@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
@@ -27,7 +27,7 @@ use Symfony\Component\Yaml\Yaml;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class YamlFileLoader extends FileLoader
+class YamlFileLoader extends AbstractFileLoader
 {
     use HostTrait;
     use LocalizedRouteTrait;

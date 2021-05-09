@@ -31,7 +31,7 @@ use function Symfony\Component\String\s;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class QuestionHelper extends Helper
+class QuestionHelper extends AbstractHelper
 {
     private $inputStream;
     private static $shell;

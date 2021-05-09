@@ -434,12 +434,12 @@ class Table
         }
 
         if (null !== $title) {
-            $titleLength = Helper::width(Helper::removeDecoration($formatter = $this->output->getFormatter(), $formattedTitle = sprintf($titleFormat, $title)));
-            $markupLength = Helper::width($markup);
+            $titleLength = AbstractHelper::width(AbstractHelper::removeDecoration($formatter = $this->output->getFormatter(), $formattedTitle = sprintf($titleFormat, $title)));
+            $markupLength = AbstractHelper::width($markup);
             if ($titleLength > $limit = $markupLength - 4) {
                 $titleLength = $limit;
-                $formatLength = Helper::width(Helper::removeDecoration($formatter, sprintf($titleFormat, '')));
-                $formattedTitle = sprintf($titleFormat, Helper::substr($title, 0, $limit - $formatLength - 3).'...');
+                $formatLength = AbstractHelper::width(AbstractHelper::removeDecoration($formatter, sprintf($titleFormat, '')));
+                $formattedTitle = sprintf($titleFormat, AbstractHelper::substr($title, 0, $limit - $formatLength - 3).'...');
             }
 
             $titleStart = ($markupLength - $titleLength) / 2;
@@ -511,7 +511,7 @@ class Table
             return sprintf($style->getBorderFormat(), str_repeat($style->getBorderChars()[2], $width));
         }
 
-        $width += Helper::length($cell) - Helper::length(Helper::removeDecoration($this->output->getFormatter(), $cell));
+        $width += AbstractHelper::length($cell) - AbstractHelper::length(AbstractHelper::removeDecoration($this->output->getFormatter(), $cell));
         $content = sprintf($style->getCellRowContentFormat(), $cell);
 
         $padType = $style->getPadType();
@@ -569,7 +569,7 @@ class Table
             foreach ($rows[$rowKey] as $column => $cell) {
                 $colspan = $cell instanceof TableCell ? $cell->getColspan() : 1;
 
-                if (isset($this->columnMaxWidths[$column]) && Helper::width(Helper::removeDecoration($formatter, $cell)) > $this->columnMaxWidths[$column]) {
+                if (isset($this->columnMaxWidths[$column]) && AbstractHelper::width(AbstractHelper::removeDecoration($formatter, $cell)) > $this->columnMaxWidths[$column]) {
                     $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column] * $colspan);
                 }
                 if (!strstr($cell, "\n")) {
@@ -754,8 +754,8 @@ class Table
 
                 foreach ($row as $i => $cell) {
                     if ($cell instanceof TableCell) {
-                        $textContent = Helper::removeDecoration($this->output->getFormatter(), $cell);
-                        $textLength = Helper::width($textContent);
+                        $textContent = AbstractHelper::removeDecoration($this->output->getFormatter(), $cell);
+                        $textLength = AbstractHelper::width($textContent);
                         if ($textLength > 0) {
                             $contentColumns = str_split($textContent, ceil($textLength / $cell->getColspan()));
                             foreach ($contentColumns as $position => $content) {
@@ -768,13 +768,13 @@ class Table
                 $lengths[] = $this->getCellWidth($row, $column);
             }
 
-            $this->effectiveColumnWidths[$column] = max($lengths) + Helper::width($this->style->getCellRowContentFormat()) - 2;
+            $this->effectiveColumnWidths[$column] = max($lengths) + AbstractHelper::width($this->style->getCellRowContentFormat()) - 2;
         }
     }
 
     private function getColumnSeparatorWidth(): int
     {
-        return Helper::width(sprintf($this->style->getBorderFormat(), $this->style->getBorderChars()[3]));
+        return AbstractHelper::width(sprintf($this->style->getBorderFormat(), $this->style->getBorderChars()[3]));
     }
 
     private function getCellWidth(array $row, int $column): int
@@ -783,7 +783,7 @@ class Table
 
         if (isset($row[$column])) {
             $cell = $row[$column];
-            $cellWidth = Helper::width(Helper::removeDecoration($this->output->getFormatter(), $cell));
+            $cellWidth = AbstractHelper::width(AbstractHelper::removeDecoration($this->output->getFormatter(), $cell));
         }
 
         $columnWidth = $this->columnWidths[$column] ?? 0;

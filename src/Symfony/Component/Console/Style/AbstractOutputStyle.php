@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class OutputStyle implements OutputInterface, StyleInterface
+abstract class AbstractOutputStyle implements OutputInterface, StyleInterface
 {
     private $output;
 

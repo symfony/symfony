@@ -29,7 +29,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -699,7 +699,7 @@ class Application implements ResetInterface
             $abbrevs = array_values($commands);
             $maxLen = 0;
             foreach ($abbrevs as $abbrev) {
-                $maxLen = max(Helper::width($abbrev), $maxLen);
+                $maxLen = max(AbstractHelper::width($abbrev), $maxLen);
             }
             $abbrevs = array_map(function ($cmd) use ($commandList, $usableWidth, $maxLen, &$commands) {
                 if ($commandList[$cmd]->isHidden()) {
@@ -710,7 +710,7 @@ class Application implements ResetInterface
 
                 $abbrev = str_pad($cmd, $maxLen, ' ').' '.$commandList[$cmd]->getDescription();
 
-                return Helper::width($abbrev) > $usableWidth ? Helper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
+                return AbstractHelper::width($abbrev) > $usableWidth ? AbstractHelper::substr($abbrev, 0, $usableWidth - 3).'...' : $abbrev;
             }, array_values($commands));
 
             if (\count($commands) > 1) {
@@ -810,7 +810,7 @@ class Application implements ResetInterface
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $class = get_debug_type($e);
                 $title = sprintf('  [%s%s]  ', $class, 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
-                $len = Helper::width($title);
+                $len = AbstractHelper::width($title);
             } else {
                 $len = 0;
             }
@@ -826,7 +826,7 @@ class Application implements ResetInterface
             foreach ('' !== $message ? preg_split('/\r?\n/', $message) : [] as $line) {
                 foreach ($this->splitStringByWidth($line, $width - 4) as $line) {
                     // pre-format lines to get the right string length
-                    $lineLength = Helper::width($line) + 4;
+                    $lineLength = AbstractHelper::width($line) + 4;
                     $lines[] = [$line, $lineLength];
 
                     $len = max($lineLength, $len);
@@ -839,7 +839,7 @@ class Application implements ResetInterface
             }
             $messages[] = $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', $len));
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - Helper::width($title))));
+                $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - AbstractHelper::width($title))));
             }
             foreach ($lines as $line) {
                 $messages[] = sprintf('<error>  %s  %s</error>', OutputFormatter::escape($line[0]), str_repeat(' ', $len - $line[1]));

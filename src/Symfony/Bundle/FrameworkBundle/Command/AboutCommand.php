@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -120,7 +120,7 @@ EOT
             }
         }
 
-        return Helper::formatMemory($size);
+        return AbstractHelper::formatMemory($size);
     }
 
     private static function isExpired(string $date): bool

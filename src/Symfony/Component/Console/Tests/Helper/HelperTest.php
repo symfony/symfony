@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 
 class HelperTest extends TestCase
 {
@@ -50,6 +50,6 @@ class HelperTest extends TestCase
      */
     public function testFormatTime($secs, $expectedFormat)
     {
-        $this->assertEquals($expectedFormat, Helper::formatTime($secs));
+        $this->assertEquals($expectedFormat, AbstractHelper::formatTime($secs));
     }
 }

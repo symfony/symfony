@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Output;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Terminal;
 
 /**
@@ -138,6 +138,6 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayLength(string $text): int
     {
-        return Helper::width(Helper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
+        return AbstractHelper::width(AbstractHelper::removeDecoration($this->getFormatter(), str_replace("\t", '        ', $text)));
     }
 }

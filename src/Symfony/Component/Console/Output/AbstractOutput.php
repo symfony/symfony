@@ -27,7 +27,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Output implements OutputInterface
+abstract class AbstractOutput implements OutputInterface
 {
     private $verbosity;
     private $formatter;

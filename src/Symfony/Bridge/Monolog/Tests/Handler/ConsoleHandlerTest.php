@@ -21,7 +21,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -64,7 +64,7 @@ class ConsoleHandlerTest extends TestCase
         $levelName = Logger::getLevelName($level);
         $levelName = sprintf('%-9s', $levelName);
 
-        $realOutput = $this->getMockBuilder(Output::class)->setMethods(['doWrite'])->getMock();
+        $realOutput = $this->getMockBuilder(AbstractOutput::class)->setMethods(['doWrite'])->getMock();
         $realOutput->setVerbosity($verbosity);
         if ($realOutput->isDebug()) {
             $log = "16:21:54 $levelName [app] My info message\n";

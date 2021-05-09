@@ -33,7 +33,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -502,12 +502,12 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'foos:bar1'], ['decorated' => false]);
         $this->assertSame('
-                                                          
-  There are no commands defined in the "foos" namespace.  
-                                                          
-  Did you mean this?                                      
-      foo                                                 
-                                                          
+
+  There are no commands defined in the "foos" namespace.
+
+  Did you mean this?
+      foo
+
 
 ', $tester->getDisplay(true));
     }
@@ -790,7 +790,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'foo'], ['decorated' => false, 'capture_stderr_separately' => true]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exception');
 
-        $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE, 'capture_stderr_separately' => true]);
+        $tester->run(['command' => 'foo'], ['decorated' => false, 'verbosity' => AbstractOutput::VERBOSITY_VERBOSE, 'capture_stderr_separately' => true]);
         $this->assertStringContainsString('Exception trace', $tester->getErrorOutput(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(['command' => 'list', '--foo' => true], ['decorated' => false, 'capture_stderr_separately' => true]);
@@ -801,7 +801,7 @@ class ApplicationTest extends TestCase
         $tester->run(['command' => 'foo3:bar'], ['decorated' => false, 'capture_stderr_separately' => true]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
 
-        $tester->run(['command' => 'foo3:bar'], ['decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
+        $tester->run(['command' => 'foo3:bar'], ['decorated' => false, 'verbosity' => AbstractOutput::VERBOSITY_VERBOSE]);
         $this->assertMatchesRegularExpression('/\[Exception\]\s*First exception/', $tester->getDisplay(), '->renderException() renders a pretty exception without code exception when code exception is default and verbosity is verbose');
         $this->assertMatchesRegularExpression('/\[Exception\]\s*Second exception/', $tester->getDisplay(), '->renderException() renders a pretty exception without code exception when code exception is 0 and verbosity is verbose');
         $this->assertMatchesRegularExpression('/\[Exception \(404\)\]\s*Third exception/', $tester->getDisplay(), '->renderException() renders a pretty exception with code exception when code exception is 404 and verbosity is verbose');
@@ -985,28 +985,28 @@ class ApplicationTest extends TestCase
         $this->assertFalse($tester->getInput()->isInteractive(), '->run() sets off the interactive mode if -q is passed');
 
         $tester->run(['command' => 'list', '--verbose' => true]);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose is passed');
 
         $tester->run(['command' => 'list', '--verbose' => 1]);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose=1 is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose=1 is passed');
 
         $tester->run(['command' => 'list', '--verbose' => 2]);
-        $this->assertSame(Output::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to very verbose if --verbose=2 is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to very verbose if --verbose=2 is passed');
 
         $tester->run(['command' => 'list', '--verbose' => 3]);
-        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if --verbose=3 is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if --verbose=3 is passed');
 
         $tester->run(['command' => 'list', '--verbose' => 4]);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if unknown --verbose level is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if unknown --verbose level is passed');
 
         $tester->run(['command' => 'list', '-v' => true]);
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
         $tester->run(['command' => 'list', '-vv' => true]);
-        $this->assertSame(Output::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
         $tester->run(['command' => 'list', '-vvv' => true]);
-        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
+        $this->assertSame(AbstractOutput::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
         $tester->run(['command' => 'help', '--help' => true], ['decorated' => false]);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run5.txt', $tester->getDisplay(true), '->run() displays the help if --help is passed');

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AnnotationFileLoader extends FileLoader
+class AnnotationFileLoader extends AbstractFileLoader
 {
     protected $loader;
 

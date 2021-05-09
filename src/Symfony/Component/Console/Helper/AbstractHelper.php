@@ -19,7 +19,7 @@ use Symfony\Component\String\UnicodeString;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Helper implements HelperInterface
+abstract class AbstractHelper implements HelperInterface
 {
     protected $helperSet = null;
 

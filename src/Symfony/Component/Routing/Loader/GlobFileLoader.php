@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class GlobFileLoader extends FileLoader
+class GlobFileLoader extends AbstractFileLoader
 {
     /**
      * {@inheritdoc}

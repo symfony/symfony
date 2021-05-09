@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
 class FileLoaderTest extends TestCase
@@ -151,7 +151,7 @@ class FileLoaderTest extends TestCase
     }
 }
 
-class TestFileLoader extends FileLoader
+class TestFileLoader extends AbstractFileLoader
 {
     private $supports = true;
 

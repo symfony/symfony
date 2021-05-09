@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class DescriptorHelper extends Helper
+class DescriptorHelper extends AbstractHelper
 {
     /**
      * @var DescriptorInterface[]

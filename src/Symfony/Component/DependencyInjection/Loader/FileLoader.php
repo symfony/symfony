@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\AbstractFileLoader as BaseFileLoader;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Attribute\When;

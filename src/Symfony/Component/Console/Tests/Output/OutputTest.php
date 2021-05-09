@@ -13,14 +13,14 @@ namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\AbstractOutput;
 
 class OutputTest extends TestCase
 {
     public function testConstructor()
     {
-        $output = new TestOutput(Output::VERBOSITY_QUIET, true);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        $output = new TestOutput(AbstractOutput::VERBOSITY_QUIET, true);
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
@@ -34,33 +34,33 @@ class OutputTest extends TestCase
     public function testSetGetVerbosity()
     {
         $output = new TestOutput();
-        $output->setVerbosity(Output::VERBOSITY_QUIET);
-        $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
+        $output->setVerbosity(AbstractOutput::VERBOSITY_QUIET);
+        $this->assertEquals(AbstractOutput::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
 
         $this->assertTrue($output->isQuiet());
         $this->assertFalse($output->isVerbose());
         $this->assertFalse($output->isVeryVerbose());
         $this->assertFalse($output->isDebug());
 
-        $output->setVerbosity(Output::VERBOSITY_NORMAL);
+        $output->setVerbosity(AbstractOutput::VERBOSITY_NORMAL);
         $this->assertFalse($output->isQuiet());
         $this->assertFalse($output->isVerbose());
         $this->assertFalse($output->isVeryVerbose());
         $this->assertFalse($output->isDebug());
 
-        $output->setVerbosity(Output::VERBOSITY_VERBOSE);
+        $output->setVerbosity(AbstractOutput::VERBOSITY_VERBOSE);
         $this->assertFalse($output->isQuiet());
         $this->assertTrue($output->isVerbose());
         $this->assertFalse($output->isVeryVerbose());
         $this->assertFalse($output->isDebug());
 
-        $output->setVerbosity(Output::VERBOSITY_VERY_VERBOSE);
+        $output->setVerbosity(AbstractOutput::VERBOSITY_VERY_VERBOSE);
         $this->assertFalse($output->isQuiet());
         $this->assertTrue($output->isVerbose());
         $this->assertTrue($output->isVeryVerbose());
         $this->assertFalse($output->isDebug());
 
-        $output->setVerbosity(Output::VERBOSITY_DEBUG);
+        $output->setVerbosity(AbstractOutput::VERBOSITY_DEBUG);
         $this->assertFalse($output->isQuiet());
         $this->assertTrue($output->isVerbose());
         $this->assertTrue($output->isVeryVerbose());
@@ -69,7 +69,7 @@ class OutputTest extends TestCase
 
     public function testWriteWithVerbosityQuiet()
     {
-        $output = new TestOutput(Output::VERBOSITY_QUIET);
+        $output = new TestOutput(AbstractOutput::VERBOSITY_QUIET);
         $output->writeln('foo');
         $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
     }
@@ -107,8 +107,8 @@ class OutputTest extends TestCase
     public function provideWriteArguments()
     {
         return [
-            ['<info>foo</info>', Output::OUTPUT_RAW, "<info>foo</info>\n"],
-            ['<info>foo</info>', Output::OUTPUT_PLAIN, "foo\n"],
+            ['<info>foo</info>', AbstractOutput::OUTPUT_RAW, "<info>foo</info>\n"],
+            ['<info>foo</info>', AbstractOutput::OUTPUT_PLAIN, "foo\n"],
         ];
     }
 
@@ -153,27 +153,27 @@ class OutputTest extends TestCase
         $output->setVerbosity($verbosity);
         $output->clear();
         $output->write('1', false);
-        $output->write('2', false, Output::VERBOSITY_QUIET);
-        $output->write('3', false, Output::VERBOSITY_NORMAL);
-        $output->write('4', false, Output::VERBOSITY_VERBOSE);
-        $output->write('5', false, Output::VERBOSITY_VERY_VERBOSE);
-        $output->write('6', false, Output::VERBOSITY_DEBUG);
+        $output->write('2', false, AbstractOutput::VERBOSITY_QUIET);
+        $output->write('3', false, AbstractOutput::VERBOSITY_NORMAL);
+        $output->write('4', false, AbstractOutput::VERBOSITY_VERBOSE);
+        $output->write('5', false, AbstractOutput::VERBOSITY_VERY_VERBOSE);
+        $output->write('6', false, AbstractOutput::VERBOSITY_DEBUG);
         $this->assertEquals($expected, $output->output, $msg);
     }
 
     public function verbosityProvider()
     {
         return [
-            [Output::VERBOSITY_QUIET, '2', '->write() in QUIET mode only outputs when an explicit QUIET verbosity is passed'],
-            [Output::VERBOSITY_NORMAL, '123', '->write() in NORMAL mode outputs anything below an explicit VERBOSE verbosity'],
-            [Output::VERBOSITY_VERBOSE, '1234', '->write() in VERBOSE mode outputs anything below an explicit VERY_VERBOSE verbosity'],
-            [Output::VERBOSITY_VERY_VERBOSE, '12345', '->write() in VERY_VERBOSE mode outputs anything below an explicit DEBUG verbosity'],
-            [Output::VERBOSITY_DEBUG, '123456', '->write() in DEBUG mode outputs everything'],
+            [AbstractOutput::VERBOSITY_QUIET, '2', '->write() in QUIET mode only outputs when an explicit QUIET verbosity is passed'],
+            [AbstractOutput::VERBOSITY_NORMAL, '123', '->write() in NORMAL mode outputs anything below an explicit VERBOSE verbosity'],
+            [AbstractOutput::VERBOSITY_VERBOSE, '1234', '->write() in VERBOSE mode outputs anything below an explicit VERY_VERBOSE verbosity'],
+            [AbstractOutput::VERBOSITY_VERY_VERBOSE, '12345', '->write() in VERY_VERBOSE mode outputs anything below an explicit DEBUG verbosity'],
+            [AbstractOutput::VERBOSITY_DEBUG, '123456', '->write() in DEBUG mode outputs everything'],
         ];
     }
 }
 
-class TestOutput extends Output
+class TestOutput extends AbstractOutput
 {
     public $output = '';
 

@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @internal
  */
-class TextDescriptor extends Descriptor
+class TextDescriptor extends AbstractDescriptor
 {
     private $fileLinkFormatter;
 

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FormatterHelper extends Helper
+class FormatterHelper extends AbstractHelper
 {
     /**
      * Formats a message within a section.

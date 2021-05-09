@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\AbstractHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -828,7 +828,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
             $mem = 100000 * $i;
             $colors = $i++ ? '41;37' : '44;37';
 
-            return "\033[".$colors.'m '.Helper::formatMemory($mem)." \033[0m";
+            return "\033[".$colors.'m '.AbstractHelper::formatMemory($mem)." \033[0m";
         });
         $bar->setFormat(" \033[44;37m %title:-37s% \033[0m\n %current%/%max% %bar% %percent:3s%%\n 🏁  %remaining:-10s% %memory:37s%");
         $bar->setBarCharacter($done = "\033[32m●\033[0m");

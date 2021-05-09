@@ -159,10 +159,12 @@
                     <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg') }}</span>
                     <span class="label">Stateless</span>
                 </div>
+                {% if collector.authenticatorManagerEnabled == false %}
                 <div class="metric">
                     <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.firewall.allows_anonymous ? 'yes' : 'no') ~ '.svg') }}</span>
                     <span class="label">Allows anonymous</span>
                 </div>
+                {% endif %}
             </div>
 
             {% if collector.firewall.security_enabled %}

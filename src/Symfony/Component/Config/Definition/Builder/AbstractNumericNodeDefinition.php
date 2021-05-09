@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
  *
  * @author David Jeanmonod <david.jeanmonod@gmail.com>
  */
-abstract class NumericNodeDefinition extends ScalarNodeDefinition
+abstract class AbstractNumericNodeDefinition extends ScalarNodeDefinition
 {
     protected $min;
     protected $max;

@@ -3,7 +3,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterMappingsPass;
+use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\AbstractRegisterMappingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -40,6 +40,6 @@ class RegisterMappingsPassTest extends TestCase
     }
 }
 
-class ConcreteMappingsPass extends RegisterMappingsPass
+class ConcreteMappingsPass extends AbstractRegisterMappingsPass
 {
 }

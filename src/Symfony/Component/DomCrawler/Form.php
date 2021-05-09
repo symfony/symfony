@@ -12,7 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\AbstractFormField;
 
 /**
  * Form represents an HTML form.
@@ -281,7 +281,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets a named field.
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return AbstractFormField|AbstractFormField[]|AbstractFormField[][] The value of the field
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
@@ -293,7 +293,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets a named field.
      */
-    public function set(FormField $field)
+    public function set(AbstractFormField $field)
     {
         $this->fields->add($field);
     }
@@ -301,7 +301,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets all fields.
      *
-     * @return FormField[]
+     * @return AbstractFormField[]
      */
     public function all()
     {
@@ -325,7 +325,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return AbstractFormField|AbstractFormField[]|AbstractFormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

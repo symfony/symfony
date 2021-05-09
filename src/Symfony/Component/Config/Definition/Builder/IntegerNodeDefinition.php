@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\IntegerNode;
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
  */
-class IntegerNodeDefinition extends NumericNodeDefinition
+class IntegerNodeDefinition extends AbstractNumericNodeDefinition
 {
     /**
      * Instantiates a Node.

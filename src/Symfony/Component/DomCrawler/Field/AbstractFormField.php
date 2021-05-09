@@ -16,7 +16,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class FormField
+abstract class AbstractFormField
 {
     /**
      * @var \DOMElement

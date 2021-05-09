@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
  * @author Tobias Schultze <http://tobion.de>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CompiledUrlGeneratorDumper extends GeneratorDumper
+class CompiledUrlGeneratorDumper extends AbstractGeneratorDumper
 {
     public function getCompiledRoutes(): array
     {

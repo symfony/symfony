@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Helper;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\JsonDescriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
-use Symfony\Bundle\FrameworkBundle\Console\Descriptor\XmlDescriptor;
+use Symfony\Bundle\FrameworkBundle\Console\Descriptor\XmlAbstractDescriptor;
 use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
@@ -29,7 +29,7 @@ class DescriptorHelper extends BaseDescriptorHelper
     {
         $this
             ->register('txt', new TextDescriptor($fileLinkFormatter))
-            ->register('xml', new XmlDescriptor())
+            ->register('xml', new XmlAbstractDescriptor())
             ->register('json', new JsonDescriptor())
             ->register('md', new MarkdownDescriptor())
         ;

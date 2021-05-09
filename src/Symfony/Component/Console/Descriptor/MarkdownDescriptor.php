@@ -26,7 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @internal
  */
-class MarkdownDescriptor extends Descriptor
+class MarkdownDescriptor extends AbstractDescriptor
 {
     /**
      * {@inheritdoc}

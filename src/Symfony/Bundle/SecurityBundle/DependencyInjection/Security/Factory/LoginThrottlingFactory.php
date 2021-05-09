@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -48,7 +48,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityF
     /**
      * @param ArrayNodeDefinition $builder
      */
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(AbstractNodeDefinition $builder)
     {
         $builder
             ->children()

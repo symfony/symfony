@@ -20,7 +20,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -888,7 +888,7 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return 'custom_listener';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(AbstractNodeDefinition $builder)
     {
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
+class ArrayNodeDefinition extends AbstractNodeDefinition implements ParentNodeDefinitionInterface
 {
     protected $performDeepMerging = true;
     protected $ignoreExtraKeys = false;
@@ -66,7 +66,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a prototype for child nodes.
      *
-     * @return NodeDefinition
+     * @return AbstractNodeDefinition
      */
     public function prototype(string $type)
     {
@@ -360,7 +360,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * {@inheritdoc}
      */
-    public function append(NodeDefinition $node)
+    public function append(AbstractNodeDefinition $node)
     {
         $this->children[$node->name] = $node->setParent($this);
 
@@ -518,7 +518,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * @return NodeDefinition[]
+     * @return AbstractNodeDefinition[]
      */
     public function getChildNodeDefinitions()
     {
@@ -530,7 +530,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @param string $nodePath The path of the node to find. e.g "doctrine.orm.mappings"
      */
-    public function find(string $nodePath): NodeDefinition
+    public function find(string $nodePath): AbstractNodeDefinition
     {
         $firstPathSegment = (false === $pathSeparatorPos = strpos($nodePath, $this->pathSeparator))
             ? $nodePath

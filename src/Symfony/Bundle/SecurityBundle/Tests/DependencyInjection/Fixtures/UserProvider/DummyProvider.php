@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DummyProvider implements UserProviderFactoryInterface
@@ -17,7 +17,7 @@ class DummyProvider implements UserProviderFactoryInterface
         return 'foo';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
     }
 }

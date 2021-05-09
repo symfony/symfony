@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ArrayNode extends BaseNode implements PrototypeNodeInterface
+class ArrayNode extends AbstractBaseNode implements PrototypeNodeInterface
 {
     protected $xmlRemappings = [];
     protected $children = [];

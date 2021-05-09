@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -37,7 +37,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
     {
         $this->extensionConfig = [];
 
-        if (!class_exists(BaseNode::class) || !$extensions = $container->getExtensions()) {
+        if (!class_exists(AbstractBaseNode::class) || !$extensions = $container->getExtensions()) {
             return;
         }
 
@@ -62,7 +62,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                     }
                 }
                 foreach ($placeholders as $placeholder) {
-                    BaseNode::setPlaceholder($placeholder, $values);
+                    AbstractBaseNode::setPlaceholder($placeholder, $values);
                 }
             }
 
@@ -87,7 +87,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                 $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
             }
         } finally {
-            BaseNode::resetPlaceholders();
+            AbstractBaseNode::resetPlaceholders();
         }
 
         $resolvingBag->clearUnusedEnvPlaceholders();

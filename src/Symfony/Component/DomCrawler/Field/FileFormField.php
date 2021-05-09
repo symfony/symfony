@@ -16,7 +16,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileFormField extends FormField
+class FileFormField extends AbstractFormField
 {
     /**
      * Sets the PHP error code associated with the field.

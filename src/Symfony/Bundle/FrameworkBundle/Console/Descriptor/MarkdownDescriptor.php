@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class MarkdownDescriptor extends Descriptor
+class MarkdownDescriptor extends AbstractDescriptor
 {
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {

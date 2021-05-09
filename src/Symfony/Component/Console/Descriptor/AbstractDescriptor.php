@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @internal
  */
-abstract class Descriptor implements DescriptorInterface
+abstract class AbstractDescriptor implements DescriptorInterface
 {
     /**
      * @var OutputInterface

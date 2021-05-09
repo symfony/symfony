@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -153,14 +153,14 @@ class TreeBuilderTest extends TestCase
         $children = $node->getChildren();
 
         $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(BaseNode::class, $children['foo']);
+        $this->assertInstanceOf(AbstractBaseNode::class, $children['foo']);
         $this->assertSame('propagation.foo', $children['foo']->getPath());
 
         $this->assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
         $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
+        $this->assertInstanceOf(AbstractBaseNode::class, $childChildren['foo']);
         $this->assertSame('propagation.child.foo', $childChildren['foo']->getPath());
     }
 
@@ -184,14 +184,14 @@ class TreeBuilderTest extends TestCase
         $children = $node->getChildren();
 
         $this->assertArrayHasKey('foo', $children);
-        $this->assertInstanceOf(BaseNode::class, $children['foo']);
+        $this->assertInstanceOf(AbstractBaseNode::class, $children['foo']);
         $this->assertSame('propagation/foo', $children['foo']->getPath());
 
         $this->assertArrayHasKey('child', $children);
         $childChildren = $children['child']->getChildren();
 
         $this->assertArrayHasKey('foo', $childChildren);
-        $this->assertInstanceOf(BaseNode::class, $childChildren['foo']);
+        $this->assertInstanceOf(AbstractBaseNode::class, $childChildren['foo']);
         $this->assertSame('propagation/child/foo', $childChildren['foo']->getPath());
     }
 }

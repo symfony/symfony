@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -40,7 +40,7 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, Secur
     /**
      * @param ArrayNodeDefinition $builder
      */
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(AbstractNodeDefinition $builder)
     {
         $builder
             ->info('An array of service ids for all of your "authenticators"')

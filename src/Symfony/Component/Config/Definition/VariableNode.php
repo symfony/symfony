@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class VariableNode extends BaseNode implements PrototypeNodeInterface
+class VariableNode extends AbstractBaseNode implements PrototypeNodeInterface
 {
     protected $defaultValueSet = false;
     protected $defaultValue;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -60,7 +60,7 @@ class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactory
         return 'anonymous';
     }
 
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(AbstractNodeDefinition $builder)
     {
         $builder
             ->beforeNormalization()

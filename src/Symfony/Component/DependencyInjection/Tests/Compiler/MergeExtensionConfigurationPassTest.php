@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
@@ -135,7 +135,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testReuseEnvPlaceholderGeneratedByPreviousExtension()
     {
-        if (!property_exists(BaseNode::class, 'placeholderUniquePrefixes')) {
+        if (!property_exists(AbstractBaseNode::class, 'placeholderUniquePrefixes')) {
             $this->markTestSkipped('This test requires symfony/config ^4.4.11|^5.0.11|^5.1.3');
         }
 

@@ -16,7 +16,7 @@ namespace Symfony\Component\Translation\Loader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class PhpFileLoader extends FileLoader
+class PhpFileLoader extends AbstractFileLoader
 {
     private static $cache = [];
 

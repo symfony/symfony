@@ -22,7 +22,7 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class BaseNode implements NodeInterface
+abstract class AbstractBaseNode implements NodeInterface
 {
     public const DEFAULT_PATH_SEPARATOR = '.';
 

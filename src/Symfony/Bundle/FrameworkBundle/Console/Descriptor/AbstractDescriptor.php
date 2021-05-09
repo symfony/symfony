@@ -28,7 +28,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-abstract class Descriptor implements DescriptorInterface
+abstract class AbstractDescriptor implements DescriptorInterface
 {
     /**
      * @var OutputInterface

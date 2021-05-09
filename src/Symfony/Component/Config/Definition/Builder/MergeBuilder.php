@@ -22,7 +22,7 @@ class MergeBuilder
     public $allowFalse = false;
     public $allowOverwrite = true;
 
-    public function __construct(NodeDefinition $node)
+    public function __construct(AbstractNodeDefinition $node)
     {
         $this->node = $node;
     }
@@ -54,7 +54,7 @@ class MergeBuilder
     /**
      * Returns the related node.
      *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
+     * @return AbstractNodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      */
     public function end()
     {

@@ -22,7 +22,7 @@ class NormalizationBuilder
     public $before = [];
     public $remappings = [];
 
-    public function __construct(NodeDefinition $node)
+    public function __construct(AbstractNodeDefinition $node)
     {
         $this->node = $node;
     }

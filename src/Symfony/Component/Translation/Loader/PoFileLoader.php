@@ -15,7 +15,7 @@ namespace Symfony\Component\Translation\Loader;
  * @copyright Copyright (c) 2010, Union of RAD https://github.com/UnionOfRAD/lithium
  * @copyright Copyright (c) 2012, Clemens Tolboom
  */
-class PoFileLoader extends FileLoader
+class PoFileLoader extends AbstractFileLoader
 {
     /**
      * Parses portable object (PO) format.

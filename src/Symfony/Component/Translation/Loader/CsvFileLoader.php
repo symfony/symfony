@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  *
  * @author Saša Stamenković <umpirsky@gmail.com>
  */
-class CsvFileLoader extends FileLoader
+class CsvFileLoader extends AbstractFileLoader
 {
     private $delimiter = ';';
     private $enclosure = '"';

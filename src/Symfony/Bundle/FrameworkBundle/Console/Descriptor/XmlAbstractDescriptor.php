@@ -31,7 +31,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class XmlDescriptor extends Descriptor
+class XmlAbstractDescriptor extends AbstractDescriptor
 {
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {

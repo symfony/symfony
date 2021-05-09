@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
@@ -453,7 +453,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertNode('transports', ArrayNodeDefinition::class, $rootNode->find('mailer.configuration.|transports'));
     }
 
-    protected function assertNode(string $expectedName, string $expectedType, NodeDefinition $actualNode): void
+    protected function assertNode(string $expectedName, string $expectedType, AbstractNodeDefinition $actualNode): void
     {
         $this->assertInstanceOf($expectedType, $actualNode);
         $this->assertSame($expectedName, $this->getField($actualNode, 'name'));

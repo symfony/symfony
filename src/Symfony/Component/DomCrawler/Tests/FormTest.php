@@ -13,7 +13,7 @@ namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\AbstractFormField;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 use Symfony\Component\DomCrawler\Form;
@@ -873,7 +873,7 @@ class FormTest extends TestCase
     protected function getFormFieldMock($name, $value = null)
     {
         $field = $this
-            ->getMockBuilder(FormField::class)
+            ->getMockBuilder(AbstractFormField::class)
             ->setMethods(['getName', 'getValue', 'setValue', 'initialize'])
             ->disableOriginalConstructor()
             ->getMock()

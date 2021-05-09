@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -47,5 +47,5 @@ interface SecurityFactoryInterface
      */
     public function getKey();
 
-    public function addConfiguration(NodeDefinition $builder);
+    public function addConfiguration(AbstractNodeDefinition $builder);
 }

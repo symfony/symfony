@@ -25,7 +25,7 @@ class ExprBuilder
     public $ifPart;
     public $thenPart;
 
-    public function __construct(NodeDefinition $node)
+    public function __construct(AbstractNodeDefinition $node)
     {
         $this->node = $node;
     }
@@ -206,7 +206,7 @@ class ExprBuilder
     /**
      * Returns the related node.
      *
-     * @return NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
+     * @return AbstractNodeDefinition|ArrayNodeDefinition|VariableNodeDefinition
      *
      * @throws \RuntimeException
      */

@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
  *
  * @author singles
  */
-class JsonFileLoader extends FileLoader
+class JsonFileLoader extends AbstractFileLoader
 {
     /**
      * {@inheritdoc}

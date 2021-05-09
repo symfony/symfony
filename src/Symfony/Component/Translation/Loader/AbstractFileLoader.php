@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-abstract class FileLoader extends ArrayLoader
+abstract class AbstractFileLoader extends ArrayLoader
 {
     /**
      * {@inheritdoc}

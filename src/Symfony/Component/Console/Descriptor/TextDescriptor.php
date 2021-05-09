@@ -26,7 +26,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @internal
  */
-class TextDescriptor extends Descriptor
+class TextDescriptor extends AbstractDescriptor
 {
     /**
      * {@inheritdoc}

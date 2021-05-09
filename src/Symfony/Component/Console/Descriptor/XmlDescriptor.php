@@ -24,7 +24,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @internal
  */
-class XmlDescriptor extends Descriptor
+class XmlDescriptor extends AbstractDescriptor
 {
     public function getInputDefinitionDocument(InputDefinition $definition): \DOMDocument
     {

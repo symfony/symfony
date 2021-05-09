@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine;
 
-use Doctrine\Persistence\AbstractManagerRegistry;
+use Doctrine\Persistence\AbstractManagerRegistry as ManagerRegistry;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Container;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-abstract class ManagerRegistry extends AbstractManagerRegistry
+abstract class AbstractManagerRegistry extends ManagerRegistry
 {
     /**
      * @var Container

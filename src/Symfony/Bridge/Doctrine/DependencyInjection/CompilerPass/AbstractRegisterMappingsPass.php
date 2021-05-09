@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author David Buchmann <david@liip.ch>
  */
-abstract class RegisterMappingsPass implements CompilerPassInterface
+abstract class AbstractRegisterMappingsPass implements CompilerPassInterface
 {
     /**
      * DI object for the driver to use, either a service definition for a

@@ -16,7 +16,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TextareaFormField extends FormField
+class TextareaFormField extends AbstractFormField
 {
     /**
      * Initializes the form field.

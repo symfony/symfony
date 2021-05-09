@@ -13,14 +13,14 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 
 class NodeDefinitionTest extends TestCase
 {
     public function testSetPathSeparatorChangesChildren()
     {
         $parentNode = new ArrayNodeDefinition('name');
-        $childNode = $this->createMock(NodeDefinition::class);
+        $childNode = $this->createMock(AbstractNodeDefinition::class);
 
         $childNode
             ->expects($this->once())

@@ -40,12 +40,12 @@ interface ParentNodeDefinitionInterface extends BuilderAwareInterface
      *
      * @return $this
      */
-    public function append(NodeDefinition $node);
+    public function append(AbstractNodeDefinition $node);
 
     /**
      * Gets the child node definitions.
      *
-     * @return NodeDefinition[]
+     * @return AbstractNodeDefinition[]
      */
     public function getChildNodeDefinitions();
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -48,7 +48,7 @@ class EntityFactory implements UserProviderFactoryInterface
         return $this->key;
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         $node
             ->children()

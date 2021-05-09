@@ -35,7 +35,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class TextDescriptor extends Descriptor
+class TextDescriptor extends AbstractDescriptor
 {
     private $fileLinkFormatter;
 

@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\VariableNode;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class VariableNodeDefinition extends NodeDefinition
+class VariableNodeDefinition extends AbstractNodeDefinition
 {
     /**
      * Instantiate a Node.

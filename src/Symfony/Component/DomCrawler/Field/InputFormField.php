@@ -19,7 +19,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InputFormField extends FormField
+class InputFormField extends AbstractFormField
 {
     /**
      * Initializes the form field.

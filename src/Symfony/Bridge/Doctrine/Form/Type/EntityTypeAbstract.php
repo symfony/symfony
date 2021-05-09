@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EntityType extends DoctrineType
+class EntityTypeAbstract extends AbstractDoctrineType
 {
     public function configureOptions(OptionsResolver $resolver)
     {

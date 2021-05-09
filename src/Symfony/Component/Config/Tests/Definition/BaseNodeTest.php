@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class BaseNodeTest extends TestCase
@@ -36,7 +36,7 @@ class BaseNodeTest extends TestCase
             }
         }
 
-        $node = $this->getMockForAbstractClass(BaseNode::class, $constructorArgs);
+        $node = $this->getMockForAbstractClass(AbstractBaseNode::class, $constructorArgs);
 
         $this->assertSame($expected, $node->getPath());
     }

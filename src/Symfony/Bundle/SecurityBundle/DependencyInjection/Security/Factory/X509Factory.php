@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -70,7 +70,7 @@ class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInter
         return 'x509';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         $node
             ->children()

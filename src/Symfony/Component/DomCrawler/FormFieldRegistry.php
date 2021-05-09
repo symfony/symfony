@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\AbstractFormField;
 
 /**
  * This is an internal class that must not be used directly.
@@ -27,7 +27,7 @@ class FormFieldRegistry
     /**
      * Adds a field to the registry.
      */
-    public function add(FormField $field)
+    public function add(AbstractFormField $field)
     {
         $segments = $this->getSegments($field->getName());
 
@@ -66,7 +66,7 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualifed name and its children.
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return AbstractFormField|AbstractFormField[]|AbstractFormField[][] The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
@@ -111,7 +111,7 @@ class FormFieldRegistry
     public function set(string $name, $value)
     {
         $target = &$this->get($name);
-        if ((!\is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof Field\AbstractFormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
             $registry = new static();
@@ -128,7 +128,7 @@ class FormFieldRegistry
     /**
      * Returns the list of field with their value.
      *
-     * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
+     * @return AbstractFormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
     public function all(): array
     {

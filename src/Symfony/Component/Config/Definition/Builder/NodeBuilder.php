@@ -119,7 +119,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return NodeDefinition&ParentNodeDefinitionInterface The parent node
+     * @return AbstractNodeDefinition&ParentNodeDefinitionInterface The parent node
      */
     public function end()
     {
@@ -129,7 +129,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Creates a child node.
      *
-     * @return NodeDefinition The child node
+     * @return AbstractNodeDefinition The child node
      *
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
@@ -160,7 +160,7 @@ class NodeBuilder implements NodeParentInterface
      *
      * @return $this
      */
-    public function append(NodeDefinition $node)
+    public function append(AbstractNodeDefinition $node)
     {
         if ($node instanceof BuilderAwareInterface) {
             $builder = clone $this;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -42,7 +42,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
         return 'memory';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         $node
             ->fixXmlConfig('user')

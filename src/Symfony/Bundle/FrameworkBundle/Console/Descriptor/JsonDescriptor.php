@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class JsonDescriptor extends Descriptor
+class JsonDescriptor extends AbstractDescriptor
 {
     protected function describeRouteCollection(RouteCollection $routes, array $options = [])
     {

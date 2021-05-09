@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
  */
 class LoginLinkFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         /** @var NodeBuilder $builder */
         $builder = $node->fixXmlConfig('signature_property', 'signature_properties')->children();

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -38,7 +38,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
         $exprLangProviders = $container->getExpressionLanguageProviders();
-        $configAvailable = class_exists(BaseNode::class);
+        $configAvailable = class_exists(AbstractBaseNode::class);
 
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof PrependExtensionInterface) {
@@ -56,7 +56,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 // create a dedicated bag so that we can track env vars per-extension
                 $resolvingBag = new MergeExtensionConfigurationParameterBag($resolvingBag);
                 if ($configAvailable) {
-                    BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
+                    AbstractBaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
                 }
             }
             $config = $resolvingBag->resolveValue($config);
@@ -80,7 +80,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 }
 
                 if ($configAvailable) {
-                    BaseNode::resetPlaceholders();
+                    AbstractBaseNode::resetPlaceholders();
                 }
 
                 throw $e;
@@ -96,7 +96,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         }
 
         if ($configAvailable) {
-            BaseNode::resetPlaceholders();
+            AbstractBaseNode::resetPlaceholders();
         }
 
         $container->addDefinitions($definitions);

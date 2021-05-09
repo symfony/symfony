@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\Config\Definition\NodeInterface;
 
@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class NodeDefinition implements NodeParentInterface
+abstract class AbstractNodeDefinition implements NodeParentInterface
 {
     protected $name;
     protected $normalization;
@@ -34,7 +34,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $nullEquivalent;
     protected $trueEquivalent = true;
     protected $falseEquivalent = false;
-    protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
+    protected $pathSeparator = AbstractBaseNode::DEFAULT_PATH_SEPARATOR;
     protected $parent;
     protected $attributes = [];
 
@@ -95,7 +95,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return NodeParentInterface|NodeBuilder|NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|null The builder of the parent node
+     * @return NodeParentInterface|NodeBuilder|AbstractNodeDefinition|ArrayNodeDefinition|VariableNodeDefinition|null The builder of the parent node
      */
     public function end()
     {
@@ -124,7 +124,7 @@ abstract class NodeDefinition implements NodeParentInterface
         }
 
         $node = $this->createNode();
-        if ($node instanceof BaseNode) {
+        if ($node instanceof AbstractBaseNode) {
             $node->setAttributes($this->attributes);
         }
 

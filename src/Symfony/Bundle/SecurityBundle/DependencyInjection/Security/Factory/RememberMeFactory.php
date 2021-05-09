@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider;
 use Symfony\Bundle\SecurityBundle\RememberMe\DecoratedRememberMeHandler;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -178,7 +178,7 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         return 'remember-me';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         $builder = $node
             ->fixXmlConfig('user_provider')

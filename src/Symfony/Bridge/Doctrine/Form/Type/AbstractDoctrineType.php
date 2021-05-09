@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Service\ResetInterface;
 
-abstract class DoctrineType extends AbstractType implements ResetInterface
+abstract class AbstractDoctrineType extends AbstractType implements ResetInterface
 {
     /**
      * @var ManagerRegistry

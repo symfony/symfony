@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Config\Tests\Fixtures\Builder;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Tests\Fixtures\BarNode;
 
-class BarNodeDefinition extends NodeDefinition
+class BarNodeDefinition extends AbstractNodeDefinition
 {
     protected function createNode(): NodeInterface
     {

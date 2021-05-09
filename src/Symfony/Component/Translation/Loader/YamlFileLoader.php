@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class YamlFileLoader extends FileLoader
+class YamlFileLoader extends AbstractFileLoader
 {
     private $yamlParser;
 

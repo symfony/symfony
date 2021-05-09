@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor;
+use Symfony\Bundle\FrameworkBundle\Console\Descriptor\AbstractDescriptor;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,7 +109,7 @@ EOF
             $resolvedServiceId = $serviceId;
             if (0 !== strpos($serviceId, $previousId)) {
                 $text[] = '';
-                if ('' !== $description = Descriptor::getClassDescription($serviceId, $resolvedServiceId)) {
+                if ('' !== $description = AbstractDescriptor::getClassDescription($serviceId, $resolvedServiceId)) {
                     if (isset($hasAlias[$serviceId])) {
                         continue;
                     }

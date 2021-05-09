@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\AbstractBaseNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\NodeInterface;
@@ -142,11 +142,11 @@ class XmlReferenceDumper
 
                 // comments
                 $comments = [];
-                if ($child instanceof BaseNode && $info = $child->getInfo()) {
+                if ($child instanceof AbstractBaseNode && $info = $child->getInfo()) {
                     $comments[] = $info;
                 }
 
-                if ($child instanceof BaseNode && $example = $child->getExample()) {
+                if ($child instanceof AbstractBaseNode && $example = $child->getExample()) {
                     $comments[] = 'Example: '.$example;
                 }
 
@@ -154,7 +154,7 @@ class XmlReferenceDumper
                     $comments[] = 'Required';
                 }
 
-                if ($child instanceof BaseNode && $child->isDeprecated()) {
+                if ($child instanceof AbstractBaseNode && $child->isDeprecated()) {
                     $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
                     $comments[] = sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
                 }

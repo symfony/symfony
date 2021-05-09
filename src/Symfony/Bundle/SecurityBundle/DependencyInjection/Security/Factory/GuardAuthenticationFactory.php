@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\AbstractNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -39,7 +39,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface, Authentica
         return 'guard';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(AbstractNodeDefinition $node)
     {
         $node
             ->fixXmlConfig('authenticator')

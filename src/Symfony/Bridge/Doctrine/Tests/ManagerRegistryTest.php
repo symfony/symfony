@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Bridge\Doctrine\AbstractManagerRegistry;
 use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 
 class ManagerRegistryTest extends TestCase
@@ -44,7 +44,7 @@ class ManagerRegistryTest extends TestCase
     }
 }
 
-class TestManagerRegistry extends ManagerRegistry
+class TestManagerRegistry extends AbstractManagerRegistry
 {
     public function setTestContainer($container)
     {

@@ -18,7 +18,7 @@ namespace Symfony\Component\DomCrawler\Field;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ChoiceFormField extends FormField
+class ChoiceFormField extends AbstractFormField
 {
     /**
      * @var string

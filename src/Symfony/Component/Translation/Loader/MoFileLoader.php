@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  */
-class MoFileLoader extends FileLoader
+class MoFileLoader extends AbstractFileLoader
 {
     /**
      * Magic used for validating the format of an MO file as well as

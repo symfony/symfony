@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class GeneratorDumper implements GeneratorDumperInterface
+abstract class AbstractGeneratorDumper implements GeneratorDumperInterface
 {
     private $routes;
 

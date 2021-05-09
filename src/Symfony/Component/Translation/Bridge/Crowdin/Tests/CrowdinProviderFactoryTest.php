@@ -17,13 +17,13 @@ class CrowdinProviderFactoryTest extends ProviderFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'crowdin://api.crowdin.com/api/v2/',
+            'crowdin://api.crowdin.com',
             'crowdin://PROJECT_ID:API_TOKEN@default',
         ];
 
         yield [
-            'crowdin://ORGANIZATION_DOMAIN.api.crowdin.com/api/v2/',
-            'crowdin://PROJECT_ID:API_TOKEN@default?domain=ORGANIZATION_DOMAIN',
+            'crowdin://ORGANIZATION_DOMAIN.api.crowdin.com',
+            'crowdin://PROJECT_ID:API_TOKEN@ORGANIZATION_DOMAIN.default',
         ];
     }
 

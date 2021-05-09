@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\Crowdin;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -27,8 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class CrowdinProviderFactory extends AbstractProviderFactory
 {
-    private const HOST = 'api.crowdin.com/api/v2/';
-    private const DSN_OPTION_DOMAIN = 'domain';
+    private const HOST = 'api.crowdin.com';
 
     /** @var LoaderInterface */
     private $loader;
@@ -63,34 +63,18 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
             throw new UnsupportedSchemeException($dsn, 'crowdin', $this->getSupportedSchemes());
         }
 
-        $host = 'default' === $dsn->getHost() ? $this->getHost($dsn) : $dsn->getHost();
-        $endpoint = sprintf('%s%s', $host, $dsn->getPort() ? ':'.$dsn->getPort() : '');
+        $endpoint = preg_replace('/(^|\.)default$/', '\1'.self::HOST, $dsn->getHost());
+        $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
-        $filesDownloader = $this->client;
+        $client = ScopingHttpClient::forBaseUri($this->client, sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
+            'auth_bearer' => $this->getPassword($dsn),
+        ], preg_quote('https://'.$endpoint.'/api/v2/'));
 
-        $client = $this->client->withOptions([
-            'base_uri' => 'https://'.$endpoint,
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->getPassword($dsn),
-            ],
-        ]);
-
-        return new CrowdinProvider($client, $this->loader, $this->logger, $this->xliffFileDumper, $this->defaultLocale, $endpoint, (int) $this->getUser($dsn), $filesDownloader);
+        return new CrowdinProvider($client, $this->loader, $this->logger, $this->xliffFileDumper, $this->defaultLocale, $endpoint);
     }
 
     protected function getSupportedSchemes(): array
     {
         return ['crowdin'];
-    }
-
-    protected function getHost(Dsn $dsn): string
-    {
-        $organizationDomain = $dsn->getOption(self::DSN_OPTION_DOMAIN);
-
-        if ($organizationDomain) {
-            return sprintf('%s.%s', $organizationDomain, self::HOST);
-        } else {
-            return self::HOST;
-        }
     }
 }

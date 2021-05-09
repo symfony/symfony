@@ -22,7 +22,7 @@ class LocoProviderFactoryTest extends ProviderFactoryTestCase
     public function createProvider(): iterable
     {
         yield [
-            'loco://localise.biz/api/',
+            'loco://localise.biz',
             'loco://API_KEY@default',
         ];
     }

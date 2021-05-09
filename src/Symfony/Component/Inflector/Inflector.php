@@ -66,6 +66,9 @@ final class Inflector
         // movies (movie)
         ['seivom', 6, true, true, 'movie'],
 
+        // conspectuses (conspectus), prospectuses (prospectus)
+        ['sesutcep', 8, true, true, 'pectus'],
+
         // feet (foot)
         ['teef', 4, true, true, 'foot'],
 
@@ -268,6 +271,9 @@ final class Inflector
 
         // circuses (circus)
         ['suc', 3, true, true, 'cuses'],
+
+        // conspectuses (conspectus), prospectuses (prospectus)
+        ['sutcep', 6, true, true, 'pectuses'],
 
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
         ['su', 2, true, true, 'i'],

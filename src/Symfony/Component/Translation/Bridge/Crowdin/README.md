@@ -12,9 +12,9 @@ CROWDIN_DSN=crowdin://PROJECT_ID:API_TOKEN@default?domain=ORGANIZATION_DOMAIN
 ```
 
 where:
-- `PROJECT_ID` is your Crowdin Project ID
-- `API_KEY` is your Personal Access API Token
-- `ORGANIZATION_DOMAIN` is your Crowdin Enterprise Organization domain (required only for Crowdin Enterprise usage)
+ - `PROJECT_ID` is your Crowdin Project ID
+ - `API_KEY` is your Personal Access API Token
+ - `ORGANIZATION_DOMAIN` is your Crowdin Enterprise Organization domain (required only for Crowdin Enterprise usage)
 
 [Generate Personal Access Token on Crowdin](https://support.crowdin.com/account-settings/#api)
 
@@ -23,7 +23,7 @@ where:
 Resources
 ---------
 
-* [Contributing](https://symfony.com/doc/current/contributing/index.html)
-* [Report issues](https://github.com/symfony/symfony/issues) and
-  [send Pull Requests](https://github.com/symfony/symfony/pulls)
-  in the [main Symfony repository](https://github.com/symfony/symfony)
+  * [Contributing](https://symfony.com/doc/current/contributing/index.html)
+  * [Report issues](https://github.com/symfony/symfony/issues) and
+    [send Pull Requests](https://github.com/symfony/symfony/pulls)
+    in the [main Symfony repository](https://github.com/symfony/symfony)

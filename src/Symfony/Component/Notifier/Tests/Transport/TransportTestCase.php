@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Notifier\Test;
+namespace Symfony\Component\Notifier\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;

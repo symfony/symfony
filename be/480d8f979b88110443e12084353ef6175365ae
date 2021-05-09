@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-10T22:34:39Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-12T07:44:41Z
+
+Hey!
+
+I think @hurricane-voronin has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2021-04-13T09:56:09Z
+
+With `.gitignore`:
+
+```
+/config/**
+!/config/packages
+!/config/packages/something.yaml
+```
+
+It seems to give an invalid result:
+given: `config/packages/foo.yaml`
+actual: git-ignored
+regex result: 0 (no match, not git-ignored)
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2021-04-13T13:11:33Z
+
+@Jeroeny `/config/**` rule was wrongly "canceled" by `!/config/packages` rule. Now fixed in 13179f8fd2225ce414e91d2303f6486ba2830bb4.
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2021-05-07T08:18:27Z
+
+This PR is hanging here for 3 weeks, AppVeyor build error is irrelevant, can someone please review it?

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Provider\NullProviderFactory;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
@@ -31,6 +32,16 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('translation.provider_factory.null', NullProviderFactory::class)
+            ->tag('translation.provider_factory')
+
+        ->set('translation.provider_factory.crowdin', CrowdinProviderFactory::class)
+            ->args([
+                service('http_client'),
+                service('logger'),
+                param('kernel.default_locale'),
+                service('translation.loader.xliff'),
+                service('translation.dumper.xliff'),
+            ])
             ->tag('translation.provider_factory')
 
         ->set('translation.provider_factory.loco', LocoProviderFactory::class)

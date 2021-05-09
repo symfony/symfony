@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-05T19:47:34Z
+
+@stof @OskarStark I've taken your previous comments on PoEditor/Lokalise providers into account, thanks for it :+1:
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-06T12:09:27Z
+
+Thanks @stof and @OskarStark for your comments, all have been addressed.
+status: needs review
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-07T06:26:29Z
+
+As this PR fixes some bugs in `read` and `write` methods, I think it should belongs to 5.3 milestone.
+The bugs fixes consists of using the internal unique ids of Loco to update (and delete) translations, instead of the key (which is not unique across an Symfony app).
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-07T16:18:27Z
+
+@nicolas-grekas I've also updated test, to remove the expectations on the `Loader`, which are useless because I was loading the expected TranslatorBag data in it.
+
+EDIT: Red AppVeyor seems unrelated

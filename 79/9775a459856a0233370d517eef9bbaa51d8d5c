@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-10T10:49:32Z
+
+Hmm, I think I would be in favor of throwing an exception (forcing everyone to update their voters to check `$token instanceof NullToken` and return early). This would mean it needs to be merged in 5.x. My reasons:
+
+* The `string` return type is part of the `TokenInterface` to be able to handle unauthenticated tokens (i.e. `UsernamePasswordToken` used to be filled with the value of the "username" form input). The `UserInterface` return type is always associated with authenticated tokens.
+* In the new security, tokens are always authenticated (the unauthenticated part is now covered by the new Passport). I do think it makes sense to remove the `string` return type from `TokenInterface::getUser()` in 6.0, making most of the `getUser()` calls much easier (as we can remove the need to check for the string case).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-10T11:26:16Z
+
+This class is covered by the BC promise and this PR targets 5.2. Throwing now would be a BC break, IMHO we’d better do that on 5.3 (with a deprecation notice first).
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-04-10T12:17:18Z
+
+> forcing everyone to update their voters to check `$token instanceof NullToken` and return early
+
+I'm not sure about this one, people already have to check if the user is an instance of their own user like:
+```php
+$user = $token->getUser();
+if ($user instanceof MyAppUser) {
+    $user->getFooAttribute();
+}
+```
+Here are suggesting to add another check:
+```php
+if (!$token instance NullToken) {
+  $user = $token->getUser();
+  $user = $token->getUser();
+  if ($user instanceof MyAppUser) {
+      $user->getFooAttribute();
+  }
+}
+```
+Moreover we already have to check if TokenStorageInterface returns `null`, I'm not sure I want to add another check here :/
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-10T12:46:17Z
+
+I think I forgot to add some extra context: `NullToken` is used only in the experimental authenticator and it's only used in voters (when `$tokenStorage->getToken()` is null).
+
+My "issue" with maintaining `string` as a return type is that it'll only be used for 1 situation in the new authenticator system: this `NullToken` in voters. Is it worth maintaining a union type (with all complexity that comes with it, e.g. always having to check the type) for this rather special case in voters?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-04-10T13:05:33Z
+
+We cannot assume that our code is exclusively used the way it's intended, unless we explicitly restrict its covered usage at time to introduce it. Even if we are in the middle of a rewrite, we should keep in mind that our libraires are used in the wild. Doing BC breaks on non-experimental code in patch releases is a no go.
+
+Behavior changes should be discussed on 5.x - and returning null as it is done currently is violating the contract, hence I think this patch is the right thing to do as a bugfix on 5.2.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-04-10T13:20:07Z
+
+That's why I also said "This would mean it needs to be merged in 5.x." in my first comment :)
+
+I'm -0.5 on making this an empty string in 5.2. Imho, it doesn't add much: This class is new in 5.2; I really don't expect people to use it; and if they do, they already coped with the `null` return value in their applications (and they probably use `$token->getUser() instanceof MyUser`, which is just as capable of catching an empty string as a null value).
+
+---------------------------------------------------------------------------
+
+by jrushlow at 2021-04-10T15:11:41Z
+
+> I do think it makes sense to remove the string return type from TokenInterface::getUser() in 6.0, making most of the getUser() calls much easier (as we can remove the need to check for the string case).
+
+When I implemented the new security system and created a couple custom authenticators - I was kind of confused by the current return type of `TokenInterface::getUser()`. Like if I'm not getting a `UserInterface` back, what would I get that is a `string`|`\Stringable`? Which pushes me towards "we should throw an exception..."
+
+I think an exception would fall inline with other `getUser()` calls in the new security system. And it's a bit more clear when reading the interface, what is happening behind the scenes.. We have a user object || we couldn't get a user object because of _insert exception here_...
+
+> We cannot assume that our code is exclusively used the way it's intended, unless we explicitly restrict its covered usage at time to introduce it.
+
+Very good point - I've seen `TokenInterface` in a couple different parts of an application that were not directly related to Authentication...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-07T13:53:51Z
+
+> Most callers have if (!token->getUser() instanceof UserInterface) checks, I think it's good as is
+
+I agree with that stance, an exception would make things more complex to deal with.
+
+I'm :+1: with this PR, NullToken should respect the contract.

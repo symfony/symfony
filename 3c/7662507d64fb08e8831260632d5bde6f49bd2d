@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2021-04-23T15:45:26Z
+
+shouldn't we assume it is a ContainerConfigurator and trigger a deprecation warning instead ? Otherwise, it is actually a BC break.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-23T15:50:40Z
+
+I think you are correct @stof.. But that is boarder line overkill. =)
+
+---------------------------------------------------------------------------
+
+by stof at 2021-04-23T16:36:45Z
+
+@Nyholm ContainerConfigurator already exists since Symfony 4.4 (maybe even earlier 4.x but I haven't checked). So I assume that this bundle might not be the only one out there using the feature without a typehint on the callable.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-01T13:26:57Z
+
+> I think you are correct @stof.. But that is boarder line overkill. =)
+
+I agree that this would be overkill. Since this failure happens at compile time, we're not going to expose prod servers, so we can do it IMHO.

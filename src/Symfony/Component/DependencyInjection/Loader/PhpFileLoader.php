@@ -102,7 +102,7 @@ class PhpFileLoader extends FileLoader
         foreach ($parameters as $parameter) {
             $reflectionType = $parameter->getType();
             if (!$reflectionType instanceof \ReflectionNamedType) {
-                throw new \InvalidArgumentException(sprintf('Could not resolve argument "$%s" for "%s".', $parameter->getName(), $path));
+                throw new \InvalidArgumentException(sprintf('Could not resolve argument "$%s" for "%s". You must typehint it (for example with "%s" or "%s").', $parameter->getName(), $path, ContainerConfigurator::class, ContainerBuilder::class));
             }
             $type = $reflectionType->getName();
 

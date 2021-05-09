@@ -7,6 +7,35 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.0-BETA3 (2021-05-09)
+
+ * feature #40947 [Translation] Added Crowdin Translation Provider (andrii-bodnar)
+ * bug #41132 [Runtime] don't display the shebang on the CLI (nicolas-grekas)
+ * bug #41113 [Console] Fix Windows code page support (orkan)
+ * bug #40902 [Security] Allow ips parameter in access_control to accept comma-separated string (edefimov)
+ * bug #40980 [TwigBridge] Fix HTML for translatable custom-file label in Bootstrap 4 theme (acran)
+ * bug #40955 [Notifier] [Bridge] Fix missed messageId for SendMessage object in slack notifier (WaylandAce)
+ * bug #40943 [PropertyInfo] PhpDocExtractor: Handle "true" and "false" property types (Maciej Zgadzaj)
+ * bug #40759 [Form] Add missing TranslatableMessage support to choice_label option of ChoiceType (alexandre-daubois)
+ * bug #40917 [Config][DependencyInjection] Uniformize trailing slash handling (dunglas)
+ * bug #40699 [PropertyInfo] Make ReflectionExtractor correctly extract nullability (shiftby)
+ * bug #40874 [PropertyInfo] fix attribute namespace with recursive traits (soullivaneuh)
+ * bug #40957 [PhpUnitBridge] Fix tests with ``@doesNotPerformAssertions`` annotations (alexpott)
+ * bug #41099 [Cache] Check if phpredis version is compatible with stream parameter (nicolassing)
+ * bug #40982 [Notifier] Fix return SentMessage then Messenger not used (WaylandAce)
+ * bug #40972 Avoid regenerating the remember me token if it is still fresh (Seldaek)
+ * bug #41072 [VarExporter] Add support of PHP enumerations (alexandre-daubois)
+ * feature #40992 [Notifier] Add SlackOptions::threadTs() to send message as reply (WaylandAce)
+ * bug #41104 Fix return type in isAllowedProperty method on ReflectionExtractor class (Tomanhez)
+ * bug #41078 [Notifier] Make FailoverTransport always pick the first transport (jschaedl)
+ * feature #39157 [TwigBridge] Add form templates for Bootstrap 5 (ker0x)
+ * bug #41022 [PasswordHasher] Improved BC layer (derrabus)
+ * bug #41105 [Inflector][String] Fixed singularize `edges` > `edge` (ruudk)
+ * bug #41075 [ErrorHandler] Skip "same vendor" ``@method`` deprecations for `Symfony\*` classes unless symfony/symfony is being tested (nicolas-grekas)
+ * bug #41096 Make Serializable implementation internal and final (derrabus)
+ * bug #40994 [Config] More accurate message on invalid config builder (a-menshchikov)
+ * bug #40767 [Routing] Fix localized paths (l-vo)
+
 * 5.3.0-BETA2 (2021-05-01)
 
  * feature #41002 [FrameworkBundle][HttpKernel] Move IDE file link formats from FrameworkExtension to FileLinkFormatter (MatTheCat)

@@ -14,6 +14,8 @@ namespace Symfony\Component\Security\Guard\Token;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', PostAuthenticationGuardToken::class);
+
 /**
  * Used as an "authenticated" token, though it could be set to not-authenticated later.
  *
@@ -21,6 +23,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * GuardTokenInterface as your authenticated token (like this class).
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {

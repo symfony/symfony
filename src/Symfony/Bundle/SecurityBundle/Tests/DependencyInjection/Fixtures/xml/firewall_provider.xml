@@ -8,7 +8,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <sec:config>
+    <sec:config enable-authenticator-manager="true">
         <sec:providers>
             <sec:provider name="with-dash" id="foo" />
         </sec:providers>

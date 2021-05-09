@@ -205,6 +205,15 @@ Security
  * Deprecate all classes in the `Core\Encoder\`  sub-namespace, use the `PasswordHasher` component instead
  * Deprecated voters that do not return a valid decision when calling the `vote` method
  * [BC break] Add optional array argument `$badges` to `UserAuthenticatorInterface::authenticateUser()`
+ * Deprecate `AuthenticationManagerInterface`, `AuthenticationProviderManager`, `AnonymousAuthenticationProvider`,
+   `AuthenticationProviderInterface`, `DaoAuthenticationProvider`, `LdapBindAuthenticationProvider`,
+   `PreAuthenticatedAuthenticationProvider`, `RememberMeAuthenticationProvider`, `UserAuthenticationProvider` and
+   `AuthenticationFailureEvent` from security-core, use the new authenticator system instead
+ * Deprecate `AbstractAuthenticationListener`, `AbstractPreAuthenticatedListener`, `AnonymousAuthenticationListener`,
+   `BasicAuthenticationListener`, `RememberMeListener`, `RemoteUserAuthenticationListener`,
+   `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
+   from security-http, use the new authenticator system instead
+ * Deprecate the Guard component, use the new authenticator system instead
 
 SecurityBundle
 --------------
@@ -218,6 +227,10 @@ SecurityBundle
  * Deprecate the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
  * Deprecate the public `security.authorization_checker` and `security.token_storage` services to private
+ * Not setting the `enable_authenticator_manager` config option to `true` is deprecated
+ * Deprecate the `security.authentication.provider.*` services, use the new authenticator system instead
+ * Deprecate the `security.authentication.listener.*` services, use the new authenticator system instead
+ * Deprecate the Guard component integration, use the new authenticator system instead
 
 Serializer
 ----------

@@ -150,6 +150,127 @@ abstract class CompleteConfigurationTest extends TestCase
                 true,
                 'security.user.provider.concrete.default',
                 null,
+                'security.authenticator.form_login.secure',
+                null,
+                null,
+                [
+                    'switch_user',
+                    'x509',
+                    'remote_user',
+                    'form_login',
+                    'http_basic',
+                    'remember_me',
+                ],
+                [
+                    'parameter' => '_switch_user',
+                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                ],
+            ],
+            [
+                'host',
+                'security.user_checker',
+                '.security.request_matcher.iw4hyjb',
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'host',
+                'security.authenticator.http_basic.host',
+                null,
+                null,
+                [
+                    'http_basic',
+                ],
+                null,
+            ],
+            [
+                'with_user_checker',
+                'app.user_checker',
+                null,
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'with_user_checker',
+                'security.authenticator.http_basic.with_user_checker',
+                null,
+                null,
+                [
+                    'http_basic',
+                ],
+                null,
+            ],
+        ], $configs);
+
+        $this->assertEquals([
+            [],
+            [
+                'security.channel_listener',
+                'security.firewall.authenticator.secure',
+                'security.authentication.switchuser_listener.secure',
+                'security.access_listener',
+            ],
+            [
+                'security.channel_listener',
+                'security.context_listener.0',
+                'security.firewall.authenticator.host',
+                'security.access_listener',
+            ],
+            [
+                'security.channel_listener',
+                'security.context_listener.1',
+                'security.firewall.authenticator.with_user_checker',
+                'security.access_listener',
+            ],
+        ], $listeners);
+
+        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyFirewalls()
+    {
+        $container = $this->getContainer('legacy_container1');
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
+        $listeners = [];
+        $configs = [];
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
+            $contextDef = $container->getDefinition($contextId);
+            $arguments = $contextDef->getArguments();
+            $listeners[] = array_map('strval', $arguments[0]->getValues());
+
+            $configDef = $container->getDefinition((string) $arguments[3]);
+            $configs[] = array_values($configDef->getArguments());
+        }
+
+        // the IDs of the services are case sensitive or insensitive depending on
+        // the Symfony version. Transform them to lowercase to simplify tests.
+        $configs[0][2] = strtolower($configs[0][2]);
+        $configs[2][2] = strtolower($configs[2][2]);
+
+        $this->assertEquals([
+            [
+                'simple',
+                'security.user_checker',
+                '.security.request_matcher.xmi9dcw',
+                false,
+                false,
+                '',
+                '',
+                '',
+                '',
+                '',
+                [],
+                null,
+            ],
+            [
+                'secure',
+                'security.user_checker',
+                null,
+                true,
+                true,
+                'security.user.provider.concrete.default',
+                null,
                 'security.authentication.form_entry_point.secure',
                 null,
                 null,
@@ -881,15 +1002,21 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testRememberMeThrowExceptionsDefault()
+    /**
+     * @group legacy
+     */
+    public function testLegacyRememberMeThrowExceptionsDefault()
     {
-        $container = $this->getContainer('container1');
+        $container = $this->getContainer('legacy_container1');
         $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
     }
 
-    public function testRememberMeThrowExceptions()
+    /**
+     * @group legacy
+     */
+    public function testLegacyRememberMeThrowExceptions()
     {
-        $container = $this->getContainer('remember_me_options');
+        $container = $this->getContainer('legacy_remember_me_options');
         $service = $container->getDefinition('security.authentication.listener.rememberme.main');
         $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
         $this->assertFalse($service->getArgument(5));

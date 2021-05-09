@@ -29,6 +29,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 interface AuthenticatorInterface extends AuthenticationEntryPointInterface
 {

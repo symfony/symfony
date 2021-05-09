@@ -27,6 +27,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * @requires extension ldap
+ * @group legacy
  */
 class LdapBindAuthenticationProviderTest extends TestCase
 {

@@ -22,8 +22,11 @@ class RememberMeCookieTest extends AbstractWebTestCase
         $this->assertSame($expectedSecureFlag, $cookies['']['/']['REMEMBERME']->isSecure());
     }
 
-    /** @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap */
-    public function testOldSessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
+    /**
+     * @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap
+     * @group legacy
+     */
+    public function testLegacySessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
     {
         $client = $this->createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'legacy_config.yml']);
 

@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', LdapBindAuthenticationProvider::class);
+
 /**
  * LdapBindAuthenticationProvider authenticates a user against an LDAP server.
  *
@@ -28,6 +30,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * credentials to the ldap.
  *
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 {

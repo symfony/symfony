@@ -22,6 +22,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener;
 
+/**
+ * @group legacy
+ */
 class AbstractPreAuthenticatedListenerTest extends TestCase
 {
     public function testHandleWithValidValues()

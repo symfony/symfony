@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class RememberMeAuthenticationProviderTest extends TestCase
 {
     public function testSupports()

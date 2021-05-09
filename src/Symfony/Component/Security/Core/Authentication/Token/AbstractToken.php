@@ -68,7 +68,7 @@ abstract class AbstractToken implements TokenInterface
 
     public function getUserIdentifier(): string
     {
-        // method returns "null" in non-legacy mode if not overriden
+        // method returns "null" in non-legacy mode if not overridden
         $username = $this->getUsername(false);
         if (null !== $username) {
             trigger_deprecation('symfony/security-core', '5.3', 'Method "%s::getUsername()" is deprecated, override "getUserIdentifier()" instead.', get_debug_type($this));

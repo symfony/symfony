@@ -33,6 +33,8 @@ use Symfony\Component\Translation\Translator;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @group legacy
  */
 class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
 {

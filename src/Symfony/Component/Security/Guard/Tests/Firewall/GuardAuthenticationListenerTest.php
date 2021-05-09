@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+ * @group legacy
  */
 class GuardAuthenticationListenerTest extends TestCase
 {

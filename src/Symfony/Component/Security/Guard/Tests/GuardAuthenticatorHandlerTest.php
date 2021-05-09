@@ -25,6 +25,9 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @group legacy
+ */
 class GuardAuthenticatorHandlerTest extends TestCase
 {
     private $tokenStorage;

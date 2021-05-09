@@ -7,7 +7,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config>
+    <config enable-authenticator-manager="true">
         <provider name="default">
             <memory>
                 <user identifier="foo" password="foo" roles="ROLE_USER" />
@@ -16,10 +16,9 @@
 
         <firewall name="simple" pattern="/login" security="false" />
 
-        <firewall name="secure" stateless="true">
+        <firewall name="secure" stateless="true" entry-point="form-login">
             <http-basic />
             <form-login />
-            <anonymous />
             <switch-user />
             <x509 />
             <remote-user />

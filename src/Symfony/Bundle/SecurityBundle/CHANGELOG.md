@@ -17,6 +17,10 @@ CHANGELOG
  * Deprecate the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
  * Deprecate the public `security.authorization_checker` and `security.token_storage` services to private
+ * Not setting the `enable_authenticator_manager` config option to `true` is deprecated
+ * Deprecate the `security.authentication.provider.*` services, use the new authenticator system instead
+ * Deprecate the `security.authentication.listener.*` services, use the new authenticator system instead
+ * Deprecate the Guard component integration, use the new authenticator system instead
 
 5.2.0
 -----

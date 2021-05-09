@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', AuthenticationProviderManager::class);
+
 // Help opcache.preload discover always-needed symbols
 class_exists(AuthenticationEvents::class);
 class_exists(AuthenticationFailureEvent::class);
@@ -35,6 +37,8 @@ class_exists(AuthenticationSuccessEvent::class);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface
 {

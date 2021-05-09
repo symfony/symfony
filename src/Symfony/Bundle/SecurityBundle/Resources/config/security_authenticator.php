@@ -62,6 +62,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.authentication.manager', NoopAuthenticationManager::class)
         ->alias(AuthenticationManagerInterface::class, 'security.authentication.manager')
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%alias_id%" alias is deprecated, use the new authenticator system instead.')
 
         ->set('security.firewall.authenticator', AuthenticatorManagerListener::class)
             ->abstract()

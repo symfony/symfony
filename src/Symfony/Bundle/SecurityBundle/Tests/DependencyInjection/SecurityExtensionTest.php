@@ -49,6 +49,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -66,6 +67,9 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    /**
+     * @group legacy
+     */
     public function testFirewallWithoutAuthenticationListener()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -97,6 +101,7 @@ class SecurityExtensionTest extends TestCase
         $extension->addUserProviderFactory(new DummyProvider());
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'my_foo' => ['foo' => []],
             ],
@@ -117,6 +122,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -136,6 +142,9 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGuardHandlerIsPassedStatelessFirewalls()
     {
         $container = $this->getRawContainer();
@@ -168,6 +177,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -190,6 +200,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -212,6 +223,7 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('Not configuring explicitly the provider for the "http_basic" listener on "ambiguous" firewall is ambiguous as there is more than one registered provider.');
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -232,6 +244,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -241,7 +254,6 @@ class SecurityExtensionTest extends TestCase
                 'default' => [
                     'form_login' => ['provider' => 'second'],
                     'remember_me' => ['secret' => 'baz'],
-                    'anonymous' => true,
                 ],
             ],
         ]);
@@ -257,6 +269,7 @@ class SecurityExtensionTest extends TestCase
         $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -295,6 +308,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -315,6 +329,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -337,6 +352,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -357,6 +373,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @dataProvider sessionConfigurationProvider
+     * @group legacy
      */
     public function testRememberMeCookieInheritFrameworkSessionCookie($config, $samesite, $secure)
     {
@@ -396,6 +413,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -471,6 +489,7 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'first' => ['id' => 'foo'],
                 'second' => ['id' => 'bar'],
@@ -481,7 +500,6 @@ class SecurityExtensionTest extends TestCase
                     'switch_user' => [
                         'provider' => 'second',
                     ],
-                    'anonymous' => true,
                 ],
             ],
         ]);
@@ -496,6 +514,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -521,6 +540,7 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'providers' => [
                 'default' => ['id' => 'foo'],
             ],
@@ -542,6 +562,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider provideEntryPointFirewalls
      */
     public function testAuthenticatorManagerEnabledEntryPoint(array $firewall, $entryPointId)
@@ -738,6 +759,9 @@ class SecurityExtensionTest extends TestCase
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];
     }
 
+    /**
+     * @group legacy
+     */
     public function testConfigureCustomFirewallListener()
     {
         $container = $this->getRawContainer();

@@ -73,6 +73,6 @@ return static function (ContainerConfigurator $container) {
                 service('doctrine'),
                 abstract_arg('user entity class name'),
             ])
-
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
     ;
 };

@@ -35,20 +35,6 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame($token, $security->getToken());
     }
 
-    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
-    {
-        return [
-            [
-                new InMemoryUser('user1', 'test', ['ROLE_ADMIN']),
-                new InMemoryUser('user1', 'test', ['ROLE_USER']),
-            ],
-            [
-                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
-                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
-            ],
-        ];
-    }
-
     /**
      * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
      */
@@ -76,6 +62,69 @@ class SecurityTest extends AbstractWebTestCase
         // user1 has lost ROLE_ADMIN and MUST be redirected away from secure page
         $client->request('GET', '/admin');
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @dataProvider userWillBeMarkedAsChangedIfRolesHasChangedProvider
+     * @group legacy
+     */
+    public function testLegacyUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
+    {
+        $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'legacy_config.yml']);
+        $client->disableReboot();
+
+        /** @var ArrayUserProvider $userProvider */
+        $userProvider = static::$kernel->getContainer()->get('security.user.provider.array');
+        $userProvider->addUser($userWithAdminRole);
+
+        $client->request('POST', '/login', [
+            '_username' => 'user1',
+            '_password' => 'test',
+        ]);
+
+        // user1 has ROLE_ADMIN and can visit secure page
+        $client->request('GET', '/admin');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // updating user provider with same user but revoked ROLE_ADMIN from user1
+        $userProvider->setUser('user1', $userWithoutAdminRole);
+
+        // user1 has lost ROLE_ADMIN and MUST be redirected away from secure page
+        $client->request('GET', '/admin');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyServiceIsFunctional()
+    {
+        $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'legacy_config.yml']);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        // put a token into the storage so the final calls can function
+        $user = new InMemoryUser('foo', 'pass');
+        $token = new UsernamePasswordToken($user, '', 'provider', ['ROLE_USER']);
+        $container->get('functional.test.security.token_storage')->setToken($token);
+
+        $security = $container->get('functional_test.security.helper');
+        $this->assertTrue($security->isGranted('ROLE_USER'));
+        $this->assertSame($token, $security->getToken());
+    }
+
+    public function userWillBeMarkedAsChangedIfRolesHasChangedProvider()
+    {
+        return [
+            [
+                new InMemoryUser('user1', 'test', ['ROLE_ADMIN']),
+                new InMemoryUser('user1', 'test', ['ROLE_USER']),
+            ],
+            [
+                new UserWithoutEquatable('user1', 'test', ['ROLE_ADMIN']),
+                new UserWithoutEquatable('user1', 'test', ['ROLE_USER']),
+            ],
+        ];
     }
 }
 

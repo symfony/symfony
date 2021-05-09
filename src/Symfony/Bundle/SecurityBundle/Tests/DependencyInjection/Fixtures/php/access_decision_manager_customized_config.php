@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'enable_authenticator_manager' => true,
     'access_decision_manager' => [
         'allow_if_all_abstain' => true,
         'allow_if_equal_granted_denied' => false,

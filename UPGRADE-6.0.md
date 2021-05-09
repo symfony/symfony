@@ -293,6 +293,15 @@ Security
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
  * `AccessDecisionManager` now throw an exception when a voter does not return a valid decision.
+ * Remove `AuthenticationManagerInterface`, `AuthenticationProviderManager`, `AnonymousAuthenticationProvider`,
+   `AuthenticationProviderInterface`, `DaoAuthenticationProvider`, `LdapBindAuthenticationProvider`,
+   `PreAuthenticatedAuthenticationProvider`, `RememberMeAuthenticationProvider`, `UserAuthenticationProvider` and
+   `AuthenticationFailureEvent` from security-core, use the new authenticator system instead
+ * Remove `AbstractAuthenticationListener`, `AbstractPreAuthenticatedListener`, `AnonymousAuthenticationListener`,
+   `BasicAuthenticationListener`, `RememberMeListener`, `RemoteUserAuthenticationListener`,
+   `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
+   from security-http, use the new authenticator system instead
+ * Remove the Guard component, use the new authenticator system instead
 
 SecurityBundle
 --------------
@@ -304,6 +313,10 @@ SecurityBundle
  * Remove the `security.user_password_encoder.generic` service, the `security.password_encoder` and the `Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface` aliases,
    use `security.user_password_hasher`, `security.password_hasher` and `Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface` instead
  * The `security.authorization_checker` and `security.token_storage` services are now private
+ * Not setting the `enable_authenticator_manager` option to `true` now throws an exception
+ * Remove the `security.authentication.provider.*` services, use the new authenticator system instead
+ * Remove the `security.authentication.listener.*` services, use the new authenticator system instead
+ * Remove the Guard component integration, use the new authenticator system instead
 
 Serializer
 ----------

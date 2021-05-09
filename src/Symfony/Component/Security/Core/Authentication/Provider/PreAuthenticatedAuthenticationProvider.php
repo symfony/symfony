@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', PreAuthenticatedAuthenticationProvider::class);
+
 /**
  * Processes a pre-authenticated authentication request.
  *
@@ -27,6 +29,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * UserNotFoundException, for example.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {

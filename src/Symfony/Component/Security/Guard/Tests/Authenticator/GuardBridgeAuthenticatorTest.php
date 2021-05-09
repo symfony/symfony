@@ -26,6 +26,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
+/**
+ * @group legacy
+ */
 class GuardBridgeAuthenticatorTest extends TestCase
 {
     private $guardAuthenticator;

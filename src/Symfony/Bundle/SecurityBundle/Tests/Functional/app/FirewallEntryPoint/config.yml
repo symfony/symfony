@@ -16,6 +16,7 @@ services:
     logger: { class: Psr\Log\NullLogger }
 
 security:
+    enable_authenticator_manager: true
     firewalls:
         secure:
             pattern: ^/secure/

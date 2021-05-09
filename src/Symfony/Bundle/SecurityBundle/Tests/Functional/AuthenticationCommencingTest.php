@@ -13,20 +13,22 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class AuthenticationCommencingTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideClientOptions
-     */
-    public function testAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped(array $options)
+    public function testAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped()
     {
-        $client = $this->createClient($options);
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
 
         $client->request('GET', '/secure-but-not-covered-by-access-control');
         $this->assertRedirect($client->getResponse(), '/login');
     }
 
-    public function provideClientOptions()
+    /**
+     * @group legacy
+     */
+    public function testLegacyAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped()
     {
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'config.yml', 'enable_authenticator_manager' => true]];
-        yield [['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml', 'enable_authenticator_manager' => false]];
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'legacy_config.yml']);
+
+        $client->request('GET', '/secure-but-not-covered-by-access-control');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 }

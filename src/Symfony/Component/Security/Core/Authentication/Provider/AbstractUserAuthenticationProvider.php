@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class UserAuthenticationProvider implements AuthenticationProviderInterface
+abstract class AbstractUserAuthenticationProvider implements AuthenticationProviderInterface
 {
     private $hideUserNotFoundExceptions;
     private $userChecker;

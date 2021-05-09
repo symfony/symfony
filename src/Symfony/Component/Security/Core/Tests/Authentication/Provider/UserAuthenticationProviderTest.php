@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
+use Symfony\Component\Security\Core\Authentication\Provider\AbstractUserAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -228,6 +228,6 @@ class UserAuthenticationProviderTest extends TestCase
             $userChecker = $this->createMock(UserCheckerInterface::class);
         }
 
-        return $this->getMockForAbstractClass(UserAuthenticationProvider::class, [$userChecker, 'key', $hide]);
+        return $this->getMockForAbstractClass(AbstractUserAuthenticationProvider::class, [$userChecker, 'key', $hide]);
     }
 }

@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class Guess
+abstract class AbstractGuess
 {
     /**
      * Marks an instance with a value that is extremely likely to be correct.

@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
-use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\AbstractGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\ResolvedFormType;
@@ -251,7 +251,7 @@ class FormFactoryTest extends TestCase
             ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\TextType',
                 ['attr' => ['maxlength' => 10]],
-                Guess::MEDIUM_CONFIDENCE
+                AbstractGuess::MEDIUM_CONFIDENCE
             ));
 
         $this->guesser2->expects($this->once())
@@ -260,7 +260,7 @@ class FormFactoryTest extends TestCase
             ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\PasswordType',
                 ['attr' => ['maxlength' => 7]],
-                Guess::HIGH_CONFIDENCE
+                AbstractGuess::HIGH_CONFIDENCE
             ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);
@@ -302,7 +302,7 @@ class FormFactoryTest extends TestCase
             ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\TextType',
                 ['attr' => ['class' => 'foo', 'maxlength' => 10]],
-                Guess::MEDIUM_CONFIDENCE
+                AbstractGuess::MEDIUM_CONFIDENCE
             ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);
@@ -329,7 +329,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     15,
-                    Guess::MEDIUM_CONFIDENCE
+                    AbstractGuess::MEDIUM_CONFIDENCE
                 ));
 
         $this->guesser2->expects($this->once())
@@ -337,7 +337,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     20,
-                    Guess::HIGH_CONFIDENCE
+                    AbstractGuess::HIGH_CONFIDENCE
                 ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);
@@ -362,7 +362,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                 20,
-                Guess::HIGH_CONFIDENCE
+                AbstractGuess::HIGH_CONFIDENCE
             ));
 
         $this->guesser2->expects($this->once())
@@ -370,7 +370,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                 '.{5,}',
-                Guess::HIGH_CONFIDENCE
+                AbstractGuess::HIGH_CONFIDENCE
             ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);
@@ -397,7 +397,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     true,
-                    Guess::MEDIUM_CONFIDENCE
+                    AbstractGuess::MEDIUM_CONFIDENCE
                 ));
 
         $this->guesser2->expects($this->once())
@@ -405,7 +405,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     false,
-                    Guess::HIGH_CONFIDENCE
+                    AbstractGuess::HIGH_CONFIDENCE
                 ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);
@@ -430,7 +430,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     '[a-z]',
-                    Guess::MEDIUM_CONFIDENCE
+                    AbstractGuess::MEDIUM_CONFIDENCE
                 ));
 
         $this->guesser2->expects($this->once())
@@ -438,7 +438,7 @@ class FormFactoryTest extends TestCase
             ->with('Application\Author', 'firstName')
             ->willReturn(new ValueGuess(
                     '[a-zA-Z]',
-                    Guess::HIGH_CONFIDENCE
+                    AbstractGuess::HIGH_CONFIDENCE
                 ));
 
         $factory = $this->getMockFactory(['createNamedBuilder']);

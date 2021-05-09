@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CompiledUrlMatcherDumper extends MatcherDumper
+class CompiledUrlMatcherDumper extends AbstractMatcherDumper
 {
     private $expressionLanguage;
     private $signalingException;

@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AbstractAnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -12,7 +12,7 @@ class AnnotationClassLoaderWithAttributesTest extends AnnotationClassLoaderTest
 {
     protected function setUp(string $env = null): void
     {
-        $this->loader = new class(null, $env) extends AnnotationClassLoader {
+        $this->loader = new class(null, $env) extends AbstractAnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
             {
             }

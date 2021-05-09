@@ -29,7 +29,7 @@ class AnnotationFileLoader extends AbstractFileLoader
     /**
      * @throws \RuntimeException
      */
-    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
+    public function __construct(FileLocatorInterface $locator, AbstractAnnotationClassLoader $loader)
     {
         if (!\function_exists('token_get_all')) {
             throw new \LogicException('The Tokenizer extension is required for the routing annotation loaders.');

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\AbstractGuess;
 
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
@@ -85,7 +85,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * @param \Closure $closure The closure to execute. Accepts a guesser
      *                          as argument and should return a Guess instance
      */
-    private function guess(\Closure $closure): ?Guess
+    private function guess(\Closure $closure): ?AbstractGuess
     {
         $guesses = [];
 
@@ -95,6 +95,6 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
             }
         }
 
-        return Guess::getBestGuess($guesses);
+        return AbstractGuess::getBestGuess($guesses);
     }
 }

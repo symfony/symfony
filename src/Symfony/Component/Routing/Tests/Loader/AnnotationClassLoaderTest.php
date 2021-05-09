@@ -12,13 +12,13 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AbstractAnnotationClassLoader;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassController;
 
 abstract class AnnotationClassLoaderTest extends TestCase
 {
     /**
-     * @var AnnotationClassLoader
+     * @var AbstractAnnotationClassLoader
      */
     protected $loader;
 

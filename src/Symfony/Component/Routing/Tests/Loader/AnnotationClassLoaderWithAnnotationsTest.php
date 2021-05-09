@@ -4,7 +4,7 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AbstractAnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 
 class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
@@ -12,7 +12,7 @@ class AnnotationClassLoaderWithAnnotationsTest extends AnnotationClassLoaderTest
     protected function setUp(string $env = null): void
     {
         $reader = new AnnotationReader();
-        $this->loader = new class($reader, $env) extends AnnotationClassLoader {
+        $this->loader = new class($reader, $env) extends AbstractAnnotationClassLoader {
             protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $annot): void
             {
             }

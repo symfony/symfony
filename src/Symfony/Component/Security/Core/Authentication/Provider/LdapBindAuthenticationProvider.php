@@ -29,7 +29,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @author Charles Sarrazin <charles@sarraz.in>
  */
-class LdapBindAuthenticationProvider extends UserAuthenticationProvider
+class LdapBindAuthenticationProvider extends AbstractUserAuthenticationProvider
 {
     private $userProvider;
     private $ldap;

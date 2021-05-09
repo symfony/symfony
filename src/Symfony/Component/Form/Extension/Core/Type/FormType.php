@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class FormType extends BaseType
+class FormType extends AbstractBaseType
 {
     private $dataMapper;
 

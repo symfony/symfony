@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class VoterTest extends TestCase
@@ -72,7 +72,7 @@ class VoterTest extends TestCase
     }
 }
 
-class VoterTest_Voter extends Voter
+class VoterTest_Voter extends AbstractVoter
 {
     protected function voteOnAttribute(string $attribute, $object, TokenInterface $token): bool
     {
@@ -85,7 +85,7 @@ class VoterTest_Voter extends Voter
     }
 }
 
-class IntegerVoterTest_Voter extends Voter
+class IntegerVoterTest_Voter extends AbstractVoter
 {
     protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
     {
@@ -98,7 +98,7 @@ class IntegerVoterTest_Voter extends Voter
     }
 }
 
-class TypeErrorVoterTest_Voter extends Voter
+class TypeErrorVoterTest_Voter extends AbstractVoter
 {
     protected function voteOnAttribute($attribute, $object, TokenInterface $token): bool
     {

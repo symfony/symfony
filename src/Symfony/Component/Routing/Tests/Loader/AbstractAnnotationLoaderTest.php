@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AbstractAnnotationClassLoader;
 
 abstract class AbstractAnnotationLoaderTest extends TestCase
 {
@@ -26,7 +26,7 @@ abstract class AbstractAnnotationLoaderTest extends TestCase
 
     public function getClassLoader($reader)
     {
-        return $this->getMockBuilder(AnnotationClassLoader::class)
+        return $this->getMockBuilder(AbstractAnnotationClassLoader::class)
             ->setConstructorArgs([$reader])
             ->getMockForAbstractClass()
         ;

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Roman Marintšenko <inoryy@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-abstract class Voter implements VoterInterface
+abstract class AbstractVoter implements VoterInterface
 {
     /**
      * {@inheritdoc}

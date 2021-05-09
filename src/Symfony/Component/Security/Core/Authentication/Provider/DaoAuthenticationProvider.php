@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DaoAuthenticationProvider extends UserAuthenticationProvider
+class DaoAuthenticationProvider extends AbstractUserAuthenticationProvider
 {
     private $hasherFactory;
     private $userProvider;

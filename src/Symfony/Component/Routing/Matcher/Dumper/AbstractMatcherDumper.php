@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class MatcherDumper implements MatcherDumperInterface
+abstract class AbstractMatcherDumper implements MatcherDumperInterface
 {
     private $routes;
 

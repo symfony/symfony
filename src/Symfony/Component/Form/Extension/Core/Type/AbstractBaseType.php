@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class BaseType extends AbstractType
+abstract class AbstractBaseType extends AbstractType
 {
     /**
      * {@inheritdoc}

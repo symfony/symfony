@@ -70,7 +70,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander M. Turek <me@derrabus.de>
  */
-abstract class AnnotationClassLoader implements LoaderInterface
+abstract class AbstractAnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
     protected $env;

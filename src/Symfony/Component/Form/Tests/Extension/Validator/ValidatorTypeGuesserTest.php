@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
-use Symfony\Component\Form\Guess\Guess;
+use Symfony\Component\Form\Guess\AbstractGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\Constraint;
@@ -81,30 +81,30 @@ class ValidatorTypeGuesserTest extends TestCase
     public function guessTypeProvider()
     {
         return [
-            [new Type('array'), new TypeGuess(CollectionType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('bool'), new TypeGuess(CheckboxType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('boolean'), new TypeGuess(CheckboxType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('double'), new TypeGuess(NumberType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('float'), new TypeGuess(NumberType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('numeric'), new TypeGuess(NumberType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('real'), new TypeGuess(NumberType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('int'), new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('integer'), new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('long'), new TypeGuess(IntegerType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('string'), new TypeGuess(TextType::class, [], Guess::LOW_CONFIDENCE)],
-            [new Type(\DateTime::class), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
-            [new Type('\DateTime'), new TypeGuess(DateType::class, [], Guess::MEDIUM_CONFIDENCE)],
+            [new Type('array'), new TypeGuess(CollectionType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('bool'), new TypeGuess(CheckboxType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('boolean'), new TypeGuess(CheckboxType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('double'), new TypeGuess(NumberType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('float'), new TypeGuess(NumberType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('numeric'), new TypeGuess(NumberType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('real'), new TypeGuess(NumberType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('int'), new TypeGuess(IntegerType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('integer'), new TypeGuess(IntegerType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('long'), new TypeGuess(IntegerType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('string'), new TypeGuess(TextType::class, [], AbstractGuess::LOW_CONFIDENCE)],
+            [new Type(\DateTime::class), new TypeGuess(DateType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
+            [new Type('\DateTime'), new TypeGuess(DateType::class, [], AbstractGuess::MEDIUM_CONFIDENCE)],
         ];
     }
 
     public function guessRequiredProvider()
     {
         return [
-            [new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
-            [new Length(['min' => 10, 'max' => 10]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
-            [new Range(['min' => 1, 'max' => 20]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+            [new NotNull(), new ValueGuess(true, AbstractGuess::HIGH_CONFIDENCE)],
+            [new NotBlank(), new ValueGuess(true, AbstractGuess::HIGH_CONFIDENCE)],
+            [new IsTrue(), new ValueGuess(true, AbstractGuess::HIGH_CONFIDENCE)],
+            [new Length(['min' => 10, 'max' => 10]), new ValueGuess(false, AbstractGuess::LOW_CONFIDENCE)],
+            [new Range(['min' => 1, 'max' => 20]), new ValueGuess(false, AbstractGuess::LOW_CONFIDENCE)],
         ];
     }
 
@@ -124,7 +124,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessRequiredReturnsFalseForUnmappedProperties()
     {
-        $this->assertEquals(new ValueGuess(false, Guess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
+        $this->assertEquals(new ValueGuess(false, AbstractGuess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
     public function testGuessMaxLengthForConstraintWithMaxValue()
@@ -134,7 +134,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertInstanceOf(ValueGuess::class, $result);
         $this->assertEquals(2, $result->getValue());
-        $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
+        $this->assertEquals(AbstractGuess::HIGH_CONFIDENCE, $result->getConfidence());
     }
 
     public function testGuessMaxLengthForConstraintWithMinValue()
@@ -202,7 +202,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertInstanceOf(ValueGuess::class, $result);
         $this->assertNull($result->getValue());
-        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $result->getConfidence());
+        $this->assertEquals(AbstractGuess::MEDIUM_CONFIDENCE, $result->getConfidence());
     }
 }
 

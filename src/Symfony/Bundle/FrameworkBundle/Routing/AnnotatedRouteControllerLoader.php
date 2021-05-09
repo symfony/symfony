@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
+use Symfony\Component\Routing\Loader\AbstractAnnotationClassLoader;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Route;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AnnotatedRouteControllerLoader extends AnnotationClassLoader
+class AnnotatedRouteControllerLoader extends AbstractAnnotationClassLoader
 {
     /**
      * Configures the _controller default parameter of a given Route instance.

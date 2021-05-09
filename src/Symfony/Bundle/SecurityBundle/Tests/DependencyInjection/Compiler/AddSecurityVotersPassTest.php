@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 
 class AddSecurityVotersPassTest extends TestCase
 {
@@ -46,19 +46,19 @@ class AddSecurityVotersPassTest extends TestCase
             ->addArgument([])
         ;
         $container
-            ->register('no_prio_service', Voter::class)
+            ->register('no_prio_service', AbstractVoter::class)
             ->addTag('security.voter')
         ;
         $container
-            ->register('lowest_prio_service', Voter::class)
+            ->register('lowest_prio_service', AbstractVoter::class)
             ->addTag('security.voter', ['priority' => 100])
         ;
         $container
-            ->register('highest_prio_service', Voter::class)
+            ->register('highest_prio_service', AbstractVoter::class)
             ->addTag('security.voter', ['priority' => 200])
         ;
         $container
-            ->register('zero_prio_service', Voter::class)
+            ->register('zero_prio_service', AbstractVoter::class)
             ->addTag('security.voter', ['priority' => 0])
         ;
         $compilerPass = new AddSecurityVotersPass();
@@ -75,11 +75,11 @@ class AddSecurityVotersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $voterDef1 = new Definition(Voter::class);
+        $voterDef1 = new Definition(AbstractVoter::class);
         $voterDef1->addTag('security.voter');
         $container->setDefinition('voter1', $voterDef1);
 
-        $voterDef2 = new Definition(Voter::class);
+        $voterDef2 = new Definition(AbstractVoter::class);
         $voterDef2->addTag('security.voter');
         $container->setDefinition('voter2', $voterDef2);
 
@@ -108,11 +108,11 @@ class AddSecurityVotersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        $voterDef1 = new Definition(Voter::class);
+        $voterDef1 = new Definition(AbstractVoter::class);
         $voterDef1->addTag('security.voter');
         $container->setDefinition('voter1', $voterDef1);
 
-        $voterDef2 = new Definition(Voter::class);
+        $voterDef2 = new Definition(AbstractVoter::class);
         $voterDef2->addTag('security.voter');
         $container->setDefinition('voter2', $voterDef2);
 

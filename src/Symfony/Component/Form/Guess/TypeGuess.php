@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\Guess;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TypeGuess extends Guess
+class TypeGuess extends AbstractGuess
 {
     private $type;
     private $options;

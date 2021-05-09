@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonType extends BaseType implements ButtonTypeInterface
+class ButtonType extends AbstractBaseType implements ButtonTypeInterface
 {
     /**
      * {@inheritdoc}

@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @implements \IteratorAggregate<\DomNode>
+ * @implements \IteratorAggregate<\DOMNode>
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
@@ -1111,7 +1111,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \Traversable<\DomNode>
+     * @return \Traversable<\DOMNode>
      */
     public function getIterator()
     {

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Add support for `ConstraintViolationList::createFromMessage()`
+
 5.3
 ---
  * Add the `normalizer` option to the `Unique` constraint

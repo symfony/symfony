@@ -19,7 +19,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 param('security.firewalls'),
                 service('security.firewall.context_locator'),
-                tagged_locator('event_dispatcher.dispatcher'),
+                tagged_locator('event_dispatcher.dispatcher', 'name'),
                 [],
                 false,
             ])

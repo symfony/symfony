@@ -949,6 +949,12 @@ abstract class FrameworkExtensionTest extends TestCase
             return array_shift($values);
         }, $failureTransports);
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+
+        $rateLimitedTransports = $container->getDefinition('messenger.rate_limiter_locator')->getArgument(0);
+        $expectedRateLimitersByRateLimitedTransports = [
+            'customised' => new Reference('limiter.customised_worker'),
+        ];
+        $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
     }
 
     public function testMessengerRouting()

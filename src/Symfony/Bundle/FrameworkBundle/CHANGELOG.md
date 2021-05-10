@@ -15,6 +15,7 @@ CHANGELOG
  * Tag all workflows services with `workflow`, those with type=workflow are
    tagged with `workflow.workflow`, and those with type=state_machine with
    `workflow.state_machine`
+ * Add `rate_limiter` configuration option to `messenger.transport` to allow rate limited transports using the RateLimiter component
 
 6.1
 ---

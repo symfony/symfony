@@ -27,6 +27,7 @@
         "symfony/http-kernel": "^5.4|^6.0",
         "symfony/process": "^5.4|^6.0",
         "symfony/property-access": "^5.4|^6.0",
+        "symfony/rate-limiter": "^5.4|^6.0",
         "symfony/routing": "^5.4|^6.0",
         "symfony/serializer": "^5.4|^6.0",
         "symfony/service-contracts": "^1.1|^2|^3",

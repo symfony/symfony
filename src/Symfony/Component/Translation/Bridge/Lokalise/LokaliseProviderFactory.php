@@ -50,7 +50,9 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
             throw new UnsupportedSchemeException($dsn, 'lokalise', $this->getSupportedSchemes());
         }
 
-        $endpoint = sprintf('%s%s', 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost(), $dsn->getPort() ? ':'.$dsn->getPort() : '');
+        $endpoint = 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost();
+        $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
+
         $client = $this->client->withOptions([
             'base_uri' => 'https://'.$endpoint.'/projects/'.$this->getUser($dsn).'/api2/',
             'headers' => [

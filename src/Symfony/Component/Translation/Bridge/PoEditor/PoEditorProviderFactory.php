@@ -50,12 +50,12 @@ final class PoEditorProviderFactory extends AbstractProviderFactory
             throw new UnsupportedSchemeException($dsn, 'poeditor', $this->getSupportedSchemes());
         }
 
-        $endpoint = sprintf('%s%s', 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost(), $dsn->getPort() ? ':'.$dsn->getPort() : '');
-        $client = $this->client->withOptions([
-            'base_uri' => 'https://'.$endpoint.'/v2/',
-        ]);
+        $endpoint = 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost();
+        $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
-        return new PoEditorProvider($this->getPassword($dsn), $this->getUser($dsn), $client, $this->loader, $this->logger, $this->defaultLocale, $endpoint);
+        $client = PoEditorHttpClient::create($this->client, 'https://'.$endpoint.'/v2/', $this->getPassword($dsn), $this->getUser($dsn));
+
+        return new PoEditorProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint);
     }
 
     protected function getSupportedSchemes(): array

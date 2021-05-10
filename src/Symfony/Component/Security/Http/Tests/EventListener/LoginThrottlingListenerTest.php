@@ -73,6 +73,21 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
     }
 
+    public function testPreventsLoginWithMultipleCase()
+    {
+        $request = $this->createRequest();
+        $passports = [$this->createPassport('wouter'), $this->createPassport('Wouter'), $this->createPassport('wOuter')];
+
+        $this->requestStack->push($request);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[$i % 3]));
+        }
+
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
+    }
+
     public function testPreventsLoginWhenOverGlobalThreshold()
     {
         $request = $this->createRequest();

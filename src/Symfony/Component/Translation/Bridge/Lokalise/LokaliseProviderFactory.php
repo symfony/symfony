@@ -52,7 +52,7 @@ final class LokaliseProviderFactory extends AbstractProviderFactory
 
         $endpoint = sprintf('%s%s', 'default' === $dsn->getHost() ? self::HOST : $dsn->getHost(), $dsn->getPort() ? ':'.$dsn->getPort() : '');
         $client = $this->client->withOptions([
-            'base_uri' => sprintf('https://%sprojects/%s/api2/', $endpoint, $this->getUser($dsn)),
+            'base_uri' => 'https://'.$endpoint.'/projects/'.$this->getUser($dsn).'/api2/',
             'headers' => [
                 'X-Api-Token' => $this->getPassword($dsn),
             ],

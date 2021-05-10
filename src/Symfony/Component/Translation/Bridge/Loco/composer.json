@@ -18,10 +18,8 @@
     "require": {
         "php": ">=7.2.5",
         "symfony/http-client": "^5.3",
+        "symfony/config": "^5.3",
         "symfony/translation": "^5.3"
-    },
-    "require-dev": {
-        "symfony/config": "^4.4|^5.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Loco\\": "" },

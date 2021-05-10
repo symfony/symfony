@@ -104,25 +104,21 @@ final class PoEditorProvider implements ProviderInterface
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
-                $exportResponses[] = [
-                    'response' => $this->client->request('POST', 'projects/export', [
-                        'body' => [
-                            'api_token' => $this->apiKey,
-                            'id' => $this->projectId,
-                            'language' => $locale,
-                            'type' => 'xlf',
-                            'filters' => json_encode(['translated']),
-                            'tags' => json_encode([$domain]),
-                        ],
-                    ]),
-                    'locale' => $locale,
-                    'domain' => $domain,
-                ];
+                $response = $this->client->request('POST', 'projects/export', [
+                    'body' => [
+                        'api_token' => $this->apiKey,
+                        'id' => $this->projectId,
+                        'language' => $locale,
+                        'type' => 'xlf',
+                        'filters' => json_encode(['translated']),
+                        'tags' => json_encode([$domain]),
+                    ],
+                ]);
+                $exportResponses[] = [$response, $locale, $domain];
             }
         }
 
-        foreach ($exportResponses as $exportResponse) {
-            $response = $exportResponse['response'];
+        foreach ($exportResponses as [$response, $locale, $domain]) {
             $responseContent = $response->toArray(false);
 
             if (200 !== $response->getStatusCode() || '200' !== (string) $responseContent['response']['code']) {
@@ -131,19 +127,10 @@ final class PoEditorProvider implements ProviderInterface
             }
 
             $fileUrl = $responseContent['result']['url'];
-            $downloadResponses[] = [
-                'response' => $this->client->request('GET', $fileUrl),
-                'locale' => $exportResponse['locale'],
-                'domain' => $exportResponse['domain'],
-                'fileUrl' => $fileUrl,
-            ];
+            $downloadResponses[] = [$this->client->request('GET', $fileUrl), $locale, $domain, $fileUrl];
         }
 
-        foreach ($downloadResponses as $downloadResponse) {
-            $response = $downloadResponse['response'];
-            $locale = $downloadResponse['locale'];
-            $domain = $downloadResponse['domain'];
-            $fileUrl = $downloadResponse['fileUrl'];
+        foreach ($downloadResponses as [$response, $locale, $domain, $fileUrl]) {
             $responseContent = $response->getContent(false);
 
             if (200 !== $response->getStatusCode()) {

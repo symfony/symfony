@@ -201,7 +201,7 @@ class XmlDescriptor extends Descriptor
 
         $dom->appendChild($objectXML = $dom->createElement('option'));
         $objectXML->setAttribute('name', '--'.$option->getName());
-        $pos = strpos($option->getShortcut(), '|');
+        $pos = strpos($option->getShortcut() ?? '', '|');
         if (false !== $pos) {
             $objectXML->setAttribute('shortcut', '-'.substr($option->getShortcut(), 0, $pos));
             $objectXML->setAttribute('shortcuts', '-'.str_replace('|', '|-', $option->getShortcut()));

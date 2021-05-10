@@ -81,8 +81,6 @@ class Cookie
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
      * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
-     *
-     * @throws \InvalidArgumentException
      */
     public static function create(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): self
     {
@@ -99,8 +97,6 @@ class Cookie
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
      * @param self::SAMESITE_*|''|null      $sameSite Whether the cookie will be available for cross-site requests
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(string $name, string $value = null, $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX)
     {

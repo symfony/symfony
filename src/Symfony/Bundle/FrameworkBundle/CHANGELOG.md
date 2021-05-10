@@ -10,6 +10,7 @@ CHANGELOG
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
  * Add `MicroKernelTrait::getBundlesPath` method to get bundles config path
  * Deprecate the `cache.adapter.doctrine` service
+ * Add support for resetting container services after each messenger message.
 
 5.3
 ---

@@ -11,8 +11,8 @@ TELEGRAM_DSN=telegram://TOKEN@default?channel=CHAT_ID
 ```
 
 where:
-- `TOKEN` is your Telegram token
-- `CHAT_ID` is your Telegram chat id
+ - `TOKEN` is your Telegram token
+ - `CHAT_ID` is your Telegram chat id
 
 Resources
 ---------

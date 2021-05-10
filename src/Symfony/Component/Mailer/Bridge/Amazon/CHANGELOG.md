@@ -4,7 +4,7 @@ CHANGELOG
 5.3
 ---
 
-* Add support for `X-SES-SOURCE-ARN`
+ * Add support for `X-SES-SOURCE-ARN`
 
 5.1.0
 -----

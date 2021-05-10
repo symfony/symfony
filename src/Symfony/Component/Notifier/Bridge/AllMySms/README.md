@@ -11,9 +11,9 @@ ALLMYSMS_DSN=allmysms://LOGIN:APIKEY@default?from=FROM
 ```
 
 where:
-- `LOGIN` is your user ID
-- `APIKEY` is your AllMySms API key
-- `FROM` is your sender (optional, default: 36180)
+ - `LOGIN` is your user ID
+ - `APIKEY` is your AllMySms API key
+ - `FROM` is your sender (optional, default: 36180)
 
 Resources
 ---------

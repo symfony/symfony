@@ -1,10 +1,10 @@
 CHANGELOG
 =========
 
-5.3.0
------
+5.3
+---
 
-* Added support for the new `serialize` filter (from Twig Bridge)
+ * Add support for the new `serialize` filter (from Twig Bridge)
 
 5.2.0
 -----

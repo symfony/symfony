@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-23T13:46:17Z
+
+Please note that you need squash your commits before this PR can be merged. The maintainer can also squash the commits for you, but then you need to “Allow edits from maintainer” (there is a checkbox in the sidebar of the PR).
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-28T08:41:05Z
+
+Thanks @OskarStark for the quick review, I have not finish the revamp of Lokalise accordingly to the recent changes :wink:
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-05T12:12:11Z
+
+status: needs review
+
+CI failures seems unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-07T16:54:09Z
+
+@nicolas-grekas It seems that Translation component needs explicitly the Config component (due to usage of `XmlUtils` in `XliffFileLoader`). Should we move it from `required-dev` to `require`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-07T17:11:21Z
+
+Please don't.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-05-09T15:53:19Z
+
+Tests seem broken.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-09T16:13:08Z
+
+@fabpot I've just pushed a fix (adding symfony/config as dev dependency of the Lokalise Provider Bridge). It fixes tests on Travis. On AppVeyor, failures seems unrelated
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-10T09:58:58Z
+
+@fabpot Last comment has been addressed, branch has been rebased, it looks ready :+1:

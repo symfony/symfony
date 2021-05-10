@@ -19,8 +19,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @template T
- *
- * @method void clearErrors(bool $deep)
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {

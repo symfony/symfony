@@ -44,6 +44,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
                 throw new TransformationFailedException('Expected an array of \IntlTimeZone objects.');
             }
 
+            /** @var string[] */
             return array_map([new self(), 'transform'], $intlTimeZone);
         }
 
@@ -60,7 +61,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return;
+            return null;
         }
 
         if ($this->multiple) {
@@ -68,6 +69,7 @@ class IntlTimeZoneToStringTransformer implements DataTransformerInterface
                 throw new TransformationFailedException('Expected an array of timezone identifier strings.');
             }
 
+            /** @var \IntlTimeZone[] */
             return array_map([new self(), 'reverseTransform'], $value);
         }
 

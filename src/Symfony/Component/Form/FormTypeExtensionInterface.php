@@ -63,7 +63,7 @@ interface FormTypeExtensionInterface
     /**
      * Gets the extended types.
      *
-     * @return iterable<class-string<FormTypeInterface>>
+     * @return string[]
      */
     public static function getExtendedTypes(): iterable;
 }

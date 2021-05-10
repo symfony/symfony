@@ -27,7 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * @extends BaseType<self>
+ * @extends BaseType<mixed>
  */
 class FormType extends BaseType
 {

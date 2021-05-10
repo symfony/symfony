@@ -19,6 +19,10 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * A builder for {@link Button} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ *
+ * @implements FormBuilderInterface<T>
  */
 class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {
@@ -135,7 +139,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Creates the button.
      *
-     * @return Button The button
+     * @return FormInterface<T> The button
      */
     public function getForm()
     {

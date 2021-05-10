@@ -12,7 +12,10 @@
 namespace Symfony\Component\Form;
 
 /**
- * @implements DataTransformerInterface<mixed, mixed>
+ * @template T
+ * @template R
+ *
+ * @implements DataTransformerInterface<T, R>
  */
 class CallbackTransformer implements DataTransformerInterface
 {
@@ -20,8 +23,8 @@ class CallbackTransformer implements DataTransformerInterface
     private $reverseTransform;
 
     /**
-     * @param callable $transform        The forward transform callback
-     * @param callable $reverseTransform The reverse transform callback
+     * @param callable(T):R $transform        The forward transform callback
+     * @param callable(R):T $reverseTransform The reverse transform callback
      */
     public function __construct(callable $transform, callable $reverseTransform)
     {

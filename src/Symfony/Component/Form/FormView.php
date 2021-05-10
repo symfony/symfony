@@ -25,7 +25,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * The variables assigned to this view.
      *
-     * @var array{value: ?T, attr: array<array-key, mixed>}&array<string, mixed>
+     * @var array{value: mixed, attr: array<array-key, mixed>}&array<string, mixed>
      */
     public $vars = [
         'value' => null,

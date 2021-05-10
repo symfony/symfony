@@ -56,9 +56,9 @@ interface DataTransformerInterface
      * of the first data transformer outputs NULL, the second must be able to
      * process that value.
      *
-     * @param T|null $value The value in the original representation
+     * @param T $value The value in the original representation
      *
-     * @return R|null The value in the transformed representation
+     * @return R The value in the transformed representation
      *
      * @throws TransformationFailedException when the transformation fails
      */
@@ -85,9 +85,9 @@ interface DataTransformerInterface
      * By convention, reverseTransform() should return NULL if an empty string
      * is passed.
      *
-     * @param R|null $value The value in the transformed representation
+     * @param R $value The value in the transformed representation
      *
-     * @return T|null The value in the original representation
+     * @return T The value in the original representation
      *
      * @throws TransformationFailedException when the transformation fails
      */

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-04-23T13:37:44Z
+
+Please note that you need squash your commits before this PR can be merged. The maintainer can also squash the commits for you, but then you need to “Allow edits from maintainer” (there is a checkbox in the sidebar of the PR).
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-26T20:20:00Z
+
+Package / Verify check fails now, it will be fixed as soon as https://github.com/symfony/symfony/pull/40928 will be merged.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-27T16:00:26Z
+
+It ready for me for a review.
+cc @OskarStark @Nyholm @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-01T16:35:34Z
+
+@stof I've addressed all your comments. I've added a test for the `delete` method of the Provider (I'll do the same for other providers).
+@OskarStark I've rebased the branch on 5.x, and removed the `SCHEME` constant from the Provider Factory.
+
+It looks ready for another review.
+
+EDIT: CI failings seems unrelated
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-05T12:04:36Z
+
+status: needs review
+
+CI failures seems unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-05-09T15:54:03Z
+
+Tests seem broken.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-05-10T10:03:41Z
+
+Last comments have been addressed, branch has been rebased

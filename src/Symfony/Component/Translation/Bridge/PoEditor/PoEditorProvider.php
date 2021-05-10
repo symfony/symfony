@@ -33,18 +33,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class PoEditorProvider implements ProviderInterface
 {
-    private $apiKey;
-    private $projectId;
     private $client;
     private $loader;
     private $logger;
     private $defaultLocale;
     private $endpoint;
 
-    public function __construct(string $apiKey, string $projectId, HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
+    public function __construct(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint)
     {
-        $this->apiKey = $apiKey;
-        $this->projectId = $projectId;
         $this->client = $client;
         $this->loader = $loader;
         $this->logger = $logger;
@@ -106,8 +102,6 @@ final class PoEditorProvider implements ProviderInterface
             foreach ($domains as $domain) {
                 $response = $this->client->request('POST', 'projects/export', [
                     'body' => [
-                        'api_token' => $this->apiKey,
-                        'id' => $this->projectId,
                         'language' => $locale,
                         'type' => 'xlf',
                         'filters' => json_encode(['translated']),
@@ -176,8 +170,6 @@ final class PoEditorProvider implements ProviderInterface
     {
         $response = $this->client->request('POST', 'terms/add', [
             'body' => [
-                'api_token' => $this->apiKey,
-                'id' => $this->projectId,
                 'data' => json_encode($terms),
             ],
         ]);
@@ -194,8 +186,6 @@ final class PoEditorProvider implements ProviderInterface
         foreach ($translationsPerLocale as $locale => $translations) {
             $responses = $this->client->request('POST', 'translations/add', [
                 'body' => [
-                    'api_token' => $this->apiKey,
-                    'id' => $this->projectId,
                     'language' => $locale,
                     'data' => json_encode($translations),
                 ],
@@ -213,8 +203,6 @@ final class PoEditorProvider implements ProviderInterface
     {
         $response = $this->client->request('POST', 'terms/delete', [
             'body' => [
-                'api_token' => $this->apiKey,
-                'id' => $this->projectId,
                 'data' => json_encode($ids),
             ],
         ]);

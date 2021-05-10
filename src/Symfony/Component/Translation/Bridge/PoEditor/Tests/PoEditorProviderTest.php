@@ -5,6 +5,7 @@ namespace Symfony\Component\Translation\Bridge\PoEditor\Tests;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Translation\Bridge\PoEditor\PoEditorHttpClient;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProvider;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -19,29 +20,25 @@ class PoEditorProviderTest extends ProviderTestCase
 {
     public function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint): ProviderInterface
     {
-        return new PoEditorProvider('API_KEY', 'PROJECT_ID', $client, $loader, $logger, $defaultLocale, $endpoint);
+        return new PoEditorProvider(PoEditorHttpClient::create($client, 'https://poeditor', 'API_KEY', 'PROJECT_ID'), $loader, $logger, $defaultLocale, $endpoint);
     }
 
     public function toStringProvider(): iterable
     {
+        $client = PoEditorHttpClient::create($this->getClient(), 'https://poeditor', 'API_KEY', 'PROJECT_ID');
+
         yield [
-            $this->createProvider($this->getClient()->withOptions([
-                'base_uri' => 'api.poeditor.com',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.poeditor.com'),
+            $this->createProvider($client, $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.poeditor.com'),
             'poeditor://api.poeditor.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
-                'base_uri' => 'https://example.com',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
+            $this->createProvider($client, $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com'),
             'poeditor://example.com',
         ];
 
         yield [
-            $this->createProvider($this->getClient()->withOptions([
-                'base_uri' => 'https://example.com:99',
-            ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
+            $this->createProvider($client, $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'example.com:99'),
             'poeditor://example.com:99',
         ];
     }

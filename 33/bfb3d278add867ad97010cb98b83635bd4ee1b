@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-27T15:29:09Z
+
+It is good DX but I dont like the idea that the Translation, Mailer and Notifier component should be ware of all the providers.
+
+We dont do the same thing in the Messenger.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2021-04-27T15:54:35Z
+
+I don't know if it's done elsewhere in the code, but what about to display the URL of the Translation Documentation page where there will be listed all Providers?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-27T15:59:27Z
+
+Another option would be, that the bridge can provide the package name
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-04-27T16:05:49Z
+
+> Another option would be, that the bridge can provide the package name
+
+That make sense. But how would the exception class know what other class that holds the package name?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-28T05:22:06Z
+
+Indeed 🧐
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-28T15:05:17Z
+
+👎🏻 It is super misleading if the page only provides the built in providers and you are using a third party one which is not under the Symfony namespace
+
+@fabpot WDYT?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-04-29T09:15:12Z
+
+Do I need to change some versions somewhere to make the lowest build pass? 🤔
+Only Mailer is failing on lowest
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-01T12:54:46Z
+
+Mailer is failing all the time, not only on lowest.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-01T13:19:59Z
+
+What do you mean?
+![image](https://user-images.githubusercontent.com/995707/116783720-af6b7600-aa90-11eb-9b5b-26f6af4f7149.jpeg)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-01T13:23:22Z
+
+I mean that I reproduce the failures locally, same as on [Travis](https://travis-ci.com/github/symfony/symfony/jobs/501911404#L7527) and [appveyor](https://ci.appveyor.com/project/fabpot/symfony/builds/38927626#L735https://ci.appveyor.com/project/fabpot/symfony/builds/38927626#L735).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-06T06:30:12Z
+
+I added the missing messenger dependency back, but still failing 🤔
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-06T18:37:01Z
+
+The last commit does not help either 😌

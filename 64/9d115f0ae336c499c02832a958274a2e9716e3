@@ -1,0 +1,133 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T08:28:27Z
+
+> In my implementation I could not avoid minor incompatible change: queue_name_pattern has changed, so looks like this cannot be released under 4.4 or 5.0. Can we include it into 5.1 please?
+
+Neither would this be allowed in master since it would break apps migrating to 5.2. Can we find another idea?
+
+---------------------------------------------------------------------------
+
+by theravel at 2020-05-19T09:06:08Z
+
+> Neither would this be allowed in master since it would break apps migrating to 5.2. Can we find another idea?
+
+@nicolas-grekas Thank you for the feedback. I changed it: now `queue_name_pattern` remains backward compatible, but I changed internals of queue name construction.
+
+Should I change target branch in this case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2020-05-19T09:13:27Z
+
+Yes please if this should be considered as a bugfix (I didn't check that part).
+
+---------------------------------------------------------------------------
+
+by theravel at 2020-05-19T22:22:21Z
+
+@nicolas-grekas changed target to 4.4
+
+---------------------------------------------------------------------------
+
+by Tobion at 2020-05-23T21:01:14Z
+
+#36196 and #36212 already try to solve the same problem.
+
+---------------------------------------------------------------------------
+
+by s-code at 2020-05-28T14:17:04Z
+
+@theravel i was able to solve this and few other problems without changing Messenger connection class, but it's little bit tricky. Here is an example https://github.com/s-code/amqp-extra-bundle. Take a look on ExtraAmqpFactory, ExtraAmqpSender, ExtraAmqpQueue, ExtraAmqpExchange.
+As for me, splitting of retry and delay logic is a must have for amqp transport.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2020-10-22T20:14:54Z
+
+On a high level, this makes sense to me:
+
+If a message is in queue A, and I read it from queue A and it fails, then it should go back onto queue A only.
+
+Messenger handles retries by actually ack'ing the original message and redelivering it. But ultimately, the desired behavior (I think) would be what I described above and what this PR does.
+
+Though, apparently this and #38486 solve the same problem (is it the *exact* same problem?) but in different ways. @s-code could you comment on what your PR does versus this one?
+
+Thanks :)
+
+---------------------------------------------------------------------------
+
+by s-code at 2020-10-22T21:18:22Z
+
+@weaverryan you are right. This two pull requests solve the same problem. The difference is in next things:
+1. Delay queue naming convention.
+
+-  #36864 requires its change from `delay_{exchange}_{routing_key}_{time}` to `delay_{exchange}_{routing_key}_{time}_(retry|delay)`. So as result we have `delay_messages_message1_500_retry`, `delay_messages_message1_500_delay` queues names for default configuration
+
+- In  #38486 there is no changes in this convention. In case of retry `{exchange}` = default exchange = '', {routing_key} = origin queue name, because for default exchange `queue name` is using as `routing key`. So queues names look like `delay__queue1_500` and `delay_messages_message1_500`
+
+2. #38486 allows to use default exchange for delay and retry logic. If in configuration we define delay.exchange_name as '', no extra ("delays") exchange will be created.  For me it's more elegant and clean solution
+
+---------------------------------------------------------------------------
+
+by theravel at 2021-03-28T21:28:25Z
+
+Dear Symfony team,
+
+I have:
+* Fixed conflicts and rebased to fresh `5.x`
+* Fixed confusion about `redelivery` term
+
+Can you take a look please?
+
+---------------------------------------------------------------------------
+
+by theravel at 2021-04-06T15:42:55Z
+
+@Tobion could you have a look please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-12T08:59:52Z
+
+(please add a changelog entry in the bridge)
+
+---------------------------------------------------------------------------
+
+by theravel at 2021-04-12T11:41:17Z
+
+@nicolas-grekas Changelog entry added
+
+---------------------------------------------------------------------------
+
+by MichaelKubovic at 2021-04-21T14:16:45Z
+
+I believe it is always the case with direct exchange.
+
+> The default exchange is a direct exchange with no name (empty string) pre-declared by the broker. It has one special property that makes it very useful for simple applications: every queue that is created is automatically bound to it with a routing key which is the same as the queue name.
+
+https://www.rabbitmq.com/tutorials/amqp-concepts.html
+
+> On 21 Apr 2021, at 15:40, Tobias Nyholm ***@***.***> wrote:
+>
+> @Nyholm commented on this pull request.
+>
+> In src/Symfony/Component/Messenger/Bridge/Amqp/Transport/AmqpStamp.php:
+>
+> > @@ -45,7 +46,7 @@ public function getAttributes(): array
+>          return $this->attributes;
+>      }
+>
+> -    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null): self
+> +    public static function createFromAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, self $previousStamp = null, string $retryRoutingKey = null): self
+> Are we sure the routing key always matches the queue name?
+>
+> —
+> You are receiving this because you are subscribed to this thread.
+> Reply to this email directly, view it on GitHub, or unsubscribe.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-10T20:42:46Z
+
+Thank you @theravel and @MichaelKubovic for confirming.

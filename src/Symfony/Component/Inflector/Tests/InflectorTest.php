@@ -78,6 +78,7 @@ class InflectorTest extends TestCase
             ['focuses', ['focus', 'focuse', 'focusis']],
             ['formulae', 'formula'],
             ['formulas', 'formula'],
+            ['conspectuses', 'conspectus'],
             ['fungi', 'fungus'],
             ['funguses', ['fungus', 'funguse', 'fungusis']],
             ['garages', ['garag', 'garage']],
@@ -219,6 +220,7 @@ class InflectorTest extends TestCase
             ['focus', 'focuses'],
             ['foot', 'feet'],
             ['formula', 'formulas'], //formulae
+            ['conspectus', 'conspectuses'],
             ['fungus', 'fungi'],
             ['garage', 'garages'],
             ['goose', 'geese'],

@@ -171,6 +171,7 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
+use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -1344,14 +1345,17 @@ class FrameworkExtension extends Extension
         $classToServices = [
             CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
             LocoProviderFactory::class => 'translation.provider_factory.loco',
+            PoEditorProviderFactory::class => 'translation.provider_factory.poeditor',
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
 
         foreach ($classToServices as $class => $service) {
-            $package = sprintf('symfony/%s-translation-provider', substr($service, \strlen('translation.provider_factory.')));
+            switch ($package = substr($service, \strlen('translation.provider_factory.'))) {
+                case 'poeditor': $package = 'po-editor'; break;
+            }
 
-            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable($package, $class, $parentPackages)) {
+            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable(sprintf('symfony/%s-translation-provider', $package), $class, $parentPackages)) {
                 $container->removeDefinition($service);
             }
         }

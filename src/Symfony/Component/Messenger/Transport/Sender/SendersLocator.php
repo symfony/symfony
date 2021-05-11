@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Messenger\Attribute\Senders;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -41,20 +42,50 @@ class SendersLocator implements SendersLocatorInterface
      */
     public function getSenders(Envelope $envelope): iterable
     {
-        $seen = [];
+        $senderAliases = $this->getSendersFromAttributes($envelope);
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
-                if (!\in_array($senderAlias, $seen, true)) {
-                    if (!$this->sendersLocator->has($senderAlias)) {
-                        throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
-                    }
-
-                    $seen[] = $senderAlias;
-                    $sender = $this->sendersLocator->get($senderAlias);
-                    yield $senderAlias => $sender;
-                }
+                $senderAliases[] = $senderAlias;
             }
         }
+
+        $senderAliases = array_unique($senderAliases);
+
+        foreach ($senderAliases as $senderAlias) {
+            if (!$this->sendersLocator->has($senderAlias)) {
+                throw new RuntimeException(sprintf('Invalid senders configuration: sender "%s" is not in the senders locator.', $senderAlias));
+            }
+
+            $sender = $this->sendersLocator->get($senderAlias);
+            yield $senderAlias => $sender;
+        }
+    }
+
+    /**
+     * @param Envelope $envelope
+     *
+     * @return string[]
+     */
+    private function getSendersFromAttributes(Envelope $envelope): array
+    {
+        $messageClass = get_class($envelope->getMessage());
+
+        try {
+            $reflectionClass = new \ReflectionClass($messageClass);
+        } catch (\ReflectionException $e) {
+            return [];
+        }
+
+        $attributes = $reflectionClass->getAttributes(Senders::class);
+
+        $senders = [];
+        foreach ($attributes as $attribute) {
+            /** @var Senders $attributeInstance */
+            $attributeInstance = $attribute->newInstance();
+            $senders = array_merge($senders, $attributeInstance->senders);
+        }
+
+        return $senders;
     }
 }

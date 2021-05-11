@@ -1,5 +1,7 @@
 --TEST--
 Test NoAssertionsTestRisky risky test
+--SKIPIF--
+<?php if ('\\' === DIRECTORY_SEPARATOR && !extension_loaded('mbstring')) die('Skipping on Windows without mbstring');
 --FILE--
 <?php
 $test =  realpath(__DIR__.'/FailTests/NoAssertionsTestRisky.php');

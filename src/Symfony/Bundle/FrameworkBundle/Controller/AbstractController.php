@@ -267,6 +267,24 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
+     * Renders a view for a form.
+     *
+     * The FormView instance is passed to the template in a variable named
+     * "form" (can be changed via $formVar argument).
+     * If the form is invalid, a 422 status code is returned.
+     */
+    protected function renderForm(string $view, FormInterface $form, array $parameters = [], Response $response = null, string $formVar = 'form'): Response
+    {
+        $response = $this->render($view, [$formVar => $form->createView()] + $parameters, $response);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $response->setStatusCode(422);
+        }
+
+        return $response;
+    }
+
+    /**
      * Streams a view.
      */
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
@@ -286,42 +304,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         $response->setCallback($callback);
-
-        return $response;
-    }
-
-    /**
-     * Handles a form.
-     *
-     * * if the form is not submitted, $render is called
-     * * if the form is submitted but invalid, $render is called and a 422 HTTP status code is set if the current status hasn't been customized
-     * * if the form is submitted and valid, $onSuccess is called, usually this method saves the data and returns a 303 HTTP redirection
-     *
-     * For both callables, instead of "mixed", you can use your form's data class as a type-hint for argument #2.
-     *
-     * @param callable(FormInterface, mixed, Request): Response $onSuccess
-     * @param callable(FormInterface, mixed, Request): Response $render
-     */
-    public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render): Response
-    {
-        $form->handleRequest($request);
-
-        $submitted = $form->isSubmitted();
-        $data = $form->getData();
-
-        if ($isValid = $submitted && $form->isValid()) {
-            $response = $onSuccess($form, $data, $request);
-        } else {
-            $response = $render($form, $data, $request);
-
-            if ($response instanceof Response && $submitted && 200 === $response->getStatusCode()) {
-                $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-        }
-
-        if (!$response instanceof Response) {
-            throw new \TypeError(sprintf('The "%s" callable passed to "%s::handleForm()" must return a Response, "%s" returned.', $isValid ? '$onSuccess' : '$render', get_debug_type($this), get_debug_type($response)));
-        }
 
         return $response;
     }

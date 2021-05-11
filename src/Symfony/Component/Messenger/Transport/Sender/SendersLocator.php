@@ -42,7 +42,11 @@ class SendersLocator implements SendersLocatorInterface
      */
     public function getSenders(Envelope $envelope): iterable
     {
-        $senderAliases = $this->getSendersFromAttributes($envelope);
+        $senderAliases = [];
+
+        if (\PHP_VERSION_ID >= 80000) {
+            $senderAliases = $this->getSendersFromAttributes($envelope);
+        }
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {

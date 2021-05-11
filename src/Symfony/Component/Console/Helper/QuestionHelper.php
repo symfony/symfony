@@ -512,7 +512,7 @@ class QuestionHelper extends Helper
             $cp = $this->setIOCodepage();
             $ret = fgets($inputStream, 4096);
 
-            return false !== $ret ? $this->resetIOCodepage($cp, $ret) : false;
+            return $this->resetIOCodepage($cp, $ret);
         }
 
         $multiLineStreamReader = $this->cloneInputStream($inputStream);
@@ -533,7 +533,7 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Set console I/O to the host code page.
+     * Sets console I/O to the host code page.
      *
      * @return int Previous code page in IBM/EBCDIC format
      */
@@ -550,13 +550,20 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Set console I/O to the specified code page and convert the user input.
+     * Sets console I/O to the specified code page and converts the user input.
+     *
+     * @param string|false $input
+     *
+     * @return string|false
      */
-    private function resetIOCodepage(int $cp, string $input): string
+    private function resetIOCodepage(int $cp, $input)
     {
-        if (\function_exists('sapi_windows_cp_set') && 0 < $cp) {
+        if (0 !== $cp) {
             sapi_windows_cp_set($cp);
-            $input = sapi_windows_cp_conv(sapi_windows_cp_get('oem'), $cp, $input);
+
+            if (false !== $input && '' !== $input) {
+                $input = sapi_windows_cp_conv(sapi_windows_cp_get('oem'), $cp, $input);
+            }
         }
 
         return $input;

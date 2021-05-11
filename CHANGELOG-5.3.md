@@ -262,3 +262,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #38596 [BrowserKit] Add jsonRequest function to the browser-kit client (alexander-schranz)
  * feature #38998 [Messenger][SQS] Make sure one can enable debug logs (Nyholm)
  * feature #38974 [Intl] deprecate polyfills in favor of symfony/polyfill-intl-icu (nicolas-grekas)
+

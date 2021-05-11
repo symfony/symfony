@@ -24,40 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 {
-    private $registerForAutoconfiguration;
-
-    public function __construct()
-    {
-        if (80000 > \PHP_VERSION_ID) {
-            return;
-        }
-
-        $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
-        $parseDefinitions->setAccessible(true);
-        $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
-
-        $this->registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
-            $attribute = (array) $attribute->newInstance();
-
-            foreach ($attribute['tags'] ?? [] as $i => $tag) {
-                if (\is_array($tag) && [0] === array_keys($tag)) {
-                    $attribute['tags'][$i] = [$class->name => $tag[0]];
-                }
-            }
-
-            $parseDefinitions->invoke(
-                $yamlLoader,
-                [
-                    'services' => [
-                        '_instanceof' => [
-                            $class->name => [$container->registerForAutoconfiguration($class->name)] + $attribute,
-                        ],
-                    ],
-                ],
-                $class->getFileName()
-            );
-        };
-    }
+    private static $registerForAutoconfiguration;
 
     /**
      * {@inheritdoc}
@@ -83,7 +50,42 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
     public function processClass(ContainerBuilder $container, \ReflectionClass $class)
     {
         foreach ($class->getAttributes(Autoconfigure::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-            ($this->registerForAutoconfiguration)($container, $class, $attribute);
+            self::registerForAutoconfiguration($container, $class, $attribute);
         }
+    }
+
+    private static function registerForAutoconfiguration(ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute)
+    {
+        if (self::$registerForAutoconfiguration) {
+            return (self::$registerForAutoconfiguration)($container, $class, $attribute);
+        }
+
+        $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
+        $parseDefinitions->setAccessible(true);
+        $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
+
+        self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
+            $attribute = (array) $attribute->newInstance();
+
+            foreach ($attribute['tags'] ?? [] as $i => $tag) {
+                if (\is_array($tag) && [0] === array_keys($tag)) {
+                    $attribute['tags'][$i] = [$class->name => $tag[0]];
+                }
+            }
+
+            $parseDefinitions->invoke(
+                $yamlLoader,
+                [
+                    'services' => [
+                        '_instanceof' => [
+                            $class->name => [$container->registerForAutoconfiguration($class->name)] + $attribute,
+                        ],
+                    ],
+                ],
+                $class->getFileName()
+            );
+        };
+
+        return (self::$registerForAutoconfiguration)($container, $class, $attribute);
     }
 }

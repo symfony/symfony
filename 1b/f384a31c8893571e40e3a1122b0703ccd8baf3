@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-11T08:43:00Z
+
+(false positives from psalm)
+
+---------------------------------------------------------------------------
+
+by longwave at 2021-05-11T09:28:37Z
+
+:+1: this solves the dependency issue for Drupal
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-11T12:05:26Z
+
+@nicolas-grekas The Travis failures look related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-11T12:25:41Z
+
+Thanks for the ping @derrabus, should be fixed now.

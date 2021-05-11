@@ -267,6 +267,7 @@
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="binary" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="service_closure" />
       <xsd:enumeration value="service_locator" />
       <!-- "tagged" is an alias of "tagged_iterator", using "tagged_iterator" is preferred. -->
       <xsd:enumeration value="tagged" />

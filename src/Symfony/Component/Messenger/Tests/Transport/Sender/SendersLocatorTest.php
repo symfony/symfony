@@ -22,6 +22,9 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendersLocatorTest extends TestCase
 {
+    /**
+     * @requires PHP 8
+     */
     public function testAttributeMapping()
     {
         $sender = $this->createMock(SenderInterface::class);

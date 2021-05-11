@@ -67,13 +67,11 @@ class SendersLocator implements SendersLocatorInterface
     }
 
     /**
-     * @param Envelope $envelope
-     *
      * @return string[]
      */
     private function getSendersFromAttributes(Envelope $envelope): array
     {
-        $messageClass = get_class($envelope->getMessage());
+        $messageClass = \get_class($envelope->getMessage());
 
         try {
             $reflectionClass = new \ReflectionClass($messageClass);

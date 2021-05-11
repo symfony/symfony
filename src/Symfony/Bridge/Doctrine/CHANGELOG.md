@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate `DoctrineTestHelper` and `TestRepositoryFactory`
  * [BC BREAK] Remove `UuidV*Generator` classes
  * Add `UuidGenerator`
+ * Add support for the new security-core `TokenVerifierInterface` in `DoctrineTokenProvider`, fixing parallel requests handling in remember-me
 
 5.2.0
 -----

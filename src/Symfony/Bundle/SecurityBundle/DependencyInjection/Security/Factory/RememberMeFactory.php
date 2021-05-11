@@ -19,10 +19,12 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\Security\Core\Authentication\RememberMe\CacheTokenVerifier;
 use Symfony\Component\Security\Http\EventListener\RememberMeLogoutListener;
 
 /**
@@ -116,10 +118,12 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
                 ->addTag('security.remember_me_handler', ['firewall' => $firewallName]);
         } elseif (isset($config['token_provider'])) {
             $tokenProviderId = $this->createTokenProvider($container, $firewallName, $config['token_provider']);
+            $tokenVerifier = $this->createTokenVerifier($container, $firewallName, $config['token_verifier'] ?? null);
             $container->setDefinition($rememberMeHandlerId, new ChildDefinition('security.authenticator.persistent_remember_me_handler'))
                 ->replaceArgument(0, new Reference($tokenProviderId))
                 ->replaceArgument(2, new Reference($userProviderId))
                 ->replaceArgument(4, $config)
+                ->replaceArgument(6, $tokenVerifier)
                 ->addTag('security.remember_me_handler', ['firewall' => $firewallName]);
         } else {
             $signatureHasherId = 'security.authenticator.remember_me_signature_hasher.'.$firewallName;
@@ -214,6 +218,9 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+            ->scalarNode('token_verifier')
+                ->info('The service ID of a custom rememberme token verifier.')
             ->end();
 
         foreach ($this->options as $name => $value) {
@@ -303,5 +310,21 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
         }
 
         return $tokenProviderId;
+    }
+
+    private function createTokenVerifier(ContainerBuilder $container, string $firewallName, ?string $serviceId): Reference
+    {
+        if ($serviceId) {
+            return new Reference($serviceId);
+        }
+
+        $tokenVerifierId = 'security.remember_me.token_verifier.'.$firewallName;
+
+        $container->register($tokenVerifierId, CacheTokenVerifier::class)
+            ->addArgument(new Reference('cache.security_token_verifier', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->addArgument(60)
+            ->addArgument('rememberme-'.$firewallName.'-stale-');
+
+        return new Reference($tokenVerifierId, ContainerInterface::NULL_ON_INVALID_REFERENCE);
     }
 }

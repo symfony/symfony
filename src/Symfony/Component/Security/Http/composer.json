@@ -21,6 +21,7 @@
         "symfony/security-core": "^5.2",
         "symfony/http-foundation": "^5.2",
         "symfony/http-kernel": "^5.2",
+        "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php80": "^1.15",
         "symfony/property-access": "^4.4|^5.0"
     },

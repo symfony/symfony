@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -267,21 +268,33 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
-     * Renders a view for a form.
+     * Renders a view and sets the appropriate status code when a form is listed in parameters.
      *
-     * The FormView instance is passed to the template in a variable named
-     * "form" (can be changed via $formVar argument).
-     * If the form is invalid, a 422 status code is returned.
+     * If an invalid form is found in the list of parameters, a 422 status code is returned.
      */
-    protected function renderForm(string $view, FormInterface $form, array $parameters = [], Response $response = null, string $formVar = 'form'): Response
+    protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
     {
-        $response = $this->render($view, [$formVar => $form->createView()] + $parameters, $response);
-
-        if ($form->isSubmitted() && !$form->isValid()) {
-            $response->setStatusCode(422);
+        if (null === $response) {
+            $response = new Response();
         }
 
-        return $response;
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof FormView) {
+                throw new \LogicException(sprintf('Passing a FormView to "%s::renderForm()" is not supported, pass directly the form instead for parameter "%s".', get_debug_type($this), $k));
+            }
+
+            if (!$v instanceof FormInterface) {
+                continue;
+            }
+
+            $parameters[$k] = $v->createView();
+
+            if (200 === $response->getStatusCode() && $v->isSubmitted() && !$v->isValid()) {
+                $response->setStatusCode(422);
+            }
+        }
+
+        return $this->render($view, $parameters, $response);
     }
 
     /**

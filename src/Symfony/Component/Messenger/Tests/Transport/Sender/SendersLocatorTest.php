@@ -31,6 +31,7 @@ class SendersLocatorTest extends TestCase
         $sender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'my_sender' => $sender,
+            'my_second_sender' => $sender,
             'my_common_sender' => $sender,
             'my_merged_sender' => $sender,
         ]);
@@ -41,7 +42,7 @@ class SendersLocatorTest extends TestCase
 
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
         $this->assertSame(
-            ['my_sender' => $sender],
+            ['my_sender' => $sender, 'my_second_sender' => $sender],
             iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
         );
         $this->assertSame(
@@ -50,7 +51,7 @@ class SendersLocatorTest extends TestCase
         );
 
         $this->assertSame(
-            ['my_sender' => $sender],
+            ['my_sender' => $sender, 'my_second_sender' => $sender],
             iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
         );
     }

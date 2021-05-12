@@ -494,12 +494,12 @@ class AbstractControllerTest extends TestCase
     {
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(false);
 
         $controller = $this->createController();
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The "$onSuccess" callable passed to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::handleForm()" must return a Response, "string" returned.');
+        $this->expectExceptionMessage('The "$render" callable passed to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::handleForm()" must return a Response, "string" returned.');
 
         $response = $controller->handleForm(
             $form,

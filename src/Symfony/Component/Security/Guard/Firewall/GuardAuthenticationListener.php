@@ -17,7 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
@@ -40,6 +43,7 @@ class GuardAuthenticationListener implements ListenerInterface
     private $guardAuthenticators;
     private $logger;
     private $rememberMeServices;
+    private $hideUserNotFoundExceptions;
 
     /**
      * @param GuardAuthenticatorHandler         $guardHandler          The Guard handler
@@ -48,7 +52,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      * @param LoggerInterface                   $logger                A LoggerInterface instance
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null, $hideUserNotFoundExceptions = true)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -59,6 +63,7 @@ class GuardAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->guardAuthenticators = $guardAuthenticators;
         $this->logger = $logger;
+        $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
     }
 
     /**
@@ -161,6 +166,12 @@ class GuardAuthenticationListener implements ListenerInterface
 
             if (null !== $this->logger) {
                 $this->logger->info('Guard authentication failed.', ['exception' => $e, 'authenticator' => \get_class($guardAuthenticator)]);
+            }
+
+            // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
+            // to prevent user enumeration via response content
+            if ($this->hideUserNotFoundExceptions && ($e instanceof UsernameNotFoundException || $e instanceof AccountStatusException)) {
+                $e = new BadCredentialsException('Bad credentials.', 0, $e);
             }
 
             $response = $this->guardHandler->handleAuthenticationFailure($e, $request, $guardAuthenticator, $this->providerKey);

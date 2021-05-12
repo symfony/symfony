@@ -17,7 +17,7 @@
                 <argument type="service" id="security.authentication.session_strategy" />
             </call>
         </service>
-        
+
         <service id="Symfony\Component\Security\Guard\GuardAuthenticatorHandler" alias="security.authentication.guard_handler" />
 
         <!-- See GuardAuthenticationFactory -->
@@ -41,6 +41,7 @@
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Authenticator -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
     </services>
 </container>

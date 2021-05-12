@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -225,6 +226,26 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator->expects($this->any())
             ->method('onAuthenticationSuccess')
             ->with($this->anything(), $this->token, 'main')
+            ->willReturn($this->response);
+
+        $manager = $this->createManager([$authenticator]);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+    }
+
+    public function testAuthenticateRequestHidesInvalidUserExceptions()
+    {
+        $invalidUserException = new UsernameNotFoundException();
+        $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willThrowException($invalidUserException);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationFailure')
+            ->with($this->equalTo($this->request), $this->callback(function ($e) use ($invalidUserException) {
+                return $e instanceof BadCredentialsException && $invalidUserException === $e->getPrevious();
+            }))
             ->willReturn($this->response);
 
         $manager = $this->createManager([$authenticator]);

@@ -18,7 +18,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -49,11 +53,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     private $eraseCredentials;
     private $logger;
     private $firewallName;
+    private $hideUserNotFoundExceptions;
 
     /**
      * @param AuthenticatorInterface[] $authenticators
      */
-    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true)
+    public function __construct(iterable $authenticators, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName, ?LoggerInterface $logger = null, bool $eraseCredentials = true, bool $hideUserNotFoundExceptions = true)
     {
         $this->authenticators = $authenticators;
         $this->tokenStorage = $tokenStorage;
@@ -61,6 +66,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $this->firewallName = $firewallName;
         $this->logger = $logger;
         $this->eraseCredentials = $eraseCredentials;
+        $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
     }
 
     /**
@@ -230,6 +236,12 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
     {
         if (null !== $this->logger) {
             $this->logger->info('Authenticator failed.', ['exception' => $authenticationException, 'authenticator' => \get_class($authenticator)]);
+        }
+
+        // Avoid leaking error details in case of invalid user (e.g. user not found or invalid account status)
+        // to prevent user enumeration via response content comparison
+        if ($this->hideUserNotFoundExceptions && ($authenticationException instanceof UsernameNotFoundException || ($authenticationException instanceof AccountStatusException && !$authenticationException instanceof CustomUserMessageAccountStatusException))) {
+            $authenticationException = new BadCredentialsException('Bad credentials.', 0, $authenticationException);
         }
 
         $response = $authenticator->onAuthenticationFailure($request, $authenticationException);

@@ -54,6 +54,7 @@
         "symfony/console": "<4.4",
         "symfony/framework-bundle": "<4.4",
         "symfony/ldap": "<4.4",
+        "symfony/security-http": "<5.2.8",
         "symfony/twig-bundle": "<4.4"
     },
     "autoload": {

@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Provider-shared Key'),
                 abstract_arg('Authenticators'),
                 service('logger')->nullOnInvalid(),
+                param('security.authentication.hide_user_not_found'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
     ;

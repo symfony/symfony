@@ -433,10 +433,10 @@ class AbstractControllerTest extends TestCase
         $response = $controller->handleForm(
             $form,
             Request::create('https://example.com'),
-            function (FormInterface $form, $data): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
             },
-            function (FormInterface $form, $data): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new Response('rendered');
             }
         );
@@ -455,10 +455,10 @@ class AbstractControllerTest extends TestCase
         $response = $controller->handleForm(
             $form,
             Request::create('https://example.com'),
-            function (FormInterface $form): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
             },
-            function (FormInterface $form): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new Response('rendered');
             }
         );
@@ -477,10 +477,10 @@ class AbstractControllerTest extends TestCase
         $response = $controller->handleForm(
             $form,
             Request::create('https://example.com'),
-            function (FormInterface $form): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
             },
-            function (FormInterface $form): Response {
+            function (FormInterface $form, $data, Request $request): Response {
                 return new Response('rendered');
             }
         );
@@ -488,6 +488,25 @@ class AbstractControllerTest extends TestCase
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame(Response::HTTP_SEE_OTHER, $response->getStatusCode());
         $this->assertSame('https://example.com/redir', $response->getTargetUrl());
+    }
+
+    public function testHandleFormTypeError()
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+
+        $controller = $this->createController();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('The "$onSuccess" callable passed to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::handleForm()" must return a Response, "string" returned.');
+
+        $response = $controller->handleForm(
+            $form,
+            Request::create('https://example.com'),
+            function () { return 'abc'; },
+            function () { return 'abc'; }
+        );
     }
 
     public function testRedirectToRoute()

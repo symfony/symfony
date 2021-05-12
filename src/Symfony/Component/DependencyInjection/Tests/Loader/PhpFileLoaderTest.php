@@ -176,4 +176,16 @@ class PhpFileLoaderTest extends TestCase
 
         $loader->load($fixtures.'/config/nested_bundle_config.php');
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testWhenEnv()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $container = new ContainerBuilder();
+        $loader = new PhpFileLoader($container, new FileLocator(), 'dev', new ConfigBuilderGenerator(sys_get_temp_dir()));
+
+        $loader->load($fixtures.'/config/when_env.php');
+    }
 }

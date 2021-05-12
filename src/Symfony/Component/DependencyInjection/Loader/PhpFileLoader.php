@@ -15,6 +15,7 @@ use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -55,12 +56,12 @@ class PhpFileLoader extends FileLoader
         $this->container->fileExists($path);
 
         // the closure forbids access to the private scope in the included file
-        $load = \Closure::bind(function ($path) use ($container, $loader, $resource, $type) {
+        $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
             return include $path;
         }, $this, ProtectedPhpFileLoader::class);
 
         try {
-            $callback = $load($path);
+            $callback = $load($path, $this->env);
 
             if (\is_object($callback) && \is_callable($callback)) {
                 $this->executeCallback($callback, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
@@ -98,8 +99,22 @@ class PhpFileLoader extends FileLoader
 
         $arguments = [];
         $configBuilders = [];
-        $parameters = (new \ReflectionFunction($callback))->getParameters();
-        foreach ($parameters as $parameter) {
+        $r = new \ReflectionFunction($callback);
+
+        if (\PHP_VERSION_ID >= 80000) {
+            $attribute = null;
+            foreach ($r->getAttributes(When::class) as $attribute) {
+                if ($this->env === $attribute->newInstance()->env) {
+                    $attribute = null;
+                    break;
+                }
+            }
+            if (null !== $attribute) {
+                return;
+            }
+        }
+
+        foreach ($r->getParameters() as $parameter) {
             $reflectionType = $parameter->getType();
             if (!$reflectionType instanceof \ReflectionNamedType) {
                 throw new \InvalidArgumentException(sprintf('Could not resolve argument "$%s" for "%s". You must typehint it (for example with "%s" or "%s").', $parameter->getName(), $path, ContainerConfigurator::class, ContainerBuilder::class));

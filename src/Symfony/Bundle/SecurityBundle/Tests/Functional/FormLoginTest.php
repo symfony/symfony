@@ -142,7 +142,7 @@ class FormLoginTest extends AbstractWebTestCase
 
                     break;
                 case 2: // Third attempt with unexisting username
-                    $this->assertStringContainsString('Username could not be found.', $text, 'Invalid response on 3rd attempt');
+                    $this->assertStringContainsString('Invalid credentials.', $text, 'Invalid response on 3rd attempt');
 
                     break;
                 case 3: // Fourth attempt : still login throttling !

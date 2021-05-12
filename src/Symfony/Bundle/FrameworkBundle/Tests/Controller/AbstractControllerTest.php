@@ -420,7 +420,7 @@ class AbstractControllerTest extends TestCase
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
         $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['form' => $formView, 'bar' => 'bar'])->willReturn('bar');
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -428,7 +428,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->renderForm('foo', $form, ['bar' => 'bar']);
+        $response = $controller->renderForm('foo', ['bar' => $form]);
 
         $this->assertTrue($response->isSuccessful());
         $this->assertSame('bar', $response->getContent());
@@ -444,7 +444,7 @@ class AbstractControllerTest extends TestCase
         $form->expects($this->once())->method('isValid')->willReturn(false);
 
         $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->with('foo', ['myForm' => $formView, 'bar' => 'bar'])->willReturn('bar');
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
 
         $container = new Container();
         $container->set('twig', $twig);
@@ -452,7 +452,7 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->renderForm('foo', $form, ['bar' => 'bar'], null, 'myForm');
+        $response = $controller->renderForm('foo', ['bar' => $form]);
 
         $this->assertSame(422, $response->getStatusCode());
         $this->assertSame('bar', $response->getContent());

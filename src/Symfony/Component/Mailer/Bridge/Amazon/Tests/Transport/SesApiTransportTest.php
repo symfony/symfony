@@ -66,6 +66,7 @@ class SesApiTransportTest extends TestCase
 
             $this->assertSame('Hello!', $content['Message_Subject_Data']);
             $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination_ToAddresses_member'][0]);
+            $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $content['Destination_CcAddresses_member'][0]);
             $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['Source']);
             $this->assertSame('Hello There!', $content['Message_Body_Text_Data']);
             $this->assertSame('aws-configuration-set-name', $content['ConfigurationSetName']);
@@ -86,6 +87,7 @@ class SesApiTransportTest extends TestCase
         $mail = new Email();
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->cc(new Address('jeremy@derusse.com', 'Jérémy'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!');
 

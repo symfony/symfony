@@ -65,6 +65,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
 
             $this->assertSame('Hello!', $content['Content']['Simple']['Subject']['Data']);
             $this->assertSame('"Saif Eddin" <saif.gmati@symfony.com>', $content['Destination']['ToAddresses'][0]);
+            $this->assertSame('=?UTF-8?B?SsOpcsOpbXk=?= <jeremy@derusse.com>', $content['Destination']['CcAddresses'][0]);
             $this->assertSame('"Fabien" <fabpot@symfony.com>', $content['FromEmailAddress']);
             $this->assertSame('Hello There!', $content['Content']['Simple']['Body']['Text']['Data']);
             $this->assertSame('<b>Hello There!</b>', $content['Content']['Simple']['Body']['Html']['Data']);
@@ -84,6 +85,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $mail = new Email();
         $mail->subject('Hello!')
             ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->cc(new Address('jeremy@derusse.com', 'Jérémy'))
             ->from(new Address('fabpot@symfony.com', 'Fabien'))
             ->text('Hello There!')
             ->html('<b>Hello There!</b>')

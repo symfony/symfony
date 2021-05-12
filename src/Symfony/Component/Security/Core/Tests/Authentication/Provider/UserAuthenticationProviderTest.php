@@ -83,7 +83,7 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPreChecksFails()
     {
-        $this->expectException(CredentialsExpiredException::class);
+        $this->expectException(BadCredentialsException::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
         $userChecker->expects($this->once())
                     ->method('checkPreAuth')
@@ -101,7 +101,7 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenPostChecksFails()
     {
-        $this->expectException(AccountExpiredException::class);
+        $this->expectException(BadCredentialsException::class);
         $userChecker = $this->createMock(UserCheckerInterface::class);
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
@@ -128,7 +128,7 @@ class UserAuthenticationProviderTest extends TestCase
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
-                 ->willThrowException(new BadCredentialsException())
+                 ->willThrowException(new CredentialsExpiredException())
         ;
 
         $provider->authenticate($this->getSupportedToken());

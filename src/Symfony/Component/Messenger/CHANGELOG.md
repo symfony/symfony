@@ -4,6 +4,7 @@ CHANGELOG
 5.3
 ---
 
+ * Add `AsMessageHandler` attribute for declaring message handlers on PHP 8.
  * Add the `RouterContextMiddleware` to restore the original router context when handling a message
  * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
  * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.

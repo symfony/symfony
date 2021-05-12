@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>Невалиден или изтекъл линк за вход.</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>Твърде много грешни опити за вход, моля опитайте отново след %minutes% минута.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>Твърде много грешни опити за вход, моля опитайте отново след %minutes% минути.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

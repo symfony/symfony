@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-05-12T10:28:38Z
+
+Shouldn't this be opt-in, as it's technically a BC break for apps already passing a form as a variable?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-05-12T10:28:45Z
+
+I was thinking the same thing 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T10:33:44Z
+
+From the HTTP pov, this is a bug fix.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2021-05-12T10:39:19Z
+
+If I understand correctly, I'm not not able to pass a Form to my view (a FormView will always be passed instead). This is weird, I agree, I'm not sure anyone would have the usage of passing a Form instead of a FormView.
+
+---------------------------------------------------------------------------
+
+by Warxcell at 2021-05-12T10:46:57Z
+
+One possible issue: if exception is handled inside controller and status code is set to 500, this could overwrite it to 422. Not really sure which one should be correct in that case. (probably the 500)
+Probably 422 status code can be set only if status === 200 (default one).
+
+```
+$response = new Response();
+try {
+  // do something
+} catch(\Exception $ex) {
+   $response->setStatus(500);
+   $error = 'xxx';
+}
+
+return $this->render('template', ['form' => $form, 'error' => $error], $response);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T10:57:01Z
+
+And yes, I'm assuming no app is going to pass a FormInterface to twig, at least not as a root variable. I think this is safe.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T11:17:11Z
+
+Let's be on the safe side, the renderForm() method is back. PR and description updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T11:19:17Z
+
+> One possible issue: if exception is handled inside controller and status code is set to 500, this could overwrite it to 422.
+
+fixed

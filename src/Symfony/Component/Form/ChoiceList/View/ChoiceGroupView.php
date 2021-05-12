@@ -15,6 +15,8 @@ namespace Symfony\Component\Form\ChoiceList\View;
  * Represents a group of choices in templates.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<self|ChoiceView>
  */
 class ChoiceGroupView implements \IteratorAggregate
 {
@@ -35,7 +37,7 @@ class ChoiceGroupView implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return self[]|ChoiceView[]
+     * @return \Traversable<self|ChoiceView>
      */
     public function getIterator()
     {

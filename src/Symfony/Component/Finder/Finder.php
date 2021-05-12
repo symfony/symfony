@@ -36,6 +36,8 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
  *     $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \IteratorAggregate<SplFileInfo>
  */
 class Finder implements \IteratorAggregate, \Countable
 {
@@ -601,7 +603,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator|SplFileInfo[] An iterator
+     * @return \Traversable<SplFileInfo> An iterator
      *
      * @throws \LogicException if the in() method has not been called
      */

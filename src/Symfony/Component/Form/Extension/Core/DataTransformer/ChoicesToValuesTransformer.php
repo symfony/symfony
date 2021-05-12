@@ -17,6 +17,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<array, string[]>
  */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
@@ -28,7 +30,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
+     * @return string[]
      *
      * @throws TransformationFailedException if the given value is not an array
      */

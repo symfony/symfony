@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * cannot be extended (via {@link \Symfony\Component\Form\FormExtensionInterface}) nor themed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ * @implements FormTypeInterface<T>
  */
 abstract class BaseType extends AbstractType
 {

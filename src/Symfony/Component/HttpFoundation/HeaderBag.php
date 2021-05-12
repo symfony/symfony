@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * HeaderBag is a container for HTTP headers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \IteratorAggregate<string, string|string[]>
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {
@@ -250,7 +252,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns an iterator for headers.
      *
-     * @return \ArrayIterator An \ArrayIterator instance
+     * @return \Traversable<string, string|string[]>
      */
     public function getIterator()
     {

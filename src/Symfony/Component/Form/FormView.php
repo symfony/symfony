@@ -15,11 +15,17 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @template T
+ *
+ * @implements \IteratorAggregate<string, FormView>
  */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
      * The variables assigned to this view.
+     *
+     * @var array{value: mixed, attr: array<array-key, mixed>}&array<string, mixed>
      */
     public $vars = [
         'value' => null,
@@ -28,6 +34,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * The parent view.
+     *
+     * @var self|null
      */
     public $parent;
 
@@ -148,7 +156,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns an iterator to iterate over children (implements \IteratorAggregate).
      *
-     * @return \ArrayIterator<string, FormView> The iterator
+     * @return \Traversable<string, FormView>
      */
     public function getIterator()
     {

@@ -18,13 +18,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements DataTransformerInterface<Collection, array>
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
     /**
      * Transforms a collection into an array.
      *
-     * @return mixed An array of entities
+     * @return mixed[] An array of entities
      *
      * @throws TransformationFailedException
      */

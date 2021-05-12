@@ -16,6 +16,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @implements DataTransformerInterface<mixed, mixed>
+ */
 class TextType extends AbstractType implements DataTransformerInterface
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

@@ -20,6 +20,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * A builder for creating {@link Form} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<FormBuilderInterface>
  */
 class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
@@ -212,7 +214,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * {@inheritdoc}
      *
-     * @return FormBuilderInterface[]|\Traversable
+     * @return \Traversable<FormBuilderInterface>
      */
     public function getIterator()
     {

@@ -19,6 +19,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Encapsulates events thus decoupling the observer from the subject they encapsulate.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @implements \IteratorAggregate<string, mixed>
  */
 class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 {
@@ -161,7 +163,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * IteratorAggregate for iterating over the object like an array.
      *
-     * @return \ArrayIterator
+     * @return \Traversable<string, mixed>
      */
     public function getIterator()
     {

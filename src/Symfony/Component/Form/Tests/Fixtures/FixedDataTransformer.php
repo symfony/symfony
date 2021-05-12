@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<mixed, mixed>
+ */
 class FixedDataTransformer implements DataTransformerInterface
 {
     private $mapping;
@@ -23,6 +26,9 @@ class FixedDataTransformer implements DataTransformerInterface
         $this->mapping = $mapping;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function transform($value)
     {
         if (!\array_key_exists($value, $this->mapping)) {
@@ -32,6 +38,9 @@ class FixedDataTransformer implements DataTransformerInterface
         return $this->mapping[$value];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function reverseTransform($value)
     {
         $result = array_search($value, $this->mapping, true);

@@ -19,6 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
+ * @template T
+ *
  * @method callable|null getIsEmptyCallback() Returns a callable that takes the model data as argument and that returns if it is empty or not - not implementing it is deprecated since Symfony 5.1
  */
 interface FormConfigInterface
@@ -167,7 +169,7 @@ interface FormConfigInterface
     /**
      * Returns the initial data of the form.
      *
-     * @return mixed The initial form data
+     * @return T|null The initial form data
      */
     public function getData();
 

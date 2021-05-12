@@ -7,6 +7,22 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.23 (2021-05-12)
+
+ * security #cve-2021-21424 [Security][Guard] Prevent user enumeration (chalasr)
+ * bug #41176 [DependencyInjection] fix dumping service-closure-arguments (nicolas-grekas)
+ * bug #41168 WDT: Only load "Sfjs" if it is not present already (weaverryan)
+ * bug #41147 [Inflector][String] wrong plural form of words ending by "pectus" (makraz)
+ * bug #41160 [HttpClient] Don't prepare the request in ScopingHttpClient (nicolas-grekas)
+ * bug #40763 Fix/Rewrite .gitignore regex builder (mvorisek)
+ * bug #40917 [Config][DependencyInjection] Uniformize trailing slash handling (dunglas)
+ * bug #40699 [PropertyInfo] Make ReflectionExtractor correctly extract nullability (shiftby)
+ * bug #40874 [PropertyInfo] fix attribute namespace with recursive traits (soullivaneuh)
+ * bug #41099 [Cache] Check if phpredis version is compatible with stream parameter (nicolassing)
+ * bug #41072 [VarExporter] Add support of PHP enumerations (alexandre-daubois)
+ * bug #41105 [Inflector][String] Fixed singularize `edges` > `edge` (ruudk)
+ * bug #41075 [ErrorHandler] Skip "same vendor" ``@method`` deprecations for `Symfony\*` classes unless symfony/symfony is being tested (nicolas-grekas)
+
 * 4.4.22 (2021-05-01)
 
  * bug #40993 [Security] [Security/Core] fix checking for bcrypt (nicolas-grekas)

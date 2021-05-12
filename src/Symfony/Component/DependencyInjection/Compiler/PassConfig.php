@@ -43,6 +43,7 @@ class PassConfig
             100 => [
                 new ResolveClassPass(),
                 new RegisterAutoconfigureAttributesPass(),
+                new RegisterAliasAttributesPass(),
                 new AttributeAutoconfigurationPass(),
                 new ResolveInstanceofConditionalsPass(),
                 new RegisterEnvVarProcessorsPass(),

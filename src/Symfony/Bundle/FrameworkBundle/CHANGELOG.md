@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add autowiring alias for `HttpCache\StoreInterface`
+ * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
 
 5.3
 ---

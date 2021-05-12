@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Translation\Bridge\Loco\Tests;
+namespace Symfony\Component\Translation\Bridge\Lokalise\Tests;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;

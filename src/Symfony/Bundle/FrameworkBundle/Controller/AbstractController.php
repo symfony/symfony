@@ -299,10 +299,10 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * For both callables, instead of "mixed", you can use your form's data class as a type-hint for argument #2.
      *
-     * @param callable(FormInterface, mixed, Request): Response $onSuccess
-     * @param callable(FormInterface, mixed, Request): Response $render
+     * @param callable(FormInterface, mixed, Request): mixed $onSuccess
+     * @param callable(FormInterface, mixed, Request): mixed $render
      */
-    public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render): Response
+    public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render)
     {
         $form->handleRequest($request);
 
@@ -314,13 +314,13 @@ abstract class AbstractController implements ServiceSubscriberInterface
         } else {
             $response = $render($form, $data, $request);
 
-            if ($submitted && 200 === $response->getStatusCode()) {
+            if ($response instanceof Response && $submitted && 200 === $response->getStatusCode()) {
                 $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
-        if (!$response instanceof Response) {
-            throw new \TypeError(sprintf('The "%s" callable passed to "%s::handleForm()" must return a Response, "%s" returned.', $isValid ? '$onSuccess' : '$render', get_debug_type($this), get_debug_type($response)));
+        if (null === $response) {
+            throw new \TypeError(sprintf('The "%s" callable passed to "%s::handleForm()" should return a value, did you forget to return a Response?', $isValid ? '$onSuccess' : '$render', get_debug_type($this)));
         }
 
         return $response;

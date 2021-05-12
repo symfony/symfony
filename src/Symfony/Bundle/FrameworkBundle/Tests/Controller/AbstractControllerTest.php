@@ -499,13 +499,13 @@ class AbstractControllerTest extends TestCase
         $controller = $this->createController();
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('The "$onSuccess" callable passed to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::handleForm()" must return a Response, "string" returned.');
+        $this->expectExceptionMessage('The "$onSuccess" callable passed to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::handleForm()" should return a value, did you forget to return a Response?');
 
         $response = $controller->handleForm(
             $form,
             Request::create('https://example.com'),
-            function () { return 'abc'; },
-            function () { return 'abc'; }
+            function () {},
+            function () {}
         );
     }
 

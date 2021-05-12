@@ -7,6 +7,31 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.0-BETA4 (2021-05-12)
+
+ * security #cve-2021-21424 [Security][Guard] Prevent user enumeration (chalasr)
+ * feature #41178 [FrameworkBundle] Introduce `AbstractController::renderForm()` instead of `handleForm()` (lyrixx)
+ * feature #41182 [DependencyInjection] allow PHP-DSL files to be env-conditional (nicolas-grekas)
+ * bug #41177 [DependencyInjection] fix empty instanceof-conditionals created by AttributeAutoconfigurationPass (nicolas-grekas)
+ * bug #41176 [DependencyInjection] fix dumping service-closure-arguments (nicolas-grekas)
+ * bug #41174 [Console] Fix Windows code page support (orkan)
+ * bug #41173 [Security] Make Login Rate Limiter also case insensitive for non-ascii user identifiers (Seldaek)
+ * bug #41170 [DependencyInjection] Don't try to load YamlFileLoader if it's not actually needed (nicolas-grekas)
+ * bug #41168 WDT: Only load "Sfjs" if it is not present already (weaverryan)
+ * feature #36864 [Messenger] Ability to distinguish retry and delay actions (theravel)
+ * bug #41164 [FrameworkBundle] fix debug:event-dispatcher and debug:firewall (nicolas-grekas)
+ * feature #41161 [HttpClient] Add `DecoratorTrait` to ease writing simple decorators (nicolas-grekas)
+ * bug #41147 [Inflector][String] wrong plural form of words ending by "pectus" (makraz)
+ * bug #41160 [HttpClient] Don't prepare the request in ScopingHttpClient (nicolas-grekas)
+ * bug #41156 [Security] Make Login Rate Limiter case insensitive (jderusse)
+ * bug #41155 [Translation] Improved Translation Providers (welcoMattic)
+ * feature #40927 [Translation] Added Lokalise Provider (welcoMattic)
+ * feature #40926 [Translation] Added PoEditor Provider (welcoMattic)
+ * bug #41137 [Security] Reset limiters on successful login (MatTheCat)
+ * bug #41148 [Runtime] fix defining $_SERVER[APP_ENV] (nicolas-grekas)
+ * bug #40758 [Security] NullToken signature (jderusse)
+ * bug #40763 Fix/Rewrite .gitignore regex builder (mvorisek)
+
 * 5.3.0-BETA3 (2021-05-09)
 
  * feature #40947 [Translation] Added Crowdin Translation Provider (andrii-bodnar)

@@ -33,7 +33,14 @@ class AutoAliasServicePass implements CompilerPassInterface
 
                 $aliasId = $container->getParameterBag()->resolveValue($tag['format']);
                 if ($container->hasDefinition($aliasId) || $container->hasAlias($aliasId)) {
-                    $container->setAlias($serviceId, new Alias($aliasId, true));
+                    $definition = $container->getDefinition($serviceId);
+
+                    $public = ($definition->getChanges()['public'] ?? false) ? $definition->isPublic() : null;
+                    if (null === $public) {
+                        trigger_deprecation('symfony/dependency-injection', '5.4', 'Aliases created with the "auto_alias" tag will be private by default in the future, you can set them to public by using the "public" option.');
+                    }
+
+                    $container->setAlias($serviceId, new Alias($aliasId, $public ?? true));
                 }
             }
         }

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-12T06:27:11Z
+
+Just making an observation. This also means we can write:
+
+```php
+<?php
+// config/packages/acme.php
+use Symfony\Config\AcmeConfig;
+
+return static function (AcmeConfig $config) use ($env) {
+    if ('prod' !== $env) {
+        $config->color('red');
+    } else {
+        $config->color('blue');
+    }
+};
+```
+
+Which is the same as:
+```php
+<?php
+// config/packages/acme.php
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Config\AcmeConfig;
+
+return static function (AcmeConfig $config, ContainerConfigurator $container) {
+    if ('prod' !== $container->env()) {
+        $config->color('red');
+    } else {
+        $config->color('blue');
+    }
+};
+```

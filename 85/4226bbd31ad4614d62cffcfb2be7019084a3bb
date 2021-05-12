@@ -1,0 +1,263 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-11T21:36:28Z
+
+> While trying the feature I forgot to return a response and I got a fatal error "cannot call getStatusCode() on null".
+
+This can be improved. Would you mind sending a PR?
+
+> callables receive mixed $data: it's too generic. Static analysis could not work properly;
+
+Use the entity-class as type hint and all works seamslessly.
+
+> This is a new syntax to learn;
+> All documentation, blog post, etc should be updated, and it's not fixable with sed or similar tool;
+
+As everything, this very PR is no exception :)
+
+> this is not really flexible. We are going to lock people with this flow
+
+How is that not flexible? Which flow is not covered? Can you give some examples please?
+
+About the proposal in this PR itself, it tights twig and forms together, which means it's relies on having only one form per controller. *That* is less flexible to me.
+
+`handleForm()` more flexible to me, and requires less logic. That's why I think it's the correct approach.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T05:30:17Z
+
+I submitted #41181 to improve `handleForm()`!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-12T06:12:50Z
+
+@lyrixx do we need the `$form` twice?
+
+```diff
+-        return $this->render('thing/new.html.twig', [
++        return $this->renderForm('thing/new.html.twig', $form, [
+             'thing' => $thing,
+             'form' => $form->createView(),
+         ]);
+     }
+```
+
+I mean `'form' => $form->createView(),` .... 🤔
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-05-12T06:28:32Z
+
+@nicolas-grekas
+
+> > This is a new syntax to learn;
+> > All documentation, blog post, etc should be updated, and it's not fixable with sed or similar tool;
+>
+> As everything, this very PR is no exception :)
+
+Not really, `handleForm()` is a new **syntax** (or a flow) to learn: IE the flow is different, and updating application will be painful! (I hope to see a rector for that if it's kept). `renderForm()` is instead a new **method** that is easy to update to. Updating application could be done in minutes with a simple `sed` command (or similar). It's the same for documentation.
+
+> > this is not really flexible. We are going to lock people with this flow
+>
+> How is that not flexible? Which flow is not covered? Can you give some examples please?
+
+Sure. I searched for `handleRequest()` in some application I have on my computer where the flow is special. So there is client code that I can not comment about, obviously.
+
+<details>
+<summary>some examples</summary>
+
+The data is not validated (1) (I don't know why):
+
+```php
+$form = $this->formFactory->create(WhitePaperAccessType::class, $whitePaperAccess);
+$form->handleRequest($request);
+
+try {
+    $whitePaperAccess->setToken($this->tokenGenerator->generateToken());
+    $this->entityManager->persist($whitePaperAccess);
+    $this->entityManager->flush();
+} catch (ORMException $exception) {
+    // Ignore and hide.
+}
+
+// [...]
+return new RedirectResponse(
+    $this->router->generate($route, $routeParams)
+);
+```
+
+There is a difference between 1/ new form 2/ form submitted 3/ form invalid (looks like XHR handling)
+
+```php
+$form = $this->createForm(ContactType::class, $contact)->handleRequest($request);
+
+if (!$form->isSubmitted()) {
+    return $this->render('account/_contact_agent.html.twig', [
+        'form' => $form->createView(),
+        'agent' => $agent,
+    ]);
+}
+
+if (!$form->isValid()) {
+    return $this->json([
+        'success' => false,
+        'data' => $this->renderView('account/_contact_agent.html.twig', [
+            'form' => $form->createView(),
+            'agent' => $agent,
+        ]),
+    ]);
+}
+
+//[...]
+
+return $this->json([
+    'success' => true,
+    'data' => $this->renderView('account/_contact_agent.html.twig', [
+        'form' => false,
+        'agent' => $agent,
+    ]),
+]);
+```
+
+There is many form (the proposed solution won't work either but it is easier to adapt)
+
+```php
+$monthlyPaymentsForm = $this->createForm(SimulatorMonthlyPaymentsType::class, $monthlyPaymentDto);
+$capacityForm = $this->createForm(SimulatorCapacityType::class, $capacityDto);
+
+$monthlyPaymentsForm->handleRequest($request);
+$capacityForm->handleRequest($request);
+
+if ($monthlyPaymentsForm->isSubmitted() && $monthlyPaymentsForm->isValid()) {
+    $monthlyPayments = $calculator->computeMonthlyPayments($monthlyPaymentDto);
+    $amortizationTable = $calculator->computeAmortizationTable($monthlyPaymentDto);
+}
+
+if ($capacityForm->isSubmitted() && $capacityForm->isValid()) {
+    $capacity = $calculator->computeCapacity($capacityDto);
+    $amortizationTable = $calculator->computeAmortizationTable($capacityDto);
+}
+
+return $this->render('tools/investment_simulator.html.twig', [
+    'monthlyPaymentsForm' => $monthlyPaymentsForm->createView(),
+    'capacityForm' => $capacityForm->createView(),
+```
+
+The data is not validated because it's a search:
+
+```php
+$originDestinationSearch = new OriginDestinationSearch();
+$form = $this->createForm(OriginDestinationType::class, $originDestinationSearch, [
+    'validation_groups' => 'None',
+    'entry_type' => CitySelectorType::class,
+]);
+
+$form->handleRequest($request);
+
+$parameters = $request->query->all();
+$parameters['locale'] = $request->getLocale();
+
+if ($originDestinationSearch->isFulfilled() && !$request->isXmlHttpRequest()) {
+    return $this->deeplinkAction($request);
+} elseif ($originDestinationSearch->isEmpty()) {
+    // $data = [...]
+} else {
+    // $data = [...]
+}
+
+$viewData = [
+    'form' => $form->createView(),
+```
+
+use `submit()` instead of `handleRequest()`
+
+```php
+$formRequest = $this->createForm(ReferrerRequestType::class, $referralProgramRequest);
+
+// We don't use $form->handleRequest because we want to always submit the value, whatever the method is
+if (!$formRequest->submit($request->query->all())->isValid()) {
+    return $this->redirectToRoute('referral_landing');
+}
+```
+
+</details>
+
+>About the proposal in this PR itself, it tights twig and forms together, which means it's relies on having only one form per controller. That is less flexible to me.
+
+I already talk about that in the examples ☝ but how could you use `handleForm()` with 2 forms? I fail to see :/. Could you show me please? Because according to the doc and the code, `handleForm()` must return a response, so which response are you supposed to return? How could you do something only if one form is valid and not the other one ? Or both of same? You can say it's the same for `renderForm()`, and indeed `renderForm()` could not work with  2 forms, but it's super easy to mimic what is done in the framework to the application and keep a full control of the flow.
+
+>handleForm() more flexible to me, and requires less logic. That's why I think it's the correct approach.
+
+I agree it requires less logic but this logic is well know but I [did think](https://github.com/symfony/symfony/pull/24576) we can do better but not this way.
+
+I highly disagree `handleForm()` it's more flexible. Since you force the flow, I fail to see how it could be flexible. Anyway I posted many example where `handleForm()` could not work whereas `renderForm()` could. (I could post much more, but I think it's useless :) )
+
+Finally, @dunglas created the initial PR in order to get a "good" status code when the form is submitted and not valid. And we end up with a totally new syntax for handling a form. We are kinda breaking things here. I don't want to be conservative, but (experience from the field) people don't really like when we change things. And it the case: it solves nothing more than setting the right status code.
+
+I'm sorry if I'm pushing hard against `handleForm()`. If we decide to close this PR I'll be fine, don't worry. But I think it would be a shame.
+
+---
+
+@OskarStark
+
+> @lyrixx do we need the `$form` twice?
+
+I thought about that too. I saw quite often in application that the `form` variable passed to twig is **not** named `form`.
+We could indeed create the view for the user, and give it to the view but if people want to change the var name ?
+
+maybe something like this :
+
+```
+return $this->renderForm('thing/new.html.twig', $form); // a "form" var is passed to the view
+return $this->renderForm('thing/new.html.twig', $form, "another_variable_name"); // a "another_variable_name" var is passed to the view
+```
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T07:14:47Z
+
+> how could you use handleForm() with 2 forms [...] handleForm() must return a response
+
+:thinking: you're right! #41184 might help :)
+
+> @dunglas created the initial PR in order to get a "good" status code when the form is submitted and not valid
+
+I agree that renderForm() solves that and reduces the diff.
+
+Thanks for the examples. While not covering 100% of use cases, handleForm() has more use cases than renderForm() to me, especially after #41184! (this PR already triggered some changes, so thanks for it,whatever the outcome).
+
+But I get your arguments. I'd be happy to see what others think about this proposal.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-12T07:21:53Z
+
+(my progress of thoughts: if handleForm() has value but renderForm() provides a smoother transition, we might replace handleForm() by renderForm() in 5.3, and reconsider handleForm() or a variant of it for 5.4)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-05-12T07:31:18Z
+
+I have removed `handleForm()` for now. CF previous comment. (thanks @nicolas-grekas)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-12T08:49:29Z
+
+> But I get your arguments. I'd be happy to see what others think about this proposal.
+
+_Disclaimer: I have very limited knowledge about Symfony forms, from both personal experience and general user experience._
+
+To me, the limited diff of this proposal between "using forms in controllers that don't extend `AbstractController`" vs "using the `AbstractController` form helper functions" is a big win over #40799 (users will have to learn less to be able to write complex or default form handling).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-12T08:53:02Z
+
+What we should think about is the number of alternatives in 5.3. Especially in documentation, you don't want to have choices without clear pros/cons. So if we keep both `renderForm()`, `handleForm()` and the pre-5.3 way, we should have very clear pros/cons on when to use each of them imho (otherwise, it's probably wise to remove/deprecate on of them).
+
+edit: I just saw that this PR removes `handleForm()`. The previously merged changes to that method made me believe we kept both. All OK :)

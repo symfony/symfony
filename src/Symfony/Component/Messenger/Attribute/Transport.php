@@ -14,16 +14,13 @@ namespace Symfony\Component\Messenger\Attribute;
 /**
  * @author Maxim Dovydenok <dovydenok.maxim@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class Senders
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+class Transport
 {
-    public array $senders;
+    public string $name;
 
-    /**
-     * @param string[] $senders
-     */
-    public function __construct(string ...$senders)
+    public function __construct(string $name)
     {
-        $this->senders = $senders;
+        $this->name = $name;
     }
 }

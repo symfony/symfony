@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttributeAndInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
@@ -30,11 +31,28 @@ class SendersLocatorTest extends TestCase
         $sender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
             'my_sender' => $sender,
+            'my_common_sender' => $sender,
+            'my_merged_sender' => $sender,
         ]);
         $locator = new SendersLocator([], $sendersLocator);
+        $locatorWithRouting = new SendersLocator([
+            DummyMessageWithAttribute::class => ['my_merged_sender'],
+        ], $sendersLocator);
 
-        $this->assertSame(['my_sender' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttribute('a')))));
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame(
+            ['my_sender' => $sender],
+            iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
+        );
+        $this->assertSame(
+            ['my_sender' => $sender, 'my_common_sender' => $sender],
+            iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
+        );
+
+        $this->assertSame(
+            ['my_sender' => $sender],
+            iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
+        );
     }
 
     public function testItReturnsTheSenderBasedOnTheMessageClass()

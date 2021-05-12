@@ -42,14 +42,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class Transport
 {
     private const FACTORY_CLASSES = [
-        SesTransportFactory::class,
         GmailTransportFactory::class,
-        MandrillTransportFactory::class,
         MailgunTransportFactory::class,
+        MailjetTransportFactory::class,
+        MandrillTransportFactory::class,
         PostmarkTransportFactory::class,
         SendgridTransportFactory::class,
-        MailjetTransportFactory::class,
         SendinblueTransportFactory::class,
+        SesTransportFactory::class,
     ];
 
     private $factories;

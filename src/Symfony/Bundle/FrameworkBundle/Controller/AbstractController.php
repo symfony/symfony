@@ -314,7 +314,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
         } else {
             $response = $render($form, $data, $request);
 
-            if ($submitted && 200 === $response->getStatusCode()) {
+            if ($response instanceof Response && $submitted && 200 === $response->getStatusCode()) {
                 $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }

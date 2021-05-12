@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Messenger\Attribute\Senders;
+use Symfony\Component\Messenger\Attribute\Transport;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -44,13 +44,17 @@ class SendersLocator implements SendersLocatorInterface
     {
         $senderAliases = [];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $senderAliases = $this->getSendersFromAttributes($envelope);
-        }
-
         foreach (HandlersLocator::listTypes($envelope) as $type) {
             foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
                 $senderAliases[] = $senderAlias;
+            }
+        }
+
+        if (\PHP_VERSION_ID >= 80000) {
+            $senderAliasesFromAttributes = $this->getSendersFromAttributes($envelope);
+
+            if (!empty($senderAliasesFromAttributes)) {
+                $senderAliases = $senderAliasesFromAttributes;
             }
         }
 
@@ -71,21 +75,24 @@ class SendersLocator implements SendersLocatorInterface
      */
     private function getSendersFromAttributes(Envelope $envelope): array
     {
-        $messageClass = \get_class($envelope->getMessage());
-
-        try {
-            $reflectionClass = new \ReflectionClass($messageClass);
-        } catch (\ReflectionException $e) {
-            return [];
-        }
-
-        $attributes = $reflectionClass->getAttributes(Senders::class);
-
         $senders = [];
-        foreach ($attributes as $attribute) {
-            /** @var Senders $attributeInstance */
-            $attributeInstance = $attribute->newInstance();
-            $senders = array_merge($senders, $attributeInstance->senders);
+
+        foreach (HandlersLocator::listTypes($envelope) as $type) {
+            if (class_exists($type) || interface_exists($type)) {
+                try {
+                    $reflectionClass = new \ReflectionClass($type);
+                } catch (\ReflectionException $e) {
+                    continue;
+                }
+
+                $attributes = $reflectionClass->getAttributes(Transport::class);
+
+                foreach ($attributes as $attribute) {
+                    /** @var Transport $attributeInstance */
+                    $attributeInstance = $attribute->newInstance();
+                    $senders[] = $attributeInstance->name;
+                }
+            }
         }
 
         return $senders;

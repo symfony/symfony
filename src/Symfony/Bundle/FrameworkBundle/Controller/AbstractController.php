@@ -297,23 +297,30 @@ abstract class AbstractController implements ServiceSubscriberInterface
      * * if the form is submitted but invalid, $render is called and a 422 HTTP status code is set if the current status hasn't been customized
      * * if the form is submitted and valid, $onSuccess is called, usually this method saves the data and returns a 303 HTTP redirection
      *
-     * @param callable(FormInterface, mixed): Response $onSuccess
-     * @param callable(FormInterface, mixed): Response $render
+     * For both callables, instead of "mixed", you can use your form's data class as a type-hint for argument #2.
+     *
+     * @param callable(FormInterface, mixed, Request): Response $onSuccess
+     * @param callable(FormInterface, mixed, Request): Response $render
      */
     public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render): Response
     {
         $form->handleRequest($request);
 
         $submitted = $form->isSubmitted();
-
         $data = $form->getData();
-        if ($submitted && $form->isValid()) {
-            return $onSuccess($form, $data);
+
+        if ($isValid = $submitted && $form->isValid()) {
+            $response = $onSuccess($form, $data, $request);
+        } else {
+            $response = $render($form, $data, $request);
+
+            if ($submitted && 200 === $response->getStatusCode()) {
+                $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
         }
 
-        $response = $render($form, $data);
-        if ($submitted && 200 === $response->getStatusCode()) {
-            $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        if (!$response instanceof Response) {
+            throw new \TypeError(sprintf('The "%s" callable passed to "%s::handleForm()" must return a Response, "%s" returned.', $isValid ? '$onSuccess' : '$render', get_debug_type($this), get_debug_type($response)));
         }
 
         return $response;

@@ -55,7 +55,7 @@ class SendersLocator implements SendersLocatorInterface
                 $typeSenderAliases = $this->getSendersFromAttributes($type);
             }
 
-            array_push($senderAliases, ...$typeSenderAliases);
+            $senderAliases = array_merge($senderAliases, $typeSenderAliases);
         }
 
         $senderAliases = array_unique($senderAliases);

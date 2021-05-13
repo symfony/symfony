@@ -50,12 +50,8 @@ class SendersLocator implements SendersLocatorInterface
             }
         }
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $senderAliasesFromAttributes = $this->getSendersFromAttributes($envelope);
-
-            if (!empty($senderAliasesFromAttributes)) {
-                $senderAliases = $senderAliasesFromAttributes;
-            }
+        if (\PHP_VERSION_ID >= 80000 && empty($senderAliases)) {
+            $senderAliases = $this->getSendersFromAttributes($envelope);
         }
 
         $senderAliases = array_unique($senderAliases);

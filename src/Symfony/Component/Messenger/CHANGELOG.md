@@ -4,7 +4,7 @@ CHANGELOG
 5.4
 ---
 
-* Add `Transport` attribute to configure message to transport mapping
+ * Add `Transport` attribute to configure message to transport mapping
 
 5.3
 ---

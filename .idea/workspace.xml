@@ -19,7 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="3c97bf04-7c9c-47f1-9f1e-2b1b5b3949f4" name="Default Changelist" comment="" />
+=======
+    <list default="true" id="3c97bf04-7c9c-47f1-9f1e-2b1b5b3949f4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/Symfony/Component/Routing/RouteCompiler.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Symfony/Component/Routing/RouteCompiler.php" afterDir="false" />
+    </list>
+>>>>>>> 09b9c8a5df... replace  by
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,7 +37,10 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+<<<<<<< HEAD
     <option name="UPDATE_TYPE" value="REBASE" />
+=======
+>>>>>>> 09b9c8a5df... replace  by
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -131,13 +140,19 @@
     </include_path>
   </component>
   <component name="ProjectId" id="1rNYAk9LMBnSLSqmwJZMbfNHvK8" />
+<<<<<<< HEAD
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+=======
+>>>>>>> 09b9c8a5df... replace  by
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+<<<<<<< HEAD
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+=======
+>>>>>>> 09b9c8a5df... replace  by
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -154,10 +169,14 @@
       <option name="presentableId" value="Default" />
       <updated>1618817872395</updated>
       <workItem from="1618817873487" duration="1786000" />
+<<<<<<< HEAD
       <workItem from="1620936116001" duration="16253000" />
       <workItem from="1621069760357" duration="635000" />
       <workItem from="1621070414629" duration="5789000" />
       <workItem from="1621090794722" duration="1601000" />
+=======
+      <workItem from="1620936116001" duration="10721000" />
+>>>>>>> 09b9c8a5df... replace  by
     </task>
     <servers />
   </component>
@@ -174,7 +193,10 @@
         </entry>
       </map>
     </option>
+<<<<<<< HEAD
     <option name="oldMeFiltersMigrated" value="true" />
+=======
+>>>>>>> 09b9c8a5df... replace  by
   </component>
   <component name="WindowStateProjectService">
     <state x="2989" y="401" width="412" height="645" key="#com.intellij.ide.util.MemberChooser" timestamp="1620939981299">
@@ -189,6 +211,7 @@
       <screen x="1920" y="0" width="2560" height="1440" />
     </state>
     <state x="2933" y="478" width="524" height="491" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/72.27.1848.1053/1920.0.2560.1440@1920.0.2560.1440" timestamp="1620940045594" />
+<<<<<<< HEAD
     <state x="1920" y="143" width="2560" height="1167" key="MergeDialog" timestamp="1621089115241">
       <screen x="72" y="27" width="4408" height="1413" />
     </state>
@@ -197,10 +220,13 @@
       <screen x="72" y="27" width="4408" height="1413" />
     </state>
     <state x="2831" y="482" width="728" height="482" key="MultipleFileMergeDialog/72.27.4408.1413@72.27.4408.1413" timestamp="1621089115243" />
+=======
+>>>>>>> 09b9c8a5df... replace  by
     <state x="2730" y="439" width="929" height="568" key="NewPhpClassDialog" timestamp="1620940728092">
       <screen x="1920" y="0" width="2560" height="1440" />
     </state>
     <state x="2730" y="439" width="929" height="568" key="NewPhpClassDialog/72.27.1848.1053/1920.0.2560.1440@1920.0.2560.1440" timestamp="1620940728092" />
+<<<<<<< HEAD
     <state x="2689" y="355" width="1022" height="737" key="SettingsEditor" timestamp="1620949708663">
       <screen x="1920" y="0" width="2560" height="1440" />
     </state>
@@ -219,5 +245,15 @@
     <state x="2863" y="329" width="672" height="678" key="search.everywhere.popup/72.27.1848.1053/1920.0.2560.1440@1920.0.2560.1440" timestamp="1621069739270" />
     <state x="753" y="268" width="672" height="496" key="search.everywhere.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1621070746044" />
     <state x="2314" y="247" width="1603" height="666" key="search.everywhere.popup/72.27.4408.1413@72.27.4408.1413" timestamp="1621090474450" />
+=======
+    <state x="2689" y="355" width="1022" height="737" key="SettingsEditor" timestamp="1618817969696">
+      <screen x="1920" y="0" width="2560" height="1440" />
+    </state>
+    <state x="2689" y="355" width="1022" height="737" key="SettingsEditor/72.27.1848.1053/1920.0.2560.1440@1920.0.2560.1440" timestamp="1618817969696" />
+    <state x="2863" y="329" width="672" height="678" key="search.everywhere.popup" timestamp="1620942420211">
+      <screen x="1920" y="0" width="2560" height="1440" />
+    </state>
+    <state x="2863" y="329" width="672" height="678" key="search.everywhere.popup/72.27.1848.1053/1920.0.2560.1440@1920.0.2560.1440" timestamp="1620942420211" />
+>>>>>>> 09b9c8a5df... replace  by
   </component>
 </project>

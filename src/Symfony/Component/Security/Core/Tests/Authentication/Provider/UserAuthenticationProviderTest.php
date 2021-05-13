@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserAuthenticationProviderTest extends TestCase
 {
@@ -58,6 +59,24 @@ class UserAuthenticationProviderTest extends TestCase
                  ->method('retrieveUser')
                  ->willThrowException(new UsernameNotFoundException())
         ;
+
+        $provider->authenticate($this->getSupportedToken());
+    }
+
+    public function testAuthenticateWhenCredentialsAreInvalidAndHideIsTrue()
+    {
+        $provider = $this->getProvider();
+        $provider->expects($this->once())
+            ->method('retrieveUser')
+            ->willReturn($this->createMock(UserInterface::class))
+        ;
+        $provider->expects($this->once())
+            ->method('checkAuthentication')
+            ->willThrowException(new BadCredentialsException())
+        ;
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Bad credentials.');
 
         $provider->authenticate($this->getSupportedToken());
     }

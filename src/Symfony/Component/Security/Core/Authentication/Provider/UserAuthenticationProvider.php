@@ -84,8 +84,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->userChecker->checkPreAuth($user);
             $this->checkAuthentication($user, $token);
             $this->userChecker->checkPostAuth($user);
-        } catch (AccountStatusException $e) {
-            if ($this->hideUserNotFoundExceptions) {
+        } catch (AuthenticationException $e) {
+            if ($this->hideUserNotFoundExceptions && ($e instanceof AccountStatusException || $e instanceof BadCredentialsException)) {
                 throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
 

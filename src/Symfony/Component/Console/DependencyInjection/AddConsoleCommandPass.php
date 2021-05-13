@@ -94,6 +94,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $lazyCommandMap[$commandName] = $id;
             $lazyCommandRefs[$id] = new TypedReference($id, $class);
 
+            foreach ($aliases as $alias) {
+                $lazyCommandMap[$alias] = $id;
+            }
+
             foreach ($tags as $tag) {
                 if (isset($tag['command'])) {
                     $aliases[] = $tag['command'];

@@ -16,13 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Matcher\ExpressionLanguageProvider;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Tests\Fixtures\Matcher\CustomUrlMatcher;
-use Symfony\Component\Routing\Tests\Fixtures\ServiceProvider\ExpressionLanguageServiceProvider;
 
 class UrlMatcherTest extends TestCase
 {

@@ -36,6 +36,7 @@ class SendersLocatorTest extends TestCase
             'interface_attribute_sender' => $sender,
             'message_config_sender' => $sender,
             'interface_config_sender' => $sender,
+            'all_config_sender' => $sender,
         ]);
 
         $locator = new SendersLocator([], $sendersLocator);
@@ -49,18 +50,37 @@ class SendersLocatorTest extends TestCase
             iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
         );
 
-        $locatorWithRouting = new SendersLocator([
+        $locatorWithFullRouting = new SendersLocator([
             DummyMessageWithAttribute::class => ['message_config_sender'],
             DummyMessageWithAttributeAndInterface::class => ['message_config_sender'],
             DummyMessageInterfaceWithAttribute::class => ['interface_config_sender'],
+            '*' => ['all_config_sender'],
         ], $sendersLocator);
         $this->assertSame(
-            ['message_config_sender' => $sender],
-            iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
+            ['message_config_sender' => $sender, 'all_config_sender' => $sender],
+            iterator_to_array($locatorWithFullRouting->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
         );
         $this->assertSame(
-            ['message_config_sender' => $sender, 'interface_config_sender' => $sender],
-            iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
+            ['message_config_sender' => $sender, 'interface_config_sender' => $sender, 'all_config_sender' => $sender],
+            iterator_to_array($locatorWithFullRouting->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
+        );
+
+        $locatorWithClassRouting = new SendersLocator([
+            DummyMessageWithAttributeAndInterface::class => ['message_config_sender'],
+            '*' => ['all_config_sender'],
+        ], $sendersLocator);
+        $this->assertSame(
+            ['message_config_sender' => $sender, 'interface_attribute_sender' => $sender, 'all_config_sender' => $sender],
+            iterator_to_array($locatorWithClassRouting->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
+        );
+
+        $locatorWithInterfaceRouting = new SendersLocator([
+            DummyMessageInterfaceWithAttribute::class => ['interface_config_sender'],
+            '*' => ['all_config_sender'],
+        ], $sendersLocator);
+        $this->assertSame(
+            ['message_attribute_sender' => $sender, 'interface_config_sender' => $sender, 'all_config_sender' => $sender],
+            iterator_to_array($locatorWithInterfaceRouting->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
         );
     }
 

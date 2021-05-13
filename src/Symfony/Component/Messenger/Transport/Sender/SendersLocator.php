@@ -45,13 +45,17 @@ class SendersLocator implements SendersLocatorInterface
         $senderAliases = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
-            foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
-                $senderAliases[] = $senderAlias;
-            }
-        }
+            $typeSenderAliases = [];
 
-        if (\PHP_VERSION_ID >= 80000 && empty($senderAliases)) {
-            $senderAliases = $this->getSendersFromAttributes($envelope);
+            foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
+                $typeSenderAliases[] = $senderAlias;
+            }
+
+            if (\PHP_VERSION_ID >= 80000 && empty($typeSenderAliases)) {
+                $typeSenderAliases = $this->getSendersFromAttributes($type);
+            }
+
+            array_push($senderAliases, ...$typeSenderAliases);
         }
 
         $senderAliases = array_unique($senderAliases);
@@ -69,28 +73,25 @@ class SendersLocator implements SendersLocatorInterface
     /**
      * @return string[]
      */
-    private function getSendersFromAttributes(Envelope $envelope): array
+    private function getSendersFromAttributes(string $type): array
     {
-        $senders = [];
-
-        foreach (HandlersLocator::listTypes($envelope) as $type) {
-            if (class_exists($type) || interface_exists($type)) {
-                try {
-                    $reflectionClass = new \ReflectionClass($type);
-                } catch (\ReflectionException $e) {
-                    continue;
-                }
-
-                $attributes = $reflectionClass->getAttributes(Transport::class);
-
-                foreach ($attributes as $attribute) {
-                    /** @var Transport $attributeInstance */
-                    $attributeInstance = $attribute->newInstance();
-                    $senders[] = $attributeInstance->name;
-                }
-            }
+        if (!class_exists($type) && !interface_exists($type)) {
+            return [];
         }
 
-        return $senders;
+        try {
+            $reflectionClass = new \ReflectionClass($type);
+        } catch (\ReflectionException $e) {
+            return [];
+        }
+
+        $attributes = $reflectionClass->getAttributes(Transport::class);
+
+        return array_map(function (\ReflectionAttribute $attribute): string {
+            /** @var Transport $attributeInstance */
+            $attributeInstance = $attribute->newInstance();
+
+            return $attributeInstance->name;
+        }, $attributes);
     }
 }

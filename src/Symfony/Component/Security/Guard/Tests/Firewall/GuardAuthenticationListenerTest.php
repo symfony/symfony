@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
@@ -257,7 +257,7 @@ class GuardAuthenticationListenerTest extends TestCase
     public function exceptionsToHide()
     {
         return [
-            [new UsernameNotFoundException()],
+            [new UserNotFoundException()],
             [new LockedException()],
         ];
     }

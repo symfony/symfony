@@ -1,10 +1,14 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+* Add `Transport` attribute to configure message to transport mapping
+
 5.3
 ---
 
- * Add `Transport` attribute to configure message to transport mapping
  * Add the `RouterContextMiddleware` to restore the original router context when handling a message
  * `InMemoryTransport` can perform message serialization through dsn `in-memory://?serialize=true`.
  * Added `queues` option to `Worker` to only fetch messages from a specific queue from a receiver implementing `QueueReceiverInterface`.

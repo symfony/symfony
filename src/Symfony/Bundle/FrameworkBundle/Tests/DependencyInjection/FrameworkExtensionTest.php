@@ -18,6 +18,11 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\FooInterface;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\WithAsAlias;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\WithAsAliasDuplicate;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\WithAsAliasMultiple;
+use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\WithAsAliasPublic;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -35,6 +40,7 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -1882,6 +1888,88 @@ abstract class FrameworkExtensionTest extends TestCase
             $transportFactoryName = strtolower($bridgeDirectory->getFilename());
             $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the TransportFactory: "%s" to the $classToServices array in the FrameworkBundleExtension?', $bridgeDirectory->getFilename()));
         }
+    }
+
+    /**
+     * @requires PHP 8
+     *
+     * @dataProvider provideClassesWithAsAliasAttributes
+     */
+    public function testAsAliasAttributesAreResolved(string $class, array $expectedAliases)
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8']);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AttributeAutoconfigurationPass()]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+        $container->registerExtension(new FrameworkExtension());
+        $container->loadFromExtension('framework');
+
+        $container->register($class, $class)->setAutoconfigured(true);
+
+        $container->compile();
+
+        foreach ($expectedAliases as $expectedAlias) {
+            $this->assertTrue($container->hasAlias($expectedAlias['id']));
+            $this->assertSame($expectedAlias['public'], $container->getAlias($expectedAlias['id'])->isPublic());
+        }
+    }
+
+    public function provideClassesWithAsAliasAttributes(): iterable
+    {
+        yield 'Private' => [WithAsAlias::class, [['id' => FooInterface::class, 'public' => false]]];
+        yield 'Public' => [WithAsAliasPublic::class, [['id' => 'some-alias', 'public' => true]]];
+        yield 'Multiple' => [WithAsAliasMultiple::class, [
+            ['id' => FooInterface::class, 'public' => true],
+            ['id' => 'some-alias', 'public' => false],
+        ]];
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAsAliasAttributesAreIgnoredWhenAliasExists()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8']);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AttributeAutoconfigurationPass()]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+        $container->registerExtension(new FrameworkExtension());
+        $container->loadFromExtension('framework');
+
+        $container->setAlias(FooInterface::class, WithAsAliasPublic::class);
+        $container->register(WithAsAlias::class, WithAsAlias::class)->setAutoconfigured(true);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasAlias(FooInterface::class));
+        $this->assertSame(WithAsAliasPublic::class, (string) $container->getAlias(FooInterface::class));
+    }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testAsAliasAttributesAreIgnoredWhenMultipleAttributesExist()
+    {
+        $container = $this->createContainer(['kernel.charset' => 'UTF-8']);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AttributeAutoconfigurationPass()]);
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+        $container->registerExtension(new FrameworkExtension());
+        $container->loadFromExtension('framework');
+
+        $container->register(WithAsAlias::class, WithAsAlias::class)->setAutoconfigured(true);
+        $container->register(WithAsAliasDuplicate::class, WithAsAliasDuplicate::class)->setAutoconfigured(true);
+        $container->register(WithAsAliasMultiple::class, WithAsAliasMultiple::class)->setAutoconfigured(true);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasAlias(FooInterface::class));
     }
 
     protected function createContainer(array $data = [])

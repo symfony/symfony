@@ -45,6 +45,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -554,6 +555,20 @@ class FrameworkExtension extends Extension
         });
         $container->registerAttributeForAutoconfiguration(AsController::class, static function (ChildDefinition $definition, AsController $attribute): void {
             $definition->addTag('controller.service_arguments');
+        });
+        $container->registerAttributeForAutoconfiguration(AsAlias::class, static function (ChildDefinition $definition, AsAlias $attribute, \ReflectionClass $class, string $serviceId, ContainerBuilder $container): void {
+            static $usedAttributeAliases = [];
+
+            $containerHasAlias = $container->hasAlias($alias = $attribute->id);
+
+            // Ignores the attributes if there is already an alias
+            // or if there are two competing attributes
+            if (!$containerHasAlias && !isset($usedAttributeAliases[$alias])) {
+                $usedAttributeAliases[$alias] = true;
+                $container->setAlias($alias, new Alias($serviceId, $attribute->public));
+            } elseif ($containerHasAlias && isset($usedAttributeAliases[$alias])) {
+                $container->removeAlias($alias);
+            }
         });
 
         if (!$container->getParameter('kernel.debug')) {

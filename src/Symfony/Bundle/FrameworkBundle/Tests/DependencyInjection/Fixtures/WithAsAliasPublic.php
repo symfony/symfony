@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
+namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures;
 
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 

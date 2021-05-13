@@ -20,7 +20,7 @@ class AsCommand
     public function __construct(
         public string $name,
         public ?string $description = null,
-        array $aliases = [],
+        public array $aliases = [],
         bool $hidden = false,
     ) {
         if (!$hidden && !$aliases) {

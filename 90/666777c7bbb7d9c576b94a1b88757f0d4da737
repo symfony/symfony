@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2021-05-04T04:55:20Z
+
+I think pluralization could work in this form:
+
+`Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minutės.|Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minučių.|Per daug nepavykusių prisijungimo bandymų, pabandykite dar kartą po %minutes% minučių.`
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2021-05-04T06:42:48Z
+
+@norkunas it would work if I modify translation file to support ICU message format (https://symfony.com/doc/current/translation/message_format.html), but I'm not sure if its a good way as other files are not using icu format.. Maybe @Nyholm could elaborate how to solve this issue..?
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-05-04T06:44:39Z
+
+I looked in https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Validator/Resources/translations/validators.lt.xlf#L27 so I thought it is supported :)
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2021-05-04T07:00:28Z
+
+Hm.. Somehow I thought that this approach is deprecated and no longer works, but looks like it still works, but you have to pass `%count% => (int)` parameter to translator. Anyway, if we want to use this approach, it would require to add `%count%` parameter to https://github.com/symfony/symfony/blob/5.x/src/Symfony/Component/Security/Core/Exception/TooManyLoginAttemptsAuthenticationException.php#L35 , but the pull request is aimed to 4.4 branch which currently does not contain this file. Maybe I should open another PR to add additional parameter?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-07T12:18:22Z
+
+Yes, please sent the PR on 5.2, we should probably keep `%messages%` next to `%count%`.
+
+---------------------------------------------------------------------------
+
+by rmikalkenas at 2021-05-08T09:06:17Z
+
+Opened a separate PR to add `%count%` argument: https://github.com/symfony/symfony/pull/41134
+And updated this PR to support plural translations

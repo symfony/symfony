@@ -25,7 +25,7 @@ if (!class_exists(BaseExpressionLanguage::class)) {
      *
      * @author Fabien Potencier <fabien@symfony.com>
      *
-     * @see ExpressionLanguageServiceProvider
+     * @see ExpressionLanguageProvider
      */
     class ExpressionLanguage extends BaseExpressionLanguage
     {

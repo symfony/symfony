@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -271,7 +271,7 @@ class AuthenticatorManagerTest extends TestCase
 
     public function testAuthenticateRequestHidesInvalidUserExceptions()
     {
-        $invalidUserException = new UsernameNotFoundException();
+        $invalidUserException = new UserNotFoundException();
         $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 

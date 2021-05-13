@@ -78,6 +78,7 @@ class ContainerConfigurator extends AbstractConfigurator
     {
         $clone = clone $this;
         $clone->path = $clone->file = $path;
+        $clone->loader->setCurrentDir(\dirname($path));
 
         return $clone;
     }

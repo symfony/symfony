@@ -124,11 +124,11 @@ class RouteCompiler implements RouteCompilerInterface
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
         preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $important = $match[1][1] >= 0;
-            $varName = $match[2][0];
+            [[$param, $paramPos], $important, [$varName]] = $match;
+            $important = $important[1] >= 0;
             // get all static text preceding the current variable
-            $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
-            $pos = $match[0][1] + \strlen($match[0][0]);
+            $precedingText = substr($pattern, $pos, $paramPos - $pos);
+            $pos = $paramPos + \strlen($param);
 
             if (!\strlen($precedingText)) {
                 $precedingChar = '';

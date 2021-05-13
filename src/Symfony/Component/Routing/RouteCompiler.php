@@ -108,7 +108,7 @@ class RouteCompiler implements RouteCompilerInterface
         $tokens = [];
         $variables = [];
         $matches = [];
-        $pos = 0;
+        $cursor = 0;
         $defaultSeparator = $isHost ? '.' : '/';
         $useUtf8 = preg_match('//u', $pattern);
         $needsUtf8 = $route->getOption('utf8');
@@ -120,15 +120,16 @@ class RouteCompiler implements RouteCompilerInterface
             throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
         }
 
+        $pattern = '/{!r}';
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
         preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);
         foreach ($matches as $match) {
-            [[$param, $paramPos], $important, [$varName]] = $match;
-            $important = $important[1] >= 0;
+            [[$param, $paramPos], $importance, [$varName]] = $match;
+            $important = $importance[1] >= 0;
             // get all static text preceding the current variable
-            $precedingText = substr($pattern, $pos, $paramPos - $pos);
-            $pos = $paramPos + \strlen($param);
+            $precedingText = substr($pattern, $cursor, $paramPos - $cursor);
+            $cursor = $paramPos + \strlen($param);
 
             if (!\strlen($precedingText)) {
                 $precedingChar = '';
@@ -161,7 +162,7 @@ class RouteCompiler implements RouteCompilerInterface
 
             $regexp = $route->getRequirement($varName);
             if (null === $regexp) {
-                $followingPattern = (string) substr($pattern, $pos);
+                $followingPattern = (string) substr($pattern, $cursor);
                 // Find the next static character after the variable that functions as a separator. By default, this separator and '/'
                 // are disallowed for the variable. This default requirement makes sure that optional variables can be matched at all
                 // and that the generating-matching-combination of URLs unambiguous, i.e. the params used for generating the URL are
@@ -205,8 +206,8 @@ class RouteCompiler implements RouteCompilerInterface
             $variables[] = $varName;
         }
 
-        if ($pos < \strlen($pattern)) {
-            $tokens[] = ['text', substr($pattern, $pos)];
+        if ($cursor < \strlen($pattern)) {
+            $tokens[] = ['text', substr($pattern, $cursor)];
         }
 
         // find the first optional token

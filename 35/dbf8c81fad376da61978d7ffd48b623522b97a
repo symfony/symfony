@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-13T07:55:52Z
+
+@nicolas-grekas is this expected behavior of http client?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-13T07:58:53Z
+
+Yes it is: `application/json` is an utf8-only content-type. The API is stupid...
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-05-13T07:59:04Z
+
+> Could you please add a test case to avoid a regression in the future?
+>
+> and maybe check other transports which are using the 'json' key?
+
+Will add a test.
+
+I think this is specific only for slack, as by spec json must be in utf-8 so adding charset everywhere shouldn't be required.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-05-13T08:11:10Z
+
+Fine thank you 👍🏻
+
+---------------------------------------------------------------------------
+
+by norkunas at 2021-05-13T08:18:25Z
+
+> After a test was added
+
+Done ;)

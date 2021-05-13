@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterfaceWithAttribute;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttributeAndInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -30,29 +31,36 @@ class SendersLocatorTest extends TestCase
     {
         $sender = $this->createMock(SenderInterface::class);
         $sendersLocator = $this->createContainer([
-            'my_sender' => $sender,
-            'my_second_sender' => $sender,
-            'my_common_sender' => $sender,
-            'my_merged_sender' => $sender,
+            'message_attribute_sender' => $sender,
+            'message_attribute_sender_2' => $sender,
+            'interface_attribute_sender' => $sender,
+            'message_config_sender' => $sender,
+            'interface_config_sender' => $sender,
         ]);
 
         $locator = new SendersLocator([], $sendersLocator);
         $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
         $this->assertSame(
-            ['my_sender' => $sender, 'my_second_sender' => $sender],
+            ['message_attribute_sender' => $sender, 'message_attribute_sender_2' => $sender],
             iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
         );
         $this->assertSame(
-            ['my_sender' => $sender, 'my_common_sender' => $sender],
+            ['message_attribute_sender' => $sender, 'interface_attribute_sender' => $sender],
             iterator_to_array($locator->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
         );
 
         $locatorWithRouting = new SendersLocator([
-            DummyMessageWithAttribute::class => ['my_merged_sender'],
+            DummyMessageWithAttribute::class => ['message_config_sender'],
+            DummyMessageWithAttributeAndInterface::class => ['message_config_sender'],
+            DummyMessageInterfaceWithAttribute::class => ['interface_config_sender'],
         ], $sendersLocator);
         $this->assertSame(
-            ['my_merged_sender' => $sender],
+            ['message_config_sender' => $sender],
             iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttribute('a'))))
+        );
+        $this->assertSame(
+            ['message_config_sender' => $sender, 'interface_config_sender' => $sender],
+            iterator_to_array($locatorWithRouting->getSenders(new Envelope(new DummyMessageWithAttributeAndInterface('a'))))
         );
     }
 

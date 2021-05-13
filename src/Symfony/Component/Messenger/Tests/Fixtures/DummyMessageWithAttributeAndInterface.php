@@ -4,7 +4,7 @@ namespace Symfony\Component\Messenger\Tests\Fixtures;
 
 use Symfony\Component\Messenger\Attribute\Transport;
 
-#[Transport('my_sender')]
+#[Transport('message_attribute_sender')]
 class DummyMessageWithAttributeAndInterface implements DummyMessageInterfaceWithAttribute
 {
     private $message;

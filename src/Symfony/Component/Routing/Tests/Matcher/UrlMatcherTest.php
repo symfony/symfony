@@ -12,16 +12,48 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\ExpressionLanguageProvider;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Tests\Fixtures\Matcher\CustomUrlMatcher;
+use Symfony\Component\Routing\Tests\Fixtures\ServiceProvider\ExpressionLanguageServiceProvider;
 
 class UrlMatcherTest extends TestCase
 {
+    public function testContext()
+    {
+        $matcher = $this->getUrlMatcher(new RouteCollection());
+
+        $matcher->setContext($requestContext = new RequestContext('bar'));
+        $this->assertSame($requestContext, $matcher->getContext());
+    }
+
+    public function testMatchRequest()
+    {
+        $coll = new RouteCollection();
+        $coll->add('bar', new Route('/foo'));
+        $request = Request::create('http://example.com/foo');
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(["_route" => "bar"], $matcher->matchRequest($request));
+    }
+
+    public function testAddExpressionLanguageProvider()
+    {
+        $serviceProvider = new ExpressionLanguageServiceProvider();
+        $provider = new ExpressionLanguageProvider($serviceProvider);
+
+        $matcher = new CustomUrlMatcher(new RouteCollection(), new RequestContext());
+        $matcher->addExpressionLanguageProvider($provider);
+        $this->assertContains($provider, $matcher->getExpressionLanguageProviders());
+    }
+
     public function testNoMethodSoAllowed()
     {
         $coll = new RouteCollection();

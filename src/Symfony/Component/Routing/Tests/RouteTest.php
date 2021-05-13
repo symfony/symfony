@@ -47,7 +47,6 @@ class RouteTest extends TestCase
         $this->assertEquals('/', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
         $route->setPath('bar');
         $this->assertEquals('/bar', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
-        $this->assertEquals($route, $route->setPath(''), '->setPath() implements a fluent interface');
         $route->setPath('//path');
         $this->assertEquals('/path', $route->getPath(), '->setPath() does not allow two slashes "//" at the beginning of the path as it would be confused with a network path when generating the path from the route');
         $route->setPath('/path/{!foo}');
@@ -67,19 +66,16 @@ class RouteTest extends TestCase
         $this->assertEquals(array_merge([
         'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         ], ['foo' => 'bar']), $route->getOptions(), '->setOptions() sets the options');
-        $this->assertEquals($route, $route->setOptions([]), '->setOptions() implements a fluent interface');
 
         $route->setOptions(['foo' => 'foo']);
         $route->addOptions(['bar' => 'bar']);
-        $this->assertEquals($route, $route->addOptions([]), '->addOptions() implements a fluent interface');
         $this->assertEquals(['foo' => 'foo', 'bar' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'], $route->getOptions(), '->addDefaults() keep previous defaults');
     }
 
     public function testOption()
     {
-        $route = new Route('/{foo}');
-        $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not set');
-        $this->assertEquals($route, $route->setOption('foo', 'bar'), '->setOption() implements a fluent interface');
+        $route = new Route('/{foo}', [], [], ['foo' => 'bar']);
+        $this->assertFalse($route->hasOption('baz'), '->hasOption() return false if option is not set');
         $this->assertEquals('bar', $route->getOption('foo'), '->setOption() sets the option');
         $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
     }
@@ -89,7 +85,6 @@ class RouteTest extends TestCase
         $route = new Route('/{foo}');
         $route->setDefaults(['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $route->getDefaults(), '->setDefaults() sets the defaults');
-        $this->assertEquals($route, $route->setDefaults([]), '->setDefaults() implements a fluent interface');
 
         $route->setDefault('foo', 'bar');
         $this->assertEquals('bar', $route->getDefault('foo'), '->setDefault() sets a default value');
@@ -103,7 +98,6 @@ class RouteTest extends TestCase
 
         $route->setDefaults(['foo' => 'foo']);
         $route->addDefaults(['bar' => 'bar']);
-        $this->assertEquals($route, $route->addDefaults([]), '->addDefaults() implements a fluent interface');
         $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $route->getDefaults(), '->addDefaults() keep previous defaults');
     }
 
@@ -116,11 +110,9 @@ class RouteTest extends TestCase
         $this->assertNull($route->getRequirement('bar'), '->getRequirement() returns null if a requirement is not defined');
         $route->setRequirements(['foo' => '^\d+$']);
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the path');
-        $this->assertEquals($route, $route->setRequirements([]), '->setRequirements() implements a fluent interface');
 
         $route->setRequirements(['foo' => '\d+']);
         $route->addRequirements(['bar' => '\d+']);
-        $this->assertEquals($route, $route->addRequirements([]), '->addRequirements() implements a fluent interface');
         $this->assertEquals(['foo' => '\d+', 'bar' => '\d+'], $route->getRequirements(), '->addRequirement() keep previous requirements');
     }
 
@@ -352,6 +344,23 @@ class RouteTest extends TestCase
         $this->assertNotSame('fr', $expected);
         $route->setRequirement('_locale', 'fr');
         $this->assertSame($expected, $route->getRequirement('_locale'));
+    }
+
+    public function testFluentInterface()
+    {
+        $route = new Route('/');
+
+        $this->assertSame($route, $route->setPath('/bar'));
+        $this->assertSame($route, $route->setHost('www.example.net'));
+        $this->assertSame($route, $route->setMethods('POST'));
+        $this->assertSame($route, $route->setSchemes('https'));
+        $this->assertSame($route, $route->setRequirement('foo', '\d+'));
+        $this->assertSame($route, $route->setRequirements(['foo' => '\d+']));
+        $this->assertSame($route, $route->setDefault('bar', 'foo'));
+        $this->assertSame($route, $route->setDefaults([]));
+        $this->assertSame($route, $route->setCondition('context.getMethod() == "GET"'));
+        $this->assertSame($route, $route->setOption('foo', 'bar'));
+        $this->assertSame($route, $route->setOptions([]));
     }
 
     public function provideNonLocalizedRoutes()

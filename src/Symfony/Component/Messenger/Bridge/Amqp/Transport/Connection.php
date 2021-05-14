@@ -80,7 +80,7 @@ class Connection
     private $queuesOptions;
     private $amqpFactory;
     private $autoSetupExchange;
-    private $autoSetup;
+    private $autoSetupDelayExchange;
 
     /**
      * @var \AMQPChannel|null
@@ -114,7 +114,7 @@ class Connection
                 'queue_name_pattern' => 'delay_%exchange_name%_%routing_key%_%delay%',
             ],
         ], $connectionOptions);
-        $this->autoSetupExchange = $this->autoSetup = $connectionOptions['auto_setup'] ?? true;
+        $this->autoSetupExchange = $this->autoSetupDelayExchange = $connectionOptions['auto_setup'] ?? true;
         $this->exchangeOptions = $exchangeOptions;
         $this->queuesOptions = $queuesOptions;
         $this->amqpFactory = $amqpFactory ?? new AmqpFactory();
@@ -288,14 +288,14 @@ class Connection
     {
         $this->clearWhenDisconnected();
 
+        if ($this->autoSetupExchange) {
+            $this->setupExchangeAndQueues(); // also setup normal exchange for delayed messages so delay queue can DLX messages to it
+        }
+
         if (0 !== $delayInMs) {
             $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
 
             return;
-        }
-
-        if ($this->autoSetupExchange) {
-            $this->setupExchangeAndQueues();
         }
 
         $this->publishOnExchange(
@@ -323,13 +323,14 @@ class Connection
     private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
+        $isRetryAttempt = $amqpStamp ? $amqpStamp->isRetryAttempt() : false;
 
-        $this->setupDelay($delay, $routingKey);
+        $this->setupDelay($delay, $routingKey, $isRetryAttempt);
 
         $this->publishOnExchange(
             $this->getDelayExchange(),
             $body,
-            $this->getRoutingKeyForDelay($delay, $routingKey),
+            $this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt),
             $headers,
             $amqpStamp
         );
@@ -354,15 +355,15 @@ class Connection
         }
     }
 
-    private function setupDelay(int $delay, ?string $routingKey)
+    private function setupDelay(int $delay, ?string $routingKey, bool $isRetryAttempt)
     {
-        if ($this->autoSetup) {
-            $this->setup(); // setup delay exchange and normal exchange for delay queue to DLX messages to
+        if ($this->autoSetupDelayExchange) {
+            $this->setupDelayExchange();
         }
 
-        $queue = $this->createDelayQueue($delay, $routingKey);
+        $queue = $this->createDelayQueue($delay, $routingKey, $isRetryAttempt);
         $queue->declareQueue(); // the delay queue always need to be declared because the name is dynamic and cannot be declared in advance
-        $queue->bind($this->connectionOptions['delay']['exchange_name'], $this->getRoutingKeyForDelay($delay, $routingKey));
+        $queue->bind($this->connectionOptions['delay']['exchange_name'], $this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt));
     }
 
     private function getDelayExchange(): \AMQPExchange
@@ -386,21 +387,19 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay, ?string $routingKey): \AMQPQueue
+    private function createDelayQueue(int $delay, ?string $routingKey, bool $isRetryAttempt): \AMQPQueue
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
-        $queue->setName(str_replace(
-            ['%delay%', '%exchange_name%', '%routing_key%'],
-            [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
-            $this->connectionOptions['delay']['queue_name_pattern']
-        ));
+        $queue->setName($this->getRoutingKeyForDelay($delay, $routingKey, $isRetryAttempt));
         $queue->setFlags(\AMQP_DURABLE);
         $queue->setArguments([
             'x-message-ttl' => $delay,
             // delete the delay queue 10 seconds after the message expires
             // publishing another message redeclares the queue which renews the lease
             'x-expires' => $delay + 10000,
-            'x-dead-letter-exchange' => $this->exchangeOptions['name'],
+            // message should be broadcasted to all consumers during delay, but to only one queue during retry
+            // empty name is default direct exchange
+            'x-dead-letter-exchange' => $isRetryAttempt ? '' : $this->exchangeOptions['name'],
             // after being released from to DLX, make sure the original routing key will be used
             // we must use an empty string instead of null for the argument to be picked up
             'x-dead-letter-routing-key' => $routingKey ?? '',
@@ -409,13 +408,15 @@ class Connection
         return $queue;
     }
 
-    private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey): string
+    private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey, bool $isRetryAttempt): string
     {
+        $action = $isRetryAttempt ? '_retry' : '_delay';
+
         return str_replace(
             ['%delay%', '%exchange_name%', '%routing_key%'],
             [$delay, $this->exchangeOptions['name'], $finalRoutingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
-        );
+        ).$action;
     }
 
     /**
@@ -450,11 +451,8 @@ class Connection
 
     public function setup(): void
     {
-        if ($this->autoSetupExchange) {
-            $this->setupExchangeAndQueues();
-        }
-        $this->getDelayExchange()->declareExchange();
-        $this->autoSetup = false;
+        $this->setupExchangeAndQueues();
+        $this->setupDelayExchange();
     }
 
     private function setupExchangeAndQueues(): void
@@ -468,6 +466,12 @@ class Connection
             }
         }
         $this->autoSetupExchange = false;
+    }
+
+    private function setupDelayExchange(): void
+    {
+        $this->getDelayExchange()->declareExchange();
+        $this->autoSetupDelayExchange = false;
     }
 
     /**

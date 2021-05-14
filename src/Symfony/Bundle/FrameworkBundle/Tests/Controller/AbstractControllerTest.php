@@ -23,6 +23,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -411,6 +412,52 @@ class AbstractControllerTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
+    public function testRenderFormNew()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', ['bar' => $form]);
+
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRenderFormSubmittedAndInvalid()
+    {
+        $formView = new FormView();
+
+        $form = $this->getMockBuilder(FormInterface::class)->getMock();
+        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(false);
+
+        $twig = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->with('foo', ['bar' => $formView])->willReturn('bar');
+
+        $container = new Container();
+        $container->set('twig', $twig);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $response = $controller->renderForm('foo', ['bar' => $form]);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame('bar', $response->getContent());
+    }
+
     public function testStreamTwig()
     {
         $twig = $this->createMock(Environment::class);
@@ -422,72 +469,6 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertInstanceOf(StreamedResponse::class, $controller->stream('foo'));
-    }
-
-    public function testHandleFormNotSubmitted()
-    {
-        $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(false);
-
-        $controller = $this->createController();
-        $response = $controller->handleForm(
-            $form,
-            Request::create('https://example.com'),
-            function (FormInterface $form, $data): Response {
-                return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
-            },
-            function (FormInterface $form, $data): Response {
-                return new Response('rendered');
-            }
-        );
-
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame('rendered', $response->getContent());
-    }
-
-    public function testHandleFormInvalid()
-    {
-        $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(false);
-
-        $controller = $this->createController();
-        $response = $controller->handleForm(
-            $form,
-            Request::create('https://example.com'),
-            function (FormInterface $form): Response {
-                return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
-            },
-            function (FormInterface $form): Response {
-                return new Response('rendered');
-            }
-        );
-
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
-        $this->assertSame('rendered', $response->getContent());
-    }
-
-    public function testHandleFormValid()
-    {
-        $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-
-        $controller = $this->createController();
-        $response = $controller->handleForm(
-            $form,
-            Request::create('https://example.com'),
-            function (FormInterface $form): Response {
-                return new RedirectResponse('https://example.com/redir', Response::HTTP_SEE_OTHER);
-            },
-            function (FormInterface $form): Response {
-                return new Response('rendered');
-            }
-        );
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame(Response::HTTP_SEE_OTHER, $response->getStatusCode());
-        $this->assertSame('https://example.com/redir', $response->getTargetUrl());
     }
 
     public function testRedirectToRoute()

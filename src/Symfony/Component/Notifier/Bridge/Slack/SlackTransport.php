@@ -95,6 +95,9 @@ final class SlackTransport extends AbstractTransport
             throw new TransportException(sprintf('Unable to post the Slack message: "%s".', $result['error']), $response);
         }
 
-        return new SentMessage($message, (string) $this);
+        $sentMessage = new SentMessage($message, (string) $this);
+        $sentMessage->setMessageId($result['ts']);
+
+        return $sentMessage;
     }
 }

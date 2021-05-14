@@ -20,57 +20,21 @@ use Symfony\Component\Notifier\Transport\Dsn;
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [
-        'slack' => [
-            'class' => Bridge\Slack\SlackTransportFactory::class,
-            'package' => 'symfony/slack-notifier',
-        ],
-        'telegram' => [
-            'class' => Bridge\Telegram\TelegramTransportFactory::class,
-            'package' => 'symfony/telegram-notifier',
-        ],
-        'mattermost' => [
-            'class' => Bridge\Mattermost\MattermostTransportFactory::class,
-            'package' => 'symfony/mattermost-notifier',
-        ],
-        'googlechat' => [
-            'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
-            'package' => 'symfony/google-chat-notifier',
-        ],
-        'nexmo' => [
-            'class' => Bridge\Nexmo\NexmoTransportFactory::class,
-            'package' => 'symfony/nexmo-notifier',
-        ],
-        'iqsms' => [
-            'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
-            'package' => 'symfony/iqsms-notifier',
-        ],
-        'rocketchat' => [
-            'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
-            'package' => 'symfony/rocket-chat-notifier',
-        ],
-        'twilio' => [
-            'class' => Bridge\Twilio\TwilioTransportFactory::class,
-            'package' => 'symfony/twilio-notifier',
-        ],
         'allmysms' => [
             'class' => Bridge\AllMySms\AllMySmsTransportFactory::class,
             'package' => 'symfony/allmysms-notifier',
         ],
-        'infobip' => [
-            'class' => Bridge\Infobip\InfobipTransportFactory::class,
-            'package' => 'symfony/infobip-notifier',
+        'clickatell' => [
+            'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
+            'package' => 'symfony/clickatell-notifier',
         ],
-        'firebase' => [
-            'class' => Bridge\Firebase\FirebaseTransportFactory::class,
-            'package' => 'symfony/firebase-notifier',
+        'discord' => [
+            'class' => Bridge\Discord\DiscordTransportFactory::class,
+            'package' => 'symfony/discord-notifier',
         ],
-        'freemobile' => [
-            'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
-            'package' => 'symfony/free-mobile-notifier',
-        ],
-        'spothit' => [
-            'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
-            'package' => 'symfony/spot-hit-notifier',
+        'esendex' => [
+            'class' => Bridge\Esendex\EsendexTransportFactory::class,
+            'package' => 'symfony/esendex-notifier',
         ],
         'fakechat' => [
             'class' => Bridge\FakeChat\FakeChatTransportFactory::class,
@@ -80,77 +44,113 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\FakeSms\FakeSmsTransportFactory::class,
             'package' => 'symfony/fake-sms-notifier',
         ],
-        'ovhcloud' => [
-            'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
-            'package' => 'symfony/ovh-cloud-notifier',
+        'firebase' => [
+            'class' => Bridge\Firebase\FirebaseTransportFactory::class,
+            'package' => 'symfony/firebase-notifier',
         ],
-        'sinch' => [
-            'class' => Bridge\Sinch\SinchTransportFactory::class,
-            'package' => 'symfony/sinch-notifier',
-        ],
-        'zulip' => [
-            'class' => Bridge\Zulip\ZulipTransportFactory::class,
-            'package' => 'symfony/zulip-notifier',
-        ],
-        'smsapi' => [
-            'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
-            'package' => 'symfony/smsapi-notifier',
-        ],
-        'esendex' => [
-            'class' => Bridge\Esendex\EsendexTransportFactory::class,
-            'package' => 'symfony/esendex-notifier',
-        ],
-        'discord' => [
-            'class' => Bridge\Discord\DiscordTransportFactory::class,
-            'package' => 'symfony/discord-notifier',
+        'freemobile' => [
+            'class' => Bridge\FreeMobile\FreeMobileTransportFactory::class,
+            'package' => 'symfony/free-mobile-notifier',
         ],
         'gatewayapi' => [
             'class' => Bridge\GatewayApi\GatewayApiTransportFactory::class,
             'package' => 'symfony/gatewayapi-notifier',
         ],
-        'octopush' => [
-            'class' => Bridge\Octopush\OctopushTransportFactory::class,
-            'package' => 'symfony/octopush-notifier',
-        ],
-        'mercure' => [
-            'class' => Bridge\Mercure\MercureTransportFactory::class,
-            'package' => 'symfony/mercure-notifier',
-        ],
         'gitter' => [
             'class' => Bridge\Gitter\GitterTransportFactory::class,
             'package' => 'symfony/gitter-notifier',
         ],
-        'clickatell' => [
-            'class' => Bridge\Clickatell\ClickatellTransportFactory::class,
-            'package' => 'symfony/clickatell-notifier',
+        'googlechat' => [
+            'class' => Bridge\GoogleChat\GoogleChatTransportFactory::class,
+            'package' => 'symfony/google-chat-notifier',
+        ],
+        'infobip' => [
+            'class' => Bridge\Infobip\InfobipTransportFactory::class,
+            'package' => 'symfony/infobip-notifier',
+        ],
+        'iqsms' => [
+            'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
+            'package' => 'symfony/iqsms-notifier',
         ],
         'lightsms' => [
             'class' => Bridge\LightSms\LightSmsTransportFactory::class,
             'package' => 'symfony/light-sms-notifier',
         ],
-        'microsoftteams' => [
-            'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
-            'package' => 'symfony/microsoft-teams-notifier',
+        'linkedin' => [
+            'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
+            'package' => 'symfony/linked-in-notifier',
         ],
-        'smsbiuras' => [
-            'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
-            'package' => 'symfony/sms-biuras-notifier',
+        'mattermost' => [
+            'class' => Bridge\Mattermost\MattermostTransportFactory::class,
+            'package' => 'symfony/mattermost-notifier',
+        ],
+        'mercure' => [
+            'class' => Bridge\Mercure\MercureTransportFactory::class,
+            'package' => 'symfony/mercure-notifier',
         ],
         'messagebird' => [
             'class' => Bridge\MessageBird\MessageBirdTransportFactory::class,
             'package' => 'symfony/message-bird-notifier',
         ],
+        'microsoftteams' => [
+            'class' => Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory::class,
+            'package' => 'symfony/microsoft-teams-notifier',
+        ],
         'mobyt' => [
             'class' => Bridge\Mobyt\MobytTransportFactory::class,
             'package' => 'symfony/mobyt-notifier',
         ],
-        'linkedin' => [
-            'class' => Bridge\LinkedIn\LinkedInTransportFactory::class,
-            'package' => 'symfony/linked-in-notifier',
+        'nexmo' => [
+            'class' => Bridge\Nexmo\NexmoTransportFactory::class,
+            'package' => 'symfony/nexmo-notifier',
+        ],
+        'octopush' => [
+            'class' => Bridge\Octopush\OctopushTransportFactory::class,
+            'package' => 'symfony/octopush-notifier',
+        ],
+        'ovhcloud' => [
+            'class' => Bridge\OvhCloud\OvhCloudTransportFactory::class,
+            'package' => 'symfony/ovh-cloud-notifier',
+        ],
+        'rocketchat' => [
+            'class' => Bridge\RocketChat\RocketChatTransportFactory::class,
+            'package' => 'symfony/rocket-chat-notifier',
         ],
         'sendinblue' => [
             'class' => Bridge\Sendinblue\SendinblueTransportFactory::class,
             'package' => 'symfony/sendinblue-notifier',
+        ],
+        'sinch' => [
+            'class' => Bridge\Sinch\SinchTransportFactory::class,
+            'package' => 'symfony/sinch-notifier',
+        ],
+        'slack' => [
+            'class' => Bridge\Slack\SlackTransportFactory::class,
+            'package' => 'symfony/slack-notifier',
+        ],
+        'smsapi' => [
+            'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
+            'package' => 'symfony/smsapi-notifier',
+        ],
+        'smsbiuras' => [
+            'class' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
+            'package' => 'symfony/sms-biuras-notifier',
+        ],
+        'spothit' => [
+            'class' => Bridge\SpotHit\SpotHitTransportFactory::class,
+            'package' => 'symfony/spot-hit-notifier',
+        ],
+        'telegram' => [
+            'class' => Bridge\Telegram\TelegramTransportFactory::class,
+            'package' => 'symfony/telegram-notifier',
+        ],
+        'twilio' => [
+            'class' => Bridge\Twilio\TwilioTransportFactory::class,
+            'package' => 'symfony/twilio-notifier',
+        ],
+        'zulip' => [
+            'class' => Bridge\Zulip\ZulipTransportFactory::class,
+            'package' => 'symfony/zulip-notifier',
         ],
     ];
 

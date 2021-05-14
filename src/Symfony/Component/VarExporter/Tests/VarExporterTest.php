@@ -16,6 +16,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
+use Symfony\Component\VarExporter\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\VarExporter\VarExporter;
 
 class VarExporterTest extends TestCase
@@ -209,6 +210,10 @@ class VarExporterTest extends TestCase
         yield ['private-constructor', PrivateConstructor::create('bar')];
 
         yield ['php74-serializable', new Php74Serializable()];
+
+        if (\PHP_VERSION_ID >= 80100) {
+            yield ['unit-enum', [FooUnitEnum::Bar], true];
+        }
     }
 }
 

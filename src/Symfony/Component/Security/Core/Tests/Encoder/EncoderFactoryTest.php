@@ -12,17 +12,20 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\MigratingPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
-use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 
 /**
  * @group legacy
@@ -193,6 +196,28 @@ class EncoderFactoryTest extends TestCase
         $expectedEncoder = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedEncoder->hash('foo', ''), $encoder->hash('foo', ''));
     }
+
+    public function testLegacyPasswordHasher()
+    {
+        $factory = new EncoderFactory([
+            SomeUser::class => new PlaintextPasswordHasher(),
+        ]);
+
+        $encoder = $factory->getEncoder(new SomeUser());
+        self::assertNotInstanceOf(SelfSaltingEncoderInterface::class, $encoder);
+        self::assertSame('foo{bar}', $encoder->encodePassword('foo', 'bar'));
+    }
+
+    public function testPasswordHasher()
+    {
+        $factory = new EncoderFactory([
+            SomeUser::class => new NativePasswordHasher(),
+        ]);
+
+        $encoder = $factory->getEncoder(new SomeUser());
+        self::assertInstanceOf(SelfSaltingEncoderInterface::class, $encoder);
+        self::assertTrue($encoder->isPasswordValid($encoder->encodePassword('foo', null), 'foo', null));
+    }
 }
 
 class SomeUser implements UserInterface
@@ -235,7 +260,6 @@ class EncAwareUser extends SomeUser implements EncoderAwareInterface
         return $this->encoderName;
     }
 }
-
 
 class HasherAwareUser extends SomeUser implements PasswordHasherAwareInterface
 {

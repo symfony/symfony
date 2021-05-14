@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 
 trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use "%s" instead.', EncoderFactory::class, PasswordHasherFactory::class);
@@ -60,7 +62,13 @@ class EncoderFactory implements EncoderFactoryInterface
         }
 
         if (!$this->encoders[$encoderKey] instanceof PasswordEncoderInterface) {
-            $this->encoders[$encoderKey] = $this->createEncoder($this->encoders[$encoderKey]);
+            if ($this->encoders[$encoderKey] instanceof LegacyPasswordHasherInterface) {
+                $this->encoders[$encoderKey] = new LegacyPasswordHasherEncoder($this->encoders[$encoderKey]);
+            } elseif ($this->encoders[$encoderKey] instanceof PasswordHasherInterface) {
+                $this->encoders[$encoderKey] = new PasswordHasherEncoder($this->encoders[$encoderKey]);
+            } else {
+                $this->encoders[$encoderKey] = $this->createEncoder($this->encoders[$encoderKey]);
+            }
         }
 
         return $this->encoders[$encoderKey];

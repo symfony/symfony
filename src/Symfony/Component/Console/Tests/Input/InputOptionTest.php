@@ -164,14 +164,6 @@ class InputOptionTest extends TestCase
         $option->setDefault('default');
     }
 
-    public function testDefaultValueWithValueBooleanMode()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cannot set a default value when using InputOption::VALUE_NEGATABLE mode.');
-        $option = new InputOption('foo', 'f', InputOption::VALUE_NEGATABLE);
-        $option->setDefault('default');
-    }
-
     public function testDefaultValueWithIsArrayMode()
     {
         $this->expectException(\LogicException::class);

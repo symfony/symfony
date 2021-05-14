@@ -40,7 +40,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         if ($withinFirewall) {
             $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
         } else {
-            $this->assertJsonStringEqualsJsonString('{"error":"Username could not be found."}', $client->getResponse()->getContent());
+            $this->assertJsonStringEqualsJsonString('{"error":"Invalid credentials."}', $client->getResponse()->getContent());
         }
     }
 

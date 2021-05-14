@@ -19,8 +19,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
  *
  * @method string hashPassword(PasswordAuthenticatedUserInterface $user, string $plainPassword)    Hashes the plain password for the given user.
- * @method string isPasswordValid(PasswordAuthenticatedUserInterface $user, string $plainPassword) Checks if the plaintext password matches the user's password.
- * @method bool   needsRehash(PasswordAuthenticatedUserInterface $user)                            Checks if the plaintext password matches the user's password.
+ * @method bool   isPasswordValid(PasswordAuthenticatedUserInterface $user, string $plainPassword) Checks if the plaintext password matches the user's password.
+ * @method bool   needsRehash(PasswordAuthenticatedUserInterface $user)                            Checks if an encoded password would benefit from rehashing.
  */
 interface UserPasswordHasherInterface
 {

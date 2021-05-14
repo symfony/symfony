@@ -24,6 +24,9 @@
     "require-dev": {
         "symfony/polyfill-intl-idn": "^1.10"
     },
+    "conflict": {
+        "ext-psr": "<1.1|>=2"
+    },
     "replace": {
         "symfony/cache-contracts": "self.version",
         "symfony/deprecation-contracts": "self.version",

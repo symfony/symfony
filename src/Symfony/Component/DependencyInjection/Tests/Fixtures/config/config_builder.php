@@ -1,7 +1,11 @@
 <?php
 
-use Symfony\Component\DependencyInjection\Tests\Fixtures\AcmeConfigBuilder;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AcmeConfig;
 
-return static function (AcmeConfigBuilder $config) {
+if ('prod' !== $env) {
+    return;
+}
+
+return function (AcmeConfig $config) {
     $config->color('blue');
 };

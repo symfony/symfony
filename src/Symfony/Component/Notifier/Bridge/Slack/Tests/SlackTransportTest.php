@@ -119,7 +119,7 @@ final class SlackTransportTest extends TransportTestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => true]));
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247']));
 
         $expectedBody = json_encode(['channel' => $channel, 'text' => $message]);
 
@@ -131,7 +131,9 @@ final class SlackTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client, $channel);
 
-        $transport->send(new ChatMessage('testMessage'));
+        $sentMessage = $transport->send(new ChatMessage('testMessage'));
+
+        $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
     }
 
     public function testSendWithNotification()
@@ -147,7 +149,7 @@ final class SlackTransportTest extends TransportTestCase
 
         $response->expects($this->once())
             ->method('getContent')
-            ->willReturn(json_encode(['ok' => true]));
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247']));
 
         $notification = new Notification($message);
         $chatMessage = ChatMessage::fromNotification($notification);
@@ -167,7 +169,9 @@ final class SlackTransportTest extends TransportTestCase
 
         $transport = $this->createTransport($client, $channel);
 
-        $transport->send($chatMessage);
+        $sentMessage = $transport->send($chatMessage);
+
+        $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
     }
 
     public function testSendWithInvalidOptions()

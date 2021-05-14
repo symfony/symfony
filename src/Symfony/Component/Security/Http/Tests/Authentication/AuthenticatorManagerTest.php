@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticatorManager;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
@@ -268,6 +269,26 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
+    public function testAuthenticateRequestHidesInvalidUserExceptions()
+    {
+        $invalidUserException = new UserNotFoundException();
+        $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $authenticator->expects($this->any())->method('authenticate')->willThrowException($invalidUserException);
+
+        $authenticator->expects($this->any())
+            ->method('onAuthenticationFailure')
+            ->with($this->equalTo($this->request), $this->callback(function ($e) use ($invalidUserException) {
+                return $e instanceof BadCredentialsException && $invalidUserException === $e->getPrevious();
+            }))
+            ->willReturn($this->response);
+
+        $manager = $this->createManager([$authenticator]);
+        $response = $manager->authenticateRequest($this->request);
+        $this->assertSame($this->response, $response);
+    }
+
     private function createAuthenticator($supports = true)
     {
         $authenticator = $this->createMock(InteractiveAuthenticatorInterface::class);
@@ -278,6 +299,6 @@ class AuthenticatorManagerTest extends TestCase
 
     private function createManager($authenticators, $firewallName = 'main', $eraseCredentials = true, array $requiredBadges = [])
     {
-        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials, $requiredBadges);
+        return new AuthenticatorManager($authenticators, $this->tokenStorage, $this->eventDispatcher, $firewallName, null, $eraseCredentials, true, $requiredBadges);
     }
 }

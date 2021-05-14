@@ -14,7 +14,7 @@ Console
 DoctrineBridge
 --------------
 
- * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()
+ * Deprecate `UserLoaderInterface::loadUserByUsername()` in favor of `UserLoaderInterface::loadUserByIdentifier()`
  * Remove `UuidV*Generator` classes
 
 DomCrawler
@@ -43,6 +43,9 @@ FrameworkBundle
  * Deprecate the `session` service and the `SessionInterface` alias, use the `\Symfony\Component\HttpFoundation\Request::getSession()` or the new `\Symfony\Component\HttpFoundation\RequestStack::getSession()` methods instead
  * Deprecate the `KernelTestCase::$container` property, use `KernelTestCase::getContainer()` instead
  * Rename the container parameter `profiler_listener.only_master_requests` to `profiler_listener.only_main_requests`
+ * Deprecate registering workflow services as public
+ * Deprecate option `--xliff-version` of the `translation:update` command, use e.g. `--format=xlf20` instead
+ * Deprecate option `--output-format` of the `translation:update` command, use e.g. `--format=xlf20` instead
 
 HttpFoundation
 --------------

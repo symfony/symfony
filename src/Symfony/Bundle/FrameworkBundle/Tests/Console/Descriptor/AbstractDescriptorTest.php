@@ -315,7 +315,7 @@ abstract class AbstractDescriptorTest extends TestCase
             foreach ($variations as $suffix => $options) {
                 $file = sprintf('%s_%s.%s', trim($name, '.'), $suffix, $this->getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
-                $data[] = [$object, $description, $options, $file];
+                $data[] = [$object, $description, $options];
             }
         }
 

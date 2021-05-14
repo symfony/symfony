@@ -388,6 +388,33 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals($secure, $definition->getArgument(3)['secure']);
     }
 
+    /**
+     * @dataProvider acceptableIpsProvider
+     */
+    public function testAcceptableAccessControlIps($ips)
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['ips' => $ips, 'path' => '/somewhere', 'roles' => 'IS_AUTHENTICATED_FULLY'],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue(true, 'Ip addresses is successfully consumed: '.(\is_string($ips) ? $ips : json_encode($ips)));
+    }
+
     public function testCustomRememberMeHandler()
     {
         $container = $this->getRawContainer();
@@ -428,6 +455,16 @@ class SecurityExtensionTest extends TestCase
                 true,
             ],
         ];
+    }
+
+    public function acceptableIpsProvider(): iterable
+    {
+        yield [['127.0.0.1']];
+        yield ['127.0.0.1'];
+        yield ['127.0.0.1, 127.0.0.2'];
+        yield ['127.0.0.1/8, 127.0.0.2/16'];
+        yield [['127.0.0.1/8, 127.0.0.2/16']];
+        yield [['127.0.0.1/8', '127.0.0.2/16']];
     }
 
     public function testSwitchUserWithSeveralDefinedProvidersButNoFirewallRootProviderConfigured()

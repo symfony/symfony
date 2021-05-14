@@ -43,7 +43,7 @@ class LazyLoadingValueHolderGenerator extends BaseGenerator
     public function getProxifiedClass(Definition $definition): ?string
     {
         if (!$definition->hasTag('proxy')) {
-            return class_exists($class = $definition->getClass()) || interface_exists($class, false) ? $class : null;
+            return ($class = $definition->getClass()) && (class_exists($class) || interface_exists($class, false)) ? $class : null;
         }
         if (!$definition->isLazy()) {
             throw new \InvalidArgumentException(sprintf('Invalid definition for service of class "%s": setting the "proxy" tag on a service requires it to be "lazy".', $definition->getClass()));

@@ -88,8 +88,13 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        if (!$this->autoload && !class_exists($class = $value->getClass(), false) && !interface_exists($class, false)) {
-            return parent::processValue($value, $isRoot);
+        if (!$this->autoload) {
+            if (!$class = $value->getClass()) {
+                return parent::processValue($value, $isRoot);
+            }
+            if (!class_exists($class, false) && !interface_exists($class, false)) {
+                return parent::processValue($value, $isRoot);
+            }
         }
 
         if (ServiceLocator::class === $value->getClass()) {

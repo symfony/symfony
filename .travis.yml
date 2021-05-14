@@ -15,6 +15,7 @@ addons:
 env:
     global:
         - SYMFONY_VERSION=4.4
+        - SYMFONY_FEATURE_BRANCH=5.x
         - MIN_PHP=7.1.3
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
@@ -201,7 +202,7 @@ install:
 
     - |
       # For the feature-branch, when deps=high, the version before it is checked out and tested with the locally patched components
-      if [[ $deps = high && $TRAVIS_BRANCH = *.x ]]; then
+      if [[ $deps = high && $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH ]]; then
           export FLIP='^'
           export SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -o '/[1-9]\.[0-9].*' | tail -n 1 | sed s/.//) &&
           git fetch --depth=2 origin $SYMFONY_VERSION &&
@@ -211,7 +212,7 @@ install:
 
     - |
       # Skip the phpunit-bridge on bugfix-branches when $deps is empty
-      if [[ ! $deps && ! $TRAVIS_BRANCH = *.x ]]; then
+      if [[ ! $deps && ! $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH ]]; then
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
       fi
 
@@ -263,7 +264,7 @@ install:
               (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
               COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-              if [[ $COMPONENTS && $LEGACY && ! $TRAVIS_BRANCH = *.x && $TRAVIS_PULL_REQUEST != false && $(echo "$SYMFONY_VERSIONS" | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1) = *.x ]]; then
+              if [[ $COMPONENTS && $LEGACY && ! $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH && $TRAVIS_PULL_REQUEST != false && $(echo "$SYMFONY_VERSIONS" | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1) = $SYMFONY_FEATURE_BRANCH ]]; then
                   export FLIP='^'
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"

@@ -216,4 +216,27 @@ final class SlackTransportTest extends TransportTestCase
 
         $transport->send(new ChatMessage('testMessage'));
     }
+
+    public function testSendIncludesContentTypeWithCharset()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247']));
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $this->assertContains('Content-Type: application/json; charset=utf-8', $options['headers']);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client);
+
+        $transport->send(new ChatMessage('testMessage'));
+    }
 }

@@ -84,6 +84,9 @@ final class SlackTransport extends AbstractTransport
         $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/chat.postMessage', [
             'json' => array_filter($options),
             'auth_bearer' => $this->accessToken,
+            'headers' => [
+                'Content-Type' => 'application/json; charset=utf-8',
+            ],
         ]);
 
         if (200 !== $response->getStatusCode()) {

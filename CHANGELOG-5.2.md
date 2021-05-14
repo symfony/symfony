@@ -7,6 +7,37 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.8 (2021-05-12)
+
+ * security #cve-2021-21424 [Security][Guard] Prevent user enumeration (chalasr)
+ * bug #41176 [DependencyInjection] fix dumping service-closure-arguments (nicolas-grekas)
+ * bug #41174 [Console] Fix Windows code page support (orkan)
+ * bug #41173 [Security] Make Login Rate Limiter also case insensitive for non-ascii user identifiers (Seldaek)
+ * bug #41168 WDT: Only load "Sfjs" if it is not present already (weaverryan)
+ * bug #41147 [Inflector][String] wrong plural form of words ending by "pectus" (makraz)
+ * bug #41160 [HttpClient] Don't prepare the request in ScopingHttpClient (nicolas-grekas)
+ * bug #41156 [Security] Make Login Rate Limiter case insensitive (jderusse)
+ * bug #41137 [Security] Reset limiters on successful login (MatTheCat)
+ * bug #40758 [Security] NullToken signature (jderusse)
+ * bug #40763 Fix/Rewrite .gitignore regex builder (mvorisek)
+ * bug #41113 [Console] Fix Windows code page support (orkan)
+ * bug #40902 [Security] Allow ips parameter in access_control to accept comma-separated string (edefimov)
+ * bug #40980 [TwigBridge] Fix HTML for translatable custom-file label in Bootstrap 4 theme (acran)
+ * bug #40955 [Notifier] [Bridge] Fix missed messageId for SendMessage object in slack notifier (WaylandAce)
+ * bug #40943 [PropertyInfo] PhpDocExtractor: Handle "true" and "false" property types (Maciej Zgadzaj)
+ * bug #40759 [Form] Add missing TranslatableMessage support to choice_label option of ChoiceType (alexandre-daubois)
+ * bug #40917 [Config][DependencyInjection] Uniformize trailing slash handling (dunglas)
+ * bug #40699 [PropertyInfo] Make ReflectionExtractor correctly extract nullability (shiftby)
+ * bug #40874 [PropertyInfo] fix attribute namespace with recursive traits (soullivaneuh)
+ * bug #40957 [PhpUnitBridge] Fix tests with ``@doesNotPerformAssertions`` annotations (alexpott)
+ * bug #41099 [Cache] Check if phpredis version is compatible with stream parameter (nicolassing)
+ * bug #40982 [Notifier] Fix return SentMessage then Messenger not used (WaylandAce)
+ * bug #41072 [VarExporter] Add support of PHP enumerations (alexandre-daubois)
+ * bug #41104 Fix return type in isAllowedProperty method on ReflectionExtractor class (Tomanhez)
+ * bug #41078 [Notifier] Make FailoverTransport always pick the first transport (jschaedl)
+ * bug #41105 [Inflector][String] Fixed singularize `edges` > `edge` (ruudk)
+ * bug #41075 [ErrorHandler] Skip "same vendor" ``@method`` deprecations for `Symfony\*` classes unless symfony/symfony is being tested (nicolas-grekas)
+
 * 5.2.7 (2021-05-01)
 
  * bug #41008 [Security] Do not try to rehash null-passwords (tjveldhuizen)

@@ -149,4 +149,21 @@ jobs:
           echo "::endgroup::"
 
       - name: Run tests
-        run: find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel ./phpunit --colors=always --exclude-group tty,benchmark,intl-dat
+        run: |
+          _run_tests() {
+            ok=0
+            echo "::group::$1"
+
+            # Run the tests
+            ./phpunit --colors=always --exclude-group tty,benchmark,intl-dat ./$1 2>&1 || ok=1
+            echo ::endgroup::
+
+            if [ $ok -ne 0 ]; then
+              echo "::error::$1 failed"
+            fi
+
+            return $ok
+          }
+          export -f _run_tests
+
+          find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests

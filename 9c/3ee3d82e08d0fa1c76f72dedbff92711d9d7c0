@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T15:57:44Z
+
+I'm going to change the target branch to 4.4 now. This is the Travis build against 5.x:
+
+https://travis-ci.com/github/symfony/symfony/builds/225946504
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-14T16:33:55Z
+
+Can't we use [the API](https://github.com/symfony/symfony/issues/40887#issuecomment-823899325) instead? One less thing to remember when doing releases would be cool!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T16:43:13Z
+
+> Can't we use [the API](https://github.com/symfony/symfony/issues/40887#issuecomment-823899325) instead? One less thing to remember when doing releases would be cool!
+
+Yes, `https://flex.symfony.com/versions.json` seems to be suitable.
+
+```JSON
+{
+  "lts": "4.4",
+  "stable": "5.2",
+  "next": "5.3",
+  "previous": "5.1",
+  "dev": "5.3",
+  "dev-name": "5.x",
+  "splits": {…}
+}
+```
+
+Right now, the `dev-name` key contains the correct branch. Can I safely assume that after we've created the `5.3`, `5.4` and `6.0` branches and removed `5.x`, this key will point to `5.4`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-14T16:45:20Z
+
+Yes you can, this is already part of the releasing process.!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T16:47:33Z
+
+Either way, I'd like to keep the `SYMFONY_FEATURE_BRANCH` variable. I would just remove the static setting and add a piece of code that fetches its value from the API.
+
+Is there a way we can cache this call in Travis? Or would it be okay to bother the API for every build?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-14T16:53:03Z
+
+No worries bothering the API, it'll handle the load just fine.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T17:53:39Z
+
+The `SYMFONY_FEATURE_BRANCH` variable is now populated from the API. Here's a build of these changes against the 5.x branch. As you can see, the detection works because on the `deps=high` build, the "flip" mechanic is applied.
+
+https://travis-ci.com/github/symfony/symfony/builds/225956783 (#41229)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T22:43:12Z
+
+Okay, let's merge the PR then and see how it performs.

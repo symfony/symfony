@@ -55,7 +55,7 @@ before_install:
       export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       export SYMFONY_DEPRECATIONS_HELPER=max[indirect]=170
-      export SYMFONY_FEATURE_BRANCH=$(php .github/get-feature-branch.php)
+      export SYMFONY_FEATURE_BRANCH=$(curl -s https://flex.symfony.com/versions.json | jq -r '."dev-name"')
 
       nanoseconds () {
           local cmd="date"

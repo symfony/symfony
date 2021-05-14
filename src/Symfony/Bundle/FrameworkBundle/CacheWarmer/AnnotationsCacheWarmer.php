@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -61,7 +62,10 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         }
 
         $annotatedClasses = include $annotatedClassPatterns;
-        $reader = new CachedReader($this->annotationReader, new DoctrineProvider($arrayAdapter), $this->debug);
+        $reader = class_exists(PsrCachedReader::class)
+            ? new PsrCachedReader($this->annotationReader, $arrayAdapter, $this->debug)
+            : new CachedReader($this->annotationReader, new DoctrineProvider($arrayAdapter), $this->debug)
+        ;
 
         foreach ($annotatedClasses as $class) {
             if (null !== $this->excludeRegexp && preg_match($this->excludeRegexp, $class)) {

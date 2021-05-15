@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -23,24 +22,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
-    public function testContext()
-    {
-        $matcher = $this->getUrlMatcher(new RouteCollection());
-
-        $matcher->setContext($requestContext = new RequestContext('bar'));
-        $this->assertSame($requestContext, $matcher->getContext());
-    }
-
-    public function testMatchRequest()
-    {
-        $coll = new RouteCollection();
-        $coll->add('bar', new Route('/foo'));
-        $request = Request::create('http://example.com/foo');
-
-        $matcher = $this->getUrlMatcher($coll);
-        $this->assertEquals(['_route' => 'bar'], $matcher->matchRequest($request));
-    }
-
     public function testNoMethodSoAllowed()
     {
         $coll = new RouteCollection();
@@ -928,7 +909,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => 'BBB'], $matcher->match('/en-en/BBB'));
     }
 
-    public function testTrailingRequirementWithDefaultA()
+    public function testTrailingRequirementWithDefault_A()
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));
@@ -939,7 +920,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/fr-fr/');
     }
 
-    public function testTrailingRequirementWithDefaultB()
+    public function testTrailingRequirementWithDefault_B()
     {
         $coll = new RouteCollection();
         $coll->add('b', new Route('/en-en/{b}', ['b' => 'bbb'], ['b' => '.*']));

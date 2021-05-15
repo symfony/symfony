@@ -120,7 +120,6 @@ class RouteCompiler implements RouteCompilerInterface
             throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
         }
 
-        $pattern = '/{!r}';
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
         preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER);

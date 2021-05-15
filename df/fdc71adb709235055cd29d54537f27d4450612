@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T18:18:22Z
+
+I've added a small hack that makes sure the PHP 8.1 build is always green. At the moment, we know that the testsuite fails on PHP 8.1 and we can monitor the progress from the generated output. We should revert this as soon as the PHP 8.1 build has to pass.
+
+I think this PR is ready now.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-15T08:26:30Z
+
+> It show that we should remove the Serializable interface before 6.0.
+
+We should remove it in 6.0. Right now, we still need it for PHP 7.1 compat.
+
+Our code is fine here. The deprecations that you see are triggered by PHPUnit and will go away as soon as new PHPUnit releases are tagged.
+
+> I see that the tests ran for 3 minutes plus an additional 10 minutes for the Intl component. Not sure why that test is super slow..
+
+No idea either.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-15T08:31:40Z
+
+> Travis is not ready, right?
+
+The PHP binaries we receive on Travis are too outdated to monitor our PHP 8.1 progress. In fact, `nightly` is some 8.0.3-dev build and 8.0 is 8.0.2 (8.0.6 would be current). This is why I'm using GHA for now.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-15T08:36:45Z
+
+I restarted the tests. It was not just a temporary thing. To run Intl component takes about 12 minutes. All other tests complete within 3 minutes (using parallel).
+
+Silly question: Could it be a PHP8.1 thing? Ie, if we temporary change PHP version to 8.0, will the Intl component test still take 10+ minutes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-15T08:50:39Z
+
+>    1x: The Serializable interface is deprecated. Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary)
+>      1x in DebugClassLoader::loadClass from Symfony\Component\ErrorHandler
+
+We might want to improve this deprecation as it should contain the affected class to be actionable.
+Either in ErrorHandler or in php-src. /cc @nikic

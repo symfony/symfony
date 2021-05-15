@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.3
+---
+
+ * Add `translation:pull` and `translation:push` commands to manage translations with third-party providers
+ * Add `TranslatorBagInterface::getCatalogues` method
+ * Add support to load XLIFF string in `XliffFileLoader`
+
 5.2.0
 -----
 

@@ -35,6 +35,7 @@ class AddToList implements ConfigurationInterface
                             ->useAttributeAsKey('message_class')
                             ->prototype('array')
                                 ->performNoDeepMerging()
+                                ->fixXmlConfig('sender')
                                 ->children()
                                     ->arrayNode('senders')
                                         ->requiresAtLeastOneElement()

@@ -385,7 +385,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Register Firewall-specific event dispatcher
         $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
         $container->register($firewallEventDispatcherId, EventDispatcher::class)
-            ->addTag('event_dispatcher.dispatcher');
+            ->addTag('event_dispatcher.dispatcher', ['name' => $firewallEventDispatcherId]);
 
         // Register listeners
         $listeners = [];
@@ -502,7 +502,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ->replaceArgument(0, $authenticators)
                 ->replaceArgument(2, new Reference($firewallEventDispatcherId))
                 ->replaceArgument(3, $id)
-                ->replaceArgument(6, $firewall['required_badges'] ?? [])
+                ->replaceArgument(7, $firewall['required_badges'] ?? [])
                 ->addTag('monolog.logger', ['channel' => 'security'])
             ;
 
@@ -1026,7 +1026,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             foreach ($ips as $ip) {
                 $container->resolveEnvPlaceholders($ip, null, $usedEnvs);
 
-                if (!$usedEnvs && !$this->isValidIp($ip)) {
+                if (!$usedEnvs && !$this->isValidIps($ip)) {
                     throw new \LogicException(sprintf('The given value "%s" in the "security.access_control" config option is not a valid IP address.', $ip));
                 }
 
@@ -1082,6 +1082,25 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
+    private function isValidIps($ips): bool
+    {
+        $ipsList = array_reduce((array) $ips, static function (array $ips, string $ip) {
+            return array_merge($ips, preg_split('/\s*,\s*/', $ip));
+        }, []);
+
+        if (!$ipsList) {
+            return false;
+        }
+
+        foreach ($ipsList as $cidr) {
+            if (!$this->isValidIp($cidr)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function isValidIp(string $cidr): bool

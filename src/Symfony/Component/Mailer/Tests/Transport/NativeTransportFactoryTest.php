@@ -111,7 +111,7 @@ EOT;
     {
         self::$fakeConfiguration = [
             'sendmail_path' => $sendmailPath,
-            'smtp' => $smtp,
+            'SMTP' => $smtp,
             'smtp_port' => $smtpPort,
         ];
 

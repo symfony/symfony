@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -267,6 +268,36 @@ abstract class AbstractController implements ServiceSubscriberInterface
     }
 
     /**
+     * Renders a view and sets the appropriate status code when a form is listed in parameters.
+     *
+     * If an invalid form is found in the list of parameters, a 422 status code is returned.
+     */
+    protected function renderForm(string $view, array $parameters = [], Response $response = null): Response
+    {
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof FormView) {
+                throw new \LogicException(sprintf('Passing a FormView to "%s::renderForm()" is not supported, pass directly the form instead for parameter "%s".', get_debug_type($this), $k));
+            }
+
+            if (!$v instanceof FormInterface) {
+                continue;
+            }
+
+            $parameters[$k] = $v->createView();
+
+            if (200 === $response->getStatusCode() && $v->isSubmitted() && !$v->isValid()) {
+                $response->setStatusCode(422);
+            }
+        }
+
+        return $this->render($view, $parameters, $response);
+    }
+
+    /**
      * Streams a view.
      */
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
@@ -286,35 +317,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
         }
 
         $response->setCallback($callback);
-
-        return $response;
-    }
-
-    /**
-     * Handles a form.
-     *
-     * * if the form is not submitted, $render is called
-     * * if the form is submitted but invalid, $render is called and a 422 HTTP status code is set if the current status hasn't been customized
-     * * if the form is submitted and valid, $onSuccess is called, usually this method saves the data and returns a 303 HTTP redirection
-     *
-     * @param callable(FormInterface, mixed): Response $onSuccess
-     * @param callable(FormInterface, mixed): Response $render
-     */
-    public function handleForm(FormInterface $form, Request $request, callable $onSuccess, callable $render): Response
-    {
-        $form->handleRequest($request);
-
-        $submitted = $form->isSubmitted();
-
-        $data = $form->getData();
-        if ($submitted && $form->isValid()) {
-            return $onSuccess($form, $data);
-        }
-
-        $response = $render($form, $data);
-        if ($submitted && 200 === $response->getStatusCode()) {
-            $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
 
         return $response;
     }

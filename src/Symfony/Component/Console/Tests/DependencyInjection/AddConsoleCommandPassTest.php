@@ -135,7 +135,7 @@ class AddConsoleCommandPassTest extends TestCase
         $commandLocator = $container->getDefinition((string) $commandLoader->getArgument(0));
 
         $this->assertSame(ContainerCommandLoader::class, $commandLoader->getClass());
-        $this->assertSame(['cmdname' => 'with-defaults'], $commandLoader->getArgument(1));
+        $this->assertSame(['cmdname' => 'with-defaults', 'cmdalias' => 'with-defaults'], $commandLoader->getArgument(1));
         $this->assertEquals([['with-defaults' => new ServiceClosureArgument(new Reference('.with-defaults.lazy'))]], $commandLocator->getArguments());
         $this->assertSame([], $container->getParameter('console.command.ids'));
 

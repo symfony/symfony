@@ -234,7 +234,7 @@ class TextDescriptor extends Descriptor
                         if (0 === $key) {
                             $tableRows[] = array_merge([$serviceId], $tagValues, [$definition->getClass()]);
                         } else {
-                            $tableRows[] = array_merge(['  "'], $tagValues, ['']);
+                            $tableRows[] = array_merge([' (same service as previous, another tag)'], $tagValues, ['']);
                         }
                     }
                 } else {

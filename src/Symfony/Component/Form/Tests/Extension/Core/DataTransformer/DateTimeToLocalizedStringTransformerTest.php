@@ -23,6 +23,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
 
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
+    private $defaultLocale;
 
     protected function setUp(): void
     {
@@ -37,6 +38,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '57.1');
 
+        $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('de_AT');
 
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
@@ -47,6 +49,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;
+        \Locale::setDefault($this->defaultLocale);
     }
 
     public function dataProvider()

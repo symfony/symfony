@@ -88,12 +88,12 @@ class SymfonyRuntime extends GenericRuntime
      */
     public function __construct(array $options = [])
     {
-        if (isset($_SERVER['argv']) && !isset($options['env']) && class_exists(ArgvInput::class)) {
+        if (isset($options['env'])) {
+            $_SERVER['APP_ENV'] = $options['env'];
+        } elseif (isset($_SERVER['argv']) && class_exists(ArgvInput::class)) {
             $this->options = $options;
             $this->getInput();
         }
-
-        $_SERVER['APP_ENV'] = $options['env'] ?? $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'dev';
 
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
             (new Dotenv())
@@ -102,6 +102,8 @@ class SymfonyRuntime extends GenericRuntime
                 ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']));
             $options['debug'] ?? $options['debug'] = '1' === $_SERVER['APP_DEBUG'];
             $options['disable_dotenv'] = true;
+        } else {
+            $_SERVER['APP_ENV'] ?? $_SERVER['APP_ENV'] = 'dev';
         }
 
         $options['error_handler'] ?? $options['error_handler'] = SymfonyErrorHandler::class;

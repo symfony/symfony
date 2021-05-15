@@ -31,6 +31,11 @@ class FailoverTransport extends RoundRobinTransport
         return $this->currentTransport;
     }
 
+    protected function getInitialCursor(): int
+    {
+        return 0;
+    }
+
     protected function getNameSymbol(): string
     {
         return '||';

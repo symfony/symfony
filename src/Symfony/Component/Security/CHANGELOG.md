@@ -34,6 +34,7 @@ The CHANGELOG for version 5.4 and newer can be found in the security sub-package
  * Deprecate using `SessionTokenStorage` outside a request context, it will throw a `SessionNotFoundException` in Symfony 6.0
  * Randomize CSRF tokens to harden BREACH attacks
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
+ * Flag `Serializable` implementation of `NullToken` as `@internal` and `@final`
 
 5.2.0
 -----

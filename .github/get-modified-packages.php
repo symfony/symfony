@@ -12,6 +12,11 @@ if (3 > $_SERVER['argc']) {
 $allPackages = json_decode($_SERVER['argv'][1], true, 512, \JSON_THROW_ON_ERROR);
 $modifiedFiles = json_decode($_SERVER['argv'][2], true, 512, \JSON_THROW_ON_ERROR);
 
+// Sort to get the longest name first (match bridge not component)
+usort($allPackages, function($a, $b) {
+    return strlen($b) <=> strlen($a) ?: $a <=> $b;
+});
+
 function isComponentBridge(string $packageDir): bool
 {
     return 0 < preg_match('@Symfony/Component/.*/Bridge/@', $packageDir);

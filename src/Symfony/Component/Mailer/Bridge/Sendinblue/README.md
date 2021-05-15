@@ -34,12 +34,12 @@ $email
 
 This example allow you to set :
 
-*   templateId
-*   params
-*   tags
-*   headers
-    *   sender.ip
-    *   X-Mailin-Custom
+ * templateId
+ * params
+ * tags
+ * headers
+    * sender.ip
+    * X-Mailin-Custom
 
 For more informations, you can refer to [Sendinblue API documentation](https://developers.sendinblue.com/reference#sendtransacemail).
 

@@ -88,7 +88,11 @@ class ReflectionExtractorTest extends TestCase
                 'date',
                 'element',
                 'c',
+                'ct',
+                'cf',
                 'd',
+                'dt',
+                'df',
                 'e',
                 'f',
             ],
@@ -134,7 +138,11 @@ class ReflectionExtractorTest extends TestCase
                 'parentAnnotationNoParent',
                 'date',
                 'c',
+                'ct',
+                'cf',
                 'd',
+                'dt',
+                'df',
                 'e',
                 'f',
             ],
@@ -444,6 +452,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableBoolProp'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))], $this->extractor->getTypes(Php74Dummy::class, 'stringCollection'));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_INT, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableWithDefault'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)], $this->extractor->getTypes(Php74Dummy::class, 'collection'));
     }
 

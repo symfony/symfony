@@ -11,8 +11,8 @@ GITTER_DSN=gitter://TOKEN@default?room_id=ROOM_ID
 ```
 
 where:
-- `TOKEN` is your Gitter token
-- `ROOM_ID` is your Gitter room id
+ - `TOKEN` is your Gitter token
+ - `ROOM_ID` is your Gitter room id
 
 Resources
 ---------

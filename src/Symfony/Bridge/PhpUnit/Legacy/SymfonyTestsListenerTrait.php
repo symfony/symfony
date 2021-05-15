@@ -239,7 +239,7 @@ class SymfonyTestsListenerTrait
                 }
 
                 if ($this->checkNumAssertions) {
-                    $this->checkNumAssertions = $test->getTestResultObject()->isStrictAboutTestsThatDoNotTestAnything() && !$test->doesNotPerformAssertions();
+                    $this->checkNumAssertions = $test->getTestResultObject()->isStrictAboutTestsThatDoNotTestAnything();
                 }
 
                 $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
@@ -268,7 +268,10 @@ class SymfonyTestsListenerTrait
         $groups = Test::getGroups($className, $test->getName(false));
 
         if ($this->checkNumAssertions) {
-            if (!self::$expectedDeprecations && !$test->getNumAssertions() && $test->getTestResultObject()->noneSkipped()) {
+            $assertions = \count(self::$expectedDeprecations) + $test->getNumAssertions();
+            if ($test->doesNotPerformAssertions() && $assertions > 0) {
+                $test->getTestResultObject()->addFailure($test, new RiskyTestError(sprintf('This test is annotated with "@doesNotPerformAssertions", but performed %s assertions', $assertions)), $time);
+            } elseif ($assertions === 0 && $test->getTestResultObject()->noneSkipped()) {
                 $test->getTestResultObject()->addFailure($test, new RiskyTestError('This test did not perform any assertions'), $time);
             }
 

@@ -37,9 +37,12 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 
     protected function getLimiters(Request $request): array
     {
+        $username = $request->attributes->get(Security::LAST_USERNAME);
+        $username = preg_match('//u', $username) ? mb_strtolower($username, 'UTF-8') : strtolower($username);
+
         return [
             $this->globalFactory->create($request->getClientIp()),
-            $this->localFactory->create($request->attributes->get(Security::LAST_USERNAME).'-'.$request->getClientIp()),
+            $this->localFactory->create($username.'-'.$request->getClientIp()),
         ];
     }
 }

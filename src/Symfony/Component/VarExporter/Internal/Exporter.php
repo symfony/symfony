@@ -60,7 +60,7 @@ class Exporter
                     $value = self::prepare($value, $objectsPool, $refsPool, $objectsCount, $valueIsStatic);
                 }
                 goto handle_value;
-            } elseif (!\is_object($value) && !$value instanceof \__PHP_Incomplete_Class) {
+            } elseif (!\is_object($value) || $value instanceof \UnitEnum) {
                 goto handle_value;
             }
 
@@ -188,7 +188,7 @@ class Exporter
     public static function export($value, string $indent = '')
     {
         switch (true) {
-            case \is_int($value) || \is_float($value): return var_export($value, true);
+            case \is_int($value) || \is_float($value) || $value instanceof \UnitEnum: return var_export($value, true);
             case [] === $value: return '[]';
             case false === $value: return 'false';
             case true === $value: return 'true';

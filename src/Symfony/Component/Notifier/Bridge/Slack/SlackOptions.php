@@ -181,4 +181,14 @@ final class SlackOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function threadTs(string $threadTs): self
+    {
+        $this->options['thread_ts'] = $threadTs;
+
+        return $this;
+    }
 }

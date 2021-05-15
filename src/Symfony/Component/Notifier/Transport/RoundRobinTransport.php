@@ -27,7 +27,7 @@ class RoundRobinTransport implements TransportInterface
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;
-    private $cursor = 0;
+    private $cursor = -1;
 
     /**
      * @param TransportInterface[] $transports
@@ -41,9 +41,6 @@ class RoundRobinTransport implements TransportInterface
         $this->transports = $transports;
         $this->deadTransports = new \SplObjectStorage();
         $this->retryPeriod = $retryPeriod;
-        // the cursor initial value is randomized so that
-        // when are not in a daemon, we are still rotating the transports
-        $this->cursor = mt_rand(0, \count($transports) - 1);
     }
 
     public function __toString(): string
@@ -64,6 +61,10 @@ class RoundRobinTransport implements TransportInterface
 
     public function send(MessageInterface $message): SentMessage
     {
+        if (!$this->supports($message)) {
+            throw new LogicException(sprintf('None of the configured Transports of "%s" supports the given message.', static::class));
+        }
+
         while ($transport = $this->getNextTransport($message)) {
             try {
                 return $transport->send($message);
@@ -80,12 +81,17 @@ class RoundRobinTransport implements TransportInterface
      */
     protected function getNextTransport(MessageInterface $message): ?TransportInterface
     {
+        if (-1 === $this->cursor) {
+            $this->cursor = $this->getInitialCursor();
+        }
+
         $cursor = $this->cursor;
         while (true) {
             $transport = $this->transports[$cursor];
 
             if (!$transport->supports($message)) {
                 $cursor = $this->moveCursor($cursor);
+
                 continue;
             }
 
@@ -112,6 +118,13 @@ class RoundRobinTransport implements TransportInterface
     protected function isTransportDead(TransportInterface $transport): bool
     {
         return $this->deadTransports->contains($transport);
+    }
+
+    protected function getInitialCursor(): int
+    {
+        // the cursor initial value is randomized so that
+        // when are not in a daemon, we are still rotating the transports
+        return mt_rand(0, \count($this->transports) - 1);
     }
 
     protected function getNameSymbol(): string

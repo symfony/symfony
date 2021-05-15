@@ -11,11 +11,11 @@ OVHCLOUD_DSN=ovhcloud://APPLICATION_KEY:APPLICATION_SECRET@default?consumer_key=
 ```
 
 where:
-- `APPLICATION_KEY` is your OvhCloud application key
-- `APPLICATION_SECRET` is your OvhCloud application secret
-- `CONSUMER_KEY` is your OvhCloud consumer key
-- `SERVICE_NAME` is your OvhCloud service name
-- `SENDER` is your sender (optional)
+ - `APPLICATION_KEY` is your OvhCloud application key
+ - `APPLICATION_SECRET` is your OvhCloud application secret
+ - `CONSUMER_KEY` is your OvhCloud consumer key
+ - `SERVICE_NAME` is your OvhCloud service name
+ - `SENDER` is your sender (optional)
 
 Resources
 ---------

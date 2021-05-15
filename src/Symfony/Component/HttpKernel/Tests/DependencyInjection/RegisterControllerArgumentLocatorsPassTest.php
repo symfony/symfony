@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -397,6 +398,27 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
         $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
+
+    /**
+     * @requires PHP 8
+     */
+    public function testBindWithTarget()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', WithTarget::class)
+            ->setBindings(['string $someApiKey' => new Reference('the_api_key')])
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+
+        $expected = ['apiKey' => new ServiceClosureArgument(new Reference('the_api_key'))];
+        $this->assertEquals($expected, $locator->getArgument(0));
+    }
 }
 
 class RegisterTestController
@@ -456,5 +478,14 @@ class ArgumentWithoutTypeController
 {
     public function fooAction(string $someArg)
     {
+    }
+}
+
+class WithTarget
+{
+    public function fooAction(
+        #[Target('some.api.key')]
+        string $apiKey
+    ) {
     }
 }

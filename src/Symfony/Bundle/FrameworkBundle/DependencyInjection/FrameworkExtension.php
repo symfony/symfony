@@ -169,6 +169,10 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
+use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
+use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
+use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
@@ -293,20 +297,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$container->hasParameter('debug.file_link_format')) {
-            $links = [
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-                'sublime' => 'subl://open?url=file://%%f&line=%%l',
-                'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
-                'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
-                'vscode' => 'vscode://file/%%f:%%l',
-            ];
-            $ide = $config['ide'];
-            // mark any env vars found in the ide setting as used
-            $container->resolveEnvPlaceholders($ide);
-
-            $container->setParameter('debug.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: ($links[$ide] ?? $ide));
+            $container->setParameter('debug.file_link_format', $config['ide']);
         }
 
         if (!empty($config['test'])) {
@@ -863,6 +854,10 @@ class FrameworkExtension extends Extension
             $workflowDefinition->replaceArgument(1, $markingStoreDefinition ?? null);
             $workflowDefinition->replaceArgument(3, $name);
             $workflowDefinition->replaceArgument(4, $workflow['events_to_dispatch']);
+            $workflowDefinition->addTag('container.private', [
+                'package' => 'symfony/framework-bundle',
+                'version' => '5.3',
+            ]);
 
             // Store to container
             $container->setDefinition($workflowId, $workflowDefinition);
@@ -1218,11 +1213,14 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
             $container->removeDefinition('console.command.translation_update');
+            $container->removeDefinition('console.command.translation_pull');
+            $container->removeDefinition('console.command.translation_push');
 
             return;
         }
 
         $loader->load('translation.php');
+        $loader->load('translation_providers.php');
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);
@@ -1344,6 +1342,51 @@ class FrameworkExtension extends Extension
                     $options,
                 ]);
         }
+
+        $classToServices = [
+            CrowdinProviderFactory::class => 'translation.provider_factory.crowdin',
+            LocoProviderFactory::class => 'translation.provider_factory.loco',
+            LokaliseProviderFactory::class => 'translation.provider_factory.lokalise',
+            PoEditorProviderFactory::class => 'translation.provider_factory.poeditor',
+        ];
+
+        $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];
+
+        foreach ($classToServices as $class => $service) {
+            switch ($package = substr($service, \strlen('translation.provider_factory.'))) {
+                case 'poeditor': $package = 'po-editor'; break;
+            }
+
+            if (!$container->hasDefinition('http_client') || !ContainerBuilder::willBeAvailable(sprintf('symfony/%s-translation-provider', $package), $class, $parentPackages)) {
+                $container->removeDefinition($service);
+            }
+        }
+
+        if (!$config['providers']) {
+            return;
+        }
+
+        foreach ($config['providers'] as $name => $provider) {
+            if (!$config['enabled_locales'] && !$provider['locales']) {
+                throw new LogicException(sprintf('You must specify one of "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" in order to use translation providers.', $name));
+            }
+        }
+
+        $container->getDefinition('console.command.translation_pull')
+            ->replaceArgument(4, array_merge($transPaths, [$config['default_path']]))
+            ->replaceArgument(5, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('console.command.translation_push')
+            ->replaceArgument(2, array_merge($transPaths, [$config['default_path']]))
+            ->replaceArgument(3, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('translation.provider_collection_factory')
+            ->replaceArgument(1, $config['enabled_locales'])
+        ;
+
+        $container->getDefinition('translation.provider_collection')->setArgument(0, $config['providers']);
     }
 
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $propertyInfoEnabled)

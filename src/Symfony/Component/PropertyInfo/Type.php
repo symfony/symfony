@@ -24,6 +24,8 @@ class Type
     public const BUILTIN_TYPE_FLOAT = 'float';
     public const BUILTIN_TYPE_STRING = 'string';
     public const BUILTIN_TYPE_BOOL = 'bool';
+    public const BUILTIN_TYPE_TRUE = 'true';
+    public const BUILTIN_TYPE_FALSE = 'false';
     public const BUILTIN_TYPE_RESOURCE = 'resource';
     public const BUILTIN_TYPE_OBJECT = 'object';
     public const BUILTIN_TYPE_ARRAY = 'array';
@@ -41,6 +43,8 @@ class Type
         self::BUILTIN_TYPE_FLOAT,
         self::BUILTIN_TYPE_STRING,
         self::BUILTIN_TYPE_BOOL,
+        self::BUILTIN_TYPE_TRUE,
+        self::BUILTIN_TYPE_FALSE,
         self::BUILTIN_TYPE_RESOURCE,
         self::BUILTIN_TYPE_OBJECT,
         self::BUILTIN_TYPE_ARRAY,

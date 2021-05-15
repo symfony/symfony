@@ -21,6 +21,7 @@ use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
@@ -757,6 +758,24 @@ class DefaultChoiceListFactoryTest extends TestCase
         );
 
         $this->assertFlatViewWithAttr($view);
+    }
+
+    /**
+     * @requires function Symfony\Component\Translation\TranslatableMessage::__construct
+     */
+    public function testPassTranslatableMessageAsLabelDoesntCastItToString()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj1],
+            static function ($choice, $key, $value) {
+                return new TranslatableMessage('my_message', ['param1' => 'value1']);
+            }
+        );
+
+        $this->assertInstanceOf(TranslatableMessage::class, $view->choices[0]->label);
+        $this->assertEquals('my_message', $view->choices[0]->label->getMessage());
+        $this->assertArrayHasKey('param1', $view->choices[0]->label->getParameters());
     }
 
     public function testCreateViewFlatLabelTranslationParametersAsArray()

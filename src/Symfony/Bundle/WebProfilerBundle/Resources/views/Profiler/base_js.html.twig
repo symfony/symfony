@@ -5,6 +5,7 @@
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
 
+if (typeof Sfjs === 'undefined') {
     Sfjs = (function() {
         "use strict";
 
@@ -37,10 +38,12 @@
             };
         }
 
-        var request = function(url, onSuccess, onError, payload, options) {
+        var request = function(url, onSuccess, onError, payload, options, tries) {
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
             options.maxTries = options.maxTries || 0;
+            tries = tries || 1;
+            var delay = Math.pow(2, tries - 1) * 1000;
             xhr.open(options.method || 'GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onreadystatechange = function(state) {
@@ -51,8 +54,8 @@
                 if (xhr.status == 404 && options.maxTries > 1) {
                     setTimeout(function(){
                         options.maxTries--;
-                        request(url, onSuccess, onError, payload, options);
-                    }, 1000);
+                        request(url, onSuccess, onError, payload, options, tries + 1);
+                    }, delay);
 
                     return null;
                 }
@@ -424,6 +427,10 @@
                     'sfwdt' + token,
                     '{{ url("_wdt", { "token": "xxxxxx" })|escape('js') }}'.replace(/xxxxxx/, newToken),
                     function(xhr, el) {
+                        /* Do nothing in the edge case where the toolbar has already been replaced with a new one */
+                        if (!document.getElementById('sfToolbarMainContent-' + newToken)) {
+                            return;
+                        }
 
                         /* Evaluate in global scope scripts embedded inside the toolbar */
                         var i, scripts = [].slice.call(el.querySelectorAll('script'));
@@ -807,5 +814,5 @@
         Sfjs.createTabs();
         Sfjs.createToggles();
     });
-
+}
 /*]]>*/</script>

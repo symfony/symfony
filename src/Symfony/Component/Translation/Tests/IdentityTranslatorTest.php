@@ -23,6 +23,7 @@ class IdentityTranslatorTest extends TranslatorTest
         parent::setUp();
 
         $this->defaultLocale = \Locale::getDefault();
+        \Locale::setDefault('en');
     }
 
     protected function tearDown(): void

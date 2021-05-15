@@ -66,9 +66,37 @@ class ParentDummy
     }
 
     /**
+     * @return true|null
+     */
+    public function isCt()
+    {
+    }
+
+    /**
+     * @return false|null
+     */
+    public function isCf()
+    {
+    }
+
+    /**
      * @return bool
      */
     public function canD()
+    {
+    }
+
+    /**
+     * @return true
+     */
+    public function canDt()
+    {
+    }
+
+    /**
+     * @return false
+     */
+    public function canDf()
     {
     }
 

@@ -70,6 +70,7 @@ final class SlackOptionsTest extends TestCase
         yield [['unfurl_links' => true]];
         yield [['unfurl_media' => true]];
         yield [['username' => 'baz']];
+        yield [['thread_ts' => '1503435956.000247']];
     }
 
     /**
@@ -111,6 +112,7 @@ final class SlackOptionsTest extends TestCase
         yield ['unfurlLinks', 'unfurl_links', true];
         yield ['unfurlMedia', 'unfurl_media', true];
         yield ['username', 'username', 'baz'];
+        yield ['threadTs', 'thread_ts', '1503435956.000247'];
     }
 
     public function testSetBlock()

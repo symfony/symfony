@@ -59,14 +59,13 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
 
     public function testProcessWithNonPublicService()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "foo" service is private: it cannot have the "container.private" tag.');
-
         $container = new ContainerBuilder();
         $container
             ->register('foo')
             ->addTag('container.private', ['package' => 'foo/bar', 'version' => '1.2']);
 
         (new AliasDeprecatedPublicServicesPass())->process($container);
+
+        $this->assertTrue($container->hasDefinition('foo'));
     }
 }

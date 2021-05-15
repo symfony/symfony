@@ -69,7 +69,7 @@ return static function (ContainerConfigurator $container) {
         ->set('event_dispatcher', EventDispatcher::class)
             ->public()
             ->tag('container.hot_path')
-            ->tag('event_dispatcher.dispatcher')
+            ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
         ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
 

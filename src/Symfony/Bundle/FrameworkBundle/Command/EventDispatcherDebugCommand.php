@@ -123,9 +123,10 @@ EOF
     private function searchForEvent(EventDispatcherInterface $dispatcher, $needle): array
     {
         $output = [];
+        $lcNeedle = strtolower($needle);
         $allEvents = array_keys($dispatcher->getListeners());
         foreach ($allEvents as $event) {
-            if (str_contains($event, $needle)) {
+            if (str_contains(strtolower($event), $lcNeedle)) {
                 $output[] = $event;
             }
         }

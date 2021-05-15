@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "::group::modify composer.json"
           composer remove --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-update psalm/phar phpunit/phpunit php-http/discovery psr/event-dispatcher
+          composer require --no-update psalm/phar phpunit/phpunit:@stable php-http/discovery psr/event-dispatcher
           echo "::endgroup::"
           echo "::group::composer update"
           composer update --no-progress --ansi

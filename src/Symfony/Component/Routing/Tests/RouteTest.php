@@ -74,7 +74,9 @@ class RouteTest extends TestCase
 
     public function testOption()
     {
-        $route = new Route('/{foo}', [], [], ['foo' => 'bar']);
+        $route = new Route('/{foo}');
+        $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not set');
+        $this->assertEquals($route, $route->setOption('foo', 'bar'), '->setOption() implements a fluent interface');
         $this->assertFalse($route->hasOption('baz'), '->hasOption() return false if option is not set');
         $this->assertEquals('bar', $route->getOption('foo'), '->setOption() sets the option');
         $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
@@ -359,7 +361,6 @@ class RouteTest extends TestCase
         $this->assertSame($route, $route->setDefault('bar', 'foo'));
         $this->assertSame($route, $route->setDefaults([]));
         $this->assertSame($route, $route->setCondition('context.getMethod() == "GET"'));
-        $this->assertSame($route, $route->setOption('foo', 'bar'));
         $this->assertSame($route, $route->setOptions([]));
     }
 

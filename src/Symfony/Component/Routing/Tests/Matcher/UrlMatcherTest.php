@@ -23,14 +23,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
-    public function testContext()
-    {
-        $matcher = $this->getUrlMatcher(new RouteCollection());
-
-        $matcher->setContext($requestContext = new RequestContext('bar'));
-        $this->assertSame($requestContext, $matcher->getContext());
-    }
-
     public function testMatchRequest()
     {
         $coll = new RouteCollection();

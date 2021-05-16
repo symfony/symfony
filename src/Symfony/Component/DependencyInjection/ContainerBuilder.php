@@ -52,27 +52,27 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     /**
-     * @var ExtensionInterface[]
+     * @var array<string, ExtensionInterface>
      */
     private $extensions = [];
 
     /**
-     * @var ExtensionInterface[]
+     * @var array<string, ExtensionInterface>
      */
     private $extensionsByNs = [];
 
     /**
-     * @var Definition[]
+     * @var array<string, Definition>
      */
     private $definitions = [];
 
     /**
-     * @var Alias[]
+     * @var array<string, Alias>
      */
     private $aliasDefinitions = [];
 
     /**
-     * @var ResourceInterface[]
+     * @var array<string, ResourceInterface>
      */
     private $resources = [];
 
@@ -220,7 +220,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return ExtensionInterface[] An array of ExtensionInterface
+     * @return array<string, ExtensionInterface> An array of ExtensionInterface
      */
     public function getExtensions()
     {
@@ -270,7 +270,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the resources for this configuration.
      *
-     * @param ResourceInterface[] $resources An array of resources
+     * @param array<string, ResourceInterface> $resources An array of resources
      *
      * @return $this
      */
@@ -885,7 +885,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets all defined aliases.
      *
-     * @return Alias[] An array of aliases
+     * @return array<string, Alias> An array of aliases
      */
     public function getAliases()
     {
@@ -947,7 +947,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the service definitions.
      *
-     * @param Definition[] $definitions An array of service definitions
+     * @param array<string, Definition> $definitions An array of service definitions
      */
     public function addDefinitions(array $definitions)
     {
@@ -959,7 +959,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param Definition[] $definitions An array of service definitions
+     * @param array<string, Definition> $definitions An array of service definitions
      */
     public function setDefinitions(array $definitions)
     {
@@ -970,7 +970,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets all service definitions.
      *
-     * @return Definition[] An array of Definition instances
+     * @return array<string, Definition> An array of Definition instances
      */
     public function getDefinitions()
     {
@@ -1293,7 +1293,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $name
      * @param bool   $throwOnAbstract
      *
-     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays
+     * @return array<string, array> An array of tags with the tagged service as key, holding a list of attribute arrays
      */
     public function findTaggedServiceIds($name, $throwOnAbstract = false)
     {

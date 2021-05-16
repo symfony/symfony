@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-15T18:40:08Z
+
+Thank your for your PR. Two questions:
+* Did you target the 5.x branch on purpose? The PR discription says you wanted to target 4.4.
+* Can we find a PR title that people would want to read in a ChangeLog? 🙂
+
+---------------------------------------------------------------------------
+
+by mvorisek at 2021-05-15T19:01:53Z
+
+@derrabus base changed, it should be 4.4, title also updated
+
+---------------------------------------------------------------------------
+
+by lindelius at 2021-05-16T12:19:24Z
+
+I can confirm that this PR fixes the issue for us, at least. Thanks!

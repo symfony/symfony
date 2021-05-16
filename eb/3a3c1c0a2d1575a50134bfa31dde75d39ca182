@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-16T09:03:17Z
+
+> Maybe worth applying the fabpot patch also?
+
+The Fabbot patch would break the PHP 5 compatibility of the PhpUnitBridge.

@@ -157,7 +157,7 @@ class NodeExtension extends AbstractExtension
     {
         $element = $node->getElement();
 
-        if ($this->hasFlag(self::ELEMENT_NAME_IN_LOWER_CASE)) {
+        if ($element && $this->hasFlag(self::ELEMENT_NAME_IN_LOWER_CASE)) {
             $element = strtolower($element);
         }
 

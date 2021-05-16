@@ -88,10 +88,12 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $serviceMap[$key] = new Reference($type);
             }
 
-            if (false !== $i = strpos($name, '::get')) {
-                $name = lcfirst(substr($name, 5 + $i));
-            } elseif (false !== strpos($name, '::')) {
-                $name = null;
+            if ($name) {
+                if (false !== $i = strpos($name, '::get')) {
+                    $name = lcfirst(substr($name, 5 + $i));
+                } elseif (false !== strpos($name, '::')) {
+                    $name = null;
+                }
             }
 
             if (null !== $name && !$this->container->has($name) && !$this->container->has($type.' $'.$name)) {

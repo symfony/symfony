@@ -30,7 +30,7 @@ class AdapterTest extends LdapTestCase
     {
         $ldap = new Adapter();
 
-        $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", null, LdapInterface::ESCAPE_DN));
+        $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", '', LdapInterface::ESCAPE_DN));
     }
 
     /**

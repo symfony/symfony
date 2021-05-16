@@ -4,7 +4,7 @@ if (!file_exists(__DIR__.'/src')) {
     exit(0);
 }
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRules([
         '@PHP71Migration' => true,
         '@PHPUnit75Migration:risky' => true,
@@ -14,7 +14,7 @@ return PhpCsFixer\Config::create()
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
-        PhpCsFixer\Finder::create()
+        (new PhpCsFixer\Finder())
             ->in(__DIR__.'/src')
             ->append([__FILE__])
             ->notPath('#/Fixtures/#')
@@ -40,4 +40,5 @@ return PhpCsFixer\Config::create()
             // explicit trigger_error tests
             ->notPath('Symfony/Component/ErrorHandler/Tests/DebugClassLoaderTest.php')
     )
+    ->setCacheFile('.php-cs-fixer.cache')
 ;

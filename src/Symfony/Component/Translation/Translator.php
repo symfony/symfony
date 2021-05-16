@@ -446,7 +446,7 @@ EOF
      */
     protected function assertValidLocale(string $locale)
     {
-        if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
+        if (null !== $locale && 1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
     }

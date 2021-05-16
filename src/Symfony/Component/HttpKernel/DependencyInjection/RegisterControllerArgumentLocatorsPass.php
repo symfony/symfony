@@ -131,7 +131,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 $args = [];
                 foreach ($parameters as $p) {
                     /** @var \ReflectionParameter $p */
-                    $type = ltrim($target = ProxyHelper::getTypeHint($r, $p), '\\');
+                    $type = ltrim($target = (string) ProxyHelper::getTypeHint($r, $p), '\\');
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
 
                     if (isset($arguments[$r->name][$p->name])) {

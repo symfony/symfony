@@ -44,7 +44,21 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serverParams = $this->getMockBuilder(ServerParams::class)->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
+        $this->serverParams = new class() extends ServerParams {
+            public $contentLength;
+            public $postMaxSize = '';
+
+            public function getContentLength(): ?int
+            {
+                return $this->contentLength;
+            }
+
+            public function getNormalizedIniPostMaxSize(): string
+            {
+                return $this->postMaxSize;
+            }
+        };
+
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
@@ -310,14 +324,10 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider getPostMaxSizeFixtures
      */
-    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = [])
+    public function testAddFormErrorIfPostMaxSizeExceeded(?int $contentLength, string $iniMax, bool $shouldFail, array $errorParams = [])
     {
-        $this->serverParams->expects($this->once())
-            ->method('getContentLength')
-            ->willReturn($contentLength);
-        $this->serverParams->expects($this->any())
-            ->method('getNormalizedIniPostMaxSize')
-            ->willReturn($iniMax);
+        $this->serverParams->contentLength = $contentLength;
+        $this->serverParams->postMaxSize = $iniMax;
 
         $options = ['post_max_size_message' => 'Max {{ max }}!'];
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);

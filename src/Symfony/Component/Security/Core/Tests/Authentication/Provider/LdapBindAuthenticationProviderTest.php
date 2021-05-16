@@ -71,6 +71,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
             ->method('bind')
             ->willThrowException(new ConnectionException())
         ;
+        $ldap->method('escape')->willReturnArgument(0);
         $userChecker = $this->createMock(UserCheckerInterface::class);
 
         $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
@@ -208,6 +209,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
             ->method('query')
             ->willReturn($query)
         ;
+        $ldap->method('escape')->willReturnArgument(0);
         $userChecker = $this->createMock(UserCheckerInterface::class);
 
         $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap, '{username}', true, 'elsa', 'test1234A$');

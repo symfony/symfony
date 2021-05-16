@@ -212,8 +212,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testValidatesPrivateResponsesCachedOnTheClient()
     {
-        $this->setNextResponse(200, [], '', function ($request, $response) {
-            $etags = preg_split('/\s*,\s*/', $request->headers->get('IF_NONE_MATCH'));
+        $this->setNextResponse(200, [], '', function (Request $request, $response) {
+            $etags = preg_split('/\s*,\s*/', $request->headers->get('IF_NONE_MATCH', ''));
             if ($request->cookies->has('authenticated')) {
                 $response->headers->set('Cache-Control', 'private, no-store');
                 $response->setETag('"private tag"');

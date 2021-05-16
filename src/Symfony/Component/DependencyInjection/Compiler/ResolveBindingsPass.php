@@ -180,7 +180,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 $typeHint = ProxyHelper::getTypeHint($reflectionMethod, $parameter);
                 $name = Target::parseName($parameter);
 
-                if (\array_key_exists($k = ltrim($typeHint, '\\').' $'.$name, $bindings)) {
+                if ($typeHint && \array_key_exists($k = ltrim($typeHint, '\\').' $'.$name, $bindings)) {
                     $arguments[$key] = $this->getBindingValue($bindings[$k]);
 
                     continue;

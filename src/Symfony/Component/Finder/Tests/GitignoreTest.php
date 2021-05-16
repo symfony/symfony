@@ -88,9 +88,9 @@ class GitignoreTest extends TestCase
                 [],
             ],
             [
-                ['/a', 'm/*'],
-                ['a', 'a/b', 'a/b/c', 'm/'],
-                ['aa', 'm', 'b/m', 'b/m/'],
+                ['/a', 'm/*', 'o/**', 'p/**/', 'x**y'],
+                ['a', 'a/b', 'a/b/c', 'm/', 'o/', 'p/', 'xy', 'xuy', 'x/y', 'x/u/y', 'xu/y', 'x/uy', 'xu/uy'],
+                ['aa', 'm', 'b/m', 'b/m/', 'o', 'b/o', 'b/o/', 'p', 'b/p', 'b/p/'],
             ],
             [
                 ['a', '!x'],
@@ -173,8 +173,8 @@ class GitignoreTest extends TestCase
             ],
             [
                 ['dir1/**/dir2/'],
-                ['dir1/dirA/dir2/', 'dir1/dirA/dirB/dir2/'],
-                [],
+                ['dir1/dir2/', 'dir1/dirA/dir2/', 'dir1/dirA/dirB/dir2/'],
+                ['dir1dir2/', 'dir1xdir2/', 'dir1/xdir2/', 'dir1x/dir2/'],
             ],
             [
                 ['dir1/*/dir2/'],
@@ -202,37 +202,22 @@ class GitignoreTest extends TestCase
                 ['a/app/cache/file.txt'],
             ],
             [
-                [
-                    '#IamComment',
-                    '/app/cache/',
-                ],
+                ['#IamComment', '/app/cache/'],
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt'],
                 ['a/app/cache/file.txt', '#IamComment', 'IamComment'],
             ],
             [
-                [
-                    '/app/cache/',
-                    '#LastLineIsComment',
-                ],
+                ['/app/cache/', '#LastLineIsComment'],
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt'],
                 ['a/app/cache/file.txt', '#LastLineIsComment', 'LastLineIsComment'],
             ],
             [
-                [
-                    '/app/cache/',
-                    '\#file.txt',
-                    '#LastLineIsComment',
-                ],
+                ['/app/cache/', '\#file.txt', '#LastLineIsComment'],
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt'],
                 ['a/app/cache/file.txt', '#LastLineIsComment', 'LastLineIsComment'],
             ],
             [
-                [
-                    '/app/cache/',
-                    '\#file.txt',
-                    '#IamComment',
-                    'another_file.txt',
-                ],
+                ['/app/cache/', '\#file.txt', '#IamComment', 'another_file.txt'],
                 ['app/cache/file.txt', 'app/cache/subdir/ile.txt', '#file.txt', 'another_file.txt'],
                 ['a/app/cache/file.txt', 'IamComment', '#IamComment'],
             ],
@@ -279,6 +264,127 @@ class GitignoreTest extends TestCase
                 ],
                 ['example/test', 'example/example.txt2', 'example/packages/foo.yaml'],
                 ['example/example.txt', 'example/packages', 'example/packages/'],
+            ],
+            // based on https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+            [
+                ['**/logs'],
+                ['logs/debug.log', 'logs/monday/foo.bar'],
+                [],
+            ],
+            [
+                ['**/logs/debug.log'],
+                ['logs/debug.log', 'build/logs/debug.log'],
+                ['logs/build/debug.log'],
+            ],
+            [
+                ['*.log'],
+                ['debug.log', 'foo.log', '.log', 'logs/debug.log'],
+                [],
+            ],
+            [
+                [
+                    '*.log',
+                    '!important.log',
+                ],
+                ['debug.log', 'trace.log'],
+                ['important.log', 'logs/important.log'],
+            ],
+            [
+                [
+                    '*.log',
+                    '!important/*.log',
+                    'trace.*',
+                ],
+                ['debug.log', 'important/trace.log'],
+                ['important/debug.log'],
+            ],
+            [
+                ['/debug.log'],
+                ['debug.log'],
+                ['logs/debug.log'],
+            ],
+            [
+                ['debug.log'],
+                ['debug.log', 'logs/debug.log'],
+                [],
+            ],
+            [
+                ['debug?.log'],
+                ['debug0.log', 'debugg.log'],
+                ['debug10.log'],
+            ],
+            [
+                ['debug[0-9].log'],
+                ['debug0.log', 'debug1.log'],
+                ['debug10.log'],
+            ],
+            [
+                ['debug[01].log'],
+                ['debug0.log', 'debug1.log'],
+                ['debug2.log', 'debug01.log'],
+            ],
+            [
+                ['debug[!01].log'],
+                ['debug2.log'],
+                ['debug0.log', 'debug1.log', 'debug01.log'],
+            ],
+            [
+                ['debug[a-z].log'],
+                ['debuga.log', 'debugb.log'],
+                ['debug1.log'],
+            ],
+            [
+                ['logs'],
+                ['logs', 'logs/debug.log', 'logs/latest/foo.bar', 'build/logs', 'build/logs/debug.log'],
+                [],
+            ],
+            [
+                ['logs/'],
+                ['logs/debug.log', 'logs/latest/foo.bar', 'build/logs/foo.bar', 'build/logs/latest/debug.log'],
+                [],
+            ],
+            [
+                [
+                    'logs/',
+                    '!logs/important.log',
+                ],
+                ['logs/debug.log'/* must be pruned on traversal 'logs/important.log'*/],
+                [],
+            ],
+            [
+                ['logs/**/debug.log'],
+                ['logs/debug.log', 'logs/monday/debug.log', 'logs/monday/pm/debug.log'],
+                [],
+            ],
+            [
+                ['logs/*day/debug.log'],
+                ['logs/monday/debug.log', 'logs/tuesday/debug.log'],
+                ['logs/latest/debug.log'],
+            ],
+            [
+                ['logs/debug.log'],
+                ['logs/debug.log'],
+                ['debug.log', 'build/logs/debug.log'],
+            ],
+            [
+                ['*/vendor/*'],
+                ['a/vendor/', 'a/vendor/b', 'a/vendor/b/c'],
+                ['a', 'vendor', 'vendor/', 'a/vendor', 'a/b/vendor', 'a/b/vendor/c'],
+            ],
+            [
+                ['**/vendor/**'],
+                ['vendor/', 'vendor/a', 'vendor/a/b', 'a/b/vendor/c/d'],
+                ['a', 'vendor', 'a/vendor', 'a/b/vendor'],
+            ],
+            [
+                ['***/***/vendor/*****/*****'],
+                ['vendor/', 'vendor/a', 'vendor/a/b', 'a/b/vendor/c/d'],
+                ['a', 'vendor', 'a/vendor', 'a/b/vendor'],
+            ],
+            [
+                ['**vendor**'],
+                ['vendor', 'vendor/', 'vendor/a', 'vendor/a/b', 'a/vendor', 'a/b/vendor', 'a/b/vendor/c/d'],
+                ['a'],
             ],
         ];
 

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T20:15:30Z
+
+cc @alcaeus
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-14T20:17:29Z
+
+The Travis failure is particularly interesting. In debug mode, `PsrCachedReader` seems to behave differently than `CachedReader` does. 👀
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-15T16:09:43Z
+
+Hey!
+
+I think @Korbeil has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2021-05-16T09:07:00Z
+
+He didn't manage that yet, though. He mentioned he has problems that tests discovered new cache having different behaviour.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2021-05-16T12:32:22Z
+
+> He mentioned he has problems that tests discovered new cache having different behaviour.
+
+I'll take the blame for that, since the difference in behaviour comes from doctrine/annotations providing the wrong functionality. They're supposed to have the same behaviour with different cache libraries.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-16T16:53:44Z
+
+The issue ~~should be~~ has been fixed by doctrine/annotations#412.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2021-05-16T19:33:00Z
+
+doctrine/annotations 1.13.1 is released, so feel free to bump 👍
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-16T19:33:20Z
+
+> (but let's release annotations 1.13.1 before merging?)
+
+1.13.1 has been tagged.

@@ -74,10 +74,9 @@ class UnusedTagsPass implements CompilerPassInterface
         'routing.expression_language_provider',
         'routing.loader',
         'routing.route_loader',
-        'security.authenticator.login_linker',
         'security.expression_language_provider',
         'security.remember_me_aware',
-        'security.remember_me_handler',
+        'security.authenticator.login_linker',
         'security.voter',
         'serializer.encoder',
         'serializer.normalizer',
@@ -92,7 +91,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.auto_mapper',
         'validator.constraint_validator',
         'validator.initializer',
-        'workflow.definition',
     ];
 
     public function process(ContainerBuilder $container)

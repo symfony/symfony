@@ -10,9 +10,9 @@
     {% for name, template in templates %}
         {% if block('toolbar', template) is defined %}
             {% with {
-                collector: profile.getcollector(name),
+                collector: profile ? profile.getcollector(name) : null,
                 profiler_url: profiler_url,
-                token: profile.token,
+                token: token ?? (profile ? profile.token : null),
                 name: name,
                 profiler_markup_version: profiler_markup_version,
                 csp_script_nonce: csp_script_nonce,

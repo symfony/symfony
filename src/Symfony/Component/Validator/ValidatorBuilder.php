@@ -13,12 +13,13 @@ namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
+use Symfony\Component\Cache\DoctrineProvider as SymfonyDoctrineProvider;
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -199,19 +200,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
-        if (null === $annotationReader) {
-            if (!class_exists(AnnotationReader::class) || !class_exists(CacheProvider::class)) {
-                throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.');
-            }
-
-            if (class_exists(ArrayAdapter::class)) {
-                $annotationReader = new CachedReader(new AnnotationReader(), new DoctrineProvider(new ArrayAdapter()));
-            } else {
-                $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
-            }
-        }
-
-        $this->annotationReader = $annotationReader;
+        $this->annotationReader = $annotationReader ?? $this->createAnnotationReader();
 
         return $this;
     }
@@ -385,5 +374,40 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
         return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+    }
+
+    private function createAnnotationReader(): Reader
+    {
+        if (!class_exists(AnnotationReader::class)) {
+            throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and symfony/cache to be installed.');
+        }
+
+        // Doctrine Annotation >= 1.13, Symfony Cache
+        if (class_exists(PsrCachedReader::class) && class_exists(ArrayAdapter::class)) {
+            return new PsrCachedReader(new AnnotationReader(), new ArrayAdapter());
+        }
+
+        // Doctrine Annotations < 1.13, Doctrine Cache >= 1.11, Symfony Cache
+        if (class_exists(CachedReader::class) && class_exists(DoctrineProvider::class) && class_exists(ArrayAdapter::class)) {
+            return new CachedReader(new AnnotationReader(), DoctrineProvider::wrap(new ArrayAdapter()));
+        }
+
+        // Doctrine Annotations < 1.13, Doctrine Cache < 1.11, Symfony Cache
+        if (class_exists(CachedReader::class) && !class_exists(DoctrineProvider::class) && class_exists(ArrayAdapter::class)) {
+            return new CachedReader(new AnnotationReader(), new SymfonyDoctrineProvider(new ArrayAdapter()));
+        }
+
+        // Doctrine Annotations < 1.13, Doctrine Cache < 1.11
+        if (class_exists(CachedReader::class) && class_exists(ArrayCache::class)) {
+            return new CachedReader(new AnnotationReader(), new ArrayCache());
+        }
+
+        // Doctrine Annotation >= 1.13, Doctrine Cache >= 2, no Symfony Cache
+        if (class_exists(PsrCachedReader::class)) {
+            throw new LogicException('Enabling annotation based constraint mapping requires the package symfony/cache to be installed.');
+        }
+
+        // Doctrine Annotation (<1.13 || >2), no Doctrine Cache, no Symfony Cache
+        throw new LogicException('Enabling annotation based constraint mapping requires the packages doctrine/annotations (>=1.13) and symfony/cache to be installed.');
     }
 }

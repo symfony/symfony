@@ -44,13 +44,16 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFileExists($cacheFile);
 
         // Assert cache is valid
-        $psr6Cache = new PhpArrayAdapter($cacheFile, new NullAdapter());
-        if (class_exists(PsrCachedReader::class)) {
-            $reader = new PsrCachedReader($this->getReadOnlyReader(), $psr6Cache);
-        } else {
-            $reader = new CachedReader($this->getReadOnlyReader(), new DoctrineProvider($psr6Cache));
-        }
-
+        $reader = class_exists(PsrCachedReader::class)
+            ? new PsrCachedReader(
+                $this->getReadOnlyReader(),
+                new PhpArrayAdapter($cacheFile, new NullAdapter())
+            )
+            : new CachedReader(
+                $this->getReadOnlyReader(),
+                new DoctrineProvider(new PhpArrayAdapter($cacheFile, new NullAdapter()))
+            )
+        ;
         $refClass = new \ReflectionClass($this);
         $reader->getClassAnnotations($refClass);
         $reader->getMethodAnnotations($refClass->getMethod(__FUNCTION__));
@@ -67,13 +70,19 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFileExists($cacheFile);
 
         // Assert cache is valid
-        $psr6Cache = new PhpArrayAdapter($cacheFile, new NullAdapter());
-        if (class_exists(PsrCachedReader::class)) {
-            $reader = new PsrCachedReader($this->getReadOnlyReader(), $psr6Cache);
-        } else {
-            $reader = new CachedReader($this->getReadOnlyReader(), new DoctrineProvider($psr6Cache));
-        }
-
+        $phpArrayAdapter = new PhpArrayAdapter($cacheFile, new NullAdapter());
+        $reader = class_exists(PsrCachedReader::class)
+            ? new PsrCachedReader(
+                $this->getReadOnlyReader(),
+                $phpArrayAdapter,
+                true
+            )
+            : new CachedReader(
+                $this->getReadOnlyReader(),
+                new DoctrineProvider($phpArrayAdapter),
+                true
+            )
+        ;
         $refClass = new \ReflectionClass($this);
         $reader->getClassAnnotations($refClass);
         $reader->getMethodAnnotations($refClass->getMethod(__FUNCTION__));

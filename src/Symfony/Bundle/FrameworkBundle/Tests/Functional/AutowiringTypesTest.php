@@ -34,7 +34,11 @@ class AutowiringTypesTest extends AbstractWebTestCase
         static::bootKernel();
 
         $annotationReader = self::getContainer()->get('test.autowiring_types.autowired_services')->getAnnotationReader();
-        $this->assertInstanceOf(class_exists(PsrCachedReader::class) ? PsrCachedReader::class : CachedReader::class, $annotationReader);
+        if (class_exists(PsrCachedReader::class)) {
+            $this->assertInstanceOf(PsrCachedReader::class, $annotationReader);
+        } else {
+            $this->assertInstanceOf(CachedReader::class, $annotationReader);
+        }
     }
 
     public function testEventDispatcherAutowiring()

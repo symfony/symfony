@@ -47,6 +47,7 @@
         "doctrine/orm": "^2.6.3"
     },
     "conflict": {
+        "doctrine/orm": ">=3",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/form": "<4.4",

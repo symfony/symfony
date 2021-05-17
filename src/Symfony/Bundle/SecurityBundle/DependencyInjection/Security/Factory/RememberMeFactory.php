@@ -104,6 +104,10 @@ class RememberMeFactory implements SecurityFactoryInterface, AuthenticatorFactor
             $loader->load('security_authenticator_remember_me.php');
         }
 
+        if ('auto' === $config['secure']) {
+            $config['secure'] = null;
+        }
+
         // create remember me handler (which manage the remember-me cookies)
         $rememberMeHandlerId = 'security.authenticator.remember_me_handler.'.$firewallName;
         if (isset($config['service']) && isset($config['token_provider'])) {

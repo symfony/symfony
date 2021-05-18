@@ -13,12 +13,20 @@ namespace Symfony\Component\Security\Core\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 class SecurityTest extends TestCase
 {
@@ -33,7 +41,7 @@ class SecurityTest extends TestCase
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
-        $security = new Security($container);
+        $security = new Security([], $container);
         $this->assertSame($token, $security->getToken());
     }
 
@@ -54,7 +62,7 @@ class SecurityTest extends TestCase
 
         $container = $this->createContainer('security.token_storage', $tokenStorage);
 
-        $security = new Security($container);
+        $security = new Security([], $container);
         $this->assertSame($expectedUser, $security->getUser());
     }
 
@@ -81,8 +89,60 @@ class SecurityTest extends TestCase
 
         $container = $this->createContainer('security.authorization_checker', $authorizationChecker);
 
-        $security = new Security($container);
+        $security = new Security([], $container);
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
+    }
+
+    public function testAutoLogin()
+    {
+        $request = new Request();
+        $authenticator = $this->createMock(AuthenticatorInterface::class);
+        $requestStack = $this->createMock(RequestStack::class);
+        $firewallMap = $this->createMock(FirewallMap::class);
+        $firewall = new FirewallConfig('main', 'main');
+        $userAuthenticator = $this->createMock(UserAuthenticatorInterface::class);
+        $user = $this->createMock(UserInterface::class);
+        $userChecker = $this->createMock(UserCheckerInterface::class);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnMap([
+                ['request_stack', $requestStack],
+                ['security.firewall.map', $firewallMap],
+                ['security.user_authenticator', $userAuthenticator],
+                ['security.user_checker', $userChecker],
+            ])
+        ;
+
+        $requestStack
+            ->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request)
+        ;
+
+        $firewallMap
+            ->expects($this->once())
+            ->method('getFirewallConfig')
+            ->willReturn($firewall)
+        ;
+        $userAuthenticator
+            ->expects($this->once())
+            ->method('authenticateUser')
+            ->with($user, $authenticator, $request)
+        ;
+        $userChecker
+            ->expects($this->once())
+            ->method('checkPreAuth')
+            ->with($user)
+        ;
+
+        $security = new Security([
+            'main' => [$authenticator],
+        ], $container);
+
+        $security->autoLogin($user);
     }
 
     private function createContainer($serviceId, $serviceObject)

@@ -42,6 +42,7 @@ use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -293,7 +294,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = $authenticationProviders = $contextRefs = [];
+        $map = $authenticationProviders = $contextRefs = $authenticators = [];
         foreach ($firewalls as $name => $firewall) {
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
                 $customUserChecker = true;
@@ -301,8 +302,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $configId = 'security.firewall.map.config.'.$name;
 
-            [$matcher, $listeners, $exceptionListener, $logoutListener] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+            [$matcher, $listeners, $exceptionListener, $logoutListener, $firewallAuthenticators] = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
+            $authenticators[$name] = array_map(function ($serviceId) {
+                return new Reference($serviceId);
+            }, $firewallAuthenticators);
             $contextId = 'security.firewall.map.context.'.$name;
             $isLazy = !$firewall['stateless'] && (!empty($firewall['anonymous']['lazy']) || $firewall['lazy']);
             $context = new ChildDefinition($isLazy ? 'security.firewall.lazy_context' : 'security.firewall.context');
@@ -317,6 +321,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
         }
+        $container
+            ->getDefinition('security.helper')
+            ->replaceArgument(0, $authenticators)
+        ;
 
         $container->setAlias('security.firewall.context_locator', (string) ServiceLocatorTagPass::register($container, $contextRefs));
 
@@ -362,7 +370,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Security disabled?
         if (false === $firewall['security']) {
-            return [$matcher, [], null, null];
+            return [$matcher, [], null, null, []];
         }
 
         $config->replaceArgument(4, $firewall['stateless']);
@@ -565,7 +573,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, $firewall['switch_user'] ?? null);
 
-        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
+        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null, $firewallAuthenticationProviders];
     }
 
     private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)

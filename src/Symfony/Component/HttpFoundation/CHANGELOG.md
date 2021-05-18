@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Allow setting session options via DSN
+
 5.3
 ---
 

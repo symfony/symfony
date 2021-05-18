@@ -51,7 +51,13 @@ class SessionHandlerFactory
                 $savePath = substr($connection, 7);
 
                 return new StrictSessionHandler(new NativeFileSessionHandler('' === $savePath ? null : $savePath));
+        }
 
+        if ($options = parse_url($connection)) {
+            parse_str($options['query'] ?? '', $options);
+        }
+
+        switch (true) {
             case 0 === strpos($connection, 'redis:'):
             case 0 === strpos($connection, 'rediss:'):
             case 0 === strpos($connection, 'memcached:'):
@@ -61,7 +67,7 @@ class SessionHandlerFactory
                 $handlerClass = 0 === strpos($connection, 'memcached:') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
-                return new $handlerClass($connection);
+                return new $handlerClass($connection, array_intersect_key($options ?: [], ['prefix' => 1, 'ttl' => 1]));
 
             case 0 === strpos($connection, 'pdo_oci://'):
                 if (!class_exists(DriverManager::class)) {
@@ -79,7 +85,7 @@ class SessionHandlerFactory
             case 0 === strpos($connection, 'sqlsrv://'):
             case 0 === strpos($connection, 'sqlite://'):
             case 0 === strpos($connection, 'sqlite3://'):
-                return new PdoSessionHandler($connection);
+                return new PdoSessionHandler($connection, $options ?: []);
         }
 
         throw new \InvalidArgumentException(sprintf('Unsupported Connection: "%s".', $connection));

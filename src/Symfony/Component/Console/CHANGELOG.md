@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+* Added support for console section contents larger than terminal size
+
 4.4.0
 -----
 

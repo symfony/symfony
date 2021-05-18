@@ -15,27 +15,56 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
+use function strlen;
+
+use const PHP_EOL;
+
 /**
  * @author Pierre du Plessis <pdples@gmail.com>
  * @author Gabriel Ostrolucký <gabriel.ostrolucky@gmail.com>
  */
 class ConsoleSectionOutput extends StreamOutput
 {
+    /**
+     * Current contents of this section as array of messages.
+     *
+     * @var string[]
+     */
     private $content = [];
+
+    /**
+     * Number of lines currently occupied by this section.
+     * Can be more then length of content array as a message can span over multiple lines.
+     *
+     * @var int
+     */
     private $lines = 0;
+
+    /**
+     * All sections associated with the current console output.
+     * The array is ordered from bottom-most to top-most section on screen.
+     *
+     * @var self[]
+     */
     private $sections;
+
+    /**
+     * Provides information about the terminal.
+     *
+     * @var Terminal
+     */
     private $terminal;
 
     /**
      * @param resource               $stream
      * @param ConsoleSectionOutput[] $sections
      */
-    public function __construct($stream, array &$sections, int $verbosity, bool $decorated, OutputFormatterInterface $formatter)
+    public function __construct($stream, array &$sections, int $verbosity, bool $decorated, OutputFormatterInterface $formatter, ?Terminal $terminal = null)
     {
         parent::__construct($stream, $verbosity, $decorated, $formatter);
         array_unshift($sections, $this);
         $this->sections = &$sections;
-        $this->terminal = new Terminal();
+        $this->terminal = $terminal ?? new Terminal();
     }
 
     /**
@@ -49,8 +78,10 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
+        $visibleLinesToClear = min($lines ?? $this->lines, $this->getVisibleLines());
+
         if ($lines) {
-            array_splice($this->content, -($lines * 2)); // Multiply lines by 2 to cater for each new line added between content
+            array_splice($this->content, -$lines);
         } else {
             $lines = $this->lines;
             $this->content = [];
@@ -58,18 +89,41 @@ class ConsoleSectionOutput extends StreamOutput
 
         $this->lines -= $lines;
 
-        parent::doWrite($this->popStreamContentUntilCurrentSection($lines), false);
+        if ($visibleLinesToClear > 0) {
+            parent::doWrite($this->popStreamContentUntilCurrentSection($visibleLinesToClear), false);
+        }
     }
 
     /**
      * Overwrites the previous output with a new message.
      *
-     * @param array|string $message
+     * @param string[]|string $message
      */
     public function overwrite($message)
     {
-        $this->clear();
-        $this->writeln($message);
+        if (is_iterable($message)) {
+            $message = implode('', $message);
+        }
+
+        // only overwrite section if it is visible
+        if ($this->getDisplayableLines() > 0) {
+
+            [, $visibleContent, $visibleLines] = $this->divideMessageByDisplayability($message);
+            $visibleContent .= PHP_EOL;
+
+            // only overwrite visible portion if it differs from what is already visible
+            if (substr($this->getContent(), -strlen($visibleContent)) !== $visibleContent) {
+
+                $erasedContent = $this->popStreamContentUntilCurrentSection(max($visibleLines, $this->getVisibleLines()));
+
+                parent::doWrite($visibleContent, false);
+                parent::doWrite($erasedContent, false);
+            }
+        }
+
+        $this->content = [];
+        $this->lines = 0;
+        $this->addContent($message);
     }
 
     public function getContent(): string
@@ -78,14 +132,15 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
+     * Register content to the section that is e.g. back-printed to the terminal on user-input.
+     *
      * @internal
      */
     public function addContent(string $input)
     {
-        foreach (explode(\PHP_EOL, $input) as $lineContent) {
-            $this->lines += ceil($this->getDisplayLength($lineContent) / $this->terminal->getWidth()) ?: 1;
-            $this->content[] = $lineContent;
-            $this->content[] = \PHP_EOL;
+        foreach (explode(PHP_EOL, $input) as $lineContent) {
+            $this->lines += $this->getDisplayHeight($lineContent);
+            $this->content[] = $lineContent. PHP_EOL;
         }
     }
 
@@ -100,12 +155,26 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
-        $erasedContent = $this->popStreamContentUntilCurrentSection();
+        $isLastSection = $this === $this->sections[0];
+
+        // only write anything to the terminal if it is visible
+        if (!$isLastSection && $this->getDisplayableLines() > 0) {
+
+            $erasedContent = $this->popStreamContentUntilCurrentSection();
+
+            $newSectionContent = $this->getContent() . $message;
+            [, $visibleContent] = $this->divideMessageByDisplayability($newSectionContent);
+
+            parent::doWrite($visibleContent, true);
+            parent::doWrite($erasedContent, false);
+        }
 
         $this->addContent($message);
 
-        parent::doWrite($message, true);
-        parent::doWrite($erasedContent, false);
+        // just append to the terminal
+        if ($isLastSection) {
+            parent::doWrite($message, true);
+        }
     }
 
     /**
@@ -136,8 +205,73 @@ class ConsoleSectionOutput extends StreamOutput
         return implode('', array_reverse($erasedContent));
     }
 
+    /**
+     * Divides the given message into two parts based on their visibility on the terminal when using as section content.
+     *
+     * The returned array has three items:
+     * [0] (string) Portion of the text above the terminal
+     * [1] (string) Portion of text on the terminal
+     * [2] (int) Number of lines the visible portion of the text takes
+     */
+    private function divideMessageByDisplayability(string $text): array
+    {
+        $portion1 = '';
+        $portion2 = $text;
+        $portion2Height = $this->getDisplayHeight($portion2);
+        $verticalSpace = $this->getDisplayableLines();
+
+        // todo: can probably be implemented more efficiently (probably logarithmic in text length instead of linear)
+        while ($portion2 !== '' && $portion2Height > $verticalSpace) {
+            $portion1 .= substr($portion2, 0, 1);
+            $portion2 = substr($portion2, 1);
+            $portion2Height = $this->getDisplayHeight($portion2);
+        }
+
+        return [
+            $portion1,
+            $portion2,
+            $portion2Height,
+        ];
+    }
+
+    private function getDisplayHeight(string $text): int
+    {
+        return substr_count($text, PHP_EOL) + ceil($this->getDisplayLength($text) / $this->terminal->getWidth(true)) ?: 1;
+    }
+
     private function getDisplayLength(string $text): string
     {
         return Helper::strlenWithoutDecoration($this->getFormatter(), str_replace("\t", '        ', $text));
+    }
+
+    /**
+     * Returns the number of lines of this section that are visible with the current terminal size.
+     *
+     * @return int
+     */
+    private function getVisibleLines(): int
+    {
+        return min($this->getDisplayableLines(), $this->lines);
+    }
+
+    /**
+     * Returns the number of lines that this section can use with the current terminal size.
+     *
+     * @return int
+     */
+    private function getDisplayableLines(): int
+    {
+        $remainingHeight = $this->terminal->getHeight(true);
+
+        foreach ($this->sections as $section) {
+
+            if ($section === $this || $remainingHeight <= 0) {
+                break;
+            }
+
+            $remainingHeight -= $section->lines;
+        }
+
+        return max($remainingHeight, 0);
     }
 }

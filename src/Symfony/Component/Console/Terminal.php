@@ -20,16 +20,17 @@ class Terminal
     /**
      * Gets the terminal width.
      *
+     * @param bool $forceRefresh
      * @return int
      */
-    public function getWidth()
+    public function getWidth(bool $forceRefresh = false)
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
             return (int) trim($width);
         }
 
-        if (null === self::$width) {
+        if ($forceRefresh || null === self::$width) {
             self::initDimensions();
         }
 
@@ -39,16 +40,17 @@ class Terminal
     /**
      * Gets the terminal height.
      *
+     * @param bool $forceRefresh
      * @return int
      */
-    public function getHeight()
+    public function getHeight(bool $forceRefresh = false)
     {
         $height = getenv('LINES');
         if (false !== $height) {
             return (int) trim($height);
         }
 
-        if (null === self::$height) {
+        if ($forceRefresh || null === self::$height) {
             self::initDimensions();
         }
 

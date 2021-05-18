@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-09T14:54:49Z
+
+Thanks for the PR.
+I think this first has to be a bugfix for 5.2.
+
+As you pointed out, this info is only relevant when the new authenticator system is not in use.
+Could you update your patch to remove it only if `enable_authenticator_manager` is `true`? And revert the removal of `FirewallConfig::allowsAnonymous()`, as it will need to be deprecated first when the old system will been removed (in 6.x).
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2021-05-09T23:12:20Z
+
+Thanks @chalasr for the feedback, Yes I'll do :+1:

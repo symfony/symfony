@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "async-aws/core": "^1.5",
         "async-aws/sqs": "^1.0",
         "symfony/messenger": "^4.3|^5.0",

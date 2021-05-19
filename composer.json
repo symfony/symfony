@@ -32,7 +32,7 @@
         "symfony/translation-implementation": "2.3"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "ext-xml": "*",
         "friendsofphp/proxy-manager-lts": "^1.0.2",
         "doctrine/event-manager": "~1.0",
@@ -50,8 +50,6 @@
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-intl-normalizer": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.15",
         "symfony/polyfill-uuid": "^1.15",
         "symfony/runtime": "self.version"
     },

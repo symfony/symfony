@@ -21,12 +21,10 @@
         "symfony/http-client-implementation": "2.4"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "psr/log": "^1.0",
         "symfony/deprecation-contracts": "^2.1",
         "symfony/http-client-contracts": "^2.4",
-        "symfony/polyfill-php73": "^1.11",
-        "symfony/polyfill-php80": "^1.15",
         "symfony/service-contracts": "^1.0|^2"
     },
     "require-dev": {

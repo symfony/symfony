@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "ext-xml": "*",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/twig-bridge": "^4.4|^5.0",

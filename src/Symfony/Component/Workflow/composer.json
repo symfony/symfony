@@ -20,8 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/polyfill-php80": "^1.15"
+        "php": ">=8.0.2"
     },
     "require-dev": {
         "psr/log": "~1.0",

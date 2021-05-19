@@ -15,9 +15,8 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "composer-plugin-api": "^1.0|^2.0",
-        "symfony/polyfill-php80": "^1.15"
+        "php": ">=8.0.2",
+        "composer-plugin-api": "^1.0|^2.0"
     },
     "require-dev": {
         "composer/composer": "^1.0.2|^2.0",

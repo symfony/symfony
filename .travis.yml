@@ -14,16 +14,16 @@ addons:
 
 env:
     global:
-        - SYMFONY_VERSION=5.x
-        - MIN_PHP=7.2.5
+        - SYMFONY_VERSION=5.4
+        - MIN_PHP=8.0.2
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
         - SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE=1
 
 matrix:
     include:
-        - php: 7.2
-          env: php_extra="7.3 8.0"
-        - php: 7.4
+        - php: 8.0
+          env: php_extra=""
+        - php: 8.0
           env: deps=high
         - php: 8.0
           env: deps=low
@@ -219,7 +219,7 @@ install:
     - |
       # Install symfony/flex
       if [[ $deps = low ]]; then
-          export SYMFONY_REQUIRE='>=3.4'
+          export SYMFONY_REQUIRE='>=4.4'
       else
           export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
       fi

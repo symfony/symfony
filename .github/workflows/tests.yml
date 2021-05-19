@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.2', '7.4']
+        php: ['8.0']
 
     services:
       postgres:
@@ -216,8 +216,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "::group::fake PHP version"
-          composer config platform.php 8.0.99
           echo "::group::composer update"
           composer update --no-progress --ansi
           echo "::endgroup::"

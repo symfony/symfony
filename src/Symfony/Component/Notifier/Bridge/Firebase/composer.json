@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "symfony/http-client": "^4.3|^5.0",
         "symfony/notifier": "^5.3"
     },

@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0.2",
         "symfony/config": "^5.3",
         "symfony/http-client": "^5.3",
         "symfony/translation": "^5.3"

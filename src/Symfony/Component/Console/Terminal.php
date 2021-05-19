@@ -20,18 +20,17 @@ class Terminal
     /**
      * Gets the terminal width.
      *
-     * @param bool $forceRefresh
      * @return int
      */
-    public function getWidth(bool $forceRefresh = false)
+    public function getWidth()
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
             return (int) trim($width);
         }
 
-        if ($forceRefresh || null === self::$width) {
-            self::initDimensions();
+        if (null === self::$width) {
+            self::updateDimensions();
         }
 
         return self::$width ?: 80;
@@ -40,18 +39,17 @@ class Terminal
     /**
      * Gets the terminal height.
      *
-     * @param bool $forceRefresh
      * @return int
      */
-    public function getHeight(bool $forceRefresh = false)
+    public function getHeight()
     {
         $height = getenv('LINES');
         if (false !== $height) {
             return (int) trim($height);
         }
 
-        if ($forceRefresh || null === self::$height) {
-            self::initDimensions();
+        if (null === self::$height) {
+            self::updateDimensions();
         }
 
         return self::$height ?: 50;
@@ -78,7 +76,10 @@ class Terminal
         return self::$stty = 0 === $exitcode;
     }
 
-    private static function initDimensions()
+    /**
+     * @internal
+     */
+    public static function updateDimensions()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {

@@ -78,6 +78,8 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
+        Terminal::updateDimensions();
+
         $visibleLinesToClear = min($lines ?? $this->lines, $this->getVisibleLines());
 
         if ($lines) {
@@ -104,6 +106,8 @@ class ConsoleSectionOutput extends StreamOutput
         if (is_iterable($message)) {
             $message = implode('', $message);
         }
+
+        Terminal::updateDimensions();
 
         // only overwrite section if it is visible
         if ($this->getDisplayableLines() > 0) {
@@ -154,6 +158,8 @@ class ConsoleSectionOutput extends StreamOutput
 
             return;
         }
+
+        Terminal::updateDimensions();
 
         $isLastSection = $this === $this->sections[0];
 
@@ -236,7 +242,7 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayHeight(string $text): int
     {
-        return substr_count($text, PHP_EOL) + ceil($this->getDisplayLength($text) / $this->terminal->getWidth(true)) ?: 1;
+        return substr_count($text, PHP_EOL) + ceil($this->getDisplayLength($text) / $this->terminal->getWidth()) ?: 1;
     }
 
     private function getDisplayLength(string $text): string
@@ -261,7 +267,7 @@ class ConsoleSectionOutput extends StreamOutput
      */
     private function getDisplayableLines(): int
     {
-        $remainingHeight = $this->terminal->getHeight(true);
+        $remainingHeight = $this->terminal->getHeight();
 
         foreach ($this->sections as $section) {
 

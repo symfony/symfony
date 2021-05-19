@@ -43,9 +43,6 @@ use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
  * As errors have a performance cost, repeated errors are all logged, so that the developer
  * can see them and weight them as more important to fix than others of the same level.
  *
-
-
- *
  * @final
  */
 class ErrorHandler

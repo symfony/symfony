@@ -65,10 +65,6 @@ use Symfony\Component\Routing\RouteCollection;
  *         {
  *         }
  *     }
-
- *
-
-
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {

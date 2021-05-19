@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * AccessDecisionManagerInterface makes authorization decisions.
- *
-
  */
 interface AccessDecisionManagerInterface
 {

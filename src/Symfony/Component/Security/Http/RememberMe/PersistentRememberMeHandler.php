@@ -27,8 +27,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * This requires storing remember-me tokens in a database. This allows
  * more control over the invalidation of remember-me tokens. See
  * {@see SignatureRememberMeHandler} if you don't want to use a database.
- *
-
  */
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {

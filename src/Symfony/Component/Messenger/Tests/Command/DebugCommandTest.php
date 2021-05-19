@@ -24,9 +24,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler;
 
-/**
-
- */
 class DebugCommandTest extends TestCase
 {
     protected function setUp(): void

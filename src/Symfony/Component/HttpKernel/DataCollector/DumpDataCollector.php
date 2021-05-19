@@ -25,8 +25,6 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Server\Connection;
 
 /**
-
- *
  * @final
  */
 class DumpDataCollector extends DataCollector implements DataDumperInterface

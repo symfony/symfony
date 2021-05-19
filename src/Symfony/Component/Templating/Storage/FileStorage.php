@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating\Storage;
 
 /**
  * FileStorage represents a template stored on the filesystem.
- *
-
  */
 class FileStorage extends Storage
 {

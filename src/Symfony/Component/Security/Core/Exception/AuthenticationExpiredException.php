@@ -16,8 +16,6 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * In practice, this is due to the User changing between requests (e.g. password changes),
  * causes the token to become un-authenticated.
- *
-
  */
 class AuthenticationExpiredException extends AccountStatusException
 {

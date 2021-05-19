@@ -30,9 +30,6 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
 
-/**
-
- */
 class ConsumeMessagesCommand extends Command
 {
     protected static $defaultName = 'messenger:consume';

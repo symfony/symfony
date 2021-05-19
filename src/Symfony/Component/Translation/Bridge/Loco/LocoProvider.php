@@ -20,8 +20,6 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
-
- *
  * In Loco:
  *  * Tags refers to Symfony's translation domains
  *  * Assets refers to Symfony's translation keys

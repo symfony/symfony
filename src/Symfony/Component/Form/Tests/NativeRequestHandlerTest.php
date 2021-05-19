@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\NativeRequestHandler;
 
-/**
-
- */
 class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {
     private static $serverBackup;

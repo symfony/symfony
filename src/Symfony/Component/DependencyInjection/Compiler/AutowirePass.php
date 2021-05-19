@@ -26,9 +26,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Inspects existing service definitions and wires the autowired ones using the type hints of their classes.
- *
-
-
  */
 class AutowirePass extends AbstractRecursivePass
 {

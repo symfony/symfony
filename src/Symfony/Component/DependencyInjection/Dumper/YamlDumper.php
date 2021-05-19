@@ -32,8 +32,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
- *
-
  */
 class YamlDumper extends Dumper
 {

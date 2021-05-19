@@ -14,10 +14,6 @@ namespace Symfony\Component\DependencyInjection\Argument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
-
- */
 trait ReferenceSetArgumentTrait
 {
     private $values;

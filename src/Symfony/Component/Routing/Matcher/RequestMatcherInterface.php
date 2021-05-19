@@ -18,8 +18,6 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * RequestMatcherInterface is the interface that all request matcher classes must implement.
- *
-
  */
 interface RequestMatcherInterface
 {

@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Call setResponse() to set the response that will be returned for the
  * current request. The propagation of this event is stopped as soon as a
  * response is set.
- *
-
  */
 class RequestEvent extends KernelEvent
 {

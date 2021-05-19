@@ -20,9 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * IS_AUTHENTICATED_REMEMBERED, or IS_AUTHENTICATED_ANONYMOUSLY is present.
  *
  * This list is most restrictive to least restrictive checking.
- *
-
-
  */
 class AuthenticatedVoter implements VoterInterface
 {

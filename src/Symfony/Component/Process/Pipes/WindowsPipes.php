@@ -20,8 +20,6 @@ use Symfony\Component\Process\Process;
  * @see https://bugs.php.net/51800
  * @see https://bugs.php.net/65650
  *
-
- *
  * @internal
  */
 class WindowsPipes extends AbstractPipes

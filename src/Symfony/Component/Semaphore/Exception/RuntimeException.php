@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Exception;
 
-/**
-
- */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

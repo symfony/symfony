@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
-/**
-
- */
 class CompoundFormPerformanceTest extends FormPerformanceTestCase
 {
     /**

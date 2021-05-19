@@ -13,8 +13,6 @@ namespace Symfony\Component\Stopwatch;
 
 /**
  * Represents an Event managed by Stopwatch.
- *
-
  */
 class StopwatchEvent
 {

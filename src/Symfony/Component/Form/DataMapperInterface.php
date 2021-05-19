@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-/**
-
- */
 interface DataMapperInterface
 {
     /**

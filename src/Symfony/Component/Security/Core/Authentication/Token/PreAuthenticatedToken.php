@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * PreAuthenticatedToken implements a pre-authenticated token.
- *
-
  */
 class PreAuthenticatedToken extends AbstractToken
 {

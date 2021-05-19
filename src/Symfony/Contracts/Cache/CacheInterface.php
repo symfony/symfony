@@ -16,8 +16,6 @@ use Psr\Cache\InvalidArgumentException;
 
 /**
  * Covers most simple to advanced caching needs.
- *
-
  */
 interface CacheInterface
 {

@@ -14,11 +14,6 @@ namespace Symfony\Component\Messenger;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
-/**
-
-
-
- */
 class MessageBus implements MessageBusInterface
 {
     private $middlewareAggregate;

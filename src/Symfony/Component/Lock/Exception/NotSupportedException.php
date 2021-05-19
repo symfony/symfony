@@ -16,8 +16,6 @@ trigger_deprecation('symfony/lock', '5.2', '%s is deprecated, You should stop us
 /**
  * NotSupportedException is thrown when an unsupported method is called.
  *
-
- *
  * @deprecated since Symfony 5.2
  */
 class NotSupportedException extends \LogicException implements ExceptionInterface

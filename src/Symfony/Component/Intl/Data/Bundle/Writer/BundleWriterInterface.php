@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
 /**
  * Writes resource bundle files.
  *
-
- *
  * @internal
  */
 interface BundleWriterInterface

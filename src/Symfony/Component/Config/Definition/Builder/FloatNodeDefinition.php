@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\FloatNode;
 
 /**
  * This class provides a fluent interface for defining a float node.
- *
-
  */
 class FloatNodeDefinition extends NumericNodeDefinition
 {

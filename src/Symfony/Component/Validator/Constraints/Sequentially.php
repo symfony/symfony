@@ -17,8 +17,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @Annotation
  * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
- *
-
  */
 class Sequentially extends Composite
 {

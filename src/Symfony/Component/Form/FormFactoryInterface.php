@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * Allows creating a form based on a name, a class or a property.
- *
-
  */
 interface FormFactoryInterface
 {

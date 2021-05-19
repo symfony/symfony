@@ -23,8 +23,6 @@ use Symfony\Component\Yaml\Inline;
 
 /**
  * Dumps a Yaml reference configuration for the given configuration/node instance.
- *
-
  */
 class YamlReferenceDumper
 {

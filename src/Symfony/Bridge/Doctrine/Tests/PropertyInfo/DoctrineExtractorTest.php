@@ -22,9 +22,6 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
-
- */
 class DoctrineExtractorTest extends TestCase
 {
     private function createExtractor()

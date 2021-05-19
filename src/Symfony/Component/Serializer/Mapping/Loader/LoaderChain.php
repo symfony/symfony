@@ -21,9 +21,6 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  * constructor. When {@link loadClassMetadata()} is called, the same method is called
  * in <em>all</em> of these loaders, regardless of whether any of them was
  * successful or not.
- *
-
-
  */
 class LoaderChain implements LoaderInterface
 {

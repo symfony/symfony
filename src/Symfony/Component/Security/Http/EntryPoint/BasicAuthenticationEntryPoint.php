@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * BasicAuthenticationEntryPoint starts an HTTP Basic authentication.
- *
-
  */
 class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

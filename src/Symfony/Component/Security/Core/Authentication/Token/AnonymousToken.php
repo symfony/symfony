@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * AnonymousToken represents an anonymous token.
- *
-
  */
 class AnonymousToken extends AbstractToken
 {

@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\LazyProxy;
 
 /**
-
- *
  * @internal
  */
 class ProxyHelper

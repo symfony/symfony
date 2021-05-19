@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts pqsql resources to array representation.
  *
-
- *
  * @final
  */
 class PgSqlCaster

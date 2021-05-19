@@ -28,9 +28,6 @@ use Symfony\Component\HttpKernel\RebootableInterface;
 /**
  * Clear and Warmup the cache.
  *
-
-
- *
  * @final
  */
 class CacheClearCommand extends Command

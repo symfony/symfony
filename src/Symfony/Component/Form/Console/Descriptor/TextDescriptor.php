@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
-
- *
  * @internal
  */
 class TextDescriptor extends Descriptor

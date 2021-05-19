@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * A button that submits the form.
- *
-
  */
 class SubmitButton extends Button implements ClickableInterface
 {

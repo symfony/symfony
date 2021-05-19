@@ -19,8 +19,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * KernelTestCase is the base class for tests needing a Kernel.
- *
-
  */
 abstract class KernelTestCase extends TestCase
 {

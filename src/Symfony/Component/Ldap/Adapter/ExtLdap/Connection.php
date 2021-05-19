@@ -20,9 +20,6 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 class Connection extends AbstractConnection
 {
     private const LDAP_INVALID_CREDENTIALS = 0x31;

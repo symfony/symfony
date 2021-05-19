@@ -14,8 +14,6 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * The property read info tells how a property can be read.
  *
-
- *
  * @internal
  */
 final class PropertyReadInfo

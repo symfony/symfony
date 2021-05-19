@@ -25,9 +25,6 @@ use Twig\Node\Node;
 use Twig\Node\SetNode;
 use Twig\NodeVisitor\AbstractNodeVisitor;
 
-/**
-
- */
 final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {
     private $scope;

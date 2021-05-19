@@ -16,8 +16,6 @@ use Symfony\Component\Form\Util\ServerParams;
 
 /**
  * A request handler using PHP super globals $_GET, $_POST and $_SERVER.
- *
-
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {

@@ -16,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test case for intl function implementations.
  *
-
- *
  * @group legacy
  */
 abstract class AbstractIntlGlobalsTest extends TestCase

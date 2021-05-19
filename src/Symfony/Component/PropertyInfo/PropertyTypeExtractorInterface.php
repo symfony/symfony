@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyInfo;
 
 /**
  * Type Extractor Interface.
- *
-
  */
 interface PropertyTypeExtractorInterface
 {

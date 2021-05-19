@@ -15,8 +15,6 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 /**
  * Formats an exception to be used as response content.
- *
-
  */
 interface ErrorRendererInterface
 {

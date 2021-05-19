@@ -17,8 +17,6 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Provides basic utility to manipulate the file system.
- *
-
  */
 class Filesystem
 {

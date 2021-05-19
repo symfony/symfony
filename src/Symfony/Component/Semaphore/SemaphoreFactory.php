@@ -17,10 +17,6 @@ use Psr\Log\NullLogger;
 
 /**
  * Factory provides method to create semaphores.
- *
-
-
-
  */
 class SemaphoreFactory implements LoggerAwareInterface
 {

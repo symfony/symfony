@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Thrown when a login link is invalid.
- *
-
  */
 class InvalidLoginLinkAuthenticationException extends AuthenticationException
 {

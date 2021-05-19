@@ -19,10 +19,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Activation strategy that ignores 404s for certain URLs.
  *
-
-
-
- *
  * @final
  */
 class NotFoundActivationStrategy extends ErrorLevelActivationStrategy implements ActivationStrategyInterface

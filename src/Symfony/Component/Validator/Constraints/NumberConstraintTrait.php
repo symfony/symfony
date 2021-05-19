@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 trigger_deprecation('symfony/validator', '5.2', '%s is deprecated.', NumberConstraintTrait::class);
 
 /**
-
- *
  * @deprecated since Symfony 5.2
  */
 trait NumberConstraintTrait

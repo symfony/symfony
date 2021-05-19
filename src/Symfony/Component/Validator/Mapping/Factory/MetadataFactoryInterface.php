@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
  * Returns {@link \Symfony\Component\Validator\Mapping\MetadataInterface} instances for values.
- *
-
  */
 interface MetadataFactoryInterface
 {

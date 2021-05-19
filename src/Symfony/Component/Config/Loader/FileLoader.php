@@ -20,8 +20,6 @@ use Symfony\Component\Config\Resource\GlobResource;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
- *
-
  */
 abstract class FileLoader extends Loader
 {

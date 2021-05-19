@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Find all service tags which are defined, but not used and yield a warning log message.
- *
-
  */
 class UnusedTagsPass implements CompilerPassInterface
 {

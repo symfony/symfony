@@ -13,9 +13,6 @@ namespace Symfony\Component\Workflow\Metadata;
 
 use Symfony\Component\Workflow\Transition;
 
-/**
-
- */
 final class InMemoryMetadataStore implements MetadataStoreInterface
 {
     use GetMetadataTrait;

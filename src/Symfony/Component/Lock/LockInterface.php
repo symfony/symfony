@@ -17,8 +17,6 @@ use Symfony\Component\Lock\Exception\LockReleasingException;
 
 /**
  * LockInterface defines an interface to manipulate the status of a lock.
- *
-
  */
 interface LockInterface
 {

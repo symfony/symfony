@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Ldap;
 
-/**
-
-
- */
 class Entry
 {
     private $dn;

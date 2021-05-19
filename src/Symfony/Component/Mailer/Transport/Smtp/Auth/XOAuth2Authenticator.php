@@ -16,8 +16,6 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 /**
  * Handles XOAUTH2 authentication.
  *
-
- *
  * @see https://developers.google.com/google-apps/gmail/xoauth2_protocol
  */
 class XOAuth2Authenticator implements AuthenticatorInterface

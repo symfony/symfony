@@ -20,9 +20,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class CsrfValidationListener implements EventSubscriberInterface
 {
     private $fieldName;

@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * A form element whose errors can be cleared.
- *
-
  */
 interface ClearableErrorsInterface
 {

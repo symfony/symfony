@@ -24,9 +24,6 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
 /**
  * Process is a thin wrapper around proc_* functions to easily
  * start independent PHP processes.
- *
-
-
  */
 class Process implements \IteratorAggregate
 {

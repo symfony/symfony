@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
 
-/**
-
- */
 class ClassParserTest extends TestCase
 {
     /** @dataProvider getParseTestData */

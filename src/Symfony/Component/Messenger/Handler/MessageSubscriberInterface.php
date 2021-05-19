@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Handler;
 
 /**
  * Handlers can implement this interface to handle multiple messages.
- *
-
  */
 interface MessageSubscriberInterface extends MessageHandlerInterface
 {

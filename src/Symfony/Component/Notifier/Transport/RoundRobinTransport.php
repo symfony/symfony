@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 
 /**
  * Uses several Transports using a round robin algorithm.
- *
-
  */
 class RoundRobinTransport implements TransportInterface
 {

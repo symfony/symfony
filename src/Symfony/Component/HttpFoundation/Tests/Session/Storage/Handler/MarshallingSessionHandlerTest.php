@@ -17,9 +17,6 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler;
 
-/**
-
- */
 class MarshallingSessionHandlerTest extends TestCase
 {
     /**

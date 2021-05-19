@@ -11,9 +11,6 @@
 
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
-/**
-
- */
 class Scope
 {
     private $parent;

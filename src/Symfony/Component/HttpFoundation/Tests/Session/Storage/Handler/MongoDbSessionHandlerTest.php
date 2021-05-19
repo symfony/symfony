@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
 
 /**
-
  * @group time-sensitive
  * @requires extension mongodb
  */

@@ -15,8 +15,6 @@ use Symfony\Component\Process\Process;
 
 /**
  * Exception for failed processes.
- *
-
  */
 class ProcessFailedException extends RuntimeException
 {

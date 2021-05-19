@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Holds information about the current request.
  *
  * This class implements a fluent interface.
- *
-
-
  */
 class RequestContext
 {

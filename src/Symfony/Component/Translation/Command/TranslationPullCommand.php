@@ -24,8 +24,6 @@ use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class TranslationPullCommand extends Command

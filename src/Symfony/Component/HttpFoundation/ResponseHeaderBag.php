@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
- *
-
  */
 class ResponseHeaderBag extends HeaderBag
 {

@@ -34,9 +34,6 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class FormValidatorTest extends ConstraintValidatorTestCase
 {
     /**

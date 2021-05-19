@@ -18,8 +18,6 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 /**
  * Factory that configures a transport (sendmail or SMTP) based on php.ini settings.
- *
-
  */
 final class NativeTransportFactory extends AbstractTransportFactory
 {

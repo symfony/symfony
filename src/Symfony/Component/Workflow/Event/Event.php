@@ -16,11 +16,6 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 
-/**
-
-
-
- */
 class Event extends BaseEvent
 {
     protected $context;

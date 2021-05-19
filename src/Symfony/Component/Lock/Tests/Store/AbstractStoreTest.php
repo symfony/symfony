@@ -16,9 +16,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
-/**
-
- */
 abstract class AbstractStoreTest extends TestCase
 {
     abstract protected function getStore(): PersistingStoreInterface;

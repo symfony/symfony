@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Represents a service wrapped in a memoizing closure.
- *
-
  */
 class ServiceClosureArgument implements ArgumentInterface
 {

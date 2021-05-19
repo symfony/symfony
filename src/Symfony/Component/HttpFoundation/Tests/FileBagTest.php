@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\FileBag;
 
 /**
  * FileBagTest.
- *
-
-
  */
 class FileBagTest extends TestCase
 {

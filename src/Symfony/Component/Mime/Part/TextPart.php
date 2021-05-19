@@ -18,9 +18,6 @@ use Symfony\Component\Mime\Encoder\QpContentEncoder;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 
-/**
-
- */
 class TextPart extends AbstractPart
 {
     private static $encoders = [];

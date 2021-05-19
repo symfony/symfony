@@ -14,10 +14,6 @@ namespace Symfony\Component\Translation\Provider;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\MissingRequiredOptionException;
 
-/**
-
-
- */
 final class Dsn
 {
     private $scheme;

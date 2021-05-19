@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * RemoteUserFactory creates services for REMOTE_USER based authentication.
  *
-
-
- *
  * @internal
  */
 class RemoteUserFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface

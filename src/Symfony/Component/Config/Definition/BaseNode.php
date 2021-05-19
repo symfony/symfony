@@ -19,8 +19,6 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * The base node class.
- *
-
  */
 abstract class BaseNode implements NodeInterface
 {

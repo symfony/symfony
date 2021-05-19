@@ -21,9 +21,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * This authenticator authenticates pre-authenticated (by the
  * webserver) X.509 certificates.
  *
-
-
- *
  * @final
  */
 class X509Authenticator extends AbstractPreAuthenticatedAuthenticator

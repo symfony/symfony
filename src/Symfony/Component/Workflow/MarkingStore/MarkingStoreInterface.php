@@ -19,8 +19,6 @@ use Symfony\Component\Workflow\Marking;
  *
  * It converts the Marking into something understandable by the subject and vice
  * versa.
- *
-
  */
 interface MarkingStoreInterface
 {

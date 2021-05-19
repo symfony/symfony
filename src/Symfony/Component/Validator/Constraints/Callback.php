@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Callback extends Constraint

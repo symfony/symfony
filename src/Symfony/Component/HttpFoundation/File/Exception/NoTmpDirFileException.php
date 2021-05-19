@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /**
  * Thrown when an UPLOAD_ERR_NO_TMP_DIR error occurred with UploadedFile.
- *
-
  */
 class NoTmpDirFileException extends FileException
 {

@@ -14,8 +14,6 @@ namespace Symfony\Component\Cache\Traits;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
-
- *
  * @internal
  */
 trait FilesystemCommonTrait

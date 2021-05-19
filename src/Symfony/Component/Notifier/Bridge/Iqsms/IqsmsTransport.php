@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class IqsmsTransport extends AbstractTransport
 {
     protected const HOST = 'api.iqsms.ru';

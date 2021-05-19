@@ -17,8 +17,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Allows the transformation of a Message and the Envelope before the email is sent.
- *
-
  */
 final class MessageEvent extends Event
 {

@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 final class Chatter implements ChatterInterface
 {
     private $transport;

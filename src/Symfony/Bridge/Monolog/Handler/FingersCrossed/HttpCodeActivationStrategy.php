@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Activation strategy that ignores certain HTTP codes.
  *
-
-
- *
  * @final
  */
 class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy implements ActivationStrategyInterface

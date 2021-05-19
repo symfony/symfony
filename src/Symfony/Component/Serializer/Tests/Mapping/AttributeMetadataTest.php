@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
-/**
-
- */
 class AttributeMetadataTest extends TestCase
 {
     public function testInterface()

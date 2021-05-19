@@ -16,8 +16,6 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * Interface for the Notifier system.
- *
-
  */
 interface NotifierInterface
 {

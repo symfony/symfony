@@ -24,9 +24,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
-
- */
 class Application extends BaseApplication
 {
     private $kernel;

@@ -19,8 +19,6 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  *
  * This provider calls several leaf providers in a chain until one is able to
  * handle the request.
- *
-
  */
 class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

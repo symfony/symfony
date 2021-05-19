@@ -22,8 +22,6 @@ use Symfony\Component\Runtime\RuntimeInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
 
 /**
-
- *
  * @internal
  */
 class ComposerPlugin implements PluginInterface, EventSubscriberInterface

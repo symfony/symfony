@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
 /**
  * Allows session to be started by PHP and managed by Symfony.
- *
-
  */
 class PhpBridgeSessionStorage extends NativeSessionStorage
 {

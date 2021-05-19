@@ -15,9 +15,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Twig\Extension\ProfilerExtension as BaseProfilerExtension;
 use Twig\Profiler\Profile;
 
-/**
-
- */
 final class ProfilerExtension extends BaseProfilerExtension
 {
     private $stopwatch;

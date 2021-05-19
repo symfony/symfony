@@ -21,9 +21,6 @@ use Twig\Source;
 
 /**
  * TwigExtractor extracts translation messages from a twig template.
- *
-
-
  */
 class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {

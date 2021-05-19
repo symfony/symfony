@@ -13,10 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
-/**
-
-
- */
 final class AmqpStamp implements NonSendableStampInterface
 {
     private $routingKey;

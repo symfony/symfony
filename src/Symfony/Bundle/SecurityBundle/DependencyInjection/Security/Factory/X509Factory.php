@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * X509Factory creates services for X509 certificate authentication.
  *
-
- *
  * @internal
  */
 class X509Factory implements SecurityFactoryInterface, AuthenticatorFactoryInterface

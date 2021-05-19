@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime;
 
 /**
  * Guesses the MIME type of a file.
- *
-
  */
 interface MimeTypeGuesserInterface
 {

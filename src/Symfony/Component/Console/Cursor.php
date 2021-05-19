@@ -13,9 +13,6 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
-
- */
 final class Cursor
 {
     private $output;

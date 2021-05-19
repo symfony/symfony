@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Workflow\Exception;
 
-/**
-
-
- */
 class LogicException extends \LogicException implements ExceptionInterface
 {
 }

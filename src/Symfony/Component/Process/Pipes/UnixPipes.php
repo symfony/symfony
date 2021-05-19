@@ -16,8 +16,6 @@ use Symfony\Component\Process\Process;
 /**
  * UnixPipes implementation uses unix pipes as handles.
  *
-
- *
  * @internal
  */
 class UnixPipes extends AbstractPipes

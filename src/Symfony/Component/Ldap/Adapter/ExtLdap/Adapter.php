@@ -14,9 +14,6 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 
-/**
-
- */
 class Adapter implements AdapterInterface
 {
     private $config;

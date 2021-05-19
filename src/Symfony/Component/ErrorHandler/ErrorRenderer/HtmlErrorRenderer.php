@@ -18,9 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-/**
-
- */
 class HtmlErrorRenderer implements ErrorRendererInterface
 {
     private const GHOST_ADDONS = [

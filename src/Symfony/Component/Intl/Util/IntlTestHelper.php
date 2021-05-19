@@ -22,8 +22,6 @@ use Symfony\Component\Intl\Intl;
  * {@link requireIntl()} or {@link requireFullIntl()}. Calling
  * {@link requireFullIntl()} is only necessary if you use functionality in the
  * test that is not provided by the stub intl implementation.
- *
-
  */
 class IntlTestHelper
 {

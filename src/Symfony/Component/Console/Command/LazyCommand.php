@@ -17,9 +17,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
-
- */
 final class LazyCommand extends Command
 {
     private $command;

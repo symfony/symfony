@@ -16,8 +16,6 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  * Doctrine entities representing a remember-me token).
  *
  * @method string getUserIdentifier() returns the identifier used to authenticate (e.g. their e-mailaddress or username)
- *
-
  */
 interface PersistentTokenInterface
 {

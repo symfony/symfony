@@ -17,9 +17,6 @@ use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationP
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\ValidatorBuilder;
 
-/**
-
- */
 class AddAutoMappingConfigurationPassTest extends TestCase
 {
     public function testNoConfigParameter()

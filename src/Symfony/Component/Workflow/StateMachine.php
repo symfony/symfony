@@ -15,9 +15,6 @@ use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class StateMachine extends Workflow
 {
     public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed')

@@ -21,8 +21,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
  * these references depending on the order in which services are called.
  *
  * Circular reference from method calls will only be detected at run-time.
- *
-
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {

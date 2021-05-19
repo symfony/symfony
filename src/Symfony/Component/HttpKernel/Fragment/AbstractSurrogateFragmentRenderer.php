@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Implements Surrogate rendering strategy.
- *
-
  */
 abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRenderer
 {

@@ -24,8 +24,6 @@ namespace Symfony\Component\Intl\Data\Util;
  * For example, "de" and "de_DE" are considered to be locales. "root" and "meta"
  * are not.
  *
-
- *
  * @internal
  */
 class LocaleScanner

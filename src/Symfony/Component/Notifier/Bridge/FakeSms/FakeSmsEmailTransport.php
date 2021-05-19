@@ -22,10 +22,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
-
- */
 final class FakeSmsEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';

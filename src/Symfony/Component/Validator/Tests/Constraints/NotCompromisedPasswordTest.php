@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
-
- */
 class NotCompromisedPasswordTest extends TestCase
 {
     public function testDefaultValues()

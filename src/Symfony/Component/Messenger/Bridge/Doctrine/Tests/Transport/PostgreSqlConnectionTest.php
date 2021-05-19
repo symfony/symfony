@@ -15,9 +15,6 @@ use Doctrine\DBAL\Schema\Table;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
-/**
-
- */
 class PostgreSqlConnectionTest extends TestCase
 {
     public function testSerialize()

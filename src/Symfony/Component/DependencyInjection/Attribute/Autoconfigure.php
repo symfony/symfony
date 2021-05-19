@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 
 /**
  * An attribute to tell how a base type should be autoconfigured.
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Autoconfigure

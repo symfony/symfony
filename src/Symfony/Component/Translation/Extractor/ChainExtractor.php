@@ -15,8 +15,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * ChainExtractor extracts translation messages from template files.
- *
-
  */
 class ChainExtractor implements ExtractorInterface
 {

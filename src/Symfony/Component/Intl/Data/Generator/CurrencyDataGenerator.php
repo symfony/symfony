@@ -19,8 +19,6 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 /**
  * The rule for compiling the currency bundle.
  *
-
- *
  * @internal
  */
 class CurrencyDataGenerator extends AbstractDataGenerator

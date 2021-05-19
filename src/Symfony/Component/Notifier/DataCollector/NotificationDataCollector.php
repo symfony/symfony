@@ -17,9 +17,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Notifier\Event\NotificationEvents;
 use Symfony\Component\Notifier\EventListener\NotificationLoggerListener;
 
-/**
-
- */
 final class NotificationDataCollector extends DataCollector
 {
     private $logger;

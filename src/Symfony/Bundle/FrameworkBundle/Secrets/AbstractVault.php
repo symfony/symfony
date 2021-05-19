@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Secrets;
 
 /**
-
- *
  * @internal
  */
 abstract class AbstractVault

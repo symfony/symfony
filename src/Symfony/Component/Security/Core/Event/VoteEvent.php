@@ -17,8 +17,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * This event is dispatched on voter vote.
  *
-
- *
  * @internal
  */
 final class VoteEvent extends Event

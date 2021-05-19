@@ -13,11 +13,6 @@ namespace Symfony\Component\Messenger\Retry;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
-
-
-
- */
 interface RetryStrategyInterface
 {
     /**

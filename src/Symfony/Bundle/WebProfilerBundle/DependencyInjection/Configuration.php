@@ -19,8 +19,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *
  * This information is solely responsible for how the different configuration
  * sections are normalized, and merged.
- *
-
  */
 class Configuration implements ConfigurationInterface
 {

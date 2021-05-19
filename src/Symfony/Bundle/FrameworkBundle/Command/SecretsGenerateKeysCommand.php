@@ -20,10 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
-
-
-
- *
  * @internal
  */
 final class SecretsGenerateKeysCommand extends Command

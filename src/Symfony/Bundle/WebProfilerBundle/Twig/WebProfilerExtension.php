@@ -21,8 +21,6 @@ use Twig\TwigFunction;
 /**
  * Twig extension for the profiler.
  *
-
- *
  * @internal
  */
 class WebProfilerExtension extends ProfilerExtension

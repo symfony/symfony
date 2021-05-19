@@ -19,9 +19,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class BeanstalkdReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
     private $connection;

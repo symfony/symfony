@@ -17,8 +17,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
 
 /**
-
- *
  * @requires extension pdo_sqlite
  */
 class PdoStoreTest extends AbstractStoreTest

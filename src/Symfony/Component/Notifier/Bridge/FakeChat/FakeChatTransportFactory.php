@@ -17,9 +17,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
-/**
-
- */
 final class FakeChatTransportFactory extends AbstractTransportFactory
 {
     protected $mailer;

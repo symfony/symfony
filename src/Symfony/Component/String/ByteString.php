@@ -18,9 +18,6 @@ use Symfony\Component\String\Exception\RuntimeException;
 /**
  * Represents a binary-safe string of bytes.
  *
-
-
- *
  * @throws ExceptionInterface
  */
 class ByteString extends AbstractString

@@ -28,8 +28,6 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
  * Base class implementing the RememberMeServicesInterface.
- *
-
  */
 abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
 {

@@ -16,9 +16,6 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 
-/**
-
- */
 class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {
     /**

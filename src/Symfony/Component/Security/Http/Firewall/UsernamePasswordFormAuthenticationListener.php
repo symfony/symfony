@@ -35,8 +35,6 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
  * UsernamePasswordFormAuthenticationListener is the default implementation of
  * an authentication via a simple form composed of a username and a password.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener

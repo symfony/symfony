@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Recipient;
 
-/**
-
- */
 class NoRecipient implements RecipientInterface
 {
 }

@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Caster;
 
 /**
  * Represents a cut array.
- *
-
  */
 class CutArrayStub extends CutStub
 {

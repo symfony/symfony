@@ -16,8 +16,6 @@ use Symfony\Component\Form\ButtonTypeInterface;
 
 /**
  * A reset button.
- *
-
  */
 class ResetType extends AbstractType implements ButtonTypeInterface
 {

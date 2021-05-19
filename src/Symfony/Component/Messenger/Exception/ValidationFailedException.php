@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-/**
-
- */
 class ValidationFailedException extends RuntimeException
 {
     private $violations;

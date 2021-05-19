@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Exception\MappingException;
 
 /**
  * Base class for all file based loaders.
- *
-
  */
 abstract class FileLoader implements LoaderInterface
 {

@@ -22,9 +22,6 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
-/**
-
- */
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {
     private const DEFAULT_TRANSPORT_OPTION = 'choose';

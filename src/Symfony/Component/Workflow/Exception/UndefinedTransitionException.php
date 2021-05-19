@@ -15,8 +15,6 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * Thrown by Workflow when an undefined transition is applied on a subject.
- *
-
  */
 class UndefinedTransitionException extends TransitionException
 {

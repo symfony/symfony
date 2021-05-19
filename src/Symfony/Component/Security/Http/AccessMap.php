@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 /**
  * AccessMap allows configuration of different access control rules for
  * specific parts of the website.
- *
-
  */
 class AccessMap implements AccessMapInterface
 {

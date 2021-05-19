@@ -16,9 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
-/**
-
- */
 class TemplateControllerTest extends TestCase
 {
     public function testTwig()

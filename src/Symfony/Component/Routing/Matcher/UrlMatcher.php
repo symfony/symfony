@@ -23,8 +23,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
- *
-
  */
 class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 {

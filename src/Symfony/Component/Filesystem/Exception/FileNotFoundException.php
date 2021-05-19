@@ -13,9 +13,6 @@ namespace Symfony\Component\Filesystem\Exception;
 
 /**
  * Exception class thrown when a file couldn't be found.
- *
-
-
  */
 class FileNotFoundException extends IOException
 {

@@ -20,10 +20,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
-
- */
 final class EventSourceHttpClient implements HttpClientInterface
 {
     use AsyncDecoratorTrait, HttpClientTrait {

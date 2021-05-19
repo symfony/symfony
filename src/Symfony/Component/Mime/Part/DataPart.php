@@ -15,9 +15,6 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypes;
 
-/**
-
- */
 class DataPart extends TextPart
 {
     private static $mimeTypes;

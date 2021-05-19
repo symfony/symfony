@@ -29,9 +29,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
 use Symfony\Component\Messenger\Worker;
 
-/**
-
- */
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {
     private const DEFAULT_TRANSPORT_OPTION = 'choose';

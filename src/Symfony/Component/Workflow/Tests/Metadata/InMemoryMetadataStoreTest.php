@@ -7,9 +7,6 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
-/**
-
- */
 class InMemoryMetadataStoreTest extends TestCase
 {
     private $store;

@@ -18,8 +18,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * The central registry of the Form component.
- *
-
  */
 class FormRegistry implements FormRegistryInterface
 {

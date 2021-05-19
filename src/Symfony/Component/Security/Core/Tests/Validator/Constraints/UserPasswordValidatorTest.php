@@ -22,9 +22,6 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
- */
 abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const PASSWORD = 's3Cr3t';

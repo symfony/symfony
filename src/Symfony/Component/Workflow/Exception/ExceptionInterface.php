@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Workflow\Exception;
 
-/**
-
-
- */
 interface ExceptionInterface extends \Throwable
 {
 }

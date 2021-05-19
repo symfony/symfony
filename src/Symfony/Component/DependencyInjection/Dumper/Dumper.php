@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Dumper is the abstract class for all built-in dumpers.
- *
-
  */
 abstract class Dumper implements DumperInterface
 {

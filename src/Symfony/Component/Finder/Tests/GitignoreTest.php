@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Gitignore;
 
-/**
-
- */
 class GitignoreTest extends TestCase
 {
     /**

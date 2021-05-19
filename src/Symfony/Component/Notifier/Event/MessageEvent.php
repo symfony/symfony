@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Event;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
-
- */
 final class MessageEvent extends Event
 {
     private $message;

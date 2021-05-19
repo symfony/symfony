@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
-/**
-
- */
 class PredisStoreTest extends AbstractRedisStoreTest
 {
     public static function setUpBeforeClass(): void

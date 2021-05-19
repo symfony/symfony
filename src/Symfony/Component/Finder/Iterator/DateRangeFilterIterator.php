@@ -15,8 +15,6 @@ use Symfony\Component\Finder\Comparator\DateComparator;
 
 /**
  * DateRangeFilterIterator filters out files that are not in the given date range (last modified dates).
- *
-
  */
 class DateRangeFilterIterator extends \FilterIterator
 {

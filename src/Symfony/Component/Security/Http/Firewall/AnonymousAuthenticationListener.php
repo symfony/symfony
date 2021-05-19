@@ -28,8 +28,6 @@ class_exists(AnonymousToken::class);
  * AnonymousAuthenticationListener automatically adds a Token if none is
  * already present.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AnonymousAuthenticationListener extends AbstractListener

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Lock\Exception;
 
-/**
-
- */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

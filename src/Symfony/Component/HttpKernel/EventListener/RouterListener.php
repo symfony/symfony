@@ -35,9 +35,6 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
-
-
- *
  * @final
  */
 class RouterListener implements EventSubscriberInterface

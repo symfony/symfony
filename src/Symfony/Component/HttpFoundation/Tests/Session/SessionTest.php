@@ -22,10 +22,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * SessionTest.
- *
-
-
-
  */
 class SessionTest extends TestCase
 {

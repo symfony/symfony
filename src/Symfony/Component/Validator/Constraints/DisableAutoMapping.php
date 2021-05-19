@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * which has higher precedence than any configuration that might be defined outside the class.
  *
  * @Annotation
- *
-
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class DisableAutoMapping extends Constraint

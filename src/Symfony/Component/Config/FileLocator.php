@@ -15,8 +15,6 @@ use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 
 /**
  * FileLocator uses an array of pre-defined paths to find files.
- *
-
  */
 class FileLocator implements FileLocatorInterface
 {

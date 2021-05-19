@@ -19,9 +19,6 @@ use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
 use Twig\Node\TextNode;
 
-/**
-
- */
 final class TransNode extends Node
 {
     public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, int $lineno = 0, string $tag = null)

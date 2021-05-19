@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Parameter;
 
 /**
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead

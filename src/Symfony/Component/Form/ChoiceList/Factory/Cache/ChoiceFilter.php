@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_filter" option.
  *
  * @internal
- *
-
  */
 final class ChoiceFilter extends AbstractStaticOption
 {

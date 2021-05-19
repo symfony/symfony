@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 
 /**
  * An attribute to tell under which environement this class should be registered as a service.
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class When

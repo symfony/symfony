@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
- *
-
  */
 class RuntimeInstantiatorTest extends TestCase
 {

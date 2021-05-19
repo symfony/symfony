@@ -38,9 +38,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * ContextListener manages the SecurityContext persistence through a session.
  *
-
-
- *
  * @final
  */
 class ContextListener extends AbstractListener

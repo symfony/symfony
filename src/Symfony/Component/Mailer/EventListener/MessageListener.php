@@ -22,8 +22,6 @@ use Symfony\Component\Mime\Message;
 
 /**
  * Manipulates the headers and the body of a Message.
- *
-
  */
 class MessageListener implements EventSubscriberInterface
 {

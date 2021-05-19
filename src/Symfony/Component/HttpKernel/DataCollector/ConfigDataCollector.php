@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
-
- *
  * @final
  */
 class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface

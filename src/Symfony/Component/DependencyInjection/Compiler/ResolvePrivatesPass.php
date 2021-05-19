@@ -16,8 +16,6 @@ trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s" class is de
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
-
- *
  * @deprecated since Symfony 5.2
  */
 class ResolvePrivatesPass implements CompilerPassInterface

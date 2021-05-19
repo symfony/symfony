@@ -16,8 +16,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Passes a value through multiple value transformers.
- *
-
  */
 class DataTransformerChain implements DataTransformerInterface
 {

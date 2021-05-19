@@ -31,8 +31,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * XmlFileLoader loads XML files service definitions.
- *
-
  */
 class XmlFileLoader extends FileLoader
 {

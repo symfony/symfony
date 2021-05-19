@@ -16,9 +16,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Encodes CSV data.
- *
-
-
  */
 class CsvEncoder implements EncoderInterface, DecoderInterface
 {

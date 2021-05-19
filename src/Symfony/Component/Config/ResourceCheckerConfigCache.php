@@ -18,8 +18,6 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * ResourceCheckerConfigCache uses instances of ResourceCheckerInterface
  * to check whether cached data is still fresh.
- *
-
  */
 class ResourceCheckerConfigCache implements ConfigCacheInterface
 {

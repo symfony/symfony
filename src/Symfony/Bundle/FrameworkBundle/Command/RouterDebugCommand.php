@@ -26,9 +26,6 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * A console command for retrieving information about routes.
  *
-
-
- *
  * @final
  */
 class RouterDebugCommand extends Command

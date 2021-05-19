@@ -42,11 +42,6 @@ use ProxyManager\Proxy\ProxyInterface;
  * Note that patching doesn't care about any coding style so you'd better to run
  * php-cs-fixer after, with rules "phpdoc_trim_consecutive_blank_line_separation"
  * and "no_superfluous_phpdoc_tags" enabled typically.
- *
-
-
-
-
  */
 class DebugClassLoader
 {

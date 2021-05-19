@@ -21,8 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Extension supporting the Symfony Validator component in forms.
- *
-
  */
 class ValidatorExtension extends AbstractExtension
 {

@@ -14,10 +14,6 @@ namespace Symfony\Component\HttpClient\Retry;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-/**
-
-
- */
 interface RetryStrategyInterface
 {
     /**

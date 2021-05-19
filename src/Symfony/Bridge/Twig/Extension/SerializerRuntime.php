@@ -14,9 +14,6 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\Serializer\SerializerInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
-/**
-
- */
 final class SerializerRuntime implements RuntimeExtensionInterface
 {
     private $serializer;

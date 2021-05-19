@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
-/**
-
- */
 class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
 {
     public function onWorkerStarted(WorkerStartedEvent $event): void

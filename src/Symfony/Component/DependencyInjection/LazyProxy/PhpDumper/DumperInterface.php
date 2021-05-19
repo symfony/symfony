@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Lazy proxy dumper capable of generating the instantiation logic PHP code for proxied services.
- *
-
  */
 interface DumperInterface
 {

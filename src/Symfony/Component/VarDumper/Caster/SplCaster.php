@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts SPL related classes to array representation.
  *
-
- *
  * @final
  */
 class SplCaster

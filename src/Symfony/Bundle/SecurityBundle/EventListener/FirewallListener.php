@@ -20,9 +20,6 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class FirewallListener extends Firewall
 {
     private $map;

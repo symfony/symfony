@@ -24,9 +24,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
-/**
-
- */
 class XmlFileLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;

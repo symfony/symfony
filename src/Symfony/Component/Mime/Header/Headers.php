@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Exception\LogicException;
 
 /**
  * A collection of headers.
- *
-
  */
 final class Headers
 {

@@ -18,10 +18,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
 /**
  * A Redis connection.
  *
-
-
-
- *
  * @internal
  * @final
  */

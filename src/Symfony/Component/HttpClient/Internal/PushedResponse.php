@@ -16,8 +16,6 @@ use Symfony\Component\HttpClient\Response\CurlResponse;
 /**
  * A pushed response with its request headers.
  *
-
- *
  * @internal
  */
 final class PushedResponse

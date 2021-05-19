@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Thrown when a resource cannot be loaded.
- *
-
  */
 class InvalidResourceException extends \InvalidArgumentException implements ExceptionInterface
 {

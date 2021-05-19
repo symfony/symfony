@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
-/**
-
- */
 class ChoiceTypePerformanceTest extends FormPerformanceTestCase
 {
     /**

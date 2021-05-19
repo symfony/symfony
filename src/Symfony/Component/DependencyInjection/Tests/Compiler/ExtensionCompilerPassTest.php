@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-/**
-
- */
 class ExtensionCompilerPassTest extends TestCase
 {
     private $container;

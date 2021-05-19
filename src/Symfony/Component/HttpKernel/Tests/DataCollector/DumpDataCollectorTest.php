@@ -19,9 +19,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
 
-/**
-
- */
 class DumpDataCollectorTest extends TestCase
 {
     public function testDump()

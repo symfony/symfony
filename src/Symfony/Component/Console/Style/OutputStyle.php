@@ -18,8 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Decorates output to add console style guide helpers.
- *
-
  */
 abstract class OutputStyle implements OutputInterface, StyleInterface
 {

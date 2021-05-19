@@ -15,10 +15,6 @@ use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 
 /**
  * Provides password hashing capabilities.
- *
-
-
-
  */
 interface PasswordHasherInterface
 {

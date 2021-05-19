@@ -25,9 +25,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * To keep info on tags, the tags are both serialized as part of cache value and provided as tag ids
  * to Adapters on operations when needed for storage to doSave(), doDelete() & doInvalidate().
  *
-
-
- *
  * @internal
  */
 abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, LoggerAwareInterface, ResettableInterface

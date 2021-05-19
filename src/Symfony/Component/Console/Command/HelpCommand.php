@@ -19,8 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * HelpCommand displays the help for a given command.
- *
-
  */
 class HelpCommand extends Command
 {

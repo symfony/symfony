@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Argument;
 
 /**
  * Represents a collection of values to lazily iterate over.
- *
-
  */
 class IteratorArgument implements ArgumentInterface
 {

@@ -25,9 +25,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 final class SendinblueApiTransport extends AbstractApiTransport
 {
     private $key;

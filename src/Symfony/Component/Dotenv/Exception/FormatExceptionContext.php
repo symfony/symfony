@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Dotenv\Exception;
 
-/**
-
- */
 final class FormatExceptionContext
 {
     private $data;

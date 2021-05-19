@@ -10,9 +10,6 @@ use Symfony\Component\Serializer\Mapping\Factory\CompiledClassMetadataFactory;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
-/**
-
- */
 final class CompiledClassMetadataFactoryTest extends TestCase
 {
     public function testItImplementsClassMetadataFactoryInterface()

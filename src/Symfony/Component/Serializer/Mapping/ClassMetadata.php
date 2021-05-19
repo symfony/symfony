@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Mapping;
 
 /**
  * {@inheritdoc}
- *
-
  */
 class ClassMetadata implements ClassMetadataInterface
 {

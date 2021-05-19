@@ -19,8 +19,6 @@ use Symfony\Component\Notifier\NotifierInterface;
 
 /**
  * Uses Notifier as a log handler.
- *
-
  */
 class NotifierHandler extends AbstractHandler
 {

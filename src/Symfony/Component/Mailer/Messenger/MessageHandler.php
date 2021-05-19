@@ -14,9 +14,6 @@ namespace Symfony\Component\Mailer\Messenger;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
-/**
-
- */
 class MessageHandler
 {
     private $transport;

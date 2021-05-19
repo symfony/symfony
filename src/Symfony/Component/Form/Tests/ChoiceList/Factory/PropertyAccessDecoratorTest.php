@@ -21,9 +21,6 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-/**
-
- */
 class PropertyAccessDecoratorTest extends TestCase
 {
     /**

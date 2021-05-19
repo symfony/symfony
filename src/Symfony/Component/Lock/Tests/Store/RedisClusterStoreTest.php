@@ -12,8 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 /**
-
- *
  * @requires extension redis
  * @group integration
  */

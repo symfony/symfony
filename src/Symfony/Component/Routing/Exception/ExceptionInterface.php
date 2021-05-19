@@ -13,8 +13,6 @@ namespace Symfony\Component\Routing\Exception;
 
 /**
  * ExceptionInterface.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

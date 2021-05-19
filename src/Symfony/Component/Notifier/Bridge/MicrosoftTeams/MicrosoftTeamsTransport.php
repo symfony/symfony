@@ -20,10 +20,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
-
- */
 final class MicrosoftTeamsTransport extends AbstractTransport
 {
     protected const ENDPOINT = 'outlook.office.com';

@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Exception;
 
 /**
  * UnsupportedException.
- *
-
  */
 class UnsupportedException extends InvalidArgumentException
 {

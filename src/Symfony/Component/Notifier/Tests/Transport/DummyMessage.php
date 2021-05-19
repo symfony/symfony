@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Tests\Transport;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
-/**
-
- */
 class DummyMessage implements MessageInterface
 {
     public function getRecipientId(): ?string

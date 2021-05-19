@@ -14,9 +14,6 @@ namespace Symfony\Component\ErrorHandler\ErrorEnhancer;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\Error\UndefinedFunctionError;
 
-/**
-
- */
 class UndefinedFunctionErrorEnhancer implements ErrorEnhancerInterface
 {
     /**

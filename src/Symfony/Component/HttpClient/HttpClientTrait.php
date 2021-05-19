@@ -18,8 +18,6 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  * Provides the common logic from writing HttpClientInterface implementations.
  *
  * All private methods are static to prevent implementers from creating memory leaks via circular references.
- *
-
  */
 trait HttpClientTrait
 {

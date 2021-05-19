@@ -14,9 +14,6 @@ namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 
-/**
-
- */
 class NativePasswordHasherTest extends TestCase
 {
     public function testCostBelowRange()

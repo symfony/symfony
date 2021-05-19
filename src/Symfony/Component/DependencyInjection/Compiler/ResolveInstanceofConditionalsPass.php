@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Applies instanceof conditionals to definitions.
- *
-
  */
 class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 {

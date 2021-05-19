@@ -17,8 +17,6 @@ use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A file in the file system.
- *
-
  */
 class File extends \SplFileInfo
 {

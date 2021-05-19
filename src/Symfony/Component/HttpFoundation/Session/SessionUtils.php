@@ -14,9 +14,6 @@ namespace Symfony\Component\HttpFoundation\Session;
 /**
  * Session utility functions.
  *
-
-
- *
  * @internal
  */
 final class SessionUtils

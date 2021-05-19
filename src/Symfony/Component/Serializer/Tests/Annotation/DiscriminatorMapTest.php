@@ -16,9 +16,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
-/**
-
- */
 class DiscriminatorMapTest extends TestCase
 {
     use ExpectDeprecationTrait;

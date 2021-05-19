@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 /**
  * Forward compatibility for new new PasswordHasher component.
  *
-
- *
  * @internal To be removed in Symfony 6
  */
 final class LegacyPasswordHasherEncoder implements PasswordEncoderInterface

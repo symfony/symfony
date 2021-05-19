@@ -19,9 +19,6 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
-/**
-
- */
 class ClassMetadataFactoryTest extends TestCase
 {
     public function testInterface()

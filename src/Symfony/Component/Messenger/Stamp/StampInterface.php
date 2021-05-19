@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Stamp;
  * An envelope stamp related to a message.
  *
  * Stamps must be serializable value objects for transport.
- *
-
  */
 interface StampInterface
 {

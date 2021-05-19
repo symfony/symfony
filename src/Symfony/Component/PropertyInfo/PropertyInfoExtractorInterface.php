@@ -15,8 +15,6 @@ namespace Symfony\Component\PropertyInfo;
  * Gets info about PHP class properties.
  *
  * A convenient interface inheriting all specific info interfaces.
- *
-
  */
 interface PropertyInfoExtractorInterface extends PropertyTypeExtractorInterface, PropertyDescriptionExtractorInterface, PropertyAccessExtractorInterface, PropertyListExtractorInterface
 {

@@ -13,9 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Tests\Fixtures\Countable;
 
-/**
-
- */
 class CountValidatorCountableTest extends CountValidatorTest
 {
     protected function createCollection(array $content)

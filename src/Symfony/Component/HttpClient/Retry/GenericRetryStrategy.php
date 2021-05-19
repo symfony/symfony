@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Decides to retry the request when HTTP status codes belong to the given list of codes.
- *
-
  */
 class GenericRetryStrategy implements RetryStrategyInterface
 {

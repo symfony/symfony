@@ -62,9 +62,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * The conversions (1) -> (2) -> (3) use the transform methods of the transformers.
  * The conversions (3) -> (2) -> (1) use the reverseTransform methods of the transformers.
- *
-
-
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {

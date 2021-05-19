@@ -22,8 +22,6 @@ use Symfony\Component\Security\Core\Security;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
- *
-
  */
 class HttpUtils
 {

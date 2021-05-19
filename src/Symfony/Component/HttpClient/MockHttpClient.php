@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 /**
  * A test-friendly HttpClient that doesn't make actual HTTP requests.
- *
-
  */
 class MockHttpClient implements HttpClientInterface
 {

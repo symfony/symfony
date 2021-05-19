@@ -42,8 +42,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  * bytes in length inclusive of structural overhead.
  *
  * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
- *
-
  */
 class MongoDbStore implements PersistingStoreInterface
 {

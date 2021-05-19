@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * A test case to ease testing a translation provider factory.
  *
-
- *
  * @internal
  */
 abstract class ProviderFactoryTestCase extends TestCase

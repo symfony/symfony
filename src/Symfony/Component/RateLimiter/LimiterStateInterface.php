@@ -18,8 +18,6 @@ namespace Symfony\Component\RateLimiter;
  * which is used by the storage implementations to store the
  * object.
  *
-
- *
  * @experimental in 5.3
  */
 interface LimiterStateInterface

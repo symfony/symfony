@@ -36,9 +36,6 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  * then "re-authenticates" the user using the information in the
  * cookie.
  *
-
-
- *
  * @final
  */
 class RememberMeAuthenticator implements InteractiveAuthenticatorInterface

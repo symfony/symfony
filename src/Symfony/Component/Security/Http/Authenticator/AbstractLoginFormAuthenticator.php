@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 
 /**
  * A base class to make form login authentication easier!
- *
-
  */
 abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {

@@ -16,9 +16,6 @@ use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Template;
 
-/**
-
- */
 class TwigRendererEngine extends AbstractRendererEngine
 {
     /**

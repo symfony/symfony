@@ -25,9 +25,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private const MAX_RETRIES = 3;

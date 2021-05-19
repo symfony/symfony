@@ -22,8 +22,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInter
 
 /**
  * Responsible for resolving the arguments passed to an action.
- *
-
  */
 final class ArgumentResolver implements ArgumentResolverInterface
 {

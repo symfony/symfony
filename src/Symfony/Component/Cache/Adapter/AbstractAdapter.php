@@ -20,9 +20,6 @@ use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
-
- */
 abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     /**

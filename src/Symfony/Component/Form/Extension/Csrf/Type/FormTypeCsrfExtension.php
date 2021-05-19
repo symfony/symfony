@@ -22,9 +22,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
     private $defaultTokenManager;

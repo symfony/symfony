@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * Generates ConfigBuilders to help create valid config.
- *
-
  */
 interface ConfigBuilderGeneratorInterface
 {

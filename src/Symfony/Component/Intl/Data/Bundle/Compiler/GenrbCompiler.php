@@ -16,8 +16,6 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * Compiles .txt resource bundles to binary .res files.
  *
-
- *
  * @internal
  */
 class GenrbCompiler implements BundleCompilerInterface

@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Request stack that controls the lifecycle of requests.
- *
-
  */
 class RequestStack
 {

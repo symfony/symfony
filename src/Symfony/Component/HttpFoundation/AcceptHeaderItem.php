@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * Represents an Accept-* header item.
- *
-
  */
 class AcceptHeaderItem
 {

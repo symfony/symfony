@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PasswordHasher\Exception;
 
-/**
-
- */
 class LogicException extends \LogicException implements ExceptionInterface
 {
 }

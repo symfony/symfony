@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-/**
-
- */
 final class FirewallConfig
 {
     private $name;

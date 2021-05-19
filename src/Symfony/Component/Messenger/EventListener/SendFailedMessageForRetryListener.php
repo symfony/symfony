@@ -28,9 +28,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class SendFailedMessageForRetryListener implements EventSubscriberInterface
 {
     private $sendersLocator;

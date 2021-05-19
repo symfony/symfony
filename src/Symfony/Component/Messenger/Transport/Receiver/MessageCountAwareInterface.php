@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\Receiver;
 
-/**
-
-
- */
 interface MessageCountAwareInterface
 {
     /**

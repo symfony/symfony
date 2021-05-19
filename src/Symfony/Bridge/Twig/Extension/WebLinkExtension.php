@@ -19,8 +19,6 @@ use Twig\TwigFunction;
 
 /**
  * Twig extension for the Symfony WebLink component.
- *
-
  */
 final class WebLinkExtension extends AbstractExtension
 {

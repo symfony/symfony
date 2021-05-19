@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
  * Represents a node in your service graph.
  *
  * Value is typically a definition, or an alias.
- *
-
  */
 class ServiceReferenceGraphNode
 {

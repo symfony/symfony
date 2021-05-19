@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * @Annotation
  * @Target({"CLASS"})
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Cascade extends Constraint

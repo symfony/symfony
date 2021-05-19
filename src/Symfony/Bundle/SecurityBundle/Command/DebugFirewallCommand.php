@@ -23,9 +23,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
-/**
-
- */
 final class DebugFirewallCommand extends Command
 {
     protected static $defaultName = 'debug:firewall';

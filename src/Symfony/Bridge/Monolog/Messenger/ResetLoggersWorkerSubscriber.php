@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 
 /**
  * Reset loggers between messages being handled to release buffered handler logs.
- *
-
  */
 class ResetLoggersWorkerSubscriber implements EventSubscriberInterface
 {

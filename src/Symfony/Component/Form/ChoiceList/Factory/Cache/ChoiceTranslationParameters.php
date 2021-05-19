@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_translation_parameters" option.
  *
  * @internal
- *
-
  */
 final class ChoiceTranslationParameters extends AbstractStaticOption
 {

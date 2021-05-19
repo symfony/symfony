@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordEmbedInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
-/**
-
- */
 final class DiscordOptions implements MessageOptionsInterface
 {
     private $options = [];

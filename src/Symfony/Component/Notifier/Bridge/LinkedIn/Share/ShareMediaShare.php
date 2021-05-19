@@ -14,8 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 use Symfony\Component\Notifier\Exception\LogicException;
 
 /**
-
- *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#sharemedia
  */
 class ShareMediaShare extends AbstractLinkedInShare

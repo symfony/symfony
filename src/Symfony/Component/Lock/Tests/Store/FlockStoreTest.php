@@ -16,9 +16,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 
-/**
-
- */
 class FlockStoreTest extends AbstractStoreTest
 {
     use BlockingStoreTestTrait;

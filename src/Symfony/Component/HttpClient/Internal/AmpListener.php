@@ -19,8 +19,6 @@ use Amp\Success;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
-
- *
  * @internal
  */
 class AmpListener implements EventListener

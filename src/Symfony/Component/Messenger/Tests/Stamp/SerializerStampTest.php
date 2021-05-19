@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-/**
-
- */
 class SerializerStampTest extends TestCase
 {
     public function testSerializable()

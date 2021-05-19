@@ -22,8 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Integration tests for {@see \Symfony\Component\DependencyInjection\ContainerBuilder} combined
  * with the ProxyManager bridge.
- *
-
  */
 class ContainerBuilderTest extends TestCase
 {

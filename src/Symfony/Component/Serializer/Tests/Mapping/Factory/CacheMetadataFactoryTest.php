@@ -19,9 +19,6 @@ use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
-/**
-
- */
 class CacheMetadataFactoryTest extends TestCase
 {
     public function testGetMetadataFor()

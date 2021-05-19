@@ -14,10 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 
 /**
-
-
-
- *
  * @internal
  */
 class SodiumVault extends AbstractVault implements EnvVarLoaderInterface

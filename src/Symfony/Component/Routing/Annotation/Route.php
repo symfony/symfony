@@ -17,9 +17,6 @@ namespace Symfony\Component\Routing\Annotation;
  * @Annotation
  * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
- *
-
-
  */
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Route

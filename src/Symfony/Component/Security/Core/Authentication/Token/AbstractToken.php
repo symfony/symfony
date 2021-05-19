@@ -17,9 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Base class for Token instances.
- *
-
-
  */
 abstract class AbstractToken implements TokenInterface
 {

@@ -19,9 +19,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
 
-/**
-
- */
 abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {
     use ExpiringStoreTestTrait;

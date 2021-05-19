@@ -15,8 +15,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
  * A message wrapped in an envelope with stamps (configurations, markers, ...).
- *
-
  */
 final class Envelope
 {

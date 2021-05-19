@@ -22,9 +22,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class FakeChatEmailTransport extends AbstractTransport
 {
     protected const HOST = 'default';

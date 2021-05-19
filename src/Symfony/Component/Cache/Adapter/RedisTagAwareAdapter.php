@@ -41,9 +41,6 @@ use Symfony\Component\Cache\Traits\RedisTrait;
  *
  * @see https://redis.io/topics/lru-cache#eviction-policies Documentation for Redis eviction policies.
  * @see https://redis.io/topics/data-types#sets Documentation for Redis Set datatype.
- *
-
-
  */
 class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 {

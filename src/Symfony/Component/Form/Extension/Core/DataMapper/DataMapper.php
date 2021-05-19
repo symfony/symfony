@@ -20,8 +20,6 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 
 /**
  * Maps arrays/objects to/from forms using data accessors.
- *
-
  */
 class DataMapper implements DataMapperInterface
 {

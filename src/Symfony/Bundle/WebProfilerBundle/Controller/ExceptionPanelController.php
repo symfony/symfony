@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * Renders the exception panel.
  *
-
- *
  * @internal
  */
 class ExceptionPanelController

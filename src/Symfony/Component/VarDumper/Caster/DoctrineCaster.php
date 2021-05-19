@@ -19,8 +19,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts Doctrine related classes to array representation.
  *
-
- *
  * @final
  */
 class DoctrineCaster

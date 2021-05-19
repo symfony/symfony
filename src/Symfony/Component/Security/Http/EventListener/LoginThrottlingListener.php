@@ -20,9 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
-/**
-
- */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {
     private $requestStack;

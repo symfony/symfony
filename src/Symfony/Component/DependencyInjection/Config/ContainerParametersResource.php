@@ -16,8 +16,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * Tracks container parameters.
  *
-
- *
  * @final
  */
 class ContainerParametersResource implements ResourceInterface

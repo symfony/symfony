@@ -15,11 +15,6 @@ use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
-/**
-
-
-
- */
 interface EntryManagerInterface
 {
     /**

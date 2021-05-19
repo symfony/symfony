@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Bridge\Gitter\GitterTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-/**
-
- */
 final class GitterTransportFactoryTest extends TransportFactoryTestCase
 {
     public function createFactory(): TransportFactoryInterface

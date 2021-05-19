@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Yields the Session.
- *
-
  */
 final class SessionValueResolver implements ArgumentValueResolverInterface
 {

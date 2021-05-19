@@ -14,9 +14,6 @@ namespace Symfony\Bridge\Twig\Node;
 use Twig\Compiler;
 use Twig\Node\Node;
 
-/**
-
- */
 final class DumpNode extends Node
 {
     private $varPrefix;

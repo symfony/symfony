@@ -20,8 +20,6 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 /**
  * Proxy that invokes a data collector when creating a form and its view.
- *
-
  */
 class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
 {

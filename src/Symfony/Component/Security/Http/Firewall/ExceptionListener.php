@@ -38,8 +38,6 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
  * ExceptionListener catches authentication exception and converts them to
  * Response instances.
  *
-
- *
  * @final
  */
 class ExceptionListener

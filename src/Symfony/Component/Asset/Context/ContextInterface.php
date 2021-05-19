@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\Context;
 
 /**
  * Holds information about the current request.
- *
-
  */
 interface ContextInterface
 {

@@ -16,9 +16,6 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 
-/**
-
- */
 final class Transports implements TransportInterface
 {
     private $transports;

@@ -23,8 +23,6 @@ if (!class_exists(BaseExpressionLanguage::class)) {
     /**
      * Adds some function to the default ExpressionLanguage.
      *
-
-     *
      * @see ExpressionLanguageProvider
      */
     class ExpressionLanguage extends BaseExpressionLanguage

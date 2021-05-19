@@ -20,9 +20,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * metadata resources are passed to ResourceCheckers. The ResourceCheckers
  * can then inspect the resources and decide whether the cache can be considered
  * fresh or not.
- *
-
-
  */
 interface ResourceCheckerInterface
 {

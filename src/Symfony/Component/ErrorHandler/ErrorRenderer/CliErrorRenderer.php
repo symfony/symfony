@@ -18,9 +18,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 // Help opcache.preload discover always-needed symbols
 class_exists(CliDumper::class);
 
-/**
 
- */
 class CliErrorRenderer implements ErrorRendererInterface
 {
     /**

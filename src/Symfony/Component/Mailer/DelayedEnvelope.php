@@ -17,8 +17,6 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 
 /**
-
- *
  * @internal
  */
 final class DelayedEnvelope extends Envelope

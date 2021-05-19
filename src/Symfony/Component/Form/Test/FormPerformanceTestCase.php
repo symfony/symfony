@@ -17,9 +17,6 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
  * Base class for performance tests.
  *
  * Copied from Doctrine 2's OrmPerformanceTestCase.
- *
-
-
  */
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {

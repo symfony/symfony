@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime\Header;
 
 /**
  * A MIME Header.
- *
-
  */
 interface HeaderInterface
 {

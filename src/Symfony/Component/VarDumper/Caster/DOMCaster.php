@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts DOM related classes to array representation.
  *
-
- *
  * @final
  */
 class DOMCaster

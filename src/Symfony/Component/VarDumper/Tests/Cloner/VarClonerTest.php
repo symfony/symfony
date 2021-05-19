@@ -16,9 +16,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php74;
 use Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums;
 
-/**
-
- */
 class VarClonerTest extends TestCase
 {
     public function testMaxIntBoundary()

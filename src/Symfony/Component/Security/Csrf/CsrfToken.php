@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Csrf;
 
 /**
  * A CSRF token.
- *
-
  */
 class CsrfToken
 {

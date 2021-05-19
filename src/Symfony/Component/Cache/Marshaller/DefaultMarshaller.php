@@ -15,8 +15,6 @@ use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * Serializes/unserializes values using igbinary_serialize() if available, serialize() otherwise.
- *
-
  */
 class DefaultMarshaller implements MarshallerInterface
 {

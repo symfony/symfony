@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
-/**
-
- */
 class SessionTokenStorageTest extends TestCase
 {
     private const SESSION_NAMESPACE = 'foobar';

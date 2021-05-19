@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
- *
-
  */
 class UniqueEntityValidator extends ConstraintValidator
 {

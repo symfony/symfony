@@ -17,8 +17,6 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
-
- *
  * @final
  */
 class RememberMeLogoutListener implements EventSubscriberInterface

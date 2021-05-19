@@ -22,9 +22,6 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class SesHttpAsyncAwsTransport extends AbstractTransport
 {
     /** @var SesClient */

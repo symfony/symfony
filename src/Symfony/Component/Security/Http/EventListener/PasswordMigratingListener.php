@@ -22,8 +22,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
-
- *
  * @final
  */
 class PasswordMigratingListener implements EventSubscriberInterface

@@ -29,9 +29,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  * The base authenticator for authenticators to use pre-authenticated
  * requests (e.g. using certificates).
  *
-
-
- *
  * @internal
  */
 abstract class AbstractPreAuthenticatedAuthenticator implements InteractiveAuthenticatorInterface

@@ -21,8 +21,6 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * This implementation resolves the _controller attribute from the short notation
  * to the fully-qualified form (from a:b:c to class::method).
  *
-
- *
  * @final
  */
 class DelegatingLoader extends BaseDelegatingLoader

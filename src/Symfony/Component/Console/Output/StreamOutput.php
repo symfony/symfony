@@ -24,8 +24,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * As `StreamOutput` can use any stream, you can also use a file:
  *
  *     $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
- *
-
  */
 class StreamOutput extends Output
 {

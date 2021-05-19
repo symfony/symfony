@@ -14,9 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
-
- */
 class DataCollectorTranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

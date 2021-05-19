@@ -18,8 +18,6 @@ use Symfony\Component\Mime\Part\TextPart;
 
 /**
  * Implements RFC 7578.
- *
-
  */
 final class FormDataPart extends AbstractMultipartPart
 {

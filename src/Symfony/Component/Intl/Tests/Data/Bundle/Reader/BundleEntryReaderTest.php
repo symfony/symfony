@@ -18,9 +18,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
-/**
-
- */
 class BundleEntryReaderTest extends TestCase
 {
     private const RES_DIR = '/res/dir';

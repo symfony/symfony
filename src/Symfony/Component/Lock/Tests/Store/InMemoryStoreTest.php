@@ -14,9 +14,6 @@ namespace Symfony\Component\Lock\Tests\Store;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\InMemoryStore;
 
-/**
-
- */
 class InMemoryStoreTest extends AbstractStoreTest
 {
     use SharedLockStoreTestTrait;

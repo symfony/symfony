@@ -15,8 +15,6 @@ use ProxyManager\Proxy\ProxyInterface;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
-
- *
  * @final
  */
 class ProxyManagerCaster

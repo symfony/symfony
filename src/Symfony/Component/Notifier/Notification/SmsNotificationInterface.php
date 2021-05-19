@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Notification;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
-/**
-
- */
 interface SmsNotificationInterface
 {
     public function asSmsMessage(SmsRecipientInterface $recipient, string $transport = null): ?SmsMessage;

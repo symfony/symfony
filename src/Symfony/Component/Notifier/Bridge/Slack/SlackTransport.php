@@ -22,9 +22,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class SlackTransport extends AbstractTransport
 {
     protected const HOST = 'slack.com';

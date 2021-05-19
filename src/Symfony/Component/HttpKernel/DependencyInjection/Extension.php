@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
 
 /**
  * Allow adding classes to the class cache.
- *
-
  */
 abstract class Extension extends BaseExtension
 {

@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
  * This class is used for testing purposes, and is not really suited for production.
- *
-
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {

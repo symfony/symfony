@@ -19,8 +19,6 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
  * The methods {@link loadChoicesForValues()} and {@link loadValuesForChoices()}
  * can be used to load the list only partially in cases where a fully-loaded
  * list is not necessary.
- *
-
  */
 interface ChoiceLoaderInterface
 {

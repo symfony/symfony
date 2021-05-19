@@ -19,8 +19,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Generates the catalogues for translations.
- *
-
  */
 class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {

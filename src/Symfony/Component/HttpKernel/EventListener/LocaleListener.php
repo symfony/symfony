@@ -23,8 +23,6 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 /**
  * Initializes the locale based on the current request.
  *
-
- *
  * @final
  */
 class LocaleListener implements EventSubscriberInterface

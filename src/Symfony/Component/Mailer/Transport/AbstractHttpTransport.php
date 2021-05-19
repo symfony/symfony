@@ -19,9 +19,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 abstract class AbstractHttpTransport extends AbstractTransport
 {
     protected $host;

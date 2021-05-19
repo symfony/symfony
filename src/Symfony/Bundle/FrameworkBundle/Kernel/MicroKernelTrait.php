@@ -25,9 +25,6 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 /**
  * A Kernel that provides configuration hooks.
  *
-
-
- *
  * @method void configureRoutes(RoutingConfigurator $routes)
  * @method void configureContainer(ContainerConfigurator $container)
  */

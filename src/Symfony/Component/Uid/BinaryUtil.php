@@ -13,8 +13,6 @@ namespace Symfony\Component\Uid;
 
 /**
  * @internal
- *
-
  */
 class BinaryUtil
 {

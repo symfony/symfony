@@ -15,9 +15,6 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
-/**
-
- */
 trait UnserializableTestTrait
 {
     /**

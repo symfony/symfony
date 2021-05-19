@@ -14,8 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 /**
  * @Annotation
  * @Target({"ANNOTATION"})
- *
-
  */
 class Required extends Existence
 {

@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-/**
-
- */
 class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {
     public function testInterface()

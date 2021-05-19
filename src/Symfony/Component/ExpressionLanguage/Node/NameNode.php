@@ -14,8 +14,6 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 use Symfony\Component\ExpressionLanguage\Compiler;
 
 /**
-
- *
  * @internal
  */
 class NameNode extends Node

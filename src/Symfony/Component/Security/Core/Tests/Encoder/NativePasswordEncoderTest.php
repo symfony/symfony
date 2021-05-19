@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 
 /**
-
  * @group legacy
  */
 class NativePasswordEncoderTest extends TestCase

@@ -56,8 +56,6 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * currently validated property and more. These values change over time, so you
  * cannot store a context and expect that the methods still return the same
  * results later on.
- *
-
  */
 interface ExecutionContextInterface
 {

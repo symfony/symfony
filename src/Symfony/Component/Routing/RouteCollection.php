@@ -19,9 +19,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * When adding a route at the end of the collection, an existing route
  * with the same name is removed first. So there can only be one route
  * with a given name.
- *
-
-
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {

@@ -17,9 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * TokenInterface is the interface for the user authentication information.
  *
  * @method string getUserIdentifier() returns the user identifier used during authentication (e.g. a user's e-mailaddress or username)
- *
-
-
  */
 interface TokenInterface extends \Serializable
 {

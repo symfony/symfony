@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Exception;
 
 /**
  * Base ExceptionInterface for the Lock Component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

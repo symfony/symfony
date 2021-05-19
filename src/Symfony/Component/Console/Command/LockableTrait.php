@@ -19,8 +19,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
  * Basic lock feature for commands.
- *
-
  */
 trait LockableTrait
 {

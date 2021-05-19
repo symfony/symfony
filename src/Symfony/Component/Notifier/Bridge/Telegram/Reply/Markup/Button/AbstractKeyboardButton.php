@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button;
 
-/**
-
- */
 abstract class AbstractKeyboardButton
 {
     protected $options = [];

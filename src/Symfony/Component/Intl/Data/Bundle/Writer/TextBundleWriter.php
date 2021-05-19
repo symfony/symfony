@@ -18,8 +18,6 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
  * {@link \Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface}
  * implementation.
  *
-
- *
  * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
  *
  * @internal

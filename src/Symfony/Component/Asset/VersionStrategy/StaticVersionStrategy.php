@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\VersionStrategy;
 
 /**
  * Returns the same version for all assets.
- *
-
  */
 class StaticVersionStrategy implements VersionStrategyInterface
 {

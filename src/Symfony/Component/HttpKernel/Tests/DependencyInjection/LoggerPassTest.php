@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Log\Logger;
 
-/**
-
- */
 class LoggerPassTest extends TestCase
 {
     public function testAlwaysSetAutowiringAlias()

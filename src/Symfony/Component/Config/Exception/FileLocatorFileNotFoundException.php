@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Exception;
 
 /**
  * File locator exception if a file does not exist.
- *
-
  */
 class FileLocatorFileNotFoundException extends \InvalidArgumentException
 {

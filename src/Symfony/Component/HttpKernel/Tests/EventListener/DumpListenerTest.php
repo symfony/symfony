@@ -21,8 +21,6 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * DumpListenerTest.
- *
-
  */
 class DumpListenerTest extends TestCase
 {

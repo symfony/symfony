@@ -35,9 +35,6 @@ class_exists(AuthenticationSuccessEvent::class);
  * AuthenticationProviderManager uses a list of AuthenticationProviderInterface
  * instances to authenticate a Token.
  *
-
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface

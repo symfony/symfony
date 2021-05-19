@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\NameConverter;
 
 /**
  * Defines the interface for property name converters.
- *
-
  */
 interface NameConverterInterface
 {

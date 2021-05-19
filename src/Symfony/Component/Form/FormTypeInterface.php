@@ -13,9 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 interface FormTypeInterface
 {
     /**

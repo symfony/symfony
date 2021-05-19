@@ -28,8 +28,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  * and generated an authentication success response. Listeners to
  * this event can do actions related to successful authentication
  * (such as migrating the password).
- *
-
  */
 class LoginSuccessEvent extends Event
 {

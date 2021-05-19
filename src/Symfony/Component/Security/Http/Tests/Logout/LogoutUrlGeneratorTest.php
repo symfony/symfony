@@ -19,9 +19,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
-/**
-
- */
 class LogoutUrlGeneratorTest extends TestCase
 {
     /** @var TokenStorage */

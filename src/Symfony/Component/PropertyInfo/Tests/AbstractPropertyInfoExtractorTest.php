@@ -22,9 +22,6 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
-
- */
 class AbstractPropertyInfoExtractorTest extends TestCase
 {
     /**

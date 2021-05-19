@@ -18,9 +18,6 @@ use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
 
-/**
-
- */
 final class MessageConverter
 {
     /**

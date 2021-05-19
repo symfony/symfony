@@ -19,8 +19,6 @@ use Twig\Error\Error;
 
 /**
  * Generates the Twig cache for all templates.
- *
-
  */
 class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {

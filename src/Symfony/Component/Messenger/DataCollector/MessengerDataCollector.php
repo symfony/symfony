@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
-
- *
  * @final
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface

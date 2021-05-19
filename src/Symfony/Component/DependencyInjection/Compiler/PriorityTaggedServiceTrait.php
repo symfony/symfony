@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Trait that allows a generic method to find and sort service by priority option in the tag.
- *
-
  */
 trait PriorityTaggedServiceTrait
 {

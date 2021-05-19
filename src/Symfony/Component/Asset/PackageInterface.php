@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset;
 
 /**
  * Asset package interface.
- *
-
  */
 interface PackageInterface
 {

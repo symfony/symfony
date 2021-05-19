@@ -20,8 +20,6 @@ use Twig\TwigFunction;
 
 /**
  * SecurityExtension exposes security context features.
- *
-
  */
 final class SecurityExtension extends AbstractExtension
 {

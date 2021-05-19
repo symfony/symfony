@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
-/**
-
- */
 final class BrowserChannel implements ChannelInterface
 {
     private $stack;

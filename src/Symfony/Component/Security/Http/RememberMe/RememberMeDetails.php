@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Http\RememberMe;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-/**
-
- */
 class RememberMeDetails
 {
     public const COOKIE_DELIMITER = ':';

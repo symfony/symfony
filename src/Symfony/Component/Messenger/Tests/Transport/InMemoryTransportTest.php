@@ -18,9 +18,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class InMemoryTransportTest extends TestCase
 {
     /**

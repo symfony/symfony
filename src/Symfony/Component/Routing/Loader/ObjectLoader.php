@@ -17,8 +17,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A route loader that calls a method on an object to load the routes.
- *
-
  */
 abstract class ObjectLoader extends Loader
 {

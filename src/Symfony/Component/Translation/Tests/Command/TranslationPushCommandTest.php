@@ -21,9 +21,6 @@ use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Tests\Command\TranslationProviderTestCase;
 use Symfony\Component\Translation\TranslatorBag;
 
-/**
-
- */
 class TranslationPushCommandTest extends TranslationProviderTestCase
 {
     protected function setUp(): void

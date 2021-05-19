@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 /**
  * Implements the ESI rendering strategy.
- *
-
  */
 class EsiFragmentRenderer extends AbstractSurrogateFragmentRenderer
 {

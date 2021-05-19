@@ -18,8 +18,6 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * UrlMatcherInterface is the interface that all URL matcher classes must implement.
- *
-
  */
 interface UrlMatcherInterface extends RequestContextAwareInterface
 {

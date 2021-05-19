@@ -19,8 +19,6 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 /**
  * Firewall collecting called listeners.
- *
-
  */
 final class TraceableFirewallListener extends FirewallListener
 {

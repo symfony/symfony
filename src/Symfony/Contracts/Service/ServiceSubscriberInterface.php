@@ -23,8 +23,6 @@ namespace Symfony\Contracts\Service;
  * It is expected that ServiceSubscriber instances consume PSR-11-based service locators internally.
  * This interface does not dictate any injection method for these service locators, although constructor
  * injection is recommended.
- *
-
  */
 interface ServiceSubscriberInterface
 {

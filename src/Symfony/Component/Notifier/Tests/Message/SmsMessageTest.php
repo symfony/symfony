@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Tests\Message;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
-/**
-
- */
 class SmsMessageTest extends TestCase
 {
     public function testCanBeConstructed()

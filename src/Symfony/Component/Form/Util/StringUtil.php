@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Form\Util;
 
-/**
-
-
- */
 class StringUtil
 {
     /**

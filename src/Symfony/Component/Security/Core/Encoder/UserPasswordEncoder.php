@@ -21,8 +21,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * A generic password encoder.
  *
-
- *
  * @deprecated since Symfony 5.3, use {@link UserPasswordHasher} instead
  */
 class UserPasswordEncoder implements UserPasswordEncoderInterface

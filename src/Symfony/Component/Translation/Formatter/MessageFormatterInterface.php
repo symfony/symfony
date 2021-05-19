@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Translation\Formatter;
 
-/**
-
-
- */
 interface MessageFormatterInterface
 {
     /**

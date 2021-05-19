@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  *
  * This is useful when passed to Worker: messages received
  * from the transport can be sent to the correct bus.
- *
-
  */
 class RoutableMessageBus implements MessageBusInterface
 {

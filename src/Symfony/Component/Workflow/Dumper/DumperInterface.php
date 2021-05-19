@@ -16,9 +16,6 @@ use Symfony\Component\Workflow\Marking;
 
 /**
  * DumperInterface is the interface implemented by workflow dumper classes.
- *
-
-
  */
 interface DumperInterface
 {

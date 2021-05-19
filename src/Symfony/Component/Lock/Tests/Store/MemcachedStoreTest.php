@@ -17,8 +17,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MemcachedStore;
 
 /**
-
- *
  * @requires extension memcached
  * @group integration
  */

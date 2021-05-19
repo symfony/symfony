@@ -17,10 +17,6 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
-
- */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {
     protected $dispatcher;

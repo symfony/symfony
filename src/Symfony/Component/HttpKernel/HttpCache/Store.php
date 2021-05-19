@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
- *
-
  */
 class Store implements StoreInterface
 {

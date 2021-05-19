@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 /**
  * Extended SwiftMailerHandler that flushes mail queue if necessary.
  *
-
- *
  * @final
  */
 class SwiftMailerHandler extends BaseSwiftMailerHandler

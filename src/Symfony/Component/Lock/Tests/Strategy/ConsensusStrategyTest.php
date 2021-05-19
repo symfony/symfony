@@ -14,9 +14,6 @@ namespace Symfony\Component\Lock\Tests\Strategy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Strategy\ConsensusStrategy;
 
-/**
-
- */
 class ConsensusStrategyTest extends TestCase
 {
     /** @var ConsensusStrategy */

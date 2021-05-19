@@ -17,10 +17,6 @@ use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\SemaphoreFactory;
 
-/**
-
-
- */
 class SemaphoreFactoryTest extends TestCase
 {
     public function testCreateSemaphore()

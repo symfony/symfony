@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 /**
  * GlobFileLoader loads files from a glob pattern.
- *
-
  */
 class GlobFileLoader extends FileLoader
 {

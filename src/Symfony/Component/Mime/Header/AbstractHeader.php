@@ -15,8 +15,6 @@ use Symfony\Component\Mime\Encoder\QpMimeHeaderEncoder;
 
 /**
  * An abstract base MIME Header.
- *
-
  */
 abstract class AbstractHeader implements HeaderInterface
 {

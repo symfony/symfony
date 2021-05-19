@@ -17,8 +17,6 @@ use Symfony\Component\VarDumper\Server\Connection;
 
 /**
  * ServerDumper forwards serialized Data clones to a server.
- *
-
  */
 class ServerDumper implements DataDumperInterface
 {

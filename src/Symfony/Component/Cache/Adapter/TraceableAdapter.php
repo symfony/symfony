@@ -20,10 +20,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * An adapter that collects data about all cache calls.
- *
-
-
-
  */
 class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {

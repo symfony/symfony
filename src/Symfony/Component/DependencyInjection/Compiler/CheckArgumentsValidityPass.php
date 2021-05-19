@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Checks if arguments of methods are properly configured.
- *
-
-
  */
 class CheckArgumentsValidityPass extends AbstractRecursivePass
 {

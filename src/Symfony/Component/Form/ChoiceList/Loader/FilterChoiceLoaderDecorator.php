@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
 
 /**
  * A decorator to filter choices only when they are loaded or partially loaded.
- *
-
  */
 class FilterChoiceLoaderDecorator extends AbstractChoiceLoader
 {

@@ -16,9 +16,6 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\TextPart;
 
-/**
-
- */
 class Message extends RawMessage
 {
     private $headers;

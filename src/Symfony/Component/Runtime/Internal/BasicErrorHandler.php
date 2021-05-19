@@ -12,8 +12,6 @@
 namespace Symfony\Component\Runtime\Internal;
 
 /**
-
- *
  * @internal
  */
 class BasicErrorHandler

@@ -23,8 +23,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 /**
  * PostgreSqlStore is a PersistingStoreInterface implementation using
  * PostgreSql advisory locks.
- *
-
  */
 class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {

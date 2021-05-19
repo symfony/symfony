@@ -17,9 +17,6 @@ use Symfony\Component\Notifier\Notification\SmsNotificationInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
-/**
-
- */
 class SmsChannel extends AbstractChannel
 {
     public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void

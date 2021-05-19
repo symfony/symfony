@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
-/**
-
- */
 final class SlackImageBlockElement extends AbstractSlackBlockElement
 {
     public function __construct(string $url, string $text)

@@ -13,9 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
-
- */
 class FormEvent extends Event
 {
     private $form;

@@ -15,8 +15,6 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 
 /**
  * Represents a 5xx response.
- *
-
  */
 final class ServerException extends \RuntimeException implements ServerExceptionInterface
 {

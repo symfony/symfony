@@ -19,9 +19,6 @@ use Twig\Template;
 
 /**
  * Tries to provide context from sources (class name, file, line, code excerpt, ...).
- *
-
-
  */
 final class SourceContextProvider implements ContextProviderInterface
 {

@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * Validates PHP values against constraints.
- *
-
  */
 interface ValidatorInterface extends MetadataFactoryInterface
 {

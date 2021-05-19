@@ -23,8 +23,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * Listeners to this event can change state based on authentication
  * failure (e.g. to implement login throttling).
- *
-
  */
 class LoginFailureEvent extends Event
 {

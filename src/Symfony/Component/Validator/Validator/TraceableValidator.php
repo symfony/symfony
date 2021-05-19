@@ -16,8 +16,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Collects some data about validator calls.
- *
-
  */
 class TraceableValidator implements ValidatorInterface, ResetInterface
 {

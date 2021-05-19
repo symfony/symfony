@@ -17,10 +17,6 @@ use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 
-/**
-
-
- */
 abstract class AbstractStoreTest extends TestCase
 {
     abstract protected function getStore(): PersistingStoreInterface;

@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
  * Interface for TokenProviders.
- *
-
  */
 interface TokenProviderInterface
 {

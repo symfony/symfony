@@ -17,9 +17,6 @@ use Psr\Log\NullLogger;
 
 /**
  * Factory provides method to create locks.
- *
-
-
  */
 class LockFactory implements LoggerAwareInterface
 {

@@ -22,9 +22,6 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsedInTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\TraitUsage\DummyUsingTrait;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
-
- */
 class PhpDocExtractorTest extends TestCase
 {
     /**

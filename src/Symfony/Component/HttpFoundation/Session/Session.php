@@ -23,10 +23,7 @@ class_exists(AttributeBag::class);
 class_exists(FlashBag::class);
 class_exists(SessionBagProxy::class);
 
-/**
 
-
- */
 class Session implements SessionInterface, \IteratorAggregate, \Countable
 {
     protected $storage;

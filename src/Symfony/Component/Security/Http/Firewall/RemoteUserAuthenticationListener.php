@@ -23,9 +23,6 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
 /**
  * REMOTE_USER authentication listener.
  *
-
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener

@@ -19,9 +19,6 @@ use Symfony\Component\Security\Core\Encoder\PasswordHasherAdapter;
 
 /**
  * A generic hasher factory implementation.
- *
-
-
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {

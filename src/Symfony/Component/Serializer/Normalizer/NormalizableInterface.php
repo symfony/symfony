@@ -16,8 +16,6 @@ namespace Symfony\Component\Serializer\Normalizer;
  *
  * If a normalizer is registered for the class and it doesn't implement
  * the Normalizable interfaces, the normalizer will be used instead.
- *
-
  */
 interface NormalizableInterface
 {

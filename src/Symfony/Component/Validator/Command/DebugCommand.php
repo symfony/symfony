@@ -27,8 +27,6 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * A console command to debug Validators information.
- *
-
  */
 class DebugCommand extends Command
 {

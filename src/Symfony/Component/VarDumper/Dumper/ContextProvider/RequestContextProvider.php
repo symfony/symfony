@@ -17,8 +17,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * Tries to provide context from a request.
- *
-
  */
 final class RequestContextProvider implements ContextProviderInterface
 {

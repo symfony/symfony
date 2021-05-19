@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Exception\LogicException;
 /**
  * @Annotation
  * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
- *
-
-
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Expression extends Constraint

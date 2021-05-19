@@ -21,9 +21,6 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 /**
  * Validates options and merges them with default values.
- *
-
-
  */
 class OptionsResolver implements Options
 {

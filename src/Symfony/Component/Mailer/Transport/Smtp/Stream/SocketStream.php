@@ -16,9 +16,6 @@ use Symfony\Component\Mailer\Exception\TransportException;
 /**
  * A stream supporting remote sockets.
  *
-
-
- *
  * @internal
  */
 final class SocketStream extends AbstractStream

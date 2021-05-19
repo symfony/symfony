@@ -16,9 +16,6 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Prefix tree of routes preserving routes order.
  *
-
-
- *
  * @internal
  */
 class StaticPrefixCollection

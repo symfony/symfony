@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Hashes passwords based on the user and the PasswordHasherFactory.
  *
-
- *
  * @final
  */
 class UserPasswordHasher implements UserPasswordHasherInterface

@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Handler for clearing invalidating the current session.
- *
-
  */
 class SessionLogoutHandler implements LogoutHandlerInterface
 {

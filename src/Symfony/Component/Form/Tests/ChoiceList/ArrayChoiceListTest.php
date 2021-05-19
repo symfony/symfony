@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Tests\ChoiceList;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
-/**
-
- */
 class ArrayChoiceListTest extends AbstractChoiceListTest
 {
     private $object;

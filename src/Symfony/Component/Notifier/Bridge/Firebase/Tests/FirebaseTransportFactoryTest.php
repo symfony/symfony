@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Bridge\Firebase\FirebaseTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-/**
-
- */
 final class FirebaseTransportFactoryTest extends TransportFactoryTestCase
 {
     /**

@@ -21,8 +21,6 @@ use Symfony\Component\Messenger\Envelope;
  * to multiple transports, the message is dispatched only one time.
  * This message is only dispatched the first time a message
  * is sent to a transport, not also if it is retried.
- *
-
  */
 final class SendMessageToTransportsEvent
 {

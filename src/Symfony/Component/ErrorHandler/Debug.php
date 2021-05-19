@@ -13,8 +13,6 @@ namespace Symfony\Component\ErrorHandler;
 
 /**
  * Registers all the debug tools.
- *
-
  */
 class Debug
 {

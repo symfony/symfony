@@ -45,9 +45,7 @@ if (trait_exists(FormattableHandlerTrait::class)) {
     }
 }
 
-/**
 
- */
 trait ServerLogHandlerTrait
 {
     private $host;

@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Authentication Token for "Remember-Me".
- *
-
  */
 class RememberMeToken extends AbstractToken
 {

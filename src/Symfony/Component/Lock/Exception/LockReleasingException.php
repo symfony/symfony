@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Exception;
 
 /**
  * LockReleasingException is thrown when an issue happens during the release of a lock.
- *
-
  */
 class LockReleasingException extends \RuntimeException implements ExceptionInterface
 {

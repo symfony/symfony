@@ -15,10 +15,6 @@ use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 
 /**
  * CompiledUrlGeneratorDumper creates a PHP array to be used with CompiledUrlGenerator.
- *
-
-
-
  */
 class CompiledUrlGeneratorDumper extends GeneratorDumper
 {

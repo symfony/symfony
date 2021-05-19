@@ -21,9 +21,6 @@ use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
 
-/**
-
- */
 class ReflectionCasterTest extends TestCase
 {
     use VarDumperTestTrait;

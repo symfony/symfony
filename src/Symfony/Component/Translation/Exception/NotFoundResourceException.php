@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Thrown when a resource does not exist.
- *
-
  */
 class NotFoundResourceException extends \InvalidArgumentException implements ExceptionInterface
 {

@@ -25,8 +25,6 @@ use Symfony\Component\DependencyInjection\Reference;
  * You can convert the generated dot file with the dot utility (http://www.graphviz.org/):
  *
  *   dot -Tpng container.dot > foo.png
- *
-
  */
 class GraphvizDumper extends Dumper
 {

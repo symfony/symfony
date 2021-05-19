@@ -18,8 +18,6 @@ use Symfony\Component\Config\ResourceCheckerInterface;
  *
  * As these resources perform the actual check themselves, we can provide
  * this class as a standard way of validating them.
- *
-
  */
 class SelfCheckingResourceChecker implements ResourceCheckerInterface
 {

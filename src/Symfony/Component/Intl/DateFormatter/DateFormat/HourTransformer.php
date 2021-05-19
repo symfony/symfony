@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 /**
  * Base class for hour transformers.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

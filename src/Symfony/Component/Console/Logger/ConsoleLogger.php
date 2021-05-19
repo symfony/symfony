@@ -20,8 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * PSR-3 compliant console logger.
  *
-
- *
  * @see https://www.php-fig.org/psr/psr-3/
  */
 class ConsoleLogger extends AbstractLogger

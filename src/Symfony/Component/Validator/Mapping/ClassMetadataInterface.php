@@ -21,8 +21,6 @@ namespace Symfony\Component\Validator\Mapping;
  * by a group sequence for that class and whether instances of that class
  * should be traversed or not.
  *
-
- *
  * @see MetadataInterface
  * @see \Symfony\Component\Validator\Constraints\GroupSequence
  * @see \Symfony\Component\Validator\GroupSequenceProviderInterface

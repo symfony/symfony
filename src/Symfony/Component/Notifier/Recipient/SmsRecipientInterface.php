@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Notifier\Recipient;
 
-/**
-
-
- */
 interface SmsRecipientInterface extends RecipientInterface
 {
     public function getPhone(): string;

@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
 /**
  * Attributes store.
- *
-
  */
 interface AttributeBagInterface extends SessionBagInterface
 {

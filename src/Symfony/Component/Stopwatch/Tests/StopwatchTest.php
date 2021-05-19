@@ -19,8 +19,6 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 /**
  * StopwatchTest.
  *
-
- *
  * @group time-sensitive
  */
 class StopwatchTest extends TestCase

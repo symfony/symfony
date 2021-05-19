@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * A builder for {@link SubmitButton} instances.
- *
-
  */
 class SubmitButtonBuilder extends ButtonBuilder
 {

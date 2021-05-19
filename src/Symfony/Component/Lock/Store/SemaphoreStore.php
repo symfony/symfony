@@ -18,8 +18,6 @@ use Symfony\Component\Lock\Key;
 
 /**
  * SemaphoreStore is a PersistingStoreInterface implementation using Semaphore as store engine.
- *
-
  */
 class SemaphoreStore implements BlockingStoreInterface
 {

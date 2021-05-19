@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport;
 
-/**
-
- */
 interface SetupableTransportInterface
 {
     /**

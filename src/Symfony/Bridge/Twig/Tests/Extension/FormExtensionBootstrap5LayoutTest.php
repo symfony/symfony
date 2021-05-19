@@ -25,8 +25,6 @@ use Twig\Loader\FilesystemLoader;
 
 /**
  * Class providing test cases for the Bootstrap 5 Twig form theme.
- *
-
  */
 class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTest
 {

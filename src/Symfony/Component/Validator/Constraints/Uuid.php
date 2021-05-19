@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * @Annotation
- *
-
-
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Uuid extends Constraint

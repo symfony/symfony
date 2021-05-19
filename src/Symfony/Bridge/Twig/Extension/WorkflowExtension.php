@@ -19,9 +19,6 @@ use Twig\TwigFunction;
 
 /**
  * WorkflowExtension.
- *
-
-
  */
 final class WorkflowExtension extends AbstractExtension
 {

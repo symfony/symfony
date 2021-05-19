@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 /**
  * CookieTest.
  *
-
-
- *
  * @group time-sensitive
  */
 class CookieTest extends TestCase

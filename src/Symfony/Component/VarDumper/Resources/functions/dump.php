@@ -12,9 +12,7 @@
 use Symfony\Component\VarDumper\VarDumper;
 
 if (!function_exists('dump')) {
-    /**
-
-     */
+    
     function dump($var, ...$moreVars)
     {
         VarDumper::dump($var);

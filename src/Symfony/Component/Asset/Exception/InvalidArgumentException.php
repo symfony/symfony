@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\Exception;
 
 /**
  * Base InvalidArgumentException for the Asset component.
- *
-
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

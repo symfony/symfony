@@ -32,8 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Helps finding unused or missing translation messages in a given locale
  * and comparing them with the fallback ones.
  *
-
- *
  * @final
  */
 class TranslationDebugCommand extends Command

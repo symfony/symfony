@@ -18,11 +18,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * CompiledUrlMatcherDumper creates PHP arrays to be used with CompiledUrlMatcher.
- *
-
-
-
-
  */
 class CompiledUrlMatcherDumper extends MatcherDumper
 {

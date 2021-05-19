@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Messenger;
 
-/**
-
- */
 class TraceableMessageBus implements MessageBusInterface
 {
     private $decoratedBus;

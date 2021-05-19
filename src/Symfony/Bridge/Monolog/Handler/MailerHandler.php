@@ -19,9 +19,6 @@ use Monolog\Logger;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
-/**
-
- */
 class MailerHandler extends AbstractProcessingHandler
 {
     private $mailer;

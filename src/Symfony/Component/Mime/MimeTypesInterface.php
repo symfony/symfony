@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mime;
 
-/**
-
- */
 interface MimeTypesInterface extends MimeTypeGuesserInterface
 {
     /**

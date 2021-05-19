@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  *
  * Do not use in production!
  *
-
- *
  * @internal
  */
 final class CachePoolClearerCacheWarmer implements CacheWarmerInterface

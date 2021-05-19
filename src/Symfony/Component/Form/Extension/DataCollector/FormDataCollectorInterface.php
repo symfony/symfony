@@ -18,8 +18,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * Collects and structures information about forms.
- *
-
  */
 interface FormDataCollectorInterface extends DataCollectorInterface
 {

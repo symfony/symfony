@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-/**
-
- */
 class RegisterEntryPointPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

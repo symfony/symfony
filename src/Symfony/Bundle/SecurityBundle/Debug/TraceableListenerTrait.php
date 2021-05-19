@@ -14,8 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\Debug;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
-
- *
  * @internal
  */
 trait TraceableListenerTrait

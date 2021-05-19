@@ -17,8 +17,6 @@ if (!class_exists(CollatorPolyfill::class)) {
 
     /**
      * Stub implementation for the Collator class of the intl extension.
-     *
-
      */
     class Collator extends IntlCollator
     {
@@ -26,8 +24,6 @@ if (!class_exists(CollatorPolyfill::class)) {
 } else {
     /**
      * Stub implementation for the Collator class of the intl extension.
-     *
-
      */
     class Collator extends CollatorPolyfill
     {

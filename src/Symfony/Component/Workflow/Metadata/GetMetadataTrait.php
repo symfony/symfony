@@ -14,9 +14,6 @@ namespace Symfony\Component\Workflow\Metadata;
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Transition;
 
-/**
-
- */
 trait GetMetadataTrait
 {
     public function getMetadata(string $key, $subject = null)

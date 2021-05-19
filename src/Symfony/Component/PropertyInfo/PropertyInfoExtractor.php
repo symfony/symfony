@@ -14,8 +14,6 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * Default {@see PropertyInfoExtractorInterface} implementation.
  *
-
- *
  * @final
  */
 class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyInitializableExtractorInterface

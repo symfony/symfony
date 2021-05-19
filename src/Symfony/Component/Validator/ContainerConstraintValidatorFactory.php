@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * Uses a service container to create constraint validators.
- *
-
  */
 class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {

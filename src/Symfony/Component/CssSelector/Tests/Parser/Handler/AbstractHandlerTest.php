@@ -16,9 +16,6 @@ use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
 
-/**
-
- */
 abstract class AbstractHandlerTest extends TestCase
 {
     /** @dataProvider getHandleValueTestData */

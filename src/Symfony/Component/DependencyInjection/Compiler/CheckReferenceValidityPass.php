@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * The following checks are performed by this pass:
  * - target definitions are not abstract
- *
-
  */
 class CheckReferenceValidityPass extends AbstractRecursivePass
 {

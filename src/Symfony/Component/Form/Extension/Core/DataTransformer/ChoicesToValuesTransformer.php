@@ -15,9 +15,6 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
- */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
     private $choiceList;

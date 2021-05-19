@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\EventListener\UserProviderListener;
  *
  * It uses an identifier (e.g. email, or username) and
  * "user loader" to load the related User object.
- *
-
  */
 class UserBadge implements BadgeInterface
 {

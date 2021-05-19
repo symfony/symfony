@@ -19,8 +19,6 @@ use Symfony\Component\Security\Core\Exception\LazyResponseException;
 
 /**
  * Wraps a lazily computed response in a signaling exception.
- *
-
  */
 final class LazyResponseEvent extends RequestEvent
 {

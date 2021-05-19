@@ -15,8 +15,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Base interface for HTTP-related exceptions.
- *
-
  */
 interface HttpExceptionInterface extends ExceptionInterface
 {

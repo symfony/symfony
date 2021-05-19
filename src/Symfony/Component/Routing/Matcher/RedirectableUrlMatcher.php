@@ -14,9 +14,6 @@ namespace Symfony\Component\Routing\Matcher;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
-/**
-
- */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
     /**

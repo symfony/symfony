@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * AccountExpiredException is thrown when the user account has expired.
- *
-
-
  */
 class AccountExpiredException extends AccountStatusException
 {

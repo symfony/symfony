@@ -20,8 +20,6 @@ use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class LokaliseProviderFactory extends AbstractProviderFactory

@@ -13,9 +13,6 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-/**
-
- */
 class DoctrineAdapter extends AbstractAdapter
 {
     private $provider;

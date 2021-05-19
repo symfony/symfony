@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 /**
  * Normalizes an object implementing the {@see \DateTimeInterface} to a date string.
  * Denormalizes a date string to an instance of {@see \DateTime} or {@see \DateTimeImmutable}.
- *
-
  */
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {

@@ -16,9 +16,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
-/**
-
- */
 class DateTimeNormalizerTest extends TestCase
 {
     /**

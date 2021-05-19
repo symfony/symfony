@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * In Crowdin:
  *  * Filenames refer to Symfony's translation domains;
  *  * Identifiers refer to Symfony's translation keys;

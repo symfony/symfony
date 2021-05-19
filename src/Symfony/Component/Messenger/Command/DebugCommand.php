@@ -20,8 +20,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * A console command to debug Messenger information.
- *
-
  */
 class DebugCommand extends Command
 {

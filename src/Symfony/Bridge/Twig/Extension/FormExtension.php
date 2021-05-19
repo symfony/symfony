@@ -24,9 +24,6 @@ use Twig\TwigTest;
 
 /**
  * FormExtension extends Twig with form capabilities.
- *
-
-
  */
 final class FormExtension extends AbstractExtension
 {

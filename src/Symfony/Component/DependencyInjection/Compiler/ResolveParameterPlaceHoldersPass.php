@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
- *
-
  */
 class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
 {

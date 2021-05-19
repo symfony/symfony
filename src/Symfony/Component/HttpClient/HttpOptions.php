@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * A helper providing autocompletion for available options.
  *
  * @see HttpClientInterface for a description of each options.
- *
-
  */
 class HttpOptions
 {

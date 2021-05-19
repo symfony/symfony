@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * MemoryDataCollector.
  *
-
- *
  * @final
  */
 class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface

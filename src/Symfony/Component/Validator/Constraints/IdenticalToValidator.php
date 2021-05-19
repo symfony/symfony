@@ -13,9 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 /**
  * Validates values are identical (===).
- *
-
-
  */
 class IdenticalToValidator extends AbstractComparisonValidator
 {

@@ -16,8 +16,6 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
-
- *
  * @internal
  */
 class OptionsResolverWrapper extends OptionsResolver

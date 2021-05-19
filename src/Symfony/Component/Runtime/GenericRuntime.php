@@ -40,8 +40,6 @@ class_exists(ClosureResolver::class);
  * In debug mode, the runtime registers a strict error handler
  * that throws exceptions when a PHP warning/notice is raised.
  *
-
- *
  * @experimental in 5.3
  */
 class GenericRuntime implements RuntimeInterface

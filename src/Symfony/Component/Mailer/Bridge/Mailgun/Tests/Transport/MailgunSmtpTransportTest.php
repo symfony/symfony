@@ -17,9 +17,6 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
-/**
-
- */
 class MailgunSmtpTransportTest extends TestCase
 {
     public function testTagAndMetadataHeaders()

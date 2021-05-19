@@ -16,8 +16,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
  * A BufferedOutput that keeps only the last N chars.
- *
-
  */
 class TrimmedBufferOutput extends Output
 {

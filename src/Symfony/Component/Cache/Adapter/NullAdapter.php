@@ -15,9 +15,6 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
-
- */
 class NullAdapter implements AdapterInterface, CacheInterface
 {
     private static $createCacheItem;

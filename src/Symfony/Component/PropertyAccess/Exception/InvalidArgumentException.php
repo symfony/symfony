@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
  * Base InvalidArgumentException for the PropertyAccess component.
- *
-
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

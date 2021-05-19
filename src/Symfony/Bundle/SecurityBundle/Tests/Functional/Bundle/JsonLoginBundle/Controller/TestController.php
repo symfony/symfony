@@ -14,9 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLoginBundle\
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
-
- */
 class TestController
 {
     public function loginCheckAction(UserInterface $user)

@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Workflow\Exception;
 
-/**
-
-
- */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

@@ -21,8 +21,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Listeners to this event must validate the user and the
  * credentials (e.g. default listeners do password verification and
  * user checking)
- *
-
  */
 class CheckPassportEvent extends Event
 {

@@ -18,9 +18,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-/**
-
- */
 class AmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private $serializer;

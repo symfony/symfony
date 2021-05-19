@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * TokenNotFoundException is thrown if a Token cannot be found.
- *
-
-
  */
 class TokenNotFoundException extends AuthenticationException
 {

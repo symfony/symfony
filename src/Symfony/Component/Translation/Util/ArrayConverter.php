@@ -20,8 +20,6 @@ namespace Symfony\Component\Translation\Util;
  *   foo:
  *     bar1: test1
  *     bar2: test2.
- *
-
  */
 class ArrayConverter
 {

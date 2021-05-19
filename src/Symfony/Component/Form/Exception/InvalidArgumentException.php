@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\Exception;
 
 /**
  * Base InvalidArgumentException for the Form component.
- *
-
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

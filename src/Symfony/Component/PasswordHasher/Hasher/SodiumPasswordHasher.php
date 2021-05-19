@@ -17,10 +17,6 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Hashes passwords using libsodium.
- *
-
-
-
  */
 final class SodiumPasswordHasher implements PasswordHasherInterface
 {

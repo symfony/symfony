@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Exception;
 
 /**
  * Thrown when an error is detected in a node Definition.
- *
-
  */
 class InvalidDefinitionException extends Exception
 {

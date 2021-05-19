@@ -14,9 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-/**
-
- */
 class ServiceConfigurator extends AbstractServiceConfigurator
 {
     public const FACTORY = 'services';

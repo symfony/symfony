@@ -20,9 +20,6 @@ use Symfony\Component\Workflow\Marking;
  * You can convert the generated dot file with the dot utility (https://graphviz.org/):
  *
  *   dot -Tpng workflow.dot > workflow.png
- *
-
-
  */
 class GraphvizDumper implements DumperInterface
 {

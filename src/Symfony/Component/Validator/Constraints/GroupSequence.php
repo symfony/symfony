@@ -48,8 +48,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @Annotation
  * @Target({"CLASS", "ANNOTATION"})
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class GroupSequence

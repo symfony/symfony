@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\LessThanOrEqualValidator;
 
-/**
-
- */
 class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
 {
     protected function createValidator()

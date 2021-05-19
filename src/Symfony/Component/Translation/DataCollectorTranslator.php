@@ -16,9 +16,6 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface
 {
     public const MESSAGE_DEFINED = 0;

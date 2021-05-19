@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl\Exception;
 
 /**
  * RuntimeException for the Intl component.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

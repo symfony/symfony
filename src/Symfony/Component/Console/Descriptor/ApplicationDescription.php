@@ -16,8 +16,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**
-
- *
  * @internal
  */
 class ApplicationDescription

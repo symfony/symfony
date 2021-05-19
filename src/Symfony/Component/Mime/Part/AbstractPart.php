@@ -13,9 +13,6 @@ namespace Symfony\Component\Mime\Part;
 
 use Symfony\Component\Mime\Header\Headers;
 
-/**
-
- */
 abstract class AbstractPart
 {
     private $headers;

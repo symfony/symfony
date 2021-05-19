@@ -14,9 +14,6 @@ namespace Symfony\Component\Lock\Tests\Strategy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
-/**
-
- */
 class UnanimousStrategyTest extends TestCase
 {
     /** @var UnanimousStrategy */

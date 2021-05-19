@@ -28,8 +28,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
-
- *
  * @group time-sensitive
  */
 class ErrorListenerTest extends TestCase

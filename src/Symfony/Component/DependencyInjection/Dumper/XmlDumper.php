@@ -26,9 +26,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * XmlDumper dumps a service container as an XML string.
- *
-
-
  */
 class XmlDumper extends Dumper
 {

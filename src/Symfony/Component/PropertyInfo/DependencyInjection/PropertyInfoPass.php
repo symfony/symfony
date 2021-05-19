@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Adds extractors to the property_info service.
- *
-
  */
 class PropertyInfoPass implements CompilerPassInterface
 {

@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Remove private aliases from the container. They were only used to establish
  * dependencies between services, and these dependencies have been resolved in
  * one of the previous passes.
- *
-
  */
 class RemovePrivateAliasesPass implements CompilerPassInterface
 {

@@ -20,8 +20,6 @@ use Symfony\Component\RateLimiter\RateLimit;
  * This allows to limit on different types of information
  * from the requests.
  *
-
- *
  * @experimental in 5.3
  */
 interface RequestRateLimiterInterface

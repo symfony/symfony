@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl\Exception;
 
 /**
  * Thrown when an invalid entry of a resource bundle was requested.
- *
-
  */
 class MissingResourceException extends RuntimeException
 {

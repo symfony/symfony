@@ -15,8 +15,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  * Represents an edge in your service graph.
  *
  * Value is typically a reference.
- *
-
  */
 class ServiceReferenceGraphEdge
 {

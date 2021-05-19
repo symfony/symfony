@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * BundleInterface.
- *
-
  */
 interface BundleInterface extends ContainerAwareInterface
 {

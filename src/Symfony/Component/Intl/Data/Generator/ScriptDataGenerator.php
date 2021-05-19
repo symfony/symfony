@@ -18,8 +18,6 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 /**
  * The rule for compiling the script bundle.
  *
-
- *
  * @internal
  */
 class ScriptDataGenerator extends AbstractDataGenerator

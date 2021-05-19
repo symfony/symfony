@@ -33,10 +33,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * to initialize a correctly defined table.
  *
  * @see https://php.net/sessionhandlerinterface
- *
-
-
-
  */
 class PdoSessionHandler extends AbstractSessionHandler
 {

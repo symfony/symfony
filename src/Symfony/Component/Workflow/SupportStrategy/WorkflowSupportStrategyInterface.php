@@ -13,9 +13,6 @@ namespace Symfony\Component\Workflow\SupportStrategy;
 
 use Symfony\Component\Workflow\WorkflowInterface;
 
-/**
-
- */
 interface WorkflowSupportStrategyInterface
 {
     public function supports(WorkflowInterface $workflow, object $subject): bool;

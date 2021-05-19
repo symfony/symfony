@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
-
- */
 class TimezoneTest extends TestCase
 {
     public function testValidTimezoneConstraints()

@@ -22,8 +22,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Manages HTTP cache objects in a Container.
- *
-
  */
 class HttpCache extends BaseHttpCache
 {

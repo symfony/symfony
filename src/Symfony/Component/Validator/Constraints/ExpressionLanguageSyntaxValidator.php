@@ -18,9 +18,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-/**
-
- */
 class ExpressionLanguageSyntaxValidator extends ConstraintValidator
 {
     private $expressionLanguage;

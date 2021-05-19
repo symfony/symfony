@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\Container;
 
 /**
  * A controller resolver searching for a controller in a psr-11 container when using the "service::method" notation.
- *
-
-
  */
 class ContainerControllerResolver extends ControllerResolver
 {

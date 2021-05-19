@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Security;
 
 /**
  * Extracts Security Errors from Request.
- *
-
  */
 class AuthenticationUtils
 {

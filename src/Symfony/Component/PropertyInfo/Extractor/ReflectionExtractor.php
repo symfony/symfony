@@ -26,8 +26,6 @@ use Symfony\Component\String\Inflector\InflectorInterface;
 /**
  * Extracts data using the reflection API.
  *
-
- *
  * @final
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface

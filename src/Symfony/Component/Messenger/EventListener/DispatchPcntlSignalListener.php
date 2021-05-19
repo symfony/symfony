@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
-/**
-
- */
 class DispatchPcntlSignalListener implements EventSubscriberInterface
 {
     public function onWorkerRunning(): void

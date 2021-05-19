@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-/**
-
- */
 class ResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
 {
     /**

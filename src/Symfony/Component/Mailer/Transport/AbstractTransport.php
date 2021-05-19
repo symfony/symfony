@@ -22,9 +22,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 abstract class AbstractTransport implements TransportInterface
 {
     private $dispatcher;

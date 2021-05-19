@@ -17,9 +17,6 @@ use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
-/**
-
- */
 class YamlEncoderTest extends TestCase
 {
     public function testEncode()

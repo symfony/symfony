@@ -17,9 +17,6 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent;
 
-/**
-
- */
 trait ContextMappingTestTrait
 {
     abstract protected function getLoaderForContextMapping(): LoaderInterface;

@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * Interface implemented by rendering strategies able to generate an URL for a fragment.
- *
-
  */
 interface FragmentUriGeneratorInterface
 {

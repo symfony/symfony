@@ -16,10 +16,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
-/**
-
-
- */
 class MemcachedAdapter extends AbstractAdapter
 {
     /**

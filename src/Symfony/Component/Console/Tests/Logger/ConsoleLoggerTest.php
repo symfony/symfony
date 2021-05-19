@@ -20,10 +20,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
-/**
-
-
- */
 class ConsoleLoggerTest extends TestCase
 {
     /**

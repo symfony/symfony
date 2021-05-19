@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Role;
 
 /**
  * RoleHierarchy defines a role hierarchy.
- *
-
  */
 class RoleHierarchy implements RoleHierarchyInterface
 {

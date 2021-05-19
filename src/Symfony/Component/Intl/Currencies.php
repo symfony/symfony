@@ -15,9 +15,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 
 /**
  * Gives access to currency-related ICU data.
- *
-
-
  */
 final class Currencies extends ResourceBundle
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-/**
-
- */
 class RouterContextStamp implements StampInterface
 {
     private $baseUrl;

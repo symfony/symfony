@@ -15,8 +15,6 @@ use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Part\SMimePart;
 
 /**
-
- *
  * @internal
  */
 abstract class SMime

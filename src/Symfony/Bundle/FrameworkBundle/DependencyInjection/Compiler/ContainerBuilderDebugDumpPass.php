@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
  * debugging tools such as the debug:container console command.
- *
-
-
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {

@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
-
- */
 class RedirectControllerTest extends TestCase
 {
     public function testEmptyRoute()

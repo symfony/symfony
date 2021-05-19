@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Holds parameters.
- *
-
  */
 class ParameterBag implements ParameterBagInterface
 {

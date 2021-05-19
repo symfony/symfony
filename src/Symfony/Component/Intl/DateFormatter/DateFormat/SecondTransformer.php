@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 /**
  * Parser and formatter for the second format.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

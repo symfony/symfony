@@ -18,9 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
-
- */
 class ImmutableEventDispatcherTest extends TestCase
 {
     /**

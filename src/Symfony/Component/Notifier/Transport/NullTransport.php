@@ -19,9 +19,6 @@ use Symfony\Component\Notifier\Message\NullMessage;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class NullTransport implements TransportInterface
 {
     private $dispatcher;

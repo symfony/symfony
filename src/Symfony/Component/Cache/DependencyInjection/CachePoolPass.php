@@ -23,9 +23,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
- */
 class CachePoolPass implements CompilerPassInterface
 {
     private $cachePoolTag;

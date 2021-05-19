@@ -18,9 +18,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
-
- */
 class ContextTest extends TestCase
 {
     use ExpectDeprecationTrait;

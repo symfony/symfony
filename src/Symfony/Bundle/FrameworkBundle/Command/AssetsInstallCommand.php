@@ -28,9 +28,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Command that places bundle web assets into a given directory.
  *
-
-
- *
  * @final
  */
 class AssetsInstallCommand extends Command

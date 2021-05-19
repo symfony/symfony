@@ -19,8 +19,6 @@ namespace Symfony\Component\Mime\Encoder;
  *
  * Note: It leaves the local part as is. In case there are non-ASCII characters
  * in the local part then it depends on the SMTP Server if this is supported.
- *
-
  */
 final class IdnAddressEncoder implements AddressEncoderInterface
 {

@@ -24,9 +24,6 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
- *
-
-
  */
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {

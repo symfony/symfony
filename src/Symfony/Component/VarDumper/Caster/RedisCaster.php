@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts Redis class from ext-redis to array representation.
  *
-
- *
  * @final
  */
 class RedisCaster

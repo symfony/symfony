@@ -18,9 +18,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild;
 
-/**
-
- */
 class DateCasterTest extends TestCase
 {
     use VarDumperTestTrait;

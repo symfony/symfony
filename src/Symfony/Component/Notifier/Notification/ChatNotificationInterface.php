@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Notification;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
-/**
-
- */
 interface ChatNotificationInterface
 {
     public function asChatMessage(RecipientInterface $recipient, string $transport = null): ?ChatMessage;

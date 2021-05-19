@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Throws an exception for any Definitions that have errors and still exist.
- *
-
  */
 class DefinitionErrorExceptionPass extends AbstractRecursivePass
 {

@@ -17,9 +17,6 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
-/**
-
- */
 class LoginLinkAuthenticationTest extends AbstractWebTestCase
 {
     public function testLoginLinkSuccess()

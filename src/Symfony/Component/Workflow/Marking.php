@@ -13,8 +13,6 @@ namespace Symfony\Component\Workflow;
 
 /**
  * Marking contains the place of every tokens.
- *
-
  */
 class Marking
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * HTTP header utility functions.
- *
-
  */
 class HeaderUtils
 {

@@ -18,8 +18,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  *
  * This badge must be used together with PasswordCredentials.
  *
-
- *
  * @final
  */
 class LdapBadge implements BadgeInterface

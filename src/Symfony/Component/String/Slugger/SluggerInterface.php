@@ -15,8 +15,6 @@ use Symfony\Component\String\AbstractUnicodeString;
 
 /**
  * Creates a URL-friendly slug from a given string.
- *
-
  */
 interface SluggerInterface
 {

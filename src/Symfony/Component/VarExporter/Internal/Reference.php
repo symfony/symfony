@@ -12,8 +12,6 @@
 namespace Symfony\Component\VarExporter\Internal;
 
 /**
-
- *
  * @internal
  */
 class Reference

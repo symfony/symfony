@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Formats an exception using Serializer for rendering.
- *
-
  */
 class SerializerErrorRenderer implements ErrorRendererInterface
 {

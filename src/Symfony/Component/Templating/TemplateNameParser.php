@@ -16,8 +16,6 @@ namespace Symfony\Component\Templating;
  *
  * This implementation takes everything as the template name
  * and the extension for the engine.
- *
-
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {

@@ -15,8 +15,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class CacheStorage implements StorageInterface

@@ -21,9 +21,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * Formats incoming records for console output by coloring them depending on log level.
- *
-
-
  */
 class ConsoleFormatter implements FormatterInterface
 {

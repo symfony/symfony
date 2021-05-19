@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Console\Output;
 
-/**
-
- */
 class BufferedOutput extends Output
 {
     private $buffer = '';

@@ -20,8 +20,6 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
-
- *
  * In PoEditor:
  *  * Terms refer to Symfony's translation keys;
  *  * Translations refer to Symfony's translated messages;

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Csrf;
 
 /**
  * Manages CSRF tokens.
- *
-
  */
 interface CsrfTokenManagerInterface
 {

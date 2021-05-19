@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\HttpExceptionTrait;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class HttpExceptionTraitTest extends TestCase
 {
     public function provideParseError(): iterable

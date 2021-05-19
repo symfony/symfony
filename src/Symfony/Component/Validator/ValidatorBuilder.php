@@ -42,9 +42,7 @@ class_exists(TranslatorInterface::class);
 class_exists(LocaleAwareInterface::class);
 class_exists(TranslatorTrait::class);
 
-/**
 
- */
 class ValidatorBuilder
 {
     private $initializers = [];

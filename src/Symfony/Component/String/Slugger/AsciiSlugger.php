@@ -19,9 +19,7 @@ if (!interface_exists(LocaleAwareInterface::class)) {
     throw new \LogicException('You cannot use the "Symfony\Component\String\Slugger\AsciiSlugger" as the "symfony/translation-contracts" package is not installed. Try running "composer require symfony/translation-contracts".');
 }
 
-/**
 
- */
 class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 {
     private const LOCALE_TO_TRANSLITERATOR_ID = [

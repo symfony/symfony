@@ -25,8 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Base class for all commands.
- *
-
  */
 class Command
 {

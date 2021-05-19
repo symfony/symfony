@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpKernel\CacheClearer;
 /**
  * ChainCacheClearer.
  *
-
- *
  * @final
  */
 class ChainCacheClearer implements CacheClearerInterface

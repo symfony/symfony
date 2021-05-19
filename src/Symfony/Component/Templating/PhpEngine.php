@@ -19,8 +19,6 @@ use Symfony\Component\Templating\Storage\StringStorage;
 
 /**
  * PhpEngine is an engine able to render PHP templates.
- *
-
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {

@@ -15,9 +15,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * Formatter class for console output.
- *
-
-
  */
 class OutputFormatter implements WrappableOutputFormatterInterface
 {

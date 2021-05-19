@@ -18,9 +18,6 @@ use Symfony\Contracts\Service\ResetInterface;
  * TokenStorage contains a TokenInterface.
  *
  * It gives access to the token representing the current user authentication.
- *
-
-
  */
 class TokenStorage implements TokenStorageInterface, ResetInterface
 {

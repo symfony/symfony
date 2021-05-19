@@ -15,8 +15,6 @@ use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 
 /**
-
- *
  * @internal
  */
 class Registry

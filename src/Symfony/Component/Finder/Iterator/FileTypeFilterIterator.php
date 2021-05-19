@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * FileTypeFilterIterator only keeps files, directories, or both.
- *
-
  */
 class FileTypeFilterIterator extends \FilterIterator
 {

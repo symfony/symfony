@@ -30,8 +30,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Base class for a normalizer dealing with objects.
- *
-
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {

@@ -19,8 +19,6 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @see http://www.w3.org/TR/selectors/#specificity
  *
-
- *
  * @internal
  */
 class Specificity

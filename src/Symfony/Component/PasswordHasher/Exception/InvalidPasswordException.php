@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PasswordHasher\Exception;
 
-/**
-
- */
 class InvalidPasswordException extends \RuntimeException implements ExceptionInterface
 {
     public function __construct(string $message = 'Invalid password.', int $code = 0, ?\Throwable $previous = null)

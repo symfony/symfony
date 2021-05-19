@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mailer\Exception;
 
-/**
-
- */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

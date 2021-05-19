@@ -22,8 +22,6 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  * This should be registered as subscriber to any "stateful" firewalls.
  *
  * @see SessionAuthenticationStrategy
- *
-
  */
 class SessionStrategyListener implements EventSubscriberInterface
 {

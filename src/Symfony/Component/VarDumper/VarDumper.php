@@ -27,9 +27,7 @@ use Symfony\Component\VarDumper\Dumper\ServerDumper;
 // Load the global dump() function
 require_once __DIR__.'/Resources/functions/dump.php';
 
-/**
 
- */
 class VarDumper
 {
     private static $handler;

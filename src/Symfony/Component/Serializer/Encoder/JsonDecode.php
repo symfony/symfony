@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
  * Decodes JSON data.
- *
-
  */
 class JsonDecode implements DecoderInterface
 {

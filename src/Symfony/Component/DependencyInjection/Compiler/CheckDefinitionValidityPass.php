@@ -25,8 +25,6 @@ use Symfony\Component\DependencyInjection\Loader\FileLoader;
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
- *
-
  */
 class CheckDefinitionValidityPass implements CompilerPassInterface
 {

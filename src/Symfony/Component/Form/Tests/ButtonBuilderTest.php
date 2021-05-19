@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
-/**
-
- */
 class ButtonBuilderTest extends TestCase
 {
     public function getValidNames()

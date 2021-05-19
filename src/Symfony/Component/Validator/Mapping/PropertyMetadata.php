@@ -22,8 +22,6 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  *
  * This class supports serialization and cloning.
  *
-
- *
  * @see PropertyMetadataInterface
  */
 class PropertyMetadata extends MemberMetadata

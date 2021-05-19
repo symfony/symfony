@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Allows turning ResponseInterface instances to PHP streams.
- *
-
  */
 class StreamWrapper
 {

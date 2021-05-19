@@ -16,8 +16,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * InputInterface is the interface implemented by all input classes.
- *
-
  */
 interface InputInterface
 {

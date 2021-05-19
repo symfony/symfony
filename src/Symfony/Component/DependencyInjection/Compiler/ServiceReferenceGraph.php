@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * This information can be used by your compiler passes instead of collecting
  * it themselves which improves performance quite a lot.
  *
-
- *
  * @final
  */
 class ServiceReferenceGraph

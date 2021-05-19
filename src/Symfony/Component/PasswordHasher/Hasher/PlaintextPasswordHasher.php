@@ -18,8 +18,6 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
  * PlaintextPasswordHasher does not do any hashing but is useful in testing environments.
  *
  * As this hasher is not cryptographically secure, usage of it in production environments is discouraged.
- *
-
  */
 class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
 {

@@ -19,10 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Overwrites a service but keeps the overridden one.
- *
-
-
-
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {

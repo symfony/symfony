@@ -35,8 +35,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
- *
-
  */
 class YamlFileLoader extends FileLoader
 {

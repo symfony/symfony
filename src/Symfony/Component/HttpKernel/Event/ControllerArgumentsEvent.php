@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * Arguments set in the event must be compatible with the signature of the
  * controller.
- *
-
  */
 final class ControllerArgumentsEvent extends KernelEvent
 {

@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Session;
 
 /**
-
- *
  * @internal
  */
 final class SessionBagProxy implements SessionBagInterface

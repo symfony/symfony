@@ -15,9 +15,6 @@ use Symfony\Component\Form\FormRenderer;
 use Twig\Compiler;
 use Twig\Node\Node;
 
-/**
-
- */
 final class FormThemeNode extends Node
 {
     public function __construct(Node $form, Node $resources, int $lineno, string $tag = null, bool $only = false)

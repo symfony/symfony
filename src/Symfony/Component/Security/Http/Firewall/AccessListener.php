@@ -26,8 +26,6 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 /**
  * AccessListener enforces access control rules.
  *
-
- *
  * @final
  */
 class AccessListener extends AbstractListener

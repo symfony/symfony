@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Stamp;
  * Marker stamp identifying a message sent by the `SendMessageMiddleware`.
  *
  * @see \Symfony\Component\Messenger\Middleware\SendMessageMiddleware
- *
-
  */
 final class SentStamp implements NonSendableStampInterface
 {

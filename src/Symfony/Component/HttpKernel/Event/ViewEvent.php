@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Call setResponse() to set the response that will be returned for the
  * current request. The propagation of this event is stopped as soon as a
  * response is set.
- *
-
  */
 final class ViewEvent extends RequestEvent
 {

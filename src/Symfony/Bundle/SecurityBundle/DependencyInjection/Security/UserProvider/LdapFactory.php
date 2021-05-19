@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * LdapFactory creates services for Ldap user provider.
- *
-
-
  */
 class LdapFactory implements UserProviderFactoryInterface
 {

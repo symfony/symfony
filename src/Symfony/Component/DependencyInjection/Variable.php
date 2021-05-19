@@ -21,8 +21,6 @@ namespace Symfony\Component\DependencyInjection;
  *     $a
  *
  * by the PHP dumper.
- *
-
  */
 class Variable
 {

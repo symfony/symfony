@@ -16,8 +16,6 @@ use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\RetryTillSaveStore;
 
 /**
-
- *
  * @group legacy
  */
 class RetryTillSaveStoreTest extends AbstractStoreTest

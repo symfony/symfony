@@ -16,9 +16,6 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
-/**
-
- */
 class FlattenExceptionNormalizerTest extends TestCase
 {
     /**

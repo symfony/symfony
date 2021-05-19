@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Inline service definitions where this is possible.
- *
-
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {

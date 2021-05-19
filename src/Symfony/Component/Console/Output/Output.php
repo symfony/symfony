@@ -24,8 +24,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *  * very verbose: -vv (highly extended output)
  *  * debug: -vvv (all debug output)
  *  * quiet: -q (no output)
- *
-
  */
 abstract class Output implements OutputInterface
 {

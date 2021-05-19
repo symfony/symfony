@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
-
- */
 class Form extends Constraint
 {
     public const NOT_SYNCHRONIZED_ERROR = '1dafa156-89e1-4736-b832-419c2e501fca';

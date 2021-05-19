@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\WebLink\Link;
 
-/**
-
- */
 class WebLinkExtensionTest extends TestCase
 {
     /**

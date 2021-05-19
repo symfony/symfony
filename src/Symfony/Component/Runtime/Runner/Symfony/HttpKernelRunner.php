@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class HttpKernelRunner implements RunnerInterface

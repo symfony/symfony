@@ -13,9 +13,6 @@ namespace Symfony\Component\Mailer\Event;
 
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 class MessageEvents
 {
     private $events = [];

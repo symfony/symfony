@@ -28,9 +28,6 @@ use Symfony\Component\Intl\Locale\Locale;
  *  - {@link getErrorMessage}
  *  - {@link getLocale}
  *
-
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

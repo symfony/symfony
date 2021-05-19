@@ -33,8 +33,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
  * the same rules as the argv one. It's almost always better to use the
  * `StringInput` when you want to provide your own input.
  *
-
- *
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
  * @see http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
  */

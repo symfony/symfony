@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
  * Base RuntimeException for Dependency Injection component.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

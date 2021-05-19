@@ -19,9 +19,6 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
-/**
-
- */
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
     private const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';

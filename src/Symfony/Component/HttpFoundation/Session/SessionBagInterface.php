@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session;
 
 /**
  * Session Bag store.
- *
-
  */
 interface SessionBagInterface
 {

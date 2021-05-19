@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection;
 
 /**
  * Parameter represents a parameter reference.
- *
-
  */
 class Parameter
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Exception;
 
 /**
  * LockAcquiringException is thrown when an issue happens during the acquisition of a lock.
- *
-
  */
 class LockAcquiringException extends \RuntimeException implements ExceptionInterface
 {

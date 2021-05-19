@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Validator\Exception;
 
-/**
-
- */
 class UnexpectedValueException extends UnexpectedTypeException
 {
     private $expectedType;

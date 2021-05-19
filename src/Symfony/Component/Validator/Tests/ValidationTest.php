@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class ValidationTest extends TestCase
 {
     public function testCreateCallableValid()

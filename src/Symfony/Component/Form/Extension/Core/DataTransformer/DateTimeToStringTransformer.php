@@ -15,9 +15,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a date string and a DateTime object.
- *
-
-
  */
 class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {

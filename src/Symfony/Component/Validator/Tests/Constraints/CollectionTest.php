@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-/**
-
- */
 class CollectionTest extends TestCase
 {
     public function testRejectInvalidFieldsOption()

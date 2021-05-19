@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Encoder;
 
 /**
  * Adds the support of an extra $context parameter for the supportsDecoding method.
- *
-
  */
 interface ContextAwareDecoderInterface extends DecoderInterface
 {

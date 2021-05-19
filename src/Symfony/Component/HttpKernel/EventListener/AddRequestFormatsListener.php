@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Adds configured formats to each request.
  *
-
- *
  * @final
  */
 class AddRequestFormatsListener implements EventSubscriberInterface

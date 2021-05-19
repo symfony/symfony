@@ -30,8 +30,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
  * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user
  * for a UsernamePasswordToken.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider

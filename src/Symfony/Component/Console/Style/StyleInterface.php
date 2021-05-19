@@ -13,8 +13,6 @@ namespace Symfony\Component\Console\Style;
 
 /**
  * Output style helpers.
- *
-
  */
 interface StyleInterface
 {

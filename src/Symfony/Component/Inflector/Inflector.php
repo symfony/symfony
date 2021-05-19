@@ -18,8 +18,6 @@ trigger_deprecation('symfony/inflector', '5.1', 'The "%s" class is deprecated, u
 /**
  * Converts words between singular and plural forms.
  *
-
- *
  * @deprecated since Symfony 5.1, use Symfony\Component\String\Inflector\EnglishInflector instead.
  */
 final class Inflector

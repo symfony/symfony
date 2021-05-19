@@ -24,10 +24,6 @@ use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A file uploaded through a form.
- *
-
-
-
  */
 class UploadedFile extends File
 {

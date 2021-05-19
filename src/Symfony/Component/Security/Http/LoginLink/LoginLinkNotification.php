@@ -23,8 +23,6 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 /**
  * Use this notification to ease sending login link
  * emails/SMS using the Notifier component.
- *
-
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {

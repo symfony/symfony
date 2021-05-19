@@ -22,8 +22,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * App Test Kernel for functional tests.
- *
-
  */
 class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInterface
 {

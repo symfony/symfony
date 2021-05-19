@@ -15,8 +15,6 @@ use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper as TestDoctrineTestHelper;
 
 /**
  * Provides utility functions needed in tests.
- *
-
  */
 final class DoctrineTestHelper extends TestDoctrineTestHelper
 {

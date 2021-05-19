@@ -17,10 +17,6 @@ use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\TransitionBlockerList;
 use Symfony\Component\Workflow\WorkflowInterface;
 
-/**
-
-
- */
 final class GuardEvent extends Event
 {
     private $transitionBlockerList;

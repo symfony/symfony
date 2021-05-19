@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * Resize a collection form element based on the data sent from the client.
- *
-
  */
 class ResizeFormListener implements EventSubscriberInterface
 {

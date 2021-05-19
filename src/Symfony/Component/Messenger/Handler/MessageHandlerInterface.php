@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Handler;
 
 /**
  * Marker interface for message handlers.
- *
-
  */
 interface MessageHandlerInterface
 {

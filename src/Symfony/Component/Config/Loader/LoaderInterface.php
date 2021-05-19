@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Loader;
 
 /**
  * LoaderInterface is the interface implemented by all loader classes.
- *
-
  */
 interface LoaderInterface
 {

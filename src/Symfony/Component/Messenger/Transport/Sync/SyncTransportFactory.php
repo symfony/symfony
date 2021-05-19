@@ -16,9 +16,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-/**
-
- */
 class SyncTransportFactory implements TransportFactoryInterface
 {
     private $messageBus;

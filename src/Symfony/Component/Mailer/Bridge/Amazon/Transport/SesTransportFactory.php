@@ -20,10 +20,6 @@ use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
-/**
-
-
- */
 final class SesTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface

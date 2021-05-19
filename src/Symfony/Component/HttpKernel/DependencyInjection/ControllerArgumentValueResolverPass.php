@@ -21,8 +21,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Gathers and configures the argument value resolvers.
- *
-
  */
 class ControllerArgumentValueResolverPass implements CompilerPassInterface
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
-/**
-
- */
 class PropertyInfoExtractorTest extends AbstractPropertyInfoExtractorTest
 {
 }

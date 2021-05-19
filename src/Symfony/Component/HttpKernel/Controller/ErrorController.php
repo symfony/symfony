@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Renders error or exception pages from a given FlattenException.
- *
-
-
  */
 class ErrorController
 {

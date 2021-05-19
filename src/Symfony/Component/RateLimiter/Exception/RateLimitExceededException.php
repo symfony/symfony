@@ -14,8 +14,6 @@ namespace Symfony\Component\RateLimiter\Exception;
 use Symfony\Component\RateLimiter\RateLimit;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class RateLimitExceededException extends \RuntimeException

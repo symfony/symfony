@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Util\Exception;
 /**
  * Exception class for when XML parsing with an XSD schema file path or a callable validator produces errors unrelated
  * to the actual XML parsing.
- *
-
  */
 class InvalidXmlException extends XmlParsingException
 {

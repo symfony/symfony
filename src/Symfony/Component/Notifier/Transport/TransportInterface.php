@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Exception\TransportExceptionInterface;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 
-/**
-
- */
 interface TransportInterface
 {
     /**

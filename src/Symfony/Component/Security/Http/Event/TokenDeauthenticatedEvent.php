@@ -25,8 +25,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Use this event if you want to trigger some actions whenever a user is
  * deauthenticated and redirected back to the authentication entry point
  * (e.g. clearing all remember-me cookies).
- *
-
  */
 final class TokenDeauthenticatedEvent extends Event
 {

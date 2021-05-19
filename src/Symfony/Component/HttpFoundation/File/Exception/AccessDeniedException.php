@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /**
  * Thrown when the access on a file was denied.
- *
-
  */
 class AccessDeniedException extends FileException
 {

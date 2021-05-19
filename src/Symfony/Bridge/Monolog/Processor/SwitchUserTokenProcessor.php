@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Adds the original security token to the log entry.
- *
-
  */
 class SwitchUserTokenProcessor extends AbstractTokenProcessor
 {

@@ -15,9 +15,6 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-/**
-
- */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**

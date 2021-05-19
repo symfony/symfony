@@ -19,9 +19,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-/**
-
- */
 class RangeValidator extends ConstraintValidator
 {
     private $propertyAccessor;

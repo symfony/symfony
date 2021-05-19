@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * Base ExceptionInterface for the Security component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

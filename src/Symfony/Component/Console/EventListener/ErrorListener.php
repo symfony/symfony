@@ -18,10 +18,6 @@ use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
-
-
- */
 class ErrorListener implements EventSubscriberInterface
 {
     private $logger;

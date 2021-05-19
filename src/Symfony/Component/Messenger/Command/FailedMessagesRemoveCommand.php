@@ -21,9 +21,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
-/**
-
- */
 class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
 {
     protected static $defaultName = 'messenger:failed:remove';

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
 
 /**
  * Token representing a user who temporarily impersonates another one.
- *
-
  */
 class SwitchUserToken extends UsernamePasswordToken
 {

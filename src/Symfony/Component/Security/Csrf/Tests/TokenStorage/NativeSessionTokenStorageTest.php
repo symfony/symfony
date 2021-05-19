@@ -16,8 +16,6 @@ use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
 
 /**
-
- *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */

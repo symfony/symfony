@@ -25,8 +25,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
-
- *
  * @internal
  */
 class ProfilerController

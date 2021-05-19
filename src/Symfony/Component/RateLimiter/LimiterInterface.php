@@ -15,8 +15,6 @@ use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
-
- *
  * @experimental in 5.3
  */
 interface LimiterInterface

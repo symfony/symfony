@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Message;
 
-/**
-
- */
 interface MessageOptionsInterface
 {
     public function toArray(): array;

@@ -18,8 +18,6 @@ use Symfony\Component\Routing\RouteCollection;
  * ClosureLoader loads routes from a PHP closure.
  *
  * The Closure must return a RouteCollection instance.
- *
-
  */
 class ClosureLoader extends Loader
 {

@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
-
- *
  * @final
  */
 class UserCheckerListener implements EventSubscriberInterface

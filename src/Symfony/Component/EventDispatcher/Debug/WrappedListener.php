@@ -16,9 +16,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
-/**
-
- */
 final class WrappedListener
 {
     private $listener;

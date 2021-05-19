@@ -19,9 +19,6 @@ use Twig\Loader\LoaderInterface;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\TextNode;
 
-/**
-
- */
 class TransNodeTest extends TestCase
 {
     public function testCompileStrict()

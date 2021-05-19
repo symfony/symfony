@@ -51,9 +51,6 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectToPopulateTestT
 use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
-/**
-
- */
 class ObjectNormalizerTest extends TestCase
 {
     use AttributesTestTrait;

@@ -25,8 +25,6 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 /**
  * Guesses and loads the appropriate constraints using Doctrine's metadata.
- *
-
  */
 final class DoctrineLoader implements LoaderInterface
 {

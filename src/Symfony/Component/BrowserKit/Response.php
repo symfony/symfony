@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\BrowserKit;
 
-/**
-
- */
 final class Response
 {
     private $content;

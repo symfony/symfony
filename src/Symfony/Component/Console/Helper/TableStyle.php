@@ -16,10 +16,6 @@ use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * Defines the styles for a Table.
- *
-
-
-
  */
 class TableStyle
 {

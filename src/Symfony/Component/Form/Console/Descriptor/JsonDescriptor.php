@@ -15,8 +15,6 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
-
- *
  * @internal
  */
 class JsonDescriptor extends Descriptor

@@ -36,8 +36,6 @@ class_exists(ServerBag::class);
  *   * getRequestUri
  *   * getUri
  *   * getUriForPath
- *
-
  */
 class Request
 {

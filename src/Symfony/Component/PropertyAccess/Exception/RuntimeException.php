@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
  * Base RuntimeException for the PropertyAccess component.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

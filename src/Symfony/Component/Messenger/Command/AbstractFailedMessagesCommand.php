@@ -33,8 +33,6 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
-
- *
  * @internal
  */
 abstract class AbstractFailedMessagesCommand extends Command

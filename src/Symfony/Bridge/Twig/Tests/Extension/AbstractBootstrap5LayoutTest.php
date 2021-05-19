@@ -33,8 +33,6 @@ use Symfony\Component\Form\FormError;
 
 /**
  * Abstract class providing test cases for the Bootstrap 5 Twig form theme.
- *
-
  */
 abstract class AbstractBootstrap5LayoutTest extends AbstractBootstrap4LayoutTest
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-/**
-
- */
 interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {
     /**

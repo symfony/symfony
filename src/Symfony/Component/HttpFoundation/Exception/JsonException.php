@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
  * Thrown by Request::toArray() when the content cannot be JSON-decoded.
- *
-
  */
 final class JsonException extends \UnexpectedValueException implements RequestExceptionInterface
 {

@@ -20,9 +20,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Sends Emails over SMTP with ESMTP support.
- *
-
-
  */
 class EsmtpTransport extends SmtpTransport
 {

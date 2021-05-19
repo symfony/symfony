@@ -17,8 +17,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * Unescaper encapsulates unescaping rules for single and double-quoted
  * YAML strings.
  *
-
- *
  * @internal
  */
 class Unescaper

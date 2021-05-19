@@ -18,8 +18,6 @@ use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the 'trans_default_domain' tag.
- *
-
  */
 final class TransDefaultDomainTokenParser extends AbstractTokenParser
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Security\Http\LoginLink;
 
-/**
-
- */
 class LoginLinkDetails
 {
     private $url;

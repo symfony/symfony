@@ -15,8 +15,6 @@ namespace Symfony\Component\Lock\Exception;
  * UnserializableKeyException is thrown when the key contains state that can no
  * be serialized and the user try to serialize it.
  * ie. Connection with a database, flock, semaphore, ...
- *
-
  */
 class UnserializableKeyException extends \RuntimeException implements ExceptionInterface
 {

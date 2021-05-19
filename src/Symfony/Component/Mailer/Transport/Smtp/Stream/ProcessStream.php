@@ -16,9 +16,6 @@ use Symfony\Component\Mailer\Exception\TransportException;
 /**
  * A stream supporting local processes.
  *
-
-
- *
  * @internal
  */
 final class ProcessStream extends AbstractStream

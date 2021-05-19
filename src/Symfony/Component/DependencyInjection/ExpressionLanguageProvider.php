@@ -19,8 +19,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * To get a service, use service('request').
  * To get a parameter, use parameter('kernel.debug').
- *
-
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {

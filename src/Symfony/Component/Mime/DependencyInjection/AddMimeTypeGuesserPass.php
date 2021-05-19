@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers custom mime types guessers.
- *
-
  */
 class AddMimeTypeGuesserPass implements CompilerPassInterface
 {

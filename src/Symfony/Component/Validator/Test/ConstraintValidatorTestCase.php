@@ -35,8 +35,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A test case to ease testing Constraint Validators.
- *
-
  */
 abstract class ConstraintValidatorTestCase extends TestCase
 {

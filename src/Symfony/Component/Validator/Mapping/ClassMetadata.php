@@ -24,9 +24,6 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  * Default implementation of {@link ClassMetadataInterface}.
  *
  * This class supports serialization and cloning.
- *
-
-
  */
 class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {

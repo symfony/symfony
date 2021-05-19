@@ -18,8 +18,6 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 /**
  * Used as a "workaround" for tagging aliases in the RememberMeFactory.
  *
-
- *
  * @internal
  */
 final class DecoratedRememberMeHandler implements RememberMeHandlerInterface

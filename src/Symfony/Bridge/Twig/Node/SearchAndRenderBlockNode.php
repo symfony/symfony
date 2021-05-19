@@ -16,9 +16,6 @@ use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FunctionExpression;
 
-/**
-
- */
 final class SearchAndRenderBlockNode extends FunctionExpression
 {
     public function compile(Compiler $compiler): void

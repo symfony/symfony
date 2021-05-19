@@ -16,9 +16,6 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
-/**
-
- */
 final class GoogleChatOptions implements MessageOptionsInterface
 {
     private $threadKey;

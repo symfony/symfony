@@ -24,9 +24,6 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class SpotHitTransport extends AbstractTransport
 {
     protected const HOST = 'spot-hit.fr';

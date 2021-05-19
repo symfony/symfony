@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Resolves a class name.
  *
  * @internal
- *
-
  */
 trait ClassResolverTrait
 {

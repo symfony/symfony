@@ -18,9 +18,6 @@ use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 
-/**
-
- */
 class ButtonTest extends TestCase
 {
     private $dispatcher;

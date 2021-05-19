@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
-/**
-
- */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;

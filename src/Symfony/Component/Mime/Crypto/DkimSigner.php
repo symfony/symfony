@@ -18,8 +18,6 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
 
 /**
-
- *
  * RFC 6376 and 8301
  */
 final class DkimSigner

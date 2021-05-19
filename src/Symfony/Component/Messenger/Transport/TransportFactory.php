@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Transport;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class TransportFactory implements TransportFactoryInterface
 {
     private $factories;

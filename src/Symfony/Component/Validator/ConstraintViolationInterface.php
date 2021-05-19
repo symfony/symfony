@@ -28,8 +28,6 @@ namespace Symfony\Component\Validator;
  * instance as root and the property path "firstName". If validation fails
  * for the "street" property of the related <tt>Address</tt> instance, the root
  * element is still the person, but the property path is "address.street".
- *
-
  */
 interface ConstraintViolationInterface
 {

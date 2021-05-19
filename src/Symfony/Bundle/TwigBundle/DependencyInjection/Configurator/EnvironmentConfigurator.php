@@ -19,8 +19,6 @@ class_exists(Environment::class);
 
 /**
  * Twig environment configurator.
- *
-
  */
 class EnvironmentConfigurator
 {

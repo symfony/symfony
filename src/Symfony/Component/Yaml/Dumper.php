@@ -16,8 +16,6 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 /**
  * Dumper dumps PHP variables to YAML strings.
  *
-
- *
  * @final
  */
 class Dumper

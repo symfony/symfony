@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 
-/**
-
- */
 final class AuthorShare extends AbstractLinkedInShare
 {
     public const PERSON = 'person';

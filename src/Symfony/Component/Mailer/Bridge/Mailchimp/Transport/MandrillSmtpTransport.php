@@ -15,9 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class MandrillSmtpTransport extends EsmtpTransport
 {
     use MandrillHeadersTrait;

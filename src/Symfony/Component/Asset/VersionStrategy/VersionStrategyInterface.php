@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\VersionStrategy;
 
 /**
  * Asset version strategy interface.
- *
-
  */
 interface VersionStrategyInterface
 {

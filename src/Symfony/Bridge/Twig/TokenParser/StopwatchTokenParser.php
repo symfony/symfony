@@ -19,8 +19,6 @@ use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the stopwatch tag.
- *
-
  */
 final class StopwatchTokenParser extends AbstractTokenParser
 {

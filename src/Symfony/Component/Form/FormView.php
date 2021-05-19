@@ -13,9 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
-/**
-
- */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**

@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Argument;
 
 /**
  * Represents a collection of services found by tag name to lazily iterate over.
- *
-
  */
 class TaggedIteratorArgument extends IteratorArgument
 {

@@ -18,8 +18,6 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * Verifies that {@link AbstractIntlGlobalsTest} matches the behavior of the
  * intl functions with a specific version of ICU.
  *
-
- *
  * @group legacy
  */
 class IntlGlobalsTest extends AbstractIntlGlobalsTest

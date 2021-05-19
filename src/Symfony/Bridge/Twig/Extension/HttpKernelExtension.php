@@ -17,8 +17,6 @@ use Twig\TwigFunction;
 
 /**
  * Provides integration with the HttpKernel component.
- *
-
  */
 final class HttpKernelExtension extends AbstractExtension
 {

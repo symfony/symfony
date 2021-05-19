@@ -16,8 +16,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * PhpExtractor extracts translation messages from a PHP template.
- *
-
  */
 class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 {

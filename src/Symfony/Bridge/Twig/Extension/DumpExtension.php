@@ -21,8 +21,6 @@ use Twig\TwigFunction;
 
 /**
  * Provides integration of the dump() function with Twig.
- *
-
  */
 final class DumpExtension extends AbstractExtension
 {

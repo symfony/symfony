@@ -17,8 +17,6 @@ namespace Symfony\Component\CssSelector\Node;
  * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
-
- *
  * @internal
  */
 abstract class AbstractNode implements NodeInterface

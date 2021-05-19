@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\File;
 
 /**
  * A PHP stream of unknown size.
- *
-
  */
 class Stream extends File
 {

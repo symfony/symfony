@@ -25,9 +25,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\IgnoreDummy;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
-/**
-
- */
 class YamlFileLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;

@@ -15,8 +15,6 @@ use Symfony\Component\Form\AbstractExtension;
 
 /**
  * Integrates the HttpFoundation component with the Form library.
- *
-
  */
 class HttpFoundationExtension extends AbstractExtension
 {

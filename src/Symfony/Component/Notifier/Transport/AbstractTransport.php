@@ -21,9 +21,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 abstract class AbstractTransport implements TransportInterface
 {
     protected const HOST = 'localhost';

@@ -27,9 +27,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
-
-
- *
  * @final
  */
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface

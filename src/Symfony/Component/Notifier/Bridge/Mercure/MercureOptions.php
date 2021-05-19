@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Mercure;
 
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
-/**
-
- */
 final class MercureOptions implements MessageOptionsInterface
 {
     private $topics;

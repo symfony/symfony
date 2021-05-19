@@ -15,9 +15,6 @@ use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
-/**
-
- */
 class Notification
 {
     private const LEVELS = [

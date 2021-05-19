@@ -16,8 +16,6 @@ use Symfony\Component\String\UnicodeString;
 
 /**
  * Helper is the base class for all helper classes.
- *
-
  */
 abstract class Helper implements HelperInterface
 {

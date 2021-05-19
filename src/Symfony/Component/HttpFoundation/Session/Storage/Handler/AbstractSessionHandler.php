@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Session\SessionUtils;
  * This abstract session handler provides a generic implementation
  * of the PHP 7.0 SessionUpdateTimestampHandlerInterface,
  * enabling strict and lazy session handling.
- *
-
  */
 abstract class AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {

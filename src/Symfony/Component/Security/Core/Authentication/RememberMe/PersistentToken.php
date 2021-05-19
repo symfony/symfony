@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
-
- *
  * @internal
  */
 final class PersistentToken implements PersistentTokenInterface

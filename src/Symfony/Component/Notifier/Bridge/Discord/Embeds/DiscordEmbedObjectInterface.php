@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
-/**
-
- */
 interface DiscordEmbedObjectInterface
 {
     public function toArray(): array;

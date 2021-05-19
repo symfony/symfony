@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
 /**
  * Builds {@see ArgumentMetadata} objects based on the given Controller.
- *
-
  */
 final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 {

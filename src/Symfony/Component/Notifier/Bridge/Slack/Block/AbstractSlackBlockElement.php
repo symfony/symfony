@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
-/**
-
- */
 abstract class AbstractSlackBlockElement implements SlackBlockElementInterface
 {
     protected $options = [];

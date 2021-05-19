@@ -18,12 +18,6 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * Encodes XML data.
- *
-
-
-
-
-
  */
 class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface
 {

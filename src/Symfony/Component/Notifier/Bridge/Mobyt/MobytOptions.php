@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
-/**
-
- */
 final class MobytOptions implements MessageOptionsInterface
 {
     public const MESSAGE_TYPE_QUALITY_HIGH = 'N';

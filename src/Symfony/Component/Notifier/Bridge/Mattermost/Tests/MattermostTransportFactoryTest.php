@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
-/**
-
- */
 final class MattermostTransportFactoryTest extends TransportFactoryTestCase
 {
     /**

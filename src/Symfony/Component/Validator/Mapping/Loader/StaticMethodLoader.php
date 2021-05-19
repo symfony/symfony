@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Loads validation metadata by calling a static method on the loaded class.
- *
-
  */
 class StaticMethodLoader implements LoaderInterface
 {

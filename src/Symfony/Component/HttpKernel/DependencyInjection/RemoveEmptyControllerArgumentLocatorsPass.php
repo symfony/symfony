@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Removes empty service-locators registered for ServiceValueResolver.
- *
-
  */
 class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 {

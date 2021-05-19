@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Interface that must be implemented by compilation passes.
- *
-
  */
 interface CompilerPassInterface
 {

@@ -15,9 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 abstract class AbstractType implements FormTypeInterface
 {
     /**

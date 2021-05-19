@@ -19,8 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A submit button.
- *
-
  */
 class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 {

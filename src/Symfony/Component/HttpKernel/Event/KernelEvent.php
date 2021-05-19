@@ -17,8 +17,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Base class for events thrown in the HttpKernel component.
- *
-
  */
 class KernelEvent extends Event
 {

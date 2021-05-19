@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * Interface for classes able to send SMS messages synchronous and/or asynchronous.
- *
-
  */
 interface TexterInterface extends TransportInterface
 {

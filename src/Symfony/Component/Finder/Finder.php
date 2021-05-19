@@ -34,8 +34,6 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
  * All methods return the current Finder object to allow chaining:
  *
  *     $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
- *
-
  */
 class Finder implements \IteratorAggregate, \Countable
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Base RuntimeException for the Translation component.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

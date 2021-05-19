@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\Authenticator\AbstractPreAuthenticatedAuthen
  *
  * @see AbstractPreAuthenticatedAuthenticator
  *
-
- *
  * @final
  */
 class PreAuthenticatedUserBadge implements BadgeInterface

@@ -15,8 +15,6 @@ namespace Symfony\Component\Config;
  * Interface for a ConfigCache factory. This factory creates
  * an instance of ConfigCacheInterface and initializes the
  * cache if necessary.
- *
-
  */
 interface ConfigCacheFactoryInterface
 {

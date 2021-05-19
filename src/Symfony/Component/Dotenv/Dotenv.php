@@ -19,9 +19,6 @@ use Symfony\Component\Process\Process;
 
 /**
  * Manages .env files.
- *
-
-
  */
 final class Dotenv
 {

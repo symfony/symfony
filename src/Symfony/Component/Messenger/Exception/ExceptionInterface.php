@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 /**
  * Base Message component's exception.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

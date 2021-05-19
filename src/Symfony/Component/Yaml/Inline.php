@@ -18,8 +18,6 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 /**
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
  *
-
- *
  * @internal
  */
 class Inline

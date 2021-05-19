@@ -15,9 +15,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
-/**
-
- */
 abstract class AbstractChannel implements ChannelInterface
 {
     protected $transport;

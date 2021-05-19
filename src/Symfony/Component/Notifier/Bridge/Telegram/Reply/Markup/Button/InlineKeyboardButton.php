@@ -12,8 +12,6 @@
 namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button;
 
 /**
-
- *
  * @see https://core.telegram.org/bots/api#inlinekeyboardbutton
  */
 final class InlineKeyboardButton extends AbstractKeyboardButton

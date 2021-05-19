@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
  * Tests for {@see \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper}.
- *
-
  */
 class NullDumperTest extends TestCase
 {

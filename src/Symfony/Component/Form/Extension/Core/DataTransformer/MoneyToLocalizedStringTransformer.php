@@ -15,9 +15,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a normalized format and a localized money string.
- *
-
-
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {

@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Channel;
 
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
-/**
-
- */
 final class ChannelPolicy implements ChannelPolicyInterface
 {
     private $policy;

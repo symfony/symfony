@@ -15,9 +15,6 @@ use Psr\Container\ContainerInterface;
 
 /**
  * A ServiceProviderInterface exposes the identifiers and the types of services provided by a container.
- *
-
-
  */
 interface ServiceProviderInterface extends ContainerInterface
 {

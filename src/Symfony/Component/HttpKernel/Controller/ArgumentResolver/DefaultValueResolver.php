@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Yields the default value defined in the action signature when no value has been given.
- *
-
  */
 final class DefaultValueResolver implements ArgumentValueResolverInterface
 {

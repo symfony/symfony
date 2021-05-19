@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * Renders a form into HTML.
- *
-
  */
 interface FormRendererInterface
 {

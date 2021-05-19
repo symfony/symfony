@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Envelope;
  * Used when a receiver has the ability to list messages and find specific messages.
  * A receiver that implements this should add the TransportMessageIdStamp
  * to the Envelopes that it returns.
- *
-
  */
 interface ListableReceiverInterface extends ReceiverInterface
 {

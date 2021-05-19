@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
-/**
-
- */
 class DiscordMediaEmbedObject extends AbstractDiscordEmbedObject
 {
     public function url(string $url): self

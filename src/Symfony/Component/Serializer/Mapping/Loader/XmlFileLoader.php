@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * Loads XML mapping files.
- *
-
  */
 class XmlFileLoader extends FileLoader
 {

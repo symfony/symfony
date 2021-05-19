@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * A clickable form element.
- *
-
  */
 interface ClickableInterface
 {

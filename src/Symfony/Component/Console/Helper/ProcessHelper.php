@@ -19,8 +19,6 @@ use Symfony\Component\Process\Process;
 /**
  * The ProcessHelper class provides helpers to run external processes.
  *
-
- *
  * @final
  */
 class ProcessHelper extends Helper

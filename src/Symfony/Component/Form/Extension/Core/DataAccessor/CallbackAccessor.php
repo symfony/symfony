@@ -17,8 +17,6 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * Writes and reads values to/from an object or array using callback functions.
- *
-
  */
 class CallbackAccessor implements DataAccessorInterface
 {

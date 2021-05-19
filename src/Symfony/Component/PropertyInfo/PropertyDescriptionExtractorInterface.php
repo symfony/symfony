@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyInfo;
 
 /**
  * Guesses the property's human readable description.
- *
-
  */
 interface PropertyDescriptionExtractorInterface
 {

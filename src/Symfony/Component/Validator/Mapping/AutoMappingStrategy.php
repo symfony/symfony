@@ -13,8 +13,6 @@ namespace Symfony\Component\Validator\Mapping;
 
 /**
  * Specifies how the auto-mapping feature should behave.
- *
-
  */
 final class AutoMappingStrategy
 {

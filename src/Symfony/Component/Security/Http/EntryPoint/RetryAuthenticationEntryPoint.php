@@ -19,8 +19,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * RetryAuthenticationEntryPoint redirects URL based on the configured scheme.
  *
  * This entry point is not intended to work with HTTP post requests.
- *
-
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

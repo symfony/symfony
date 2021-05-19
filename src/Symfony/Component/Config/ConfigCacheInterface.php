@@ -15,8 +15,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * Interface for ConfigCache.
- *
-
  */
 interface ConfigCacheInterface
 {

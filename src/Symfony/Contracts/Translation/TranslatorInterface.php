@@ -12,8 +12,6 @@
 namespace Symfony\Contracts\Translation;
 
 /**
-
- *
  * @method string getLocale() Returns the default locale
  */
 interface TranslatorInterface

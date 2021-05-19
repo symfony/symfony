@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Message;
 
-/**
-
- */
 final class SentMessage
 {
     private $original;

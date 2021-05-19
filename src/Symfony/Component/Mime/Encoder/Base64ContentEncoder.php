@@ -13,9 +13,6 @@ namespace Symfony\Component\Mime\Encoder;
 
 use Symfony\Component\Mime\Exception\RuntimeException;
 
-/**
-
- */
 final class Base64ContentEncoder extends Base64Encoder implements ContentEncoderInterface
 {
     public function encodeByteStream($stream, int $maxLineLength = 0): iterable

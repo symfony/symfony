@@ -21,8 +21,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Profiler.
- *
-
  */
 class Profiler implements ResetInterface
 {

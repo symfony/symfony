@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl\Exception;
 
 /**
  * Base ExceptionInterface for the Intl component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

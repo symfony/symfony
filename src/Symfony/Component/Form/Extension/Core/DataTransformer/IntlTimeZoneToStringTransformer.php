@@ -16,8 +16,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a timezone identifier string and a IntlTimeZone object.
- *
-
  */
 class IntlTimeZoneToStringTransformer implements DataTransformerInterface
 {

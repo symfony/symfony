@@ -15,8 +15,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * ExpressionRequestMatcher uses an expression to match a Request.
- *
-
  */
 class ExpressionRequestMatcher extends RequestMatcher
 {

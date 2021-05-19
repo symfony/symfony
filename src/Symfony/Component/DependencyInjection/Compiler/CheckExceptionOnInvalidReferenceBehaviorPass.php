@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Checks that all references are pointing to a valid service.
- *
-
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {

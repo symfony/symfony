@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Validates that a card number belongs to a specified scheme.
  *
-
-
- *
  * @see https://en.wikipedia.org/wiki/Payment_card_number
  * @see https://www.regular-expressions.info/creditcard.html
  */

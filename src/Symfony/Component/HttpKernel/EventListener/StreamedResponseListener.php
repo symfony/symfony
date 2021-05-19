@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * StreamedResponseListener is responsible for sending the Response
  * to the client.
  *
-
- *
  * @final
  */
 class StreamedResponseListener implements EventSubscriberInterface

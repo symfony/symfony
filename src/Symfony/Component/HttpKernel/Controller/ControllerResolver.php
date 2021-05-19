@@ -17,9 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * This implementation uses the '_controller' request attribute to determine
  * the controller to execute.
- *
-
-
  */
 class ControllerResolver implements ControllerResolverInterface
 {

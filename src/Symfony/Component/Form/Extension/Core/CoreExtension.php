@@ -23,8 +23,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Represents the main form extension, which loads the core functionality.
- *
-
  */
 class CoreExtension extends AbstractExtension
 {

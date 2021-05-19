@@ -19,8 +19,6 @@ use Twig\Environment;
 
 /**
  * Implements the Hinclude rendering strategy.
- *
-
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {

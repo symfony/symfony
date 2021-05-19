@@ -21,9 +21,6 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
  * based on the passed parameters.
- *
-
-
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {

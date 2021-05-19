@@ -20,9 +20,6 @@ use Symfony\Component\Console\Terminal;
 
 /**
  * The ProgressBar provides helpers to display progress output.
- *
-
-
  */
 final class ProgressBar
 {

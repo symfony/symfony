@@ -17,9 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 // Help opcache.preload discover always-needed symbols
 class_exists(IntlFormatter::class);
 
-/**
 
- */
 class MessageFormatter implements MessageFormatterInterface, IntlFormatterInterface
 {
     private $translator;

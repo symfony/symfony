@@ -13,9 +13,6 @@ namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
-/**
-
- */
 class TableCell
 {
     private $value;

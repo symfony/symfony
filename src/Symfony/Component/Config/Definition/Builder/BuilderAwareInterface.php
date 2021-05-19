@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * An interface that can be implemented by nodes which build other nodes.
- *
-
  */
 interface BuilderAwareInterface
 {

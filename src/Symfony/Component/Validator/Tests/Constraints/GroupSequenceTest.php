@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
-/**
-
- */
 class GroupSequenceTest extends TestCase
 {
     public function testCreate()

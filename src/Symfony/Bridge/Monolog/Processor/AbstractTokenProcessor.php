@@ -16,9 +16,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The base class for security token processors.
- *
-
-
  */
 abstract class AbstractTokenProcessor
 {

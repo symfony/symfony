@@ -17,9 +17,6 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
-/**
-
- */
 abstract class MiddlewareTestCase extends TestCase
 {
     protected function getStackMock(bool $nextIsCalled = true)

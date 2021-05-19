@@ -21,9 +21,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-/**
-
- */
 final class TraceableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
     private $client;

@@ -18,8 +18,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * List available cache pools.
- *
-
  */
 final class CachePoolListCommand extends Command
 {

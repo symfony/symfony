@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Exception;
 use Symfony\Component\Notifier\Bridge;
 use Symfony\Component\Notifier\Transport\Dsn;
 
-/**
-
- */
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [

@@ -13,8 +13,6 @@ namespace Symfony\Component\Validator;
 
 /**
  * Default implementation of {@ConstraintViolationInterface}.
- *
-
  */
 class ConstraintViolation implements ConstraintViolationInterface
 {

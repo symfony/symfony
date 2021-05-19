@@ -17,8 +17,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PostgreSqlStore;
 
 /**
-
- *
  * @requires extension pdo_pgsql
  * @group integration
  */

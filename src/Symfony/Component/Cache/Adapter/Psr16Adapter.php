@@ -18,8 +18,6 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * Turns a PSR-16 cache into a PSR-6 one.
- *
-
  */
 class Psr16Adapter extends AbstractAdapter implements PruneableInterface, ResettableInterface
 {

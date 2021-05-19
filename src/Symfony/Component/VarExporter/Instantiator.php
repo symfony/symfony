@@ -18,8 +18,6 @@ use Symfony\Component\VarExporter\Internal\Registry;
 
 /**
  * A utility class to create objects without calling their constructor.
- *
-
  */
 final class Instantiator
 {

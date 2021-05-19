@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Loader;
 
 /**
  * Placeholder for a parameter.
- *
-
  */
 class ParamConfigurator
 {

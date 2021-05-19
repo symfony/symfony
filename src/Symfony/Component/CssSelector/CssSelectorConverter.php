@@ -21,8 +21,6 @@ use Symfony\Component\CssSelector\XPath\Translator;
 /**
  * CssSelectorConverter is the main entry point of the component and can convert CSS
  * selectors to XPath expressions.
- *
-
  */
 class CssSelectorConverter
 {

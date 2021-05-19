@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpClient\Internal;
 
 /**
-
- *
  * @internal
  */
 final class Canary

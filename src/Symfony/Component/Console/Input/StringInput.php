@@ -19,8 +19,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * Usage:
  *
  *     $input = new StringInput('foo --bar="foobar"');
- *
-
  */
 class StringInput extends ArgvInput
 {

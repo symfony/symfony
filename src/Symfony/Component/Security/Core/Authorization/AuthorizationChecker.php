@@ -20,9 +20,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
  * AuthorizationChecker is the main authorization point of the Security component.
  *
  * It gives access to the token representing the current user authentication.
- *
-
-
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Uid;
 
 /**
  * A v4 UUID contains a 122-bit random number.
- *
-
  */
 class UuidV4 extends Uuid
 {

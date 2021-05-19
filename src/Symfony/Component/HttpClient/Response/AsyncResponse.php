@@ -24,8 +24,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Provides a single extension point to process a response's content stream.
- *
-
  */
 final class AsyncResponse implements ResponseInterface, StreamableInterface
 {

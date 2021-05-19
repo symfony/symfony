@@ -15,9 +15,6 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
-/**
-
- */
 interface WorkflowInterface
 {
     /**

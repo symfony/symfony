@@ -19,8 +19,6 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
-
- *
  * @final
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface

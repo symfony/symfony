@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Exception\MappingException;
 /**
  * Base loader for loading validation metadata from a file.
  *
-
- *
  * @see YamlFileLoader
  * @see XmlFileLoader
  */

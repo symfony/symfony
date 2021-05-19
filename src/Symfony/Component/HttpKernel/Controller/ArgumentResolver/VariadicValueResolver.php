@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * Yields a variadic argument's values from the request attributes.
- *
-
  */
 final class VariadicValueResolver implements ArgumentValueResolverInterface
 {

@@ -21,8 +21,6 @@ use Symfony\Contracts\Cache\ItemInterface;
  * It does so by wrapping the computation of items in a pool of locks.
  * Foreach each apps, there can be at most 20 concurrent processes that
  * compute items at the same time and only one per cache-key.
- *
-
  */
 final class LockRegistry
 {

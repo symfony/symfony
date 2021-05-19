@@ -16,9 +16,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * AccountStatusException is the base class for authentication exceptions
  * caused by the user account status.
- *
-
-
  */
 abstract class AccountStatusException extends AuthenticationException
 {

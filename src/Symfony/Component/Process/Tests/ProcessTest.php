@@ -23,9 +23,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Pipes\PipesInterface;
 use Symfony\Component\Process\Process;
 
-/**
-
- */
 class ProcessTest extends TestCase
 {
     private static $phpBin;

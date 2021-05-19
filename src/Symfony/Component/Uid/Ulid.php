@@ -15,8 +15,6 @@ namespace Symfony\Component\Uid;
  * A ULID is lexicographically sortable and contains a 48-bit timestamp and 80-bit of crypto-random entropy.
  *
  * @see https://github.com/ulid/spec
- *
-
  */
 class Ulid extends AbstractUid
 {

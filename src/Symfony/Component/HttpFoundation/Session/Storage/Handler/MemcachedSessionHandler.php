@@ -16,8 +16,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * provided by the PHP memcached extension.
  *
  * @see https://php.net/memcached
- *
-
  */
 class MemcachedSessionHandler extends AbstractSessionHandler
 {

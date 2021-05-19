@@ -16,12 +16,6 @@ use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * BinaryFileResponse represents an HTTP response delivering a file.
- *
-
-
-
-
-
  */
 class BinaryFileResponse extends Response
 {

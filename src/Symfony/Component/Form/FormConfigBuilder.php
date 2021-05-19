@@ -21,8 +21,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * A basic form configuration.
- *
-
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {

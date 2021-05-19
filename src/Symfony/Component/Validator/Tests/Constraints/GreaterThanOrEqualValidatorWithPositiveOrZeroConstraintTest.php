@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-/**
-
- */
 class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends GreaterThanOrEqualValidatorTest
 {
     protected function createConstraint(array $options = null): Constraint

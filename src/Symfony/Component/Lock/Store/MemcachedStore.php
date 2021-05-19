@@ -19,8 +19,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * MemcachedStore is a PersistingStoreInterface implementation using Memcached as store engine.
- *
-
  */
 class MemcachedStore implements PersistingStoreInterface
 {

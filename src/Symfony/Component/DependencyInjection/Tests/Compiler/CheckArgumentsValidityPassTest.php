@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\Compiler\CheckArgumentsValidityPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-/**
-
- */
 class CheckArgumentsValidityPassTest extends TestCase
 {
     public function testProcess()

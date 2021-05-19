@@ -20,12 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Provides helpers to display a table.
- *
-
-
-
-
-
  */
 class Table
 {

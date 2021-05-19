@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @internal
- *
-
-
  */
 trait ZeroComparisonConstraintTrait
 {

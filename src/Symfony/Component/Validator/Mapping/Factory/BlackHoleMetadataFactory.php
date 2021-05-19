@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\LogicException;
  * This implementation is useful if you want to validate values against
  * constraints only and you don't need to add constraints to classes and
  * properties.
- *
-
  */
 class BlackHoleMetadataFactory implements MetadataFactoryInterface
 {

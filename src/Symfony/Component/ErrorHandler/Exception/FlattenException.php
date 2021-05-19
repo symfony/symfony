@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * FlattenException wraps a PHP Error or Exception to be able to serialize it.
  *
  * Basically, this class removes all objects from the trace.
- *
-
  */
 class FlattenException
 {

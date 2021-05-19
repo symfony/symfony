@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Exception;
 
 /**
  * LockExpiredException is thrown when a lock may conflict due to a TTL expiration.
- *
-
  */
 class LockExpiredException extends \RuntimeException implements ExceptionInterface
 {

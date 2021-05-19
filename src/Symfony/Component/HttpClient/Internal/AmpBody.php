@@ -19,8 +19,6 @@ use Amp\Success;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
-
- *
  * @internal
  */
 class AmpBody implements RequestBody, InputStream

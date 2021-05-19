@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * If you want to create your own composite constraint, extend this class and
  * let {@link getCompositeOption()} return the name of the property which
  * contains the nested constraints.
- *
-
  */
 abstract class Composite extends Constraint
 {

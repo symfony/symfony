@@ -14,8 +14,6 @@ namespace Symfony\Component\Process\Pipes;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
-
- *
  * @internal
  */
 abstract class AbstractPipes implements PipesInterface

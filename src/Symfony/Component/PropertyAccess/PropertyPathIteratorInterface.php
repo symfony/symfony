@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess;
 
-/**
-
- */
 interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
 {
     /**

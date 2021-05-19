@@ -21,9 +21,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class FirebaseTransport extends AbstractTransport
 {
     protected const HOST = 'fcm.googleapis.com/fcm/send';

@@ -21,8 +21,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * An implementation of a browser using the HttpClient component
  * to make real HTTP requests.
- *
-
  */
 class HttpBrowser extends AbstractBrowser
 {

@@ -23,8 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * This type does not appear in the form's type inheritance chain and as such
  * cannot be extended (via {@link \Symfony\Component\Form\FormExtensionInterface}) nor themed.
- *
-
  */
 abstract class BaseType extends AbstractType
 {

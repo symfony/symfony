@@ -19,8 +19,6 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * Each instance contains a confidence value about the correctness of the guess.
  * Thus an instance with confidence HIGH_CONFIDENCE is more likely to be
  * correct than an instance with confidence LOW_CONFIDENCE.
- *
-
  */
 abstract class Guess
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 /**
  * Loads validation metadata from a list of YAML files.
  *
-
-
- *
  * @see FilesLoader
  */
 class YamlFilesLoader extends FilesLoader

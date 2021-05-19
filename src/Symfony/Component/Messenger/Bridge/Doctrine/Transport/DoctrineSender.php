@@ -21,9 +21,6 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class DoctrineSender implements SenderInterface
 {
     private $connection;

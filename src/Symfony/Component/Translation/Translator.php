@@ -27,9 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 // Help opcache.preload discover always-needed symbols
 class_exists(MessageCatalogue::class);
 
-/**
 
- */
 class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface
 {
     /**

@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
-
- *
  * @internal to be removed in Symfony 6
  */
 final class ServiceSessionFactory implements SessionStorageFactoryInterface

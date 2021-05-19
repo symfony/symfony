@@ -23,9 +23,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\ExpressionLanguage\Expression;
 
-/**
-
- */
 class ContainerConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'container';

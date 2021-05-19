@@ -14,9 +14,6 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpOptions;
 
-/**
-
- */
 class HttpOptionsTest extends TestCase
 {
     public function provideSetAuthBasic(): iterable

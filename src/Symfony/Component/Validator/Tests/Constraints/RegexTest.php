@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
-
- */
 class RegexTest extends TestCase
 {
     public function testConstraintGetDefaultOption()

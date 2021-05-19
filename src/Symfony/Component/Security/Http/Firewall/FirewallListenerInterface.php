@@ -16,10 +16,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Can be implemented by firewall listeners.
- *
-
-
-
  */
 interface FirewallListenerInterface
 {

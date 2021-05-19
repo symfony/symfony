@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Recipient;
 
-/**
-
- */
 interface RecipientInterface
 {
 }

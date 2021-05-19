@@ -16,10 +16,6 @@ use Symfony\Component\Validator\Constraints\TimezoneValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
-
- */
 class TimezoneValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): TimezoneValidator

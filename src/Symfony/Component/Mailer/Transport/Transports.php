@@ -18,9 +18,6 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 final class Transports implements TransportInterface
 {
     private $transports;

@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
-/**
-
- */
 class DoctrineReceivedStamp implements NonSendableStampInterface
 {
     private $id;

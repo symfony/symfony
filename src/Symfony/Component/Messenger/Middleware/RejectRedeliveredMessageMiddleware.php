@@ -27,8 +27,6 @@ use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp as LegacyAmq
  * redelivered message, the message would get redelivered again and again. The purpose of this middleware is to prevent
  * infinite redelivery loops and to unblock the queue by republishing the redelivered messages as retries with a retry
  * limit and potential delay.
- *
-
  */
 class RejectRedeliveredMessageMiddleware implements MiddlewareInterface
 {

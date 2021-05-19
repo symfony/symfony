@@ -12,8 +12,6 @@
 namespace Symfony\Component\Finder\Iterator;
 
 /**
-
- *
  * @internal
  */
 class LazyIterator implements \IteratorAggregate

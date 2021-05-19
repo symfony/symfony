@@ -18,10 +18,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
-
- */
 class RedisReceiver implements ReceiverInterface
 {
     private $connection;

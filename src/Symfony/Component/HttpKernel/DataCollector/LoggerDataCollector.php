@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * LogDataCollector.
  *
-
- *
  * @final
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface

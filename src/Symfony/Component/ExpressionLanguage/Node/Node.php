@@ -15,8 +15,6 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 
 /**
  * Represents a node in the AST.
- *
-
  */
 class Node
 {

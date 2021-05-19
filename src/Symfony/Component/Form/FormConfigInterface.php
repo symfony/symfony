@@ -17,8 +17,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * The configuration of a {@link Form} object.
  *
-
- *
  * @method callable|null getIsEmptyCallback() Returns a callable that takes the model data as argument and that returns if it is empty or not - not implementing it is deprecated since Symfony 5.1
  */
 interface FormConfigInterface

@@ -15,8 +15,6 @@ use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
-
- *
  * @internal
  */
 trait ProxyTrait

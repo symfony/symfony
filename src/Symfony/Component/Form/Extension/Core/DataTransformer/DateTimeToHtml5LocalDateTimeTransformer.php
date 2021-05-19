@@ -13,11 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
-
-
- */
 class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {
     public const HTML5_FORMAT = 'Y-m-d\\TH:i:s';

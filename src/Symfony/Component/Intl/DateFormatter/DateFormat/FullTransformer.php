@@ -17,8 +17,6 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
 /**
  * Parser and formatter for date formats.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

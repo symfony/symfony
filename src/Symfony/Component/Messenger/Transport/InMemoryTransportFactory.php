@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Transport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-/**
-
- */
 class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
 {
     /**

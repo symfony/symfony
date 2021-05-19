@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Resolves named arguments to their corresponding numeric index.
- *
-
  */
 class ResolveNamedArgumentsPass extends AbstractRecursivePass
 {

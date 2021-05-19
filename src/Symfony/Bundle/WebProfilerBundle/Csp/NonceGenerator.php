@@ -14,8 +14,6 @@ namespace Symfony\Bundle\WebProfilerBundle\Csp;
 /**
  * Generates Content-Security-Policy nonce.
  *
-
- *
  * @internal
  */
 class NonceGenerator

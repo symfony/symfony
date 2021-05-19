@@ -16,8 +16,6 @@ namespace Symfony\Component\CssSelector\Exception;
  *
  * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
- *
-
  */
 class InternalErrorException extends ParseException
 {

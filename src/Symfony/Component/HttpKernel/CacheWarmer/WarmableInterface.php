@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
 
 /**
  * Interface for classes that support warming their cache.
- *
-
  */
 interface WarmableInterface
 {

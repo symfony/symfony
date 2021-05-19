@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-/**
-
- */
 class TraceableMiddlewareTest extends MiddlewareTestCase
 {
     public function testHandle()

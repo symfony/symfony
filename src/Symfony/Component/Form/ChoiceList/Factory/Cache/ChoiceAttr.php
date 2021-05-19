@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_attr" option.
  *
  * @internal
- *
-
  */
 final class ChoiceAttr extends AbstractStaticOption
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
-/**
-
- */
 interface TokenVerifierInterface
 {
     /**

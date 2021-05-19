@@ -14,8 +14,6 @@ namespace Symfony\Component\DependencyInjection\Argument;
 use Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
 
 /**
-
- *
  * @internal
  */
 class ServiceLocator extends BaseServiceLocator

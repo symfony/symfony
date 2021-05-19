@@ -19,9 +19,6 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-/**
-
- */
 class CliDumperTest extends TestCase
 {
     use VarDumperTestTrait;

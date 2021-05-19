@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * An interface that must be implemented by all node parents.
- *
-
  */
 interface NodeParentInterface
 {

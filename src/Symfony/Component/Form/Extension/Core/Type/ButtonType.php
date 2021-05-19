@@ -16,8 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A form button.
- *
-
  */
 class ButtonType extends BaseType implements ButtonTypeInterface
 {

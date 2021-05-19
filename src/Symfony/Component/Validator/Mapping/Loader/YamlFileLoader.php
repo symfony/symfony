@@ -18,8 +18,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Loads validation metadata from a YAML file.
- *
-
  */
 class YamlFileLoader extends FileLoader
 {

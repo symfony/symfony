@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts common resource types to array representation.
  *
-
- *
  * @final
  */
 class ResourceCaster

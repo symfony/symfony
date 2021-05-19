@@ -14,8 +14,6 @@ namespace Symfony\Component\RateLimiter\Storage;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 interface StorageInterface

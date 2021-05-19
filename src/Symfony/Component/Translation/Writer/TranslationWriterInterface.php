@@ -16,8 +16,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * TranslationWriter writes translation messages.
- *
-
  */
 interface TranslationWriterInterface
 {

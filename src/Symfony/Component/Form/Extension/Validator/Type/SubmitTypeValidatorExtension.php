@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-/**
-
- */
 class SubmitTypeValidatorExtension extends BaseValidatorExtension
 {
     /**

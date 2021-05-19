@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
-
- */
 class StackMiddleware implements MiddlewareInterface, StackInterface
 {
     private $stack;

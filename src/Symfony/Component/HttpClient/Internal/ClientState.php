@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpClient\Internal;
 /**
  * Internal representation of the client state.
  *
-
- *
  * @internal
  */
 class ClientState

@@ -15,9 +15,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 
 /**
  * Gives access to language-related ICU data.
- *
-
-
  */
 final class Languages extends ResourceBundle
 {

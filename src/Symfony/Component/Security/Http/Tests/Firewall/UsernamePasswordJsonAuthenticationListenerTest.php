@@ -32,8 +32,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
 
 /**
-
- *
  * @group legacy
  */
 class UsernamePasswordJsonAuthenticationListenerTest extends TestCase

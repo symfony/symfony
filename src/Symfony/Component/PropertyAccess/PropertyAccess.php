@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess;
 
 /**
  * Entry point of the PropertyAccess component.
- *
-
  */
 final class PropertyAccess
 {

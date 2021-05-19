@@ -20,10 +20,6 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 /**
  * HttpBasicFactory creates services for HTTP basic authentication.
  *
-
-
-
- *
  * @internal
  */
 class HttpBasicLdapFactory extends HttpBasicFactory

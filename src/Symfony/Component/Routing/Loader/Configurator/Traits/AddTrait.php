@@ -15,9 +15,6 @@ use Symfony\Component\Routing\Loader\Configurator\CollectionConfigurator;
 use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
-
- */
 trait AddTrait
 {
     use LocalizedRouteTrait;

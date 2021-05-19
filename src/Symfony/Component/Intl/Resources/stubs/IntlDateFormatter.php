@@ -18,8 +18,6 @@ if (!class_exists(IntlDateFormatterPolyfill::class)) {
     /**
      * Stub implementation for the IntlDateFormatter class of the intl extension.
      *
-
-     *
      * @see BaseIntlDateFormatter
      */
     class IntlDateFormatter extends BaseIntlDateFormatter
@@ -28,8 +26,6 @@ if (!class_exists(IntlDateFormatterPolyfill::class)) {
 } else {
     /**
      * Stub implementation for the IntlDateFormatter class of the intl extension.
-     *
-
      *
      * @see BaseIntlDateFormatter
      */

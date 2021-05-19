@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @property int $maxSize
- *
-
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class File extends Constraint

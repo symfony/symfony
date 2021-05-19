@@ -34,8 +34,6 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 final class AmpResponse implements ResponseInterface, StreamableInterface

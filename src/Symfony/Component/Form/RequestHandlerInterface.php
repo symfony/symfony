@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * Submits forms if they were submitted.
- *
-
  */
 interface RequestHandlerInterface
 {

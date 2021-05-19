@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 final class Mailer implements MailerInterface
 {
     private $transport;

@@ -17,8 +17,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * TranslationReader reads translation messages from translation files.
- *
-
  */
 class TranslationReader implements TranslationReaderInterface
 {

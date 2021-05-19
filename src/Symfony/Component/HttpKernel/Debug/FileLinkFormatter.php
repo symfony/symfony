@@ -18,8 +18,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Formats debug file links.
  *
-
- *
  * @final
  */
 class FileLinkFormatter

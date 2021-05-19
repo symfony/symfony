@@ -14,8 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup;
 use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\KeyboardButton;
 
 /**
-
- *
  * @see https://core.telegram.org/bots/api#replykeyboardmarkup
  */
 final class ReplyKeyboardMarkup extends AbstractTelegramReplyMarkup

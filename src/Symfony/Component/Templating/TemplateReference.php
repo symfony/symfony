@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating;
 
 /**
  * Internal representation of a template.
- *
-
  */
 class TemplateReference implements TemplateReferenceInterface
 {

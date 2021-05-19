@@ -20,8 +20,6 @@ use Symfony\Component\RateLimiter\Reservation;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class TokenBucketLimiter implements LimiterInterface

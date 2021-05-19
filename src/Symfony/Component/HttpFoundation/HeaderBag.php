@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * HeaderBag is a container for HTTP headers.
- *
-
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {

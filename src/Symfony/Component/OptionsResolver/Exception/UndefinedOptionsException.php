@@ -16,8 +16,6 @@ namespace Symfony\Component\OptionsResolver\Exception;
  *
  * You should remove the options in question from your code or define them
  * beforehand.
- *
-
  */
 class UndefinedOptionsException extends InvalidArgumentException
 {

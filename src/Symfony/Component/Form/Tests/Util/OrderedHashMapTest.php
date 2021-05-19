@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Tests\Util;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
-/**
-
- */
 class OrderedHashMapTest extends TestCase
 {
     public function testGet()

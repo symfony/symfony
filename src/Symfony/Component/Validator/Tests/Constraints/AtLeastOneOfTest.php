@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-/**
-
- */
 class AtLeastOneOfTest extends TestCase
 {
     public function testRejectNonConstraints()

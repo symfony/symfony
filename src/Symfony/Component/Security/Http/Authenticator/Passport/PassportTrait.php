@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport;
 
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
-/**
-
- */
 trait PassportTrait
 {
     private $badges = [];

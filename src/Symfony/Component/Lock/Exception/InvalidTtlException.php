@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Lock\Exception;
 
-/**
-
- */
 class InvalidTtlException extends InvalidArgumentException implements ExceptionInterface
 {
 }

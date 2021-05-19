@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Provides a test Normalizer which only implements the DenormalizerInterface.
- *
-
  */
 class TestDenormalizer implements DenormalizerInterface
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Serializer\Tests\Mapping;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
-/**
-
- */
 class TestClassMetadataFactory
 {
     public static function createClassMetadata(string $namespace, bool $withParent = false, bool $withInterface = false): ClassMetadata

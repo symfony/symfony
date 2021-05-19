@@ -16,8 +16,6 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 /**
  * Parser and formatter for time zone format.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

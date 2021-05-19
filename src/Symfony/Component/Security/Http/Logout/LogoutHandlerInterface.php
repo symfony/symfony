@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * Interface that needs to be implemented by LogoutHandlers.
  *
-
- *
  * @deprecated since Symfony 5.1
  */
 interface LogoutHandlerInterface

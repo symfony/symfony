@@ -12,9 +12,6 @@
 namespace Symfony\Component\Mime;
 
 /**
-
-
- *
  * @internal
  */
 final class CharacterStream

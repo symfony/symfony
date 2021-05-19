@@ -18,9 +18,6 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
-
- */
 class AmazonSqsSender implements SenderInterface
 {
     private $connection;

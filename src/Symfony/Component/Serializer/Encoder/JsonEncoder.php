@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Encoder;
 
 /**
  * Encodes JSON data.
- *
-
  */
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {

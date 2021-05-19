@@ -16,8 +16,6 @@ namespace Symfony\Component\Cache\Marshaller;
  *
  * Implementations of this interface MUST deal with errors carefully. They MUST
  * also deal with forward and backward compatibility at the storage format level.
- *
-
  */
 interface MarshallerInterface
 {

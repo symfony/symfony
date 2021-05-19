@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
 /**
  * Writes .json resource bundles.
  *
-
- *
  * @internal
  */
 class JsonBundleWriter implements BundleWriterInterface

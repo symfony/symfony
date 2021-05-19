@@ -13,9 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
-
- */
 class JsonLoginTest extends AbstractWebTestCase
 {
     public function testDefaultJsonLoginSuccess()

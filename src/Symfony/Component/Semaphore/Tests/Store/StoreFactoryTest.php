@@ -17,9 +17,6 @@ use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
 
-/**
-
- */
 class StoreFactoryTest extends TestCase
 {
     /**

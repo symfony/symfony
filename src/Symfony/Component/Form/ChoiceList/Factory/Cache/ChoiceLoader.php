@@ -20,8 +20,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_loader" option.
  *
  * @internal
- *
-
  */
 final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInterface
 {

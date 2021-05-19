@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * AuthenticationCredentialsNotFoundException is thrown when an authentication is rejected
  * because no Token is available.
- *
-
-
  */
 class AuthenticationCredentialsNotFoundException extends AuthenticationException
 {

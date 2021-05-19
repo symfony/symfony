@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
  * Registers the default logger if necessary.
- *
-
  */
 class LoggerPass implements CompilerPassInterface
 {

@@ -21,9 +21,6 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 class PostmarkSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $id, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)

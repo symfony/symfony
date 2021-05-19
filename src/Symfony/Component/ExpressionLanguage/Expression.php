@@ -13,8 +13,6 @@ namespace Symfony\Component\ExpressionLanguage;
 
 /**
  * Represents an expression.
- *
-
  */
 class Expression
 {

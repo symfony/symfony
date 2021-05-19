@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Event;
 
 use Symfony\Component\Notifier\Message\MessageInterface;
 
-/**
-
- */
 class NotificationEvents
 {
     private $events = [];

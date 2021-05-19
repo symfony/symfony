@@ -15,9 +15,6 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
-/**
-
- */
 final class CompiledClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     private $compiledClassMetadata = [];

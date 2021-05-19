@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Exception;
 
-/**
-
- */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

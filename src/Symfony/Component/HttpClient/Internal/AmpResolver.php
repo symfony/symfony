@@ -19,8 +19,6 @@ use Amp\Success;
 /**
  * Handles local overrides for the DNS resolver.
  *
-
- *
  * @internal
  */
 class AmpResolver implements Dns\Resolver

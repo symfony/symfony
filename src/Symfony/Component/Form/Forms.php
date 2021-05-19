@@ -57,8 +57,6 @@ namespace Symfony\Component\Form;
  *     $formFactory = Forms::createFormFactoryBuilder()
  *         ->addExtension(new ValidatorExtension($validator))
  *         ->getFormFactory();
- *
-
  */
 final class Forms
 {

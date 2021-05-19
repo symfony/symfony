@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Data\Bundle\Compiler;
 /**
  * Compiles a resource bundle.
  *
-
- *
  * @internal
  */
 interface BundleCompilerInterface

@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * To get the chat id, send a message in Telegram with the user you want
  * and then execute curl 'https://api.telegram.org/bot%token%/getUpdates' | json_pp
  * command.
- *
-
  */
 final class TelegramTransport extends AbstractTransport
 {

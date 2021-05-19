@@ -23,8 +23,6 @@ use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\TranslatorBag;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class TranslationPushCommand extends Command

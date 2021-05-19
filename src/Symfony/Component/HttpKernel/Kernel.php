@@ -52,8 +52,6 @@ class_exists(ConfigCache::class);
  *
  * Environment names must always start with a letter and
  * they must only contain letters and numbers.
- *
-
  */
 abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface
 {

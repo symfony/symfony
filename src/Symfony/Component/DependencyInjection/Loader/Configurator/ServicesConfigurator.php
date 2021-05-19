@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-/**
-
- */
 class ServicesConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'services';

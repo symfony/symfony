@@ -17,8 +17,6 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 /**
  * This class provides a fluent interface for defining an array node.
- *
-
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\Profiler;
 
 /**
  * Storage for profiler using files.
- *
-
  */
 class FileProfilerStorage implements ProfilerStorageInterface
 {

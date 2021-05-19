@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Exception;
 
-/**
-
- */
 class LengthException extends LogicException
 {
 }

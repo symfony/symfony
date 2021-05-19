@@ -16,9 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
- */
 class CollectionToArrayTransformerTest extends TestCase
 {
     /**

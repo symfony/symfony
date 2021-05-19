@@ -17,10 +17,6 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
-/**
-
-
- */
 class EntryManager implements EntryManagerInterface
 {
     private $connection;

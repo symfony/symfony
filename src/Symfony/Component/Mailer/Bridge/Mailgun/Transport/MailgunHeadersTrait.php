@@ -18,9 +18,6 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 trait MailgunHeadersTrait
 {
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage

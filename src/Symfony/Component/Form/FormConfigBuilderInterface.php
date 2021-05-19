@@ -15,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
-
- *
  * @method $this setIsEmptyCallback(callable|null $isEmptyCallback) Sets the callback that will be called to determine if the model data of the form is empty or not - not implementing it is deprecated since Symfony 5.1
  */
 interface FormConfigBuilderInterface extends FormConfigInterface

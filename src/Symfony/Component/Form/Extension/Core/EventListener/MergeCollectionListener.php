@@ -16,9 +16,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-/**
-
- */
 class MergeCollectionListener implements EventSubscriberInterface
 {
     private $allowAdd;

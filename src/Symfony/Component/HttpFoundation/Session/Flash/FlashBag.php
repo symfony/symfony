@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
 
 /**
  * FlashBag flash message container.
- *
-
  */
 class FlashBag implements FlashBagInterface
 {

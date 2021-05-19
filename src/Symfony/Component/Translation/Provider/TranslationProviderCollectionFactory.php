@@ -14,8 +14,6 @@ namespace Symfony\Component\Translation\Provider;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class TranslationProviderCollectionFactory

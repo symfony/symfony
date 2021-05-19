@@ -18,8 +18,6 @@ trigger_deprecation('symfony/event-dispatcher', '5.1', '%s is deprecated, use th
 /**
  * A helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
  *
-
- *
  * @deprecated since Symfony 5.1
  */
 final class LegacyEventDispatcherProxy

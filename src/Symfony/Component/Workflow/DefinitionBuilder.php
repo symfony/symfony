@@ -15,10 +15,6 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * Builds a definition.
- *
-
-
-
  */
 class DefinitionBuilder
 {

@@ -20,8 +20,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * Generates the router matcher and generator classes.
  *
-
- *
  * @final
  */
 class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface

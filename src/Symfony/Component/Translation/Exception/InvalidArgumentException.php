@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Base InvalidArgumentException for the Translation component.
- *
-
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

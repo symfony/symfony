@@ -26,8 +26,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 /**
  * A console command for retrieving information about services.
  *
-
- *
  * @internal
  */
 class ContainerDebugCommand extends Command

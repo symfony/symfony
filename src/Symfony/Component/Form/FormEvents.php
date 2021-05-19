@@ -23,8 +23,6 @@ use Symfony\Component\Form\Event\SubmitEvent;
  *
  * To learn how to dynamically modify forms using events check the cookbook
  * entry at {@link https://symfony.com/doc/any/cookbook/form/dynamic_form_modification.html}.
- *
-
  */
 final class FormEvents
 {

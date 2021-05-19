@@ -46,9 +46,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
- *
-
-
  */
 class PhpDumper extends Dumper
 {

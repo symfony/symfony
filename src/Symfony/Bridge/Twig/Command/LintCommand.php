@@ -28,9 +28,6 @@ use Twig\Source;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
- *
-
-
  */
 class LintCommand extends Command
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Ldap\Adapter;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 abstract class AbstractConnection implements ConnectionInterface
 {
     protected $config;

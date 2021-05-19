@@ -19,8 +19,6 @@ use Symfony\Component\Translation\Command\XliffLintCommand;
 
 /**
  * Tests the XliffLintCommand.
- *
-
  */
 class XliffLintCommandTest extends TestCase
 {

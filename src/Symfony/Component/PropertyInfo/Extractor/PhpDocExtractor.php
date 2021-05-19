@@ -25,8 +25,6 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
 /**
  * Extracts data using a PHPDoc parser.
  *
-
- *
  * @final
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface

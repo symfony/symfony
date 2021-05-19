@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts Reflector related classes to array representation.
  *
-
- *
  * @final
  */
 class ReflectionCaster

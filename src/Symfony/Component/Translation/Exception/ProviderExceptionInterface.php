@@ -12,8 +12,6 @@
 namespace Symfony\Component\Translation\Exception;
 
 /**
-
- *
  * @experimental in 5.3
  */
 interface ProviderExceptionInterface extends ExceptionInterface

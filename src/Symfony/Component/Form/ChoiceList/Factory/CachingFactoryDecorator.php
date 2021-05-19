@@ -21,9 +21,6 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * To cache a list based on its options, arguments must be decorated
  * by a {@see Cache\AbstractStaticOption} implementation.
- *
-
-
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {

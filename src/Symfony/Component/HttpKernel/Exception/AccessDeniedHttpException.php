@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
-/**
-
-
- */
 class AccessDeniedHttpException extends HttpException
 {
     /**

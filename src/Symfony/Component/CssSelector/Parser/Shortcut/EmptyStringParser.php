@@ -25,8 +25,6 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
-
- *
  * @internal
  */
 class EmptyStringParser implements ParserInterface

@@ -18,8 +18,6 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 /**
  * Casts common Exception classes to array representation.
  *
-
- *
  * @final
  */
 class ExceptionCaster

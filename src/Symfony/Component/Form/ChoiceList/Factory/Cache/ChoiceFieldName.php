@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_name" callback.
  *
  * @internal
- *
-
  */
 final class ChoiceFieldName extends AbstractStaticOption
 {

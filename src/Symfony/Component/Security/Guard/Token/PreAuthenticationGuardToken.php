@@ -22,8 +22,6 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  * immediately by the GuardAuthenticationProvider. If authentication is
  * successful, a different authenticated token is returned
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface

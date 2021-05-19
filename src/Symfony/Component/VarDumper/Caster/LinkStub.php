@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Caster;
 
 /**
  * Represents a file or a URL.
- *
-
  */
 class LinkStub extends ConstStub
 {

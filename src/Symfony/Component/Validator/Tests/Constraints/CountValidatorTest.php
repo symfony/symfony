@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
- */
 abstract class CountValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()

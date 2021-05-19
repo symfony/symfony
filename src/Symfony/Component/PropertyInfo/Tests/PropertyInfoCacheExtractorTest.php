@@ -14,9 +14,6 @@ namespace Symfony\Component\PropertyInfo\Tests;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 
-/**
-
- */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {
     protected function setUp(): void

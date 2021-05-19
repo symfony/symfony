@@ -18,9 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
-
- */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {
     private $userProvider;

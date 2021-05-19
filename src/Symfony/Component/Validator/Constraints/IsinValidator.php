@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
-
- *
  * @see https://en.wikipedia.org/wiki/International_Securities_Identification_Number
  */
 class IsinValidator extends ConstraintValidator

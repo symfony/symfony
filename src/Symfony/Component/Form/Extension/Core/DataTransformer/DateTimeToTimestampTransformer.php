@@ -15,9 +15,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a timestamp and a DateTime object.
- *
-
-
  */
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 /**
  * Implements the SSI rendering strategy.
- *
-
  */
 class SsiFragmentRenderer extends AbstractSurrogateFragmentRenderer
 {

@@ -29,8 +29,6 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * This provides fully concurrent HTTP requests, with transparent
  * HTTP/2 push when a curl version that supports it is installed.
- *
-
  */
 final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {

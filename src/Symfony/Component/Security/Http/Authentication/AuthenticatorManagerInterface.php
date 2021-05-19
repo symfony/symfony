@@ -15,10 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
-/**
-
-
- */
 interface AuthenticatorManagerInterface
 {
     /**

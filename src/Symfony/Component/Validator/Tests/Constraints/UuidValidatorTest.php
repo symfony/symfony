@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
- */
 class UuidValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()

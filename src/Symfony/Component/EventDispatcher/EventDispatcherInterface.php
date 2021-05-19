@@ -17,8 +17,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
- *
-
  */
 interface EventDispatcherInterface extends ContractsEventDispatcherInterface
 {

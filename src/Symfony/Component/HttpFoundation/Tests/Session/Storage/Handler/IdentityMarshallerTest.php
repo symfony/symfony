@@ -14,9 +14,6 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
 
-/**
-
- */
 class IdentityMarshallerTest extends Testcase
 {
     public function testMarshall()

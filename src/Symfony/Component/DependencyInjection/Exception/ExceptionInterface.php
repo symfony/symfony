@@ -15,9 +15,6 @@ use Psr\Container\ContainerExceptionInterface;
 
 /**
  * Base ExceptionInterface for Dependency Injection component.
- *
-
-
  */
 interface ExceptionInterface extends ContainerExceptionInterface, \Throwable
 {

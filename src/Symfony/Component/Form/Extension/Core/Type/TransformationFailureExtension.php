@@ -16,9 +16,6 @@ use Symfony\Component\Form\Extension\Core\EventListener\TransformationFailureLis
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class TransformationFailureExtension extends AbstractTypeExtension
 {
     private $translator;

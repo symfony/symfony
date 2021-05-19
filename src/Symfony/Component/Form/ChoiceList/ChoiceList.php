@@ -27,8 +27,6 @@ use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * A set of convenient static methods to create cacheable choice list options.
- *
-
  */
 final class ChoiceList
 {

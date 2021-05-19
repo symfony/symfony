@@ -18,8 +18,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * IcuResFileLoader loads translations from a resource bundle.
- *
-
  */
 class IcuResFileLoader implements LoaderInterface
 {

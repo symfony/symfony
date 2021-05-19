@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Sets the session in the request.
  *
-
- *
  * @final
  */
 class TestSessionListener extends AbstractTestSessionListener

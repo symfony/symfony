@@ -22,9 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 trigger_deprecation('symfony/amazon-mailer', '5.1', 'The "%s" class is deprecated, use "%s" instead. The Amazon transport now requires "AsyncAws". Run "composer require async-aws/ses".', SesHttpTransport::class, SesHttpAsyncAwsTransport::class);
 
-/**
 
- */
 class SesHttpTransport extends AbstractHttpTransport
 {
     private const HOST = 'email.%region%.amazonaws.com';

@@ -16,9 +16,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
-/**
-
- */
 class MaxDepthTest extends TestCase
 {
     use ExpectDeprecationTrait;

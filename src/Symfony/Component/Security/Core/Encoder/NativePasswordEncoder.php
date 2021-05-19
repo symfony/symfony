@@ -18,10 +18,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * Hashes passwords using password_hash().
  *
-
-
-
- *
  * @deprecated since Symfony 5.3, use {@link NativePasswordHasher} instead
  */
 final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSaltingEncoderInterface

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
-/**
-
- */
 class UnprocessableEntityHttpException extends HttpException
 {
     /**

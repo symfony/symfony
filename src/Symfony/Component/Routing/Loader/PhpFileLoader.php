@@ -20,10 +20,6 @@ use Symfony\Component\Routing\RouteCollection;
  * PhpFileLoader loads routes from a PHP file.
  *
  * The file must return a RouteCollection instance.
- *
-
-
-
  */
 class PhpFileLoader extends FileLoader
 {

@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * ExtensionInterface is the interface implemented by container extension classes.
- *
-
  */
 interface ExtensionInterface
 {

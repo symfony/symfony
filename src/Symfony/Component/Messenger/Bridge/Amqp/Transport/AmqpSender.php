@@ -21,8 +21,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * Symfony Messenger sender to send messages to AMQP brokers using PHP's AMQP extension.
- *
-
  */
 class AmqpSender implements SenderInterface
 {

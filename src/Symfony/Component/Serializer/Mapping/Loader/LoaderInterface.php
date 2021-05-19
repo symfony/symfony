@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * Loads {@link ClassMetadataInterface}.
- *
-
  */
 interface LoaderInterface
 {

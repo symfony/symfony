@@ -20,8 +20,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * This event is dispatched on authentication failure.
  *
-
- *
  * @deprecated since Symfony 5.3, use LoginFailureEvent with the new authenticator system instead
  */
 final class AuthenticationFailureEvent extends AuthenticationEvent

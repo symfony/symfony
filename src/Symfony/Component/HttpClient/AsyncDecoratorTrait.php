@@ -18,8 +18,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 /**
  * Eases with processing responses while streaming them.
- *
-
  */
 trait AsyncDecoratorTrait
 {

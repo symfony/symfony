@@ -19,9 +19,6 @@ use Symfony\Component\Notifier\Transport\NullTransportFactory;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 class NullTransportFactoryTest extends TestCase
 {
     /**

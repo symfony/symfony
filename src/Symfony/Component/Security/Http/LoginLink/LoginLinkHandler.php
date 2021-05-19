@@ -23,9 +23,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkException;
 
-/**
-
- */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
     private $urlGenerator;

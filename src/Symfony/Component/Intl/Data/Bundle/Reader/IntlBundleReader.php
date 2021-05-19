@@ -17,8 +17,6 @@ use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 /**
  * Reads binary .res resource bundles.
  *
-
- *
  * @internal
  */
 class IntlBundleReader implements BundleReaderInterface

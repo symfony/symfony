@@ -14,8 +14,6 @@ namespace Symfony\Component\Config\Builder;
 /**
  * A ConfigBuilder provides helper methods to build a large complex array.
  *
-
- *
  * @experimental in 5.3
  */
 interface ConfigBuilderInterface

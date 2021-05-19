@@ -27,8 +27,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * The implementation buffers responses in memory and doesn't stream directly from the network.
  * You can disable/enable this layer by setting option "no_cache" under "extra" to true/false.
  * By default, caching is enabled unless the "buffer" option is set to false.
- *
-
  */
 class CachingHttpClient implements HttpClientInterface
 {

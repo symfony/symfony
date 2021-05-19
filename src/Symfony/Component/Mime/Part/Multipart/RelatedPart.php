@@ -14,9 +14,6 @@ namespace Symfony\Component\Mime\Part\Multipart;
 use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\AbstractPart;
 
-/**
-
- */
 final class RelatedPart extends AbstractMultipartPart
 {
     private $mainPart;

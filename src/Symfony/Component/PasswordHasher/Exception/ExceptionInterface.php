@@ -13,8 +13,6 @@ namespace Symfony\Component\PasswordHasher\Exception;
 
 /**
  * Interface for exceptions thrown by the password-hasher component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

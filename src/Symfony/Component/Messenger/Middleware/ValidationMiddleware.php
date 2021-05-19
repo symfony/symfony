@@ -16,9 +16,6 @@ use Symfony\Component\Messenger\Exception\ValidationFailedException;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
-
- */
 class ValidationMiddleware implements MiddlewareInterface
 {
     private $validator;

@@ -23,9 +23,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class MandrillApiTransport extends AbstractApiTransport
 {
     private const HOST = 'mandrillapp.com';

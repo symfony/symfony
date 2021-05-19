@@ -15,8 +15,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * PhpFileDumper generates PHP files from a message catalogue.
- *
-
  */
 class PhpFileDumper extends FileDumper
 {

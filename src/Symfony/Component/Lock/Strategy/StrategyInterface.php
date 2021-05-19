@@ -13,8 +13,6 @@ namespace Symfony\Component\Lock\Strategy;
 
 /**
  * StrategyInterface defines an interface to indicate when a quorum is met and can be met.
- *
-
  */
 interface StrategyInterface
 {

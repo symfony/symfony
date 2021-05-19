@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
  * Thrown when an index cannot be found.
- *
-
  */
 class NoSuchIndexException extends AccessException
 {

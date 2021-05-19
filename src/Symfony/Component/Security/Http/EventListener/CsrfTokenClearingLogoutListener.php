@@ -16,8 +16,6 @@ use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
-
- *
  * @final
  */
 class CsrfTokenClearingLogoutListener implements EventSubscriberInterface

@@ -16,9 +16,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 
-/**
-
- */
 class JsonBundleReaderTest extends TestCase
 {
     /**

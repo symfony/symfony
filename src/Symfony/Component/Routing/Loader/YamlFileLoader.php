@@ -23,9 +23,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileLoader loads Yaml routing files.
- *
-
-
  */
 class YamlFileLoader extends FileLoader
 {

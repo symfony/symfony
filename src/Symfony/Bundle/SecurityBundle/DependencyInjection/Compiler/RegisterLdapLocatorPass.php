@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
-
- *
  * @internal
  */
 class RegisterLdapLocatorPass implements CompilerPassInterface

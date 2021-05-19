@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 /**
  * LateDataCollectorInterface.
- *
-
  */
 interface LateDataCollectorInterface
 {

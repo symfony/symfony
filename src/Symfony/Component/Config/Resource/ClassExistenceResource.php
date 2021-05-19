@@ -17,8 +17,6 @@ namespace Symfony\Component\Config\Resource;
  *
  * The resource must be a fully-qualified class name.
  *
-
- *
  * @final
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface

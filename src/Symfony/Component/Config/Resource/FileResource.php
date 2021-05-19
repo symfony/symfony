@@ -16,8 +16,6 @@ namespace Symfony\Component\Config\Resource;
  *
  * The resource can be a file or a directory.
  *
-
- *
  * @final
  */
 class FileResource implements SelfCheckingResourceInterface

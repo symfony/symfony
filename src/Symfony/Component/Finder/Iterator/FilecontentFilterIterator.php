@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * FilecontentFilterIterator filters files by their contents using patterns (regexps or strings).
- *
-
-
  */
 class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {

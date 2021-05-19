@@ -21,8 +21,6 @@ use Symfony\Component\Ldap\Security\LdapAuthenticator;
 /**
  * A trait decorating the authenticator with LDAP functionality.
  *
-
- *
  * @internal
  */
 trait LdapFactoryTrait

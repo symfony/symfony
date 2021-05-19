@@ -13,9 +13,6 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 
-/**
-
- */
 final class Dsn
 {
     private $scheme;

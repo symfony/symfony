@@ -14,9 +14,6 @@ namespace Symfony\Component\Semaphore\Tests\Store;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Store\RedisStore;
 
-/**
-
- */
 abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {
     /**

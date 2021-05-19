@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Provides a base class for the validation of property comparisons.
- *
-
-
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {

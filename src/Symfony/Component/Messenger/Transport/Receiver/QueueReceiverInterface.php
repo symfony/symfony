@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Some transports may have multiple queues. This interface is used to read from only some queues.
  *
-
- *
  * @experimental in 5.3
  */
 interface QueueReceiverInterface extends ReceiverInterface

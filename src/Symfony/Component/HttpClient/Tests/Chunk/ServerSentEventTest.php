@@ -14,9 +14,6 @@ namespace Symfony\Component\HttpClient\Tests\Chunk;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
 
-/**
-
- */
 class ServerSentEventTest extends TestCase
 {
     public function testParse()

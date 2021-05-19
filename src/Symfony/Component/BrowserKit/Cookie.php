@@ -13,8 +13,6 @@ namespace Symfony\Component\BrowserKit;
 
 /**
  * Cookie represents an HTTP cookie.
- *
-
  */
 class Cookie
 {

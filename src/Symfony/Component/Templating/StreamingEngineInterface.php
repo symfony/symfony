@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating;
 
 /**
  * StreamingEngineInterface provides a method that knows how to stream a template.
- *
-
  */
 interface StreamingEngineInterface
 {

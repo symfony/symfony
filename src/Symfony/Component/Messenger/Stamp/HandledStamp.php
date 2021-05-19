@@ -22,8 +22,6 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  *
  * @see \Symfony\Component\Messenger\Middleware\HandleMessageMiddleware
  * @see \Symfony\Component\Messenger\HandleTrait
- *
-
  */
 final class HandledStamp implements StampInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * Base InvalidArgumentException for the Security component.
- *
-
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

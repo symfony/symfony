@@ -19,9 +19,6 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 abstract class AbstractApiTransport extends AbstractHttpTransport
 {
     abstract protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface;

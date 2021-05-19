@@ -39,11 +39,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *     $serializer->serialize($obj, 'xml')
  *     $serializer->decode($data, 'xml')
  *     $serializer->denormalize($data, 'Class', 'xml')
- *
-
-
-
-
  */
 class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {

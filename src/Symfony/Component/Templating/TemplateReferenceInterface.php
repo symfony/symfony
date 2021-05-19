@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating;
 
 /**
  * Interface to be implemented by all templates.
- *
-
  */
 interface TemplateReferenceInterface
 {

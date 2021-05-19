@@ -16,8 +16,6 @@ use Symfony\Component\Intl\Data\Bundle\Writer\BundleWriterInterface;
 /**
  * Stores contextual information for resource bundle generation.
  *
-
- *
  * @internal
  */
 class GeneratorConfig

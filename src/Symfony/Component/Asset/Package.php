@@ -17,9 +17,6 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
  * Basic package that adds a version to asset URLs.
- *
-
-
  */
 class Package implements PackageInterface
 {

@@ -18,8 +18,6 @@ namespace Symfony\Component\OptionsResolver\Exception;
  * check whether the optional option is set. You can do this with `isset($options['optional'])`.
  * In contrast to the {@link UndefinedOptionsException}, this is a runtime exception that can
  * occur when evaluating lazy options.
- *
-
  */
 class NoSuchOptionException extends \OutOfBoundsException implements ExceptionInterface
 {

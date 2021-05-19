@@ -41,9 +41,6 @@ class_exists(ArgumentServiceLocator::class);
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *  * IGNORE_ON_UNINITIALIZED_REFERENCE: Ignores/returns null for uninitialized services or invalid references
- *
-
-
  */
 class Container implements ContainerInterface, ResetInterface
 {

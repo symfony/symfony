@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
 
 /**
  * Provides integration with the HttpKernel component.
- *
-
  */
 final class HttpKernelRuntime
 {

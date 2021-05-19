@@ -17,8 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Creates new {@link ExecutionContext} instances.
  *
-
- *
  * @internal version 2.5. Code against ExecutionContextFactoryInterface instead.
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface

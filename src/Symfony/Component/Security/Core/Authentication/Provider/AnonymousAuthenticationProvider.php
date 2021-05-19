@@ -21,8 +21,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * AnonymousAuthenticationProvider validates AnonymousToken instances.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface

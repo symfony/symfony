@@ -23,8 +23,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
-
- *
  * @final
  */
 class ValidatorDataCollector extends DataCollector implements LateDataCollectorInterface

@@ -23,8 +23,6 @@ use Symfony\Contracts\Cache\CacheInterface;
  * An in-memory cache storage.
  *
  * Acts as a least-recently-used (LRU) storage when configured with a maximum number of items.
- *
-
  */
 class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {

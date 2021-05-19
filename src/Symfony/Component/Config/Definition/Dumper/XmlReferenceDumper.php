@@ -20,8 +20,6 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 /**
  * Dumps an XML reference configuration for the given configuration/node instance.
- *
-
  */
 class XmlReferenceDumper
 {

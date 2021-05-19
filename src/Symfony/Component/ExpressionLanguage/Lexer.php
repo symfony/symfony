@@ -13,8 +13,6 @@ namespace Symfony\Component\ExpressionLanguage;
 
 /**
  * Lexes an expression.
- *
-
  */
 class Lexer
 {

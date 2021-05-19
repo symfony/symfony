@@ -20,8 +20,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * StoreFactory create stores and connections.
- *
-
  */
 class StoreFactory
 {

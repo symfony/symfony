@@ -14,8 +14,6 @@ namespace Symfony\Component\Runtime\Resolver;
 use Symfony\Component\Runtime\ResolverInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class ClosureResolver implements ResolverInterface

@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Constraints\Negative;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-/**
-
- */
 class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
 {
     protected function createConstraint(array $options = null): Constraint

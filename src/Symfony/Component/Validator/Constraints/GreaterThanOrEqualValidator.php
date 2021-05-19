@@ -13,9 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 /**
  * Validates values are greater than or equal to the previous (>=).
- *
-
-
  */
 class GreaterThanOrEqualValidator extends AbstractComparisonValidator
 {

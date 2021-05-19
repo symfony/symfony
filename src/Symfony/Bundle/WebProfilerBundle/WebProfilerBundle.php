@@ -13,9 +13,6 @@ namespace Symfony\Bundle\WebProfilerBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
-
- */
 class WebProfilerBundle extends Bundle
 {
     public function boot()

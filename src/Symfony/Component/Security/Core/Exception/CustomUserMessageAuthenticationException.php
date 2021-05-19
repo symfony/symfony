@@ -17,8 +17,6 @@ namespace Symfony\Component\Security\Core\Exception;
  * Be sure that the message passed to this exception is something that
  * can be shown safely to your user. In other words, avoid catching
  * other exceptions and passing their message directly to this class.
- *
-
  */
 class CustomUserMessageAuthenticationException extends AuthenticationException
 {

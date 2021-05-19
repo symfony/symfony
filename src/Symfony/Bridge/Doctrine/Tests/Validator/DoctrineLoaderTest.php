@@ -31,9 +31,6 @@ use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class DoctrineLoaderTest extends TestCase
 {
     protected function setUp(): void

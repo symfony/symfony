@@ -15,10 +15,6 @@ use Symfony\Component\Ldap\Adapter\AbstractQuery;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
-/**
-
-
- */
 class Query extends AbstractQuery
 {
     // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this

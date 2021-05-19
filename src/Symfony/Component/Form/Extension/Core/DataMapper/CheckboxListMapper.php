@@ -20,8 +20,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * A {@link ChoiceListInterface} implementation is used to find the
  * corresponding string values for the choices. Each checkbox form whose "value"
  * option corresponds to any of the selected values is marked as selected.
- *
-
  */
 class CheckboxListMapper implements DataMapperInterface
 {

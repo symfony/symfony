@@ -15,9 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 final class SendinblueSmtpTransport extends EsmtpTransport
 {
     public function __construct(string $username, string $password, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)

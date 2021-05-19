@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpClient\Internal;
 /**
  * Cache for resolved DNS queries.
  *
-
- *
  * @internal
  */
 final class DnsCache

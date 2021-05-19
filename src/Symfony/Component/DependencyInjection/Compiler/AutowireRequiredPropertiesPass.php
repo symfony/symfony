@@ -18,9 +18,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Looks for definitions with autowiring enabled and registers their corresponding "@required" properties.
- *
-
-
  */
 class AutowireRequiredPropertiesPass extends AbstractRecursivePass
 {

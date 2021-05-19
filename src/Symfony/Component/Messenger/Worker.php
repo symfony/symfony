@@ -30,9 +30,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
-
-
- *
  * @final
  */
 class Worker

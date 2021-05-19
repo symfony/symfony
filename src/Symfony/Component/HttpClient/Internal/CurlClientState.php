@@ -16,8 +16,6 @@ use Psr\Log\LoggerInterface;
 /**
  * Internal representation of the cURL client's state.
  *
-
- *
  * @internal
  */
 final class CurlClientState extends ClientState

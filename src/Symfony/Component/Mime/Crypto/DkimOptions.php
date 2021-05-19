@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime\Crypto;
 
 /**
  * A helper providing autocompletion for available DkimSigner options.
- *
-
  */
 final class DkimOptions
 {

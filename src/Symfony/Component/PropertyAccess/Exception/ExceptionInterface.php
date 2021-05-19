@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
  * Marker interface for the PropertyAccess component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

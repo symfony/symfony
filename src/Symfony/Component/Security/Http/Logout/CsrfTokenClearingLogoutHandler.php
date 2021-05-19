@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 
-/**
-
- */
 class CsrfTokenClearingLogoutHandler implements LogoutHandlerInterface
 {
     private $csrfTokenStorage;

@@ -25,9 +25,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsVariadics
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 
-/**
-
- */
 class ResolveNamedArgumentsPassTest extends TestCase
 {
     public function testProcess()

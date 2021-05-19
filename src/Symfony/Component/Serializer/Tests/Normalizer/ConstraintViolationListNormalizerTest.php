@@ -18,10 +18,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-/**
-
-
- */
 class ConstraintViolationListNormalizerTest extends TestCase
 {
     private $normalizer;

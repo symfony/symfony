@@ -13,9 +13,6 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-/**
-
- */
 trait CheckPasswordLengthTrait
 {
     private function isPasswordTooLong(string $password): bool

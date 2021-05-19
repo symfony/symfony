@@ -13,8 +13,6 @@ namespace Symfony\Component\ExpressionLanguage;
 
 /**
  * Represents an already parsed expression.
- *
-
  */
 class SerializedParsedExpression extends ParsedExpression
 {

@@ -25,8 +25,6 @@ namespace Symfony\Component\ExpressionLanguage;
  * the value of the function call based on the values defined for the
  * expression (it receives the values as a first argument and the function
  * arguments as remaining arguments).
- *
-
  */
 class ExpressionFunction
 {

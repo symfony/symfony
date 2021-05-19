@@ -17,8 +17,6 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * Reads .json resource bundles.
  *
-
- *
  * @internal
  */
 class JsonBundleReader implements BundleReaderInterface

@@ -15,9 +15,6 @@ use Symfony\Component\Semaphore\Key;
 
 /**
  * SemaphoreExpiredException is thrown when a semaphore may conflict due to a TTL expiration.
- *
-
-
  */
 class SemaphoreExpiredException extends \RuntimeException implements ExceptionInterface
 {

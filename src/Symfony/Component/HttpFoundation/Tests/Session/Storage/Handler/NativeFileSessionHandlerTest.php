@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 /**
  * Test class for NativeFileSessionHandler.
  *
-
- *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */

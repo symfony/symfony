@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
-/**
-
- */
 interface SlackBlockElementInterface
 {
     public function toArray(): array;

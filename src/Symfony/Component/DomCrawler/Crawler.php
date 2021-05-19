@@ -16,8 +16,6 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Crawler eases navigation of a list of \DOMNode objects.
- *
-
  */
 class Crawler implements \Countable, \IteratorAggregate
 {

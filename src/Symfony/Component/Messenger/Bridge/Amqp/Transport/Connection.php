@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Exception\LogicException;
 /**
  * An AMQP connection.
  *
-
- *
  * @final
  */
 class Connection

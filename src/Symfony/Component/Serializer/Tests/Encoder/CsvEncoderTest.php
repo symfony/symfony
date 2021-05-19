@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
-/**
-
- */
 class CsvEncoderTest extends TestCase
 {
     /**

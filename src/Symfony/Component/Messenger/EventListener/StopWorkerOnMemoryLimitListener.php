@@ -15,10 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
-/**
-
-
- */
 class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
 {
     private $memoryLimit;

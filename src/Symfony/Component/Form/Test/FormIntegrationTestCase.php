@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
-/**
-
- */
 abstract class FormIntegrationTestCase extends TestCase
 {
     /**

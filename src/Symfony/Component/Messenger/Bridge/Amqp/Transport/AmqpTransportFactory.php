@@ -15,9 +15,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-/**
-
- */
 class AmqpTransportFactory implements TransportFactoryInterface
 {
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface

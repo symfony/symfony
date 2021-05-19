@@ -22,8 +22,6 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
  * TranslationNodeVisitor extracts translation messages.
- *
-
  */
 final class TranslationNodeVisitor extends AbstractNodeVisitor
 {

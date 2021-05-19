@@ -15,8 +15,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * Represents the main properties of a PHP variable, pre-casted by a caster.
- *
-
  */
 class CutStub extends Stub
 {

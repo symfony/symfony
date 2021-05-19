@@ -27,8 +27,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Tests the ConsoleHandler and also the ConsoleFormatter.
- *
-
  */
 class ConsoleHandlerTest extends TestCase
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Uid;
 
-/**
-
- */
 class NilUuid extends Uuid
 {
     protected const TYPE = -1;

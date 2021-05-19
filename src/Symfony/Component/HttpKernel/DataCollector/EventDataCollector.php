@@ -21,8 +21,6 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * EventDataCollector.
  *
-
- *
  * @final
  */
 class EventDataCollector extends DataCollector implements LateDataCollectorInterface

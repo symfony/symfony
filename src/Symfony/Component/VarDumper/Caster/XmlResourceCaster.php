@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts XML resources to array representation.
  *
-
- *
  * @final
  */
 class XmlResourceCaster

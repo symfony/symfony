@@ -12,8 +12,6 @@
 namespace Symfony\Component\RateLimiter;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class Reservation

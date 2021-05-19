@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Exception interface for all exceptions thrown by the component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

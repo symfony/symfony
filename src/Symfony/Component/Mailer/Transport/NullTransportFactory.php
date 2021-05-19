@@ -13,9 +13,6 @@ namespace Symfony\Component\Mailer\Transport;
 
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 
-/**
-
- */
 final class NullTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface

@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * An attribute to tell how a dependency is used and hint named autowiring aliases.
- *
-
  */
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class Target

@@ -13,8 +13,6 @@ namespace Symfony\Component\Stopwatch;
 
 /**
  * Stopwatch section.
- *
-
  */
 class Section
 {

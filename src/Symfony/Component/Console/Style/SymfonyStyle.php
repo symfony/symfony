@@ -30,8 +30,6 @@ use Symfony\Component\Console\Terminal;
 
 /**
  * Output decorator helpers for the Symfony Style Guide.
- *
-
  */
 class SymfonyStyle extends OutputStyle
 {

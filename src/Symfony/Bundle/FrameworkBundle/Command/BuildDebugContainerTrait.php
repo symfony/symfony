@@ -20,9 +20,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @internal
- *
-
-
  */
 trait BuildDebugContainerTrait
 {

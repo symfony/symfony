@@ -23,9 +23,6 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class ViolationMapper implements ViolationMapperInterface
 {
     private $formRenderer;

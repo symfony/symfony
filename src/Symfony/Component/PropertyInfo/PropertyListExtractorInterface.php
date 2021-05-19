@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyInfo;
 
 /**
  * Extracts the list of properties available for the given class.
- *
-
  */
 interface PropertyListExtractorInterface
 {

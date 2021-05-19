@@ -20,8 +20,6 @@ use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 final class NativeResponse implements ResponseInterface, StreamableInterface

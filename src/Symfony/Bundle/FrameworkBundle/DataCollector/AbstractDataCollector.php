@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-/**
-
- */
 abstract class AbstractDataCollector implements TemplateAwareDataCollectorInterface
 {
     /**

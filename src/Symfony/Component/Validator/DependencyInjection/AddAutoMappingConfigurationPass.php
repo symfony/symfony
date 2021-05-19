@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Injects the automapping configuration as last argument of loaders tagged with the "validator.auto_mapper" tag.
- *
-
  */
 class AddAutoMappingConfigurationPass implements CompilerPassInterface
 {

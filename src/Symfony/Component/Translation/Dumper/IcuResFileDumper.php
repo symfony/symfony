@@ -15,8 +15,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * IcuResDumper generates an ICU ResourceBundle formatted string representation of a message catalogue.
- *
-
  */
 class IcuResFileDumper extends FileDumper
 {

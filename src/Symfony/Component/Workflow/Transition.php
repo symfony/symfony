@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Workflow;
 
-/**
-
-
- */
 class Transition
 {
     private $name;

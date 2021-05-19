@@ -15,8 +15,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * ArrayLoader loads translations from a PHP array.
- *
-
  */
 class ArrayLoader implements LoaderInterface
 {

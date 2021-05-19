@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
 use Symfony\Component\Notifier\Exception\LengthException;
 
-/**
-
- */
 final class SlackHeaderBlock extends AbstractSlackBlock
 {
     private const TEXT_LIMIT = 150;

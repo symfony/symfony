@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\NullMessage;
 
-/**
-
- */
 class NullMessageTest extends TestCase
 {
     /**

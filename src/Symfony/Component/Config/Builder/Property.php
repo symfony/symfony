@@ -15,8 +15,6 @@ namespace Symfony\Component\Config\Builder;
  * Represents a property when building classes.
  *
  * @internal
- *
-
  */
 class Property
 {

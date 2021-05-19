@@ -13,10 +13,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
-
- */
 final class GatewayApiTransportTest extends TransportTestCase
 {
     /**

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Ldap\Adapter;
 
-/**
-
- */
 interface AdapterInterface
 {
     /**

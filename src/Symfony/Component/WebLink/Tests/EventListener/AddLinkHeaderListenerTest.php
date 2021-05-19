@@ -22,9 +22,6 @@ use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
 
-/**
-
- */
 class AddLinkHeaderListenerTest extends TestCase
 {
     public function testOnKernelResponse()

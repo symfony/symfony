@@ -19,8 +19,6 @@ namespace Symfony\Component\HttpFoundation;
  * protects yourself against XSSI and JSON-JavaScript Hijacking.
  *
  * @see https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/AJAX_Security_Cheat_Sheet.md#always-return-json-with-an-object-on-the-outside
- *
-
  */
 class JsonResponse extends Response
 {

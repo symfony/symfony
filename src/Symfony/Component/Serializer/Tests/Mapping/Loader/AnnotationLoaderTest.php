@@ -21,9 +21,6 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTestTrait;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
-/**
-
- */
 abstract class AnnotationLoaderTest extends TestCase
 {
     use ContextMappingTestTrait;

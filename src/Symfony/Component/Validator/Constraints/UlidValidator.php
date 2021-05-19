@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid ULID (Universally Unique Lexicographically Sortable Identifier).
  * Cf https://github.com/ulid/spec for ULID specifications.
- *
-
  */
 class UlidValidator extends ConstraintValidator
 {

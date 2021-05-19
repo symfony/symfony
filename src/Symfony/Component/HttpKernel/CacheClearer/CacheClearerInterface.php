@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\CacheClearer;
 
 /**
  * CacheClearerInterface.
- *
-
  */
 interface CacheClearerInterface
 {

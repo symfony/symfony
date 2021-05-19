@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
  * a message should not be sent if it was just received.
  *
  * @see SendMessageMiddleware
- *
-
  */
 final class ReceivedStamp implements NonSendableStampInterface
 {

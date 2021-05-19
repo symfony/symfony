@@ -26,8 +26,6 @@ class_exists(ResponseHeaderBag::class);
 
 /**
  * An implementation of a Symfony HTTP kernel using a "real" HTTP client.
- *
-
  */
 final class HttpClientKernel implements HttpKernelInterface
 {

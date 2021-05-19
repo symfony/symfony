@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder;
 
 /**
  * Gitignore matches against text.
- *
-
-
  */
 class Gitignore
 {

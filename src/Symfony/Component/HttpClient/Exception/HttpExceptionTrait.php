@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpClient\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 trait HttpExceptionTrait

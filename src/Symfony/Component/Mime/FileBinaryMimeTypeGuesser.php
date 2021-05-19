@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Exception\LogicException;
 
 /**
  * Guesses the MIME type with the binary "file" (only available on *nix).
- *
-
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {

@@ -15,8 +15,6 @@ use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
-
- *
  * @internal
  */
 class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements RedirectableUrlMatcherInterface

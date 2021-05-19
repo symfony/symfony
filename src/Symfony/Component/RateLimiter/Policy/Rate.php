@@ -16,8 +16,6 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
 /**
  * Data object representing the fill rate of a token bucket.
  *
-
- *
  * @experimental in 5.3
  */
 final class Rate

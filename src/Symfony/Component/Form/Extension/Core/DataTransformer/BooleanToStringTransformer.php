@@ -17,9 +17,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a Boolean and a string.
- *
-
-
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {

@@ -17,8 +17,6 @@ use Symfony\Component\Form\Console\Descriptor\TextDescriptor;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
-
- *
  * @internal
  */
 class DescriptorHelper extends BaseDescriptorHelper

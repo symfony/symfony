@@ -20,9 +20,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Yaml\Yaml;
 
-/**
-
- */
 class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

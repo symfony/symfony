@@ -28,8 +28,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
  * UserProviderInterface implementation may still throw a
  * UserNotFoundException, for example.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface

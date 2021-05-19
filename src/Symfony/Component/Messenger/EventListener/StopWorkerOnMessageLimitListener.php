@@ -16,10 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
-/**
-
-
- */
 class StopWorkerOnMessageLimitListener implements EventSubscriberInterface
 {
     private $maximumNumberOfMessages;

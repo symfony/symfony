@@ -15,9 +15,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTransformer;
 
-/**
-
- */
 class DateIntervalToStringTransformerTest extends DateIntervalTestCase
 {
     public function dataProviderISO()

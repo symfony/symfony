@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\VariableNode;
 
 /**
  * This class provides a fluent interface for defining a node.
- *
-
  */
 class VariableNodeDefinition extends NodeDefinition
 {

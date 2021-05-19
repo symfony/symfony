@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates that values are a multiple of the given number.
- *
-
  */
 class DivisibleByValidator extends AbstractComparisonValidator
 {

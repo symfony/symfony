@@ -13,8 +13,6 @@ namespace Symfony\Component\Semaphore\Exception;
 
 /**
  * Base ExceptionInterface for the Semaphore Component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

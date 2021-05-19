@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Notification;
 use Symfony\Component\Notifier\Message\EmailMessage;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 
-/**
-
- */
 interface EmailNotificationInterface
 {
     public function asEmailMessage(EmailRecipientInterface $recipient, string $transport = null): ?EmailMessage;

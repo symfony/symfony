@@ -24,8 +24,6 @@ use Symfony\Component\VarExporter\Internal\Values;
  * while preserving all the semantics associated with serialize() (unlike var_export()).
  *
  * By leveraging OPcache, the generated PHP code is faster than doing the same with unserialize().
- *
-
  */
 final class VarExporter
 {

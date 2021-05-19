@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
-/**
-
- */
 class ResolveTaggedIteratorArgumentPassTest extends TestCase
 {
     public function testProcess()

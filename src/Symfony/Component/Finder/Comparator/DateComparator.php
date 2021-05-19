@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder\Comparator;
 
 /**
  * DateCompare compiles date comparisons.
- *
-
  */
 class DateComparator extends Comparator
 {

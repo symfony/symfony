@@ -17,9 +17,6 @@ use Symfony\Component\Form\Tests\AbstractRequestHandlerTest;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
-
- */
 class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {
     public function testRequestShouldNotBeNull()

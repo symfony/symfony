@@ -22,8 +22,6 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  *
  * Once {@link getChoices()} or {@link getValues()} is called, the list is
  * loaded fully.
- *
-
  */
 class LazyChoiceList implements ChoiceListInterface
 {

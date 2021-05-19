@@ -17,8 +17,6 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * Exposes functions defined in the request context to route conditions.
- *
-
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {

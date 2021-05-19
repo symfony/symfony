@@ -13,9 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Definition;
 
-/**
-
- */
 class InlineServiceConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'service';

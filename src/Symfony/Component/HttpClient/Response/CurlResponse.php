@@ -21,8 +21,6 @@ use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 final class CurlResponse implements ResponseInterface, StreamableInterface

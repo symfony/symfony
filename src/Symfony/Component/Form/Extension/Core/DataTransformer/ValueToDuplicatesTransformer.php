@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
- */
 class ValueToDuplicatesTransformer implements DataTransformerInterface
 {
     private $keys;

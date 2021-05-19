@@ -15,9 +15,6 @@ namespace Symfony\Component\Security\Core\User;
  * UserInterface implementation used by the in-memory user provider.
  *
  * This should not be used for anything else.
- *
-
-
  */
 final class InMemoryUser extends User
 {

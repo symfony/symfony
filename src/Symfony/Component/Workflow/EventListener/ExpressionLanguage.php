@@ -17,8 +17,6 @@ use Symfony\Component\Workflow\Exception\RuntimeException;
 
 /**
  * Adds some function to the default Symfony Security ExpressionLanguage.
- *
-
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {

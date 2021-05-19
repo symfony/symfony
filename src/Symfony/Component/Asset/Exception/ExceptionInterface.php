@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\Exception;
 
 /**
  * Base ExceptionInterface for the Asset component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

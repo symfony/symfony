@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
- */
 class ResolveDecoratorStackPass implements CompilerPassInterface
 {
     private $tag;

@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * A Mailbox list MIME Header for something like From, To, Cc, and Bcc (one or more named addresses).
- *
-
  */
 final class MailboxListHeader extends AbstractHeader
 {

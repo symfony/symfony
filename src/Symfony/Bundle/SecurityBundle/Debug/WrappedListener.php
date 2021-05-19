@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 /**
  * Wraps a security listener for calls record.
  *
-
- *
  * @internal
  */
 final class WrappedListener

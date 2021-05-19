@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\User;
 
 /**
  * For users that can be authenticated using a password.
- *
-
-
  */
 interface PasswordAuthenticatedUserInterface
 {

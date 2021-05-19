@@ -29,9 +29,6 @@ use Symfony\Component\HttpKernel\EventListener\DebugHandlersListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
-
- */
 class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()

@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Channel;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
-/**
-
- */
 interface ChannelInterface
 {
     public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void;

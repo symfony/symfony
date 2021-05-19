@@ -14,9 +14,6 @@ namespace Symfony\Component\Process\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpExecutableFinder;
 
-/**
-
- */
 class PhpExecutableFinderTest extends TestCase
 {
     /**

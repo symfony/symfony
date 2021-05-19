@@ -20,8 +20,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * QtFileLoader loads translations from QT Translations XML files.
- *
-
  */
 class QtFileLoader implements LoaderInterface
 {

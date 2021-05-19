@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\HostnameValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
- */
 class HostnameValidatorTest extends ConstraintValidatorTestCase
 {
     public function testNullIsValid()

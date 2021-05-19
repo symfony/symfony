@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Replaces aliases with actual service definitions, effectively removing these
  * aliases.
- *
-
  */
 class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {

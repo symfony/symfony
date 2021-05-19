@@ -17,8 +17,6 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
-
- *
  * @internal
  */
 trait AbstractAdapterTrait

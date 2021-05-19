@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * A pass to automatically process extensions if they implement
  * CompilerPassInterface.
- *
-
  */
 class ExtensionCompilerPass implements CompilerPassInterface
 {

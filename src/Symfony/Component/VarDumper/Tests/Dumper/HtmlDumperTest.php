@@ -16,9 +16,6 @@ use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
-/**
-
- */
 class HtmlDumperTest extends TestCase
 {
     public function testGet()

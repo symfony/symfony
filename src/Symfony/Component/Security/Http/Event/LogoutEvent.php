@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
-
- */
 class LogoutEvent extends Event
 {
     private $request;

@@ -18,8 +18,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
-
- *
  * @final
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface

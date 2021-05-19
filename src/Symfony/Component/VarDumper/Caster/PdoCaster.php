@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts PDO related classes to array representation.
  *
-
- *
  * @final
  */
 class PdoCaster

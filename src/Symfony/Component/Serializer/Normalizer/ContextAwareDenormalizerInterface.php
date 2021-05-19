@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 /**
  * Adds the support of an extra $context parameter for the supportsDenormalization method.
- *
-
  */
 interface ContextAwareDenormalizerInterface extends DenormalizerInterface
 {

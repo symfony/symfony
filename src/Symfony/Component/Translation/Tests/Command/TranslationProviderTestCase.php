@@ -17,9 +17,6 @@ use Symfony\Component\Translation\Provider\FilteringProvider;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 
-/**
-
- */
 abstract class TranslationProviderTestCase extends TestCase
 {
     protected $fs;

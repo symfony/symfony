@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Replaces the DecoratedRememberMeHandler services with the real definition.
  *
-
- *
  * @internal
  */
 final class ReplaceDecoratedRememberMeHandlerPass implements CompilerPassInterface

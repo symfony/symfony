@@ -26,9 +26,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
- *
-
-
  */
 class LintCommand extends Command
 {

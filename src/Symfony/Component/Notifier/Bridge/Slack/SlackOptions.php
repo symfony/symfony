@@ -17,9 +17,6 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
-/**
-
- */
 final class SlackOptions implements MessageOptionsInterface
 {
     private $options;

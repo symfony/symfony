@@ -15,8 +15,6 @@ namespace Symfony\Component\Yaml;
  * Escaper encapsulates escaping rules for single and double-quoted
  * YAML strings.
  *
-
- *
  * @internal
  */
 class Escaper

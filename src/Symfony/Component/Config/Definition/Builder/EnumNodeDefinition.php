@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\EnumNode;
 
 /**
  * Enum Node Definition.
- *
-
  */
 class EnumNodeDefinition extends ScalarNodeDefinition
 {

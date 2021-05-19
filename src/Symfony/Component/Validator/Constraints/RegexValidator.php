@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Validates whether a value match or not given regexp pattern.
- *
-
-
  */
 class RegexValidator extends ConstraintValidator
 {

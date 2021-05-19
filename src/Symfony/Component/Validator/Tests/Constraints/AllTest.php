@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-/**
-
- */
 class AllTest extends TestCase
 {
     public function testRejectNonConstraints()

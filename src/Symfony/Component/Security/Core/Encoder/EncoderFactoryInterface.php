@@ -19,8 +19,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * EncoderFactoryInterface to support different encoders for different accounts.
  *
-
- *
  * @deprecated since Symfony 5.3, use {@link PasswordHasherFactoryInterface} instead
  */
 interface EncoderFactoryInterface

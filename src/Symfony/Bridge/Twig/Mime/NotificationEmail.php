@@ -18,9 +18,6 @@ use Twig\Extra\CssInliner\CssInlinerExtension;
 use Twig\Extra\Inky\InkyExtension;
 use Twig\Extra\Markdown\MarkdownExtension;
 
-/**
-
- */
 class NotificationEmail extends TemplatedEmail
 {
     public const IMPORTANCE_URGENT = 'urgent';

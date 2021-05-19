@@ -26,12 +26,6 @@ use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
-
-
-
- */
 class Workflow implements WorkflowInterface
 {
     public const DISABLE_LEAVE_EVENT = 'workflow_disable_leave_event';

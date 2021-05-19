@@ -12,7 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 /**
-
  * @group integration
  */
 class PredisStoreTest extends AbstractRedisStoreTest

@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Exception;
 
 /**
  * CircularReferenceException.
- *
-
  */
 class CircularReferenceException extends RuntimeException
 {

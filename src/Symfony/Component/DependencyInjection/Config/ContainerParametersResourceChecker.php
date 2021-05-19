@@ -15,9 +15,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
-
- */
 class ContainerParametersResourceChecker implements ResourceCheckerInterface
 {
     /** @var ContainerInterface */

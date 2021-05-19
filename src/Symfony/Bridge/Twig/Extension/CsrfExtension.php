@@ -14,10 +14,6 @@ namespace Symfony\Bridge\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
-
-
- */
 final class CsrfExtension extends AbstractExtension
 {
     /**

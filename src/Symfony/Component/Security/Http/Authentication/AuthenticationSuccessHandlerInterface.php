@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * If you want to customize the success handling process, instead of
  * overwriting the respective listener globally, you can set a custom success
  * handler which implements this interface.
- *
-
  */
 interface AuthenticationSuccessHandlerInterface
 {

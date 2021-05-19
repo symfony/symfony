@@ -28,8 +28,6 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 /**
  * Starts a dump server to collect and output dumps on a single place with multiple formats support.
  *
-
- *
  * @final
  */
 class ServerDumpCommand extends Command

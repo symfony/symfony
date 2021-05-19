@@ -15,8 +15,6 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Represents a choice in templates.
- *
-
  */
 class ChoiceView
 {

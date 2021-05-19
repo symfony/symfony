@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Argument;
 
-/**
-
- */
 final class BoundArgument implements ArgumentInterface
 {
     public const SERVICE_BINDING = 0;

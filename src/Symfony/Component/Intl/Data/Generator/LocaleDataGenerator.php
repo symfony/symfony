@@ -20,9 +20,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 /**
  * The rule for compiling the locale bundle.
  *
-
-
- *
  * @internal
  */
 class LocaleDataGenerator extends AbstractDataGenerator

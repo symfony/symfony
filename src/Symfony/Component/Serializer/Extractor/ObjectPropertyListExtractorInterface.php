@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Serializer\Extractor;
 
-/**
-
- */
 interface ObjectPropertyListExtractorInterface
 {
     /**

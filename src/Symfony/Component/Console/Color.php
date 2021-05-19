@@ -13,9 +13,6 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
-/**
-
- */
 final class Color
 {
     private const COLORS = [

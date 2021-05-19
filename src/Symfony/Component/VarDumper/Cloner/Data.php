@@ -14,9 +14,6 @@ namespace Symfony\Component\VarDumper\Cloner;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 
-/**
-
- */
 class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     private $data;

@@ -13,9 +13,6 @@ namespace Symfony\Bridge\Twig\Mime;
 
 use Symfony\Component\Mime\Email;
 
-/**
-
- */
 class TemplatedEmail extends Email
 {
     private $htmlTemplate;

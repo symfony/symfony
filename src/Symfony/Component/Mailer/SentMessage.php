@@ -14,9 +14,6 @@ namespace Symfony\Component\Mailer;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 class SentMessage
 {
     private $original;

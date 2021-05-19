@@ -20,8 +20,6 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * The rule for compiling the language bundle.
  *
-
- *
  * @internal
  */
 class LanguageDataGenerator extends AbstractDataGenerator

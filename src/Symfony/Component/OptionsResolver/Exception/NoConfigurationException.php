@@ -18,8 +18,6 @@ use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
  * for which no value was configured inside the OptionsResolver instance.
  *
  * @see OptionsResolverIntrospector
- *
-
  */
 class NoConfigurationException extends \RuntimeException implements ExceptionInterface
 {

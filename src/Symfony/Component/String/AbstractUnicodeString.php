@@ -22,8 +22,6 @@ use Symfony\Component\String\Exception\RuntimeException;
  * This class is the abstract type to use as a type-hint when the logic you want to
  * implement is Unicode-aware but doesn't care about code points vs grapheme clusters.
  *
-
- *
  * @throws ExceptionInterface
  */
 abstract class AbstractUnicodeString extends AbstractString

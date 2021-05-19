@@ -24,9 +24,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-/**
-
- */
 class ErrorListener implements EventSubscriberInterface
 {
     protected $controller;

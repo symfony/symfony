@@ -17,8 +17,6 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * Ldap interface.
- *
-
  */
 interface LdapInterface
 {

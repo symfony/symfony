@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @Annotation
  * @NamedArgumentConstructor
  * @Target({"CLASS"})
- *
-
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap

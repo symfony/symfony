@@ -15,8 +15,6 @@ namespace Symfony\Component\Console\Helper;
  * Helps outputting debug information when running an external program from a command.
  *
  * An external program can be a Process, an HTTP request, or anything else.
- *
-
  */
 class DebugFormatterHelper extends Helper
 {

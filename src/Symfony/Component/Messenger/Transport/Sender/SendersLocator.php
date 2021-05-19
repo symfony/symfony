@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 
 /**
  * Maps a message to a list of senders.
- *
-
  */
 class SendersLocator implements SendersLocatorInterface
 {

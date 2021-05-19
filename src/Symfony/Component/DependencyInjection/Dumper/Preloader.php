@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-/**
-
- */
 final class Preloader
 {
     public static function append(string $file, array $list): void

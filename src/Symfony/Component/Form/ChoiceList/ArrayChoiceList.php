@@ -19,8 +19,6 @@ namespace Symfony\Component\Form\ChoiceList;
  * Both the choices and their values are passed to the constructor.
  * Each choice must have a corresponding value (with the same key) in
  * the values array.
- *
-
  */
 class ArrayChoiceList implements ChoiceListInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * Http utility functions.
- *
-
  */
 class IpUtils
 {
@@ -95,8 +93,6 @@ class IpUtils
     /**
      * Compares two IPv6 addresses.
      * In case a subnet is given, it checks if it contains the request IP.
-     *
-
      *
      * @see https://github.com/dsp/v6tools
      *

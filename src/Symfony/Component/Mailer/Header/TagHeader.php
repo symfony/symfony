@@ -13,9 +13,6 @@ namespace Symfony\Component\Mailer\Header;
 
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
-/**
-
- */
 final class TagHeader extends UnstructuredHeader
 {
     public function __construct(string $value)

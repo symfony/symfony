@@ -18,9 +18,6 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Generates a fragment URI.
- *
-
-
  */
 final class FragmentUriGenerator implements FragmentUriGeneratorInterface
 {

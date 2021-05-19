@@ -17,9 +17,6 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
-/**
-
- */
 class LockFactoryTest extends TestCase
 {
     public function testCreateLock()

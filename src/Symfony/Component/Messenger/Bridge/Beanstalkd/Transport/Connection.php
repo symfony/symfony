@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
-
- *
  * @internal
  * @final
  */

@@ -19,9 +19,6 @@ use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication2;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2;
 
-/**
-
- */
 class ObjectsProvider
 {
     public static function getInputArguments()

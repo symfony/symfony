@@ -15,8 +15,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Compiles a node to PHP code.
- *
-
  */
 class Compiler implements ResetInterface
 {

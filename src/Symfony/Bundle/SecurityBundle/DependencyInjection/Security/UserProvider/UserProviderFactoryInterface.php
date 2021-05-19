@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * UserProviderFactoryInterface is the interface for all user provider factories.
- *
-
-
  */
 interface UserProviderFactoryInterface
 {

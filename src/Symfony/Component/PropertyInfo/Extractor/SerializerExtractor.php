@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 /**
  * Lists available properties using Symfony Serializer Component metadata.
  *
-
- *
  * @final
  */
 class SerializerExtractor implements PropertyListExtractorInterface

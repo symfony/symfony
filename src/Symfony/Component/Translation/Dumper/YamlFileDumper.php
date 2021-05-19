@@ -18,8 +18,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileDumper generates yaml files from a message catalogue.
- *
-
  */
 class YamlFileDumper extends FileDumper
 {

@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\EqualToValidator;
 
-/**
-
- */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
     protected function createValidator()

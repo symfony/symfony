@@ -12,8 +12,6 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 /**
-
- *
  * Implementations must be cloneable, and each clone must unstack the stack independently.
  */
 interface StackInterface

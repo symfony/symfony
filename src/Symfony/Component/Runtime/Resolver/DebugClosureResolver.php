@@ -12,8 +12,6 @@
 namespace Symfony\Component\Runtime\Resolver;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class DebugClosureResolver extends ClosureResolver

@@ -15,9 +15,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
-/**
-
- */
 class PhpSerializer implements SerializerInterface
 {
     /**

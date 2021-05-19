@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpFoundation\Exception;
  * Raised when a session does not exists. This happens in the following cases:
  * - the session is not enabled
  * - attempt to read a session outside a request context (ie. cli script).
- *
-
  */
 class SessionNotFoundException extends \LogicException implements RequestExceptionInterface
 {

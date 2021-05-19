@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
 
-/**
-
- */
 class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()

@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
- *
-
  */
 class ProxyDumperTest extends TestCase
 {

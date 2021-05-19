@@ -22,8 +22,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * experimental, this class can be used to trigger deprecation notices.
  *
  * @internal
- *
-
  */
 class NoopAuthenticationManager implements AuthenticationManagerInterface
 {

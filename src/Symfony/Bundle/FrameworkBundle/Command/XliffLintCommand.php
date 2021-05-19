@@ -16,10 +16,6 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
  *
-
-
-
- *
  * @final
  */
 class XliffLintCommand extends BaseLintCommand

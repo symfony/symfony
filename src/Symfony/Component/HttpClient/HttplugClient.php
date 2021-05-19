@@ -53,8 +53,6 @@ if (!interface_exists(RequestFactory::class)) {
  *
  * Run "composer require nyholm/psr7" to install an efficient implementation of response
  * and stream factories with flex-provided autowiring aliases.
- *
-
  */
 final class HttplugClient implements HttplugInterface, HttpAsyncClient, RequestFactory, StreamFactory, UriFactory
 {

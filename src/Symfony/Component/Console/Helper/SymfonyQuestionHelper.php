@@ -20,8 +20,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Symfony Style Guide compliant question helper.
- *
-
  */
 class SymfonyQuestionHelper extends QuestionHelper
 {

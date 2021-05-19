@@ -16,9 +16,6 @@ use Symfony\Component\Finder\Finder;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
- *
-
-
  */
 final class LintCommand extends BaseLintCommand
 {

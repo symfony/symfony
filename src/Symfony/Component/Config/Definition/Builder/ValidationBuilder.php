@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class builds validation conditions.
- *
-
  */
 class ValidationBuilder
 {

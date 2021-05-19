@@ -19,8 +19,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * A token storage that increments the session usage index when the token is accessed.
- *
-
  */
 final class UsageTrackingTokenStorage implements TokenStorageInterface, ServiceSubscriberInterface
 {

@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
  * AbstractCloner implements a generic caster mechanism for objects and resources.
- *
-
  */
 abstract class AbstractCloner implements ClonerInterface
 {

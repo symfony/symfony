@@ -25,9 +25,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
 
-/**
-
- */
 class Serializer implements SerializerInterface
 {
     public const MESSENGER_SERIALIZATION_CONTEXT = 'messenger_serialization';

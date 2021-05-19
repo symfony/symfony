@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-/**
-
- */
 class TranslatorPathsPass extends AbstractRecursivePass
 {
     private $translatorServiceId;

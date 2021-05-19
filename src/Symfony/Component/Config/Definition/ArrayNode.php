@@ -17,8 +17,6 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * Represents an Array node in the config tree.
- *
-
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {

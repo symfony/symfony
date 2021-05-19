@@ -23,8 +23,6 @@ use Symfony\Component\OptionsResolver\Exception\NoConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
-
- *
  * @internal
  */
 abstract class Descriptor implements DescriptorInterface

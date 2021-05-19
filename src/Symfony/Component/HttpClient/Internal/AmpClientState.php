@@ -35,8 +35,6 @@ use Psr\Log\LoggerInterface;
 /**
  * Internal representation of the Amp client's state.
  *
-
- *
  * @internal
  */
 final class AmpClientState extends ClientState

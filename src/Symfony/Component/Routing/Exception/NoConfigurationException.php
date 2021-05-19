@@ -13,8 +13,6 @@ namespace Symfony\Component\Routing\Exception;
 
 /**
  * Exception thrown when no routes are configured.
- *
-
  */
 class NoConfigurationException extends ResourceNotFoundException
 {

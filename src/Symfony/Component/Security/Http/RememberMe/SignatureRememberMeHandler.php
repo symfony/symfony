@@ -27,8 +27,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * However, it cannot invalidate a specific user session, all sessions for
  * that user will be invalidated instead. Use {@see PersistentRememberMeHandler}
  * if you need this.
- *
-
  */
 final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {

@@ -16,8 +16,6 @@ namespace Symfony\Component\Templating\Helper;
  *
  * Most of the time, a Helper is an adapter around an existing
  * class that exposes a read-only interface for templates.
- *
-
  */
 abstract class Helper implements HelperInterface
 {

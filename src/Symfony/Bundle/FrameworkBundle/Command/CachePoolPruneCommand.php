@@ -19,8 +19,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Cache pool pruner command.
- *
-
  */
 final class CachePoolPruneCommand extends Command
 {

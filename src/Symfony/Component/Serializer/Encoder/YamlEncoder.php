@@ -18,8 +18,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Encodes YAML data.
- *
-
  */
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {

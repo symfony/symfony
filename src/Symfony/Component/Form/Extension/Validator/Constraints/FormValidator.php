@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-/**
-
- */
 class FormValidator extends ConstraintValidator
 {
     private $resolvedGroups;

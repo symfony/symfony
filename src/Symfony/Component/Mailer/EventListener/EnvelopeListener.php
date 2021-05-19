@@ -18,8 +18,6 @@ use Symfony\Component\Mime\Message;
 
 /**
  * Manipulates the Envelope of a Message.
- *
-
  */
 class EnvelopeListener implements EventSubscriberInterface
 {

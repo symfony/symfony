@@ -13,8 +13,6 @@ namespace Symfony\Component\DomCrawler;
 
 /**
  * Any HTML element that can link to an URI.
- *
-
  */
 abstract class AbstractUriElement
 {

@@ -15,8 +15,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * Represents a list of function arguments.
- *
-
  */
 class ArgsStub extends EnumStub
 {

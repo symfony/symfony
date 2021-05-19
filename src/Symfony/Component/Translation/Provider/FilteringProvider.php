@@ -17,8 +17,6 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 /**
  * Filters domains and locales between the Translator config values and those specific to each provider.
  *
-
- *
  * @experimental in 5.3
  */
 class FilteringProvider implements ProviderInterface

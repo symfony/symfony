@@ -23,9 +23,6 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp as LegacyDoctrineReceivedStamp;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisReceivedStamp as LegacyRedisReceivedStamp;
 
-/**
-
- */
 class EnvelopeTest extends TestCase
 {
     public function testConstruct()

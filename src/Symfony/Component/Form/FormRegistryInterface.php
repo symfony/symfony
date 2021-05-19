@@ -13,8 +13,6 @@ namespace Symfony\Component\Form;
 
 /**
  * The central registry of the Form component.
- *
-
  */
 interface FormRegistryInterface
 {

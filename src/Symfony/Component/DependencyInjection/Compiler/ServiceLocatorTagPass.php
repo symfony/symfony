@@ -22,8 +22,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Applies the "container.service_locator" tag by wrapping references into ServiceClosureArgument instances.
- *
-
  */
 final class ServiceLocatorTagPass extends AbstractRecursivePass
 {

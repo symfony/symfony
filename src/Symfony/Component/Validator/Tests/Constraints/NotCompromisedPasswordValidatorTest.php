@@ -21,9 +21,6 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const PASSWORD_TRIGGERING_AN_ERROR = 'apiError';

@@ -19,8 +19,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * A DTO to work with AsyncResponse.
- *
-
  */
 final class AsyncContext
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-/**
-
- */
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholderUniquePrefix;

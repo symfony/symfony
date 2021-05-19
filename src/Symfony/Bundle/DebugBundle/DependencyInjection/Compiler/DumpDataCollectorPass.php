@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Registers the file link format for the {@link \Symfony\Component\HttpKernel\DataCollector\DumpDataCollector}.
- *
-
  */
 class DumpDataCollectorPass implements CompilerPassInterface
 {

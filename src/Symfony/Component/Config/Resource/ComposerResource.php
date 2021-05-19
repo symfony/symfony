@@ -14,8 +14,6 @@ namespace Symfony\Component\Config\Resource;
 /**
  * ComposerResource tracks the PHP version and Composer dependencies.
  *
-
- *
  * @final
  */
 class ComposerResource implements SelfCheckingResourceInterface

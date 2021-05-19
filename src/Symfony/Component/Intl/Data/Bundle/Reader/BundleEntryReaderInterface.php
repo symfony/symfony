@@ -16,8 +16,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 /**
  * Reads individual entries of a resource file.
  *
-
- *
  * @internal
  */
 interface BundleEntryReaderInterface extends BundleReaderInterface

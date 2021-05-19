@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 
 /**
  * This normalizer is only used in Debug/Dev/Messenger contexts.
- *
-
  */
 final class FlattenExceptionNormalizer implements DenormalizerInterface, ContextAwareNormalizerInterface
 {

@@ -20,8 +20,6 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
  * A test case to ease testing a notifier transport factory.
- *
-
  */
 abstract class TransportFactoryTestCase extends TestCase
 {

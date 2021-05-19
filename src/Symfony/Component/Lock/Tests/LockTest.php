@@ -23,9 +23,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\ExpiringStoreTrait;
 
-/**
-
- */
 class LockTest extends TestCase
 {
     public function testAcquireNoBlocking()

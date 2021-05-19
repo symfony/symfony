@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * This exception is thrown when the csrf token is invalid.
- *
-
-
  */
 class InvalidCsrfTokenException extends AuthenticationException
 {

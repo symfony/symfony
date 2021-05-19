@@ -15,8 +15,6 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 
 /**
  * JsonFileLoader loads translations from an json file.
- *
-
  */
 class JsonFileLoader extends FileLoader
 {

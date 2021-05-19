@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\VersionAwareTest;
 
-/**
-
- */
 abstract class BaseTypeTest extends TypeTestCase
 {
     use VersionAwareTest;

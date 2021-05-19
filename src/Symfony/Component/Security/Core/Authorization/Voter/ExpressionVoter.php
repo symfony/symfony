@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * ExpressionVoter votes based on the evaluation of an expression.
- *
-
  */
 class ExpressionVoter implements VoterInterface
 {

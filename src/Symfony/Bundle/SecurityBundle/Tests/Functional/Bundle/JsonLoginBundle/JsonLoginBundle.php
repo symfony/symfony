@@ -13,9 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLoginBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
-
- */
 class JsonLoginBundle extends Bundle
 {
 }

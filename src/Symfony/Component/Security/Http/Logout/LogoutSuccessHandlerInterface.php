@@ -26,8 +26,6 @@ trigger_deprecation('symfony/security-http', '5.1', 'The "%s" interface is depre
  * If you want to only perform some logout related clean-up task, use the
  * LogoutHandlerInterface instead.
  *
-
- *
  * @deprecated since Symfony 5.1
  */
 interface LogoutSuccessHandlerInterface

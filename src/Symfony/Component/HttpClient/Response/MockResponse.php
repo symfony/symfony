@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * A test-friendly response.
- *
-
  */
 class MockResponse implements ResponseInterface, StreamableInterface
 {

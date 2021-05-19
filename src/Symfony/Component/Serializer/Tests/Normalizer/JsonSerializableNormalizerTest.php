@@ -20,9 +20,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
 
-/**
-
- */
 class JsonSerializableNormalizerTest extends TestCase
 {
     /**

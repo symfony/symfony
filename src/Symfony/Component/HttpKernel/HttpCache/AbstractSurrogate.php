@@ -17,9 +17,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Abstract class implementing Surrogate capabilities to Request and Response instances.
- *
-
-
  */
 abstract class AbstractSurrogate implements SurrogateInterface
 {

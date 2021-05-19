@@ -20,8 +20,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *     $p = new PhpProcess('<?php echo "foo"; ?>');
  *     $p->run();
  *     print $p->getOutput()."\n";
- *
-
  */
 class PhpProcess extends Process
 {

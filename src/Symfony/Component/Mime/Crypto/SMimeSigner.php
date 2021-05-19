@@ -14,9 +14,6 @@ namespace Symfony\Component\Mime\Crypto;
 use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Message;
 
-/**
-
- */
 final class SMimeSigner extends SMime
 {
     private $signCertificate;

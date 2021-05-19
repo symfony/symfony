@@ -23,10 +23,6 @@ use Symfony\Component\Translation\Util\XliffUtils;
 
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
- *
-
-
-
  */
 class XliffLintCommand extends Command
 {

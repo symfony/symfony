@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 /**
  * Tests AttributeBag.
- *
-
  */
 class AttributeBagTest extends TestCase
 {

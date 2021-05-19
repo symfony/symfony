@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid ISSN.
  *
-
-
- *
  * @see https://en.wikipedia.org/wiki/Issn
  */
 class IssnValidator extends ConstraintValidator

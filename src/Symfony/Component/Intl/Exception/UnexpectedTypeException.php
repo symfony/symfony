@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl\Exception;
 
 /**
  * Thrown when a method argument had an unexpected type.
- *
-
  */
 class UnexpectedTypeException extends InvalidArgumentException
 {

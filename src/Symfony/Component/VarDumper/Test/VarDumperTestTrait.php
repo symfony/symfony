@@ -14,9 +14,6 @@ namespace Symfony\Component\VarDumper\Test;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-/**
-
- */
 trait VarDumperTestTrait
 {
     /**

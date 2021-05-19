@@ -16,9 +16,6 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
-/**
-
- */
 final class EsmtpTransportFactory extends AbstractTransportFactory
 {
     public function create(Dsn $dsn): TransportInterface

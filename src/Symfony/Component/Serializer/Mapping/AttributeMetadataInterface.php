@@ -17,8 +17,6 @@ namespace Symfony\Component\Serializer\Mapping;
  * Primarily, the metadata stores serialization groups.
  *
  * @internal
- *
-
  */
 interface AttributeMetadataInterface
 {

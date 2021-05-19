@@ -18,8 +18,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Provides timing information via the stopwatch.
- *
-
  */
 final class TraceableValueResolver implements ArgumentValueResolverInterface
 {

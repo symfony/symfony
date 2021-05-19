@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * A SQS connection.
  *
-
- *
  * @internal
  * @final
  */

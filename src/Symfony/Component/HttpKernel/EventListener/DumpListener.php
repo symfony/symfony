@@ -20,8 +20,6 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Configures dump() handler.
- *
-
  */
 class DumpListener implements EventSubscriberInterface
 {

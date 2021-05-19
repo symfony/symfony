@@ -21,8 +21,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 /**
  * Describe collected data clones for cli output.
  *
-
- *
  * @final
  */
 class CliDescriptor implements DumpDescriptorInterface

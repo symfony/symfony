@@ -13,9 +13,6 @@ namespace Symfony\Component\Serializer\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 
-/**
-
- */
 final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterface
 {
     private $propertyListExtractor;

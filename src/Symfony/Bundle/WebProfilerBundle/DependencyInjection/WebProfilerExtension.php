@@ -28,8 +28,6 @@ use Symfony\Component\DependencyInjection\Reference;
  *        toolbar="true"
  *        intercept-redirects="true"
  *     />
- *
-
  */
 class WebProfilerExtension extends Extension
 {

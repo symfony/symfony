@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Cloner;
 
 /**
  * DumperInterface used by Data objects.
- *
-
  */
 interface DumperInterface
 {

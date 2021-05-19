@@ -17,8 +17,6 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 /**
  * An optional base class that creates a PostAuthenticationGuardToken for you.
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractGuardAuthenticator implements AuthenticatorInterface

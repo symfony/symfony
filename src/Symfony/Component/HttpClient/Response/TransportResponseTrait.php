@@ -21,8 +21,6 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 /**
  * Implements common logic for transport-level response classes.
  *
-
- *
  * @internal
  */
 trait TransportResponseTrait

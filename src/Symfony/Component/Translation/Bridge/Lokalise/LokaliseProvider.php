@@ -21,8 +21,6 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
-
- *
  * In Lokalise:
  *  * Filenames refers to Symfony's translation domains;
  *  * Keys refers to Symfony's translation keys;

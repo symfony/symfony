@@ -18,8 +18,6 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * Compiler pass to inject their service locator to service subscribers.
- *
-
  */
 class ResolveServiceSubscribersPass extends AbstractRecursivePass
 {

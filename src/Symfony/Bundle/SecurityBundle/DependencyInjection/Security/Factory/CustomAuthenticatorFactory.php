@@ -16,8 +16,6 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
-
- *
  * @internal
  */
 class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface

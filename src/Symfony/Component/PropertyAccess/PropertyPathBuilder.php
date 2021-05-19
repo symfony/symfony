@@ -13,9 +13,6 @@ namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
 
-/**
-
- */
 class PropertyPathBuilder
 {
     private $elements = [];

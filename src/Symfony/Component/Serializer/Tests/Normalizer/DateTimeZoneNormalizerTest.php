@@ -16,9 +16,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 
-/**
-
- */
 class DateTimeZoneNormalizerTest extends TestCase
 {
     /**

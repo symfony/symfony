@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * BadCredentialsException is thrown when the user credentials are invalid.
- *
-
-
  */
 class BadCredentialsException extends AuthenticationException
 {

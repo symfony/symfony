@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * NONE: the session is not changed
  * MIGRATE: the session id is updated, attributes are kept
  * INVALIDATE: the session id is updated, attributes are lost
- *
-
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {

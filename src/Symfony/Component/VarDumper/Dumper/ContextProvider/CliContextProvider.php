@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Dumper\ContextProvider;
 
 /**
  * Tries to provide context on CLI.
- *
-
  */
 final class CliContextProvider implements ContextProviderInterface
 {

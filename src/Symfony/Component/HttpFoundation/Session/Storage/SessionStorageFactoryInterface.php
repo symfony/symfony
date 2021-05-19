@@ -13,9 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/**
-
- */
 interface SessionStorageFactoryInterface
 {
     /**

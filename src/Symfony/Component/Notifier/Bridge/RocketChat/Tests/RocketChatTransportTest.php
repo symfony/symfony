@@ -19,9 +19,6 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class RocketChatTransportTest extends TransportTestCase
 {
     /**

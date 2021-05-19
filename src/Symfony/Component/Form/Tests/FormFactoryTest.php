@@ -26,9 +26,6 @@ use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Test\FormBuilderInterface;
 
-/**
-
- */
 class FormFactoryTest extends TestCase
 {
     /**

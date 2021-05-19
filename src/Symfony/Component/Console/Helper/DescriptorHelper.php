@@ -21,8 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * This class adds helper method to describe objects in various formats.
- *
-
  */
 class DescriptorHelper extends Helper
 {

@@ -13,9 +13,6 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
-
- */
 interface ConstraintValidatorInterface
 {
     /**

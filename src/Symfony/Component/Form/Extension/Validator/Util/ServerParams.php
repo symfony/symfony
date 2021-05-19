@@ -16,8 +16,6 @@ use Symfony\Component\Form\Util\ServerParams as BaseServerParams;
 trigger_deprecation('symfony/form', '5.1', 'The "%s" class is deprecated. Use "%s" instead.', ServerParams::class, BaseServerParams::class);
 
 /**
-
- *
  * @deprecated since Symfony 5.1. Use {@see BaseServerParams} instead.
  */
 class ServerParams extends BaseServerParams

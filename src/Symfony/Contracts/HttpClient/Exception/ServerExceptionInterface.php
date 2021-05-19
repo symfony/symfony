@@ -13,8 +13,6 @@ namespace Symfony\Contracts\HttpClient\Exception;
 
 /**
  * When a 5xx response is returned.
- *
-
  */
 interface ServerExceptionInterface extends HttpExceptionInterface
 {

@@ -19,10 +19,6 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * Class with the default authentication success handling logic.
- *
-
-
-
  */
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {

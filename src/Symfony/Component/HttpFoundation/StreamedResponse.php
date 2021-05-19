@@ -21,8 +21,6 @@ namespace Symfony\Component\HttpFoundation;
  * can also be used if needed.
  *
  * @see flush()
- *
-
  */
 class StreamedResponse extends Response
 {

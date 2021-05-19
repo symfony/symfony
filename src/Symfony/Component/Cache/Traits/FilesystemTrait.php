@@ -14,9 +14,6 @@ namespace Symfony\Component\Cache\Traits;
 use Symfony\Component\Cache\Exception\CacheException;
 
 /**
-
-
- *
  * @internal
  */
 trait FilesystemTrait

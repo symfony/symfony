@@ -23,8 +23,6 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 /**
  * Configures the "guard" authentication provider key under a firewall.
  *
-
- *
  * @internal
  */
 class GuardAuthenticationFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface

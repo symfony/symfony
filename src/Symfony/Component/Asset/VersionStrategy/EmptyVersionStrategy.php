@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\VersionStrategy;
 
 /**
  * Disable version for all assets.
- *
-
  */
 class EmptyVersionStrategy implements VersionStrategyInterface
 {

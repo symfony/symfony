@@ -15,9 +15,6 @@ use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 
-/**
-
- */
 interface ConnectionInterface
 {
     /**

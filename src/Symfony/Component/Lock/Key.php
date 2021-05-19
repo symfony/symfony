@@ -15,8 +15,6 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
 
 /**
  * Key is a container for the state of the locks in stores.
- *
-
  */
 final class Key
 {

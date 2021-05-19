@@ -17,8 +17,6 @@ use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
 /**
-
- *
  * @requires extension zookeeper
  */
 class ZookeeperStoreTest extends AbstractStoreTest

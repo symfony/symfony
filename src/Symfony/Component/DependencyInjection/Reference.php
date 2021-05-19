@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection;
 
 /**
  * Reference represents a service reference.
- *
-
  */
 class Reference
 {

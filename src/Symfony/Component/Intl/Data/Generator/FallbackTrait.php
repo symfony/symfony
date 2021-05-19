@@ -15,8 +15,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Locale;
 
 /**
-
- *
  * @internal
  */
 trait FallbackTrait

@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpClient\Chunk;
 
 /**
-
- *
  * @internal
  */
 class InformationalChunk extends DataChunk

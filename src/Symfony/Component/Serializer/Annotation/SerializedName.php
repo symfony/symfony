@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @Annotation
  * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
- *
-
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 final class SerializedName

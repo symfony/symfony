@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Caster;
 
 /**
  * Represents a single backtrace frame as returned by debug_backtrace() or Exception->getTrace().
- *
-
  */
 class FrameStub extends EnumStub
 {

@@ -16,8 +16,6 @@ class_exists(ResponseHeaderBag::class);
 
 /**
  * Response represents an HTTP response.
- *
-
  */
 class Response
 {

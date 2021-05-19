@@ -21,8 +21,6 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * is more than enough and no other implementations will ever be supported.
  *
  * @internal
- *
-
  */
 interface ProfilerStorageInterface
 {

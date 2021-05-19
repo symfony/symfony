@@ -46,8 +46,6 @@ if (!interface_exists(ClientInterface::class)) {
  * Run "composer require psr/http-client" to install the base ClientInterface. Run
  * "composer require nyholm/psr7" to install an efficient implementation of response
  * and stream factories with flex-provided autowiring aliases.
- *
-
  */
 final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface
 {

@@ -15,9 +15,6 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
-/**
-
- */
 final class ResponseStream implements ResponseStreamInterface
 {
     private $generator;

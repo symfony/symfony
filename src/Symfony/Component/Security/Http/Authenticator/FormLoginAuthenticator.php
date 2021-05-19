@@ -35,9 +35,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
-
-
- *
  * @final
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator

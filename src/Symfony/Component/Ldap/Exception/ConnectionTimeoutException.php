@@ -13,8 +13,6 @@ namespace Symfony\Component\Ldap\Exception;
 
 /**
  * ConnectionTimeoutException is thrown if binding to ldap time out.
- *
-
  */
 class ConnectionTimeoutException extends ConnectionException
 {

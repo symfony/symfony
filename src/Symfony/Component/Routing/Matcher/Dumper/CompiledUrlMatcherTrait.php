@@ -18,8 +18,6 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
-
- *
  * @internal
  *
  * @property RequestContext $context

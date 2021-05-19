@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Exception;
 
 /**
  * A concrete implementation of RecoverableExceptionInterface that can be used directly.
- *
-
  */
 class RecoverableMessageHandlingException extends RuntimeException implements RecoverableExceptionInterface
 {

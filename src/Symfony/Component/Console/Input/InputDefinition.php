@@ -23,8 +23,6 @@ use Symfony\Component\Console\Exception\LogicException;
  *         new InputArgument('name', InputArgument::REQUIRED),
  *         new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
  *     ]);
- *
-
  */
 class InputDefinition
 {

@@ -13,10 +13,6 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-/**
-
-
- */
 final class CsrfRuntime
 {
     private $csrfTokenManager;

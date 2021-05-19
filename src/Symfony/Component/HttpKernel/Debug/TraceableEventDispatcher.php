@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Collects some data about event listeners.
  *
  * This event dispatcher delegates the dispatching to another one.
- *
-
  */
 class TraceableEventDispatcher extends BaseTraceableEventDispatcher
 {

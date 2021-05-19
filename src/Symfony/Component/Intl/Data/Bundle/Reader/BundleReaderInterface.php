@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Data\Bundle\Reader;
 /**
  * Reads resource bundle files.
  *
-
- *
  * @internal
  */
 interface BundleReaderInterface

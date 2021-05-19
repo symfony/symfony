@@ -19,8 +19,6 @@ use Twig\Node\Expression\FunctionExpression;
  *
  * The function name is used as block name. For example, if the function name
  * is "foo", the block "foo" will be rendered.
- *
-
  */
 final class RenderBlockNode extends FunctionExpression
 {

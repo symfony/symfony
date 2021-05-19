@@ -30,9 +30,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @internal since Symfony 5.1
- *
-
-
  */
 class Connection implements ResetInterface
 {

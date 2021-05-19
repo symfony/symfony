@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl\Util;
 
 /**
  * Facilitates the comparison of ICU version strings.
- *
-
  */
 class IcuVersion
 {

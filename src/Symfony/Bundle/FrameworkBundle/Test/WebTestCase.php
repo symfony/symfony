@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * WebTestCase is the base class for functional tests.
- *
-
  */
 abstract class WebTestCase extends KernelTestCase
 {

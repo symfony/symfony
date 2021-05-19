@@ -17,10 +17,6 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
-
- */
 class UploadValidatorExtension extends AbstractTypeExtension
 {
     private $translator;

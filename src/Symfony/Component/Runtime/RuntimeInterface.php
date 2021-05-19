@@ -14,8 +14,6 @@ namespace Symfony\Component\Runtime;
 /**
  * Enables decoupling applications from global state.
  *
-
- *
  * @experimental in 5.3
  */
 interface RuntimeInterface

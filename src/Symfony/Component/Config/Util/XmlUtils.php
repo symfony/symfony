@@ -18,10 +18,6 @@ use Symfony\Component\Config\Util\Exception\XmlParsingException;
  * XMLUtils is a bunch of utility methods to XML operations.
  *
  * This class contains static methods only and is not meant to be instantiated.
- *
-
-
-
  */
 class XmlUtils
 {

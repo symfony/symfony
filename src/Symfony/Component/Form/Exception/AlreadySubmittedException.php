@@ -14,8 +14,6 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Thrown when an operation is called that is not acceptable after submitting
  * a form.
- *
-
  */
 class AlreadySubmittedException extends LogicException
 {

@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 use Psr\Cache\CacheItemPoolInterface;
 
-/**
-
- */
 class CacheTokenVerifier implements TokenVerifierInterface
 {
     private $cache;

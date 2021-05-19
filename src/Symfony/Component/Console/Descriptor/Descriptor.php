@@ -20,8 +20,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
-
- *
  * @internal
  */
 abstract class Descriptor implements DescriptorInterface

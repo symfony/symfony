@@ -26,8 +26,6 @@ trigger_deprecation('symfony/lock', '5.2', '%s is deprecated, the "%s" class pro
  * RetryTillSaveStore is a PersistingStoreInterface implementation which decorate a non blocking PersistingStoreInterface to provide a
  * blocking storage.
  *
-
- *
  * @deprecated since Symfony 5.2
  */
 class RetryTillSaveStore implements BlockingStoreInterface, LoggerAwareInterface

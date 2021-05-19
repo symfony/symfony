@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Register all services that have the "kernel.locale_aware" tag into the listener.
- *
-
  */
 class RegisterLocaleAwareServicesPass implements CompilerPassInterface
 {

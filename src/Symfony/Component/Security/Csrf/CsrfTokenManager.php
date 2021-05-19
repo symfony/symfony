@@ -20,9 +20,6 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
  * Default implementation of {@link CsrfTokenManagerInterface}.
- *
-
-
  */
 class CsrfTokenManager implements CsrfTokenManagerInterface
 {

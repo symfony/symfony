@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Mapping;
 
 /**
  * Knows how to get the class discriminator mapping for classes and objects.
- *
-
  */
 interface ClassDiscriminatorResolverInterface
 {

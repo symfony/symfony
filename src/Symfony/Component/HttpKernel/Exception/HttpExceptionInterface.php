@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel\Exception;
 
 /**
  * Interface for HTTP error exceptions.
- *
-
  */
 interface HttpExceptionInterface extends \Throwable
 {

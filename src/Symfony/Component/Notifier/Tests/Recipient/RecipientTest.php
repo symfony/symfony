@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
-/**
-
- */
 class RecipientTest extends TestCase
 {
     public function testCannotBeConstructedWithoutEmailAndWithoutPhone()

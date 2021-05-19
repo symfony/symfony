@@ -16,9 +16,6 @@ use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 
-/**
-
- */
 final class Ldap implements LdapInterface
 {
     private $adapter;

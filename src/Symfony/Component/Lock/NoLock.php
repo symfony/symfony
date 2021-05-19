@@ -16,8 +16,6 @@ namespace Symfony\Component\Lock;
  *
  * This can be used to disable locking in classes
  * requiring a lock.
- *
-
  */
 final class NoLock implements LockInterface
 {

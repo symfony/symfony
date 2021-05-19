@@ -27,8 +27,6 @@ use Twig\Loader\FilesystemLoader;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
- *
-
  */
 class DebugCommand extends Command
 {

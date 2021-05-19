@@ -15,8 +15,6 @@ use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
-
- *
  * @requires extension redis
  * @group integration
  */

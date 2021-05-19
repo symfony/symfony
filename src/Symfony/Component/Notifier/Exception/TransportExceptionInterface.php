@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Exception;
 
-/**
-
- */
 interface TransportExceptionInterface extends ExceptionInterface
 {
     public function getDebug(): string;

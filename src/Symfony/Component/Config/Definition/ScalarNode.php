@@ -22,8 +22,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  *   * null
  *   * integers
  *   * floats
- *
-
  */
 class ScalarNode extends VariableNode
 {

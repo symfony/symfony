@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
 /**
  * This definition extends another definition.
- *
-
  */
 class ChildDefinition extends Definition
 {

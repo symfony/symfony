@@ -14,9 +14,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-/**
-
- */
 class ResolveFactoryClassPass extends AbstractRecursivePass
 {
     /**

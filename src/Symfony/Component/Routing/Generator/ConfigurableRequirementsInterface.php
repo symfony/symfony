@@ -31,9 +31,6 @@ namespace Symfony\Component\Routing\Generator;
  *   the requirements. Thus this option allows to disable the check on URL generation for
  *   performance reasons (saving a preg_match for each requirement every time a URL is
  *   generated).
- *
-
-
  */
 interface ConfigurableRequirementsInterface
 {

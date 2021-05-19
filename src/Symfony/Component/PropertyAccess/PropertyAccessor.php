@@ -31,10 +31,6 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
  * Default implementation of {@link PropertyAccessorInterface}.
- *
-
-
-
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {

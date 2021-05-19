@@ -15,10 +15,6 @@ use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 
-/**
-
-
- */
 interface PersistingStoreInterface
 {
     /**

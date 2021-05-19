@@ -23,8 +23,6 @@ use Symfony\Component\Workflow\Transition;
  * You can convert the generated puml file with the plantuml.jar utility (http://plantuml.com/):
  *
  * php bin/console workflow:dump pull_request travis --dump-format=puml | java -jar plantuml.jar -p  > workflow.png
- *
-
  */
 class PlantUmlDumper implements DumperInterface
 {

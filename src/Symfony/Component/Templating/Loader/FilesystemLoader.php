@@ -17,8 +17,6 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * FilesystemLoader is a loader that read templates from the filesystem.
- *
-
  */
 class FilesystemLoader extends Loader
 {

@@ -22,9 +22,6 @@ use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
-/**
-
- */
 class CombinedStoreTest extends AbstractStoreTest
 {
     use ExpiringStoreTestTrait;

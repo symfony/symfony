@@ -19,9 +19,6 @@ use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
 
-/**
-
- */
 class Email extends Message
 {
     public const PRIORITY_HIGHEST = 1;

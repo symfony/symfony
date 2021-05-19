@@ -17,9 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterf
 // Help opcache.preload discover always-needed symbols
 class_exists(Session::class);
 
-/**
 
- */
 class SessionFactory
 {
     private $requestStack;

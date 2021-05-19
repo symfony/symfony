@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Exception;
 
-/**
-
- */
 class ThrowingCasterException extends \Exception
 {
     /**

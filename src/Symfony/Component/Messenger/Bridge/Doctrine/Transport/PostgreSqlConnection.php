@@ -17,8 +17,6 @@ use Doctrine\DBAL\Schema\Table;
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
  * @internal
- *
-
  */
 final class PostgreSqlConnection extends Connection
 {

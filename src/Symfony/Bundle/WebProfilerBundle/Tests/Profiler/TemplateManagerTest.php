@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 
-/**
-
- */
 class TemplateManagerTest extends TestCase
 {
     /**

@@ -19,10 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid ISBN-10 or ISBN-13.
  *
-
-
-
- *
  * @see https://en.wikipedia.org/wiki/Isbn
  */
 class IsbnValidator extends ConstraintValidator

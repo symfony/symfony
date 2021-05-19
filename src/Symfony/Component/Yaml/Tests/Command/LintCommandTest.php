@@ -20,8 +20,6 @@ use Symfony\Component\Yaml\Command\LintCommand;
 
 /**
  * Tests the YamlLintCommand.
- *
-
  */
 class LintCommandTest extends TestCase
 {

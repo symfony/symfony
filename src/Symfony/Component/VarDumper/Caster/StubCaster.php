@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts a caster's Stub.
  *
-
- *
  * @final
  */
 class StubCaster

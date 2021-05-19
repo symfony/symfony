@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
-
- */
 class TypeTest extends TestCase
 {
     use ExpectDeprecationTrait;

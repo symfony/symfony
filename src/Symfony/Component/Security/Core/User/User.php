@@ -16,8 +16,6 @@ namespace Symfony\Component\Security\Core\User;
  *
  * This should not be used for anything else.
  *
-
- *
  * @deprecated since Symfony 5.3, use {@link InMemoryUser} instead
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface

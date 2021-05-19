@@ -17,9 +17,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstCh
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyThirdChild;
 
-/**
-
- */
 class ClassDiscriminatorMappingTest extends TestCase
 {
     public function testGetClass()

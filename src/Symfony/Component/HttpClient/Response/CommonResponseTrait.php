@@ -20,8 +20,6 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 /**
  * Implements common logic for response classes.
  *
-
- *
  * @internal
  */
 trait CommonResponseTrait

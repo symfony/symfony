@@ -13,9 +13,6 @@ namespace Symfony\Component\Routing;
 
 /**
  * A Route describes a route and its parameters.
- *
-
-
  */
 class Route implements \Serializable
 {

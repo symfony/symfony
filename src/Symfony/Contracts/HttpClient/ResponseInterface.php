@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * A (lazily retrieved) HTTP response.
- *
-
  */
 interface ResponseInterface
 {

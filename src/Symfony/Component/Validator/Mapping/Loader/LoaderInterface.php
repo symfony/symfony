@@ -15,8 +15,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Loads validation metadata into {@link ClassMetadata} instances.
- *
-
  */
 interface LoaderInterface
 {

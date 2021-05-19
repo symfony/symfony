@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * LockedException is thrown if the user account is locked.
- *
-
-
  */
 class LockedException extends AccountStatusException
 {

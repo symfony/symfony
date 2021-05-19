@@ -13,8 +13,6 @@ namespace Symfony\Component\DomCrawler\Field;
 
 /**
  * FileFormField represents a file form field (an HTML file input tag).
- *
-
  */
 class FileFormField extends FormField
 {

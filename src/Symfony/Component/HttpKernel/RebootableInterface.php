@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpKernel;
 
 /**
  * Allows the Kernel to be rebooted using a temporary cache directory.
- *
-
  */
 interface RebootableInterface
 {

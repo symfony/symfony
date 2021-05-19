@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * HttpBasicFactory creates services for HTTP basic authentication.
  *
-
- *
  * @internal
  */
 class HttpBasicFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface

@@ -13,9 +13,6 @@ namespace Symfony\Component\Mailer\Header;
 
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
-/**
-
- */
 final class MetadataHeader extends UnstructuredHeader
 {
     private $key;

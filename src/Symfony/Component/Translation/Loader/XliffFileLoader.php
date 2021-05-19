@@ -23,8 +23,6 @@ use Symfony\Component\Translation\Util\XliffUtils;
 
 /**
  * XliffFileLoader loads translations from XLIFF files.
- *
-
  */
 class XliffFileLoader implements LoaderInterface
 {

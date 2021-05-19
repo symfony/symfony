@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
-/**
-
- */
 final class SmsMessage implements MessageInterface
 {
     private $transport;

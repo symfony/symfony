@@ -15,8 +15,6 @@ use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * Compresses values using gzdeflate().
- *
-
  */
 class DeflateMarshaller implements MarshallerInterface
 {

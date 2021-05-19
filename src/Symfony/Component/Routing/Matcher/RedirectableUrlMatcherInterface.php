@@ -13,8 +13,6 @@ namespace Symfony\Component\Routing\Matcher;
 
 /**
  * RedirectableUrlMatcherInterface knows how to redirect the user.
- *
-
  */
 interface RedirectableUrlMatcherInterface
 {

@@ -23,9 +23,6 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Form type for use with the Security component's form-based authentication
  * listener.
- *
-
-
  */
 class UserLoginType extends AbstractType
 {

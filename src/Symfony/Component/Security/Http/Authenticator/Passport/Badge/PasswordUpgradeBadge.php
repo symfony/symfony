@@ -19,8 +19,6 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  *
  * @see PasswordUpgraderInterface
  *
-
- *
  * @final
  */
 class PasswordUpgradeBadge implements BadgeInterface

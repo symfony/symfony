@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
  * Thrown when a property path is not available.
- *
-
  */
 class AccessException extends RuntimeException
 {

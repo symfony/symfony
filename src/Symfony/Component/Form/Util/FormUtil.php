@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form\Util;
 
-/**
-
- */
 class FormUtil
 {
     /**

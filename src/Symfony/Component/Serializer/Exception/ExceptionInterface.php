@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Exception;
 
 /**
  * Base exception interface.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

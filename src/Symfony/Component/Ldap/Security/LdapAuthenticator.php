@@ -25,8 +25,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  * LdapBadge in the authenticate() method. This class should only be
  * used for Symfony or third party authenticators.
  *
-
- *
  * @final
  */
 class LdapAuthenticator implements AuthenticatorInterface

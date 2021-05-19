@@ -21,8 +21,6 @@ use Symfony\Contracts\Cache\CacheTrait;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
-
- *
  * @internal
  */
 trait ContractsTrait

@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
-/**
-
- */
 class ChannelPolicyTest extends TestCase
 {
     public function testCannotRetrieveChannelsUsingUnavailableImportance()

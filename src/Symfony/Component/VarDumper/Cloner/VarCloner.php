@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
-/**
-
- */
 class VarCloner extends AbstractCloner
 {
     private static $gid;

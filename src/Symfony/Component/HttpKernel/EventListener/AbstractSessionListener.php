@@ -31,9 +31,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * them makes sense, you can disable this behaviour by setting the header
  * AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER on the response.
  *
-
-
- *
  * @internal
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface

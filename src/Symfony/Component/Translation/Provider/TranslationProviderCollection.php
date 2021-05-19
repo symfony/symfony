@@ -14,8 +14,6 @@ namespace Symfony\Component\Translation\Provider;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class TranslationProviderCollection

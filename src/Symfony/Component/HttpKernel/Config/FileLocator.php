@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * FileLocator uses the KernelInterface to locate resources in bundles.
- *
-
  */
 class FileLocator extends BaseFileLocator
 {

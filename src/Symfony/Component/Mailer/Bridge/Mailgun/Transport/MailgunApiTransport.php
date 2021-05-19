@@ -24,9 +24,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class MailgunApiTransport extends AbstractApiTransport
 {
     private const HOST = 'api.%region_dot%mailgun.net';

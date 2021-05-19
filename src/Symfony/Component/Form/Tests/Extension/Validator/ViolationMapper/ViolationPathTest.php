@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 
-/**
-
- */
 class ViolationPathTest extends TestCase
 {
     public function providePaths()

@@ -16,11 +16,6 @@ namespace Symfony\Component\EventDispatcher;
  * If an EventSubscriber is added to an EventDispatcherInterface, the manager invokes
  * {@link getSubscribedEvents} and registers the subscriber as a listener for all
  * returned events.
- *
-
-
-
-
  */
 interface EventSubscriberInterface
 {

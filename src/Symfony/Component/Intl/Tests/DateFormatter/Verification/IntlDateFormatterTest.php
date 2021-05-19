@@ -18,8 +18,6 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 /**
  * Verifies that {@link AbstractIntlDateFormatterTest} matches the behavior of
  * the {@link \IntlDateFormatter} class in a specific version of ICU.
- *
-
  */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {

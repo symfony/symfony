@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating\Helper;
 
 /**
  * SlotsHelper manages template slots.
- *
-
  */
 class SlotsHelper extends Helper
 {

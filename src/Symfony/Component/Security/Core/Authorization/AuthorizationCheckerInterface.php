@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 /**
  * The AuthorizationCheckerInterface.
- *
-
  */
 interface AuthorizationCheckerInterface
 {

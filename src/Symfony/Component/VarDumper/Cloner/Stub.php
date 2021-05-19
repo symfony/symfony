@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Cloner;
 
 /**
  * Represents the main properties of a PHP variable.
- *
-
  */
 class Stub
 {

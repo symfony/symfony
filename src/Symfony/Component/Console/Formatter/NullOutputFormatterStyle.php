@@ -10,9 +10,6 @@
 
 namespace Symfony\Component\Console\Formatter;
 
-/**
-
- */
 final class NullOutputFormatterStyle implements OutputFormatterStyleInterface
 {
     /**

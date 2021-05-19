@@ -14,8 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Firebase;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
-
- *
  * @see https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref.html
  */
 abstract class FirebaseOptions implements MessageOptionsInterface

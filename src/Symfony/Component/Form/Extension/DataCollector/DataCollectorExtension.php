@@ -15,9 +15,6 @@ use Symfony\Component\Form\AbstractExtension;
 
 /**
  * Extension for collecting data of the forms on a page.
- *
-
-
  */
 class DataCollectorExtension extends AbstractExtension
 {

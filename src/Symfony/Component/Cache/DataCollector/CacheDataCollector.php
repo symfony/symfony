@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 /**
-
-
- *
  * @final
  */
 class CacheDataCollector extends DataCollector implements LateDataCollectorInterface

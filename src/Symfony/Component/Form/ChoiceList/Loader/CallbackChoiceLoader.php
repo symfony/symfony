@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
 
 /**
  * Loads an {@link ArrayChoiceList} instance from a callable returning iterable choices.
- *
-
  */
 class CallbackChoiceLoader extends AbstractChoiceLoader
 {

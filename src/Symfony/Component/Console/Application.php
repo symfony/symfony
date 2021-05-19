@@ -61,8 +61,6 @@ use Symfony\Contracts\Service\ResetInterface;
  *     $app = new Application('myapp', '1.0 (stable)');
  *     $app->add(new SimpleCommand());
  *     $app->run();
- *
-
  */
 class Application implements ResetInterface
 {

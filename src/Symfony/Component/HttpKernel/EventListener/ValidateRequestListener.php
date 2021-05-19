@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Validates Requests.
  *
-
- *
  * @final
  */
 class ValidateRequestListener implements EventSubscriberInterface

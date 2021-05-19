@@ -13,9 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Alias;
 
-/**
-
- */
 class AliasConfigurator extends AbstractServiceConfigurator
 {
     public const FACTORY = 'alias';

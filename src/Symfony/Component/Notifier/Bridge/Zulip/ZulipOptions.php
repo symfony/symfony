@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Zulip;
 
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
-/**
-
- */
 final class ZulipOptions implements MessageOptionsInterface
 {
     /** @var string|null */

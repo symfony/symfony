@@ -16,8 +16,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Extend this class to create a reusable set of constraints.
- *
-
  */
 abstract class Compound extends Composite
 {

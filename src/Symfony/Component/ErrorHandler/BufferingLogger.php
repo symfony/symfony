@@ -15,8 +15,6 @@ use Psr\Log\AbstractLogger;
 
 /**
  * A buffering logger that stacks logs for later.
- *
-
  */
 class BufferingLogger extends AbstractLogger
 {

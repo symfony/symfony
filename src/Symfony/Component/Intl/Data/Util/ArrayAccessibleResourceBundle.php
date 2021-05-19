@@ -19,8 +19,6 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
  * More information can be found on https://bugs.php.net/64356.
  * This class can be removed once that bug is fixed.
  *
-
- *
  * @internal
  */
 class ArrayAccessibleResourceBundle implements \ArrayAccess, \IteratorAggregate, \Countable

@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Util;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
-
- */
 class ServerParams
 {
     private $requestStack;

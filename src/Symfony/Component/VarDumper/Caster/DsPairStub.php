@@ -13,9 +13,6 @@ namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\VarDumper\Cloner\Stub;
 
-/**
-
- */
 class DsPairStub extends Stub
 {
     public function __construct($key, $value)

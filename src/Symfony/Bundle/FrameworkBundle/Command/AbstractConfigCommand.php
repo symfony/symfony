@@ -21,10 +21,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * A console command for dumping available configuration reference.
- *
-
-
-
  */
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {

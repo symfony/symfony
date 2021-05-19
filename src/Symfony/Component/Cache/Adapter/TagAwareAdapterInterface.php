@@ -15,8 +15,6 @@ use Psr\Cache\InvalidArgumentException;
 
 /**
  * Interface for invalidating cached items using tags.
- *
-
  */
 interface TagAwareAdapterInterface extends AdapterInterface
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Http\Authentication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-/**
-
- */
 class CustomAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
     private $handler;

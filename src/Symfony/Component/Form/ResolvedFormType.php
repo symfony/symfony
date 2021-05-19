@@ -18,8 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A wrapper for a form type and its extensions.
- *
-
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {

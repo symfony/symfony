@@ -21,9 +21,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 
-/**
-
- */
 final class MetadataAwareNameConverterTest extends TestCase
 {
     public function testInterface()

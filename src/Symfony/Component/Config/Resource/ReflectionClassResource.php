@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
-
- *
  * @final
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface

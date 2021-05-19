@@ -13,8 +13,6 @@ namespace Symfony\Component\Ldap\Exception;
 
 /**
  * Base ExceptionInterface for the Ldap component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

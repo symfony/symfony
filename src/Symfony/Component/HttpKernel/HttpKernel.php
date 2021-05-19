@@ -46,8 +46,6 @@ class_exists(KernelEvents::class);
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
- *
-
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {

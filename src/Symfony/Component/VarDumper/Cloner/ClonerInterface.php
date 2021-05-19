@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
-/**
-
- */
 interface ClonerInterface
 {
     /**

@@ -15,9 +15,6 @@ use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
-/**
-
- */
 interface TransportFactoryInterface
 {
     /**

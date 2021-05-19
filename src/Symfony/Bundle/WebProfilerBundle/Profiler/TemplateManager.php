@@ -19,9 +19,6 @@ use Twig\Environment;
 /**
  * Profiler Templates Manager.
  *
-
-
- *
  * @internal
  */
 class TemplateManager

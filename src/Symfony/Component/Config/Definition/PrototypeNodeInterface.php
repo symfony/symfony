@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition;
 
 /**
  * This interface must be implemented by nodes which can be used as prototypes.
- *
-
  */
 interface PrototypeNodeInterface extends NodeInterface
 {

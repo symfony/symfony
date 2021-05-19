@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 /**
  * Normalizes an {@see \SplFileInfo} object to a data URI.
  * Denormalizes a data URI to a {@see \SplFileObject} object.
- *
-
  */
 class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {

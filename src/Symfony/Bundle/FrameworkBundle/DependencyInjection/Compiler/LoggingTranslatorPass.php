@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class LoggingTranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

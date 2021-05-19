@@ -22,8 +22,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 final class HttplugWaitLoop

@@ -13,8 +13,6 @@ namespace Symfony\Component\Validator\Exception;
 
 /**
  * Base ExceptionInterface for the Validator component.
- *
-
  */
 interface ExceptionInterface extends \Throwable
 {

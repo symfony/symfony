@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class provides a fluent interface for building a node.
- *
-
  */
 class NodeBuilder implements NodeParentInterface
 {

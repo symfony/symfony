@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 /**
  * Stores CSRF tokens.
- *
-
  */
 interface TokenStorageInterface
 {

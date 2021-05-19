@@ -13,10 +13,6 @@ namespace Symfony\Component\Workflow\SupportStrategy;
 
 use Symfony\Component\Workflow\WorkflowInterface;
 
-/**
-
-
- */
 final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterface
 {
     private $className;

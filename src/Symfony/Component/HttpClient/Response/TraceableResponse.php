@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @internal
  */
 class TraceableResponse implements ResponseInterface, StreamableInterface

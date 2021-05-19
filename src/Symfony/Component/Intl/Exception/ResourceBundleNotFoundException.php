@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Intl\Exception;
 
-/**
-
- */
 class ResourceBundleNotFoundException extends RuntimeException
 {
 }

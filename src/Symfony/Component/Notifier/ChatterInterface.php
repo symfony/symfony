@@ -15,8 +15,6 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * Interface for classes able to send chat messages synchronous and/or asynchronous.
- *
-
  */
 interface ChatterInterface extends TransportInterface
 {

@@ -26,8 +26,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDumm
 
 /**
  * Provides a dummy Normalizer which extends the AbstractNormalizer.
- *
-
  */
 class AbstractNormalizerTest extends TestCase
 {

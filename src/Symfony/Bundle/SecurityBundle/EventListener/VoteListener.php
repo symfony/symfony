@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Event\VoteEvent;
 /**
  * Listen to vote events from traceable voters.
  *
-
- *
  * @internal
  */
 class VoteListener implements EventSubscriberInterface

@@ -16,8 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * CliDumper dumps variables for command line output.
- *
-
  */
 class CliDumper extends AbstractDumper
 {

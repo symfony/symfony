@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * ExcludeDirectoryFilterIterator filters out directories.
- *
-
  */
 class ExcludeDirectoryFilterIterator extends \FilterIterator implements \RecursiveIterator
 {

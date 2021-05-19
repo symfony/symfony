@@ -28,9 +28,6 @@ use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
-
- */
 class FormDataExtractorTest extends TestCase
 {
     use VarDumperTestTrait;

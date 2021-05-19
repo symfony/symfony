@@ -15,8 +15,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * QtFileDumper generates ts files from a message catalogue.
- *
-
  */
 class QtFileDumper extends FileDumper
 {

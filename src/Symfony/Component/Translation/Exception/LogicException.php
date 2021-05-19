@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Exception;
 
 /**
  * Base LogicException for Translation component.
- *
-
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

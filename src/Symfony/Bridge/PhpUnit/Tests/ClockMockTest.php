@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 /**
-
- *
  * @covers \Symfony\Bridge\PhpUnit\ClockMock
  */
 class ClockMockTest extends TestCase

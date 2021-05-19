@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
  * This node represents a float value in the config tree.
- *
-
  */
 class FloatNode extends NumericNode
 {

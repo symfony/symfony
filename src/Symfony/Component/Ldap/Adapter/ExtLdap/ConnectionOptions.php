@@ -17,8 +17,6 @@ use Symfony\Component\Ldap\Exception\LdapException;
  * A class representing the Ldap extension's options, which can be used with
  * ldap_set_option or ldap_get_option.
  *
-
- *
  * @internal
  */
 final class ConnectionOptions

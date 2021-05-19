@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Stamp;
 
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
-/**
-
- */
 final class ValidationStamp implements StampInterface
 {
     private $groups;

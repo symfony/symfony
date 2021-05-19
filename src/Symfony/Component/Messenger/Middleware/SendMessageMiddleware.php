@@ -22,10 +22,6 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
-
- */
 class SendMessageMiddleware implements MiddlewareInterface
 {
     use LoggerAwareTrait;

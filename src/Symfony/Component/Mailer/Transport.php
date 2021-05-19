@@ -35,10 +35,6 @@ use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
-
- */
 class Transport
 {
     private const FACTORY_CLASSES = [

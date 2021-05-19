@@ -20,8 +20,6 @@ use Symfony\Component\Console\Exception\InvalidOptionException;
  * Usage:
  *
  *     $input = new ArrayInput(['command' => 'foo:bar', 'foo' => 'bar', '--bar' => 'foobar']);
- *
-
  */
 class ArrayInput extends Input
 {

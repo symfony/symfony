@@ -13,9 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 /**
  * Validates values are all unequal (!=).
- *
-
-
  */
 class NotEqualToValidator extends AbstractComparisonValidator
 {

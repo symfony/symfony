@@ -24,8 +24,6 @@ use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 
 /**
-
- *
  * @final
  */
 class WorkflowDumpCommand extends Command

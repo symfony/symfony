@@ -24,8 +24,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * You can also call setThrowable() to replace the thrown exception. This
  * exception will be thrown if no response is set during processing of this
  * event.
- *
-
  */
 final class ExceptionEvent extends RequestEvent
 {

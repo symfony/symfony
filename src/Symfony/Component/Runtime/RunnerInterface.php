@@ -12,8 +12,6 @@
 namespace Symfony\Component\Runtime;
 
 /**
-
- *
  * @experimental in 5.3
  */
 interface RunnerInterface

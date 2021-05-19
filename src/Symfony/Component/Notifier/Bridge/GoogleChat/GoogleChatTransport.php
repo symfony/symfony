@@ -22,9 +22,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class GoogleChatTransport extends AbstractTransport
 {
     protected const HOST = 'chat.googleapis.com';

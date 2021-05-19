@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 /**
-
- *
  * @final
  */
 class ControllerResolver extends ContainerControllerResolver

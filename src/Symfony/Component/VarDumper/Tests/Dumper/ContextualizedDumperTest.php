@@ -17,9 +17,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
 
-/**
-
- */
 class ContextualizedDumperTest extends TestCase
 {
     public function testContextualizedCliDumper()

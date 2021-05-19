@@ -24,8 +24,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Use a k-anonymity model to protect the password being searched for.
  *
  * @see https://haveibeenpwned.com/API/v2#SearchingPwnedPasswordsByRange
- *
-
  */
 class NotCompromisedPasswordValidator extends ConstraintValidator
 {

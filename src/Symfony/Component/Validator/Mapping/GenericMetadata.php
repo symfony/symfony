@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * A generic container of {@link Constraint} objects.
  *
  * This class supports serialization and cloning.
- *
-
  */
 class GenericMetadata implements MetadataInterface
 {

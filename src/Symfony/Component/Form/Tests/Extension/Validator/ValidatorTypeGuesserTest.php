@@ -35,10 +35,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 
-/**
-
-
- */
 class ValidatorTypeGuesserTest extends TestCase
 {
     public const TEST_CLASS = 'Symfony\Component\Form\Tests\Extension\Validator\ValidatorTypeGuesserTest_TestClass';

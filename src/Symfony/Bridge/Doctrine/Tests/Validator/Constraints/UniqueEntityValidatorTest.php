@@ -39,9 +39,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
-
- */
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     private const EM_NAME = 'foo';

@@ -13,9 +13,6 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 
 use Symfony\Component\Routing\RouteCollection;
 
-/**
-
- */
 class ImportConfigurator
 {
     use Traits\HostTrait;

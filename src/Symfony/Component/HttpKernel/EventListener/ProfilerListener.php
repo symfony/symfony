@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * ProfilerListener collects data for the current request by listening to the kernel events.
  *
-
- *
  * @final
  */
 class ProfilerListener implements EventSubscriberInterface

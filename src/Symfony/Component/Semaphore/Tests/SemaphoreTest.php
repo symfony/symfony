@@ -20,10 +20,6 @@ use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Semaphore;
 
-/**
-
-
- */
 class SemaphoreTest extends TestCase
 {
     public function testAcquireReturnsTrue()

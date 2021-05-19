@@ -16,9 +16,6 @@ use Symfony\Component\Notifier\Notification\ChatNotificationInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
-/**
-
- */
 class ChatChannel extends AbstractChannel
 {
     public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void

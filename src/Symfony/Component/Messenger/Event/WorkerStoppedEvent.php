@@ -15,8 +15,6 @@ use Symfony\Component\Messenger\Worker;
 
 /**
  * Dispatched when a worker has been stopped.
- *
-
  */
 final class WorkerStoppedEvent
 {

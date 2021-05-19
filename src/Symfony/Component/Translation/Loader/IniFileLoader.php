@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation\Loader;
 
 /**
  * IniFileLoader loads translations from an ini file.
- *
-
  */
 class IniFileLoader extends FileLoader
 {

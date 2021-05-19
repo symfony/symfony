@@ -25,9 +25,6 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * Caches items at warm up time using a PHP array that is stored in shared memory by OPCache since PHP 7.0.
  * Warmed up items are read-only and run-time discovered items are cached using a fallback adapter.
- *
-
-
  */
 class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {

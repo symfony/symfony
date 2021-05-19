@@ -20,10 +20,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * This authenticator authenticates a remote user.
  *
-
-
-
- *
  * @final
  *
  * @internal in Symfony 5.1

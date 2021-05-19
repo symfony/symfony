@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Tests the YamlLintCommand.
- *
-
  */
 class YamlLintCommandTest extends TestCase
 {

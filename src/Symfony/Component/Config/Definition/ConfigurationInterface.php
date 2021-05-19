@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition;
 
 /**
  * Configuration interface.
- *
-
  */
 interface ConfigurationInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
  * This exception is thrown when an environment variable is not found.
- *
-
  */
 class EnvNotFoundException extends InvalidArgumentException
 {

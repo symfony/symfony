@@ -25,9 +25,6 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
-/**
-
- */
 class StoreFactoryTest extends TestCase
 {
     /**

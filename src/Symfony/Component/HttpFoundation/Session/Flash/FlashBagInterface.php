@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 
 /**
  * FlashBagInterface.
- *
-
  */
 interface FlashBagInterface extends SessionBagInterface
 {

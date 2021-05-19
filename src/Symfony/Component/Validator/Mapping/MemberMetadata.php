@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * This class supports serialization and cloning.
  *
-
- *
  * @see PropertyMetadataInterface
  */
 abstract class MemberMetadata extends GenericMetadata implements PropertyMetadataInterface

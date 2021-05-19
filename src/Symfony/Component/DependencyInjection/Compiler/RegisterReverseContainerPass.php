@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
- */
 class RegisterReverseContainerPass implements CompilerPassInterface
 {
     private $beforeRemoving;

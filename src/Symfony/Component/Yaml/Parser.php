@@ -17,8 +17,6 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
  *
-
- *
  * @final
  */
 class Parser

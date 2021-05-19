@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * Base RuntimeException for the Security component.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

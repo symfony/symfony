@@ -18,8 +18,6 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 /**
  * Describe collected data clones for html output.
  *
-
- *
  * @final
  */
 class HtmlDescriptor implements DumpDescriptorInterface

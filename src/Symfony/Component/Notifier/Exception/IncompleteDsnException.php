@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Exception;
 
-/**
-
- */
 class IncompleteDsnException extends InvalidArgumentException
 {
     private $dsn;

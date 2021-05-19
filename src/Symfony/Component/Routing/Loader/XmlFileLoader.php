@@ -21,9 +21,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * XmlFileLoader loads XML routing files.
- *
-
-
  */
 class XmlFileLoader extends FileLoader
 {

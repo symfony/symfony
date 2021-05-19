@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * This exception is thrown when the RememberMeServices implementation
  * detects that a presented cookie has already been used by someone else.
- *
-
-
  */
 class CookieTheftException extends AuthenticationException
 {

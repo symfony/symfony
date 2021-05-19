@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Exception\LogicException;
 
 /**
  * Used for the comparison of values.
- *
-
-
  */
 abstract class AbstractComparison extends Constraint
 {

@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Test class for MockArraySessionStorage.
- *
-
  */
 class MockArraySessionStorageTest extends TestCase
 {

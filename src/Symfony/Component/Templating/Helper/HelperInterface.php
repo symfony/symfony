@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating\Helper;
 
 /**
  * HelperInterface is the interface all helpers must implement.
- *
-
  */
 interface HelperInterface
 {

@@ -25,8 +25,6 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
  * Concrete implementation of the RememberMeServicesInterface which needs
  * an implementation of TokenProviderInterface for providing remember-me
  * capabilities.
- *
-
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {

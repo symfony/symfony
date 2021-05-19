@@ -18,8 +18,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * A server collecting Data clones sent by a ServerDumper.
  *
-
- *
  * @final
  */
 class DumpServer

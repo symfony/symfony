@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
-/**
-
- */
 final class SlackSectionBlock extends AbstractSlackBlock
 {
     public function __construct()

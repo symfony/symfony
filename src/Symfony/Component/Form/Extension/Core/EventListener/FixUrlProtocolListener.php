@@ -17,8 +17,6 @@ use Symfony\Component\Form\FormEvents;
 
 /**
  * Adds a protocol to a URL if it doesn't already have one.
- *
-
  */
 class FixUrlProtocolListener implements EventSubscriberInterface
 {

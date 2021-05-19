@@ -19,9 +19,6 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  * The only methods supported in this class are `getDefault` and `canonicalize`.
  * All other methods will throw an exception when used.
  *
-
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

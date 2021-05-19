@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 /**
  * Encapsulates common logic of {@link FormTypeValidatorExtension} and
  * {@link SubmitTypeValidatorExtension}.
- *
-
  */
 abstract class BaseValidatorExtension extends AbstractTypeExtension
 {

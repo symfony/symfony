@@ -38,11 +38,6 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
-
-
- */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {
     private $authenticators;

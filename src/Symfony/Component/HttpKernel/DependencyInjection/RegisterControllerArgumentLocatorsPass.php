@@ -28,8 +28,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Creates the service-locators required by ServiceValueResolver.
- *
-
  */
 class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 {

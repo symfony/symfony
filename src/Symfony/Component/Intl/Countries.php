@@ -15,9 +15,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 
 /**
  * Gives access to region-related ICU data.
- *
-
-
  */
 final class Countries extends ResourceBundle
 {

@@ -18,9 +18,6 @@ use Symfony\Component\VarDumper\Caster\PdoCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
-
- */
 class PdoCasterTest extends TestCase
 {
     use VarDumperTestTrait;

@@ -16,8 +16,6 @@ use Symfony\Polyfill\Intl\Icu\Icu;
 /**
  * Provides fake static versions of the global functions in the intl extension.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead

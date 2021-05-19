@@ -18,9 +18,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 /**
  * Default logout listener will redirect users to a configured path.
  *
-
-
- *
  * @final
  */
 class DefaultLogoutListener implements EventSubscriberInterface

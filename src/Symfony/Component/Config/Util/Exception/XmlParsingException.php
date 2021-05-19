@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Util\Exception;
 
 /**
  * Exception class for when XML cannot be parsed properly.
- *
-
  */
 class XmlParsingException extends \InvalidArgumentException
 {

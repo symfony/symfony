@@ -19,8 +19,6 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * new = all ∖ source = {x: x ∈ target ∧ x ∉ source}
  * obsolete = source ∖ all = {x: x ∈ source ∧ x ∉ source ∧ x ∉ target} = ∅
  * Basically, the result contains messages from both catalogues.
- *
-
  */
 class MergeOperation extends AbstractOperation
 {

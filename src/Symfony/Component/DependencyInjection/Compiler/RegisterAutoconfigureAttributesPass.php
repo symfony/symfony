@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 /**
  * Reads #[Autoconfigure] attributes on definitions that are autoconfigured
  * and don't have the "container.ignore_attributes" tag.
- *
-
  */
 final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 {

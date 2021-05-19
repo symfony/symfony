@@ -20,8 +20,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML File Loader.
- *
-
  */
 class YamlFileLoader extends FileLoader
 {

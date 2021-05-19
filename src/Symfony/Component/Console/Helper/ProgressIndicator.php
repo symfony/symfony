@@ -15,9 +15,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
-
- */
 class ProgressIndicator
 {
     private $output;

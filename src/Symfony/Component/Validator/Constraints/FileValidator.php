@@ -20,9 +20,6 @@ use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-/**
-
- */
 class FileValidator extends ConstraintValidator
 {
     public const KB_BYTES = 1000;

@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * UserNotFoundException is thrown if a User cannot be found for the given identifier.
- *
-
-
  */
 class UserNotFoundException extends AuthenticationException
 {

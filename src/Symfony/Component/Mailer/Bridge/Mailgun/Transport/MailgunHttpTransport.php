@@ -21,9 +21,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class MailgunHttpTransport extends AbstractHttpTransport
 {
     use MailgunHeadersTrait;

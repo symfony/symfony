@@ -14,9 +14,6 @@ namespace Symfony\Component\Translation;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class TranslatableMessage implements TranslatableInterface
 {
     private $message;

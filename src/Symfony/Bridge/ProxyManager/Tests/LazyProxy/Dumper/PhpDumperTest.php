@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 /**
  * Integration tests for {@see \Symfony\Component\DependencyInjection\Dumper\PhpDumper} combined
  * with the ProxyManager bridge.
- *
-
  */
 class PhpDumperTest extends TestCase
 {

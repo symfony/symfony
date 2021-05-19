@@ -20,9 +20,6 @@ use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
-/**
-
- */
 class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     use ContractsTrait;

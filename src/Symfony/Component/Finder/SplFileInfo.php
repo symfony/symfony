@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder;
 
 /**
  * Extends \SplFileInfo to support relative paths.
- *
-
  */
 class SplFileInfo extends \SplFileInfo
 {

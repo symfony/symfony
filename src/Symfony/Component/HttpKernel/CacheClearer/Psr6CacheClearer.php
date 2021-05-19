@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
-/**
-
- */
 class Psr6CacheClearer implements CacheClearerInterface
 {
     private $pools = [];

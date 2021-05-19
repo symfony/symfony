@@ -18,8 +18,6 @@ use Twig\TwigFunction;
 
 /**
  * Twig extension for the Symfony HttpFoundation component.
- *
-
  */
 final class HttpFoundationExtension extends AbstractExtension
 {

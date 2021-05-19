@@ -14,8 +14,6 @@ namespace Symfony\Component\Runtime\Runner;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class ClosureRunner implements RunnerInterface

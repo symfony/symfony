@@ -17,8 +17,6 @@ namespace Symfony\Component\Serializer\Normalizer;
  *
  * By implementing this interface, the return value of the
  * supports*() methods will be cached by type and format.
- *
-
  */
 interface CacheableSupportsMethodInterface
 {

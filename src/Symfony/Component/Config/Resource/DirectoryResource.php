@@ -14,8 +14,6 @@ namespace Symfony\Component\Config\Resource;
 /**
  * DirectoryResource represents a resources stored in a subdirectory tree.
  *
-
- *
  * @final
  */
 class DirectoryResource implements SelfCheckingResourceInterface

@@ -19,8 +19,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileLoader loads translations from Yaml files.
- *
-
  */
 class YamlFileLoader extends FileLoader
 {

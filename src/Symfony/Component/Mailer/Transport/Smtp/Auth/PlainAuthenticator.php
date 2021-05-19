@@ -15,8 +15,6 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
  * Handles PLAIN authentication.
- *
-
  */
 class PlainAuthenticator implements AuthenticatorInterface
 {

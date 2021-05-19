@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Util\RingBuffer;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 
-/**
-
- */
 class RingBufferTest extends TestCase
 {
     /**

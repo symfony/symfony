@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Message;
 
-/**
-
- */
 interface MessageInterface
 {
     public function getRecipientId(): ?string;

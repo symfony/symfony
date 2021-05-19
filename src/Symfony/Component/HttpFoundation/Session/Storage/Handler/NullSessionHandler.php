@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * Can be used in unit testing or in a situations where persisted sessions are not desired.
- *
-
  */
 class NullSessionHandler extends AbstractSessionHandler
 {

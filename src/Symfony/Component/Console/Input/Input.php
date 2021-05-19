@@ -22,8 +22,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
  *  * `ArgvInput`: The input comes from the CLI arguments (argv)
  *  * `StringInput`: The input is provided as a string
  *  * `ArrayInput`: The input is provided as an array
- *
-
  */
 abstract class Input implements InputInterface, StreamableInputInterface
 {

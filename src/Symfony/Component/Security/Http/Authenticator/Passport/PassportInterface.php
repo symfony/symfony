@@ -19,8 +19,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  *
  * A passport badge can be used to add any additional information to the
  * passport.
- *
-
  */
 interface PassportInterface
 {

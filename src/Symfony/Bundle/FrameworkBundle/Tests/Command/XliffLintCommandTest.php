@@ -24,8 +24,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Tests the part of the XliffLintCommand managed by the FrameworkBundle. The
  * rest of the features are tested in the Translation component.
- *
-
  */
 class XliffLintCommandTest extends TestCase
 {

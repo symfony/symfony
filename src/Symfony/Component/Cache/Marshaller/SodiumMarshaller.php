@@ -16,8 +16,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * Encrypt/decrypt values using Libsodium.
- *
-
  */
 class SodiumMarshaller implements MarshallerInterface
 {

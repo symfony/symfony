@@ -13,9 +13,6 @@ namespace Symfony\Component\Process;
 
 /**
  * Generic executable finder.
- *
-
-
  */
 class ExecutableFinder
 {

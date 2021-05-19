@@ -18,8 +18,6 @@ if (!class_exists(LocalePolyfill::class)) {
     /**
      * Stub implementation for the Locale class of the intl extension.
      *
-
-     *
      * @see IntlLocale
      */
     class Locale extends IntlLocale
@@ -28,8 +26,6 @@ if (!class_exists(LocalePolyfill::class)) {
 } else {
     /**
      * Stub implementation for the Locale class of the intl extension.
-     *
-
      *
      * @see IntlLocale
      */

@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 /**
  * Allow to delay connection to Redis.
  *
-
-
- *
  * @internal
  */
 class RedisProxy

@@ -13,8 +13,6 @@ namespace Symfony\Component\Translation;
 
 /**
  * MetadataAwareInterface.
- *
-
  */
 interface MetadataAwareInterface
 {

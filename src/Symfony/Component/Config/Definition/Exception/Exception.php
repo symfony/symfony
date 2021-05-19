@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Exception;
 
 /**
  * Base exception for all configuration exceptions.
- *
-
  */
 class Exception extends \RuntimeException
 {

@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 /**
  * Wraps a lazy security listener.
  *
-
- *
  * @internal
  */
 final class WrappedLazyListener extends AbstractListener

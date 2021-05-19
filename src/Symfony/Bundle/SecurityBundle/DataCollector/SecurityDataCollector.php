@@ -31,8 +31,6 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
-
- *
  * @final
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface

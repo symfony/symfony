@@ -15,9 +15,6 @@ use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 
 /**
  * Key is a container for the state of the semaphores in stores.
- *
-
-
  */
 final class Key
 {

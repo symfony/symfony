@@ -18,9 +18,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * A normalizer that normalizes a ConstraintViolationListInterface instance.
  *
  * This Normalizer implements RFC7807 {@link https://tools.ietf.org/html/rfc7807}.
- *
-
-
  */
 class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {

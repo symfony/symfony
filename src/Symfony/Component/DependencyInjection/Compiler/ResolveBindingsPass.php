@@ -23,9 +23,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
-/**
-
- */
 class ResolveBindingsPass extends AbstractRecursivePass
 {
     private $usedBindings = [];

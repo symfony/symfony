@@ -18,8 +18,6 @@ use Twig\Environment;
 
 /**
  * Renders a form into HTML using a rendering engine.
- *
-
  */
 class FormRenderer implements FormRendererInterface
 {

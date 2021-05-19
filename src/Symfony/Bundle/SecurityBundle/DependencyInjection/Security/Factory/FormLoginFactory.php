@@ -20,9 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * FormLoginFactory creates services for form login authentication.
  *
-
-
- *
  * @internal
  */
 class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface

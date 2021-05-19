@@ -18,10 +18,6 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * Hashes passwords using libsodium.
  *
-
-
-
- *
  * @deprecated since Symfony 5.3, use {@link SodiumPasswordHasher} instead
  */
 final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSaltingEncoderInterface

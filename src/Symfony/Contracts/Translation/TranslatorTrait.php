@@ -15,8 +15,6 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
  * A trait to help implement TranslatorInterface and LocaleAwareInterface.
- *
-
  */
 trait TranslatorTrait
 {

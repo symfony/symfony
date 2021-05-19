@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpClient\Chunk;
 
 /**
-
- *
  * @internal
  */
 class LastChunk extends DataChunk

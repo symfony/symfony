@@ -14,9 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-/**
-
- */
 class PrototypeConfigurator extends AbstractServiceConfigurator
 {
     public const FACTORY = 'load';

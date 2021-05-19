@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 
-/**
-
- */
 abstract class AbstractLinkedInShare
 {
     protected $options = [];

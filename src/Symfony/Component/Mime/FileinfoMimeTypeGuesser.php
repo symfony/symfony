@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Exception\LogicException;
 
 /**
  * Guesses the MIME type using the PECL extension FileInfo.
- *
-
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {

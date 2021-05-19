@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * AuthenticationServiceException is thrown when an authentication request could not be processed due to a system problem.
- *
-
-
  */
 class AuthenticationServiceException extends AuthenticationException
 {

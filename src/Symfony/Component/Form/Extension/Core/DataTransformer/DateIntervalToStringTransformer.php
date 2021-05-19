@@ -17,8 +17,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a date string and a DateInterval object.
- *
-
  */
 class DateIntervalToStringTransformer implements DataTransformerInterface
 {

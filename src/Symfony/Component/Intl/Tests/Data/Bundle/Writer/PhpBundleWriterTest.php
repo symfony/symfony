@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
 
-/**
-
- */
 class PhpBundleWriterTest extends TestCase
 {
     /**

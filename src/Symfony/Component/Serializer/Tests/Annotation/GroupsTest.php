@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
-/**
-
- */
 class GroupsTest extends TestCase
 {
     public function testEmptyGroupsParameter()

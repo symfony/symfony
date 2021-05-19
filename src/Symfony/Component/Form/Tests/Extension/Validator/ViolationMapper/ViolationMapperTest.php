@@ -31,9 +31,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
-
- */
 class ViolationMapperTest extends TestCase
 {
     private const LEVEL_0 = 0;

@@ -16,9 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 // Help opcache.preload discover always-needed symbols
 class_exists(MockFileSessionStorage::class);
 
-/**
 
- */
 class MockFileSessionStorageFactory implements SessionStorageFactoryInterface
 {
     private $savePath;

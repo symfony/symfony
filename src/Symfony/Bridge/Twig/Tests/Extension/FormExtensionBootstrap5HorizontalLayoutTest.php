@@ -23,8 +23,6 @@ use Twig\Loader\FilesystemLoader;
 
 /**
  * Class providing test cases for the Bootstrap 5 horizontal Twig form theme.
- *
-
  */
 class FormExtensionBootstrap5HorizontalLayoutTest extends AbstractBootstrap5HorizontalLayoutTest
 {

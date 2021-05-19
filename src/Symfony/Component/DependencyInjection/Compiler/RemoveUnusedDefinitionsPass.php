@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Removes unused service definitions from the container.
- *
-
-
  */
 class RemoveUnusedDefinitionsPass extends AbstractRecursivePass
 {

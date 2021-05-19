@@ -22,9 +22,6 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\FormTypeInterface;
 
-/**
-
- */
 class CachingFactoryDecoratorTest extends TestCase
 {
     /**

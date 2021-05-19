@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
- */
 class CachePoolPrunerPass implements CompilerPassInterface
 {
     private $cacheCommandServiceId;

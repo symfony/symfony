@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tag;
 
-/**
-
-
- */
 final class TaggedValue
 {
     private $tag;

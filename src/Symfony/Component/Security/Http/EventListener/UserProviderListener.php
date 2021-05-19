@@ -19,8 +19,6 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * Configures the user provider as user loader, if no user load
  * has been explicitly set.
  *
-
- *
  * @final
  */
 class UserProviderListener

@@ -14,9 +14,6 @@ namespace Symfony\Component\Console\Tests\Formatter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\NullOutputFormatterStyle;
 
-/**
-
- */
 class NullOutputFormatterStyleTest extends TestCase
 {
     public function testApply()

@@ -15,9 +15,6 @@ use Doctrine\Common\Cache\CacheProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
-/**
-
- */
 class DoctrineProvider extends CacheProvider implements PruneableInterface, ResettableInterface
 {
     private $pool;

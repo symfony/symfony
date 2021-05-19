@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl;
 /**
  * Provides access to locale-related data.
  *
-
- *
  * @internal
  */
 final class Locale extends \Locale

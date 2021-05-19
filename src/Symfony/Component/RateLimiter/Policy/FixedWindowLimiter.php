@@ -21,8 +21,6 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 use Symfony\Component\RateLimiter\Util\TimeUtil;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class FixedWindowLimiter implements LimiterInterface

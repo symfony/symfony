@@ -37,9 +37,7 @@ class ComparisonTest_Class
     }
 }
 
-/**
 
- */
 abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTestCase
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)

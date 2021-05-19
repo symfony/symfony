@@ -19,15 +19,6 @@ use Symfony\Component\EventDispatcher\Debug\WrappedListener;
  *
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
- *
-
-
-
-
-
-
-
-
  */
 class EventDispatcher implements EventDispatcherInterface
 {

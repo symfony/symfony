@@ -13,8 +13,6 @@ namespace Symfony\Component\Console\Command;
 
 /**
  * Interface for command reacting to signal.
- *
-
  */
 interface SignalableCommandInterface
 {

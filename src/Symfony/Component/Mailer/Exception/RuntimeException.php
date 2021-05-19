@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mailer\Exception;
 
-/**
-
- */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

@@ -16,9 +16,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
-/**
-
- */
 class SerializedNameTest extends TestCase
 {
     use ExpectDeprecationTrait;

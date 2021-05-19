@@ -13,9 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
-/**
-
- */
 interface TemplateAwareDataCollectorInterface extends DataCollectorInterface
 {
     public static function getTemplate(): ?string;

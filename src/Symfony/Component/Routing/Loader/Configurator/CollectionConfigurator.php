@@ -14,9 +14,6 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
-
- */
 class CollectionConfigurator
 {
     use Traits\AddTrait;

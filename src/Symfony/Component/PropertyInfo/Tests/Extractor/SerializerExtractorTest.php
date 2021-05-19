@@ -20,9 +20,6 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
-/**
-
- */
 class SerializerExtractorTest extends TestCase
 {
     /**

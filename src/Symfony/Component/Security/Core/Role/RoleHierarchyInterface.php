@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Role;
 
 /**
  * RoleHierarchyInterface is the interface for a role hierarchy.
- *
-
  */
 interface RoleHierarchyInterface
 {

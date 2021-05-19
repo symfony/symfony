@@ -28,9 +28,6 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php7ParentDummy;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
-
- */
 class ReflectionExtractorTest extends TestCase
 {
     use ExpectDeprecationTrait;

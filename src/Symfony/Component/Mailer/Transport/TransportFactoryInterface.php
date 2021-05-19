@@ -14,9 +14,6 @@ namespace Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 
-/**
-
- */
 interface TransportFactoryInterface
 {
     /**

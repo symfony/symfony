@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder\Iterator;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
- *
-
  */
 class SortableIterator implements \IteratorAggregate
 {

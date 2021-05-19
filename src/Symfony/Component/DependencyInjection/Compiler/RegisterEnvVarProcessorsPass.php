@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Creates the container.env_var_processors_locator service.
- *
-
  */
 class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {

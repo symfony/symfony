@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * UsernamePasswordToken implements a username and password token.
- *
-
  */
 class UsernamePasswordToken extends AbstractToken
 {

@@ -17,9 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
-/**
-
- */
 class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
 {
     public const RESTART_REQUESTED_TIMESTAMP_KEY = 'workers.restart_requested_timestamp';

@@ -18,8 +18,6 @@ use Twig\TokenParser\TokenParserInterface;
 
 /**
  * Twig extension for the stopwatch helper.
- *
-
  */
 final class StopwatchExtension extends AbstractExtension
 {

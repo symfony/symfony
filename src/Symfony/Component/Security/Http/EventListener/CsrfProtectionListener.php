@@ -19,8 +19,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
-
- *
  * @final
  */
 class CsrfProtectionListener implements EventSubscriberInterface

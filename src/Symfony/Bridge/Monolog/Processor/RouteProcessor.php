@@ -20,8 +20,6 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Adds the current route information to the log entry.
  *
-
- *
  * @final
  */
 class RouteProcessor implements EventSubscriberInterface, ResetInterface

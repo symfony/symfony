@@ -14,9 +14,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
-/**
-
- */
 class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
     use ObjectToPopulateTrait;

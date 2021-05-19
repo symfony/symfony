@@ -22,11 +22,6 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  * FlockStore is a PersistingStoreInterface implementation using the FileSystem flock.
  *
  * Original implementation in \Symfony\Component\Filesystem\LockHandler.
- *
-
-
-
-
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {

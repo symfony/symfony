@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The default implementation of the authentication trust resolver.
- *
-
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {

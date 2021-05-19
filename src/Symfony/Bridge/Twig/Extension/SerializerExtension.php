@@ -14,9 +14,6 @@ namespace Symfony\Bridge\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
-/**
-
- */
 final class SerializerExtension extends AbstractExtension
 {
     public function getFilters(): array

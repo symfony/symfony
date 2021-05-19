@@ -16,9 +16,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\NativeRequestHandler;
 
-/**
-
- */
 class FormConfigTest extends TestCase
 {
     public function getHtml4Ids()

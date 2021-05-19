@@ -16,9 +16,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts GMP objects to array representation.
  *
-
-
- *
  * @final
  */
 class GmpCaster

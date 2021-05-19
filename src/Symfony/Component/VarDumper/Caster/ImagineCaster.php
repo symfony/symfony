@@ -14,9 +14,6 @@ namespace Symfony\Component\VarDumper\Caster;
 use Imagine\Image\ImageInterface;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
-/**
-
- */
 final class ImagineCaster
 {
     public static function castImage(ImageInterface $c, array $a, Stub $stub, bool $isNested): array

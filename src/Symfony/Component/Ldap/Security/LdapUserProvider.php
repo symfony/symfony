@@ -24,10 +24,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * LdapUserProvider is a simple user provider on top of LDAP.
- *
-
-
-
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

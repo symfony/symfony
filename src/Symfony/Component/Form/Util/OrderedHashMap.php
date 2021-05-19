@@ -61,8 +61,6 @@ namespace Symfony\Component\Form\Util;
  *             // ...
  *         }
  *     }
- *
-
  */
 class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 {

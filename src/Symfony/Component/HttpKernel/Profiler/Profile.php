@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * Profile.
- *
-
  */
 class Profile
 {

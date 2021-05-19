@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PasswordHasher\Hasher;
 
-/**
-
- */
 interface PasswordHasherAwareInterface
 {
     /**

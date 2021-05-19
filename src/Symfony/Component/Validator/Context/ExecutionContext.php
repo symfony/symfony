@@ -29,8 +29,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * The context used and created by {@link ExecutionContextFactory}.
  *
-
- *
  * @see ExecutionContextInterface
  *
  * @internal since version 2.5. Code against ExecutionContextInterface instead.

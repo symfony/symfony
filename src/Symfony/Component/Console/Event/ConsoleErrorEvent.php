@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Allows to handle throwables thrown while running a command.
- *
-
  */
 final class ConsoleErrorEvent extends ConsoleEvent
 {

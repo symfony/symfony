@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class ResponseRunner implements RunnerInterface

@@ -23,8 +23,6 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
 
 /**
  * CombinedStore is a PersistingStoreInterface implementation able to manage and synchronize several StoreInterfaces.
- *
-
  */
 class CombinedStore implements SharedLockStoreInterface, LoggerAwareInterface
 {

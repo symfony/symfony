@@ -23,9 +23,6 @@ use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\FormRegistry;
 
-/**
-
- */
 class FormPassTest extends TestCase
 {
     public function testDoNothingIfFormExtensionNotLoaded()

@@ -17,8 +17,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticatorManagerInterface
 
 /**
  * Firewall authentication listener that delegates to the authenticator system.
- *
-
  */
 class AuthenticatorManagerListener extends AbstractListener
 {

@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  * Metadata container.
  *
  * Adds metadata to the session.
- *
-
  */
 class MetadataBag implements SessionBagInterface
 {

@@ -15,8 +15,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
  * This node represents an integer value in the config tree.
- *
-
  */
 class IntegerNode extends NumericNode
 {

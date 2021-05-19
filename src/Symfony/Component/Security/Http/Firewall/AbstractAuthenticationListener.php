@@ -47,9 +47,6 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
  * /login_check. If you want to change this behavior, you can overwrite the
  * requiresAuthentication() method.
  *
-
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractAuthenticationListener extends AbstractListener

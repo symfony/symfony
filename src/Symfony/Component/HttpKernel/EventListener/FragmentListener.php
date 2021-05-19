@@ -27,8 +27,6 @@ use Symfony\Component\HttpKernel\UriSigner;
  * Throws an AccessDeniedHttpException exception if the request
  * is not signed or if it is not an internal sub-request.
  *
-
- *
  * @final
  */
 class FragmentListener implements EventSubscriberInterface

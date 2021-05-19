@@ -19,9 +19,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Type extension for collecting data of a form with this type.
- *
-
-
  */
 class DataCollectorTypeExtension extends AbstractTypeExtension
 {

@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Signature\Exception;
 
 use Symfony\Component\Security\Core\Exception\RuntimeException;
 
-/**
-
- */
 class ExpiredSignatureException extends RuntimeException
 {
 }

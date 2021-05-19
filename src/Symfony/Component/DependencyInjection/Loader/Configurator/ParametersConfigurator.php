@@ -13,9 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
-
- */
 class ParametersConfigurator extends AbstractConfigurator
 {
     public const FACTORY = 'parameters';

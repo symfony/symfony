@@ -19,9 +19,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-/**
-
- */
 class CsrfTokenManagerTest extends TestCase
 {
     /**

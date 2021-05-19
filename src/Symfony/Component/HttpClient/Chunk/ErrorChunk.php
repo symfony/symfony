@@ -16,8 +16,6 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 
 /**
-
- *
  * @internal
  */
 class ErrorChunk implements ChunkInterface

@@ -16,9 +16,6 @@ use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 
-/**
-
- */
 class UnwrappinDenormalizerTest extends TestCase
 {
     private $denormalizer;

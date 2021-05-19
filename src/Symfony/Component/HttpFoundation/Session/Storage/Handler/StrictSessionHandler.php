@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * Adds basic `SessionUpdateTimestampHandlerInterface` behaviors to another `SessionHandlerInterface`.
- *
-
  */
 class StrictSessionHandler extends AbstractSessionHandler
 {

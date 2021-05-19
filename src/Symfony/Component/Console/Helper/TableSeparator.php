@@ -13,8 +13,6 @@ namespace Symfony\Component\Console\Helper;
 
 /**
  * Marks a row as being a separator.
- *
-
  */
 class TableSeparator extends TableCell
 {

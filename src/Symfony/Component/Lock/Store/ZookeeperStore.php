@@ -20,8 +20,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * ZookeeperStore is a PersistingStoreInterface implementation using Zookeeper as store engine.
- *
-
  */
 class ZookeeperStore implements PersistingStoreInterface
 {

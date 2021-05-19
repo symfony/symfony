@@ -17,8 +17,6 @@ use Symfony\Component\Uid\Ulid;
 
 /**
  * Transforms between a ULID string and a Ulid object.
- *
-
  */
 class UlidToStringTransformer implements DataTransformerInterface
 {

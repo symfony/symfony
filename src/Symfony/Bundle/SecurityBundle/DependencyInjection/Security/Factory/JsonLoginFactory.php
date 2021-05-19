@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * JsonLoginFactory creates services for JSON login authentication.
  *
-
- *
  * @internal
  */
 class JsonLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface

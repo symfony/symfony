@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Interface implemented by HTTP cache stores.
- *
-
  */
 interface StoreInterface
 {

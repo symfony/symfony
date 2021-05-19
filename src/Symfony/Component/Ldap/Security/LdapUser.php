@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
-
- *
  * @final
  */
 class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface

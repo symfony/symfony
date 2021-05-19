@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * ExceptionDataCollector.
  *
-
- *
  * @final
  */
 class ExceptionDataCollector extends DataCollector

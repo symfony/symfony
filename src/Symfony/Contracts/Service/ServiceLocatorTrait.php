@@ -20,9 +20,6 @@ class_exists(NotFoundExceptionInterface::class);
 
 /**
  * A trait to help implement ServiceProviderInterface.
- *
-
-
  */
 trait ServiceLocatorTrait
 {

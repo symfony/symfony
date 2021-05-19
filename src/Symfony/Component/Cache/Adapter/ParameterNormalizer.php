@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-/**
-
- */
 final class ParameterNormalizer
 {
     public static function normalizeDuration(string $duration): int

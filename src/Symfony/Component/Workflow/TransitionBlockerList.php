@@ -13,8 +13,6 @@ namespace Symfony\Component\Workflow;
 
 /**
  * A list of transition blockers.
- *
-
  */
 final class TransitionBlockerList implements \IteratorAggregate, \Countable
 {

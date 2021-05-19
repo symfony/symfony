@@ -29,8 +29,6 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * Obsolete Messages: also called 'obsolete' (obsolete = source ∖ all = {x: x ∈ source ∧ x ∉ all}).
  *
  * Result: also called 'result', is the resulting catalogue for the given domain that holds the same messages as 'all'.
- *
-
  */
 interface OperationInterface
 {

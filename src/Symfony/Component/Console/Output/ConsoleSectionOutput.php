@@ -15,10 +15,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
-/**
-
-
- */
 class ConsoleSectionOutput extends StreamOutput
 {
     private $content = [];

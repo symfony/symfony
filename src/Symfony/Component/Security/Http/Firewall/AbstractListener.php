@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * A base class for listeners that can tell whether they should authenticate incoming requests.
- *
-
  */
 abstract class AbstractListener implements FirewallListenerInterface
 {

@@ -28,9 +28,6 @@ namespace Symfony\Component\Serializer\Normalizer;
  * setter method exists for any of the properties. If a setter exists it is
  * called with the property value. No automatic denormalization of the value
  * takes place.
- *
-
-
  */
 class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {

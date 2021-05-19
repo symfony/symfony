@@ -17,8 +17,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 /**
  * Normalizes an instance of {@see \DateInterval} to an interval string.
  * Denormalizes an interval string to an instance of {@see \DateInterval}.
- *
-
  */
 class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {

@@ -15,8 +15,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Loader is the base class for all template loader classes.
- *
-
  */
 abstract class Loader implements LoaderInterface
 {

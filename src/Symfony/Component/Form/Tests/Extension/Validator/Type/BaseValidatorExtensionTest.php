@@ -15,9 +15,6 @@ use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
-/**
-
- */
 abstract class BaseValidatorExtensionTest extends TypeTestCase
 {
     public function testValidationGroupNullByDefault()

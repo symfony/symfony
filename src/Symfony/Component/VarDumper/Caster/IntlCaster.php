@@ -14,9 +14,6 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
-
-
- *
  * @final
  */
 class IntlCaster

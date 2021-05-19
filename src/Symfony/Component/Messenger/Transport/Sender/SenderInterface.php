@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Transport\Sender;
 
 use Symfony\Component\Messenger\Envelope;
 
-/**
-
- */
 interface SenderInterface
 {
     /**

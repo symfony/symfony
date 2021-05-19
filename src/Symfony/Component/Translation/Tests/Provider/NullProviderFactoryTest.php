@@ -18,8 +18,6 @@ use Symfony\Component\Translation\Provider\NullProvider;
 use Symfony\Component\Translation\Provider\NullProviderFactory;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class NullProviderFactoryTest extends TestCase

@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
-
- *
  * @see https://en.wikipedia.org/wiki/ISO_9362#Structure
  */
 class BicValidator extends ConstraintValidator

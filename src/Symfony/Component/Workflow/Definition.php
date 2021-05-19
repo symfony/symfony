@@ -15,11 +15,6 @@ use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
-/**
-
-
-
- */
 final class Definition
 {
     private $places = [];

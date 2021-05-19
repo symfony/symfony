@@ -23,8 +23,6 @@ use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 /**
-
- *
  * @internal
  */
 class LoginThrottlingFactory implements AuthenticatorFactoryInterface, SecurityFactoryInterface

@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 final class OvhCloudTransport extends AbstractTransport
 {
     protected const HOST = 'eu.api.ovh.com';

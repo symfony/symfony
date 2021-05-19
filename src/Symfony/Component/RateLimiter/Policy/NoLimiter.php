@@ -21,8 +21,6 @@ use Symfony\Component\RateLimiter\Reservation;
  * This can be used in cases where an implementation requires a
  * limiter, but no rate limit should be enforced.
  *
-
- *
  * @experimental in 5.3
  */
 final class NoLimiter implements LimiterInterface

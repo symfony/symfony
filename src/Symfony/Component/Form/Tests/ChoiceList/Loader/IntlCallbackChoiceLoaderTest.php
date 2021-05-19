@@ -16,10 +16,6 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 
-/**
-
-
- */
 class IntlCallbackChoiceLoaderTest extends TestCase
 {
     /**

@@ -20,8 +20,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * A {@link ChoiceListInterface} implementation is used to find the
  * corresponding string values for the choices. The radio form whose "value"
  * option corresponds to the selected value is marked as selected.
- *
-
  */
 class RadioListMapper implements DataMapperInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
 
 /**
  * Passport badges allow to add more information to a passport (e.g. a CSRF token).
- *
-
  */
 interface BadgeInterface
 {

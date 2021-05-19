@@ -21,8 +21,6 @@ use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
 /**
  * A base class to make form login authentication easier!
  *
-
- *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator

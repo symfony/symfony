@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers the expression language providers.
- *
-
  */
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {

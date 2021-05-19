@@ -18,9 +18,6 @@ use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
 
 /**
-
-
- *
  * @internal
  */
 class RegisterCsrfFeaturesPass implements CompilerPassInterface

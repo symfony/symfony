@@ -15,8 +15,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * Creates a Messenger transport.
- *
-
  */
 interface TransportFactoryInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * LogoutException is thrown when the account cannot be logged out.
- *
-
  */
 class LogoutException extends RuntimeException
 {

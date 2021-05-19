@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
-/**
-
- */
 interface SerializerInterface
 {
     /**

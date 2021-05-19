@@ -20,8 +20,6 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * new = all ∖ source = {x: x ∈ target ∧ x ∉ source}
  * obsolete = source ∖ all = source ∖ target = {x: x ∈ source ∧ x ∉ target}
  * Basically, the result contains messages from the target catalogue.
- *
-
  */
 class TargetOperation extends AbstractOperation
 {

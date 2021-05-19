@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Csrf\Tests\TokenGenerator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
-/**
-
- */
 class UriSafeTokenGeneratorTest extends TestCase
 {
     private const ENTROPY = 1000;

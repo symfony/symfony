@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating\Storage;
 
 /**
  * StringStorage represents a template stored in a string.
- *
-
  */
 class StringStorage extends Storage
 {

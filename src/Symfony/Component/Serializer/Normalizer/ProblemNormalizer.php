@@ -18,9 +18,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * Normalizes errors according to the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
- *
-
-
  */
 class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {

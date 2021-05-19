@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * A console command to display information about the current installation.
  *
-
- *
  * @final
  */
 class AboutCommand extends Command

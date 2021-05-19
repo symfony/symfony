@@ -21,8 +21,6 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 /**
  * Sends a rejected message to a "failure transport".
- *
-
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {

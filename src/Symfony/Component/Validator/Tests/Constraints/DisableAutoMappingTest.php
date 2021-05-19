@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Mapping\AutoMappingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
-
- */
 class DisableAutoMappingTest extends TestCase
 {
     public function testGroups()

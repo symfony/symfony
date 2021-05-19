@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * DisabledException is thrown when the user account is disabled.
- *
-
-
  */
 class DisabledException extends AccountStatusException
 {

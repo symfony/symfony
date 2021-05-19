@@ -18,9 +18,6 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\Share\VisibilityShare;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
-/**
-
- */
 final class LinkedInOptions implements MessageOptionsInterface
 {
     private $options = [];

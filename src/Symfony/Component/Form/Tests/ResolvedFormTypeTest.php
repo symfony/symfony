@@ -28,9 +28,6 @@ use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 class ResolvedFormTypeTest extends TestCase
 {
     /**

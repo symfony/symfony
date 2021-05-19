@@ -13,10 +13,6 @@ namespace Symfony\Component\Workflow\Exception;
 
 use Symfony\Component\Workflow\WorkflowInterface;
 
-/**
-
-
- */
 class TransitionException extends LogicException
 {
     private $subject;

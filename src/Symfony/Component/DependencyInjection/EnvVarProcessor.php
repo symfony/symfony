@@ -15,9 +15,6 @@ use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-/**
-
- */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private $container;

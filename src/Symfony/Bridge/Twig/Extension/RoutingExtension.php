@@ -20,8 +20,6 @@ use Twig\TwigFunction;
 
 /**
  * Provides integration of the Routing component with Twig.
- *
-
  */
 final class RoutingExtension extends AbstractExtension
 {

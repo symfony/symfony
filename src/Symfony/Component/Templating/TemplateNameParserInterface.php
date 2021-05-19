@@ -14,8 +14,6 @@ namespace Symfony\Component\Templating;
 /**
  * TemplateNameParserInterface converts template names to TemplateReferenceInterface
  * instances.
- *
-
  */
 interface TemplateNameParserInterface
 {

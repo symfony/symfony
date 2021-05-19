@@ -23,9 +23,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
-/**
-
- */
 class DoctrineChoiceLoaderTest extends TestCase
 {
     use ExpectDeprecationTrait;

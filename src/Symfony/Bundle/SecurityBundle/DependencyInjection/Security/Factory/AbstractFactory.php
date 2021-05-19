@@ -19,10 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * AbstractFactory is the base class for all classes inheriting from
  * AbstractAuthenticationListener.
- *
-
-
-
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {

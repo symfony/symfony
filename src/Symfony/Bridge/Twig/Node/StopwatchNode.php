@@ -17,8 +17,6 @@ use Twig\Node\Node;
 
 /**
  * Represents a stopwatch node.
- *
-
  */
 final class StopwatchNode extends Node
 {

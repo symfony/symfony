@@ -15,9 +15,6 @@ use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Node;
 
-/**
-
- */
 final class TransDefaultDomainNode extends Node
 {
     public function __construct(AbstractExpression $expr, int $lineno = 0, string $tag = null)

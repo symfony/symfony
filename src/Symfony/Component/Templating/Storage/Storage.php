@@ -13,8 +13,6 @@ namespace Symfony\Component\Templating\Storage;
 
 /**
  * Storage is the base class for all storage classes.
- *
-
  */
 abstract class Storage
 {

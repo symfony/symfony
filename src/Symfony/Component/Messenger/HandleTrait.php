@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * Leverages a message bus to expect a single, synchronous message handling and return its result.
- *
-
  */
 trait HandleTrait
 {

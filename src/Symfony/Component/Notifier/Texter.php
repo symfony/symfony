@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
-
- */
 final class Texter implements TexterInterface
 {
     private $transport;

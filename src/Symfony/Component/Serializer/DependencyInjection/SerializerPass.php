@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
  * encoders and normalizers to the "serializer" service.
- *
-
-
  */
 class SerializerPass implements CompilerPassInterface
 {

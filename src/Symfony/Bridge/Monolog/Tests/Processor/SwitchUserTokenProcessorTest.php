@@ -19,8 +19,6 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * Tests the SwitchUserTokenProcessor.
- *
-
  */
 class SwitchUserTokenProcessorTest extends TestCase
 {

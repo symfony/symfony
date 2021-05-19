@@ -18,8 +18,6 @@ namespace Symfony\Component\Cache\Traits;
  * Calls are made to individual nodes via: RedisCluster->{method}($host, ...args)'
  *  according to https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#directed-node-commands
  *
-
- *
  * @internal
  */
 class RedisClusterNodeProxy

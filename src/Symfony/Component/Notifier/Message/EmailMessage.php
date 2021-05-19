@@ -20,9 +20,6 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 
-/**
-
- */
 final class EmailMessage implements MessageInterface
 {
     private $message;

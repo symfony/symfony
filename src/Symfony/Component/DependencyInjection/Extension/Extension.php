@@ -21,8 +21,6 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * Provides useful features shared by many extensions.
- *
-
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {

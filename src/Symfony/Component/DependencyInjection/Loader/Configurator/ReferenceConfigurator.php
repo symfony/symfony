@@ -13,9 +13,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
-
- */
 class ReferenceConfigurator extends AbstractConfigurator
 {
     /** @internal */

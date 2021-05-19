@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Exception;
 
 use Symfony\Component\Notifier\Message\MessageInterface;
 
-/**
-
- */
 class UnsupportedMessageTypeException extends LogicException
 {
     public function __construct(string $transport, string $supported, MessageInterface $given)

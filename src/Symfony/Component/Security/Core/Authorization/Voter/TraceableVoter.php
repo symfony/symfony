@@ -18,8 +18,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Decorates voter classes to send result events.
  *
-
- *
  * @internal
  */
 class TraceableVoter implements VoterInterface

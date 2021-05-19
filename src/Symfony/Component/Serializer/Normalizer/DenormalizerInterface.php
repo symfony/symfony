@@ -19,9 +19,6 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
-/**
-
- */
 interface DenormalizerInterface
 {
     /**

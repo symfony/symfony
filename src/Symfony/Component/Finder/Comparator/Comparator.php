@@ -13,8 +13,6 @@ namespace Symfony\Component\Finder\Comparator;
 
 /**
  * Comparator.
- *
-
  */
 class Comparator
 {

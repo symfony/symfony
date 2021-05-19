@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * An interface that must be implemented by nodes which can have children.
- *
-
  */
 interface ParentNodeDefinitionInterface extends BuilderAwareInterface
 {

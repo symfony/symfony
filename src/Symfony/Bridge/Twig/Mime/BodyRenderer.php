@@ -17,9 +17,6 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Message;
 use Twig\Environment;
 
-/**
-
- */
 final class BodyRenderer implements BodyRendererInterface
 {
     private $twig;

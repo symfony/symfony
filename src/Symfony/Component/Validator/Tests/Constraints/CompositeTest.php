@@ -33,9 +33,7 @@ class ConcreteComposite extends Composite
     }
 }
 
-/**
 
- */
 class CompositeTest extends TestCase
 {
     public function testConstraintHasDefaultGroup()

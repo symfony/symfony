@@ -20,8 +20,6 @@ namespace Symfony\Component\Form\Util;
  * You can wrap the iterator into a {@link \RecursiveIteratorIterator} in order to
  * enter any child form that inherits its parent's data and iterate the children
  * of that form as well.
- *
-
  */
 class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {

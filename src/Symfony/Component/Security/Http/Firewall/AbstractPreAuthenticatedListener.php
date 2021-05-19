@@ -32,8 +32,6 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
  * authenticates users based on a pre-authenticated request (like a certificate
  * for instance).
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead

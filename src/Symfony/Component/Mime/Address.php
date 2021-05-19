@@ -19,9 +19,6 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
-/**
-
- */
 final class Address
 {
     /**

@@ -17,9 +17,6 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-/**
-
- */
 class BeanstalkdTransport implements TransportInterface, MessageCountAwareInterface
 {
     private $connection;

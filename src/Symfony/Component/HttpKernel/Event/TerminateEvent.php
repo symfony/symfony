@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * Since it's only triggered on main requests, the `getRequestType()` method
  * will always return the value of `HttpKernelInterface::MAIN_REQUEST`.
- *
-
  */
 final class TerminateEvent extends KernelEvent
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
 /**
  * Generates CSRF tokens.
- *
-
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {

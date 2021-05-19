@@ -20,8 +20,6 @@ use Symfony\Component\Intl\Util\IcuVersion;
 /**
  * Test case for IntlDateFormatter implementations.
  *
-
- *
  * @group legacy
  */
 abstract class AbstractIntlDateFormatterTest extends TestCase

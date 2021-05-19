@@ -22,9 +22,6 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
-
-
- *
  * @internal
  */
 trait RedisTrait

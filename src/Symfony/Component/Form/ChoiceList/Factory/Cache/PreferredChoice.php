@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "preferred_choices" option.
  *
  * @internal
- *
-
  */
 final class PreferredChoice extends AbstractStaticOption
 {

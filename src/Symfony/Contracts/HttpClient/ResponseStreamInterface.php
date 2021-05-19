@@ -13,8 +13,6 @@ namespace Symfony\Contracts\HttpClient;
 
 /**
  * Yields response chunks, returned by HttpClientInterface::stream().
- *
-
  */
 interface ResponseStreamInterface extends \Iterator
 {

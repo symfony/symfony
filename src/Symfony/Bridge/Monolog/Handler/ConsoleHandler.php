@@ -38,8 +38,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  * - OutputInterface::VERBOSITY_DEBUG (-vvv) will show all DEBUG and higher logs, i.e. all logs
  *
  * This mapping can be customized with the $verbosityLevelMap constructor parameter.
- *
-
  */
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {

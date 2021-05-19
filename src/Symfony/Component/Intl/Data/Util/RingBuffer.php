@@ -20,8 +20,6 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  * is full, the next written element overwrites the first bucket in the buffer,
  * then the second and so on.
  *
-
- *
  * @internal
  */
 class RingBuffer implements \ArrayAccess

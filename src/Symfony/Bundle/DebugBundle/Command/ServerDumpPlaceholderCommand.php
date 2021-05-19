@@ -21,8 +21,6 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 /**
  * A placeholder command easing VarDumper server discovery.
  *
-
- *
  * @internal
  */
 class ServerDumpPlaceholderCommand extends Command

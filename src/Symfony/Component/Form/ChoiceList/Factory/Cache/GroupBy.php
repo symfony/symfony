@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "group_by" callback.
  *
  * @internal
- *
-
  */
 final class GroupBy extends AbstractStaticOption
 {

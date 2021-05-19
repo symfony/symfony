@@ -16,8 +16,6 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
-
- *
  * @requires extension sysvsem
  */
 class SemaphoreStoreTest extends AbstractStoreTest

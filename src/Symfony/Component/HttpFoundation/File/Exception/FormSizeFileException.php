@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /**
  * Thrown when an UPLOAD_ERR_FORM_SIZE error occurred with UploadedFile.
- *
-
  */
 class FormSizeFileException extends FileException
 {

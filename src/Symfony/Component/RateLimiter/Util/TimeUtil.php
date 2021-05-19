@@ -12,8 +12,6 @@
 namespace Symfony\Component\RateLimiter\Util;
 
 /**
-
- *
  * @internal
  */
 final class TimeUtil

@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
-
- */
 class ResettableServicePass implements CompilerPassInterface
 {
     private $tagName;

@@ -21,8 +21,6 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  * prepends the current request base path if a Context is available to
  * allow a website to be hosted easily under any given path under the Web
  * Server root directory.
- *
-
  */
 class PathPackage extends Package
 {

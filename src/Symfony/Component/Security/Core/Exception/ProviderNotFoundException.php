@@ -14,9 +14,6 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * ProviderNotFoundException is thrown when no AuthenticationProviderInterface instance
  * supports an authentication Token.
- *
-
-
  */
 class ProviderNotFoundException extends AuthenticationException
 {

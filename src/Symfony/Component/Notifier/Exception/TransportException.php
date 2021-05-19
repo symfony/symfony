@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Exception;
 
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-/**
-
- */
 class TransportException extends RuntimeException implements TransportExceptionInterface
 {
     private $response;

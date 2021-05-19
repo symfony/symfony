@@ -17,8 +17,6 @@ use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 /**
-
- *
  * @internal
  */
 class LegacyLogoutHandlerListener implements EventSubscriberInterface

@@ -29,8 +29,6 @@ use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
-
-
  * @group legacy
  */
 class GuardAuthenticationListenerTest extends TestCase

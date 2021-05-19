@@ -15,9 +15,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
-/**
-
- */
 class FailedMessageProcessingMiddleware implements MiddlewareInterface
 {
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

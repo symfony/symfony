@@ -34,9 +34,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
-/**
 
- */
 class AutowirePassTest extends TestCase
 {
     public function testProcess()

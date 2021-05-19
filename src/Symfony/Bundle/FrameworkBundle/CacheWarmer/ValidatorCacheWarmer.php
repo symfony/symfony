@@ -23,8 +23,6 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  * Warms up XML and YAML validator metadata.
- *
-
  */
 class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {

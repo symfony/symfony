@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Serializer\Exception;
 
-/**
-
- */
 class NotEncodableValueException extends UnexpectedValueException
 {
 }

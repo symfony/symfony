@@ -49,9 +49,6 @@ use Symfony\Component\Notifier\Transport\Transports;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 class Transport
 {
     private const FACTORY_CLASSES = [

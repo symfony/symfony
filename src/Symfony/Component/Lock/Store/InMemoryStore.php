@@ -18,8 +18,6 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 /**
  * InMemoryStore is a PersistingStoreInterface implementation using
  * php-array to manage locks.
- *
-
  */
 class InMemoryStore implements SharedLockStoreInterface
 {

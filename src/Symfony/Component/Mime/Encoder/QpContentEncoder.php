@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mime\Encoder;
 
-/**
-
- */
 final class QpContentEncoder implements ContentEncoderInterface
 {
     public function encodeByteStream($stream, int $maxLineLength = 0): iterable

@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
  * Interface for the session.
- *
-
  */
 interface SessionInterface
 {

@@ -22,9 +22,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
-
- */
 class EventSourceHttpClientTest extends TestCase
 {
     public function testGetServerSentEvents()

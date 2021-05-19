@@ -20,10 +20,6 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  * and shutdown only once per PHP execution cycle.
  *
  * When doing functional testing, you should use MockFileSessionStorage instead.
- *
-
-
-
  */
 class MockArraySessionStorage implements SessionStorageInterface
 {

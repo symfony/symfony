@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Stamp;
  * Marker item to tell this message should be handled in after the current bus has finished.
  *
  * @see \Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware
- *
-
  */
 final class DispatchAfterCurrentBusStamp implements NonSendableStampInterface
 {

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Security\Http\LoginLink\Exception;
 
-/**
-
- */
 class InvalidLoginLinkException extends \RuntimeException implements InvalidLoginLinkExceptionInterface
 {
 }

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mime\Encoder;
 
-/**
-
- */
 final class Base64MimeHeaderEncoder extends Base64Encoder implements MimeHeaderEncoderInterface
 {
     public function getName(): string

@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 /**
  * Adds services tagged kernel.fragment_renderer as HTTP content rendering strategies.
- *
-
  */
 class FragmentRendererPass implements CompilerPassInterface
 {

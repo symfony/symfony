@@ -22,8 +22,6 @@ use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the 'trans' tag.
- *
-
  */
 final class TransTokenParser extends AbstractTokenParser
 {

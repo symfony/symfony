@@ -15,8 +15,6 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
 
 /**
  * Loader is the abstract class used by all built-in loaders.
- *
-
  */
 abstract class Loader implements LoaderInterface
 {

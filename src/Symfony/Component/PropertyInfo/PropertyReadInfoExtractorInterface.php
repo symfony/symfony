@@ -13,8 +13,6 @@ namespace Symfony\Component\PropertyInfo;
 
 /**
  * Extract read information for the property of a class.
- *
-
  */
 interface PropertyReadInfoExtractorInterface
 {

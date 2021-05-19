@@ -23,9 +23,6 @@ use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 class DateIntervalType extends AbstractType
 {
     private $timeParts = [

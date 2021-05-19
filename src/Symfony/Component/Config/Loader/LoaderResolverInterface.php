@@ -13,8 +13,6 @@ namespace Symfony\Component\Config\Loader;
 
 /**
  * LoaderResolverInterface selects a loader for a given resource.
- *
-
  */
 interface LoaderResolverInterface
 {

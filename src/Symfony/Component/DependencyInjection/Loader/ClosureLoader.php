@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * ClosureLoader loads service definitions from a PHP closure.
  *
  * The Closure has access to the container as its first argument.
- *
-
  */
 class ClosureLoader extends Loader
 {

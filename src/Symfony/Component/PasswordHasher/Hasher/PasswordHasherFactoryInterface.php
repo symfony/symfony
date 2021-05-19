@@ -17,9 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * PasswordHasherFactoryInterface to support different password hashers for different user accounts.
- *
-
-
  */
 interface PasswordHasherFactoryInterface
 {

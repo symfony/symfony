@@ -13,8 +13,6 @@ namespace Symfony\Component\DomCrawler\Field;
 
 /**
  * FormField is the abstract class for all form fields.
- *
-
  */
 abstract class FormField
 {

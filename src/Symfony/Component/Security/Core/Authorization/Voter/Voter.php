@@ -15,9 +15,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Voter is an abstract default implementation of a voter.
- *
-
-
  */
 abstract class Voter implements VoterInterface
 {

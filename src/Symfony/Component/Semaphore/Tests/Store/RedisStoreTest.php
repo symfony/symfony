@@ -12,8 +12,6 @@
 namespace Symfony\Component\Semaphore\Tests\Store;
 
 /**
-
- *
  * @requires extension redis
  */
 class RedisStoreTest extends AbstractRedisStoreTest

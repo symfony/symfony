@@ -17,8 +17,6 @@ use Symfony\Contracts\Translation\TranslatorTrait;
 
 /**
  * IdentityTranslator does not translate anything.
- *
-
  */
 class IdentityTranslator implements TranslatorInterface, LocaleAwareInterface
 {

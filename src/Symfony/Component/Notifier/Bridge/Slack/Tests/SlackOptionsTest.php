@@ -17,9 +17,6 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Notification\Notification;
 
-/**
-
- */
 final class SlackOptionsTest extends TestCase
 {
     use ExpectDeprecationTrait;

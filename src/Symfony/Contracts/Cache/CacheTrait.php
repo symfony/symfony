@@ -20,8 +20,6 @@ class_exists(InvalidArgumentException::class);
 
 /**
  * An implementation of CacheInterface for PSR-6 CacheItemPoolInterface classes.
- *
-
  */
 trait CacheTrait
 {

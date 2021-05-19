@@ -13,9 +13,6 @@ namespace Symfony\Component\Process;
 
 /**
  * An executable finder specifically designed for the PHP executable.
- *
-
-
  */
 class PhpExecutableFinder
 {

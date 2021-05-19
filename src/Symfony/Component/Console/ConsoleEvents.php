@@ -18,8 +18,6 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 /**
  * Contains all events dispatched by an Application.
- *
-
  */
 final class ConsoleEvents
 {

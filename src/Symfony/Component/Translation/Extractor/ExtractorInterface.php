@@ -16,8 +16,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * Extracts translation messages from a directory or files to the catalogue.
  * New found messages are injected to the catalogue using the prefix.
- *
-
  */
 interface ExtractorInterface
 {

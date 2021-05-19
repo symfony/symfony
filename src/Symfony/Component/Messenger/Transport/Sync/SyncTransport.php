@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * Transport that immediately marks messages as received and dispatches for handling.
- *
-
  */
 class SyncTransport implements TransportInterface
 {

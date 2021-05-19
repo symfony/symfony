@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\VarDumper\VarDumper;
 
-/**
-
- */
 class DebugBundle extends Bundle
 {
     public function boot()

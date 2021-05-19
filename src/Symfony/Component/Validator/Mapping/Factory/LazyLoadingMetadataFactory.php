@@ -33,8 +33,6 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
  * You can also optionally pass a {@link CacheInterface} instance to the
  * constructor. This cache will be used for persisting the generated metadata
  * between multiple PHP requests.
- *
-
  */
 class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 {

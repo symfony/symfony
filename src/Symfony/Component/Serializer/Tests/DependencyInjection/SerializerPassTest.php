@@ -18,8 +18,6 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 
 /**
  * Tests for the SerializerPass class.
- *
-
  */
 class SerializerPassTest extends TestCase
 {

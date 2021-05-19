@@ -23,10 +23,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * class, please see the LuhnValidatorTest class.
  *
  * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
- *
-
-
-
  */
 class LuhnValidator extends ConstraintValidator
 {

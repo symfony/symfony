@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 
-/**
-
- */
 class GuardListener
 {
     private $configuration;

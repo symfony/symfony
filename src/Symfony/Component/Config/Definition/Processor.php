@@ -14,8 +14,6 @@ namespace Symfony\Component\Config\Definition;
 /**
  * This class is the entry point for config normalization/merging/finalization.
  *
-
- *
  * @final
  */
 class Processor

@@ -21,8 +21,6 @@ use Symfony\Component\Console\Input\ArrayInput;
  *
  *     $application = new Application();
  *     $application->setAutoExit(false);
- *
-
  */
 class ApplicationTester
 {

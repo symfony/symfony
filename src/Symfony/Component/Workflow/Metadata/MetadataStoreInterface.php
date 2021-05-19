@@ -15,8 +15,6 @@ use Symfony\Component\Workflow\Transition;
 
 /**
  * MetadataStoreInterface is able to fetch metadata for a specific workflow.
- *
-
  */
 interface MetadataStoreInterface
 {

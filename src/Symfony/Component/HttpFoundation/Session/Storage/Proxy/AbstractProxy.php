@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 
-/**
-
- */
 abstract class AbstractProxy
 {
     /**

@@ -17,8 +17,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 
 /**
-
- *
  * @internal
  */
 abstract class ResourceBundle

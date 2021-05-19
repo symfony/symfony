@@ -19,8 +19,6 @@ class_exists(ParsedExpression::class);
 
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
- *
-
  */
 class ExpressionLanguage
 {

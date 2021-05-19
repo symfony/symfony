@@ -14,9 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Valid;
 
-/**
-
- */
 class ValidTest extends TestCase
 {
     public function testGroupsCanBeSet()

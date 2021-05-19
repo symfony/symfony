@@ -24,9 +24,6 @@ namespace Symfony\Component\Serializer\Normalizer;
  * any required parameters were not present as properties. Then the denormalizer
  * walks through the given map of property names to property values to see if a
  * property with the corresponding name exists. If found, the property gets the value.
- *
-
-
  */
 class PropertyNormalizer extends AbstractObjectNormalizer
 {

@@ -14,8 +14,6 @@ namespace Symfony\Component\Config\Definition\Exception;
 /**
  * A very general exception which can be thrown whenever non of the more specific
  * exceptions is suitable.
- *
-
  */
 class InvalidConfigurationException extends Exception
 {

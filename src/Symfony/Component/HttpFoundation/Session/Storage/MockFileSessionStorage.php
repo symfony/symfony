@@ -19,8 +19,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * and shutdown only once per PHP execution cycle and this class does
  * not pollute any session related globals, including session_*() functions
  * or session.* PHP ini directives.
- *
-
  */
 class MockFileSessionStorage extends MockArraySessionStorage
 {

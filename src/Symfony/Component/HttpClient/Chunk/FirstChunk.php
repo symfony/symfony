@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpClient\Chunk;
 
 /**
-
- *
  * @internal
  */
 class FirstChunk extends DataChunk

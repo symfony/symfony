@@ -13,8 +13,6 @@ namespace Symfony\Component\Intl;
 
 /**
  * Gives access to internationalization data.
- *
-
  */
 final class Intl
 {

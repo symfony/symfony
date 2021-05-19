@@ -15,8 +15,6 @@ use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class NullProvider implements ProviderInterface

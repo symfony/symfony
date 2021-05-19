@@ -22,8 +22,6 @@ use Symfony\Component\Validator\Exception\MappingException;
  * those constraints. Constraints can also be loaded using their fully
  * qualified class names. At last, namespace aliases can be defined to load
  * constraints with the syntax "alias:ShortName".
- *
-
  */
 abstract class AbstractLoader implements LoaderInterface
 {

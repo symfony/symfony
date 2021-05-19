@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Recipient;
 
-/**
-
- */
 trait SmsRecipientTrait
 {
     private $phone;

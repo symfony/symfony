@@ -15,9 +15,6 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class FormValidatorPerformanceTest extends FormPerformanceTestCase
 {
     protected function getExtensions()

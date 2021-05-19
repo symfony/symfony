@@ -14,9 +14,6 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
-
- */
 class RoutingConfigurator
 {
     use Traits\AddTrait;

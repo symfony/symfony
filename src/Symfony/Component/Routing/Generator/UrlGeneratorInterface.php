@@ -25,9 +25,6 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * and we do not need to distinguish them as the difference is mostly semantical and
  * less technical. Generating URIs, i.e. representation-independent resource identifiers,
  * is also possible.
- *
-
-
  */
 interface UrlGeneratorInterface extends RequestContextAwareInterface
 {

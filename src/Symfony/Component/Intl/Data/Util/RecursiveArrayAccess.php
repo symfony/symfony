@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Data\Util;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 
 /**
-
- *
  * @internal
  */
 class RecursiveArrayAccess

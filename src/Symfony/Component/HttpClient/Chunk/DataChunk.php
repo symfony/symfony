@@ -14,8 +14,6 @@ namespace Symfony\Component\HttpClient\Chunk;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 
 /**
-
- *
  * @internal
  */
 class DataChunk implements ChunkInterface

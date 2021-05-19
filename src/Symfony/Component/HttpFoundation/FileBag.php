@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * FileBag is a container for uploaded files.
- *
-
-
  */
 class FileBag extends ParameterBag
 {

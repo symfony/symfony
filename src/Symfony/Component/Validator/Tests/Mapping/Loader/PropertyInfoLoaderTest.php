@@ -28,9 +28,6 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class PropertyInfoLoaderTest extends TestCase
 {
     public function testLoadClassMetadata()

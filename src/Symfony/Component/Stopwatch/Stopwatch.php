@@ -18,8 +18,6 @@ class_exists(Section::class);
 
 /**
  * Stopwatch provides a way to profile code.
- *
-
  */
 class Stopwatch implements ResetInterface
 {

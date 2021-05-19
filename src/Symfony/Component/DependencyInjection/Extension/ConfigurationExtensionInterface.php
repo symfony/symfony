@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * ConfigurationExtensionInterface is the interface implemented by container extension classes.
- *
-
  */
 interface ConfigurationExtensionInterface
 {

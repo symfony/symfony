@@ -34,10 +34,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass\Wobble;
 use Symfony\Component\ExpressionLanguage\Expression;
 
-/**
-
-
- */
 class CheckTypeDeclarationsPassTest extends TestCase
 {
     public function testProcessThrowsExceptionOnInvalidTypesConstructorArguments()

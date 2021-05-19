@@ -18,8 +18,6 @@ if (!class_exists(NumberFormatterPolyfill::class)) {
     /**
      * Stub implementation for the NumberFormatter class of the intl extension.
      *
-
-     *
      * @see IntlNumberFormatter
      */
     class NumberFormatter extends IntlNumberFormatter
@@ -28,8 +26,6 @@ if (!class_exists(NumberFormatterPolyfill::class)) {
 } else {
     /**
      * Stub implementation for the NumberFormatter class of the intl extension.
-     *
-
      *
      * @see IntlNumberFormatter
      */

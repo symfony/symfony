@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 /**
  * Tests NamespacedAttributeBag.
  *
-
- *
  * @group legacy
  */
 class NamespacedAttributeBagTest extends TestCase

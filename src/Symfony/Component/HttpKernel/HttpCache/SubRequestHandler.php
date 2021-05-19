@@ -17,8 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
-
- *
  * @internal
  */
 class SubRequestHandler

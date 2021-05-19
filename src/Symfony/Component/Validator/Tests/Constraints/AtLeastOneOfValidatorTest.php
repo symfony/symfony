@@ -37,9 +37,6 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validation;
 
-/**
-
- */
 class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()

@@ -36,8 +36,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * BufferHandler) in order to call Elasticsearch only once with a bulk push. For
  * even better performance and fault tolerance, a proper ELK (https://www.elastic.co/what-is/elk-stack)
  * stack is recommended.
- *
-
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {

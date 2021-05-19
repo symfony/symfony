@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Exception;
 
 /**
  * RuntimeException.
- *
-
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

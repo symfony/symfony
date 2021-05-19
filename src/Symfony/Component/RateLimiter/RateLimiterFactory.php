@@ -23,8 +23,6 @@ use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class RateLimiterFactory

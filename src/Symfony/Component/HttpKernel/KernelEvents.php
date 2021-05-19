@@ -22,8 +22,6 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Contains all events thrown in the HttpKernel component.
- *
-
  */
 final class KernelEvents
 {

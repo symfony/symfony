@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Exception;
 
 /**
  * Base LogicException for the Security component.
- *
-
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

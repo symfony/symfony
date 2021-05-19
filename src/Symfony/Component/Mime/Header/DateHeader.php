@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime\Header;
 
 /**
  * A Date MIME Header.
- *
-
  */
 final class DateHeader extends AbstractHeader
 {

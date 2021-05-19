@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\Exception;
 
 /**
  * Base BadMethodCallException for the Form component.
- *
-
  */
 class BadMethodCallException extends \BadMethodCallException implements ExceptionInterface
 {

@@ -24,9 +24,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * Saves session in test environment.
  *
-
-
- *
  * @internal
  */
 abstract class AbstractTestSessionListener implements EventSubscriberInterface

@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- *
  * @internal
  */
 class JsonDescriptor extends Descriptor

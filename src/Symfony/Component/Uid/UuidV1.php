@@ -13,8 +13,6 @@ namespace Symfony\Component\Uid;
 
 /**
  * A v1 UUID contains a 60-bit timestamp and 62 extra unique bits.
- *
-
  */
 class UuidV1 extends Uuid
 {

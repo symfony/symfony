@@ -18,8 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class ConsoleApplicationRunner implements RunnerInterface

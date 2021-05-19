@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Adds remember-me cookies to the Response.
  *
-
- *
  * @final
  */
 class ResponseListener implements EventSubscriberInterface

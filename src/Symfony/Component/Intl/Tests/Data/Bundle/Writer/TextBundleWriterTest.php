@@ -16,8 +16,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\TextBundleWriter;
 
 /**
-
- *
  * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
  */
 class TextBundleWriterTest extends TestCase

@@ -23,8 +23,6 @@ class_exists(HttpHeaderSerializer::class);
 /**
  * Adds the Link HTTP header to the response.
  *
-
- *
  * @final
  */
 class AddLinkHeaderListener implements EventSubscriberInterface

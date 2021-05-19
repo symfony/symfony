@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * A signaling exception that wraps a lazily computed response.
- *
-
  */
 class LazyResponseException extends \Exception implements ExceptionInterface
 {

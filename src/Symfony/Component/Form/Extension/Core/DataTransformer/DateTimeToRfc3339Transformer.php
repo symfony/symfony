@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
- */
 class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 {
     /**

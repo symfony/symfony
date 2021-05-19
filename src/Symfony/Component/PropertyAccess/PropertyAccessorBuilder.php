@@ -17,8 +17,6 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
  * A configurable builder to create a PropertyAccessor.
- *
-
  */
 class PropertyAccessorBuilder
 {

@@ -28,8 +28,6 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 /**
  * Encode a user's password.
  *
-
- *
  * @final
  *
  * @deprecated since Symfony 5.3, use {@link UserPasswordHashCommand} instead

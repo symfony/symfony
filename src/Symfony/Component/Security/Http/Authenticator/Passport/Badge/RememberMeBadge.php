@@ -18,8 +18,6 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport\Badge;
  * cookie is only created if this badge is enabled. By default, this is done
  * by the {@see RememberMeConditionsListener} if all conditions are met.
  *
-
- *
  * @final
  */
 class RememberMeBadge implements BadgeInterface

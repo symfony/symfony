@@ -23,8 +23,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * - TokenBasedRememberMeServices (does not require a TokenProvider)
  * - PersistentTokenBasedRememberMeServices (requires a TokenProvider)
  *
-
- *
  * @method logout(Request $request, Response $response, TokenInterface $token)
  */
 interface RememberMeServicesInterface

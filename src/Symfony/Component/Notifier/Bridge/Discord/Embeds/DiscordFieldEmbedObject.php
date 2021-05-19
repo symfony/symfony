@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
-/**
-
- */
 final class DiscordFieldEmbedObject extends AbstractDiscordEmbedObject
 {
     public function name(string $name): self

@@ -14,9 +14,6 @@ namespace Symfony\Component\Messenger\Tests\Stamp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-/**
-
- */
 class DelayStampTest extends TestCase
 {
     public function testDelayFor()

@@ -23,8 +23,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * Used as fly weight for {@see CachingFactoryDecorator}.
  *
  * @internal
- *
-
  */
 abstract class AbstractStaticOption
 {

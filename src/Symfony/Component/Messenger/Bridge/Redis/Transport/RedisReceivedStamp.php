@@ -13,9 +13,6 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
-/**
-
- */
 class RedisReceivedStamp implements NonSendableStampInterface
 {
     private $id;

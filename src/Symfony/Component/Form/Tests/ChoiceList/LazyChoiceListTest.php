@@ -17,9 +17,6 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
-/**
-
- */
 class LazyChoiceListTest extends TestCase
 {
     /**

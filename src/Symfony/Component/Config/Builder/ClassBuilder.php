@@ -15,8 +15,6 @@ namespace Symfony\Component\Config\Builder;
  * Build PHP classes to generate config.
  *
  * @internal
- *
-
  */
 class ClassBuilder
 {

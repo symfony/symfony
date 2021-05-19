@@ -19,9 +19,6 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
  * When in debug mode, those metadata resources that implement
  * \Symfony\Component\Config\Resource\SelfCheckingResourceInterface will
  * be used to check cache freshness.
- *
-
-
  */
 class ConfigCache extends ResourceCheckerConfigCache
 {

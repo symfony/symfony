@@ -20,8 +20,6 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
- *
-
  */
 class DeprecationErrorHandler
 {

@@ -19,8 +19,6 @@ use Symfony\Component\Form\FormTypeInterface;
  * which configures a "choice_label" option.
  *
  * @internal
- *
-
  */
 final class ChoiceLabel extends AbstractStaticOption
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Translation\Exception\LogicException;
 
-/**
-
- */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
     private $messages = [];

@@ -13,8 +13,6 @@ namespace Symfony\Component\Dotenv\Exception;
 
 /**
  * Thrown when a file does not exist or is not readable.
- *
-
  */
 final class PathException extends \RuntimeException implements ExceptionInterface
 {

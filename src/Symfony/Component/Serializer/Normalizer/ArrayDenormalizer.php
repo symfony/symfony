@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Denormalizes arrays of objects.
  *
-
- *
  * @final
  */
 class ArrayDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface, SerializerAwareInterface, CacheableSupportsMethodInterface

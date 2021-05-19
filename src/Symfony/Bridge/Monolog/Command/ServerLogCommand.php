@@ -23,9 +23,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-/**
-
- */
 class ServerLogCommand extends Command
 {
     private const BG_COLOR = ['black', 'blue', 'cyan', 'green', 'magenta', 'red', 'white', 'yellow'];

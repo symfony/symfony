@@ -14,8 +14,6 @@ namespace Symfony\Component\RateLimiter;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
-
- *
  * @experimental in 5.3
  */
 final class CompoundLimiter implements LimiterInterface

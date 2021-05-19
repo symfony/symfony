@@ -14,9 +14,6 @@ namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 use Symfony\Component\Form\Exception\ErrorMappingException;
 use Symfony\Component\Form\FormInterface;
 
-/**
-
- */
 class MappingRule
 {
     private $origin;

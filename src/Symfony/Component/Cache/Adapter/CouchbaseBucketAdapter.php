@@ -16,9 +16,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
-/**
-
- */
 class CouchbaseBucketAdapter extends AbstractAdapter
 {
     private const THIRTY_DAYS_IN_SECONDS = 2592000;

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-/**
-
- */
 class NullToken implements TokenInterface
 {
     public function __toString(): string

@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
-
- */
 class CasterTest extends TestCase
 {
     use VarDumperTestTrait;

@@ -21,8 +21,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Auto-configure the default options based on the requested URL.
- *
-
  */
 class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {

@@ -14,8 +14,6 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * The write mutator defines how a property can be written.
  *
-
- *
  * @internal
  */
 final class PropertyWriteInfo

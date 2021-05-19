@@ -17,9 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
-/**
-
- */
 interface UserAuthenticatorInterface
 {
     /**

@@ -13,8 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 /**
  * Represents a cookie.
- *
-
  */
 class Cookie
 {

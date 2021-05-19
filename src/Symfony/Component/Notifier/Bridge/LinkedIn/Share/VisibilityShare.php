@@ -13,9 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 
 use Symfony\Component\Notifier\Exception\LogicException;
 
-/**
-
- */
 final class VisibilityShare extends AbstractLinkedInShare
 {
     public const MEMBER_NETWORK_VISIBILITY = 'MemberNetworkVisibility';

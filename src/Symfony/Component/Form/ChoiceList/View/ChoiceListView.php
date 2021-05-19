@@ -17,8 +17,6 @@ namespace Symfony\Component\Form\ChoiceList\View;
  * A choice list contains choices and optionally preferred choices which are
  * displayed in the very beginning of the list. Both choices and preferred
  * choices may be grouped in {@link ChoiceGroupView} instances.
- *
-
  */
 class ChoiceListView
 {

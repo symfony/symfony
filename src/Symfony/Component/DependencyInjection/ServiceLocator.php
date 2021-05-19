@@ -20,10 +20,6 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-/**
-
-
- */
 class ServiceLocator implements ServiceProviderInterface
 {
     use ServiceLocatorTrait {

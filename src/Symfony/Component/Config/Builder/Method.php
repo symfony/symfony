@@ -15,8 +15,6 @@ namespace Symfony\Component\Config\Builder;
  * Represents a method when building classes.
  *
  * @internal
- *
-
  */
 class Method
 {

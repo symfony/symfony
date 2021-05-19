@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Implements credentials checking using a custom checker function.
  *
-
- *
  * @final
  */
 class CustomCredentials implements CredentialsInterface

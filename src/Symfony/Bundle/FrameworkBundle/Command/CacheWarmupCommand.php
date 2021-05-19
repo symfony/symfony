@@ -22,8 +22,6 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 /**
  * Warmup the cache.
  *
-
- *
  * @final
  */
 class CacheWarmupCommand extends Command

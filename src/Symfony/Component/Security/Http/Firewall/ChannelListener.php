@@ -21,8 +21,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * ChannelListener switches the HTTP protocol based on the access control
  * configuration.
  *
-
- *
  * @final
  */
 class ChannelListener extends AbstractListener

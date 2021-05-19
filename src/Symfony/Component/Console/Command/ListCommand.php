@@ -19,8 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * ListCommand displays the list of all available commands for the application.
- *
-
  */
 class ListCommand extends Command
 {

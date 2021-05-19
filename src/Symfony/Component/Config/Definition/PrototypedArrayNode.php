@@ -18,8 +18,6 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * Represents a prototyped Array node in the config tree.
- *
-
  */
 class PrototypedArrayNode extends ArrayNode
 {

@@ -14,9 +14,6 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-/**
-
- */
 abstract class AbstractExtension implements FormExtensionInterface
 {
     /**

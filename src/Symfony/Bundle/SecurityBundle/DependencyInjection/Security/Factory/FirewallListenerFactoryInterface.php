@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Can be implemented by a security factory to add a listener to the firewall.
- *
-
  */
 interface FirewallListenerFactoryInterface
 {

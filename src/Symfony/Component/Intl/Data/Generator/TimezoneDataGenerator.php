@@ -22,8 +22,6 @@ use Symfony\Component\Intl\Locale;
 /**
  * The rule for compiling the zone bundle.
  *
-
- *
  * @internal
  */
 class TimezoneDataGenerator extends AbstractDataGenerator

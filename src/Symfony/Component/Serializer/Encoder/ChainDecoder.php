@@ -16,10 +16,6 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 /**
  * Decoder delegating the decoding to a chain of decoders.
  *
-
-
-
- *
  * @final
  */
 class ChainDecoder implements ContextAwareDecoderInterface

@@ -17,8 +17,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Iterator for all templates in bundles and in the application Resources directory.
  *
-
- *
  * @internal
  */
 class TemplateIterator implements \IteratorAggregate

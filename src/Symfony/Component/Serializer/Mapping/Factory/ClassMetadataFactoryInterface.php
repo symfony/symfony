@@ -16,8 +16,6 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * Returns a {@see ClassMetadataInterface}.
- *
-
  */
 interface ClassMetadataFactoryInterface
 {

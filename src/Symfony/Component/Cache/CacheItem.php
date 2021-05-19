@@ -16,9 +16,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Contracts\Cache\ItemInterface;
 
-/**
-
- */
 final class CacheItem implements ItemInterface
 {
     private const METADATA_EXPIRY_OFFSET = 1527506807;

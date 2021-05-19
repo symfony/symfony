@@ -15,9 +15,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
-/**
-
- */
 trait BlockingStoreTestTrait
 {
     /**

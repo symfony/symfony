@@ -13,8 +13,6 @@ namespace Symfony\Component\VarDumper\Dumper\ContextProvider;
 
 /**
  * Interface to provide contextual data about dump data clones sent to a server.
- *
-
  */
 interface ContextProviderInterface
 {

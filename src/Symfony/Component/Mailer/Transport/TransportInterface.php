@@ -21,8 +21,6 @@ use Symfony\Component\Mime\RawMessage;
  *
  * When sending emails, you should prefer MailerInterface implementations
  * as they allow asynchronous sending.
- *
-
  */
 interface TransportInterface
 {

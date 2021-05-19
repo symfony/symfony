@@ -24,8 +24,6 @@ use Symfony\Contracts\Service\ResetInterface;
  * Collects some data about event listeners.
  *
  * This event dispatcher delegates the dispatching to another one.
- *
-
  */
 class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {

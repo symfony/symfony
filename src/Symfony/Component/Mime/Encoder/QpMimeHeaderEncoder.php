@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Mime\Encoder;
 
-/**
-
- */
 final class QpMimeHeaderEncoder extends QpEncoder implements MimeHeaderEncoderInterface
 {
     protected function initSafeMap(): void

@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-/**
-
- */
 class MessengerDataCollectorTest extends TestCase
 {
     /** @var CliDumper */

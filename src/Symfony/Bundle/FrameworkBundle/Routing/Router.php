@@ -28,8 +28,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * This Router creates the Loader only when the cache is empty.
- *
-
  */
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {

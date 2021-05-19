@@ -15,8 +15,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * RoleVoter votes if any attribute starts with a given prefix.
- *
-
  */
 class RoleVoter implements VoterInterface
 {

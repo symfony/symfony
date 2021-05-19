@@ -14,10 +14,6 @@ namespace Symfony\Component\Notifier\Transport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 
-/**
-
-
- */
 final class Dsn
 {
     private $scheme;

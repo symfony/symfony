@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
-
- */
 class UlidType extends AbstractType
 {
     /**

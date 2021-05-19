@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
-/**
-
- */
 class ValidationStampTest extends TestCase
 {
     public function testStamp()

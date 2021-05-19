@@ -38,8 +38,6 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  * This authenticator is used to bridge Guard authenticators with
  * the Symfony Authenticator system.
  *
-
- *
  * @internal
  *
  * @deprecated since Symfony 5.3

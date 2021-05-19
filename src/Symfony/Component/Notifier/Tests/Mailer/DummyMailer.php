@@ -15,9 +15,6 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 class DummyMailer implements MailerInterface
 {
     private $sentMessage = null;

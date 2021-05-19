@@ -15,8 +15,6 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Caches metadata using a PSR-6 implementation.
- *
-
  */
 class CacheClassMetadataFactory implements ClassMetadataFactoryInterface
 {

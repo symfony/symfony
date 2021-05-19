@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * This handler clears the passed cookies when a user logs out.
- *
-
  */
 class CookieClearingLogoutHandler implements LogoutHandlerInterface
 {

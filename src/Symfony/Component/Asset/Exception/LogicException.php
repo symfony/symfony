@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset\Exception;
 
 /**
  * Base LogicException for the Asset component.
- *
-
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

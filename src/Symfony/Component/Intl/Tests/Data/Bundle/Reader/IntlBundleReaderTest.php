@@ -17,7 +17,6 @@ use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
-
  * @requires extension intl
  */
 class IntlBundleReaderTest extends TestCase

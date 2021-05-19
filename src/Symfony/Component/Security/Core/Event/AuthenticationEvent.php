@@ -16,8 +16,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This is a general purpose authentication event.
- *
-
  */
 class AuthenticationEvent extends Event
 {

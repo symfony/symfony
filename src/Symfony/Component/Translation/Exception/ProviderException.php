@@ -14,8 +14,6 @@ namespace Symfony\Component\Translation\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
-
- *
  * @experimental in 5.3
  */
 class ProviderException extends RuntimeException implements ProviderExceptionInterface

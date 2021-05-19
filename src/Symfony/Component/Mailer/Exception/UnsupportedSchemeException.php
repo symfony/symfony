@@ -14,9 +14,6 @@ namespace Symfony\Component\Mailer\Exception;
 use Symfony\Component\Mailer\Bridge;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-/**
-
- */
 class UnsupportedSchemeException extends LogicException
 {
     private const SCHEME_TO_PACKAGE_MAP = [

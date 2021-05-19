@@ -16,9 +16,6 @@ use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 
-/**
-
- */
 class Envelope
 {
     private $sender;

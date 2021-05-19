@@ -20,8 +20,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Suggests a package, that should be installed (via composer),
  * if the package is missing, and the input command namespace can be mapped to a Symfony bundle.
  *
-
- *
  * @internal
  */
 final class SuggestMissingPackageSubscriber implements EventSubscriberInterface

@@ -18,8 +18,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * ResponseListener fixes the Response headers based on the Request.
  *
-
- *
  * @final
  */
 class ResponseListener implements EventSubscriberInterface

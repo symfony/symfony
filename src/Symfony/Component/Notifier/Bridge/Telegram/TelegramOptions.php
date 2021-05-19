@@ -14,9 +14,6 @@ namespace Symfony\Component\Notifier\Bridge\Telegram;
 use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\AbstractTelegramReplyMarkup;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
-/**
-
- */
 final class TelegramOptions implements MessageOptionsInterface
 {
     public const PARSE_MODE_HTML = 'HTML';

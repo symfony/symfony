@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
  * controller to execute based on a Request object.
  *
  * A Controller can be any valid PHP callable.
- *
-
  */
 interface ControllerResolverInterface
 {

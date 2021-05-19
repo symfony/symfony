@@ -16,8 +16,6 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * ChainLoader is a loader that calls other loaders to load templates.
- *
-
  */
 class ChainLoader extends Loader
 {

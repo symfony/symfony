@@ -16,10 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
-/**
-
-
- */
 class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
 {
     private $timeLimitInSeconds;

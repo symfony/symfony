@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -84,8 +85,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->userChecker->checkPreAuth($user);
             $this->checkAuthentication($user, $token);
             $this->userChecker->checkPostAuth($user);
-        } catch (AccountStatusException $e) {
-            if ($this->hideUserNotFoundExceptions) {
+        } catch (AccountStatusException | BadCredentialsException $e) {
+            if ($this->hideUserNotFoundExceptions && !$e instanceof CustomUserMessageAccountStatusException) {
                 throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
 

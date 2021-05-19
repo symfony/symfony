@@ -17,8 +17,6 @@ use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ObjectRepository;
 
 /**
-
- *
  * @deprecated in 5.3, will be removed in 6.0.
  */
 class TestRepositoryFactory implements RepositoryFactory

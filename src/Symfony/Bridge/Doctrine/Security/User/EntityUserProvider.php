@@ -26,9 +26,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * Wrapper around a Doctrine ObjectManager.
  *
  * Provides provisioning for Doctrine entity users.
- *
-
-
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

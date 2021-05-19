@@ -15,9 +15,6 @@ use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-/**
-
- */
 class DbalLogger implements SQLLogger
 {
     public const MAX_STRING_LENGTH = 32;

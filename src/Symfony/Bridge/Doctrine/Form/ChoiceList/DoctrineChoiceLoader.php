@@ -16,8 +16,6 @@ use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
 
 /**
  * Loads choices using a Doctrine object manager.
- *
-
  */
 class DoctrineChoiceLoader extends AbstractChoiceLoader
 {

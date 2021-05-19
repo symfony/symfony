@@ -21,8 +21,6 @@ use Symfony\Component\Form\FormEvents;
  *
  * This works with ORM, MongoDB and CouchDB instances of the collection interface.
  *
-
- *
  * @see Collection
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface

@@ -18,8 +18,6 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Automatically adds the cache table needed for the PdoAdapter.
- *
-
  */
 final class PdoCacheAdapterDoctrineSchemaSubscriber implements EventSubscriber
 {

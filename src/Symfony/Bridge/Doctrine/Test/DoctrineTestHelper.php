@@ -23,8 +23,6 @@ use PHPUnit\Framework\TestCase;
 /**
  * Provides utility functions needed in tests.
  *
-
- *
  * @deprecated in 5.3, will be removed in 6.0.
  */
 class DoctrineTestHelper

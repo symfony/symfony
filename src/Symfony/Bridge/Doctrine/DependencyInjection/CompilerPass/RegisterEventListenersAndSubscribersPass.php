@@ -22,10 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers event listeners and subscribers to the available doctrine connections.
- *
-
-
-
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {

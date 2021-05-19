@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
 /**
  * Checks whether the connection is still open or reconnects otherwise.
- *
-
  */
 class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 {

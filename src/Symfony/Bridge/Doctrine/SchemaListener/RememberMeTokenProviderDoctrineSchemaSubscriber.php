@@ -20,8 +20,6 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
 /**
  * Automatically adds the rememberme table needed for the {@see DoctrineTokenProvider}.
- *
-
  */
 final class RememberMeTokenProviderDoctrineSchemaSubscriber implements EventSubscriber
 {

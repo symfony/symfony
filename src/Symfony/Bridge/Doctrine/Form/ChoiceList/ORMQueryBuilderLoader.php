@@ -19,9 +19,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.
- *
-
-
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {

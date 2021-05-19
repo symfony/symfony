@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
-
- *
  * @internal
  */
 abstract class AbstractDoctrineMiddleware implements MiddlewareInterface

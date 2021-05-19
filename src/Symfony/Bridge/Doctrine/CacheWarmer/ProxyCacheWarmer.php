@@ -19,8 +19,6 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  *
  * In the process of generating proxies the cache for all the metadata is primed also,
  * since this information is necessary to build the proxies in the first place.
- *
-
  */
 class ProxyCacheWarmer implements CacheWarmerInterface
 {

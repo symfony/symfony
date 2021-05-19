@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
 /**
  * Closes connection and therefore saves number of connections.
- *
-
  */
 class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
 {

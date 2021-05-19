@@ -18,8 +18,6 @@ use Symfony\Component\Form\Exception\RuntimeException;
 /**
  * A utility for reading object IDs.
  *
-
- *
  * @internal
  */
 class IdReader

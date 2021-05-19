@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * Wraps all handlers in a single doctrine transaction.
- *
-
  */
 class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 {

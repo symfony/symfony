@@ -16,9 +16,6 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
-
- */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
     /**

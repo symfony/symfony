@@ -24,8 +24,6 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Extracts data using Doctrine ORM and ODM metadata.
- *
-
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {

@@ -90,6 +90,8 @@ return static function (ContainerConfigurator $container) {
             ->args([service_locator([
                 'security.token_storage' => service('security.token_storage'),
                 'security.authorization_checker' => service('security.authorization_checker'),
+                'request_stack' => service('request_stack'),
+                'event_dispatcher' => service('event_dispatcher'),
             ])])
         ->alias(Security::class, 'security.helper')
 

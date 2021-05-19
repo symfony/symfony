@@ -832,10 +832,6 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument(new Reference(sprintf('%s.metadata_store', $workflowId)));
-            $definitionDefinition->addTag('workflow.definition', [
-                'name' => $name,
-                'type' => $type,
-            ]);
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {

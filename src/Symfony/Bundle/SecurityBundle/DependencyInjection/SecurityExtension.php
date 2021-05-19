@@ -142,6 +142,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('collectors.php');
         $loader->load('guard.php');
 
+        $container->getDefinition('data_collector.security')->addArgument($this->authenticatorManagerEnabled);
+
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('security_debug.php');
         }

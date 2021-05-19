@@ -44,8 +44,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $firewallMap;
     private $firewall;
     private $hasVarDumper;
+    private $authenticatorManagerEnabled;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null, bool $authenticatorManagerEnabled = false)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
@@ -54,6 +55,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         $this->firewallMap = $firewallMap;
         $this->firewall = $firewall;
         $this->hasVarDumper = class_exists(ClassStub::class);
+        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
     }
 
     /**
@@ -207,6 +209,8 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         if ($this->firewall) {
             $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
+
+        $this->data['authenticator_manager_enabled'] = $this->authenticatorManagerEnabled;
     }
 
     /**
@@ -391,5 +395,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getName()
     {
         return 'security';
+    }
+
+    public function isAuthenticatorManagerEnabled(): bool
+    {
+        return $this->data['authenticator_manager_enabled'];
     }
 }

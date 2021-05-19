@@ -66,13 +66,5 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
         ->alias(LoginLinkHandlerInterface::class, 'security.authenticator.firewall_aware_login_link_handler')
-
-        ->set('security.authenticator.entity_login_link_user_handler', EntityLoginLinkUserHandler::class)
-            ->abstract()
-            ->args([
-                service('doctrine'),
-                abstract_arg('user entity class name'),
-            ])
-            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
     ;
 };

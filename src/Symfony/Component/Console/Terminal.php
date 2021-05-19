@@ -64,6 +64,7 @@ class Terminal
      *
      * todo: Any chance to support Windows here?
      *
+     * @param bool $overwrite Whether to overwrite a potentially already existing handler for the SIGWINCH signal.
      * @param bool $activateAsyncSignalHandling Whether to also activate asynchronous signal processing to ensure immediate event processing.
      * @return bool Returns true if the signal handler has been successfully installed and false otherwise.
      */

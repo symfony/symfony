@@ -95,10 +95,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         $id = $this->getId($key);
 
@@ -117,10 +115,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function clear(string $prefix = '')
+    public function clear(string $prefix = ''): bool
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
@@ -155,20 +151,16 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         return $this->deleteItems([$key]);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         $ids = [];
 
@@ -206,7 +198,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem($key): CacheItem
     {
         if ($this->deferred) {
             $this->commit();
@@ -232,7 +224,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): iterable
     {
         if ($this->deferred) {
             $this->commit();
@@ -255,10 +247,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
             return false;
@@ -270,10 +260,8 @@ trait AbstractAdapterTrait
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         if (!$item instanceof CacheItem) {
             return false;

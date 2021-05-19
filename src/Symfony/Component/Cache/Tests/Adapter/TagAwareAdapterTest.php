@@ -85,9 +85,9 @@ class TagAwareAdapterTest extends AdapterTestCase
         $tag = $this->createMock(CacheItemInterface::class);
         $tag->expects(self::exactly(2))->method('get')->willReturn(10);
 
-        $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn([
+        $tagsPool->expects(self::exactly(2))->method('getItems')->willReturn(new \ArrayIterator([
             'baz'.TagAwareAdapter::TAGS_PREFIX => $tag,
-        ]);
+        ]));
 
         $pool->save($item);
         $this->assertTrue($pool->getItem('foo')->isHit());

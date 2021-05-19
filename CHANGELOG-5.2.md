@@ -7,6 +7,21 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.9 (2021-05-19)
+
+ * security #cve-2021-21424 [Security\Core] Fix user enumeration via response body on invalid credentials (chalasr)
+ * bug #41275 Fixes Undefined method call (faizanakram99)
+ * bug #41269 [SecurityBundle] Remove invalid unused service (chalasr)
+ * bug #41139 [Security] [DataCollector] Remove allows anonymous information in datacollector (ismail1432)
+ * bug #41230 [FrameworkBundle][Validator] Fix deprecations from Doctrine Annotations+Cache (derrabus)
+ * bug #41206 [Mailer] Fix SES API call with UTF-8 Addresses (jderusse)
+ * bug #41240 Fixed deprecation warnings about passing null as parameter (derrabus)
+ * bug #41241 [Finder] Fix gitignore regex build with "**" (mvorisek)
+ * bug #41224 [HttpClient] fix adding query string to relative URLs with scoped clients (nicolas-grekas)
+ * bug #41233 [DependencyInjection][ProxyManagerBridge] Don't call class_exists() on null (derrabus)
+ * bug #41211 [Notifier] Add missing charset to content-type for Slack notifier (norkunas)
+ * bug #41210 [Console] Fix Windows code page support (orkan)
+
 * 5.2.8 (2021-05-12)
 
  * security #cve-2021-21424 [Security][Guard] Prevent user enumeration (chalasr)

@@ -22,7 +22,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
  *
  * @internal
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ProfilerStorageInterface
 {

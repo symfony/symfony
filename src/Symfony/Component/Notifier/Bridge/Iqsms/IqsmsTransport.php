@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Oleksandr Barabolia <alexandrbarabolya@gmail.com>
+
  */
 final class IqsmsTransport extends AbstractTransport
 {

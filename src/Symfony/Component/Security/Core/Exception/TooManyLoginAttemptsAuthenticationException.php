@@ -15,7 +15,7 @@ namespace Symfony\Component\Security\Core\Exception;
  * This exception is thrown if there where too many failed login attempts in
  * this session.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class TooManyLoginAttemptsAuthenticationException extends AuthenticationException
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * The Closure must return a RouteCollection instance.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ClosureLoader extends Loader
 {

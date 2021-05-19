@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * HttpBasicFactory creates services for HTTP basic authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

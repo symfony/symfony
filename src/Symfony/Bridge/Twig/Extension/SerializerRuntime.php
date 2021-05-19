@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 /**
- * @author Jesse Rushlow <jr@rushlow.dev>
+
  */
 final class SerializerRuntime implements RuntimeExtensionInterface
 {

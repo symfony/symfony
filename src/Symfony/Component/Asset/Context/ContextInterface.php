@@ -14,7 +14,7 @@ namespace Symfony\Component\Asset\Context;
 /**
  * Holds information about the current request.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ContextInterface
 {

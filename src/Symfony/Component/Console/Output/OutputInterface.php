@@ -16,7 +16,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 /**
  * OutputInterface is the interface implemented by all Output classes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface OutputInterface
 {

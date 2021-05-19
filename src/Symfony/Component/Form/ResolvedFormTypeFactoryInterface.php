@@ -18,7 +18,7 @@ namespace Symfony\Component\Form;
  * implementation, within which you can customize the concrete FormBuilderInterface
  * implementations or FormView subclasses that are used by the framework.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ResolvedFormTypeFactoryInterface
 {

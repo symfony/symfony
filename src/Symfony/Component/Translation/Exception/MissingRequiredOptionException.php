@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Exception;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 class MissingRequiredOptionException extends IncompleteDsnException
 {

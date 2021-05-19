@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author James Hemery <james@yieldstudio.fr>
+
  */
 final class SpotHitTransportFactory extends AbstractTransportFactory
 {

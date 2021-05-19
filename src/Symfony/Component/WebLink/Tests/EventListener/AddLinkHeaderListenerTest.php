@@ -23,7 +23,7 @@ use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class AddLinkHeaderListenerTest extends TestCase
 {

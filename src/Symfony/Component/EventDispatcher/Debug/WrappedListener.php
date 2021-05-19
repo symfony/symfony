@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class WrappedListener
 {

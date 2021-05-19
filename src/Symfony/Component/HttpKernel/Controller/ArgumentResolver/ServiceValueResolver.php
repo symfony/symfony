@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * Yields a service keyed by _controller and argument name.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class ServiceValueResolver implements ArgumentValueResolverInterface
 {

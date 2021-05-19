@@ -23,7 +23,7 @@ trigger_deprecation('symfony/form', '5.2', 'The "%s" class is deprecated. Use "%
 /**
  * Maps arrays/objects to/from forms using property paths.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @deprecated since symfony/form 5.2. Use {@see DataMapper} instead.
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Receiver that decorates another, but receives only 1 specific message.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  *
  * @internal
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
 /**
  * This exception is thrown when a circular reference is detected.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ServiceCircularReferenceException extends RuntimeException
 {

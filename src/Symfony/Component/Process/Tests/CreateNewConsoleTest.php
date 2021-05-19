@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 /**
- * @author Andrei Olteanu <andrei@flashsoft.eu>
+
  */
 class CreateNewConsoleTest extends TestCase
 {

@@ -18,7 +18,7 @@ if (!function_exists('trigger_deprecation')) {
      * @param string $message The message of the deprecation
      * @param mixed  ...$args Values to insert in the message using printf() formatting
      *
-     * @author Nicolas Grekas <p@tchwork.com>
+
      */
     function trigger_deprecation(string $package, string $version, string $message, ...$args): void
     {

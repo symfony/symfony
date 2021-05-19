@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Part\Multipart\RelatedPart;
 use Symfony\Component\Mime\Part\TextPart;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class MessageConverter
 {

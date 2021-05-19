@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 /**
  * Applies instanceof conditionals to definitions.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 {

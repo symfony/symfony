@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * Reads .json resource bundles.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

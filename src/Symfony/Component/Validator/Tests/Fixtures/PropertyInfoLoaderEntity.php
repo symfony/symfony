@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PropertyInfoLoaderEntity
 {

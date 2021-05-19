@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Adapter;
 
 /**
- * @author Lars Strojny <lars@strojny.net>
+
  */
 final class ParameterNormalizer
 {

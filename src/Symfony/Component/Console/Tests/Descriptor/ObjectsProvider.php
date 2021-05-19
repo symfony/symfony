@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2;
 
 /**
- * @author Jean-François Simon <contact@jfsimon.fr>
+
  */
 class ObjectsProvider
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Envelope
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Stamp;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class RouterContextStamp implements StampInterface
 {

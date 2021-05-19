@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * ResponseListener fixes the Response headers based on the Request.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

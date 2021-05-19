@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime\Encoder;
 
 /**
- * @author Chris Corbyn
+
  */
 final class Base64MimeHeaderEncoder extends Base64Encoder implements MimeHeaderEncoderInterface
 {

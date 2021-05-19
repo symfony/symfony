@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Util;
 /**
  * Facilitates the comparison of ICU version strings.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class IcuVersion
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Exception\LogicException;
 /**
  * Represents a Question.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Question
 {

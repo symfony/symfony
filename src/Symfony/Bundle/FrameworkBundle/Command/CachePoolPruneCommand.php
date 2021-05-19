@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Cache pool pruner command.
  *
- * @author Rob Frawley 2nd <rmf@src.run>
+
  */
 final class CachePoolPruneCommand extends Command
 {

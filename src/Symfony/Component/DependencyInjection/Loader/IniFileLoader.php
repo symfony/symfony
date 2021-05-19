@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 /**
  * IniFileLoader loads parameters from INI files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class IniFileLoader extends FileLoader
 {

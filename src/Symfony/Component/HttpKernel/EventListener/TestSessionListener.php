@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Sets the session in the request.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

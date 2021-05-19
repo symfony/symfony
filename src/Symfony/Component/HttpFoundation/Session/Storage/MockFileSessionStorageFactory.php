@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class_exists(MockFileSessionStorage::class);
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class MockFileSessionStorageFactory implements SessionStorageFactoryInterface
 {

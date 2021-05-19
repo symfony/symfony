@@ -18,8 +18,8 @@ use Symfony\Component\Form\Tests\VersionAwareTest;
  *
  * Copied from Doctrine 2's OrmPerformanceTestCase.
  *
- * @author robo
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 abstract class FormPerformanceTestCase extends FormIntegrationTestCase
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
 /**
  * Turns a PSR-6 cache into a PSR-16 one.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterface
 {

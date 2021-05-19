@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * A server collecting Data clones sent by a ServerDumper.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  *
  * @final
  */

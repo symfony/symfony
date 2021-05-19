@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Christin Gruber <c.gruber@touchdesign.de>
+
  */
 final class GitterTransportFactory extends AbstractTransportFactory
 {

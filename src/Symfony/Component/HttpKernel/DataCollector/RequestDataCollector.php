@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

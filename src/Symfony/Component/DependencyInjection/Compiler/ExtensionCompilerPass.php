@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * A pass to automatically process extensions if they implement
  * CompilerPassInterface.
  *
- * @author Wouter J <wouter@wouterj.nl>
+
  */
 class ExtensionCompilerPass implements CompilerPassInterface
 {

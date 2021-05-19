@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
+
  */
 final class SinchTransportFactory extends AbstractTransportFactory
 {

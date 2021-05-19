@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class MessengerDataCollectorTest extends TestCase
 {

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ResolveDecoratorStackPass implements CompilerPassInterface
 {

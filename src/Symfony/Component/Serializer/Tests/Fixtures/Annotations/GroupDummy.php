@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class GroupDummy extends GroupDummyParent implements GroupDummyInterface
 {

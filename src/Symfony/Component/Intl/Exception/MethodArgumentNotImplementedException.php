@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\Exception;
 
 /**
- * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+
  *
  * @deprecated since Symfony 5.3, use symfony/polyfill-intl-icu ^1.21 instead
  */

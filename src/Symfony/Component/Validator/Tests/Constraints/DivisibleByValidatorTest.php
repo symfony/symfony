@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\DivisibleByValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Colin O'Dell <colinodell@gmail.com>
+
  */
 class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
 {

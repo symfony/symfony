@@ -42,7 +42,7 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
  * UsernamePasswordJsonAuthenticationListener is a stateless implementation of
  * an authentication via a JSON document composed of a username and a password.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Extractor;
 
 /**
- * @author David Maicher <mail@dmaicher.de>
+
  */
 interface ObjectPropertyListExtractorInterface
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Test context handling from Serializer metadata.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 trait ContextMetadataTestTrait
 {

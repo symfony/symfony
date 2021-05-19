@@ -14,7 +14,7 @@ namespace Symfony\Component\RateLimiter;
 use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

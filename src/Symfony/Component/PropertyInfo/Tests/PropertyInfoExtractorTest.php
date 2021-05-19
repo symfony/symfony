@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PropertyInfoExtractorTest extends AbstractPropertyInfoExtractorTest
 {

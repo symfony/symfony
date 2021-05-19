@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
 
 /**
- * @author Jérôme Desjardins <jewome62@gmail.com>
+
  */
 class DateTimeZoneNormalizerTest extends TestCase
 {

@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @internal
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class NoopAuthenticationManager implements AuthenticationManagerInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl;
 /**
  * Gives access to internationalization data.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class Intl
 {

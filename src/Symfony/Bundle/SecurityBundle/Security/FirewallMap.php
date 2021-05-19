@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
  *
  * Listeners will only be initialized if we really need them.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class FirewallMap implements FirewallMapInterface
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TwilioTransportFactory extends AbstractTransportFactory
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  */
 abstract class TranslationProviderTestCase extends TestCase
 {

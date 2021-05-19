@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 /**
  * Test class for NativeSessionStorage.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * These tests require separate processes.
  *

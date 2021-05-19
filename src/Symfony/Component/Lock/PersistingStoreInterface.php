@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockReleasingException;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 interface PersistingStoreInterface
 {

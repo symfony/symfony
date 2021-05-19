@@ -17,7 +17,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 /**
  * HelperSet represents a set of helpers to be used with a command.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HelperSet implements \IteratorAggregate
 {

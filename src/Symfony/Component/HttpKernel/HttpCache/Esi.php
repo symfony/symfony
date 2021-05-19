@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  *  * Edge Architecture Specification (http://www.w3.org/TR/edge-arch)
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Esi extends AbstractSurrogate
 {

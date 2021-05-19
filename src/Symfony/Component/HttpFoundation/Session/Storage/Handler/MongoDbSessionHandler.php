@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 /**
  * Session handler using the mongodb/mongodb package and MongoDB driver extension.
  *
- * @author Markus Bachmann <markus.bachmann@bachi.biz>
+
  *
  * @see https://packagist.org/packages/mongodb/mongodb
  * @see https://php.net/mongodb

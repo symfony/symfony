@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mailer\Exception;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface TransportExceptionInterface extends ExceptionInterface
 {

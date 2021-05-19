@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @Entity
  */

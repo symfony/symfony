@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Uses the session domain to restrict allowed redirection targets.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class AddSessionDomainConstraintPass implements CompilerPassInterface
 {

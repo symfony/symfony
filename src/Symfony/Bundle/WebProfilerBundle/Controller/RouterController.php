@@ -24,10 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 /**
- * RouterController.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
  * @internal
  */
 class RouterController

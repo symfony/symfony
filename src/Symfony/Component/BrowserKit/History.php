@@ -11,11 +11,6 @@
 
 namespace Symfony\Component\BrowserKit;
 
-/**
- * History.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class History
 {
     protected $stack = [];

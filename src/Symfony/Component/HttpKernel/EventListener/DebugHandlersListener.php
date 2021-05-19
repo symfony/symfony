@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Configures errors and exceptions handlers.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  *

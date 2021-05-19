@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Notifier;
 /**
  * Sends a rejected message to the notifier.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {

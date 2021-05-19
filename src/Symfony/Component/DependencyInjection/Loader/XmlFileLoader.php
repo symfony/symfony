@@ -32,7 +32,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 /**
  * XmlFileLoader loads XML files service definitions.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class XmlFileLoader extends FileLoader
 {

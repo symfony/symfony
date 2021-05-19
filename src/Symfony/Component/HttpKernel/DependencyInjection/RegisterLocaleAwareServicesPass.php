@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Register all services that have the "kernel.locale_aware" tag into the listener.
  *
- * @author Pierre Bobiet <pierrebobiet@gmail.com>
+
  */
 class RegisterLocaleAwareServicesPass implements CompilerPassInterface
 {

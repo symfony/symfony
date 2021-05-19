@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 /**
  * Dummy output.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DummyOutput extends BufferedOutput
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Utility class for Github actions.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class GithubActionReporter
 {

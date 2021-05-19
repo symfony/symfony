@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {

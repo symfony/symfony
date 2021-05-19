@@ -14,7 +14,7 @@ namespace Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 final class NullTransportFactory extends AbstractTransportFactory
 {

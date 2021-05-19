@@ -26,7 +26,7 @@ use Symfony\Component\Validator\ConstraintViolation;
  * You can also wrap the iterator into a {@link \RecursiveIteratorIterator} to
  * flatten the recursive structure into a flat list of errors.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
 {

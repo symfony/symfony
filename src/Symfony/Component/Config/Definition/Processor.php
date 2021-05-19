@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Definition;
 /**
  * This class is the entry point for config normalization/merging/finalization.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @final
  */

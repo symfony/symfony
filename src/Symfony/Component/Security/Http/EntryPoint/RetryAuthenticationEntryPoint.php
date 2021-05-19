@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  *
  * This entry point is not intended to work with HTTP post requests.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Exception;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class ValidationFailedException extends RuntimeException
 {

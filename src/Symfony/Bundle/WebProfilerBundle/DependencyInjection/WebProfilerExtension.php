@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *        intercept-redirects="true"
  *     />
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class WebProfilerExtension extends Extension
 {

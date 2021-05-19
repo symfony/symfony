@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Locale;
 
 /**
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  *
  * @internal
  */

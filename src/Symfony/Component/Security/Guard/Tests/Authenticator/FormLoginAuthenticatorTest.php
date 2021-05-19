@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 
 /**
- * @author Jean Pasdeloup <jpasdeloup@sedona.fr>
+
  * @group legacy
  */
 class FormLoginAuthenticatorTest extends TestCase

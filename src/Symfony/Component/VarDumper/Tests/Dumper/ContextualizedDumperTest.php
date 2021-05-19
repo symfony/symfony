@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
 
 /**
- * @author Kévin Thérage <therage.kevin@gmail.com>
+
  */
 class ContextualizedDumperTest extends TestCase
 {

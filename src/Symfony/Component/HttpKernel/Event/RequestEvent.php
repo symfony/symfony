@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  * current request. The propagation of this event is stopped as soon as a
  * response is set.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RequestEvent extends KernelEvent
 {

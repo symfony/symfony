@@ -17,8 +17,8 @@ use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 /**
  * SemaphoreInterface defines an interface to manipulate the status of a semaphore.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 interface SemaphoreInterface
 {

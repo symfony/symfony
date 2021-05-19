@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

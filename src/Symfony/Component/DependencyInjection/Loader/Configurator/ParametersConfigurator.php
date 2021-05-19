@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ParametersConfigurator extends AbstractConfigurator
 {

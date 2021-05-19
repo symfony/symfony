@@ -21,8 +21,8 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Semaphore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class SemaphoreTest extends TestCase
 {

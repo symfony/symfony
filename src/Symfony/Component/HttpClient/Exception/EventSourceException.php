@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Exception;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class EventSourceException extends \RuntimeException implements DecodingExceptionInterface
 {

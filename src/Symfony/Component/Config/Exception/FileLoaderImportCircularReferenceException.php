@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Exception;
 /**
  * Exception class for when a circular reference is detected when importing resources.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class FileLoaderImportCircularReferenceException extends LoaderLoadException
 {

@@ -17,8 +17,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 /**
  * CookieTest.
  *
- * @author John Kary <john@johnkary.net>
- * @author Hugo Hamon <hugo.hamon@sensio.com>
+
+
  *
  * @group time-sensitive
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Formatter;
 /**
  * Formatter style interface for defining styles.
  *
- * @author Konstantin Kudryashov <ever.zet@gmail.com>
+
  */
 interface OutputFormatterStyleInterface
 {

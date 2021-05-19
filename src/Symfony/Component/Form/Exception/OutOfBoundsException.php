@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Base OutOfBoundsException for Form component.
  *
- * @author Alexander Kotynia <aleksander.kot@gmail.com>
+
  */
 class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {

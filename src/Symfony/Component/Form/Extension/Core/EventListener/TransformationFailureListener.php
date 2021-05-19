@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  */
 class TransformationFailureListener implements EventSubscriberInterface
 {

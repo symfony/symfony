@@ -14,7 +14,7 @@ namespace Symfony\Component\Workflow\Exception;
 /**
  * Base RuntimeException for the Workflow component.
  *
- * @author Alain Flaus <alain.flaus@gmail.com>
+
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

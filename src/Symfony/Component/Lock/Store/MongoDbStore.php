@@ -43,7 +43,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  *
  * @see https://docs.mongodb.com/manual/reference/limits/#Index-Key-Limit
  *
- * @author Joe Bennett <joe@assimtech.com>
+
  */
 class MongoDbStore implements PersistingStoreInterface
 {

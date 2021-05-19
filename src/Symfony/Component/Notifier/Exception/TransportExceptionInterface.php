@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Exception;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface TransportExceptionInterface extends ExceptionInterface
 {

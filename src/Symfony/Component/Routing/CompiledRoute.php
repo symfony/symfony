@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing;
 /**
  * CompiledRoutes are returned by the RouteCompiler class.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class CompiledRoute implements \Serializable
 {

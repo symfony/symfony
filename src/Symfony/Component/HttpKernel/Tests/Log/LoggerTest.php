@@ -17,8 +17,8 @@ use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Jordi Boggiano <j.boggiano@seld.be>
+
+
  */
 class LoggerTest extends TestCase
 {

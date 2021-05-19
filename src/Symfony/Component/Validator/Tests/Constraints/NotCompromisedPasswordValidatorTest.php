@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Martin Rademacher <mano@radebatz.net>
+
  */
 class InvalidDummy
 {

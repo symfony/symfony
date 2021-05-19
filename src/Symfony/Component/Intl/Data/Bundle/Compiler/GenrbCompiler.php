@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * Compiles .txt resource bundles to binary .res files.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

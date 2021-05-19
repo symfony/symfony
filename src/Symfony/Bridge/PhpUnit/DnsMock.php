@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DnsMock
 {

@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * corresponding string values for the choices. The radio form whose "value"
  * option corresponds to the selected value is marked as selected.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RadioListMapper implements DataMapperInterface
 {

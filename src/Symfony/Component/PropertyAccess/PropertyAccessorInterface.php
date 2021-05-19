@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess;
 /**
  * Writes and reads values to/from an object/array graph.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface PropertyAccessorInterface
 {

@@ -15,7 +15,7 @@ namespace Symfony\Component\Config;
  * A ConfigCacheFactory implementation that validates the
  * cache with an arbitrary set of ResourceCheckers.
  *
- * @author Matthias Pigulla <mp@webfactory.de>
+
  */
 class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
 {

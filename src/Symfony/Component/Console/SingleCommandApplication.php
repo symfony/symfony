@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class SingleCommandApplication extends Command
 {

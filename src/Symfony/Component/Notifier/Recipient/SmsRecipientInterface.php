@@ -12,8 +12,8 @@
 namespace Symfony\Component\Notifier\Recipient;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
+
  */
 interface SmsRecipientInterface extends RecipientInterface
 {

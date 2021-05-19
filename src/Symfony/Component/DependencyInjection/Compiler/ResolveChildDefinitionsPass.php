@@ -22,8 +22,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
  * This replaces all ChildDefinition instances with their equivalent fully
  * merged Definition instance.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {

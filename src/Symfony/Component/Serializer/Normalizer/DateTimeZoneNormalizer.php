@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 /**
  * Normalizes a {@see \DateTimeZone} object to a timezone string.
  *
- * @author Jérôme Desjardins <jewome62@gmail.com>
+
  */
 class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {

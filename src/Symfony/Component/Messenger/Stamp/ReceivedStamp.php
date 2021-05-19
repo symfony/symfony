@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
  *
  * @see SendMessageMiddleware
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 final class ReceivedStamp implements NonSendableStampInterface
 {

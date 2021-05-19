@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 /**
  * Describe collected data clones for html output.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  *
  * @final
  */

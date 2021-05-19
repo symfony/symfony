@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 /**
  * Definition represents a service definition.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Definition
 {

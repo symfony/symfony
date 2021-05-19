@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * You can disable/enable this layer by setting option "no_cache" under "extra" to true/false.
  * By default, caching is enabled unless the "buffer" option is set to false.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class CachingHttpClient implements HttpClientInterface
 {

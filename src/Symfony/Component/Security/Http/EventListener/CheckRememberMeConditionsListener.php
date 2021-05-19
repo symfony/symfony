@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  *      parameters under the "remember_me" firewall key (or "always_remember_me"
  *      is enabled)
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

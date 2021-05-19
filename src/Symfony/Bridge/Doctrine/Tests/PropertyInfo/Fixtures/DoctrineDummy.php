@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\OneToMany;
 /**
  * @Entity
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineDummy
 {

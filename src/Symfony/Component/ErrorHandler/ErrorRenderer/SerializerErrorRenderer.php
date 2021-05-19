@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Formats an exception using Serializer for rendering.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class SerializerErrorRenderer implements ErrorRendererInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

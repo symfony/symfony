@@ -12,7 +12,7 @@
 namespace Symfony\Component\Ldap\Adapter;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 interface AdapterInterface
 {

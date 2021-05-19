@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * A console command for retrieving information about event dispatcher.
  *
- * @author Matthieu Auger <mail@matthieuauger.com>
+
  *
  * @final
  */

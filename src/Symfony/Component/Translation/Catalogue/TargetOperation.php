@@ -21,7 +21,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * obsolete = source ∖ all = source ∖ target = {x: x ∈ source ∧ x ∉ target}
  * Basically, the result contains messages from the target catalogue.
  *
- * @author Michael Lee <michael.lee@zerustech.com>
+
  */
 class TargetOperation extends AbstractOperation
 {

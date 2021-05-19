@@ -16,7 +16,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

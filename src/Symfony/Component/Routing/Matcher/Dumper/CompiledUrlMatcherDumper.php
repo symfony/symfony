@@ -19,10 +19,10 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * CompiledUrlMatcherDumper creates PHP arrays to be used with CompiledUrlMatcher.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
- * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
+
  */
 class CompiledUrlMatcherDumper extends MatcherDumper
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * @internal
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 trait PrefixTrait
 {

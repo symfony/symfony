@@ -16,7 +16,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * JsonFileDumper generates an json formatted string representation of a message catalogue.
  *
- * @author singles
+
  */
 class JsonFileDumper extends FileDumper
 {

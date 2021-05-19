@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 /**
  * @Entity
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineRelation
 {

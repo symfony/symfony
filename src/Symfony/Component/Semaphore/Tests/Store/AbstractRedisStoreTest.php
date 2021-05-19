@@ -15,7 +15,7 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\Store\RedisStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {

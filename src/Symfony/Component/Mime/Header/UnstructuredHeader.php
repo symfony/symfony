@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Header;
 /**
  * A Simple MIME Header.
  *
- * @author Chris Corbyn
+
  */
 class UnstructuredHeader extends AbstractHeader
 {

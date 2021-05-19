@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class ResolveFactoryClassPass extends AbstractRecursivePass
 {

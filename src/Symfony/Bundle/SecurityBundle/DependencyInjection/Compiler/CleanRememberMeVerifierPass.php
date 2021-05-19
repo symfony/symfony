@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Cleans up the remember me verifier cache if cache is missing.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
+
  */
 class CleanRememberMeVerifierPass implements CompilerPassInterface
 {

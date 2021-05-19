@@ -16,7 +16,7 @@ use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  */
 class ClassParserTest extends TestCase
 {

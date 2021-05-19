@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class EmailMessageTest extends TestCase
 {

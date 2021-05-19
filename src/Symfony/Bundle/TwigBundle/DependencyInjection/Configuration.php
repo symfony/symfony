@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * TwigExtension configuration structure.
  *
- * @author Jeremy Mikola <jmikola@gmail.com>
+
  */
 class Configuration implements ConfigurationInterface
 {

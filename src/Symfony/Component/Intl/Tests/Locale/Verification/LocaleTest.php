@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * Verifies that {@link AbstractLocaleTest} matches the behavior of the
  * {@link Locale} class with a specific version of ICU.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class LocaleTest extends AbstractLocaleTest
 {

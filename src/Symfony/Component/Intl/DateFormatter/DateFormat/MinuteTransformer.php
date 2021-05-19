@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 /**
  * Parser and formatter for minute format.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+
  *
  * @internal
  *

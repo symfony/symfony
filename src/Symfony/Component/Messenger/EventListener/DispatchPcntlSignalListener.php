@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
+
  */
 class DispatchPcntlSignalListener implements EventSubscriberInterface
 {

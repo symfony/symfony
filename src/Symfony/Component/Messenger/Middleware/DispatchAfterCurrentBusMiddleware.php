@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
  * means sub-dispatched messages with a DispatchAfterCurrentBus stamp would be
  * handled after the Doctrine transaction has been committed.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
 {

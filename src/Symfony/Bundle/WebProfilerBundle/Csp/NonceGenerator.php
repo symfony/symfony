@@ -14,7 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Csp;
 /**
  * Generates Content-Security-Policy nonce.
  *
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\JsonSerializableDummy;
 
 /**
- * @author Fred Cox <mcfedr@gmail.com>
+
  */
 class JsonSerializableNormalizerTest extends TestCase
 {

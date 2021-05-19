@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer;
 
 /**
- * @author Joel Wurtz <joel.wurtz@gmail.com>
+
  */
 trait SerializerAwareTrait
 {

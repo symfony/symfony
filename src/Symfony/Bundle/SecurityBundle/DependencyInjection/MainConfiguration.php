@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 /**
  * SecurityExtension configuration structure.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class MainConfiguration implements ConfigurationInterface
 {

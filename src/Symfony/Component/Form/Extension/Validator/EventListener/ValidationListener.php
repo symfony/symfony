@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ValidationListener implements EventSubscriberInterface
 {

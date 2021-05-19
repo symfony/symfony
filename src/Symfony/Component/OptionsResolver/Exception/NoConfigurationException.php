@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
  *
  * @see OptionsResolverIntrospector
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class NoConfigurationException extends \RuntimeException implements ExceptionInterface
 {

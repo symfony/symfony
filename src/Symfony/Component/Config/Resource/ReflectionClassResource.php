@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  */

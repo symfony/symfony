@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class GroupSequenceTest extends TestCase
 {

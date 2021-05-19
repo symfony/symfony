@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Exception\BadMethodCallException;
  * More information can be found on https://bugs.php.net/64356.
  * This class can be removed once that bug is fixed.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

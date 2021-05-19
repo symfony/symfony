@@ -23,10 +23,10 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  *
  * Original implementation in \Symfony\Component\Filesystem\LockHandler.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Romain Neutron <imprec@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
+
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {

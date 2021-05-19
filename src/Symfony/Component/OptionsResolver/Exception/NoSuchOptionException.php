@@ -19,7 +19,7 @@ namespace Symfony\Component\OptionsResolver\Exception;
  * In contrast to the {@link UndefinedOptionsException}, this is a runtime exception that can
  * occur when evaluating lazy options.
  *
- * @author Tobias Schultze <http://tobion.de>
+
  */
 class NoSuchOptionException extends \OutOfBoundsException implements ExceptionInterface
 {

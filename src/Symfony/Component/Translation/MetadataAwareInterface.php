@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation;
 /**
  * MetadataAwareInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface MetadataAwareInterface
 {

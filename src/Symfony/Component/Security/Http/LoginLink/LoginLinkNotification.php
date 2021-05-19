@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
  * Use this notification to ease sending login link
  * emails/SMS using the Notifier component.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class LoginLinkNotification extends Notification implements EmailNotificationInterface, SmsNotificationInterface
 {

@@ -16,9 +16,9 @@ use Symfony\Component\Mailer\Exception\TransportException;
 /**
  * A stream supporting remote sockets and local processes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Chris Corbyn
+
+
+
  *
  * @internal
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Store\RedisStore;
 use Symfony\Component\Lock\Store\RetryTillSaveStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @group legacy
  */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 abstract class AbstractUid implements \JsonSerializable
 {

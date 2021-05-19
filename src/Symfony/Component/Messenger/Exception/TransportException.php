@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Exception;
 
 /**
- * @author Eric Masoero <em@studeal.fr>
+
  */
 class TransportException extends RuntimeException
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

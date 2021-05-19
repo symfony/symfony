@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Iliya Miroslavov Iliev <i.miroslavov@gmail.com>
+
  */
 final class SinchTransport extends AbstractTransport
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  *
  * @internal
  */

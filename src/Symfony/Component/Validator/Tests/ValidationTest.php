@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @author Jan Vernieuwe <jan.vernieuwe@phpro.be>
+
  */
 class ValidationTest extends TestCase
 {

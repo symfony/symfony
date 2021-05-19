@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
 /**
  * Runtime lazy loading proxy generator.
  *
- * @author Marco Pivetta <ocramius@gmail.com>
+
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {

@@ -40,7 +40,7 @@ class_exists(ClosureResolver::class);
  * In debug mode, the runtime registers a strict error handler
  * that throws exceptions when a PHP warning/notice is raised.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @experimental in 5.3
  */

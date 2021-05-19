@@ -30,7 +30,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  *
  * Result: also called 'result', is the resulting catalogue for the given domain that holds the same messages as 'all'.
  *
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  */
 interface OperationInterface
 {

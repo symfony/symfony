@@ -30,7 +30,7 @@ use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
 use Symfony\Component\Messenger\Worker;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {

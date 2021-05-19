@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
 /**
  * Writes .json resource bundles.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

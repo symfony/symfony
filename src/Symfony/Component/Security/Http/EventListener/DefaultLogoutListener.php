@@ -18,8 +18,8 @@ use Symfony\Component\Security\Http\HttpUtils;
 /**
  * Default logout listener will redirect users to a configured path.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
  *
  * @final
  */

@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Internal representation of the cURL client's state.
  *
- * @author Alexander M. Turek <me@derrabus.de>
+
  *
  * @internal
  */

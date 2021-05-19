@@ -16,8 +16,8 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Prefix tree of routes preserving routes order.
  *
- * @author Frank de Jonge <info@frankdejonge.nl>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  *
  * @internal
  */

@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Christin Gruber <c.gruber@touchdesign.de>
+
  */
 final class GitterTransportTest extends TransportTestCase
 {

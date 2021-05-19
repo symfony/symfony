@@ -20,8 +20,8 @@ trigger_deprecation('symfony/security-http', '5.1', 'The "%s" class is deprecate
 /**
  * Default logout success handler will redirect users to a configured path.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
  *
  * @deprecated since Symfony 5.1
  */

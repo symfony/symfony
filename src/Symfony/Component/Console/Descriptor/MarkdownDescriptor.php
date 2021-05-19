@@ -20,9 +20,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Markdown descriptor.
- *
- * @author Jean-François Simon <contact@jfsimon.fr>
  *
  * @internal
  */

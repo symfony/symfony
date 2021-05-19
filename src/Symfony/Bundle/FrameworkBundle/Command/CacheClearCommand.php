@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\RebootableInterface;
 /**
  * Clear and Warmup the cache.
  *
- * @author Francis Besset <francis.besset@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  *
  * @final
  */

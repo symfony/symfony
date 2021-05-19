@@ -15,7 +15,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {

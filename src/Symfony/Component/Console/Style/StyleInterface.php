@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Style;
 /**
  * Output style helpers.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 interface StyleInterface
 {

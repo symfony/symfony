@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
 {

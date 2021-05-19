@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessageHandler
 {

@@ -29,7 +29,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  * this event can do actions related to successful authentication
  * (such as migrating the password).
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class LoginSuccessEvent extends Event
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\ErrorMappingException;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class MappingRule
 {

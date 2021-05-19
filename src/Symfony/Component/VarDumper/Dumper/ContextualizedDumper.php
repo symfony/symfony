@@ -15,7 +15,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
 
 /**
- * @author Kévin Thérage <therage.kevin@gmail.com>
+
  */
 class ContextualizedDumper implements DataDumperInterface
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 /**
  * StopwatchTest.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @group time-sensitive
  */

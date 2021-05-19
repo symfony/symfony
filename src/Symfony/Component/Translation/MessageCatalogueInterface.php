@@ -16,7 +16,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * MessageCatalogueInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface MessageCatalogueInterface
 {

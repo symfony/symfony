@@ -27,9 +27,9 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * A console command for dumping available configuration reference.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
- * @author Wouter J <waldio.webdesign@gmail.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
+
  *
  * @final
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 
 /**
- * @author Jules Pietri <jules@heahprod.com>
+
  */
 abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
 {

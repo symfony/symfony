@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 /**
  * Automatically adds the rememberme table needed for the {@see DoctrineTokenProvider}.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 final class RememberMeTokenProviderDoctrineSchemaSubscriber implements EventSubscriber
 {

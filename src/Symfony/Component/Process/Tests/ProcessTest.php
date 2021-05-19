@@ -24,7 +24,7 @@ use Symfony\Component\Process\Pipes\PipesInterface;
 use Symfony\Component\Process\Process;
 
 /**
- * @author Robert Schönthal <seroscho@googlemail.com>
+
  */
 class ProcessTest extends TestCase
 {

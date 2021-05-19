@@ -14,8 +14,8 @@ namespace Symfony\Component\Cache\Traits;
 use Symfony\Component\Cache\Exception\CacheException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Rob Frawley 2nd <rmf@src.run>
+
+
  *
  * @internal
  */

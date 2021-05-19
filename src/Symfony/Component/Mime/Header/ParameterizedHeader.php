@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Header;
 use Symfony\Component\Mime\Encoder\Rfc2231Encoder;
 
 /**
- * @author Chris Corbyn
+
  */
 final class ParameterizedHeader extends UnstructuredHeader
 {

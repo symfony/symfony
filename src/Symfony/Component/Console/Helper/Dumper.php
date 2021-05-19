@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 final class Dumper
 {

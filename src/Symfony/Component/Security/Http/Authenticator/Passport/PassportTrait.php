@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Authenticator\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 trait PassportTrait
 {

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Ensures that the application is not indexed by search engines.
  *
- * @author Gary PEGEOT <garypegeot@gmail.com>
+
  */
 class DisallowRobotsIndexingListener implements EventSubscriberInterface
 {

@@ -14,8 +14,8 @@ namespace Symfony\Component\Finder;
 /**
  * Gitignore matches against text.
  *
- * @author Michael Voříšek <vorismi3@fel.cvut.cz>
- * @author Ahmed Abdou <mail@ahmd.io>
+
+
  */
 class Gitignore
 {

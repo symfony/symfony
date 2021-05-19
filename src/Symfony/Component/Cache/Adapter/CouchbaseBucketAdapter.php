@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
- * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
+
  */
 class CouchbaseBucketAdapter extends AbstractAdapter
 {

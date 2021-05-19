@@ -14,7 +14,7 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DsPairStub extends Stub
 {

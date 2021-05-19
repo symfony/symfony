@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 final class FirewallConfig
 {

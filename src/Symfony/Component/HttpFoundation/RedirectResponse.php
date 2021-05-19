@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * RedirectResponse represents an HTTP response doing a redirect.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RedirectResponse extends Response
 {

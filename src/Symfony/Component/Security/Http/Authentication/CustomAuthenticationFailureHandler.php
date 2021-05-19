@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class CustomAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class Existence extends Composite
 {

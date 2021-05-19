@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * SecurityFactoryInterface is the interface for all security authentication listener.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface SecurityFactoryInterface
 {

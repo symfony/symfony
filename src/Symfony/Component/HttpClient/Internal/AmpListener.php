@@ -19,7 +19,7 @@ use Amp\Success;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

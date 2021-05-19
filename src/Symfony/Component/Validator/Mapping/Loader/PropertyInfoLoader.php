@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Guesses and loads the appropriate constraints using PropertyInfo.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 final class PropertyInfoLoader implements LoaderInterface
 {

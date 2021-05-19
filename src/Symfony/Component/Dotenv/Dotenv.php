@@ -20,8 +20,8 @@ use Symfony\Component\Process\Process;
 /**
  * Manages .env files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 final class Dotenv
 {

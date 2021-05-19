@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Gary PEGEOT <garypegeot@gmail.com>
+
  */
 class InMemoryTransportTest extends TestCase
 {

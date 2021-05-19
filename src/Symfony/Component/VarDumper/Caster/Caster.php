@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Helper for filtering out properties in casters.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  */

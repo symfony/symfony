@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 /**
  * Tests NamespacedAttributeBag.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * @group legacy
  */

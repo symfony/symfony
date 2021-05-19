@@ -17,9 +17,9 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Carlos Pereira De Amorim <carlos@shauri.fr>
+
+
+
  */
 class Event extends BaseEvent
 {

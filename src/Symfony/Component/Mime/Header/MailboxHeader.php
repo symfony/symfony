@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 /**
  * A Mailbox MIME Header for something like Sender (one named address).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class MailboxHeader extends AbstractHeader
 {

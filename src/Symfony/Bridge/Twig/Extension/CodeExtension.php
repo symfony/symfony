@@ -18,7 +18,7 @@ use Twig\TwigFilter;
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class CodeExtension extends AbstractExtension
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Part;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractMultipartPart extends AbstractPart
 {

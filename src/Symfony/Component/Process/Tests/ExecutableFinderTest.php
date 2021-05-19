@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
- * @author Chris Smith <chris@cs278.org>
+
  */
 class ExecutableFinderTest extends TestCase
 {

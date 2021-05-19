@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

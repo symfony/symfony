@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
- * @author Renan Taranto <renantaranto@gmail.com>
+
  */
 class UuidTest extends TestCase
 {

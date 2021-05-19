@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class PdoCasterTest extends TestCase
 {

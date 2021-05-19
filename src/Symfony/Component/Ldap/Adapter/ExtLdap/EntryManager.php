@@ -18,8 +18,8 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
- * @author Bob van de Vijver <bobvandevijver@hotmail.com>
+
+
  */
 class EntryManager implements EntryManagerInterface
 {

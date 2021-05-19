@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * not pollute any session related globals, including session_*() functions
  * or session.* PHP ini directives.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class MockFileSessionStorage extends MockArraySessionStorage
 {

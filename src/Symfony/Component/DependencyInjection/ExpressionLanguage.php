@@ -21,7 +21,7 @@ if (!class_exists(BaseExpressionLanguage::class)) {
 /**
  * Adds some function to the default ExpressionLanguage.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @see ExpressionLanguageProvider
  */

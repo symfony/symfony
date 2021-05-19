@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Server\Connection;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  */

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Kernel;
 /**
  * App Test Kernel for functional tests.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class AppKernel extends Kernel
 {

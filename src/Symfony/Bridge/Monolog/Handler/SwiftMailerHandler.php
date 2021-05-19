@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 /**
  * Extended SwiftMailerHandler that flushes mail queue if necessary.
  *
- * @author Philipp Kräutli <pkraeutli@astina.ch>
+
  *
  * @final
  */

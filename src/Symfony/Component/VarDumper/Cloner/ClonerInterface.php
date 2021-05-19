@@ -12,7 +12,7 @@
 namespace Symfony\Component\VarDumper\Cloner;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ClonerInterface
 {

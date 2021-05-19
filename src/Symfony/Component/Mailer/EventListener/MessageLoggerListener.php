@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Logs Messages.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  */
 interface ClearableTokenStorageInterface extends TokenStorageInterface
 {

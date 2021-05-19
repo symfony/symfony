@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 /**
  * Wraps errors in forms.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormError
 {

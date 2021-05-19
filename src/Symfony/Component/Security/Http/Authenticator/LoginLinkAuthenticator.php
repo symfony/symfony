@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkExceptio
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 final class LoginLinkAuthenticator extends AbstractAuthenticator implements InteractiveAuthenticatorInterface
 {

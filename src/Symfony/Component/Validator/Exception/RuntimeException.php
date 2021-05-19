@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Exception;
 /**
  * Base RuntimeException for the Validator component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

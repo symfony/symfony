@@ -14,7 +14,7 @@ namespace Symfony\Component\VarDumper\Caster;
 /**
  * Represents a cut array.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class CutArrayStub extends CutStub
 {

@@ -29,7 +29,7 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 /**
  * PHP 5.3 compatible trait-like shared implementation.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

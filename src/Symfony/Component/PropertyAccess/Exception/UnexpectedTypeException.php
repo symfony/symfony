@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * Thrown when a value does not match an expected type.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class UnexpectedTypeException extends RuntimeException
 {

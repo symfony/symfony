@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  */
 class TransformationFailureExtension extends AbstractTypeExtension
 {

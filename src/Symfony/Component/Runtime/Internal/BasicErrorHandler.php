@@ -12,7 +12,7 @@
 namespace Symfony\Component\Runtime\Internal;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

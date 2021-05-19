@@ -23,7 +23,7 @@ use Symfony\Component\Cache\DoctrineProvider;
  * Warms up annotation caches for classes found in composer's autoload class map
  * and declared in DI bundle extensions using the addAnnotatedClassesToCache method.
  *
- * @author Titouan Galopin <galopintitouan@gmail.com>
+
  */
 class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
 {

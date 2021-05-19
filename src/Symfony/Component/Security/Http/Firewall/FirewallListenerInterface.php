@@ -17,9 +17,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 /**
  * Can be implemented by firewall listeners.
  *
- * @author Christian Scheb <me@christianscheb.de>
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
+
  */
 interface FirewallListenerInterface
 {

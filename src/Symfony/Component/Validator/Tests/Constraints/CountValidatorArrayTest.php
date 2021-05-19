@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CountValidatorArrayTest extends CountValidatorTest
 {

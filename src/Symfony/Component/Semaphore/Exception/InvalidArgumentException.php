@@ -12,7 +12,7 @@
 namespace Symfony\Component\Semaphore\Exception;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

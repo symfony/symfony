@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 /**
  * ContainerBagInterface is the interface implemented by objects that manage service container parameters.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ContainerBagInterface extends ContainerInterface
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 /**
  * Supports the argument type of {@see UserInterface}.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 final class UserValueResolver implements ArgumentValueResolverInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Asset\Context;
 /**
  * A context that does nothing.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NullContext implements ContextInterface
 {

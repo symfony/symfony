@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Assert\DisableAutoMapping
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PropertyInfoLoaderNoAutoMappingEntity
 {

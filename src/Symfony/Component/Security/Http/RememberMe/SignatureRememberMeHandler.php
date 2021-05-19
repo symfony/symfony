@@ -28,7 +28,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * that user will be invalidated instead. Use {@see PersistentRememberMeHandler}
  * if you need this.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 final class SignatureRememberMeHandler extends AbstractRememberMeHandler
 {

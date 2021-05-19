@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * Represents a cookie.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class Cookie
 {

@@ -19,7 +19,7 @@ class_exists(Section::class);
 /**
  * Stopwatch provides a way to profile code.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Stopwatch implements ResetInterface
 {

@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\FileBag;
 /**
  * FileBagTest.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+
+
  */
 class FileBagTest extends TestCase
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  *
  * @internal
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

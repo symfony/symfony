@@ -23,8 +23,8 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author James Hemery <james@yieldstudio.fr>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class FakeSmsEmailTransport extends AbstractTransport
 {

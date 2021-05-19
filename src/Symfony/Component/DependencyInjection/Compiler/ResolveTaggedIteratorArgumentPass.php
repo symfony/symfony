@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 /**
  * Resolves all TaggedIteratorArgument arguments.
  *
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 class ResolveTaggedIteratorArgumentPass extends AbstractRecursivePass
 {

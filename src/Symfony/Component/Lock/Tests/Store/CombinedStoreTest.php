@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class CombinedStoreTest extends AbstractStoreTest
 {

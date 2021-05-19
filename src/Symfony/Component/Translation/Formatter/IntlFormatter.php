@@ -15,8 +15,8 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\LogicException;
 
 /**
- * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+
+
  */
 class IntlFormatter implements IntlFormatterInterface
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
+
  */
 class BeanstalkdSender implements SenderInterface
 {

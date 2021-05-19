@@ -16,7 +16,7 @@ use Twig\Node\Expression\AbstractExpression;
 use Twig\Node\Node;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TransDefaultDomainNode extends Node
 {

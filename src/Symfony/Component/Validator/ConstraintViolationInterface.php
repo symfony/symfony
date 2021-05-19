@@ -29,7 +29,7 @@ namespace Symfony\Component\Validator;
  * for the "street" property of the related <tt>Address</tt> instance, the root
  * element is still the person, but the property path is "address.street".
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ConstraintViolationInterface
 {

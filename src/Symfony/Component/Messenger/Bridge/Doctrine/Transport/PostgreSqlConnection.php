@@ -18,7 +18,7 @@ use Doctrine\DBAL\Schema\Table;
  *
  * @internal
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 final class PostgreSqlConnection extends Connection
 {

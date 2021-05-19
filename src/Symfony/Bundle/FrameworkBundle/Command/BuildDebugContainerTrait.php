@@ -21,8 +21,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * @internal
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 trait BuildDebugContainerTrait
 {

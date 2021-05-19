@@ -29,8 +29,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  * called with the property value. No automatic denormalization of the value
  * takes place.
  *
- * @author Nils Adermann <naderman@naderman.de>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {

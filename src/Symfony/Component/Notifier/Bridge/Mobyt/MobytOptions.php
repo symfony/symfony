@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
- * @author Bastien Durand <bdurand-dev@outlook.com>
+
  */
 final class MobytOptions implements MessageOptionsInterface
 {

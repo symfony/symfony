@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * WebProcessor override to read from the HttpFoundation's Request.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
+
  *
  * @final
  */

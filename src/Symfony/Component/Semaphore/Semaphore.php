@@ -23,8 +23,8 @@ use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 /**
  * Semaphore is the default implementation of the SemaphoreInterface.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Jérémy Derussé <jeremy@derusse.com>
+
+
  */
 final class Semaphore implements SemaphoreInterface, LoggerAwareInterface
 {

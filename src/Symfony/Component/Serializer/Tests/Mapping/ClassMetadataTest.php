@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ClassMetadataTest extends TestCase
 {

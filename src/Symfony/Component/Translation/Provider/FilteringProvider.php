@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 /**
  * Filters domains and locales between the Translator config values and those specific to each provider.
  *
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * @experimental in 5.3
  */

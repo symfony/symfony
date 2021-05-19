@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class ValidationStampTest extends TestCase
 {

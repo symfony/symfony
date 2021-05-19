@@ -16,7 +16,7 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class ContainerParametersResourceChecker implements ResourceCheckerInterface
 {

@@ -25,7 +25,7 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
 /**
- * @author Ryan Weaver <weaverryan@gmail.com>
+
  * @group legacy
  */
 class GuardAuthenticationProviderTest extends TestCase

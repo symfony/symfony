@@ -50,7 +50,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 /**
  * Clear cache pools.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class CachePoolClearCommand extends Command
 {

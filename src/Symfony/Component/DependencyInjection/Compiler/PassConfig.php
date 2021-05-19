@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  *
  * This class has a default configuration embedded.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class PassConfig
 {

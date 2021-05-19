@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Kernel;
 /**
  * Sets the classes to compile in the cache for the container.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class FormIntegrationTestCase extends TestCase
 {

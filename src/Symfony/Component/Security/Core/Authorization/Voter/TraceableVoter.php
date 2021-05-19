@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Decorates voter classes to send result events.
  *
- * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+
  *
  * @internal
  */

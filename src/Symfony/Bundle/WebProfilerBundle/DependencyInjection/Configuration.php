@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * This information is solely responsible for how the different configuration
  * sections are normalized, and merged.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Configuration implements ConfigurationInterface
 {

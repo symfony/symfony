@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TransportException extends RuntimeException implements TransportExceptionInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 /**
  * Restore the Router context when processing the message.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class RouterContextMiddleware implements MiddlewareInterface
 {

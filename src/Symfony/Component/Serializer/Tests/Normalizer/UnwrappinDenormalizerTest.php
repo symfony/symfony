@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
 
 /**
- * @author Eduard Bulava <bulavaeduard@gmail.com>
+
  */
 class UnwrappinDenormalizerTest extends TestCase
 {

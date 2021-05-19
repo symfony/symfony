@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Locale;
 /**
  * The rule for compiling the zone bundle.
  *
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  *
  * @internal
  */

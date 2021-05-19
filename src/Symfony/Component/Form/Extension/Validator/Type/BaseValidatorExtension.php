@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  * Encapsulates common logic of {@link FormTypeValidatorExtension} and
  * {@link SubmitTypeValidatorExtension}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class BaseValidatorExtension extends AbstractTypeExtension
 {

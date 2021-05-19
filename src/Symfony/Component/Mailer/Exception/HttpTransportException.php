@@ -14,7 +14,7 @@ namespace Symfony\Component\Mailer\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HttpTransportException extends TransportException
 {

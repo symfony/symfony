@@ -14,7 +14,7 @@ namespace Symfony\Component\EventDispatcher;
 /**
  * A read-only proxy for an event dispatcher.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {

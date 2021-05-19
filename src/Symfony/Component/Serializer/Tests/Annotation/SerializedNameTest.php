@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 class SerializedNameTest extends TestCase
 {

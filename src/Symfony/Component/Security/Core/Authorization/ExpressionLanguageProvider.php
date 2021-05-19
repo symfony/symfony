@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 /**
  * Define some ExpressionLanguage functions.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {

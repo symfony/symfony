@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ReferenceConfigurator extends AbstractConfigurator
 {

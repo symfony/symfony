@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouteCollection;
  * AnnotationFileLoader loads routing information from annotations set
  * on a PHP class and its methods.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AnnotationFileLoader extends FileLoader
 {

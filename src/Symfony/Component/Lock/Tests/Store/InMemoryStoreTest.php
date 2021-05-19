@@ -15,7 +15,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\InMemoryStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class InMemoryStoreTest extends AbstractStoreTest
 {

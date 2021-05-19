@@ -24,7 +24,7 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {

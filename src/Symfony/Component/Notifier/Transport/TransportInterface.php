@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface TransportInterface
 {

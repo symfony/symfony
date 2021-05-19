@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 /**
  * Thrown by Workflow when a not enabled transition is applied on a subject.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class NotEnabledTransitionException extends TransitionException
 {

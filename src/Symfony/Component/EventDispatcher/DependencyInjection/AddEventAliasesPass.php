@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * This pass allows bundles to extend the list of event aliases.
  *
- * @author Alexander M. Turek <me@derrabus.de>
+
  */
 class AddEventAliasesPass implements CompilerPassInterface
 {

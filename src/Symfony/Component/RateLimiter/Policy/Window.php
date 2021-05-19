@@ -14,7 +14,7 @@ namespace Symfony\Component\RateLimiter\Policy;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  * @experimental in 5.3

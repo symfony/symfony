@@ -19,7 +19,7 @@ use Twig\Extra\Inky\InkyExtension;
 use Twig\Extra\Markdown\MarkdownExtension;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NotificationEmail extends TemplatedEmail
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Formatter;
 /**
  * Formats ICU message patterns.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface IntlFormatterInterface
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 interface TransportFactoryInterface
 {

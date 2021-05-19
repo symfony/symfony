@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Parameter;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  *

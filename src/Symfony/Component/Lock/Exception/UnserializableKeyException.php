@@ -16,7 +16,7 @@ namespace Symfony\Component\Lock\Exception;
  * be serialized and the user try to serialize it.
  * ie. Connection with a database, flock, semaphore, ...
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class UnserializableKeyException extends \RuntimeException implements ExceptionInterface
 {

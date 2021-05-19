@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\VarDumper;
 /**
  * DumpListenerTest.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DumpListenerTest extends TestCase
 {

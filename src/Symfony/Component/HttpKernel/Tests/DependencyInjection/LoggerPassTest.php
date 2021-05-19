@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class LoggerPassTest extends TestCase
 {

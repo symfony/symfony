@@ -20,8 +20,8 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 /**
  * The rule for compiling the locale bundle.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Roland Franssen <franssen.roland@gmail.com>
+
+
  *
  * @internal
  */

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * Noop proxy instantiator - produces the real service instead of a proxy instance.
  *
- * @author Marco Pivetta <ocramius@gmail.com>
+
  */
 class RealServiceInstantiator implements InstantiatorInterface
 {

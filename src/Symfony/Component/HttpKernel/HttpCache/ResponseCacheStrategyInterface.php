@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * ResponseCacheStrategyInterface implementations know how to compute the
  * Response cache HTTP header based on the different response cache headers.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ResponseCacheStrategyInterface
 {

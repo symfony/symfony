@@ -19,7 +19,7 @@ use Symfony\Component\Form\Util\StringUtil;
 /**
  * Trims string data.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class TrimListener implements EventSubscriberInterface
 {

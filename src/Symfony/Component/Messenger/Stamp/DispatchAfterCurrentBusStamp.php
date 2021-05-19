@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @see \Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 final class DispatchAfterCurrentBusStamp implements NonSendableStampInterface
 {

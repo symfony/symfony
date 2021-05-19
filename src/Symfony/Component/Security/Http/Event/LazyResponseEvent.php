@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\LazyResponseException;
 /**
  * Wraps a lazily computed response in a signaling exception.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class LazyResponseEvent extends RequestEvent
 {

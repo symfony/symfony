@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
 {

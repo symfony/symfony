@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * Automatically adds any required database tables to the Doctrine Schema.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 final class MessengerTransportDoctrineSchemaSubscriber implements EventSubscriber
 {

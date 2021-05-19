@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 /**
  * Reads binary .res resource bundles.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Signs URIs.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class UriSigner
 {

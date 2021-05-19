@@ -17,7 +17,7 @@ use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FunctionExpression;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class SearchAndRenderBlockNode extends FunctionExpression
 {

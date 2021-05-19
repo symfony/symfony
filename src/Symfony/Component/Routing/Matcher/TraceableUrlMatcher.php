@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * TraceableUrlMatcher helps debug path info matching by tracing the match.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TraceableUrlMatcher extends UrlMatcher
 {

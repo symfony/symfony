@@ -20,7 +20,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
  * can be used to load the list only partially in cases where a fully-loaded
  * list is not necessary.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ChoiceLoaderInterface
 {

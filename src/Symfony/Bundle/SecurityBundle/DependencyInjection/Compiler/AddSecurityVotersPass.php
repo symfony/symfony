@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 /**
  * Adds all configured security voters to the access decision manager.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class AddSecurityVotersPass implements CompilerPassInterface
 {

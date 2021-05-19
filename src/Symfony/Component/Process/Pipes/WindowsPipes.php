@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
  * @see https://bugs.php.net/51800
  * @see https://bugs.php.net/65650
  *
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

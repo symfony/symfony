@@ -39,8 +39,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Provides a stateless implementation of an authentication via
  * a JSON document composed of a username and a password.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Wouter de Jong <wouter@wouterj.nl>
+
+
  *
  * @final
  */

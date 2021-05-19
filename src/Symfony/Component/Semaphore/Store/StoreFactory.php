@@ -21,8 +21,8 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 /**
  * StoreFactory create stores and connections.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Jérémy Derussé <jeremy@derusse.com>
+
+
  */
 class StoreFactory
 {

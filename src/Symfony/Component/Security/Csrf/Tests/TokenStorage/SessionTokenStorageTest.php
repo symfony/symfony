@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class SessionTokenStorageTest extends TestCase
 {

@@ -30,7 +30,7 @@ class_exists(TranslatorTrait::class);
 /**
  * Provides integration of the Translation component with Twig.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TranslationExtension extends AbstractExtension
 {

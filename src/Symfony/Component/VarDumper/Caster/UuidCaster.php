@@ -15,7 +15,7 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 final class UuidCaster
 {

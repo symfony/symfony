@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * A DTO to work with AsyncResponse.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class AsyncContext
 {

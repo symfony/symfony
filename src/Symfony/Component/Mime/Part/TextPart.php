@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TextPart extends AbstractPart
 {

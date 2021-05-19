@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  * @requires extension redis
  * @group integration
  */

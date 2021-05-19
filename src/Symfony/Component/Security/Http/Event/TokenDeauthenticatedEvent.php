@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  * deauthenticated and redirected back to the authentication entry point
  * (e.g. clearing all remember-me cookies).
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 final class TokenDeauthenticatedEvent extends Event
 {

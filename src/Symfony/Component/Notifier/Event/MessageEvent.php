@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class MessageEvent extends Event
 {

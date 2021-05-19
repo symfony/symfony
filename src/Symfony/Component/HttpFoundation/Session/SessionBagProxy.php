@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

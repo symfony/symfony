@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * PSR-3 compliant console logger.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @see https://www.php-fig.org/psr/psr-3/
  */

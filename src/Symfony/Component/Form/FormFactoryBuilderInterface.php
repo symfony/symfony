@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * A builder for FormFactoryInterface objects.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface FormFactoryBuilderInterface
 {

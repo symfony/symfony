@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Tales Santos <tales.augusto.santos@gmail.com>
+
  */
 class DefaultValue
 {

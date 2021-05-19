@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\RateLimit;
  * This allows to limit on different types of information
  * from the requests.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class AmazonSqsReceivedStamp implements NonSendableStampInterface
 {

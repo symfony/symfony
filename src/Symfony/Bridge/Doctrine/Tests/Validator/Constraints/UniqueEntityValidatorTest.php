@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {

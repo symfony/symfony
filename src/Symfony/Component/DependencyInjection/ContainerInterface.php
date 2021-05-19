@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 /**
  * ContainerInterface is the interface implemented by service container classes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 interface ContainerInterface extends PsrContainerInterface
 {

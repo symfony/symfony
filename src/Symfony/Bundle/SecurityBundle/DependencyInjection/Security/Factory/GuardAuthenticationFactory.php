@@ -23,7 +23,7 @@ use Symfony\Component\Security\Guard\Authenticator\GuardBridgeAuthenticator;
 /**
  * Configures the "guard" authentication provider key under a firewall.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @internal
  */

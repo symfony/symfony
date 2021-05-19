@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+
  */
 final class MercureTransport extends AbstractTransport
 {

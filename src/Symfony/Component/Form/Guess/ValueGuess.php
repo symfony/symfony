@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Guess;
 /**
  * Contains a guessed value.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ValueGuess extends Guess
 {

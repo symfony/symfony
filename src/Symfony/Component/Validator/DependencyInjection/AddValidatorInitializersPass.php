@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
  */
 class AddValidatorInitializersPass implements CompilerPassInterface
 {

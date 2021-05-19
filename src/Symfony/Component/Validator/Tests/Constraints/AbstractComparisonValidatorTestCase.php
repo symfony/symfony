@@ -38,7 +38,7 @@ class ComparisonTest_Class
 }
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTestCase
 {

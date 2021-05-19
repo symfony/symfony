@@ -17,8 +17,8 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 /**
  * Maps a message to a list of handlers.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Samuel Roze <samuel.roze@gmail.com>
+
+
  */
 class HandlersLocator implements HandlersLocatorInterface
 {

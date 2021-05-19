@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Represents a closure acting as a service locator.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ServiceLocatorArgument implements ArgumentInterface
 {

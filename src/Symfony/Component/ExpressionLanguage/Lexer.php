@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage;
 /**
  * Lexes an expression.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Lexer
 {

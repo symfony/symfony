@@ -20,7 +20,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  *
  *     $input = new StringInput('foo --bar="foobar"');
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class StringInput extends ArgvInput
 {

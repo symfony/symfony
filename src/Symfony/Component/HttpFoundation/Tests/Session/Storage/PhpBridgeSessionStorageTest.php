@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 /**
  * Test class for PhpSessionStorage.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * These tests require separate processes.
  *

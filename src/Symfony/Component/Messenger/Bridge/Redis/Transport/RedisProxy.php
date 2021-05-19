@@ -14,8 +14,8 @@ namespace Symfony\Component\Messenger\Bridge\Redis\Transport;
 /**
  * Allow to delay connection to Redis.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  *
  * @internal
  */

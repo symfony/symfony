@@ -18,7 +18,7 @@ use Symfony\Component\Semaphore\Store\RedisStore;
 use Symfony\Component\Semaphore\Store\StoreFactory;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class StoreFactoryTest extends TestCase
 {

@@ -35,7 +35,7 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  * Responsible for accepting the PreAuthenticationGuardToken and calling
  * the correct authenticator to retrieve the authenticated token.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */

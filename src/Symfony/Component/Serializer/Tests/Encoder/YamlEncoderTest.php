@@ -18,7 +18,7 @@ use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class YamlEncoderTest extends TestCase
 {

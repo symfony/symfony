@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 class MailgunSmtpTransportTest extends TestCase
 {

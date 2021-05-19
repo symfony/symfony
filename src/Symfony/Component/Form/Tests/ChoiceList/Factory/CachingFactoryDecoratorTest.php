@@ -23,7 +23,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\FormTypeInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CachingFactoryDecoratorTest extends TestCase
 {

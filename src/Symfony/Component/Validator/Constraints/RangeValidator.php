@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RangeValidator extends ConstraintValidator
 {

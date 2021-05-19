@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
  *
- * @author Marco Pivetta <ocramius@gmail.com>
+
  */
 class ProxyDumperTest extends TestCase
 {

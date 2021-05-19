@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
 {

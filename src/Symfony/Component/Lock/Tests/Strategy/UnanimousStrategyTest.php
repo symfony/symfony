@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Strategy\UnanimousStrategy;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class UnanimousStrategyTest extends TestCase
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
 /**
- * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
+
  *
  * @requires extension zookeeper
  */

@@ -16,7 +16,7 @@ use Psr\Cache\CacheItemInterface;
 /**
  * Computes and returns the cached value of an item.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface CallbackInterface
 {

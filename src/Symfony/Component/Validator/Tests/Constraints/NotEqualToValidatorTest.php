@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Constraints\NotEqualToValidator;
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {

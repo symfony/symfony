@@ -33,7 +33,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * SwitchUserListener allows a user to impersonate another one temporarily
  * (like the Unix su command).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

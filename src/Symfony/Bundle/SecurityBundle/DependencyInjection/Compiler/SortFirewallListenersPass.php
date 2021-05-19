@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 /**
  * Sorts firewall listeners based on the execution order provided by FirewallListenerInterface::getPriority().
  *
- * @author Christian Scheb <me@christianscheb.de>
+
  */
 class SortFirewallListenersPass implements CompilerPassInterface
 {

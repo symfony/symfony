@@ -31,7 +31,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  *  * For HTTPs requests, it chooses between HTTPs base URLs and relative protocol URLs
  *    or falls back to any base URL if no secure ones are available.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class UrlPackage extends Package
 {

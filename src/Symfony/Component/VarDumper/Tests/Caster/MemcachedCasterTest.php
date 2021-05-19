@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class MemcachedCasterTest extends TestCase
 {

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mime;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Xavier De Cock <xdecock@gmail.com>
+
+
  *
  * @internal
  */

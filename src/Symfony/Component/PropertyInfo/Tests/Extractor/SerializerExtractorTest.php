@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class SerializerExtractorTest extends TestCase
 {

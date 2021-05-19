@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * A submit button.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 {

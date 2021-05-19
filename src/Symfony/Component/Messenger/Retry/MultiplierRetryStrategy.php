@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  *      * Retry 2: 20 second delay (10000 * 2 = 20000)
  *      * Retry 3: 40 second delay (20000 * 2 = 40000)
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  *
  * @final
  */

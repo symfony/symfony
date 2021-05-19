@@ -25,8 +25,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  * walks through the given map of property names to property values to see if a
  * property with the corresponding name exists. If found, the property gets the value.
  *
- * @author Matthieu Napoli <matthieu@mnapoli.fr>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 class PropertyNormalizer extends AbstractObjectNormalizer
 {

@@ -22,8 +22,8 @@ use Symfony\Component\Routing\RouteCollection;
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
  * based on the passed parameters.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {

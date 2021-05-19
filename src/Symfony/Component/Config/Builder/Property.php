@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Builder;
  *
  * @internal
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class Property
 {

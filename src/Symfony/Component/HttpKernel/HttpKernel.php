@@ -47,7 +47,7 @@ class_exists(KernelEvents::class);
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {

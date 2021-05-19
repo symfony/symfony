@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Simulates a browser and makes requests to an HttpKernel instance.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @method Request  getRequest()  A Request instance
  * @method Response getResponse() A Response instance

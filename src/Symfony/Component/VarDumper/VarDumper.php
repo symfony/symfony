@@ -28,7 +28,7 @@ use Symfony\Component\VarDumper\Dumper\ServerDumper;
 require_once __DIR__.'/Resources/functions/dump.php';
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class VarDumper
 {

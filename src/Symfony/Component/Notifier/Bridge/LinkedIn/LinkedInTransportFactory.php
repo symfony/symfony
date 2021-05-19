@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Smaïne Milianni <smaine.milianni@gmail.com>
+
  */
 final class LinkedInTransportFactory extends AbstractTransportFactory
 {

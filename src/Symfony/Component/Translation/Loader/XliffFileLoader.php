@@ -24,7 +24,7 @@ use Symfony\Component\Translation\Util\XliffUtils;
 /**
  * XliffFileLoader loads translations from XLIFF files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class XliffFileLoader implements LoaderInterface
 {

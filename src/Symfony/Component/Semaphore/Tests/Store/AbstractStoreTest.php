@@ -18,8 +18,8 @@ use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 abstract class AbstractStoreTest extends TestCase
 {

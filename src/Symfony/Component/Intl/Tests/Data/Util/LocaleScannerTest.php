@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class LocaleScannerTest extends TestCase
 {

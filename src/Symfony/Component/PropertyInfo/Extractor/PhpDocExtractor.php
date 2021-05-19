@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
 /**
  * Extracts data using a PHPDoc parser.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @final
  */

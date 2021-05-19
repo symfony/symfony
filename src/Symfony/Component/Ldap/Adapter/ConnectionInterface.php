@@ -16,7 +16,7 @@ use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
 use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 interface ConnectionInterface
 {

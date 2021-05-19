@@ -20,7 +20,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 abstract class AbstractRedisStoreTest extends AbstractStoreTest
 {

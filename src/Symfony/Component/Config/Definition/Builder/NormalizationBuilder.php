@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 /**
  * This class builds normalization conditions.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class NormalizationBuilder
 {

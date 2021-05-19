@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\TransitionBlocker;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class GuardListener
 {

@@ -20,7 +20,7 @@ use Twig\Node\Node;
 use Twig\Node\TextNode;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TransNode extends Node
 {

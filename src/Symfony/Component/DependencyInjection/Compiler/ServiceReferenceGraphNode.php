@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * Value is typically a definition, or an alias.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ServiceReferenceGraphNode
 {

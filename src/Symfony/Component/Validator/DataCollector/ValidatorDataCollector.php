@@ -23,7 +23,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  *
  * @final
  */

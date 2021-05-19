@@ -16,7 +16,7 @@ use Symfony\Component\HttpClient\Exception\HttpExceptionTrait;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class HttpExceptionTraitTest extends TestCase
 {

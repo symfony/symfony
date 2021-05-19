@@ -15,7 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

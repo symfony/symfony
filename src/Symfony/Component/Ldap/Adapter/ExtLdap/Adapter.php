@@ -15,7 +15,7 @@ use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 class Adapter implements AdapterInterface
 {

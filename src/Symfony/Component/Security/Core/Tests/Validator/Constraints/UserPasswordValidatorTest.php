@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 {

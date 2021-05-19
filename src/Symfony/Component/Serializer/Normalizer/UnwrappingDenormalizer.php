@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
- * @author Eduard Bulava <bulavaeduard@gmail.com>
+
  */
 final class UnwrappingDenormalizer implements DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {

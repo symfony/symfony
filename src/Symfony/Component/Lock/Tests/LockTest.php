@@ -24,7 +24,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\ExpiringStoreTrait;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class LockTest extends TestCase
 {

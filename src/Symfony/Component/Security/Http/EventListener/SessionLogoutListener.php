@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 /**
  * Handler for clearing invalidating the current session.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @final
  */

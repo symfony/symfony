@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @method void upgradePassword(PasswordAuthenticatedUserInterface|UserInterface $user, string $newHashedPassword) Upgrades the hashed password of a user, typically for using a better hash algorithm.
  *                                                                                                                 This method should persist the new password in the user storage and update the $user object accordingly.

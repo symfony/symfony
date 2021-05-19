@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
 /**
  * Aggregates several cache warmers into a single one.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

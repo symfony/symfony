@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Cloner\DumperInterface;
 /**
  * Abstract mechanism for dumping a Data object.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 {

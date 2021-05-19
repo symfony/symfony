@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  * An ArgumentResolverInterface instance knows how to determine the
  * arguments for a specific action.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ArgumentResolverInterface
 {

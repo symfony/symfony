@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Recipient\NoRecipient;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Notifier implements NotifierInterface
 {

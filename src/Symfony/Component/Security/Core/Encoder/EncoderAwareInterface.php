@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Encoder;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 
 /**
- * @author Christophe Coevoet <stof@notk.org>
+
  *
  * @deprecated since Symfony 5.3, use {@link PasswordHasherAwareInterface} instead.
  */

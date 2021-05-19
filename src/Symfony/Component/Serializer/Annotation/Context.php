@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @NamedArgumentConstructor
  * @Target({"PROPERTY", "METHOD"})
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class Context

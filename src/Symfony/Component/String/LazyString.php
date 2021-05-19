@@ -14,7 +14,7 @@ namespace Symfony\Component\String;
 /**
  * A string whose value is computed lazily by a callback.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class LazyString implements \Stringable, \JsonSerializable
 {

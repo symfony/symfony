@@ -19,8 +19,8 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
+
+
  */
 class RedisReceiver implements ReceiverInterface
 {

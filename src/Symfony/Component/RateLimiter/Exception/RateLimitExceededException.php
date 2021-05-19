@@ -14,7 +14,7 @@ namespace Symfony\Component\RateLimiter\Exception;
 use Symfony\Component\RateLimiter\RateLimit;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+
  *
  * @experimental in 5.3
  */

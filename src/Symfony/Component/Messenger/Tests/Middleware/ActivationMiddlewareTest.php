@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class ActivationMiddlewareTest extends MiddlewareTestCase
 {

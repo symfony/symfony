@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @author Alexander M. Turek <me@derrabus.de>
+
  */
 final class AttributeAutoconfigurationPass extends AbstractRecursivePass
 {

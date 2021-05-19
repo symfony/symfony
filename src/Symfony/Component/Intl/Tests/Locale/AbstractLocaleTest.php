@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test case for Locale implementations.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class AbstractLocaleTest extends TestCase
 {

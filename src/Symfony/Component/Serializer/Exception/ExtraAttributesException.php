@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Exception;
 /**
  * ExtraAttributesException.
  *
- * @author Julien DIDIER <julien@didier.io>
+
  */
 class ExtraAttributesException extends RuntimeException
 {

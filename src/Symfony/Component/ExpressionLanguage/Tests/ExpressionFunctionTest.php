@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 /**
  * Tests ExpressionFunction.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
  */
 class ExpressionFunctionTest extends TestCase
 {

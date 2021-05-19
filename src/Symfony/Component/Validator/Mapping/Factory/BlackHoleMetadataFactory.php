@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  * constraints only and you don't need to add constraints to classes and
  * properties.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class BlackHoleMetadataFactory implements MetadataFactoryInterface
 {

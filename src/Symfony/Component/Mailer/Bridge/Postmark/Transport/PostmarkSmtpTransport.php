@@ -22,7 +22,7 @@ use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Kevin Verschaeve
+
  */
 class PostmarkSmtpTransport extends EsmtpTransport
 {

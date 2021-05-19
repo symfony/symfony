@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * The rule for compiling the region bundle.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see http://source.icu-project.org/repos/icu/icu4j/trunk/main/classes/core/src/com/ibm/icu/util/Region.java
  *

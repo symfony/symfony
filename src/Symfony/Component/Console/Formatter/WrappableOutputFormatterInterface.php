@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Formatter;
 /**
  * Formatter interface for console output that supports word wrapping.
  *
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 interface WrappableOutputFormatterInterface extends OutputFormatterInterface
 {

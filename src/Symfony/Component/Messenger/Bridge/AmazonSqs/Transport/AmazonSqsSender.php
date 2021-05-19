@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class AmazonSqsSender implements SenderInterface
 {

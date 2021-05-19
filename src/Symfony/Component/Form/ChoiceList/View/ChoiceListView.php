@@ -18,7 +18,7 @@ namespace Symfony\Component\Form\ChoiceList\View;
  * displayed in the very beginning of the list. Both choices and preferred
  * choices may be grouped in {@link ChoiceGroupView} instances.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ChoiceListView
 {

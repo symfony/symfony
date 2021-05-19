@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class BundleEntryReaderTest extends TestCase
 {

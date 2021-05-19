@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Message\SmsMessage;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class SmsMessageTest extends TestCase
 {

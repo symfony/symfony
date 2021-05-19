@@ -21,7 +21,7 @@ namespace Symfony\Component\Translation\Util;
  *     bar1: test1
  *     bar2: test2.
  *
- * @author Gennady Telegin <gtelegin@gmail.com>
+
  */
 class ArrayConverter
 {

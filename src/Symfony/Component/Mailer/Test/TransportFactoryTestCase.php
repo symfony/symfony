@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * A test case to ease testing Transport Factory.
  *
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 abstract class TransportFactoryTestCase extends TestCase
 {

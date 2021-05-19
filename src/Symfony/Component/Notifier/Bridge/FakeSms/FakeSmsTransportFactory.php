@@ -18,8 +18,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author James Hemery <james@yieldstudio.fr>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class FakeSmsTransportFactory extends AbstractTransportFactory
 {

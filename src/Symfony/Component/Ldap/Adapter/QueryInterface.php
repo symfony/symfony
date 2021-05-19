@@ -16,8 +16,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
- * @author Bob van de Vijver <bobvandevijver@hotmail.com>
+
+
  */
 interface QueryInterface
 {

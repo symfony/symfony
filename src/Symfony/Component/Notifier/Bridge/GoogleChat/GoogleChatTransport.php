@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Jérôme Tamarelle <jerome@tamarelle.net>
+
  */
 final class GoogleChatTransport extends AbstractTransport
 {

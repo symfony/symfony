@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 /**
- * @author Timo Bakx <timobakx@gmail.com>
+
  */
 final class DebugFirewallCommand extends Command
 {

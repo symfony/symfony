@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Worker;
 /**
  * Dispatched after the worker processed a message or didn't receive a message at all.
  *
- * @author Tobias Schultze <http://tobion.de>
+
  */
 final class WorkerRunningEvent
 {

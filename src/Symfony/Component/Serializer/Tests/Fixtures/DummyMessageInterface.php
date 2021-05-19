@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
  *    "two"="Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo"
  * })
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 interface DummyMessageInterface
 {

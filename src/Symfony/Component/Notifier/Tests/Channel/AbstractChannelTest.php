@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class AbstractChannelTest extends TestCase
 {

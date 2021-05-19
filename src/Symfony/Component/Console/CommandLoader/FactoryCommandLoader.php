@@ -16,7 +16,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 /**
  * A simple command loader using factories to instantiate commands lazily.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class FactoryCommandLoader implements CommandLoaderInterface
 {

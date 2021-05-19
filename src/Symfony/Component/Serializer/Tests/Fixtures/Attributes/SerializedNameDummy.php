@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 class SerializedNameDummy
 {

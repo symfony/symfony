@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 /**
  * MessageDigestPasswordHasher uses a message digest algorithm.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessageDigestPasswordHasher implements LegacyPasswordHasherInterface
 {

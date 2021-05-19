@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * Allows to inspect input and output of a command.
  *
- * @author Francesco Levorato <git@flevour.net>
+
  */
 class ConsoleEvent extends Event
 {

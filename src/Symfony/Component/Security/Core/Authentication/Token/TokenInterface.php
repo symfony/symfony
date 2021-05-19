@@ -18,8 +18,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @method string getUserIdentifier() returns the user identifier used during authentication (e.g. a user's e-mailaddress or username)
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 interface TokenInterface extends \Serializable
 {

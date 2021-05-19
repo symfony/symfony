@@ -29,7 +29,7 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
 /**
  * RememberMeListener implements authentication capabilities via a cookie.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @final
  *

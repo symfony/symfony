@@ -20,7 +20,7 @@ use Symfony\Component\Mime\MessageConverter;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractApiTransport extends AbstractHttpTransport
 {

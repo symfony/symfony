@@ -18,7 +18,7 @@ use Twig\TwigFilter;
 /**
  * Provides integration of the Yaml component with Twig.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class YamlExtension extends AbstractExtension
 {

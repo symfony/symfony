@@ -31,7 +31,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  * A command that parses templates to extract translation messages and adds them
  * into the translation files.
  *
- * @author Michel Salib <michelsalib@hotmail.com>
+
  *
  * @final
  */

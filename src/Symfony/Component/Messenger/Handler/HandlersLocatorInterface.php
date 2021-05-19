@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Maps a message to a list of handlers.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface HandlersLocatorInterface
 {

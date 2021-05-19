@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @property int $maxSize
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class File extends Constraint

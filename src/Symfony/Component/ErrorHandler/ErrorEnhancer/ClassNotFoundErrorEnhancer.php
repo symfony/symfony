@@ -17,7 +17,7 @@ use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {

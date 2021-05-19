@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * Interface for resolving the authentication status of a given token.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface AuthenticationTrustResolverInterface
 {

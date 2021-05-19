@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 /**
  * This listener clears the passed cookies when a user logs out.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @final
  */

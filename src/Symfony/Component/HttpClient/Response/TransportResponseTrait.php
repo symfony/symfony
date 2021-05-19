@@ -21,7 +21,7 @@ use Symfony\Component\HttpClient\Internal\ClientState;
 /**
  * Implements common logic for transport-level response classes.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

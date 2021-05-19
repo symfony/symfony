@@ -20,7 +20,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 /**
  * Not able to guess anything.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
 {

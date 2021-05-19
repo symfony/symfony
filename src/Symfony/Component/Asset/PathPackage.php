@@ -22,7 +22,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  * allow a website to be hosted easily under any given path under the Web
  * Server root directory.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class PathPackage extends Package
 {

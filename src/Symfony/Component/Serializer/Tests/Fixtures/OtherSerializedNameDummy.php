@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
- * @author Anthony GRASSIOT <antograssiot@free.fr>
+
  */
 class OtherSerializedNameDummy
 {

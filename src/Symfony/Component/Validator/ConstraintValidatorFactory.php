@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\ExpressionValidator;
  * Constraint will return the class name of the ConstraintValidator that
  * should validate the Constraint.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {

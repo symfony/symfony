@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionNamedTypeFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\ReflectionUnionTypeFixture;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ReflectionCasterTest extends TestCase
 {
@@ -465,7 +465,7 @@ array:2 [
         Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
         ›     yield 1;
         › }
-        › 
+        ›
       }
     }
     closed: false

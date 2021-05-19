@@ -26,8 +26,8 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\LoggerThatSetAnErrorHandler;
 /**
  * ErrorHandlerTest.
  *
- * @author Robert Schönthal <seroscho@googlemail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 class ErrorHandlerTest extends TestCase
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 class DummyMailer implements MailerInterface
 {

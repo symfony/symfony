@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  *
  * @property string[] $groups The groups that the constraint belongs to
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class Constraint
 {

@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * @author Gildas Quemener <gildas.quemener@gmail.com>
+
  */
 class AddRequestFormatsListenerTest extends TestCase
 {

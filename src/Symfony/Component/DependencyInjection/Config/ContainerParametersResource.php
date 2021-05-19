@@ -16,7 +16,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * Tracks container parameters.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  *
  * @final
  */

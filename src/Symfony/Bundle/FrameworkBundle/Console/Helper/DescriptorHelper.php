@@ -19,7 +19,7 @@ use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  *
  * @internal
  */

@@ -20,7 +20,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * In Loco:
  *  * Tags refers to Symfony's translation domains

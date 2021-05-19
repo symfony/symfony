@@ -18,7 +18,7 @@ if (!class_exists(IntlDateFormatterPolyfill::class)) {
     /**
      * Stub implementation for the IntlDateFormatter class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see BaseIntlDateFormatter
      */
@@ -29,7 +29,7 @@ if (!class_exists(IntlDateFormatterPolyfill::class)) {
     /**
      * Stub implementation for the IntlDateFormatter class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see BaseIntlDateFormatter
      */

@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

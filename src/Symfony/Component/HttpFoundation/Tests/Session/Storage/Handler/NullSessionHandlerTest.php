@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 /**
  * Test class for NullSessionHandler.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled

@@ -25,7 +25,7 @@ class_exists(SessionHandlerProxy::class);
 /**
  * This provides a base class for session attribute storage.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class NativeSessionStorage implements SessionStorageInterface
 {

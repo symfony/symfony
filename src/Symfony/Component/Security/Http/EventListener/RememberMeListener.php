@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
  * a remember-me cookie.
  * Upon login failure, all remember-me cookies are removed.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

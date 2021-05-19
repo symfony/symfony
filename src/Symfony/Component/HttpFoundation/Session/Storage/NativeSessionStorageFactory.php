@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class_exists(NativeSessionStorage::class);
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class NativeSessionStorageFactory implements SessionStorageFactoryInterface
 {

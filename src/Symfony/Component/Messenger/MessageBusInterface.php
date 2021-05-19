@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 interface MessageBusInterface
 {

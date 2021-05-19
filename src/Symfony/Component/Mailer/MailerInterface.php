@@ -19,7 +19,7 @@ use Symfony\Component\Mime\RawMessage;
  *
  * Implementations must support synchronous and asynchronous sending.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface MailerInterface
 {

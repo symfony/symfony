@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 abstract class AbstractRecursivePass implements CompilerPassInterface
 {

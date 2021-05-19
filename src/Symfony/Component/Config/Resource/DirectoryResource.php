@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Resource;
 /**
  * DirectoryResource represents a resources stored in a subdirectory tree.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

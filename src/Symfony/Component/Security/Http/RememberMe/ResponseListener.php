@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Adds remember-me cookies to the Response.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @final
  */

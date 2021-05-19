@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Definition;
 /**
  * Configuration interface.
  *
- * @author Victor Berchet <victor@suumit.com>
+
  */
 interface ConfigurationInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * The rule for compiling the language bundle.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

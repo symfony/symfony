@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 /**
  * Compiler pass to inject their service locator to service subscribers.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ResolveServiceSubscribersPass extends AbstractRecursivePass
 {

@@ -14,8 +14,8 @@ namespace Symfony\Component\Process;
 /**
  * An executable finder specifically designed for the PHP executable.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 class PhpExecutableFinder
 {

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Tests the YamlLintCommand.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 class YamlLintCommandTest extends TestCase
 {

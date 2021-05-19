@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseFormatSame;
 
 /**
- * @author Kévin Dunglas <kevin@dunglas.fr>
+
  */
 class ResponseFormatSameTest extends TestCase
 {

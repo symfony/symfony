@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Encoder;
 use Symfony\Component\Mime\Exception\RuntimeException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Base64ContentEncoder extends Base64Encoder implements ContentEncoderInterface
 {

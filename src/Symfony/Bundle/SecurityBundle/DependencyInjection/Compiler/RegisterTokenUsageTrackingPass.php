@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * Injects the session tracker enabler in "security.context_listener" + binds "security.untracked_token_storage" to ProcessorInterface instances.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

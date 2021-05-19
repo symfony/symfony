@@ -45,11 +45,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-/**
- * Bundle.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class SecurityBundle extends Bundle
 {
     public function build(ContainerBuilder $container)

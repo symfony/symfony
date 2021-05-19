@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Message;
 /**
  * Manipulates the headers and the body of a Message.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessageListener implements EventSubscriberInterface
 {

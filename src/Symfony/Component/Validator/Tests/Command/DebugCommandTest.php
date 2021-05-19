@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
 
 /**
- * @author Loïc Frémont <lc.fremont@gmail.com>
+
  */
 class DebugCommandTest extends TestCase
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class AmazonSqsTransportFactory implements TransportFactoryInterface
 {

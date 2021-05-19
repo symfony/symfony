@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * LogDataCollector.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild;
 
 /**
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
  */
 class DateCasterTest extends TestCase
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Message;
 
 /**
- * @author Sebastiaan Stok <s.stok@rollerscapes.net>
+
  */
 final class SMimeSigner extends SMime
 {

@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class InlineFragmentRenderer extends RoutableFragmentRenderer
 {

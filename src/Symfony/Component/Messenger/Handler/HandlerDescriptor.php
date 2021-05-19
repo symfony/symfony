@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Handler;
 /**
  * Describes a handler and the possible associated options, such as `from_transport`, `bus`, etc.
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 final class HandlerDescriptor
 {

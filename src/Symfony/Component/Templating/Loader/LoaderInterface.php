@@ -17,7 +17,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 /**
  * LoaderInterface is the interface all loaders must implement.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface LoaderInterface
 {

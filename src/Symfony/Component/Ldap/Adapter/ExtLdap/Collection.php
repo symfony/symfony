@@ -16,7 +16,7 @@ use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 class Collection implements CollectionInterface
 {

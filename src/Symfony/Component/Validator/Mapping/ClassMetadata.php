@@ -25,8 +25,8 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  *
  * This class supports serialization and cloning.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  */
 class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {

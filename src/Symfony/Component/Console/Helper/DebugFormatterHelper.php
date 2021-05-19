@@ -16,7 +16,7 @@ namespace Symfony\Component\Console\Helper;
  *
  * An external program can be a Process, an HTTP request, or anything else.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DebugFormatterHelper extends Helper
 {

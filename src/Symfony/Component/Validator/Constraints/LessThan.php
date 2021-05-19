@@ -15,8 +15,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Daniel Holmes <daniel@danielholmes.org>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class LessThan extends AbstractComparison

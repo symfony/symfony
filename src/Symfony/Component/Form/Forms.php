@@ -58,7 +58,7 @@ namespace Symfony\Component\Form;
  *         ->addExtension(new ValidatorExtension($validator))
  *         ->getFormFactory();
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class Forms
 {

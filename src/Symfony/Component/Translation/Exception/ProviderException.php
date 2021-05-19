@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Exception;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @experimental in 5.3
  */

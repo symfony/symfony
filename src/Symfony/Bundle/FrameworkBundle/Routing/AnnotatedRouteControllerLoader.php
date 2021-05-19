@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Route;
  * AnnotatedRouteControllerLoader is an implementation of AnnotationClassLoader
  * that sets the '_controller' default based on the class and method names.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AnnotatedRouteControllerLoader extends AnnotationClassLoader
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Compiler;
 /**
  * Compiles a resource bundle.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

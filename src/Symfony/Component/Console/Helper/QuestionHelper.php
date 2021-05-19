@@ -29,7 +29,7 @@ use function Symfony\Component\String\s;
 /**
  * The QuestionHelper class provides helpers to interact with the user.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class QuestionHelper extends Helper
 {

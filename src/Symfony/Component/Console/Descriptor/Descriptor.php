@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  *
  * @internal
  */

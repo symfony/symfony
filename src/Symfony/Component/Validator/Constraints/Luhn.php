@@ -19,9 +19,9 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Tim Nagel <t.nagel@infinite.net.au>
- * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Luhn extends Constraint

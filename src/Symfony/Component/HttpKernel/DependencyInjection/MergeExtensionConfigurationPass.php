@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Ensures certain extensions are always loaded.
  *
- * @author Kris Wallsmith <kris@symfony.com>
+
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {

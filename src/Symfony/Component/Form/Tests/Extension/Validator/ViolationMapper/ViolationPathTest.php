@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ViolationPathTest extends TestCase
 {

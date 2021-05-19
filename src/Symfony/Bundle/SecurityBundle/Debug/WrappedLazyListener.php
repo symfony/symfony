@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 /**
  * Wraps a lazy security listener.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  *
  * @internal
  */

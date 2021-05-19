@@ -25,9 +25,9 @@ use Symfony\Component\Mime\MimeTypes;
 /**
  * A file uploaded through a form.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Florian Eckerstorfer <florian@eckerstorfer.org>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
+
  */
 class UploadedFile extends File
 {

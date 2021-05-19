@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 /**
  * A Path Header, such a Return-Path (one address).
  *
- * @author Chris Corbyn
+
  */
 final class PathHeader extends AbstractHeader
 {

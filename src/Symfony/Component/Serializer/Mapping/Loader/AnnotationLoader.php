@@ -27,8 +27,8 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 /**
  * Loader for Doctrine annotations and PHP 8 attributes.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Alexander M. Turek <me@derrabus.de>
+
+
  */
 class AnnotationLoader implements LoaderInterface
 {

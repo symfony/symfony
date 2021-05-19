@@ -31,7 +31,7 @@ use Symfony\Component\Console\Terminal;
 /**
  * Output decorator helpers for the Symfony Style Guide.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 class SymfonyStyle extends OutputStyle
 {

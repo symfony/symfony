@@ -14,7 +14,7 @@ namespace Symfony\Component\Workflow\Metadata;
 use Symfony\Component\Workflow\Transition;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 final class InMemoryMetadataStore implements MetadataStoreInterface
 {

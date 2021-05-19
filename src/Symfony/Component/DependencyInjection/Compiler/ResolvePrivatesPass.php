@@ -16,7 +16,7 @@ trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s" class is de
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @deprecated since Symfony 5.2
  */

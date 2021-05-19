@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Jérôme Tamarelle <jerome@tamarelle.net>
+
  */
 final class GoogleChatTransportFactory extends AbstractTransportFactory
 {

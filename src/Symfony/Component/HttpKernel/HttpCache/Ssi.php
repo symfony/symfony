@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Ssi implements the SSI capabilities to Request and Response instances.
  *
- * @author Sebastian Krebs <krebs.seb@gmail.com>
+
  */
 class Ssi extends AbstractSurrogate
 {

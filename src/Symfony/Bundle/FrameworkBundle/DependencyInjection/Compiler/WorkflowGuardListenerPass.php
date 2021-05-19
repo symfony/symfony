@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class WorkflowGuardListenerPass implements CompilerPassInterface
 {

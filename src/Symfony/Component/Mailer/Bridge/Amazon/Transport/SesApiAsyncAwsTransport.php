@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
 {

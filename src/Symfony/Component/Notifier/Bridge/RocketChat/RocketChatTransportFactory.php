@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Jeroen Spee <https://github.com/Jeroeny>
+
  */
 final class RocketChatTransportFactory extends AbstractTransportFactory
 {

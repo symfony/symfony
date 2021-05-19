@@ -14,7 +14,7 @@ namespace Symfony\Component\Stopwatch;
 /**
  * Represents an Period for an Event.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class StopwatchPeriod
 {

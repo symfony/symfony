@@ -17,7 +17,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * The resource must be a fully-qualified class name.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
  * An implementation used when there are no credentials to be checked (e.g.
  * API token authentication).
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class SelfValidatingPassport extends Passport
 {

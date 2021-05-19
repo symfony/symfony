@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Jeroen Spee <https://github.com/Jeroeny>
+
  */
 final class FirebaseTransport extends AbstractTransport
 {

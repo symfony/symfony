@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class FailedMessageProcessingMiddleware implements MiddlewareInterface
 {

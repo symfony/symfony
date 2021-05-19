@@ -16,7 +16,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @requires extension sysvsem
  */

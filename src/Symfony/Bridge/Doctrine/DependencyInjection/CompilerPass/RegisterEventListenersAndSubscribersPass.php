@@ -23,9 +23,9 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Registers event listeners and subscribers to the available doctrine connections.
  *
- * @author Jeremy Mikola <jmikola@gmail.com>
- * @author Alexander <iam.asm89@gmail.com>
- * @author David Maicher <mail@dmaicher.de>
+
+
+
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {

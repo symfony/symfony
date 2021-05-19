@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  *

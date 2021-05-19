@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
  * AccessDecisionManager is the base class for all access decision managers
  * that use decision voters.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AccessDecisionManager implements AccessDecisionManagerInterface
 {

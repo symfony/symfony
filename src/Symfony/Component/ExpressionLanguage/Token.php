@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage;
 /**
  * Represents a Token.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Token
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * A console command to test route matching.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class SlackOptions implements MessageOptionsInterface
 {

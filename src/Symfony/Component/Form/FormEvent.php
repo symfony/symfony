@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormEvent extends Event
 {

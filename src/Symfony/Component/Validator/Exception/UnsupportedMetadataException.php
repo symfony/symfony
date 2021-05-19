@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Exception;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class UnsupportedMetadataException extends InvalidArgumentException
 {

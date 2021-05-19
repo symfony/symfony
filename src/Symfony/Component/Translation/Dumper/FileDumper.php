@@ -21,7 +21,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  * Options:
  * - path (mandatory): the directory where the files should be saved
  *
- * @author Michel Salib <michelsalib@hotmail.com>
+
  */
 abstract class FileDumper implements DumperInterface
 {

@@ -18,7 +18,7 @@ use Psr\Log\LogLevel;
 /**
  * Minimalist PSR-3 logger designed to write in stderr or any other stream.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class Logger extends AbstractLogger
 {

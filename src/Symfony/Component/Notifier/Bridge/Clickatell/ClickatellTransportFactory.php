@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Kevin Auvinet <k.auvinet@gmail.com>
+
  */
 final class ClickatellTransportFactory extends AbstractTransportFactory
 {

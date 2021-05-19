@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class DiscriminatorMapTest extends TestCase
 {

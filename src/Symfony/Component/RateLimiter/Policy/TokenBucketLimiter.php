@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\Reservation;
 use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

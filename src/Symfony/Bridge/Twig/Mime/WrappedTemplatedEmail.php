@@ -17,7 +17,7 @@ use Twig\Environment;
 /**
  * @internal
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class WrappedTemplatedEmail
 {

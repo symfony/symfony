@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\LockedException;
 /**
  * Checks the state of the in-memory user account.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class InMemoryUserChecker implements UserCheckerInterface
 {

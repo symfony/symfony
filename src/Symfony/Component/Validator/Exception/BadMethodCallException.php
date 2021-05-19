@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Exception;
 /**
  * Base BadMethodCallException for the Validator component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class BadMethodCallException extends \BadMethodCallException implements ExceptionInterface
 {

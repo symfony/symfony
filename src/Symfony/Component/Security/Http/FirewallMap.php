@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  * FirewallMap allows configuration of different firewalls for specific parts
  * of the website.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class FirewallMap implements FirewallMapInterface
 {

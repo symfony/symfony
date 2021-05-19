@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Baptiste Clavié <clavie.b@gmail.com>
+
  */
 class XmlReaderCasterTest extends TestCase
 {
@@ -90,7 +90,7 @@ XMLReader {
   +depth: 1
   +value: """
     \n
-        
+
     """
   +baseURI: "%sxml_reader.xml"
    …9
@@ -178,7 +178,7 @@ XMLReader {
   +depth: 2
   +value: """
     \n
-            
+
     """
   +baseURI: "%sxml_reader.xml"
    …9
@@ -216,7 +216,7 @@ XMLReader {
   +depth: 2
   +value: """
     \n
-        
+
     """
   +baseURI: "%sxml_reader.xml"
    …9

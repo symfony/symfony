@@ -21,8 +21,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * can then inspect the resources and decide whether the cache can be considered
  * fresh or not.
  *
- * @author Matthias Pigulla <mp@webfactory.de>
- * @author Benjamin Klotz <bk@webfactory.de>
+
+
  */
 interface ResourceCheckerInterface
 {

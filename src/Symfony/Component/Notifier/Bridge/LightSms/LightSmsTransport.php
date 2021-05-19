@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Vasilij Duško <vasilij@prado.lt>
+
  */
 final class LightSmsTransport extends AbstractTransport
 {

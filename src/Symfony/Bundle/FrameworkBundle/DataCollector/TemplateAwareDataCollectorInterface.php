@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
- * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+
  */
 interface TemplateAwareDataCollectorInterface extends DataCollectorInterface
 {

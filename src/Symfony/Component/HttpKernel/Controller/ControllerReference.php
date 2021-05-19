@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
  * an argument. In the latter case, instead of passing an array representing
  * the controller, you can use an instance of this class.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @see FragmentRendererInterface
  */

@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * Stamps must be serializable value objects for transport.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 interface StampInterface
 {

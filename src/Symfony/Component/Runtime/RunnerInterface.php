@@ -12,7 +12,7 @@
 namespace Symfony\Component\Runtime;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @experimental in 5.3
  */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder\Iterator;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @internal
  */

@@ -20,11 +20,6 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Bundle.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class TwigBundle extends Bundle
 {
     public function build(ContainerBuilder $container)

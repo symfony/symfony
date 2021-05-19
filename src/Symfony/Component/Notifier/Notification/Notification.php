@@ -16,7 +16,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Notification
 {

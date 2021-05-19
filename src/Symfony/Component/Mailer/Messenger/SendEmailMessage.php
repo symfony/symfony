@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class SendEmailMessage
 {

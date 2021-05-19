@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {

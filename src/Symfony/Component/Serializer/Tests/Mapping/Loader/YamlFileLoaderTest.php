@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Tests\Mapping\Loader\Features\ContextMappingTes
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class YamlFileLoaderTest extends TestCase
 {

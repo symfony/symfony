@@ -5,7 +5,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 use Psr\Container\ContainerInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class NamedArgumentsDummy
 {

@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CollectionToArrayTransformerTest extends TestCase
 {

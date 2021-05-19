@@ -14,9 +14,9 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * @author Franz Wilding <franz.wilding@me.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Fred Cox <mcfedr@gmail.com>
+
+
+
  */
 class DateTimeToHtml5LocalDateTimeTransformer extends BaseDateTimeTransformer
 {

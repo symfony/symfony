@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DataUriNormalizerTest extends TestCase
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * A type that should be converted into a {@link SubmitButton} instance.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface SubmitButtonTypeInterface extends FormTypeInterface
 {

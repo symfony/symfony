@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * The following checks are performed by this pass:
  * - target definitions are not abstract
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class CheckReferenceValidityPass extends AbstractRecursivePass
 {

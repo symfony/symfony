@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\EnumNode;
 /**
  * Enum Node Definition.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class EnumNodeDefinition extends ScalarNodeDefinition
 {

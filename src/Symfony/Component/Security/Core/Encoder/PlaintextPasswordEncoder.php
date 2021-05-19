@@ -20,7 +20,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
  *
  * As this encoder is not cryptographically secure, usage of it in production environments is discouraged.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @deprecated since Symfony 5.3, use {@link PlaintextPasswordHasher} instead
  */

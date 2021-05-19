@@ -46,7 +46,7 @@ if (trait_exists(FormattableHandlerTrait::class)) {
 }
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 trait ServerLogHandlerTrait
 {

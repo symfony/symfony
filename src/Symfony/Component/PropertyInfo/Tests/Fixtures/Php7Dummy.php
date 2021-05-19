@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class Php7Dummy extends Php7ParentDummy
 {

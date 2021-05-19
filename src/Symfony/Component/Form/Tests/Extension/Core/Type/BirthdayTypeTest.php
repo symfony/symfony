@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
- * @author Stepan Anchugov <kixxx1@gmail.com>
+
  */
 class BirthdayTypeTest extends DateTypeTest
 {

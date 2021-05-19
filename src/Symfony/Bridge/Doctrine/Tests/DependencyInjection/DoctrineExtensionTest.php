@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
- * @author  Fabio B. Silva <fabio.bat.silva@gmail.com>
+
  */
 class DoctrineExtensionTest extends TestCase
 {

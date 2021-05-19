@@ -16,7 +16,7 @@ use Symfony\Config\AddToListConfig;
 /**
  * Test to use the generated config and test its output.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class GeneratedConfigTest extends TestCase
 {

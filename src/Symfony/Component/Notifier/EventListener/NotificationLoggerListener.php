@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Event\NotificationEvents;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NotificationLoggerListener implements EventSubscriberInterface, ResetInterface
 {

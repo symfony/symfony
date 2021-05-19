@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Exception;
 /**
  * Base OutOfBoundsException for the Validator component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {

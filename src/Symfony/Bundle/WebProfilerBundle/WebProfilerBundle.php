@@ -14,7 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class WebProfilerBundle extends Bundle
 {

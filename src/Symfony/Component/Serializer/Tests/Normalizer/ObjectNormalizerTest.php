@@ -52,7 +52,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\SkipNullValuesTestTra
 use Symfony\Component\Serializer\Tests\Normalizer\Features\TypeEnforcementTestTrait;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ObjectNormalizerTest extends TestCase
 {

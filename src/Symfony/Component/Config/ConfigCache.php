@@ -20,8 +20,8 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
  * \Symfony\Component\Config\Resource\SelfCheckingResourceInterface will
  * be used to check cache freshness.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Matthias Pigulla <mp@webfactory.de>
+
+
  */
 class ConfigCache extends ResourceCheckerConfigCache
 {

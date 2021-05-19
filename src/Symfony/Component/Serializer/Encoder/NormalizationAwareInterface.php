@@ -17,7 +17,7 @@ namespace Symfony\Component\Serializer\Encoder;
  * Implementing this interface essentially just tells the Serializer that the
  * data should not be pre-normalized before being passed to this Encoder.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
+
  */
 interface NormalizationAwareInterface
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ButtonTest extends TestCase
 {

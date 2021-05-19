@@ -24,7 +24,7 @@ use Symfony\Component\Workflow\Transition;
  *
  * php bin/console workflow:dump pull_request travis --dump-format=puml | java -jar plantuml.jar -p  > workflow.png
  *
- * @author Sébastien Morel <morel.seb@gmail.com>
+
  */
 class PlantUmlDumper implements DumperInterface
 {

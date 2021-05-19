@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHand
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler;
 
 /**
- * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
+
  */
 class MarshallingSessionHandlerTest extends TestCase
 {

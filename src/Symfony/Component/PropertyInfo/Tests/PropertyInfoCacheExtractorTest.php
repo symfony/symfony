@@ -15,7 +15,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {

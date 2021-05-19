@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * When an unchecked timeout or a network error occurs, a TransportExceptionInterface
  * MUST be thrown by the destructor unless one was already thrown by another method.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ChunkInterface
 {

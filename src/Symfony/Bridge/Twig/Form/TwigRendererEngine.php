@@ -17,7 +17,7 @@ use Twig\Environment;
 use Twig\Template;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class TwigRendererEngine extends AbstractRendererEngine
 {

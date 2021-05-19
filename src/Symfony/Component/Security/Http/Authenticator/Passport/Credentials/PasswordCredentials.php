@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\LogicException;
  * These plaintext passwords are checked by the UserPasswordEncoder during
  * authentication.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

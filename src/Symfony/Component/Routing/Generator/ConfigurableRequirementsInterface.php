@@ -32,8 +32,8 @@ namespace Symfony\Component\Routing\Generator;
  *   performance reasons (saving a preg_match for each requirement every time a URL is
  *   generated).
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 interface ConfigurableRequirementsInterface
 {

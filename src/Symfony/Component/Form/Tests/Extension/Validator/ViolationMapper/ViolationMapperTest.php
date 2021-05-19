@@ -32,7 +32,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ViolationMapperTest extends TestCase
 {

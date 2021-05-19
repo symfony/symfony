@@ -21,8 +21,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Edouard Lescot <edouard.lescot@gmail.com>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class MicrosoftTeamsTransport extends AbstractTransport
 {

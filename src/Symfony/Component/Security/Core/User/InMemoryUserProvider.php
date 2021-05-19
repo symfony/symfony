@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * Useful for testing, demonstration, prototyping, and for simple needs
  * (a backend with a unique admin for instance)
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class InMemoryUserProvider implements UserProviderInterface
 {

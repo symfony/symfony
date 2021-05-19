@@ -27,7 +27,7 @@ use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 /**
- * @author Jesse Rushlow <jr@rushlow.dev>
+
  */
 class SerializerExtensionTest extends TestCase
 {

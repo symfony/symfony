@@ -20,7 +20,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
 /**
- * @author Alexander Borisov <boshurik@gmail.com>
+
  */
 class MailerHandler extends AbstractProcessingHandler
 {

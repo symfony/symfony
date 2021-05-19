@@ -14,7 +14,7 @@ namespace Symfony\Component\Mailer\Header;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 final class TagHeader extends UnstructuredHeader
 {

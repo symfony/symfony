@@ -15,8 +15,8 @@ namespace Symfony\Component\DomCrawler;
  * The UriResolver class takes an URI (relative, absolute, fragment, etc.)
  * and turns it into an absolute URI against another given base URI.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class UriResolver
 {

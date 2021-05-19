@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
- * @author Christin Gruber <c.gruber@touchdesign.de>
+
  */
 final class GitterTransportFactoryTest extends TransportFactoryTestCase
 {

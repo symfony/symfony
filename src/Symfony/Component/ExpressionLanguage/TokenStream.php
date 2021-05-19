@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage;
 /**
  * Represents a token stream.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TokenStream
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class CollectionConfigurator
 {

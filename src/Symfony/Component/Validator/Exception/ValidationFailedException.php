@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Exception;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * @author Jan Vernieuwe <jan.vernieuwe@phpro.be>
+
  */
 class ValidationFailedException extends RuntimeException
 {

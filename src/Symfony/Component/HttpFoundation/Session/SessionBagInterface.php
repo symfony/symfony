@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session;
 /**
  * Session Bag store.
  *
- * @author Drak <drak@zikula.org>
+
  */
 interface SessionBagInterface
 {

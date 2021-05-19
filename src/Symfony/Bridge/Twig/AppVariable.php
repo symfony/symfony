@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AppVariable
 {

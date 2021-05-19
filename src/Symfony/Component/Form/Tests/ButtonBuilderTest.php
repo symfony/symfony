@@ -16,7 +16,7 @@ use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
- * @author Alexander Cheprasov <cheprasov.84@ya.ru>
+
  */
 class ButtonBuilderTest extends TestCase
 {

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Manages HTTP cache objects in a Container.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HttpCache extends BaseHttpCache
 {

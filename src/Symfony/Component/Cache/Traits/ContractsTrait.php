@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\CacheTrait;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

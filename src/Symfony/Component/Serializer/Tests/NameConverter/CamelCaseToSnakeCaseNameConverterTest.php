@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {

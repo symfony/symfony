@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * holds a NativeSessionStorage instance, the "cookie_secure" option
  * will be set to true whenever the current main request is secure.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

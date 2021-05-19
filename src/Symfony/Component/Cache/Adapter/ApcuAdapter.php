@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ApcuAdapter extends AbstractAdapter
 {

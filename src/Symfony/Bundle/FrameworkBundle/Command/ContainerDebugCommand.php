@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 /**
  * A console command for retrieving information about services.
  *
- * @author Ryan Weaver <ryan@thatsquality.com>
+
  *
  * @internal
  */

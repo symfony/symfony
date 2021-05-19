@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class SyncTransportFactory implements TransportFactoryInterface
 {

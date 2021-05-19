@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  *
  * @final
  */

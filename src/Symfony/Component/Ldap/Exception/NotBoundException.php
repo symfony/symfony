@@ -14,7 +14,7 @@ namespace Symfony\Component\Ldap\Exception;
 /**
  * NotBoundException is thrown if the connection with the LDAP server is not yet bound.
  *
- * @author Bob van de Vijver <bobvandevijver@hotmail.com>
+
  */
 class NotBoundException extends \RuntimeException implements ExceptionInterface
 {

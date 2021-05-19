@@ -15,7 +15,7 @@ use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\LimiterStateInterface;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  *
  * @internal
  * @experimental in 5.3

@@ -18,7 +18,7 @@ use Twig\TwigFunction;
 /**
  * Provides integration with the HttpKernel component.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class HttpKernelExtension extends AbstractExtension
 {

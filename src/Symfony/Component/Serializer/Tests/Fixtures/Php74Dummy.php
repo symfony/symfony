@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 /**
- * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+
  */
 final class Php74Dummy
 {

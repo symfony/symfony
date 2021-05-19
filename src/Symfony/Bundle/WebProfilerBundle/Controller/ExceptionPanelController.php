@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * Renders the exception panel.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  *
  * @internal
  */

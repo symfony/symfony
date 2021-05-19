@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\NativeRequestHandler;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormConfigTest extends TestCase
 {

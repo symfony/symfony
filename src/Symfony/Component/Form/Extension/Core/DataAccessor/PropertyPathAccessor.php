@@ -22,8 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Writes and reads values to/from an object or array using property path.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 class PropertyPathAccessor implements DataAccessorInterface
 {

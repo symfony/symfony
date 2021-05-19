@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Part\SMimePart;
 
 /**
- * @author Sebastiaan Stok <s.stok@rollerscapes.net>
+
  *
  * @internal
  */

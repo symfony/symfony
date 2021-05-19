@@ -24,7 +24,7 @@ if (false) {
     /**
      * UserChecker checks the user account flags.
      *
-     * @author Fabien Potencier <fabien@symfony.com>
+
      *
      * @deprecated since Symfony 5.3, use {@link InMemoryUserChecker} instead
      */

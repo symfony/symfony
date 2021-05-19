@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /**
  * Yields the same instance as the request object passed along.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 final class RequestValueResolver implements ArgumentValueResolverInterface
 {

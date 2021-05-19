@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+
  */
 class DoctrineSender implements SenderInterface
 {

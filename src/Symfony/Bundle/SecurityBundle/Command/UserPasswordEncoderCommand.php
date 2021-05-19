@@ -28,7 +28,7 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 /**
  * Encode a user's password.
  *
- * @author Sarah Khalil <mkhalil.sarah@gmail.com>
+
  *
  * @final
  *

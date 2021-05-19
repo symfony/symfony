@@ -25,12 +25,6 @@ use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
 
-/**
- * TwigExtension.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jeremy Mikola <jmikola@gmail.com>
- */
 class TwigExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)

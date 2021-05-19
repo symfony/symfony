@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
  * AnnotationDirectoryLoader loads routing information from annotations set
  * on PHP classes and methods.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {

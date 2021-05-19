@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 /**
  * Merges extension configs into the container builder.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {

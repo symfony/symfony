@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * Transforms a value between different representations.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface DataTransformerInterface
 {

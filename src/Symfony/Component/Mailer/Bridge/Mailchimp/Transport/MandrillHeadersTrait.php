@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 trait MandrillHeadersTrait
 {

@@ -37,7 +37,7 @@ class_exists(ServerBag::class);
  *   * getUri
  *   * getUriForPath
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Request
 {

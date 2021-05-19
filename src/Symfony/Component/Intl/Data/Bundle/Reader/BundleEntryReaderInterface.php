@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 /**
  * Reads individual entries of a resource file.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

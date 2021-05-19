@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormTypeInterface;
  *
  * @internal
  *
- * @author Jules Pietri <jules@heahprod.com>
+
  */
 final class ChoiceLoader extends AbstractStaticOption implements ChoiceLoaderInterface
 {

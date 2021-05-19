@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
  * constructor. This cache will be used for persisting the generated metadata
  * between multiple PHP requests.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 {

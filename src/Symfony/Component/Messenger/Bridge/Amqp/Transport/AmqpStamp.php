@@ -14,8 +14,8 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
- * @author Guillaume Gammelin <ggammelin@gmail.com>
- * @author Samuel Roze <samuel.roze@gmail.com>
+
+
  */
 final class AmqpStamp implements NonSendableStampInterface
 {

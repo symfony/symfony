@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Gitignore;
 
 /**
- * @author Michael Voříšek <vorismi3@fel.cvut.cz>
+
  */
 class GitignoreTest extends TestCase
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class StopWorkersCommand extends Command
 {

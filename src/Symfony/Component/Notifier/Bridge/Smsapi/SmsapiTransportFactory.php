@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Marcin Szepczynski <szepczynski@gmail.com>
+
  */
 final class SmsapiTransportFactory extends AbstractTransportFactory
 {

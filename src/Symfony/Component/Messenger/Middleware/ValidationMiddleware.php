@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class ValidationMiddleware implements MiddlewareInterface
 {

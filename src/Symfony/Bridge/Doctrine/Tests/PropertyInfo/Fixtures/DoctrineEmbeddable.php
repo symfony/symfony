@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Embeddable;
 /**
  * @Embeddable
  *
- * @author Udaltsov Valentin <udaltsov.valentin@gmail.com>
+
  */
 class DoctrineEmbeddable
 {

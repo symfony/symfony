@@ -17,7 +17,7 @@ namespace Symfony\Component\Config\Loader;
  * A resource can be anything (e.g. a full path to a config file or a Closure).
  * Each loader determines whether it can load a resource and how.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class LoaderResolver implements LoaderResolverInterface
 {

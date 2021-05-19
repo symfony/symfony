@@ -15,7 +15,7 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ArrayChoiceListTest extends AbstractChoiceListTest
 {

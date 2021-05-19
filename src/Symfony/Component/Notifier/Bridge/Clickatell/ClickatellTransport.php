@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Kevin Auvinet <k.auvinet@gmail.com>
+
  */
 final class ClickatellTransport extends AbstractTransport
 {

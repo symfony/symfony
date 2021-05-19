@@ -14,7 +14,7 @@ namespace TestBundle\FooBundle\Controller\Test;
 /**
  * DefaultController.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DefaultController
 {

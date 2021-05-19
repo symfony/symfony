@@ -26,7 +26,7 @@ use Symfony\Component\String\Inflector\InflectorInterface;
 /**
  * Extracts data using the reflection API.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @final
  */

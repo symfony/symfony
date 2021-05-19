@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 final class SlackOptionsTest extends TestCase
 {

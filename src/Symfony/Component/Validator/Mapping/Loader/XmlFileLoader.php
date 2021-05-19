@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Loads validation metadata from an XML file.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class XmlFileLoader extends FileLoader
 {

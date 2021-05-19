@@ -20,7 +20,7 @@ class_exists(ParsedExpression::class);
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ExpressionLanguage
 {

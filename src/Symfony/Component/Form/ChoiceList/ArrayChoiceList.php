@@ -20,7 +20,7 @@ namespace Symfony\Component\Form\ChoiceList;
  * Each choice must have a corresponding value (with the same key) in
  * the values array.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ArrayChoiceList implements ChoiceListInterface
 {

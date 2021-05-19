@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * ContainerAware trait.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 trait ContainerAwareTrait
 {

@@ -20,7 +20,7 @@ class_exists(Environment::class);
 /**
  * Twig environment configurator.
  *
- * @author Christian Flothmann <christian.flothmann@xabbuh.de>
+
  */
 class EnvironmentConfigurator
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\FormRegistry;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormPassTest extends TestCase
 {

@@ -18,8 +18,8 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 /**
  * Basic package that adds a version to asset URLs.
  *
- * @author Kris Wallsmith <kris@symfony.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  */
 class Package implements PackageInterface
 {

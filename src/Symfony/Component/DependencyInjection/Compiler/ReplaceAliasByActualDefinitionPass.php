@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * Replaces aliases with actual service definitions, effectively removing these
  * aliases.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {

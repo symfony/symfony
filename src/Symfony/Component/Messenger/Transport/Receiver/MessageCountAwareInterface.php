@@ -12,8 +12,8 @@
 namespace Symfony\Component\Messenger\Transport\Receiver;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
+
  */
 interface MessageCountAwareInterface
 {

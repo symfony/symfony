@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PhpBundleWriterTest extends TestCase
 {

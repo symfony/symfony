@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 final class ClassMetadataFactoryCompiler
 {

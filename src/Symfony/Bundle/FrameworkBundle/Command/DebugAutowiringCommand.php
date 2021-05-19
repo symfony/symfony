@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 /**
  * A console command for autowiring information.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @internal
  */

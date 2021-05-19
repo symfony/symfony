@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\CacheClearer;
 /**
  * CacheClearerInterface.
  *
- * @author Dustin Dobervich <ddobervich@gmail.com>
+
  */
 interface CacheClearerInterface
 {

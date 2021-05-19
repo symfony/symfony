@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Event;
 use Symfony\Component\Notifier\Message\MessageInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NotificationEvents
 {

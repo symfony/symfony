@@ -14,7 +14,7 @@ namespace Symfony\Component\Config;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface FileLocatorInterface
 {

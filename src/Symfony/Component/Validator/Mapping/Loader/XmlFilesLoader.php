@@ -14,8 +14,8 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 /**
  * Loads validation metadata from a list of XML files.
  *
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @see FilesLoader
  */

@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Pavel Dyakonov <wapinet@mail.ru>
+
  */
 class UuidType extends AbstractType
 {

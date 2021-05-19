@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Util;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormUtil
 {

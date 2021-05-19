@@ -16,8 +16,8 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Resets provided services.
  *
- * @author Alexander M. Turek <me@derrabus.de>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  *
  * @internal
  */

@@ -21,8 +21,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 final class EventSourceHttpClient implements HttpClientInterface
 {

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
 /**
  * Creates and validates secure hashes used in login links and remember-me cookies.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
+
  */
 class SignatureHasher
 {

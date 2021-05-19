@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess\Exception;
 /**
  * Thrown when a property is not initialized.
  *
- * @author Jules Pietri <jules@heahprod.com>
+
  */
 class UninitializedPropertyException extends AccessException
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpClient\Internal;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

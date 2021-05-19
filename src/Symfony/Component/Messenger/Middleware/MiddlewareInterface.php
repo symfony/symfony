@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Messenger\Envelope;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 interface MiddlewareInterface
 {

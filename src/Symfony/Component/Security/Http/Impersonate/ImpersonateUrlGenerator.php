@@ -20,8 +20,8 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 /**
  * Provides generator functions for the impersonate url exit.
  *
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @author Damien Fayet <damienf1521@gmail.com>
+
+
  */
 class ImpersonateUrlGenerator
 {

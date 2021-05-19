@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Exception;
 /**
  * Exception class for when a resource cannot be loaded or imported.
  *
- * @author Ryan Weaver <ryan@thatsquality.com>
+
  */
 class LoaderLoadException extends \Exception
 {

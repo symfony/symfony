@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Inline service definitions where this is possible.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {

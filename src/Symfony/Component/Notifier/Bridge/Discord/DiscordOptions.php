@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
- * @author Karoly Gossler <connor@connor.hu>
+
  */
 final class DiscordOptions implements MessageOptionsInterface
 {

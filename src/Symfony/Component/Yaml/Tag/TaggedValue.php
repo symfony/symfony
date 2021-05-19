@@ -12,8 +12,8 @@
 namespace Symfony\Component\Yaml\Tag;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Guilhem N. <egetick@gmail.com>
+
+
  */
 final class TaggedValue
 {

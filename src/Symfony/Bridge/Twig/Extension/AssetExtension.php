@@ -18,7 +18,7 @@ use Twig\TwigFunction;
 /**
  * Twig extension for the Symfony Asset component.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class AssetExtension extends AbstractExtension
 {

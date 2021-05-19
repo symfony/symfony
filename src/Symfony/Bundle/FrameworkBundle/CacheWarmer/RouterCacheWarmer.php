@@ -20,7 +20,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * Generates the router matcher and generator classes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

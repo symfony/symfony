@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormTypeInterface;
  *
  * @internal
  *
- * @author Vincent Langlet <vincentlanglet@users.noreply.github.com>
+
  */
 final class ChoiceTranslationParameters extends AbstractStaticOption
 {

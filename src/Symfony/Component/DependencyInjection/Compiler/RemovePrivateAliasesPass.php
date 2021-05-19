@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * dependencies between services, and these dependencies have been resolved in
  * one of the previous passes.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class RemovePrivateAliasesPass implements CompilerPassInterface
 {

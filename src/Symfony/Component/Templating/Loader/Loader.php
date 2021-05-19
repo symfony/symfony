@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Loader is the base class for all template loader classes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class Loader implements LoaderInterface
 {

@@ -19,8 +19,8 @@ use Symfony\Component\Cache\Traits\FilesystemTrait;
 /**
  * Stores tag id <> cache id relationship as a symlink, and lookup on invalidation calls.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author André Rømcke <andre.romcke+symfony@gmail.com>
+
+
  */
 class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {

@@ -16,8 +16,8 @@ use Symfony\Component\Semaphore\Key;
 /**
  * SemaphoreAcquiringException is thrown when an issue happens during the acquisition of a semaphore.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class SemaphoreAcquiringException extends \RuntimeException implements ExceptionInterface
 {

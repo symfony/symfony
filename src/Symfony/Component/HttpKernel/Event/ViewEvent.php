@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * current request. The propagation of this event is stopped as soon as a
  * response is set.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class ViewEvent extends RequestEvent
 {

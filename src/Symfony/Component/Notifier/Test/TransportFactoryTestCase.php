@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 /**
  * A test case to ease testing a notifier transport factory.
  *
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 abstract class TransportFactoryTestCase extends TestCase
 {

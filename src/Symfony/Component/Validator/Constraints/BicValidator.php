@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Michael Hirschler <michael.vhirsch@gmail.com>
+
  *
  * @see https://en.wikipedia.org/wiki/ISO_9362#Structure
  */

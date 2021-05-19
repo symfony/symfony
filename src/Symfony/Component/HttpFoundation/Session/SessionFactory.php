@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterf
 class_exists(Session::class);
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class SessionFactory
 {

@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Suggests a package, that should be installed (via composer),
  * if the package is missing, and the input command namespace can be mapped to a Symfony bundle.
  *
- * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
+
  *
  * @internal
  */

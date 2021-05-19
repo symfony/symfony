@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\AbstractTelegramRepl
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
- * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
+
  */
 final class TelegramOptions implements MessageOptionsInterface
 {

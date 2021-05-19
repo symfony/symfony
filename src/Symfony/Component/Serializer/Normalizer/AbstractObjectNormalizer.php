@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Base class for a normalizer dealing with objects.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {

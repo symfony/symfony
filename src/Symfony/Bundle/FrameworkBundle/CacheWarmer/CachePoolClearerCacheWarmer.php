@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  *
  * Do not use in production!
  *
- * @author Teoh Han Hui <teohhanhui@gmail.com>
+
  *
  * @internal
  */

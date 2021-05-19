@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Channel;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ChannelPolicyInterface
 {

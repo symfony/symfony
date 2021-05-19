@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ServicesConfigurator extends AbstractConfigurator
 {

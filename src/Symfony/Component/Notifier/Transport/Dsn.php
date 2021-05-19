@@ -15,8 +15,8 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class Dsn
 {

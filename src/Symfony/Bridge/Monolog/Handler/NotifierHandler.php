@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\NotifierInterface;
 /**
  * Uses Notifier as a log handler.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NotifierHandler extends AbstractHandler
 {

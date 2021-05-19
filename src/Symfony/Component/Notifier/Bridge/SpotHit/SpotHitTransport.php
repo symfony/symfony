@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author James Hemery <james@yieldstudio.fr>
+
  */
 final class SpotHitTransport extends AbstractTransport
 {

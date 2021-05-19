@@ -15,7 +15,7 @@ use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * @experimental in 5.3
  */

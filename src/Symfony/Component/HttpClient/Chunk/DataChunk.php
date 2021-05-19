@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Chunk;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

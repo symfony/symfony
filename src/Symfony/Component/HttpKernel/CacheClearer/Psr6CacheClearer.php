@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Psr6CacheClearer implements CacheClearerInterface
 {

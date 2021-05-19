@@ -15,7 +15,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {

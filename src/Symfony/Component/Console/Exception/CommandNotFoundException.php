@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Exception;
 /**
  * Represents an incorrect command name typed in the console.
  *
- * @author Jérôme Tamarelle <jerome@tamarelle.net>
+
  */
 class CommandNotFoundException extends \InvalidArgumentException implements ExceptionInterface
 {

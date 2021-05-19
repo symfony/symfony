@@ -19,7 +19,7 @@ use Symfony\Component\Config\ResourceCheckerInterface;
  * As these resources perform the actual check themselves, we can provide
  * this class as a standard way of validating them.
  *
- * @author Matthias Pigulla <mp@webfactory.de>
+
  */
 class SelfCheckingResourceChecker implements ResourceCheckerInterface
 {

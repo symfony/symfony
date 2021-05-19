@@ -23,7 +23,7 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
 {

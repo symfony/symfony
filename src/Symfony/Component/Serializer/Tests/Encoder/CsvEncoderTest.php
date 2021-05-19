@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class CsvEncoderTest extends TestCase
 {

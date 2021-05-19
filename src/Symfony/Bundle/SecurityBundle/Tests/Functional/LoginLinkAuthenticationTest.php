@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class LoginLinkAuthenticationTest extends AbstractWebTestCase
 {

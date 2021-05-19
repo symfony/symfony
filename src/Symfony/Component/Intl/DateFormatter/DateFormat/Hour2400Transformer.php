@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 /**
  * Parser and formatter for 24 hour format (0-23).
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+
  *
  * @internal
  *

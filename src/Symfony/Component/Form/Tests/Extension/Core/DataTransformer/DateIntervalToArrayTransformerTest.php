@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTransformer;
 
 /**
- * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
+
  */
 class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
 {

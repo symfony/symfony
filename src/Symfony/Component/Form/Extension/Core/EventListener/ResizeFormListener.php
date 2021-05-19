@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
 /**
  * Resize a collection form element based on the data sent from the client.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ResizeFormListener implements EventSubscriberInterface
 {

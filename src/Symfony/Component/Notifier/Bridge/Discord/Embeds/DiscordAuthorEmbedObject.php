@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Discord\Embeds;
 
 /**
- * @author Karoly Gossler <connor@connor.hu>
+
  */
 final class DiscordAuthorEmbedObject extends AbstractDiscordEmbedObject
 {

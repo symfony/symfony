@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
+
  */
 class RemoveUnusedSessionMarshallingHandlerPass implements CompilerPassInterface
 {

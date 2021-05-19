@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

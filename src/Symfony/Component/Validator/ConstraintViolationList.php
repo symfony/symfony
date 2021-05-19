@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator;
 /**
  * Default implementation of {@ConstraintViolationListInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
 {

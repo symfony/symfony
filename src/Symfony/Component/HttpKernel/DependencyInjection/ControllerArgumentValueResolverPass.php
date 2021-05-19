@@ -22,7 +22,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 /**
  * Gathers and configures the argument value resolvers.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 class ControllerArgumentValueResolverPass implements CompilerPassInterface
 {

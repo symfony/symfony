@@ -22,7 +22,7 @@ use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Andrii Bodnar <andrii.bodnar@crowdin.com>
+
  *
  * @experimental in 5.3
  */

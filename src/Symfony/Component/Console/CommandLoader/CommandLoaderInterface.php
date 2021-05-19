@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 interface CommandLoaderInterface
 {

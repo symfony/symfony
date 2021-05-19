@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * Base class for constraint validators.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {

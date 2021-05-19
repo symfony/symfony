@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  * Credentials are a special badge used to explicitly mark the
  * credential check of an authenticator.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 interface CredentialsInterface extends BadgeInterface
 {

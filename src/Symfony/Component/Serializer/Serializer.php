@@ -40,10 +40,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *     $serializer->decode($data, 'xml')
  *     $serializer->denormalize($data, 'Class', 'xml')
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Lukas Kahwe Smith <smith@pooteeweet.org>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
+
+
  */
 class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface, ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {

@@ -20,7 +20,7 @@ use Twig\TokenParser\AbstractTokenParser;
 /**
  * Token Parser for the stopwatch tag.
  *
- * @author Wouter J <wouter@wouterj.nl>
+
  */
 final class StopwatchTokenParser extends AbstractTokenParser
 {

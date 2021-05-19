@@ -29,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * The context used and created by {@link ExecutionContextFactory}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see ExecutionContextInterface
  *

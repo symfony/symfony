@@ -25,7 +25,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * This event dispatcher delegates the dispatching to another one.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {

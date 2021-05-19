@@ -16,8 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * Maps a message to a list of senders.
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 interface SendersLocatorInterface
 {

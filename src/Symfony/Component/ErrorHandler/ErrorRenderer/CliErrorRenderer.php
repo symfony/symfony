@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 class_exists(CliDumper::class);
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class CliErrorRenderer implements ErrorRendererInterface
 {

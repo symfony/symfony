@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
  * A decorator that delegates all method calls to the authenticator
  * manager of the current firewall.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Formats debug file links.
  *
- * @author Jérémy Romey <jeremy@free-agent.fr>
+
  *
  * @final
  */

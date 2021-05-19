@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Renders a form into HTML.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface FormRendererInterface
 {

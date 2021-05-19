@@ -32,7 +32,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @group legacy
  */

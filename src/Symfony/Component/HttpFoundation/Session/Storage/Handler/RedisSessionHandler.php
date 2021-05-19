@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
  * Redis based session storage handler based on the Redis class
  * provided by the PHP redis extension.
  *
- * @author Dalibor Karlović <dalibor@flexolabs.io>
+
  */
 class RedisSessionHandler extends AbstractSessionHandler
 {

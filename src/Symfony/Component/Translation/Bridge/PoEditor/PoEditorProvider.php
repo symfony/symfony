@@ -20,7 +20,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * In PoEditor:
  *  * Terms refer to Symfony's translation keys;

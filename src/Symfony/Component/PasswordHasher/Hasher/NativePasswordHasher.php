@@ -17,9 +17,9 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 /**
  * Hashes passwords using password_hash().
  *
- * @author Elnur Abdurrakhimov <elnur@elnur.pro>
- * @author Terje Bråten <terje@braten.be>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
  */
 final class NativePasswordHasher implements PasswordHasherInterface
 {

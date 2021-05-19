@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Store implements StoreInterface
 {

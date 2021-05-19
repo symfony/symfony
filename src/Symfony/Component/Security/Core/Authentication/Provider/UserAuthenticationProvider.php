@@ -28,7 +28,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */

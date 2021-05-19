@@ -35,7 +35,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Internal representation of the Amp client's state.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

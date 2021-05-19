@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * StreamedResponseListener is responsible for sending the Response
  * to the client.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

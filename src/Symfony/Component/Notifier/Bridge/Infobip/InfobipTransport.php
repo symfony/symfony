@@ -21,8 +21,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jérémy Romey <jeremy@free-agent.fr>
+
+
  */
 final class InfobipTransport extends AbstractTransport
 {

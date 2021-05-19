@@ -14,7 +14,7 @@ namespace Symfony\Component\VarDumper\Cloner;
 /**
  * Represents the current state of a dumper while dumping.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Cursor
 {

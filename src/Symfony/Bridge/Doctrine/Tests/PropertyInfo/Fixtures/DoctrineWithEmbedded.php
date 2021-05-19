@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\Id;
 /**
  * @Entity
  *
- * @author Udaltsov Valentin <udaltsov.valentin@gmail.com>
+
  */
 class DoctrineWithEmbedded
 {

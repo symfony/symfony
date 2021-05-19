@@ -12,7 +12,7 @@
 namespace Symfony\Component\VarDumper\Exception;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ThrowingCasterException extends \Exception
 {

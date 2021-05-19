@@ -14,7 +14,7 @@ namespace Symfony\Component\Uid;
 /**
  * @internal
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class BinaryUtil
 {

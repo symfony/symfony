@@ -14,8 +14,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class GatewayApiTransportTest extends TransportTestCase
 {

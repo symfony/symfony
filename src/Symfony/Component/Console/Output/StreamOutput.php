@@ -25,7 +25,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  *     $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class StreamOutput extends Output
 {

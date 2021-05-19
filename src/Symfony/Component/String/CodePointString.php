@@ -17,8 +17,8 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
 /**
  * Represents a string of Unicode code points encoded as UTF-8.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  *
  * @throws ExceptionInterface
  */

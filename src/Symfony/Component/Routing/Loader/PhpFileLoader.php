@@ -21,9 +21,9 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * The file must return a RouteCollection instance.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Nicolas grekas <p@tchwork.com>
- * @author Jules Pietri <jules@heahprod.com>
+
+
+
  */
 class PhpFileLoader extends FileLoader
 {

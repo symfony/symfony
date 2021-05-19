@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpOptions;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class HttpOptionsTest extends TestCase
 {

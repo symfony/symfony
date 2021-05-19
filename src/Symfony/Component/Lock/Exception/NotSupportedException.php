@@ -16,7 +16,7 @@ trigger_deprecation('symfony/lock', '5.2', '%s is deprecated, You should stop us
 /**
  * NotSupportedException is thrown when an unsupported method is called.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @deprecated since Symfony 5.2
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class ChannelPolicyTest extends TestCase
 {

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
 /**
  * Allow adding classes to the class cache.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class Extension extends BaseExtension
 {

@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  *
  * @internal
  */

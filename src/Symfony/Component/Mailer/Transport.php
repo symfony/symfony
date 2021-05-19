@@ -36,8 +36,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
+
  */
 class Transport
 {

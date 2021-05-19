@@ -24,7 +24,7 @@ namespace Symfony\Contracts\Service;
  * This interface does not dictate any injection method for these service locators, although constructor
  * injection is recommended.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ServiceSubscriberInterface
 {

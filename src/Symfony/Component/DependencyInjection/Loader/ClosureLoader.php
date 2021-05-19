@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * The Closure has access to the container as its first argument.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ClosureLoader extends Loader
 {

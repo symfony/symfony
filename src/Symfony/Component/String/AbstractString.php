@@ -22,8 +22,8 @@ use Symfony\Component\String\Exception\RuntimeException;
  * This class is the abstract type to use as a type-hint when the logic you want to
  * implement doesn't care about the exact variant it deals with.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  *
  * @throws ExceptionInterface
  */

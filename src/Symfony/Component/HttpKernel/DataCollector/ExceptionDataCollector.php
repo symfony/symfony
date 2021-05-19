@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * ExceptionDataCollector.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -21,7 +21,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * QtFileLoader loads translations from QT Translations XML files.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+
  */
 class QtFileLoader implements LoaderInterface
 {

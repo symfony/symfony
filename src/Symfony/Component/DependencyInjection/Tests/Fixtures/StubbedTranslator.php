@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 use Psr\Container\ContainerInterface;
 
 /**
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 class StubbedTranslator
 {

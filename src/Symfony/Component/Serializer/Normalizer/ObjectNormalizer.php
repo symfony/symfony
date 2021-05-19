@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Converts between objects and arrays using the PropertyAccess component.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ObjectNormalizer extends AbstractObjectNormalizer
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Workflow;
 /**
  * Marking contains the place of every tokens.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class Marking
 {

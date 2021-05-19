@@ -18,7 +18,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+
  */
 class LoggingTranslatorPass implements CompilerPassInterface
 {

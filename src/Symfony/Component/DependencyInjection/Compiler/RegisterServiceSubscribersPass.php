@@ -26,7 +26,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * Compiler pass to register tagged services that require a service locator.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class RegisterServiceSubscribersPass extends AbstractRecursivePass
 {

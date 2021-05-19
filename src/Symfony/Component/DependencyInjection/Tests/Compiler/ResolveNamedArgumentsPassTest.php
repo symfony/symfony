@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ResolveNamedArgumentsPassTest extends TestCase
 {

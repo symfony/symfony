@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Denormalizes arrays of objects.
  *
- * @author Alexander M. Turek <me@derrabus.de>
+
  *
  * @final
  */

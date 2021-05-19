@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Message;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class ChatMessage implements MessageInterface
 {

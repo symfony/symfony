@@ -31,7 +31,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

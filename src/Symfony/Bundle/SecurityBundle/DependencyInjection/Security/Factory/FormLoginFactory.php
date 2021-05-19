@@ -20,8 +20,8 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * FormLoginFactory creates services for form login authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  *
  * @internal
  */

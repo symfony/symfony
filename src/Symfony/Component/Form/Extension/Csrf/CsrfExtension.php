@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * This extension protects forms by using a CSRF token.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CsrfExtension extends AbstractExtension
 {

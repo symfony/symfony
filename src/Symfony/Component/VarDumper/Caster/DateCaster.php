@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts DateTimeInterface related classes to array representation.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
  *
  * @final
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class GroupsTest extends TestCase
 {

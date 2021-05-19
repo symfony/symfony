@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime\Encoder;
 
 /**
- * @author Chris Corbyn
+
  */
 final class QpMimeHeaderEncoder extends QpEncoder implements MimeHeaderEncoderInterface
 {

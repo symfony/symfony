@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * PHP stream wrappers are able to fetch response bodies concurrently,
  * but each request is opened synchronously.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterface
 {

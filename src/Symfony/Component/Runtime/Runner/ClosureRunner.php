@@ -14,7 +14,7 @@ namespace Symfony\Component\Runtime\Runner;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @experimental in 5.3
  */

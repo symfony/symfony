@@ -12,8 +12,8 @@
 namespace Symfony\Component\Ldap;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
- * @author Karl Shea <karl@karlshea.com>
+
+
  */
 class Entry
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Data\Util;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

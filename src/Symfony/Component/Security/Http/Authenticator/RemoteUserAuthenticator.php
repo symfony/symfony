@@ -20,9 +20,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * This authenticator authenticates a remote user.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Maxime Douailin <maxime.douailin@gmail.com>
+
+
+
  *
  * @final
  *

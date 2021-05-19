@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * MIGRATE: the session id is updated, attributes are kept
  * INVALIDATE: the session id is updated, attributes are lost
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {

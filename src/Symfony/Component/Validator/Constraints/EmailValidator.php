@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class EmailValidator extends ConstraintValidator
 {

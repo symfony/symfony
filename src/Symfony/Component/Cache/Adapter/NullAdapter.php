@@ -16,7 +16,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
- * @author Titouan Galopin <galopintitouan@gmail.com>
+
  */
 class NullAdapter implements AdapterInterface, CacheInterface
 {

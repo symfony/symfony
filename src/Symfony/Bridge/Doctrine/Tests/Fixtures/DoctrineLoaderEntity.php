@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @UniqueEntity(fields={"alreadyMappedUnique"})
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 {

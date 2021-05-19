@@ -16,8 +16,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 /**
  * This class builds an if expression.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Christophe Coevoet <stof@notk.org>
+
+
  */
 class ExprBuilder
 {

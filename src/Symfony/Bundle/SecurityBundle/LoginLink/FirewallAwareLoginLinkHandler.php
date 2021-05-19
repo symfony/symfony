@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 /**
  * Decorates the login link handler for the current firewall.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class FirewallAwareLoginLinkHandler implements LoginLinkHandlerInterface
 {

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\Version;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class VersionTest extends TestCase
 {

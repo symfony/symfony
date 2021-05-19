@@ -15,10 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 /**
- * TemplateController.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
  * @final
  */
 class TemplateController

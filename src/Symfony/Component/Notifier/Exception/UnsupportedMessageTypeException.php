@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Exception;
 use Symfony\Component\Notifier\Message\MessageInterface;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 class UnsupportedMessageTypeException extends LogicException
 {

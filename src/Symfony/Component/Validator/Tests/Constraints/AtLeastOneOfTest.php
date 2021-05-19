@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
+
  */
 class AtLeastOneOfTest extends TestCase
 {

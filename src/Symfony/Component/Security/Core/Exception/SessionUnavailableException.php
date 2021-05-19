@@ -20,8 +20,8 @@ namespace Symfony\Component\Security\Core\Exception;
  *     b) The user has disabled cookies, and a new session is started on each
  *        request.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
  */
 class SessionUnavailableException extends AuthenticationException
 {

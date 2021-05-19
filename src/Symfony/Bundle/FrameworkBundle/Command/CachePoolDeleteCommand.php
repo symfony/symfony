@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 /**
  * Delete an item from a cache pool.
  *
- * @author Pierre du Plessis <pdples@gmail.com>
+
  */
 final class CachePoolDeleteCommand extends Command
 {

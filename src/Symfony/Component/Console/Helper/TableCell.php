@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+
  */
 class TableCell
 {

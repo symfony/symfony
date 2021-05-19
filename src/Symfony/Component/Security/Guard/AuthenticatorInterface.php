@@ -27,8 +27,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * process to give you the power to control most parts of the process from
  * one location.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
- * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+
+
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */

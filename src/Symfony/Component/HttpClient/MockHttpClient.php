@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * A test-friendly HttpClient that doesn't make actual HTTP requests.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class MockHttpClient implements HttpClientInterface
 {

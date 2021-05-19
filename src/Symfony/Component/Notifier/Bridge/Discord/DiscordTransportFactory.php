@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Mathieu Piot <math.piot@gmail.com>
+
  */
 final class DiscordTransportFactory extends AbstractTransportFactory
 {

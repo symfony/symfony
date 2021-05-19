@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 final class MobytTransportTest extends TransportTestCase
 {

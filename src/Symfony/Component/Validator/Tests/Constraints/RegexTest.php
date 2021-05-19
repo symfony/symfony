@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RegexTest extends TestCase
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
 use Symfony\Component\Lock\Key;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class KeyTest extends TestCase
 {

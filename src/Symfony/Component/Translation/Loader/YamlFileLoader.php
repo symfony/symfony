@@ -20,7 +20,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * YamlFileLoader loads translations from Yaml files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class YamlFileLoader extends FileLoader
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 
 /**
- * @author Smaïne Milianni <smaine.milianni@gmail.com>
+
  */
 abstract class AbstractLinkedInShare
 {

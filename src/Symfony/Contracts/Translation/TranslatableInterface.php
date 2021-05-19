@@ -12,7 +12,7 @@
 namespace Symfony\Contracts\Translation;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface TranslatableInterface
 {

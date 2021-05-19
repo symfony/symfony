@@ -21,8 +21,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Sends Emails over SMTP with ESMTP support.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Chris Corbyn
+
+
  */
 class EsmtpTransport extends SmtpTransport
 {

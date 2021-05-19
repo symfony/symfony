@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 trait AddTrait
 {

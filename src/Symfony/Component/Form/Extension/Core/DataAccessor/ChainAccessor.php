@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\AccessException;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  */
 class ChainAccessor implements DataAccessorInterface
 {

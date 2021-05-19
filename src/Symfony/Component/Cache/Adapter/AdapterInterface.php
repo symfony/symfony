@@ -20,7 +20,7 @@ class_exists(CacheItem::class);
 /**
  * Interface for adapters managing instances of Symfony's CacheItem.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 interface AdapterInterface extends CacheItemPoolInterface
 {

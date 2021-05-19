@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * Verifies that {@link AbstractIntlGlobalsTest} matches the behavior of the
  * intl functions with a specific version of ICU.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @group legacy
  */

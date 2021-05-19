@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 /**
  * Custom loader for entities in the choice list.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+
  */
 interface EntityLoaderInterface
 {

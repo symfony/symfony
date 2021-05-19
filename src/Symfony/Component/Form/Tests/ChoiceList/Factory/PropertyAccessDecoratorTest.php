@@ -22,7 +22,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyAccessDecoratorTest extends TestCase
 {

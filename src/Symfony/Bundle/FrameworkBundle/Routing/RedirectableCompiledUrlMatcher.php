@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

@@ -24,7 +24,7 @@ use Symfony\Component\Form\FormTypeInterface;
  *
  * @internal
  *
- * @author Jules Pietri <jules@heahprod.com>
+
  */
 abstract class AbstractStaticOption
 {

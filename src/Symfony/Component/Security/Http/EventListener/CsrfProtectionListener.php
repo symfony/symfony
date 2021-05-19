@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

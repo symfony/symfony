@@ -22,7 +22,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * by the PHP dumper.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class Variable
 {

@@ -26,8 +26,8 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * less technical. Generating URIs, i.e. representation-independent resource identifiers,
  * is also possible.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 interface UrlGeneratorInterface extends RequestContextAwareInterface
 {

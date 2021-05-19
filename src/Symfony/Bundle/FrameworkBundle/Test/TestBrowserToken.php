@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * A very limited token that is used to login in tests using the KernelBrowser.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class TestBrowserToken extends AbstractToken
 {

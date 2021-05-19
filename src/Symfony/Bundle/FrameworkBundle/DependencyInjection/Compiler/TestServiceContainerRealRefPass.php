@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class TestServiceContainerRealRefPass implements CompilerPassInterface
 {

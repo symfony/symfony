@@ -15,7 +15,7 @@ namespace Symfony\Component\Config\Resource;
  * Interface for Resources that can check for freshness autonomously,
  * without special support from external services.
  *
- * @author Matthias Pigulla <mp@webfactory.de>
+
  */
 interface SelfCheckingResourceInterface extends ResourceInterface
 {

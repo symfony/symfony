@@ -25,8 +25,8 @@ use Symfony\Component\String\Exception\InvalidArgumentException;
  *
  * @see https://unicode.org/reports/tr15/
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  *
  * @throws ExceptionInterface
  */

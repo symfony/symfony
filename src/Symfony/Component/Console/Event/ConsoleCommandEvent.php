@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Event;
 /**
  * Allows to do things before the command is executed, like skipping the command or changing the input.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class ConsoleCommandEvent extends ConsoleEvent
 {

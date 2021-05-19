@@ -14,7 +14,7 @@ namespace Symfony\Component\Ldap\Exception;
 /**
  * AlreadyExistsException is thrown if the element already exists.
  *
- * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+
  */
 class AlreadyExistsException extends ConnectionException
 {

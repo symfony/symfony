@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  */
 class NotNormalizableValueException extends UnexpectedValueException
 {

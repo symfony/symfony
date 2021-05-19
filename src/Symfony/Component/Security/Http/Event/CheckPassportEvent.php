@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  * credentials (e.g. default listeners do password verification and
  * user checking)
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class CheckPassportEvent extends Event
 {

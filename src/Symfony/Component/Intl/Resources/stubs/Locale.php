@@ -18,7 +18,7 @@ if (!class_exists(LocalePolyfill::class)) {
     /**
      * Stub implementation for the Locale class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see IntlLocale
      */
@@ -29,7 +29,7 @@ if (!class_exists(LocalePolyfill::class)) {
     /**
      * Stub implementation for the Locale class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see IntlLocale
      */

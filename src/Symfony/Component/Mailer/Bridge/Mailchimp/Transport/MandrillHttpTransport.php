@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Kevin Verschaeve
+
  */
 class MandrillHttpTransport extends AbstractHttpTransport
 {

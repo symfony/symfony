@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 /**
  * The default implementation of FormFactoryBuilderInterface.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormFactoryBuilder implements FormFactoryBuilderInterface
 {

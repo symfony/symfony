@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**
- * @author Wouter J <wouter@wouterj.nl>
+
  */
 class ExtensionCompilerPassTest extends TestCase
 {

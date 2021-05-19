@@ -26,7 +26,7 @@ namespace Symfony\Component\Templating;
  * Each template loader uses the logical template name to look for
  * the template.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface EngineInterface
 {

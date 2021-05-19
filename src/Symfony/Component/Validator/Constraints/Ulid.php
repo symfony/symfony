@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  *
- * @author Laurent Clouet <laurent35240@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Ulid extends Constraint

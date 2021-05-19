@@ -15,7 +15,7 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\Error\UndefinedMethodError;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class UndefinedMethodErrorEnhancer implements ErrorEnhancerInterface
 {

@@ -21,9 +21,9 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  *
  * When doing functional testing, you should use MockFileSessionStorage instead.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- * @author Drak <drak@zikula.org>
+
+
+
  */
 class MockArraySessionStorage implements SessionStorageInterface
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\TextPart;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Message extends RawMessage
 {

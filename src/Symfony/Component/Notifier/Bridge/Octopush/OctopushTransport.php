@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Aurélien Martin <pro@aurelienmartin.com>
+
  */
 final class OctopushTransport extends AbstractTransport
 {

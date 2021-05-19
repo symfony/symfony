@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Exception;
 /**
  * LockStorageException is thrown when an issue happens during the manipulation of a lock in a store.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class LockStorageException extends \RuntimeException implements ExceptionInterface
 {

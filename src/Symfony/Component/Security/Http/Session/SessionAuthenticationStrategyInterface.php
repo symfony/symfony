@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Implementation are responsible for updating the session after an interactive
  * authentication attempt was successful.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface SessionAuthenticationStrategyInterface
 {

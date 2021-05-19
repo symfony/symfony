@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * AjaxDataCollector.
  *
- * @author Bart van den Burg <bart@burgov.nl>
+
  *
  * @final
  */

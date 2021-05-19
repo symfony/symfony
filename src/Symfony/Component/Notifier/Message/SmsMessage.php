@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class SmsMessage implements MessageInterface
 {

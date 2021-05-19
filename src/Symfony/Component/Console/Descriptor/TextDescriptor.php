@@ -20,10 +20,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Text descriptor.
- *
- * @author Jean-François Simon <contact@jfsimon.fr>
- *
  * @internal
  */
 class TextDescriptor extends Descriptor

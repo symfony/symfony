@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class IsFalseValidator extends ConstraintValidator
 {

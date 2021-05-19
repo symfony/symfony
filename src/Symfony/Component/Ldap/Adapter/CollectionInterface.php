@@ -14,7 +14,7 @@ namespace Symfony\Component\Ldap\Adapter;
 use Symfony\Component\Ldap\Entry;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 interface CollectionInterface extends \Countable, \IteratorAggregate, \ArrayAccess
 {

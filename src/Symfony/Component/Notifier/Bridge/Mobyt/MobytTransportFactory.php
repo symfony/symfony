@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Bastien Durand <bdurand-dev@outlook.com>
+
  */
 final class MobytTransportFactory extends AbstractTransportFactory
 {

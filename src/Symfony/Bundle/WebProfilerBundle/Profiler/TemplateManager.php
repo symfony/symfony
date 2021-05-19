@@ -19,8 +19,8 @@ use Twig\Environment;
 /**
  * Profiler Templates Manager.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Artur Wielogórski <wodor@wodor.net>
+
+
  *
  * @internal
  */

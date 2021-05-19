@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 /**
  * Pass the current locale to the provided services.
  *
- * @author Pierre Bobiet <pierrebobiet@gmail.com>
+
  */
 class LocaleAwareListener implements EventSubscriberInterface
 {

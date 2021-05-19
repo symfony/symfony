@@ -16,7 +16,7 @@ use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 class ProgressIndicator
 {

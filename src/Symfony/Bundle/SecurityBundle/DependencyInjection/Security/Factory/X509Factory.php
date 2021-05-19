@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * X509Factory creates services for X509 certificate authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

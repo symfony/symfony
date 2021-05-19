@@ -14,9 +14,9 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * ServerBag is a container for HTTP headers from the $_SERVER variable.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- * @author Robert Kiss <kepten@gmail.com>
+
+
+
  */
 class ServerBag extends ParameterBag
 {

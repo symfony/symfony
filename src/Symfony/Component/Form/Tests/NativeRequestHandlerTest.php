@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\NativeRequestHandler;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {

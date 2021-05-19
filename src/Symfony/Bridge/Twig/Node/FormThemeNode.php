@@ -16,7 +16,7 @@ use Twig\Compiler;
 use Twig\Node\Node;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class FormThemeNode extends Node
 {

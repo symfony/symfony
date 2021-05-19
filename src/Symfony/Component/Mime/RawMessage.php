@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime;
 use Symfony\Component\Mime\Exception\LogicException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RawMessage implements \Serializable
 {

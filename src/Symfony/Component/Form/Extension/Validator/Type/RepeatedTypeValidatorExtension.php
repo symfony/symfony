@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RepeatedTypeValidatorExtension extends AbstractTypeExtension
 {

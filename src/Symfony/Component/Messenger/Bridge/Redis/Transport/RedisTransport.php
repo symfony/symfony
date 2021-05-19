@@ -18,8 +18,8 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
+
+
  */
 class RedisTransport implements TransportInterface, SetupableTransportInterface
 {

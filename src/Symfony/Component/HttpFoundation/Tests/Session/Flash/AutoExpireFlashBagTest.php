@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
 /**
  * AutoExpireFlashBagTest.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class AutoExpireFlashBagTest extends TestCase
 {

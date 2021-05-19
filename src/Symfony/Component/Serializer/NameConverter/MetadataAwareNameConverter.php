@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
 {

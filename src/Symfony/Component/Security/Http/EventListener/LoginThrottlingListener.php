@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 final class LoginThrottlingListener implements EventSubscriberInterface
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class ServerLogCommand extends Command
 {

@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * EventDataCollector.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

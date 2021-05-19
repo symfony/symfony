@@ -19,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * List available cache pools.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 final class CachePoolListCommand extends Command
 {

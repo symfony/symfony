@@ -15,7 +15,7 @@ namespace Symfony\Component\Form\Guess;
  * Contains a guessed class name and a list of options for creating an instance
  * of that class.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class TypeGuess extends Guess
 {

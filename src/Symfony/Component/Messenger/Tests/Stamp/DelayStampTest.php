@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 /**
- * @author Yanick Witschi <yanick.witschi@terminal42.ch>
+
  */
 class DelayStampTest extends TestCase
 {

@@ -22,8 +22,8 @@ use Twig\Source;
 /**
  * TwigExtractor extracts translation messages from a twig template.
  *
- * @author Michel Salib <michelsalib@hotmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  */
 class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {

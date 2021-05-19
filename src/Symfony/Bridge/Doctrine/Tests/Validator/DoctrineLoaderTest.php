@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineLoaderTest extends TestCase
 {

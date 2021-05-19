@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Simulates a browser and makes requests to a Kernel object.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class KernelBrowser extends HttpKernelBrowser
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
  * Provides some utility methods for XLIFF translation files, such as validating
  * their contents according to the XSD schema.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class XliffUtils
 {

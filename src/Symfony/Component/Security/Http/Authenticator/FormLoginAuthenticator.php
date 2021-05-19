@@ -35,8 +35,8 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  *
  * @final
  */

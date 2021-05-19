@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class HtmlDumperTest extends TestCase
 {

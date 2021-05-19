@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceEx
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {

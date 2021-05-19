@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 /**
  * The rule for compiling the currency bundle.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

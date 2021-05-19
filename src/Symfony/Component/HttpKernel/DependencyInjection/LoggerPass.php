@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Log\Logger;
 /**
  * Registers the default logger if necessary.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class LoggerPass implements CompilerPassInterface
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ChatNotificationInterface
 {

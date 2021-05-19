@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Replaces all references to aliases with references to the actual service.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {

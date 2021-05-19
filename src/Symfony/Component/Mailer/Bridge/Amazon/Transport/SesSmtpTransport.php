@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Kevin Verschaeve
+
  */
 class SesSmtpTransport extends EsmtpTransport
 {

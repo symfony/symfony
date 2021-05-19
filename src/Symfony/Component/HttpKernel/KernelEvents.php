@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 /**
  * Contains all events thrown in the HttpKernel component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class KernelEvents
 {

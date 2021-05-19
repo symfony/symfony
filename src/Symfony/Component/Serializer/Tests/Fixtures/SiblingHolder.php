@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class SiblingHolder
 {
@@ -46,7 +46,7 @@ class SiblingHolder
 }
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class Sibling
 {

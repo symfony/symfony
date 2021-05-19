@@ -25,8 +25,8 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
 /**
  * RedisStore is a PersistingStoreInterface implementation using Redis as store engine.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class RedisStore implements SharedLockStoreInterface
 {

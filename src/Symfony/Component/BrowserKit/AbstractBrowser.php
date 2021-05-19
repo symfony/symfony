@@ -25,7 +25,7 @@ use Symfony\Component\Process\PhpProcess;
  * If you want to be able to run requests in their own process (insulated flag),
  * you need to also implement the getScript() method.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractBrowser
 {

@@ -23,7 +23,7 @@ use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  */
 class TranslationPullCommandTest extends TranslationProviderTestCase
 {

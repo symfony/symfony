@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Entry point for the Validator component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class Validation
 {

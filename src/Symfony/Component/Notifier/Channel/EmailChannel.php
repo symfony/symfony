@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class EmailChannel implements ChannelInterface
 {

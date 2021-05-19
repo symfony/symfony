@@ -24,7 +24,7 @@ use Symfony\Component\Translation\Reader\TranslationReaderInterface;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * @experimental in 5.3
  */

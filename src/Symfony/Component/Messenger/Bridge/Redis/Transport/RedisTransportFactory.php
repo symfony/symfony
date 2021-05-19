@@ -16,8 +16,8 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Alexander Schranz <alexander@suluio>
- * @author Antoine Bluchet <soyuka@gmail.com>
+
+
  */
 class RedisTransportFactory implements TransportFactoryInterface
 {

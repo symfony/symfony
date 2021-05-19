@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * Unlike UUIDv1, this implementation of UUIDv6 doesn't leak the MAC address of the host.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class UuidV6 extends Uuid
 {

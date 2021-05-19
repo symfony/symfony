@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\NameConverter;
 /**
  * CamelCase to Underscore name converter.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
 {

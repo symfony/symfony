@@ -21,7 +21,7 @@ namespace Symfony\Component\Form\Util;
  * enter any child form that inherits its parent's data and iterate the children
  * of that form as well.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class InheritDataAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {

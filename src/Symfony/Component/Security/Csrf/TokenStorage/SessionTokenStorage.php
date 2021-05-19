@@ -22,7 +22,7 @@ use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 /**
  * Token storage that uses a Symfony Session object.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class SessionTokenStorage implements ClearableTokenStorageInterface
 {

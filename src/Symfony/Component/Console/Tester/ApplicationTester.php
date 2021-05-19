@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\ArrayInput;
  *     $application = new Application();
  *     $application->setAutoExit(false);
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ApplicationTester
 {

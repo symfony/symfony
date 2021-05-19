@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\LazyProxy;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

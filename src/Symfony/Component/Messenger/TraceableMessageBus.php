@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class TraceableMessageBus implements MessageBusInterface
 {

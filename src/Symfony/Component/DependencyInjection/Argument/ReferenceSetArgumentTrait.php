@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Titouan Galopin <galopintitouan@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 trait ReferenceSetArgumentTrait
 {

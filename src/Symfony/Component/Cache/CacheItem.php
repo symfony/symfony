@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class CacheItem implements ItemInterface
 {

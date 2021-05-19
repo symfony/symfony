@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
- * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
+
  */
 class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {

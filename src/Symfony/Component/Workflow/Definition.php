@@ -16,9 +16,9 @@ use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
+
+
  */
 final class Definition
 {

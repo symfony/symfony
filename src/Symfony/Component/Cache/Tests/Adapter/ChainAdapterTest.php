@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  * @group time-sensitive
  */
 class ChainAdapterTest extends AdapterTestCase

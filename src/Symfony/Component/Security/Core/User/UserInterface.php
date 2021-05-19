@@ -28,7 +28,7 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @method string getUserIdentifier() returns the identifier for this user (e.g. its username or e-mailaddress)
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface UserInterface
 {

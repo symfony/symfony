@@ -17,8 +17,8 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 
 /**
- * @author Rob Frawley 2nd <rmf@src.run>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  *
  * @internal
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractChannel implements ChannelInterface
 {

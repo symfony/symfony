@@ -16,7 +16,7 @@ use Symfony\Component\Console\Color;
 /**
  * Formatter style class for defining styles.
  *
- * @author Konstantin Kudryashov <ever.zet@gmail.com>
+
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {

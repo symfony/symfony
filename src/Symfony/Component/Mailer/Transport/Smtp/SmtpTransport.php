@@ -26,8 +26,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Sends emails over SMTP.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Chris Corbyn
+
+
  */
 class SmtpTransport extends AbstractTransport
 {

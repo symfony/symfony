@@ -12,7 +12,7 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class ImgStub extends ConstStub
 {

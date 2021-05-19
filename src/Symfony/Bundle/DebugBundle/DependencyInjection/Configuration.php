@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * DebugExtension configuration structure.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Configuration implements ConfigurationInterface
 {

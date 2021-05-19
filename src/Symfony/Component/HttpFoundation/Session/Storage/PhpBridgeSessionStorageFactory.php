@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class_exists(PhpBridgeSessionStorage::class);
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class PhpBridgeSessionStorageFactory implements SessionStorageFactoryInterface
 {

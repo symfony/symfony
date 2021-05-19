@@ -17,7 +17,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\Cache\CacheTrait;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class CacheTraitTest extends TestCase
 {

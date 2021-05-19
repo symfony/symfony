@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class TestClassMetadataFactory
 {

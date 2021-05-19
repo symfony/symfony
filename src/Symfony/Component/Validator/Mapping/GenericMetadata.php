@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * This class supports serialization and cloning.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class GenericMetadata implements MetadataInterface
 {

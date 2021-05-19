@@ -15,7 +15,7 @@ use Monolog\Formatter\FormatterInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class VarDumperFormatter implements FormatterInterface
 {

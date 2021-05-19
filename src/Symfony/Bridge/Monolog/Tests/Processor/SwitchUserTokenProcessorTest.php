@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 /**
  * Tests the SwitchUserTokenProcessor.
  *
- * @author Igor Timoshenko <igor.timoshenko@i.ua>
+
  */
 class SwitchUserTokenProcessorTest extends TestCase
 {

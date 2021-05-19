@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 /**
  * The EnvVarProcessorInterface is implemented by objects that manage environment-like variables.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface EnvVarProcessorInterface
 {

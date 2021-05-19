@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  * Verifies that {@link AbstractCollatorTest} matches the behavior of the
  * {@link \Collator} class in a specific version of ICU.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CollatorTest extends AbstractCollatorTest
 {

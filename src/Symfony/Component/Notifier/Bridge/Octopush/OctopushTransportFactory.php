@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Aurélien Martin <pro@aurelienmartin.com>
+
  */
 final class OctopushTransportFactory extends AbstractTransportFactory
 {

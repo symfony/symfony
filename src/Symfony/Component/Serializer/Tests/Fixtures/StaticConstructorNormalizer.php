@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
- * @author Guilhem N. <egetick@gmail.com>
+
  */
 class StaticConstructorNormalizer extends ObjectNormalizer
 {

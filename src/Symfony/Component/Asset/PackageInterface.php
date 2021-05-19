@@ -14,7 +14,7 @@ namespace Symfony\Component\Asset;
 /**
  * Asset package interface.
  *
- * @author Kris Wallsmith <kris@symfony.com>
+
  */
 interface PackageInterface
 {

@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * This event is dispatched on voter vote.
  *
- * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+
  *
  * @internal
  */

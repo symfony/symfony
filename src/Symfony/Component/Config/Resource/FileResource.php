@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * The resource can be a file or a directory.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\AbstractPreAuthenticatedAuthen
  *
  * @see AbstractPreAuthenticatedAuthenticator
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

@@ -39,9 +39,9 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
- * @author Ryan Weaver <ryan@symfonycasts.com>
- * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+
+
+
  */
 class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthenticatorInterface
 {

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {

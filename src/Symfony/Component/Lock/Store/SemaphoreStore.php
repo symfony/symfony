@@ -19,7 +19,7 @@ use Symfony\Component\Lock\Key;
 /**
  * SemaphoreStore is a PersistingStoreInterface implementation using Semaphore as store engine.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class SemaphoreStore implements BlockingStoreInterface
 {

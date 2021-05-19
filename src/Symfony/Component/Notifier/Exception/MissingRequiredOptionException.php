@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Exception;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 class MissingRequiredOptionException extends IncompleteDsnException
 {

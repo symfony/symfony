@@ -12,7 +12,7 @@
 namespace Symfony\Component\RateLimiter\Util;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Represents a PHP class identifier.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ClassStub extends ConstStub
 {

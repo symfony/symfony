@@ -14,8 +14,8 @@ namespace Symfony\Component\HttpFoundation\Session;
 /**
  * Session utility functions.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Rémon van de Kamp <rpkamp@gmail.com>
+
+
  *
  * @internal
  */

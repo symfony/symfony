@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * Normalizer implementation.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {

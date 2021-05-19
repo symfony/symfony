@@ -24,7 +24,7 @@ use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\Util\ServerParams;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class AbstractRequestHandlerTest extends TestCase
 {

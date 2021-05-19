@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * A Controller can be any valid PHP callable.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ControllerResolverInterface
 {

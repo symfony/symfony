@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * in the DoctrineBundle resp.
  * DoctrineMongodbBundle, DoctrineCouchdbBundle and DoctrinePhpcrBundle.
  *
- * @author David Buchmann <david@liip.ch>
+
  */
 abstract class RegisterMappingsPass implements CompilerPassInterface
 {

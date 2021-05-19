@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 /**
  * A form extension with preloaded types, type extensions and type guessers.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PreloadedExtension implements FormExtensionInterface
 {

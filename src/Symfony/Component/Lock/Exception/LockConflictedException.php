@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Lock;
  *
  * In non-blocking mode it is caught by {@see Lock::acquire()} and {@see Lock::acquireRead()}.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class LockConflictedException extends \RuntimeException implements ExceptionInterface
 {

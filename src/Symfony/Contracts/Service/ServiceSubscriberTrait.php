@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
  * Implementation of ServiceSubscriberInterface that determines subscribed services from
  * private method return types. Service ids are available as "ClassName::methodName".
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 trait ServiceSubscriberTrait
 {

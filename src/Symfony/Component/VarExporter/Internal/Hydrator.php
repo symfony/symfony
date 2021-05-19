@@ -14,7 +14,7 @@ namespace Symfony\Component\VarExporter\Internal;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

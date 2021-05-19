@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class AuditTrailListener implements EventSubscriberInterface
 {

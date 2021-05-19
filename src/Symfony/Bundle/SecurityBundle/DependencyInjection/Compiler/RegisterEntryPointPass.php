@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class RegisterEntryPointPass implements CompilerPassInterface
 {

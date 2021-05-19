@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {

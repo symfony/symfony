@@ -29,7 +29,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormDataExtractorTest extends TestCase
 {

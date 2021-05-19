@@ -18,7 +18,7 @@ namespace Symfony\Component\RateLimiter;
  * which is used by the storage implementations to store the
  * object.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

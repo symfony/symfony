@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * A class that is able to create and handle "magic" login links.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 interface LoginLinkHandlerInterface
 {

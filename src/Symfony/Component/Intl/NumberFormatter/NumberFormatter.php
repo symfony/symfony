@@ -35,8 +35,8 @@ use Symfony\Component\Intl\Locale\Locale;
  *  - {@link parse}
  *  - {@link setAttribute}
  *
- * @author Eriksen Costa <eriksen.costa@infranology.com.br>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @internal
  *

@@ -25,7 +25,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *     $output = new StreamOutput(fopen('php://stdout', 'w'));
  *     $stdErr = new StreamOutput(fopen('php://stderr', 'w'));
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {

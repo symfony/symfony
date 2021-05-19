@@ -18,7 +18,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * Default implementation of {@link FormDataExtractorInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormDataExtractor implements FormDataExtractorInterface
 {

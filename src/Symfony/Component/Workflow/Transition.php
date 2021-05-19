@@ -12,8 +12,8 @@
 namespace Symfony\Component\Workflow;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class Transition
 {

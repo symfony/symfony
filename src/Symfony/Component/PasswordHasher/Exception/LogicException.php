@@ -12,7 +12,7 @@
 namespace Symfony\Component\PasswordHasher\Exception;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

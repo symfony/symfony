@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
+
  */
 class HostnameValidatorTest extends ConstraintValidatorTestCase
 {

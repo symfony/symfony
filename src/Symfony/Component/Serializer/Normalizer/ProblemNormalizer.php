@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @see https://tools.ietf.org/html/rfc7807
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
+
  */
 class ProblemNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {

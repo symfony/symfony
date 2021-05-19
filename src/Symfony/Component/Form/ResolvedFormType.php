@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * A wrapper for a form type and its extensions.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {

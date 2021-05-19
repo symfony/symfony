@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Extractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 
 /**
- * @author David Maicher <mail@dmaicher.de>
+
  */
 final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterface
 {

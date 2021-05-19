@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEn
 use Symfony\Component\Validator\Validation;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PropertyInfoLoaderTest extends TestCase
 {

@@ -30,7 +30,7 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  * By having the logic here instead of the listener, more of the process
  * can be called directly (e.g. for manual authentication) or overridden.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @final
  *

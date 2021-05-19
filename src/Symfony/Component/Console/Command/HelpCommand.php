@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * HelpCommand displays the help for a given command.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HelpCommand extends Command
 {

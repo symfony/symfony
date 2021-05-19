@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
  * This is a wrapper around the actual firewall configuration which allows us
  * to lazy load the context for one specific firewall only when we need it.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class FirewallContext
 {

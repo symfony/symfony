@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Signature\Exception;
 use Symfony\Component\Security\Core\Exception\RuntimeException;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class InvalidSignatureException extends RuntimeException
 {

@@ -36,8 +36,8 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *  * before removing passes to check all services even if they are not currently used,
  *  * after removing passes to check only services are used in the app.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Julien Maulny <jmaulny@darkmira.fr>
+
+
  */
 final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 {

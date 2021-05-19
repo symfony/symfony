@@ -17,7 +17,7 @@ use Symfony\Component\Console\Formatter\NullOutputFormatterStyle;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
- * @author Tien Xuan Vo <tien.xuan.vo@gmail.com>
+
  */
 class NullOutputFormatterTest extends TestCase
 {

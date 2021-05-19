@@ -39,7 +39,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  *
  * This mapping can be customized with the $verbosityLevelMap constructor parameter.
  *
- * @author Tobias Schultze <http://tobion.de>
+
  */
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {

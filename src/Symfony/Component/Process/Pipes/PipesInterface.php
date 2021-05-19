@@ -14,7 +14,7 @@ namespace Symfony\Component\Process\Pipes;
 /**
  * PipesInterface manages descriptors and pipes for the use of proc_open.
  *
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

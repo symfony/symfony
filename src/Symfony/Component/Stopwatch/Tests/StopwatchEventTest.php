@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 /**
  * StopwatchEventTest.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @group time-sensitive
  */

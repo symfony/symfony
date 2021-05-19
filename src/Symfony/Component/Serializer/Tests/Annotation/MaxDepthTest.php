@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class MaxDepthTest extends TestCase
 {

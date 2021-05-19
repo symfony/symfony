@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * RemoteUserFactory creates services for REMOTE_USER based authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Maxime Douailin <maxime.douailin@gmail.com>
+
+
  *
  * @internal
  */

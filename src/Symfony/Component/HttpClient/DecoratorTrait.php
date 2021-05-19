@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * Eases with writing decorators.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 trait DecoratorTrait
 {

@@ -19,7 +19,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Allows lazy loading of listener and subscriber services.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ContainerAwareEventManager extends EventManager
 {

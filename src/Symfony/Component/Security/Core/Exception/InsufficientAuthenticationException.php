@@ -16,8 +16,8 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * This is the case when a user is anonymous and the resource to be displayed has an access role.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
  */
 class InsufficientAuthenticationException extends AuthenticationException
 {

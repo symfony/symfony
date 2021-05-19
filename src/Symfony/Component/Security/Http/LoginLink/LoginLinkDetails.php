@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\LoginLink;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class LoginLinkDetails
 {

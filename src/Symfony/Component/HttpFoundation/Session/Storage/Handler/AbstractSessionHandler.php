@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionUtils;
  * of the PHP 7.0 SessionUpdateTimestampHandlerInterface,
  * enabling strict and lazy session handling.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 abstract class AbstractSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {

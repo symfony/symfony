@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
  *
  * It gives access to the token representing the current user authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {

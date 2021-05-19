@@ -17,7 +17,7 @@ class_exists(ResponseHeaderBag::class);
 /**
  * Response represents an HTTP response.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Response
 {

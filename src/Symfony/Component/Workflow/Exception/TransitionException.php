@@ -14,8 +14,8 @@ namespace Symfony\Component\Workflow\Exception;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * @author Andrew Tch <andrew.tchircoff@gmail.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class TransitionException extends LogicException
 {

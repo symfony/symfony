@@ -19,7 +19,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @see http://www.w3.org/TR/selectors/#specificity
  *
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  *
  * @internal
  */

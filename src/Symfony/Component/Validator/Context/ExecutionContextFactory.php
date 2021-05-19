@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Creates new {@link ExecutionContext} instances.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal version 2.5. Code against ExecutionContextFactoryInterface instead.
  */

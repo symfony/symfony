@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 /**
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 class ClassExistsMock
 {

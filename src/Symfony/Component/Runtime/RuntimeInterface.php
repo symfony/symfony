@@ -14,7 +14,7 @@ namespace Symfony\Component\Runtime;
 /**
  * Enables decoupling applications from global state.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @experimental in 5.3
  */

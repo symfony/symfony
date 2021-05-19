@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * Transforms between a timezone identifier string and a DateTimeZone object.
  *
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 class DateTimeZoneToStringTransformer implements DataTransformerInterface
 {

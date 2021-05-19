@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Victor Bocharsky <victor@symfonycasts.com>
+
  */
 abstract class AbstractHttpTransport extends AbstractTransport
 {

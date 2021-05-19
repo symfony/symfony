@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * Decorates the original AccessDecisionManager class to log information
  * about the security voters and the decisions made by them.
  *
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+
  *
  * @internal
  */

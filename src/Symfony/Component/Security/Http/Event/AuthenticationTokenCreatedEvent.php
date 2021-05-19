@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * When a newly authenticated security token was created, before it becomes effective in the security system.
  *
- * @author Christian Scheb <me@christianscheb.de>
+
  */
 class AuthenticationTokenCreatedEvent extends Event
 {

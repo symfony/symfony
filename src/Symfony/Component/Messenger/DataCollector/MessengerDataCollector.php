@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  *
  * @final
  */

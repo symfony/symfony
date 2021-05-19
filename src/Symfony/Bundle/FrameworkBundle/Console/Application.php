@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Application extends BaseApplication
 {

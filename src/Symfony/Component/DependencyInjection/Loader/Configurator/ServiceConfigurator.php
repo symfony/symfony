@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ServiceConfigurator extends AbstractServiceConfigurator
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Util\IcuVersion;
 /**
  * Test case for IntlDateFormatter implementations.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @group legacy
  */

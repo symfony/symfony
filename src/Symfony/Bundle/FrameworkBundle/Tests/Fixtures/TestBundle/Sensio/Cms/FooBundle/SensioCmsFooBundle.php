@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * Bundle.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class SensioCmsFooBundle extends Bundle
 {

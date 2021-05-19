@@ -17,7 +17,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @requires extension pdo_sqlite
  */

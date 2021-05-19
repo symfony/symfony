@@ -21,7 +21,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 /**
  * StoreFactory create stores and connections.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class StoreFactory
 {

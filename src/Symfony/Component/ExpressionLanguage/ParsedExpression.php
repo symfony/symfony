@@ -16,7 +16,7 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
 /**
  * Represents an already parsed expression.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ParsedExpression extends Expression
 {

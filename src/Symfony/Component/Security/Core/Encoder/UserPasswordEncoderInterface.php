@@ -19,7 +19,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" interface is depre
 /**
  * UserPasswordEncoderInterface is the interface for the password encoder service.
  *
- * @author Ariel Ferrandini <arielferrandini@gmail.com>
+
  *
  * @deprecated since Symfony 5.3, use {@link UserPasswordHasherInterface} instead
  */

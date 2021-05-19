@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RouterDataCollector extends DataCollector
 {

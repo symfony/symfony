@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
- * @author Guilhem N <egetick@gmail.com>
+
  */
 class PassConfigTest extends TestCase
 {

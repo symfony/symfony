@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+
  */
 abstract class AbstractDoctrineExtension extends Extension
 {

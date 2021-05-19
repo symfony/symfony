@@ -16,7 +16,7 @@ trigger_deprecation('symfony/workflow', '5.3', 'The "%s" class is deprecated.', 
 /**
  * Thrown by GuardListener when there is no token set, but guards are placed on a transition.
  *
- * @author Matt Johnson <matj1985@gmail.com>
+
  *
  * @deprecated since Symfony 5.3
  */

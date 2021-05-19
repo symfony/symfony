@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Submits forms if they were submitted.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface RequestHandlerInterface
 {

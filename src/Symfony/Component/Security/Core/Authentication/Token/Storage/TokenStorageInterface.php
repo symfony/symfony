@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * The TokenStorageInterface.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface TokenStorageInterface
 {

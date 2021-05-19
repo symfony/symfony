@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Encodes YAML data.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class YamlEncoder implements EncoderInterface, DecoderInterface
 {

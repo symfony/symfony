@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class IgnoreDummy
 {

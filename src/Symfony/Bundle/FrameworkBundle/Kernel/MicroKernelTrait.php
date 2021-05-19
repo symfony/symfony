@@ -25,8 +25,8 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 /**
  * A Kernel that provides configuration hooks.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  *
  * @method void configureRoutes(RoutingConfigurator $routes)
  * @method void configureContainer(ContainerConfigurator $container)

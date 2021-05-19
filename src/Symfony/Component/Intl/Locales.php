@@ -16,8 +16,8 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 /**
  * Gives access to locale-related ICU data.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Roland Franssen <franssen.roland@gmail.com>
+
+
  */
 final class Locales extends ResourceBundle
 {

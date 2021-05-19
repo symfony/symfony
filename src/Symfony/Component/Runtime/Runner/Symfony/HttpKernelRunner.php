@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @experimental in 5.3
  */

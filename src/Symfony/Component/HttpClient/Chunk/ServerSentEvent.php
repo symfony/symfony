@@ -14,8 +14,8 @@ namespace Symfony\Component\HttpClient\Chunk;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 final class ServerSentEvent extends DataChunk implements ChunkInterface
 {

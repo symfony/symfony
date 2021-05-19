@@ -24,9 +24,9 @@ use Symfony\Component\Translation\Util\XliffUtils;
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Robin Chalas <robin.chalas@gmail.com>
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+
+
+
  */
 class XliffLintCommand extends Command
 {

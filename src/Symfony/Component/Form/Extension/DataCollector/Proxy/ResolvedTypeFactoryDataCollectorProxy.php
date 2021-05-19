@@ -20,7 +20,7 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  * Proxy that wraps resolved types into {@link ResolvedTypeDataCollectorProxy}
  * instances.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ResolvedTypeFactoryDataCollectorProxy implements ResolvedFormTypeFactoryInterface
 {

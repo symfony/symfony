@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ValidTest extends TestCase
 {

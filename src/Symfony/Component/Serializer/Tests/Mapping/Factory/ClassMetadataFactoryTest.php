@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ClassMetadataFactoryTest extends TestCase
 {

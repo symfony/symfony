@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Transport;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
- * @author Antonio Pauletich <antonio.pauletich95@gmail.com>
+
  */
 class BeanstalkdReceivedStamp implements NonSendableStampInterface
 {

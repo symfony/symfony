@@ -22,7 +22,7 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
  * If you're using Guard authentication, you *must* use a class that implements
  * GuardTokenInterface as your authenticated token (like this class).
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @deprecated since Symfony 5.3, use the new authenticator system instead
  */

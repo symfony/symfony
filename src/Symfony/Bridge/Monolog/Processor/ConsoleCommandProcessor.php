@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Adds the current console command information to the log entry.
  *
- * @author Piotr Stankowski <git@trakos.pl>
+
  */
 class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Sender;
 use Symfony\Component\Messenger\Envelope;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 interface SenderInterface
 {

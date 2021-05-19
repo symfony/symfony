@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {

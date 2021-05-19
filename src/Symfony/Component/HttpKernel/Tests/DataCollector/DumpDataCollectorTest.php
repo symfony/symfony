@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DumpDataCollectorTest extends TestCase
 {

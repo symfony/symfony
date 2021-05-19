@@ -21,8 +21,8 @@ use Symfony\Component\Console\Terminal;
 /**
  * The ProgressBar provides helpers to display progress output.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Chris Jones <leeked@gmail.com>
+
+
  */
 final class ProgressBar
 {

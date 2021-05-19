@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Transports implements TransportInterface
 {

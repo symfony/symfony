@@ -33,7 +33,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  *
  * @internal
  */

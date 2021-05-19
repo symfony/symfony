@@ -12,7 +12,7 @@
 namespace Symfony\Component\Uid;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class NilUuid extends Uuid
 {

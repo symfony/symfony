@@ -29,7 +29,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
+
  */
 class SendFailedMessageForRetryListener implements EventSubscriberInterface
 {

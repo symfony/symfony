@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @NamedArgumentConstructor
  * @Target({"CLASS"})
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap

@@ -16,7 +16,7 @@ use Symfony\Component\Process\Process;
 /**
  * UnixPipes implementation uses unix pipes as handles.
  *
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

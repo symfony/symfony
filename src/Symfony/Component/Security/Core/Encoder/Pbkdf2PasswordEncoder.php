@@ -24,9 +24,9 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
  * But also warrants a warning, using PBKDF2 (with a high number of iterations) slows down the process.
  * PBKDF2 should be used with caution and care.
  *
- * @author Sebastiaan Stok <s.stok@rollerscapes.net>
- * @author Andrew Johnson
- * @author Fabien Potencier <fabien@symfony.com>
+
+
+
  *
  * @deprecated since Symfony 5.3, use {@link Pbkdf2PasswordHasher} instead
  */

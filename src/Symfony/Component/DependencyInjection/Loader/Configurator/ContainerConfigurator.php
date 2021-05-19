@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ContainerConfigurator extends AbstractConfigurator
 {

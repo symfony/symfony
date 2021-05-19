@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Provider;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * @experimental in 5.3
  */

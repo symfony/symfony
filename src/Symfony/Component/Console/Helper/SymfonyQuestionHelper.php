@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Symfony Style Guide compliant question helper.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 class SymfonyQuestionHelper extends QuestionHelper
 {

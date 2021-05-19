@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * overwriting the respective listener globally, you can set a custom failure
  * handler which implements this interface.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface AuthenticationFailureHandlerInterface
 {

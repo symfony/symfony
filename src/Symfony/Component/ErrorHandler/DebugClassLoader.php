@@ -43,10 +43,10 @@ use ProxyManager\Proxy\ProxyInterface;
  * php-cs-fixer after, with rules "phpdoc_trim_consecutive_blank_line_separation"
  * and "no_superfluous_phpdoc_tags" enabled typically.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Christophe Coevoet <stof@notk.org>
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Guilhem Niot <guilhem.niot@gmail.com>
+
+
+
+
  */
 class DebugClassLoader
 {

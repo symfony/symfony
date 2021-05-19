@@ -18,8 +18,8 @@ use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
- * @author Wouter de Jong <wouter@wouterj.nl>
+
+
  *
  * @internal
  */

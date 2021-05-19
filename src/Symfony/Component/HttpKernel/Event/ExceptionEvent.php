@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * exception will be thrown if no response is set during processing of this
  * event.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class ExceptionEvent extends RequestEvent
 {

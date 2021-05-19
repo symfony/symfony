@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Command\XliffLintCommand;
 /**
  * Tests the XliffLintCommand.
  *
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+
  */
 class XliffLintCommandTest extends TestCase
 {

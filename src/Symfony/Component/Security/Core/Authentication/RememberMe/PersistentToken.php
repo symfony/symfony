@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  *
  * @internal
  */

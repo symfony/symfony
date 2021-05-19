@@ -30,7 +30,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * LogoutListener logout users.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

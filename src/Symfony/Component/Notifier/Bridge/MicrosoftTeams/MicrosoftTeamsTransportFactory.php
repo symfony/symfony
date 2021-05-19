@@ -18,8 +18,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Edouard Lescot <edouard.lescot@gmail.com>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class MicrosoftTeamsTransportFactory extends AbstractTransportFactory
 {

@@ -16,7 +16,7 @@ namespace Symfony\Component\OptionsResolver\Exception;
  *
  * You should make sure a valid value is passed to the option.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class InvalidOptionsException extends InvalidArgumentException
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\SerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 final class MetadataAwareNameConverterTest extends TestCase
 {

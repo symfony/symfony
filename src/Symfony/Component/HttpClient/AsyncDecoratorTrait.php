@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * Eases with processing responses while streaming them.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 trait AsyncDecoratorTrait
 {

@@ -18,7 +18,7 @@ namespace Symfony\Component\Serializer\Mapping;
  *
  * @internal
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 interface AttributeMetadataInterface
 {

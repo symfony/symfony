@@ -16,10 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * ChromePhpHandler.
- *
- * @author Christophe Coevoet <stof@notk.org>
- *
  * @final
  */
 class ChromePhpHandler extends BaseChromePhpHandler

@@ -14,8 +14,8 @@ namespace Symfony\Component\Workflow\SupportStrategy;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * @author Andreas Kleemann <akleemann@inviqa.com>
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+
+
  */
 final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterface
 {

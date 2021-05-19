@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Reader;
 /**
  * Reads resource bundle files.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Creates the container.env_var_processors_locator service.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {

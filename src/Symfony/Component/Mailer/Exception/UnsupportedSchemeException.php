@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Bridge;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 class UnsupportedSchemeException extends LogicException
 {

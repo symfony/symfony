@@ -17,8 +17,8 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * @internal
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Jules Pietri <jules@heahprod.com>
+
+
  */
 trait LocalizedRouteTrait
 {

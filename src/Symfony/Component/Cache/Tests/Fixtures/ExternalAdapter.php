@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 /**
  * Adapter not implementing the {@see \Symfony\Component\Cache\Adapter\AdapterInterface}.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ExternalAdapter implements CacheItemPoolInterface
 {

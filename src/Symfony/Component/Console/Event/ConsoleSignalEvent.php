@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @author marie <marie@users.noreply.github.com>
+
  */
 final class ConsoleSignalEvent extends ConsoleEvent
 {

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form\Util;
 
 /**
- * @author Issei Murasawa <issei.m7@gmail.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 class StringUtil
 {

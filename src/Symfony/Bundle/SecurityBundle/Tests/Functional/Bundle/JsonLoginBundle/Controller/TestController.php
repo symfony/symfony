@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class TestController
 {

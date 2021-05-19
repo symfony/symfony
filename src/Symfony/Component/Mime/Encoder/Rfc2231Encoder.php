@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Encoder;
 use Symfony\Component\Mime\CharacterStream;
 
 /**
- * @author Chris Corbyn
+
  */
 final class Rfc2231Encoder implements EncoderInterface
 {

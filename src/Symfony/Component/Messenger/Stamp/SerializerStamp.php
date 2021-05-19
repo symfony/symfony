@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Stamp;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 final class SerializerStamp implements StampInterface
 {

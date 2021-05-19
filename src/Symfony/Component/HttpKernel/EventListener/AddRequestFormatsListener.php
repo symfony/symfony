@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Adds configured formats to each request.
  *
- * @author Gildas Quemener <gildas.quemener@gmail.com>
+
  *
  * @final
  */

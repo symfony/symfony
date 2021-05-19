@@ -18,10 +18,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * XML descriptor.
- *
- * @author Jean-François Simon <contact@jfsimon.fr>
- *
  * @internal
  */
 class XmlDescriptor extends Descriptor

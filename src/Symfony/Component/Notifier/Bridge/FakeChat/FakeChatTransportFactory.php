@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 final class FakeChatTransportFactory extends AbstractTransportFactory
 {

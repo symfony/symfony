@@ -20,8 +20,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether a value is a valid image file and is valid
  * against minWidth, maxWidth, minHeight and maxHeight constraints.
  *
- * @author Benjamin Dulau <benjamin.dulau@gmail.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 class ImageValidator extends FileValidator
 {

@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * setResponse() you can set a new response that will be returned to the
  * browser.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class ResponseEvent extends KernelEvent
 {

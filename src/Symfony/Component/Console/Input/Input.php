@@ -23,7 +23,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
  *  * `StringInput`: The input is provided as a string
  *  * `ArrayInput`: The input is provided as an array
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class Input implements InputInterface, StreamableInputInterface
 {

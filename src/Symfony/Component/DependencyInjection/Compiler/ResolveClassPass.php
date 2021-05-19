@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ResolveClassPass implements CompilerPassInterface
 {

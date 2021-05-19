@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class StopWorkerOnRestartSignalListener implements EventSubscriberInterface
 {

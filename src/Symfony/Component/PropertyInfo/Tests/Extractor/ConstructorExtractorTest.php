@@ -17,7 +17,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
+
  */
 class ConstructorExtractorTest extends TestCase
 {

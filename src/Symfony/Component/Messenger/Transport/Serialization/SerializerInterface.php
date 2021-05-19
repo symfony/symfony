@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 interface SerializerInterface
 {

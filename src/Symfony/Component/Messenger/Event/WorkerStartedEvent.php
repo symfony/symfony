@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Worker;
 /**
  * Dispatched when a worker has been started.
  *
- * @author Tobias Schultze <http://tobion.de>
+
  */
 final class WorkerStartedEvent
 {

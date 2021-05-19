@@ -16,7 +16,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 /**
  * Forward compatibility for new new PasswordHasher component.
  *
- * @author Alexander M. Turek <me@derrabus.de>
+
  *
  * @internal To be removed in Symfony 6
  */

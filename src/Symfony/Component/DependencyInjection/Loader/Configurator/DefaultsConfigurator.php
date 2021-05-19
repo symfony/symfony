@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DefaultsConfigurator extends AbstractServiceConfigurator
 {

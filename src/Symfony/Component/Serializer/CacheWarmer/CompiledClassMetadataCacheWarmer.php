@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryCompiler;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
- * @author Fabien Bourigault <bourigaultfabien@gmail.com>
+
  */
 final class CompiledClassMetadataCacheWarmer implements CacheWarmerInterface
 {

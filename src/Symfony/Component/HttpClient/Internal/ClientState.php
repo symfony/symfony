@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Internal;
 /**
  * Internal representation of the client state.
  *
- * @author Alexander M. Turek <me@derrabus.de>
+
  *
  * @internal
  */

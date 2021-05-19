@@ -16,7 +16,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class BaseValidatorExtensionTest extends TypeTestCase
 {

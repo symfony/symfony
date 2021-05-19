@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExcept
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 /**
- * @author Pascal Luna <skalpa@zetareticuli.org>
+
  */
 class FlattenExceptionNormalizerTest extends TestCase
 {

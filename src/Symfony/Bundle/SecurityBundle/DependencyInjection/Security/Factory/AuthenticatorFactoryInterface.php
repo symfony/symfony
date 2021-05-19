@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 interface AuthenticatorFactoryInterface
 {

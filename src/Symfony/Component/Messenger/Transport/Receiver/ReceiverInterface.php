@@ -15,8 +15,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
+
  */
 interface ReceiverInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Contracts\HttpClient\Exception;
 /**
  * When a content-type cannot be decoded to the expected representation.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface DecodingExceptionInterface extends ExceptionInterface
 {

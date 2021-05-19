@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Reader;
 use Symfony\Component\Intl\Data\Util\RingBuffer;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

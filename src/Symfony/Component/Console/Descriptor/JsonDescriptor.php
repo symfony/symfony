@@ -18,9 +18,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * JSON descriptor.
- *
- * @author Jean-François Simon <contact@jfsimon.fr>
  *
  * @internal
  */

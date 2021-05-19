@@ -17,7 +17,7 @@ use Http\Promise\Promise as HttplugPromiseInterface;
 use Psr\Http\Message\ResponseInterface as Psr7ResponseInterface;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  *
  * @internal
  */

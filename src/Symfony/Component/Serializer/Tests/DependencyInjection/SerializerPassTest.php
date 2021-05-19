@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 /**
  * Tests for the SerializerPass class.
  *
- * @author Javier Lopez <f12loalf@gmail.com>
+
  */
 class SerializerPassTest extends TestCase
 {

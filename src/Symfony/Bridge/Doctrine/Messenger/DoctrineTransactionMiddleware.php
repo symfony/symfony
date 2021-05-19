@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 /**
  * Wraps all handlers in a single doctrine transaction.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 {

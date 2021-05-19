@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Base ExceptionInterface for the Form component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ExceptionInterface extends \Throwable
 {

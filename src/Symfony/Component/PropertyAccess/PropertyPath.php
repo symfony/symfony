@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
 /**
  * Default implementation of {@link PropertyPathInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {

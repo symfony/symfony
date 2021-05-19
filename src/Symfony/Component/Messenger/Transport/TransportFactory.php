@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class TransportFactory implements TransportFactoryInterface
 {

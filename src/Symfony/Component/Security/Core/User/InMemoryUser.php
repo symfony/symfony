@@ -16,8 +16,8 @@ namespace Symfony\Component\Security\Core\User;
  *
  * This should not be used for anything else.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  */
 final class InMemoryUser extends User
 {

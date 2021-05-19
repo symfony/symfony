@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Default implementation of {@link ConstraintViolationBuilderInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal since version 2.5. Code against ConstraintViolationBuilderInterface instead.
  */

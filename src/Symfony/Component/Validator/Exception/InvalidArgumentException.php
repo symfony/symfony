@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Exception;
 /**
  * Base InvalidArgumentException for the Validator component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

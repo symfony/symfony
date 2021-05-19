@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * Tests SessionListener.
  *
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+
  */
 class TestSessionListenerTest extends TestCase
 {

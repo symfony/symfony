@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Adds services tagged twig.loader as Twig loaders.
  *
- * @author Daniel Leech <daniel@dantleech.com>
+
  */
 class TwigLoaderPass implements CompilerPassInterface
 {

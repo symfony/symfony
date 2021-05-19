@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @author Yann LUCAS
+
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {

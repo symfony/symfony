@@ -23,7 +23,7 @@ use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractTransport implements TransportInterface
 {

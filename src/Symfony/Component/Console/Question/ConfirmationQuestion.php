@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Question;
 /**
  * Represents a yes/no question.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ConfirmationQuestion extends Question
 {

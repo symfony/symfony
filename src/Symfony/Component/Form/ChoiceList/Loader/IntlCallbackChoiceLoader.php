@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\ChoiceList\Loader;
 /**
  * Callback choice loader optimized for Intl choice types.
  *
- * @author Jules Pietri <jules@heahprod.com>
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
+
  */
 class IntlCallbackChoiceLoader extends CallbackChoiceLoader
 {

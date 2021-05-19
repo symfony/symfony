@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class IcuVersionTest extends TestCase
 {

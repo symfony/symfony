@@ -26,7 +26,7 @@ use Symfony\Component\Form\FormError;
 /**
  * Abstract class providing test cases for the Bootstrap 4 Twig form theme.
  *
- * @author Hidde Wieringa <hidde@hiddewieringa.nl>
+
  */
 abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 {

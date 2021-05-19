@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ImmutableEventDispatcherTest extends TestCase
 {

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Null dumper, negates any proxy code generation for any given service definition.
  *
- * @author Marco Pivetta <ocramius@gmail.com>
+
  *
  * @final
  */

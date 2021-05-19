@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Strategy;
 /**
  * ConsensusStrategy is a StrategyInterface implementation where strictly more than 50% items should be successful.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class ConsensusStrategy implements StrategyInterface
 {

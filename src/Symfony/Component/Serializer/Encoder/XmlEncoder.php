@@ -19,11 +19,11 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 /**
  * Encodes XML data.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
- * @author John Wards <jwards@whiteoctober.co.uk>
- * @author Fabian Vogler <fabian@equivalence.ch>
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
+
+
+
+
  */
 class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface, SerializerAwareInterface
 {

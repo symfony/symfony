@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 /**
  * Sends a rejected message to a "failure transport".
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {

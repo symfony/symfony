@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
+
  */
 final class GatewayApiTransportFactory extends AbstractTransportFactory
 {

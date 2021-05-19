@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class MessageHandler
 {

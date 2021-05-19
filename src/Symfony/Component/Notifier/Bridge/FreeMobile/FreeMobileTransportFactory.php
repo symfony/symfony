@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Antoine Makdessi <amakdessi@me.com>
+
  */
 final class FreeMobileTransportFactory extends AbstractTransportFactory
 {

@@ -16,8 +16,8 @@ use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
 use Symfony\Component\Semaphore\Exception\SemaphoreReleasingException;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Jérémy Derussé <jeremy@derusse.com>
+
+
  */
 interface PersistingStoreInterface
 {

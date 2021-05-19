@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Asserts that the response is in the given format.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 final class ResponseFormatSame extends Constraint
 {

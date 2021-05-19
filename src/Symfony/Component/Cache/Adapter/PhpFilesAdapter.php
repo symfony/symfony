@@ -18,9 +18,9 @@ use Symfony\Component\Cache\Traits\FilesystemCommonTrait;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
- * @author Piotr Stankowski <git@trakos.pl>
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Rob Frawley 2nd <rmf@src.run>
+
+
+
  */
 class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
 {

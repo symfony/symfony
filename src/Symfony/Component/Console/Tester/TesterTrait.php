@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+
  */
 trait TesterTrait
 {

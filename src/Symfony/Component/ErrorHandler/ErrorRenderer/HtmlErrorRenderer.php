@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  */
 class HtmlErrorRenderer implements ErrorRendererInterface
 {

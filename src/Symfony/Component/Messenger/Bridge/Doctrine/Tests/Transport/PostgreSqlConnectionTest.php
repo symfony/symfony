@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class PostgreSqlConnectionTest extends TestCase
 {

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Alexander M. Turek <me@derrabus.de>
+
  */
 class ResettableServicePass implements CompilerPassInterface
 {

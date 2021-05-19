@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Exception;
 /**
  * Base exception interface.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface ExceptionInterface extends \Throwable
 {

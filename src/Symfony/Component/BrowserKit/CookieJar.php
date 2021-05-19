@@ -11,11 +11,6 @@
 
 namespace Symfony\Component\BrowserKit;
 
-/**
- * CookieJar.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class CookieJar
 {
     protected $cookieJar = [];

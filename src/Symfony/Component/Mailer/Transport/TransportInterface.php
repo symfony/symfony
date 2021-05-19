@@ -22,7 +22,7 @@ use Symfony\Component\Mime\RawMessage;
  * When sending emails, you should prefer MailerInterface implementations
  * as they allow asynchronous sending.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface TransportInterface
 {

@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Loads validation metadata using a Doctrine annotation {@link Reader} or using PHP 8 attributes.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Alexander M. Turek <me@derrabus.de>
+
+
  */
 class AnnotationLoader implements LoaderInterface
 {

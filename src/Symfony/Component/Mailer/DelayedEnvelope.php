@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

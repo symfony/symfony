@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class AmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {

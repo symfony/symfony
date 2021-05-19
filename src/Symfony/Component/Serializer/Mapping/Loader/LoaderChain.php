@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  * in <em>all</em> of these loaders, regardless of whether any of them was
  * successful or not.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 class LoaderChain implements LoaderInterface
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 /**
  * Represents a prototyped Array node in the config tree.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class PrototypedArrayNode extends ArrayNode
 {

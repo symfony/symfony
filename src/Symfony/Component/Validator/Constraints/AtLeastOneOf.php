@@ -15,7 +15,7 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
+
  */
 class AtLeastOneOf extends Composite
 {

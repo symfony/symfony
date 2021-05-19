@@ -19,9 +19,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid ISBN-10 or ISBN-13.
  *
- * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
- * @author Manuel Reinhard <manu@sprain.ch>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
+
  *
  * @see https://en.wikipedia.org/wiki/Isbn
  */

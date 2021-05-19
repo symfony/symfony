@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Provides utility functions needed in tests.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @deprecated in 5.3, will be removed in 6.0.
  */

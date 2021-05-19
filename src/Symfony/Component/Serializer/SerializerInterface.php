@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer;
 
 /**
- * @author Jordi Boggiano <j.boggiano@seld.be>
+
  */
 interface SerializerInterface
 {

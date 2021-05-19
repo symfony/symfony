@@ -37,7 +37,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * even better performance and fault tolerance, a proper ELK (https://www.elastic.co/what-is/elk-stack)
  * stack is recommended.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class ElasticsearchLogstashHandler extends AbstractHandler
 {

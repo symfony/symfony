@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess\Exception;
 /**
  * Thrown when a property path is malformed.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class InvalidPropertyPathException extends RuntimeException
 {

@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class_exists(MessageCatalogue::class);
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Asset\VersionStrategy;
 /**
  * Asset version strategy interface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface VersionStrategyInterface
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Data\Util\RingBuffer;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class RingBufferTest extends TestCase
 {

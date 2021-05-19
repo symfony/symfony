@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  *
  * @see PasswordUpgraderInterface
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * Type value object (immutable).
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @final
  */

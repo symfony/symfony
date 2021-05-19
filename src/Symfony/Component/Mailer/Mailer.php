@@ -21,7 +21,7 @@ use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Mailer implements MailerInterface
 {

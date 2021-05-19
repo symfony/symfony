@@ -18,7 +18,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * BasePasswordEncoder is the base class for all password encoders.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @deprecated since Symfony 5.3, use CheckPasswordLengthTrait instead
  */

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraint;
  * against their class' metadata and whether traversable objects should be
  * traversed or not.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see CascadingStrategy
  * @see TraversalStrategy

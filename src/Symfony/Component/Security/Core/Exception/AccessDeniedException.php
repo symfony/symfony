@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * AccessDeniedException is thrown when the account has not the required role.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class AccessDeniedException extends RuntimeException
 {

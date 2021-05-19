@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Redirects a request to another URL.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Envelope;
  * This message is only dispatched the first time a message
  * is sent to a transport, not also if it is retried.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 final class SendMessageToTransportsEvent
 {

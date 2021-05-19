@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+
  */
 abstract class FileLoader extends ArrayLoader
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpClient\Exception;
 use Symfony\Contracts\HttpClient\Exception\TimeoutExceptionInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class TimeoutException extends TransportException implements TimeoutExceptionInterface
 {

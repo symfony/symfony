@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
- * @author Guilhem Niot <guilhem.niot@gmail.com>
+
  */
 class ResolveBindingsPass extends AbstractRecursivePass
 {

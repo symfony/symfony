@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 /**
  * Parser and formatter for time zone format.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+
  *
  * @internal
  *

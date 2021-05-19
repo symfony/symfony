@@ -18,7 +18,7 @@ use Twig\TwigFunction;
 /**
  * LogoutUrlHelper provides generator functions for the logout URL to Twig.
  *
- * @author Jeremy Mikola <jmikola@gmail.com>
+
  */
 final class LogoutUrlExtension extends AbstractExtension
 {

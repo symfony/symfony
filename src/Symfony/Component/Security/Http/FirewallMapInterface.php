@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * This interface must be implemented by firewall maps.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface FirewallMapInterface
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * Implementations must be cloneable, and each clone must unstack the stack independently.
  */

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 /**
  * Provides generator functions for the logout URL.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jeremy Mikola <jmikola@gmail.com>
+
+
  */
 class LogoutUrlGenerator
 {

@@ -17,7 +17,7 @@ namespace Symfony\Component\Security\Core\User;
  * Once all password hashes have been upgraded to a modern algorithm via password migrations,
  * implement {@see PasswordAuthenticatedUserInterface} instead.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 interface LegacyPasswordAuthenticatedUserInterface extends PasswordAuthenticatedUserInterface
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypes;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DataPart extends TextPart
 {

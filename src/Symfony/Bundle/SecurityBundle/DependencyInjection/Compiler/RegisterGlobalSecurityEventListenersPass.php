@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * This compiler pass must be run after RegisterListenersPass of the
  * EventDispatcher component.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

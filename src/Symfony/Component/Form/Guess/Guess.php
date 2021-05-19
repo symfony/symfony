@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * Thus an instance with confidence HIGH_CONFIDENCE is more likely to be
  * correct than an instance with confidence LOW_CONFIDENCE.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class Guess
 {

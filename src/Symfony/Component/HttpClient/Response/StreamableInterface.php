@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface StreamableInterface
 {

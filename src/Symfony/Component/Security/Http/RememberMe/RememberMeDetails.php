@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class RememberMeDetails
 {

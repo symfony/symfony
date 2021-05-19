@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Envelope;
  * A receiver that implements this should add the TransportMessageIdStamp
  * to the Envelopes that it returns.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 interface ListableReceiverInterface extends ReceiverInterface
 {

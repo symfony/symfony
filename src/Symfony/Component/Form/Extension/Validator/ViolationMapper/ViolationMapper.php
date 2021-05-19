@@ -24,7 +24,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ViolationMapper implements ViolationMapperInterface
 {

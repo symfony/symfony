@@ -17,8 +17,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * It ignores errors from the new handler.
  *
- * @author Ross Motley <ross.motley@amara.com>
- * @author Oliver Radwell <oliver.radwell@amara.com>
+
+
  */
 class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {

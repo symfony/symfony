@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * This class handles the rendering of resource fragments that are included into
  * a main resource. The handling of the rendering is managed by specialized renderers.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @see FragmentRendererInterface
  */

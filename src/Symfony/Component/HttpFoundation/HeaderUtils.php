@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * HTTP header utility functions.
  *
- * @author Christian Schmidt <github@chsc.dk>
+
  */
 class HeaderUtils
 {

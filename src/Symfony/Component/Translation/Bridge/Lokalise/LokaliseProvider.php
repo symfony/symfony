@@ -21,7 +21,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Mathieu Santostefano <msantostefano@protonmail.com>
+
  *
  * In Lokalise:
  *  * Filenames refers to Symfony's translation domains;

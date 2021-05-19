@@ -16,8 +16,8 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
 /**
  * Validates YAML files syntax and outputs encountered errors.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
  *
  * @final
  */

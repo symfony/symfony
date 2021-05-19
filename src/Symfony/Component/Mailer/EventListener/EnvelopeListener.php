@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Message;
 /**
  * Manipulates the Envelope of a Message.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class EnvelopeListener implements EventSubscriberInterface
 {

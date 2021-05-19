@@ -22,8 +22,8 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * XmlFileLoader loads XML routing files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class XmlFileLoader extends FileLoader
 {

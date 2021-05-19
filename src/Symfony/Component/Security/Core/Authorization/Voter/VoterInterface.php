@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * VoterInterface is the interface implemented by all voters.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface VoterInterface
 {

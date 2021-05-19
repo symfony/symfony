@@ -19,8 +19,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  *     $output = new NullOutput();
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class NullOutput implements OutputInterface
 {

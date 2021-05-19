@@ -15,7 +15,7 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\ErrorHandler\Error\UndefinedFunctionError;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class UndefinedFunctionErrorEnhancer implements ErrorEnhancerInterface
 {

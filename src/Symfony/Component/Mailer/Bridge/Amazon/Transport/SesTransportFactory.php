@@ -21,8 +21,8 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
- * @author Jérémy Derussé <jeremy@derusse.com>
+
+
  */
 final class SesTransportFactory extends AbstractTransportFactory
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Exception;
 /**
  * Base LogicException for the Security component.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

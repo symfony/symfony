@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  * In most cases, it is better to inherit from BaseNode instead of implementing
  * this interface yourself.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface NodeInterface
 {

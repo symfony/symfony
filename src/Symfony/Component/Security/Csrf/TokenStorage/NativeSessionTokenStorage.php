@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 /**
  * Token storage that uses PHP's native session handling.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class NativeSessionTokenStorage implements ClearableTokenStorageInterface
 {

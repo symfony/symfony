@@ -16,9 +16,9 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 /**
  * Builds a definition.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
+
+
  */
 class DefinitionBuilder
 {

@@ -16,7 +16,7 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 
 /**
- * @author Teoh Han Hui <teohhanhui@gmail.com>
+
  */
 class DoctrineFooType extends Type
 {

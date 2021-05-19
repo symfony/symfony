@@ -18,8 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
- * @author David Badura <d.a.badura@gmail.com>
+
+
  */
 class UploadValidatorExtension extends AbstractTypeExtension
 {

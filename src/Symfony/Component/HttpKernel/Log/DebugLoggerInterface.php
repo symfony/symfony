@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * DebugLoggerInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface DebugLoggerInterface
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Gary PEGEOT <garypegeot@gmail.com>
+
  */
 class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
 {

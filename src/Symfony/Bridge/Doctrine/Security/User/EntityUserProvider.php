@@ -27,8 +27,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * Provides provisioning for Doctrine entity users.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {

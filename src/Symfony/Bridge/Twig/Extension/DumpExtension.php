@@ -22,7 +22,7 @@ use Twig\TwigFunction;
 /**
  * Provides integration of the dump() function with Twig.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class DumpExtension extends AbstractExtension
 {

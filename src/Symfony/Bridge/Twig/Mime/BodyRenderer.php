@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Message;
 use Twig\Environment;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class BodyRenderer implements BodyRendererInterface
 {

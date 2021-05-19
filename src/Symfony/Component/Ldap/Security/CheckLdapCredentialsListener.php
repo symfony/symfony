@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * Verifies password credentials using an LDAP service whenever the
  * LdapBadge is attached to the Security passport.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class CheckLdapCredentialsListener implements EventSubscriberInterface
 {

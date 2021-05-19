@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {

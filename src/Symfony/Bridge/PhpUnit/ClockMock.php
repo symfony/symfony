@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\PhpUnit;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Dominic Tubach <dominic.tubach@to.com>
+
+
  */
 class ClockMock
 {

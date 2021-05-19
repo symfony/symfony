@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqualValidator;
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
 {

@@ -16,7 +16,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 /**
  * Extracts the constructor argument type using ConstructorArgumentTypeExtractorInterface implementations.
  *
- * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
+
  */
 final class ConstructorExtractor implements PropertyTypeExtractorInterface
 {

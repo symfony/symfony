@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * Matches URLs based on rules dumped by CompiledUrlMatcherDumper.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class CompiledUrlMatcher extends UrlMatcher
 {

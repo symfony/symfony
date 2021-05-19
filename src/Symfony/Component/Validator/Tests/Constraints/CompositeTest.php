@@ -34,7 +34,7 @@ class ConcreteComposite extends Composite
 }
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CompositeTest extends TestCase
 {

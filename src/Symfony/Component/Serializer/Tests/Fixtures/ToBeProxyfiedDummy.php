@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ToBeProxyfiedDummy
 {

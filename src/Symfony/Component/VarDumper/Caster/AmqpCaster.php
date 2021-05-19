@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts Amqp related classes to array representation.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  *
  * @final
  */

@@ -18,9 +18,9 @@ use Symfony\Component\Messenger\Exception\TransportException;
 /**
  * A Redis connection.
  *
- * @author Alexander Schranz <alexander@sulu.io>
- * @author Antoine Bluchet <soyuka@gmail.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
+
  *
  * @internal
  * @final

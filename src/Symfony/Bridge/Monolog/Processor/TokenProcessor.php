@@ -16,8 +16,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * Adds the current security token to the log entry.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
- * @author Igor Timoshenko <igor.timoshenko@i.ua>
+
+
  */
 class TokenProcessor extends AbstractTokenProcessor
 {

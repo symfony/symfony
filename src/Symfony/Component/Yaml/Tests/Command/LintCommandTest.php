@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Command\LintCommand;
 /**
  * Tests the YamlLintCommand.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 class LintCommandTest extends TestCase
 {

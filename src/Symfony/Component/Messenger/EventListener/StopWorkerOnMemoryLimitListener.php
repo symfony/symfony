@@ -16,8 +16,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 
 /**
- * @author Simon Delicata <simon.delicata@free.fr>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class StopWorkerOnMemoryLimitListener implements EventSubscriberInterface
 {

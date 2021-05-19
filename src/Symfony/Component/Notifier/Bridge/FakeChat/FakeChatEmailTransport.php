@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Transport\AbstractTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 final class FakeChatEmailTransport extends AbstractTransport
 {

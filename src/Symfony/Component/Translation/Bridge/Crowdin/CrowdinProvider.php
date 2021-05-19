@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Andrii Bodnar <andrii.bodnar@crowdin.com>
+
  *
  * In Crowdin:
  *  * Filenames refer to Symfony's translation domains;

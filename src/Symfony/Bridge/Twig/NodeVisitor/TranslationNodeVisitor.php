@@ -23,7 +23,7 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
 /**
  * TranslationNodeVisitor extracts translation messages.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TranslationNodeVisitor extends AbstractNodeVisitor
 {

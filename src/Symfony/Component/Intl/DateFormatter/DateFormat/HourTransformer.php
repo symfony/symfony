@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 /**
  * Base class for hour transformers.
  *
- * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+
  *
  * @internal
  *

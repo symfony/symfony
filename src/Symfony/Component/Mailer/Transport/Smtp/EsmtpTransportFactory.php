@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 final class EsmtpTransportFactory extends AbstractTransportFactory
 {

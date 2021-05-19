@@ -18,9 +18,9 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecate
 /**
  * Hashes passwords using password_hash().
  *
- * @author Elnur Abdurrakhimov <elnur@elnur.pro>
- * @author Terje Bråten <terje@braten.be>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
  *
  * @deprecated since Symfony 5.3, use {@link NativePasswordHasher} instead
  */

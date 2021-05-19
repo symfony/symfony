@@ -14,7 +14,7 @@ namespace Symfony\Component\Mime\Encoder;
 use Symfony\Component\Mime\CharacterStream;
 
 /**
- * @author Chris Corbyn
+
  */
 class QpEncoder implements EncoderInterface
 {

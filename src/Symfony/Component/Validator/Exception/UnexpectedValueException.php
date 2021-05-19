@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Exception;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  */
 class UnexpectedValueException extends UnexpectedTypeException
 {

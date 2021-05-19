@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 abstract class AbstractTransportFactory implements TransportFactoryInterface
 {

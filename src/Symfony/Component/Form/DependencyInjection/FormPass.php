@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * Adds all services with the tags "form.type", "form.type_extension" and
  * "form.type_guesser" as arguments of the "form.extension" service.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormPass implements CompilerPassInterface
 {

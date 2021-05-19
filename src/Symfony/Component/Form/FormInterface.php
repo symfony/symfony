@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * A form group bundling multiple forms in a hierarchical structure.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {

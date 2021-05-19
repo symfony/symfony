@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class Dummy extends ParentDummy
 {

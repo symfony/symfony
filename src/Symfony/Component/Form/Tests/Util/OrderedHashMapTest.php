@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class OrderedHashMapTest extends TestCase
 {

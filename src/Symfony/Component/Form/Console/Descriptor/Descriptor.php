@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\Exception\NoConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  *
  * @internal
  */

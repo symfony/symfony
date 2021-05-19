@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 class ResolveTaggedIteratorArgumentPassTest extends TestCase
 {

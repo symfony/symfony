@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 
 /**
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  *
  * @internal
  */

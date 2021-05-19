@@ -19,7 +19,7 @@ use Symfony\Component\Finder\Glob;
  *
  * Only existence/removal is tracked (not mtimes.)
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  */

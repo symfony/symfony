@@ -25,8 +25,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * Process is a thin wrapper around proc_* functions to easily
  * start independent PHP processes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Romain Neutron <imprec@gmail.com>
+
+
  */
 class Process implements \IteratorAggregate
 {

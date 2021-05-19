@@ -18,7 +18,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 /**
  * Creates {@link ChoiceListInterface} instances.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ChoiceListFactoryInterface
 {

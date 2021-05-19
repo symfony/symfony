@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 /**
  * A form button.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class Button implements \IteratorAggregate, FormInterface
 {

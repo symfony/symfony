@@ -17,7 +17,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 /**
  * Loads commands from a PSR-11 container.
  *
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 class ContainerCommandLoader implements CommandLoaderInterface
 {

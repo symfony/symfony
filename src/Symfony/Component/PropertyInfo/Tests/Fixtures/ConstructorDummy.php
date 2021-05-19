@@ -3,7 +3,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
+
  */
 class ConstructorDummy
 {

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class UriSafeTokenGeneratorTest extends TestCase
 {

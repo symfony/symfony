@@ -17,7 +17,7 @@ use Symfony\Component\Console\Exception\LogicException;
 /**
  * Represents a command line argument.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class InputArgument
 {

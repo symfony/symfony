@@ -24,7 +24,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  * PostgreSqlStore is a PersistingStoreInterface implementation using
  * PostgreSql advisory locks.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStoreInterface
 {

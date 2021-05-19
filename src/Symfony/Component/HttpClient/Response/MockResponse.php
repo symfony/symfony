@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * A test-friendly response.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class MockResponse implements ResponseInterface, StreamableInterface
 {

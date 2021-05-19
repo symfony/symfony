@@ -23,9 +23,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /**
  * SessionTest.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Robert Schönthal <seroscho@googlemail.com>
- * @author Drak <drak@zikula.org>
+
+
+
  */
 class SessionTest extends TestCase
 {

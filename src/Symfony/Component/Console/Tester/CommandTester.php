@@ -17,8 +17,8 @@ use Symfony\Component\Console\Input\ArrayInput;
 /**
  * Eases the testing of console commands.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
  */
 class CommandTester
 {

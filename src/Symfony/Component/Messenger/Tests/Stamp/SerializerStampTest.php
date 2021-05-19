@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class SerializerStampTest extends TestCase
 {

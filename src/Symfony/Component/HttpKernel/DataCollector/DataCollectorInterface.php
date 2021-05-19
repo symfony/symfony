@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * DataCollectorInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface DataCollectorInterface extends ResetInterface
 {

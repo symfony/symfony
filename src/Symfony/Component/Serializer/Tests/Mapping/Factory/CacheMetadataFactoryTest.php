@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class CacheMetadataFactoryTest extends TestCase
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class AddAutoMappingConfigurationPassTest extends TestCase
 {

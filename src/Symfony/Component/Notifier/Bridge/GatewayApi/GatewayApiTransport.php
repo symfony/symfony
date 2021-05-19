@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
+
  */
 final class GatewayApiTransport extends AbstractTransport
 {

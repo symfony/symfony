@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
  * Emulates the invalid behavior if the reference is not found within the
  * container.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {

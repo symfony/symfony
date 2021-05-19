@@ -21,7 +21,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *     $p->run();
  *     print $p->getOutput()."\n";
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class PhpProcess extends Process
 {

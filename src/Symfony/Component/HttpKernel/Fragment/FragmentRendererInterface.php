@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 /**
  * Interface implemented by all rendering strategies.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface FragmentRendererInterface
 {

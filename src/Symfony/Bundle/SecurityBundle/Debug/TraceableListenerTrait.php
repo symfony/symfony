@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Debug;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  *
  * @internal
  */

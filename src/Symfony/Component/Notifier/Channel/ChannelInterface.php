@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ChannelInterface
 {

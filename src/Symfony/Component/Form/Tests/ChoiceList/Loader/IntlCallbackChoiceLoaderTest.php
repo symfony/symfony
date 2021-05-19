@@ -17,8 +17,8 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 
 /**
- * @author Jules Pietri <jules@heahprod.com>
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
+
  */
 class IntlCallbackChoiceLoaderTest extends TestCase
 {

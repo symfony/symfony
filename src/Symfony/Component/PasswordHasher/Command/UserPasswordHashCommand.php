@@ -27,8 +27,8 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
 /**
  * Hashes a user's password.
  *
- * @author Sarah Khalil <mkhalil.sarah@gmail.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
  *
  * @final
  */

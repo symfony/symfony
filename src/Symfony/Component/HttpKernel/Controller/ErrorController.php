@@ -20,8 +20,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * Renders error or exception pages from a given FlattenException.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
- * @author Matthias Pigulla <mp@webfactory.de>
+
+
  */
 class ErrorController
 {

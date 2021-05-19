@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * Basically, this class removes all objects from the trace.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class FlattenException
 {

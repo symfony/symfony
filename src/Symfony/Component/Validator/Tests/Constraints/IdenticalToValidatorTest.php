@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\IdenticalToValidator;
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {

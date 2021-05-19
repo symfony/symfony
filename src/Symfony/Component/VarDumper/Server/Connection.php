@@ -17,7 +17,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
 /**
  * Forwards serialized Data clones to a server.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class Connection
 {

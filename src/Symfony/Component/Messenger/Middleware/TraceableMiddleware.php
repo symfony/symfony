@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 /**
  * Collects some data about a middleware.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class TraceableMiddleware implements MiddlewareInterface
 {

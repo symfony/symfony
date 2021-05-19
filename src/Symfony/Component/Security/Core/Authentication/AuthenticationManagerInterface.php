@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * AuthenticationManagerInterface is the interface for authentication managers,
  * which process Token authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal since Symfony 5.3
  */

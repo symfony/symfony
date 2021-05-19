@@ -15,7 +15,7 @@ use Symfony\Component\Notifier\Message\EmailMessage;
 use Symfony\Component\Notifier\Recipient\EmailRecipientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface EmailNotificationInterface
 {

@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Part\AbstractMultipartPart;
 use Symfony\Component\Mime\Part\AbstractPart;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class RelatedPart extends AbstractMultipartPart
 {

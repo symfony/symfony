@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ViolationMapperInterface
 {

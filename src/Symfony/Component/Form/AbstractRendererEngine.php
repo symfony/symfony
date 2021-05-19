@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Default implementation of {@link FormRendererEngineInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class AbstractRendererEngine implements FormRendererEngineInterface
 {

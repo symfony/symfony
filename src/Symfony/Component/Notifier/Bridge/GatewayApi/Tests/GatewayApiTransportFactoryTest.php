@@ -7,8 +7,8 @@ use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
- * @author Piergiuseppe Longo <piergiuseppe.longo@gmail.com>
- * @author Oskar Stark <oskarstark@googlemail.com>
+
+
  */
 final class GatewayApiTransportFactoryTest extends TransportFactoryTestCase
 {

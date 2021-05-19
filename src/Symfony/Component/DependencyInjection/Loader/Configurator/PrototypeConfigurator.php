@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class PrototypeConfigurator extends AbstractServiceConfigurator
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkExceptio
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkException;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {

@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 abstract class AbstractConnection implements ConnectionInterface
 {

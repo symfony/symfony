@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyPathBuilderTest extends TestCase
 {

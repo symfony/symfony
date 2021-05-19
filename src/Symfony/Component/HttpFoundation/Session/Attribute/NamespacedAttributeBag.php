@@ -17,7 +17,7 @@ trigger_deprecation('symfony/http-foundation', '5.3', 'The "%s" class is depreca
  * This class provides structured storage of session attributes using
  * a name spacing character in the key.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * @deprecated since Symfony 5.3
  */

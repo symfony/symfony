@@ -17,7 +17,7 @@ use Symfony\Component\Mime\RawMessage;
 /**
  * @final
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessagePart extends DataPart
 {

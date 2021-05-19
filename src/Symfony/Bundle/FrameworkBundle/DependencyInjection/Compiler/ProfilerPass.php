@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Adds tagged data_collector services to profiler service.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ProfilerPass implements CompilerPassInterface
 {

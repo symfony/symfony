@@ -21,11 +21,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Provides helpers to display a table.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Саша Стаменковић <umpirsky@gmail.com>
- * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
- * @author Max Grigorian <maxakawizard@gmail.com>
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
+
+
+
+
  */
 class Table
 {

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 
 /**
- * @author Elnur Abdurrakhimov <elnur@elnur.pro>
+
  */
 class NativePasswordHasherTest extends TestCase
 {

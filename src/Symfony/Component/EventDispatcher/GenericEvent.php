@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * Encapsulates events thus decoupling the observer from the subject they encapsulate.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 {

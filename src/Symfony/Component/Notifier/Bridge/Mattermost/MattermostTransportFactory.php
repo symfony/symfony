@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Emanuele Panzeri <thepanz@gmail.com>
+
  */
 final class MattermostTransportFactory extends AbstractTransportFactory
 {

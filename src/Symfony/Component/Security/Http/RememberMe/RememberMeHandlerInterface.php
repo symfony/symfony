@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * If you want to add a custom implementation, you want to extend from
  * {@see AbstractRememberMeHandler} instead.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 interface RememberMeHandlerInterface
 {

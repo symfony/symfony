@@ -8,7 +8,7 @@ use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Transition;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class InMemoryMetadataStoreTest extends TestCase
 {

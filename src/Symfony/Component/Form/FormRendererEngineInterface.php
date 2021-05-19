@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Adapter for rendering form templates with a specific templating engine.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface FormRendererEngineInterface
 {

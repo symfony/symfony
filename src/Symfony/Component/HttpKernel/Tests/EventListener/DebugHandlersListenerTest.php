@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DebugHandlersListenerTest extends TestCase
 {

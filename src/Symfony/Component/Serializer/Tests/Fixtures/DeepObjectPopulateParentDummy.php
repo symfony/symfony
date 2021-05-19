@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
 /**
- * @author Jérôme Desjardin <jewome62@gmail.com>
+
  */
 class DeepObjectPopulateParentDummy
 {

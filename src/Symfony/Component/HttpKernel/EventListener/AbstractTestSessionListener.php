@@ -24,8 +24,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * Saves session in test environment.
  *
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  *
  * @internal
  */

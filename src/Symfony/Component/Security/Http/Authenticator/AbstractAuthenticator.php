@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 /**
  * An optional base class that creates the necessary tokens for you.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 abstract class AbstractAuthenticator implements AuthenticatorInterface
 {

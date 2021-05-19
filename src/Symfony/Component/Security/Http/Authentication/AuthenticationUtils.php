@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Extracts Security Errors from Request.
  *
- * @author Boris Vujicic <boris.vujicic@gmail.com>
+
  */
 class AuthenticationUtils
 {

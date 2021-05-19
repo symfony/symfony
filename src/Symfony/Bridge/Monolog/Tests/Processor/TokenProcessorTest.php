@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 /**
  * Tests the TokenProcessor.
  *
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
  */
 class TokenProcessorTest extends TestCase
 {

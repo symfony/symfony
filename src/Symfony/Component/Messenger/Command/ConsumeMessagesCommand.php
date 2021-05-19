@@ -31,7 +31,7 @@ use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class ConsumeMessagesCommand extends Command
 {

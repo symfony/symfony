@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * Writes and reads values to/from an object or array bound to a form.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  */
 interface DataAccessorInterface
 {

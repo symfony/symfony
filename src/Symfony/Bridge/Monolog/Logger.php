@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
 {

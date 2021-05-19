@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /**
  * Test class for MockArraySessionStorage.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class MockArraySessionStorageTest extends TestCase
 {

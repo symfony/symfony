@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 /**
  * Registers console commands.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class AddConsoleCommandPass implements CompilerPassInterface
 {

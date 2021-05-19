@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class TypeHinted
 {

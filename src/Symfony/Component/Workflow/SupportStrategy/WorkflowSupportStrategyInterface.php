@@ -14,7 +14,7 @@ namespace Symfony\Component\Workflow\SupportStrategy;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+
  */
 interface WorkflowSupportStrategyInterface
 {

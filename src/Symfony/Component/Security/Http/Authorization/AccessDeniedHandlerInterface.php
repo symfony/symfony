@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * This is used by the ExceptionListener to translate an AccessDeniedException
  * to a Response object.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface AccessDeniedHandlerInterface
 {

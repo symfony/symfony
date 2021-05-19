@@ -15,7 +15,7 @@ use Twig\Compiler;
 use Twig\Node\Node;
 
 /**
- * @author Julien Galenski <julien.galenski@gmail.com>
+
  */
 final class DumpNode extends Node
 {

@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Represents a backtrace as returned by debug_backtrace() or Exception->getTrace().
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class TraceStub extends Stub
 {

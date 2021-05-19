@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * MemoryDataCollector.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface ExpressionFunctionProviderInterface
 {

@@ -38,8 +38,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * ContextListener manages the SecurityContext persistence through a session.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  *
  * @final
  */

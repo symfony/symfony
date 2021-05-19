@@ -22,7 +22,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * A catalogue binary operation performs operation on
  * source (the left argument) and target (the right argument) catalogues.
  *
- * @author Jean-François Simon <contact@jfsimon.fr>
+
  */
 abstract class AbstractOperation implements OperationInterface
 {

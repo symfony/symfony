@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\LogicException;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Michael Hirschler <michael.vhirsch@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Bic extends Constraint

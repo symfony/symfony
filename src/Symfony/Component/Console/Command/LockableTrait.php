@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 /**
  * Basic lock feature for commands.
  *
- * @author Geoffrey Brier <geoffrey.brier@gmail.com>
+
  */
 trait LockableTrait
 {

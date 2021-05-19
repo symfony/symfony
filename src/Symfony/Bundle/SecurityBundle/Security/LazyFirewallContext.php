@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 /**
  * Lazily calls authentication listeners when actually required by the access listener.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class LazyFirewallContext extends FirewallContext
 {

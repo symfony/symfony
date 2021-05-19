@@ -20,7 +20,7 @@ use Twig\Environment;
 /**
  * Implements the Hinclude rendering strategy.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {

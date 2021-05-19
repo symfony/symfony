@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Address
 {

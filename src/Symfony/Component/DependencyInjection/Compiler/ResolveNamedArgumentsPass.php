@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Resolves named arguments to their corresponding numeric index.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ResolveNamedArgumentsPass extends AbstractRecursivePass
 {

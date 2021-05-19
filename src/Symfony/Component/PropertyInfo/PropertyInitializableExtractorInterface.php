@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * Guesses if the property can be initialized through the constructor.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 interface PropertyInitializableExtractorInterface
 {

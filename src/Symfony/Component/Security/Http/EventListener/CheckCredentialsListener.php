@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * This listeners uses the interfaces of authenticators to
  * determine how to check credentials.
  *
- * @author Wouter de Jong <wouter@driveamber.com>
+
  *
  * @final
  */

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Uses a RequestStack to populate the context.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RequestStackContext implements ContextInterface
 {

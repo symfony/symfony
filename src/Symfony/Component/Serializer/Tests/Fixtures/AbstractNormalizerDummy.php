@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 /**
  * Provides a dummy Normalizer which extends the AbstractNormalizer.
  *
- * @author Konstantin S. M. Möllers <ksm.moellers@gmail.com>
+
  */
 class AbstractNormalizerDummy extends AbstractNormalizer
 {

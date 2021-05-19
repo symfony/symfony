@@ -14,7 +14,7 @@ namespace Symfony\Component\Templating;
 /**
  * DelegatingEngine selects an engine for a given template.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {

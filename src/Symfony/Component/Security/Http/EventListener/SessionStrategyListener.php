@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
  *
  * @see SessionAuthenticationStrategy
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class SessionStrategyListener implements EventSubscriberInterface
 {

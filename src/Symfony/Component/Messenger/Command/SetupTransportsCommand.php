@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+
  */
 class SetupTransportsCommand extends Command
 {

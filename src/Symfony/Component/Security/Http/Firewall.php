@@ -26,7 +26,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * (a Basic authentication for the /api, and a web based authentication for
  * everything else for instance).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Firewall implements EventSubscriberInterface
 {

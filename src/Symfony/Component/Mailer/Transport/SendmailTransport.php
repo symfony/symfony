@@ -32,8 +32,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * - SendmailTransportFactory to use most common sendmail path and recommanded options
  * - NativeTransportFactory when configuration is set via php.ini
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Chris Corbyn
+
+
  */
 class SendmailTransport extends AbstractTransport
 {

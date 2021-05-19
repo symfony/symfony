@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid ISSN.
  *
- * @author Antonio J. García Lagar <aj@garcialagar.es>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @see https://en.wikipedia.org/wiki/Issn
  */

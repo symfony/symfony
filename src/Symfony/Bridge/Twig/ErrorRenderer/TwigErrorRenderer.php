@@ -21,7 +21,7 @@ use Twig\Environment;
  * Provides the ability to render custom Twig-based HTML error pages
  * in non-debug mode, otherwise falls back to HtmlErrorRenderer.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  */
 class TwigErrorRenderer implements ErrorRendererInterface
 {

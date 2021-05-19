@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Propagate "container.hot_path" tags to referenced services.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ResolveHotPathPass extends AbstractRecursivePass
 {

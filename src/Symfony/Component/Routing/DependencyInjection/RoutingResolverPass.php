@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Adds tagged routing.loader services to routing.resolver service.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class RoutingResolverPass implements CompilerPassInterface
 {

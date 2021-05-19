@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class SessionHandlerFactory
 {

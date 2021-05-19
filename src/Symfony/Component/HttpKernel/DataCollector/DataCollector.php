@@ -23,8 +23,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  *
  * Children of this class must store the collected data in the data property.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bschussek@symfony.com>
+
+
  */
 abstract class DataCollector implements DataCollectorInterface
 {

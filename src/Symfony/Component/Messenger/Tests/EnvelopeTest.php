@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceivedStamp as Lega
 use Symfony\Component\Messenger\Transport\RedisExt\RedisReceivedStamp as LegacyRedisReceivedStamp;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class EnvelopeTest extends TestCase
 {

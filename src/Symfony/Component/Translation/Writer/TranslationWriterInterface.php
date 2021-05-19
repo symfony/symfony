@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * TranslationWriter writes translation messages.
  *
- * @author Michel Salib <michelsalib@hotmail.com>
+
  */
 interface TranslationWriterInterface
 {

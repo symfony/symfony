@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 /**
  * Handles CRAM-MD5 authentication.
  *
- * @author Chris Corbyn
+
  */
 class CramMd5Authenticator implements AuthenticatorInterface
 {

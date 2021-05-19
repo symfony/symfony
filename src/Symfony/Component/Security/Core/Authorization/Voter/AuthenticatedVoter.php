@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * This list is most restrictive to least restrictive checking.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
+
  */
 class AuthenticatedVoter implements VoterInterface
 {

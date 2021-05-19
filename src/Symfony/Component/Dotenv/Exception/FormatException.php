@@ -14,7 +14,7 @@ namespace Symfony\Component\Dotenv\Exception;
 /**
  * Thrown when a file has a syntax error.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class FormatException extends \LogicException implements ExceptionInterface
 {

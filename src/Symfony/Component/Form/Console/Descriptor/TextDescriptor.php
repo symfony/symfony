@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  *
  * @internal
  */

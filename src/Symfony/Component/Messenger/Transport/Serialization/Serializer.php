@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializerInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class Serializer implements SerializerInterface
 {

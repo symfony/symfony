@@ -27,7 +27,7 @@ trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecate
 /**
  * BasicAuthenticationListener implements Basic HTTP authentication.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  *

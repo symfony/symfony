@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class Preloader
 {

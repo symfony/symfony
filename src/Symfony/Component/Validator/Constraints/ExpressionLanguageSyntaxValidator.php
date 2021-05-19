@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Andrey Sevastianov <mrpkmail@gmail.com>
+
  */
 class ExpressionLanguageSyntaxValidator extends ConstraintValidator
 {

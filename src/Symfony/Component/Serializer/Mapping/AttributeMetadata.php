@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Mapping;
 /**
  * {@inheritdoc}
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class AttributeMetadata implements AttributeMetadataInterface
 {

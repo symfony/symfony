@@ -16,7 +16,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 /**
  * Represents a choice question.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ChoiceQuestion extends Question
 {

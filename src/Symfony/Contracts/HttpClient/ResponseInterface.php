@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 /**
  * A (lazily retrieved) HTTP response.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ResponseInterface
 {

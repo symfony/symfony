@@ -38,7 +38,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @author Przemysław Bogusz <przemyslaw.bogusz@tubotax.pl>
+
  */
 class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 /**
  * An AMQP connection.
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  *
  * @final
  */

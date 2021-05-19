@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 /**
  * FlashBagTest.
  *
- * @author Drak <drak@zikula.org>
+
  */
 class FlashBagTest extends TestCase
 {

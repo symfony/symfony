@@ -21,7 +21,7 @@ namespace Symfony\Component\Validator\Mapping;
  * should be validated against their class' metadata and whether traversable
  * objects should be traversed or not.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see MetadataInterface
  * @see CascadingStrategy

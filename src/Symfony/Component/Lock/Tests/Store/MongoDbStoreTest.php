@@ -19,7 +19,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\MongoDbStore;
 
 /**
- * @author Joe Bennett <joe@assimtech.com>
+
  *
  * @requires extension mongodb
  * @group integration

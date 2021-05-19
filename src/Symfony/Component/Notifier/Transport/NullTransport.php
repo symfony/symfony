@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NullTransport implements TransportInterface
 {

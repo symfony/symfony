@@ -14,9 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Secrets;
 use Symfony\Component\DependencyInjection\EnvVarLoaderInterface;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
  *
  * @internal
  */

@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  * This node is intended for values of arbitrary type.
  * Any PHP type is accepted as a value.
  *
- * @author Jeremy Mikola <jmikola@gmail.com>
+
  */
 class VariableNode extends BaseNode implements PrototypeNodeInterface
 {

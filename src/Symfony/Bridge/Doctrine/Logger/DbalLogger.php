@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DbalLogger implements SQLLogger
 {

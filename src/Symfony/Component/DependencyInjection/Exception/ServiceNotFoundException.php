@@ -16,7 +16,7 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * This exception is thrown when a non-existent service is requested.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ServiceNotFoundException extends InvalidArgumentException implements NotFoundExceptionInterface
 {

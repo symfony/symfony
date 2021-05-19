@@ -21,11 +21,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
-/**
- * DoctrineDataCollector.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class DoctrineDataCollector extends DataCollector
 {
     private $registry;

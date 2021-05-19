@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Iterator for all templates in bundles and in the application Resources directory.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

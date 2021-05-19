@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 /**
  * Returns a {@link ClassMetadata}.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {

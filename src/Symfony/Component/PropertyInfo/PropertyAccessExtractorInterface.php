@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * Guesses if the property can be accessed or mutated.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 interface PropertyAccessExtractorInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  *
  * @final
  */

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * Implement this interface for any classes that will be called to "start"
  * the authentication process (see method for more details).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface AuthenticationEntryPointInterface
 {

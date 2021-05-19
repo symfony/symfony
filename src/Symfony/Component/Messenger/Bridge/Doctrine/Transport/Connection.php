@@ -31,8 +31,8 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @internal since Symfony 5.1
  *
- * @author Vincent Touzet <vincent.touzet@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 class Connection implements ResetInterface
 {

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author Rob Frawley 2nd <rmf@src.run>
+
  */
 class CachePoolPrunerPass implements CompilerPassInterface
 {

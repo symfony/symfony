@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {

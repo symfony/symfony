@@ -47,12 +47,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-/**
- * SecurityExtension.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- */
 class SecurityExtension extends Extension implements PrependExtensionInterface
 {
     private $requestMatchers = [];

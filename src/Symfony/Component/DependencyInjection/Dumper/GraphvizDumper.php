@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  *   dot -Tpng container.dot > foo.png
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class GraphvizDumper extends Dumper
 {

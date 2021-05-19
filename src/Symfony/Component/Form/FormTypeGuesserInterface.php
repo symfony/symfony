@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface FormTypeGuesserInterface
 {

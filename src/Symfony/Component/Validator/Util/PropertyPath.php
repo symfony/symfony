@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator\Util;
  *
  * For more extensive functionality, use Symfony's PropertyAccess component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyPath
 {

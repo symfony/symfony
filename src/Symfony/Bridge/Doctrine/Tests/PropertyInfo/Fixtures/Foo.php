@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures;
 
 /**
- * @author Teoh Han Hui <teohhanhui@gmail.com>
+
  */
 class Foo
 {

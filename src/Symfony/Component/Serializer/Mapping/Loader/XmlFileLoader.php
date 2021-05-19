@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 /**
  * Loads XML mapping files.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class XmlFileLoader extends FileLoader
 {

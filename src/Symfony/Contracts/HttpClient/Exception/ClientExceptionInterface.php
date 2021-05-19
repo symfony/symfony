@@ -14,7 +14,7 @@ namespace Symfony\Contracts\HttpClient\Exception;
 /**
  * When a 4xx response is returned.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface ClientExceptionInterface extends HttpExceptionInterface
 {

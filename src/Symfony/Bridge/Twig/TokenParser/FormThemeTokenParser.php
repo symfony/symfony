@@ -20,7 +20,7 @@ use Twig\TokenParser\AbstractTokenParser;
 /**
  * Token Parser for the 'form_theme' tag.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class FormThemeTokenParser extends AbstractTokenParser
 {

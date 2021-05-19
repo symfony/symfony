@@ -14,8 +14,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
 /**
  * Thrown when trying to inject a parameter into a constructor/method with an incompatible type.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Julien Maulny <jmaulny@darkmira.fr>
+
+
  */
 class InvalidParameterTypeException extends InvalidArgumentException
 {

@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 
 /**
- * @author Jérémy Romey <jeremy@free-agent.fr>
+
  */
 final class HttpClientDataCollector extends DataCollector implements LateDataCollectorInterface
 {

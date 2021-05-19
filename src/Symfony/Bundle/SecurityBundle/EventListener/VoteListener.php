@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Event\VoteEvent;
 /**
  * Listen to vote events from traceable voters.
  *
- * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+
  *
  * @internal
  */

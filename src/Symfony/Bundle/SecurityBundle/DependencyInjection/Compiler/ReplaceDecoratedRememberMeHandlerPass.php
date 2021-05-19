@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Replaces the DecoratedRememberMeHandler services with the real definition.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @internal
  */

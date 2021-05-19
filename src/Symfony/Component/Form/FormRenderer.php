@@ -19,7 +19,7 @@ use Twig\Environment;
 /**
  * Renders a form into HTML using a rendering engine.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormRenderer implements FormRendererInterface
 {

@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Quentin Dequippe <quentin@dequippe.tech>
+
  */
 final class AllMySmsTransport extends AbstractTransport
 {

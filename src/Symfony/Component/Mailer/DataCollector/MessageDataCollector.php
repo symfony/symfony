@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\Event\MessageEvents;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class MessageDataCollector extends DataCollector
 {

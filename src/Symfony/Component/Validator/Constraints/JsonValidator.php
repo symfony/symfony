@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Imad ZAIRIG <imadzairig@gmail.com>
+
  */
 class JsonValidator extends ConstraintValidator
 {

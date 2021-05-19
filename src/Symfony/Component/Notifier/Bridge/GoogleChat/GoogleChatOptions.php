@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 
 /**
- * @author Jérôme Tamarelle <jerome@tamarelle.net>
+
  */
 final class GoogleChatOptions implements MessageOptionsInterface
 {

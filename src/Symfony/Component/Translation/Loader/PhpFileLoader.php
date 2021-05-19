@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Loader;
 /**
  * PhpFileLoader loads translations from PHP files returning an array of translations.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class PhpFileLoader extends FileLoader
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Console\Exception\LogicException;
  *         new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
  *     ]);
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class InputDefinition
 {

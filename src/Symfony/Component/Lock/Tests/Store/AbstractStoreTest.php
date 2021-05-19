@@ -17,7 +17,7 @@ use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 abstract class AbstractStoreTest extends TestCase
 {

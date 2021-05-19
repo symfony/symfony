@@ -20,7 +20,7 @@ use Twig\TwigFunction;
 /**
  * Twig extension for the Symfony WebLink component.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 final class WebLinkExtension extends AbstractExtension
 {

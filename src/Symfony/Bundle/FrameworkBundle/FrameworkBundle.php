@@ -81,11 +81,6 @@ class_exists(ErrorHandler::class);
 class_exists(Hydrator::class);
 class_exists(Registry::class);
 
-/**
- * Bundle.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class FrameworkBundle extends Bundle
 {
     public function boot()

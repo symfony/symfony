@@ -17,7 +17,7 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class TemplateControllerTest extends TestCase
 {

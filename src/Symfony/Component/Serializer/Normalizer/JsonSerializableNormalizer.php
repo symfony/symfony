@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 /**
  * A normalizer that uses an objects own JsonSerializable implementation.
  *
- * @author Fred Cox <mcfedr@gmail.com>
+
  */
 class JsonSerializableNormalizer extends AbstractNormalizer
 {

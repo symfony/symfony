@@ -26,7 +26,7 @@ namespace Symfony\Component\ExpressionLanguage;
  * expression (it receives the values as a first argument and the function
  * arguments as remaining arguments).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ExpressionFunction
 {

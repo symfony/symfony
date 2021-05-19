@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CsrfTokenManagerTest extends TestCase
 {

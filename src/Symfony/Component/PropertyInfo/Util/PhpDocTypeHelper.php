@@ -22,8 +22,8 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Transforms a php doc type to a {@link Type} instance.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Guilhem N. <egetick@gmail.com>
+
+
  */
 final class PhpDocTypeHelper
 {

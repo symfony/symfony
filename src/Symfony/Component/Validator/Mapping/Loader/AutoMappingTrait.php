@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Utility methods to create auto mapping loaders.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 trait AutoMappingTrait
 {

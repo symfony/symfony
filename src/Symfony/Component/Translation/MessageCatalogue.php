@@ -15,7 +15,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Translation\Exception\LogicException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {

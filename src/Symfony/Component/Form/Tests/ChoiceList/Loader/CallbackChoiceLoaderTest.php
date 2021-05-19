@@ -17,7 +17,7 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 
 /**
- * @author Jules Pietri <jules@heahprod.com>
+
  */
 class CallbackChoiceLoaderTest extends TestCase
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Negative;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
+
  */
 class LessThanValidatorWithNegativeConstraintTest extends LessThanValidatorTest
 {

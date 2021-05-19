@@ -18,8 +18,8 @@ use Symfony\Component\String\Exception\RuntimeException;
 /**
  * Represents a binary-safe string of bytes.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  *
  * @throws ExceptionInterface
  */

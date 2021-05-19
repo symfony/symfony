@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 /**
  * Generate ConfigBuilders to help create valid config.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
 {

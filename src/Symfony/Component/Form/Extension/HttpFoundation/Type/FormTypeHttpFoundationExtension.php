@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 {

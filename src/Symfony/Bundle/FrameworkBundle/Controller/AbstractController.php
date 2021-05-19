@@ -52,7 +52,7 @@ use Twig\Environment;
 /**
  * Provides common features needed in controllers.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractController implements ServiceSubscriberInterface
 {

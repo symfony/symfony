@@ -19,7 +19,7 @@ use Symfony\Component\Config\Exception\LoaderLoadException;
  * This loader acts as an array of LoaderInterface objects - each having
  * a chance to load a given resource (handled by the resolver)
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DelegatingLoader extends Loader
 {

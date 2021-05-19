@@ -25,9 +25,9 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  * Can be optionally be extended from by the developer to alter the behavior
  * while keeping the default behavior.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
+
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {

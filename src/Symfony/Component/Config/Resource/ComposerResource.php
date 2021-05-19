@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Resource;
 /**
  * ComposerResource tracks the PHP version and Composer dependencies.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @final
  */

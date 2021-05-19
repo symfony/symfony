@@ -23,7 +23,7 @@ class_exists(HttpHeaderSerializer::class);
 /**
  * Adds the Link HTTP header to the response.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  *
  * @final
  */

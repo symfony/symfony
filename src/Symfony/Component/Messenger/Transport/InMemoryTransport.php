@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Transport that stays in memory. Useful for testing purpose.
  *
- * @author Gary PEGEOT <garypegeot@gmail.com>
+
  */
 class InMemoryTransport implements TransportInterface, ResetInterface
 {

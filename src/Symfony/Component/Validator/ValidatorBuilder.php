@@ -43,7 +43,7 @@ class_exists(LocaleAwareInterface::class);
 class_exists(TranslatorTrait::class);
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ValidatorBuilder
 {

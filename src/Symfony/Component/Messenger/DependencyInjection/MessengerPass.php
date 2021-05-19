@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class MessengerPass implements CompilerPassInterface
 {

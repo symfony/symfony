@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
 /**
  * SizeRangeFilterIterator filters out files that are not in the given size range.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {

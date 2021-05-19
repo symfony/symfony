@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * been inlined or removed. Private services will be removed when they are not
  * used by other services.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

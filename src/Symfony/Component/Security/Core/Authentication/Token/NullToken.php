@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class NullToken implements TokenInterface
 {

@@ -17,9 +17,9 @@ use Symfony\Component\Console\Exception\LogicException;
 /**
  * Defines the styles for a Table.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Саша Стаменковић <umpirsky@gmail.com>
- * @author Dany Maillard <danymaillard93b@gmail.com>
+
+
+
  */
 class TableStyle
 {

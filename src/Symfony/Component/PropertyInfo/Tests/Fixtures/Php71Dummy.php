@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Teoh Han Hui <teohhanhui@gmail.com>
+
  */
 class Php71Dummy
 {

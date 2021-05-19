@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 /**
  * Base class used by classes that extract translation messages from files.
  *
- * @author Marcos D. Sánchez <marcosdsanchez@gmail.com>
+
  */
 abstract class AbstractFileExtractor
 {

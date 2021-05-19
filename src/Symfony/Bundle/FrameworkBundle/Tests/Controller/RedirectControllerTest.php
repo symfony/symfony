@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @author Marcin Sikon <marcin.sikon@gmail.com>
+
  */
 class RedirectControllerTest extends TestCase
 {

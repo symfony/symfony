@@ -19,7 +19,7 @@ trigger_deprecation('symfony/security-core', '5.3', 'The "%s" interface is depre
  * SelfSaltingEncoderInterface is a marker interface for encoders that do not
  * require a user-generated salt.
  *
- * @author Zan Baldwin <hello@zanbaldwin.com>
+
  *
  * @deprecated since Symfony 5.3, use {@link LegacyPasswordHasherInterface} instead
  */

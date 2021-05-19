@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Share;
 use Symfony\Component\Notifier\Exception\LogicException;
 
 /**
- * @author Smaïne Milianni <smaine.milianni@gmail.com>
+
  *
  * @see https://docs.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api#schema lifecycleState section
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler;
 /**
  * Link represents an HTML link (an HTML a, area or link tag).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Link extends AbstractUriElement
 {

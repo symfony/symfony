@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 /**
  * Gives access to timezone-related ICU data.
  *
- * @author Roland Franssen <franssen.roland@gmail.com>
+
  */
 final class Timezones extends ResourceBundle
 {

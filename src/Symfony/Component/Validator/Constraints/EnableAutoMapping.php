@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @Annotation
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class EnableAutoMapping extends Constraint

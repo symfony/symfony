@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 /**
  * Lazily loads fragment renderers from the dependency injection container.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class LazyLoadingFragmentHandler extends FragmentHandler
 {

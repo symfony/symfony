@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
  * Lazy proxy instantiator, capable of instantiating a proxy given a container, the
  * service definitions and a callback that produces the real service instance.
  *
- * @author Marco Pivetta <ocramius@gmail.com>
+
  */
 interface InstantiatorInterface
 {

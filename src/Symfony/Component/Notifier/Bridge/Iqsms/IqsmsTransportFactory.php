@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Oleksandr Barabolia <alexandrbarabolya@gmail.com>
+
  */
 final class IqsmsTransportFactory extends AbstractTransportFactory
 {

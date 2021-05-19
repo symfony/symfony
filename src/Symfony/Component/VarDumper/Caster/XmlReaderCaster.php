@@ -15,7 +15,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Casts XmlReader class to array representation.
  *
- * @author Baptiste Clavié <clavie.b@gmail.com>
+
  *
  * @final
  */

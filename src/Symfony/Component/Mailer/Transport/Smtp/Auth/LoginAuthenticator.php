@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 /**
  * Handles LOGIN authentication.
  *
- * @author Chris Corbyn
+
  */
 class LoginAuthenticator implements AuthenticatorInterface
 {

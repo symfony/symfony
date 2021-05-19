@@ -12,7 +12,7 @@
 namespace Symfony\Component\BrowserKit;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Response
 {

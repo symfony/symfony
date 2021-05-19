@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * Used by service that should trigger deprecation when accessed by the user.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  *
  * @internal to be removed in 6.0
  */

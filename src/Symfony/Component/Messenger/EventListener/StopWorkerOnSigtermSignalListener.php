@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
+
  */
 class StopWorkerOnSigtermSignalListener implements EventSubscriberInterface
 {

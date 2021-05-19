@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
- * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+
  */
 interface BlockingStoreInterface extends PersistingStoreInterface
 {

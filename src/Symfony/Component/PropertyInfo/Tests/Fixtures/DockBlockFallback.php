@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 /**
  * PhpDocExtractor should fallback from property -> accessor -> mutator when looking up dockblocks.
  *
- * @author Martin Rademacher <mano@radebatz.net>
+
  */
 class DockBlockFallback
 {

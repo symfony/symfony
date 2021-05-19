@@ -21,7 +21,7 @@ use Twig\TwigFunction;
 /**
  * SecurityExtension exposes security context features.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class SecurityExtension extends AbstractExtension
 {

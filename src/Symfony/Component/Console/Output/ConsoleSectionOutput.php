@@ -16,8 +16,8 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Terminal;
 
 /**
- * @author Pierre du Plessis <pdples@gmail.com>
- * @author Gabriel Ostrolucký <gabriel.ostrolucky@gmail.com>
+
+
  */
 class ConsoleSectionOutput extends StreamOutput
 {

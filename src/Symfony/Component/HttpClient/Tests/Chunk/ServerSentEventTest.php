@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Chunk\ServerSentEvent;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+
  */
 class ServerSentEventTest extends TestCase
 {
@@ -70,7 +70,7 @@ data: <tag>
 data
 data:   <foo />
 data:
-data: 
+data:
 data: </tag>
 STR;
         $sse = new ServerSentEvent($rawData);

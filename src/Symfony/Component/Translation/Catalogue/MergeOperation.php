@@ -20,7 +20,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * obsolete = source ∖ all = {x: x ∈ source ∧ x ∉ source ∧ x ∉ target} = ∅
  * Basically, the result contains messages from both catalogues.
  *
- * @author Jean-François Simon <contact@jfsimon.fr>
+
  */
 class MergeOperation extends AbstractOperation
 {

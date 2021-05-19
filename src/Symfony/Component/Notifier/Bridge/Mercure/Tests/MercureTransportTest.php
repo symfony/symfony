@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TypeError;
 
 /**
- * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+
  */
 final class MercureTransportTest extends TransportTestCase
 {

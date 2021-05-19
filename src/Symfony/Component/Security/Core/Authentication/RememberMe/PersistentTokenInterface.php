@@ -17,7 +17,7 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  *
  * @method string getUserIdentifier() returns the identifier used to authenticate (e.g. their e-mailaddress or username)
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 interface PersistentTokenInterface
 {

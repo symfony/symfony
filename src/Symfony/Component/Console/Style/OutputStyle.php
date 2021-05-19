@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Decorates output to add console style guide helpers.
  *
- * @author Kevin Bond <kevinbond@gmail.com>
+
  */
 abstract class OutputStyle implements OutputInterface, StyleInterface
 {

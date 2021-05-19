@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class NotCompromisedPasswordTest extends TestCase
 {

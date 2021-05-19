@@ -21,7 +21,7 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DeprecationErrorHandler
 {

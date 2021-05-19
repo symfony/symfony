@@ -16,9 +16,9 @@ use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 /**
  * Provides password hashing and verification capabilities for "legacy" hashers that require external salts.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
+
  */
 interface LegacyPasswordHasherInterface extends PasswordHasherInterface
 {

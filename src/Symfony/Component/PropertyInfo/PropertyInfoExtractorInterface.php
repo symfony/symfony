@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * A convenient interface inheriting all specific info interfaces.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 interface PropertyInfoExtractorInterface extends PropertyTypeExtractorInterface, PropertyDescriptionExtractorInterface, PropertyAccessExtractorInterface, PropertyListExtractorInterface
 {

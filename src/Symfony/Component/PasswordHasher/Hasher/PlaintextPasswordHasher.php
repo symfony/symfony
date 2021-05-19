@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\LegacyPasswordHasherInterface;
  *
  * As this hasher is not cryptographically secure, usage of it in production environments is discouraged.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class PlaintextPasswordHasher implements LegacyPasswordHasherInterface
 {

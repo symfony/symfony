@@ -41,8 +41,8 @@ use Symfony\Component\Intl\Locale\Locale;
  *  - {@link setTimeZoneId}
  *  - {@link setTimeZone}
  *
- * @author Igor Wiedler <igor@wiedler.ch>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @internal
  *

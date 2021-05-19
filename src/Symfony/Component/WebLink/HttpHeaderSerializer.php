@@ -18,7 +18,7 @@ use Psr\Link\LinkInterface;
  *
  * @see https://tools.ietf.org/html/rfc5988
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 final class HttpHeaderSerializer
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Slack\Block;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 abstract class AbstractSlackBlock implements SlackBlockInterface
 {

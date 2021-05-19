@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 /**
  * Decoder delegating the decoding to a chain of decoders.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+
+
+
  *
  * @final
  */

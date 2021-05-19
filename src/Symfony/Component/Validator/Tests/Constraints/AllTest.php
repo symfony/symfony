@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class AllTest extends TestCase
 {

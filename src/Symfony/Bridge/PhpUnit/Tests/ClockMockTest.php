@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 /**
- * @author Dominic Tubach <dominic.tubach@to.com>
+
  *
  * @covers \Symfony\Bridge\PhpUnit\ClockMock
  */

@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Thomas Ferney <thomas.ferney@gmail.com>
+
  */
 final class OvhCloudTransportFactory extends AbstractTransportFactory
 {

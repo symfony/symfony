@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * Transforms between an ISO 8601 week date string and an array.
  *
- * @author Damien Fayet <damienf1521@gmail.com>
+
  */
 class WeekToArrayTransformer implements DataTransformerInterface
 {

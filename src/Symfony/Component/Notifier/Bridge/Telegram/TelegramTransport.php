@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * and then execute curl 'https://api.telegram.org/bot%token%/getUpdates' | json_pp
  * command.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TelegramTransport extends AbstractTransport
 {

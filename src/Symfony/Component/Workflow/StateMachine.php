@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class StateMachine extends Workflow
 {

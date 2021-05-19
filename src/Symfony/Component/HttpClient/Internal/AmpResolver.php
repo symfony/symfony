@@ -19,7 +19,7 @@ use Amp\Success;
 /**
  * Handles local overrides for the DNS resolver.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

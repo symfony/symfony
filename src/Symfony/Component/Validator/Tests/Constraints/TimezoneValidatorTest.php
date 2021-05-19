@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Javier Spagnoletti <phansys@gmail.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  */
 class TimezoneValidatorTest extends ConstraintValidatorTestCase
 {

@@ -26,7 +26,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class StoreFactoryTest extends TestCase
 {

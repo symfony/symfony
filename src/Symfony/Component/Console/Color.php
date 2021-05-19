@@ -14,7 +14,7 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class Color
 {

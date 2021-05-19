@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Activation strategy that ignores 404s for certain URLs.
  *
- * @author Jordi Boggiano <j.boggiano@seld.be>
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Pierrick Vignand <pierrick.vignand@gmail.com>
+
+
+
  *
  * @final
  */

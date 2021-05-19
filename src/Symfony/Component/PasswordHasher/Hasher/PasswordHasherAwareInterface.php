@@ -12,7 +12,7 @@
 namespace Symfony\Component\PasswordHasher\Hasher;
 
 /**
- * @author Christophe Coevoet <stof@notk.org>
+
  */
 interface PasswordHasherAwareInterface
 {

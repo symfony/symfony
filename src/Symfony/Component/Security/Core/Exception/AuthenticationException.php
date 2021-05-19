@@ -16,8 +16,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * AuthenticationException is the base class for all authentication exceptions.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Alexander <iam.asm89@gmail.com>
+
+
  */
 class AuthenticationException extends RuntimeException
 {

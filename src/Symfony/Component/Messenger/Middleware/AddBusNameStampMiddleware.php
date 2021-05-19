@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 /**
  * Adds the BusNameStamp to the bus.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class AddBusNameStampMiddleware implements MiddlewareInterface
 {

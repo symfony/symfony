@@ -28,8 +28,8 @@ use Symfony\Component\Intl\Locale\Locale;
  *  - {@link getErrorMessage}
  *  - {@link getLocale}
  *
- * @author Igor Wiedler <igor@wiedler.ch>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @internal
  *

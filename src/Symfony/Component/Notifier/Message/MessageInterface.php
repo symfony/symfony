@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Message;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface MessageInterface
 {

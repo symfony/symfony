@@ -20,7 +20,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
  * /!\ Don't put a PlaintextPasswordHasher in the list as that'd mean a leaked hash
  * could be used to authenticate successfully without knowing the cleartext password.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class MigratingPasswordHasher implements PasswordHasherInterface
 {

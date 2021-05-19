@@ -16,7 +16,7 @@ use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormValidatorPerformanceTest extends FormPerformanceTestCase
 {

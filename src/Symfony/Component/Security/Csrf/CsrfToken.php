@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Csrf;
 /**
  * A CSRF token.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CsrfToken
 {

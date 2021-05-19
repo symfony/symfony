@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Pierre Tondereau <pierre.tondereau@protonmail.com>
+
  */
 final class SendinblueTransportFactory extends AbstractTransportFactory
 {

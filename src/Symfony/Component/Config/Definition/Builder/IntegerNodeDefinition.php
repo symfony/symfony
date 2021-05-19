@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\IntegerNode;
 /**
  * This class provides a fluent interface for defining an integer node.
  *
- * @author Jeanmonod David <david.jeanmonod@gmail.com>
+
  */
 class IntegerNodeDefinition extends NumericNodeDefinition
 {

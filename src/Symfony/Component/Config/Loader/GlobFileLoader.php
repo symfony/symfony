@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Loader;
 /**
  * GlobFileLoader loads files from a glob pattern.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class GlobFileLoader extends FileLoader
 {

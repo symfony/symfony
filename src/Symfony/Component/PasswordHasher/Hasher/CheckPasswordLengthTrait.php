@@ -14,7 +14,7 @@ namespace Symfony\Component\PasswordHasher\Hasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
+
  */
 trait CheckPasswordLengthTrait
 {

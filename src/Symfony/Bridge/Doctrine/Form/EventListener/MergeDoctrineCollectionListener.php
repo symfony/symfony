@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormEvents;
  *
  * This works with ORM, MongoDB and CouchDB instances of the collection interface.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see Collection
  */

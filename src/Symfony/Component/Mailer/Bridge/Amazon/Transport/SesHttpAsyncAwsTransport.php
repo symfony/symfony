@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class SesHttpAsyncAwsTransport extends AbstractTransport
 {

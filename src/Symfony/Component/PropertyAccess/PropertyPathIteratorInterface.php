@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
 {

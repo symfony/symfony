@@ -20,8 +20,8 @@ use Twig\TwigFunction;
 /**
  * WorkflowExtension.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Carlos Pereira De Amorim <carlos@shauri.fr>
+
+
  */
 final class WorkflowExtension extends AbstractExtension
 {

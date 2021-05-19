@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether a value is a valid timezone identifier.
  *
- * @author Javier Spagnoletti <phansys@gmail.com>
- * @author Hugo Hamon <hugohamon@neuf.fr>
+
+
  */
 class TimezoneValidator extends ConstraintValidator
 {

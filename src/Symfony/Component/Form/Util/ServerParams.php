@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Util;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ServerParams
 {

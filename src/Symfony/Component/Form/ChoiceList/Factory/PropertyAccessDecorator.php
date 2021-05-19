@@ -33,7 +33,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *     // extract values from the $value property
  *     $list = $createListFromChoices($objects, 'value');
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyAccessDecorator implements ChoiceListFactoryInterface
 {

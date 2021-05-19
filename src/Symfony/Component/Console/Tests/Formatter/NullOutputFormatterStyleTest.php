@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\NullOutputFormatterStyle;
 
 /**
- * @author Tien Xuan Vo <tien.xuan.vo@gmail.com>
+
  */
 class NullOutputFormatterStyleTest extends TestCase
 {

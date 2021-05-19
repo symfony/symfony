@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Strategy\ConsensusStrategy;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class ConsensusStrategyTest extends TestCase
 {

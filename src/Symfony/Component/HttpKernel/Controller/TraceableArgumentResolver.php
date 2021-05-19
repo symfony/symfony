@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TraceableArgumentResolver implements ArgumentResolverInterface
 {

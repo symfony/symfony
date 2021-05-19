@@ -15,7 +15,7 @@ use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ButtonTypeTest extends BaseTypeTest
 {

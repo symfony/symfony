@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Handles Content-Security-Policy HTTP header for the WebProfiler Bundle.
  *
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

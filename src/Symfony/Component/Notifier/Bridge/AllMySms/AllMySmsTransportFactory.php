@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Quentin Dequippe <quentin@dequippe.tech>
+
  */
 final class AllMySmsTransportFactory extends AbstractTransportFactory
 {

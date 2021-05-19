@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * Profiler.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Profiler implements ResetInterface
 {

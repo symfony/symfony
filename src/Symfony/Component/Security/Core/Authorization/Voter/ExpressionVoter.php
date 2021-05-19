@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 /**
  * ExpressionVoter votes based on the evaluation of an expression.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ExpressionVoter implements VoterInterface
 {

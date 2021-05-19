@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
  * The PHP file is required and the $container variable can be
  * used within the file to change the container.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class PhpFileLoader extends FileLoader
 {

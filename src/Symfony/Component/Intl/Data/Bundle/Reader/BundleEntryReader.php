@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Locale;
 /**
  * Default implementation of {@link BundleEntryReaderInterface}.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @see BundleEntryReaderInterface
  *

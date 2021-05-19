@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * References Doctrine connections and entity/document managers.
  *
- * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
+
  */
 abstract class ManagerRegistry extends AbstractManagerRegistry
 {

@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class AmazonSqsTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ResetInterface
 {

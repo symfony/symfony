@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * @author Joel Wurtz <joel.wurtz@gmail.com>
+
  */
 interface DenormalizerAwareInterface
 {

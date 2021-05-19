@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\NodeVisitor;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  */
 class Scope
 {

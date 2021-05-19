@@ -20,8 +20,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * with the same name is removed first. So there can only be one route
  * with a given name.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {

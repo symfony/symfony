@@ -20,8 +20,8 @@ use Twig\Template;
 /**
  * Tries to provide context from sources (class name, file, line, code excerpt, ...).
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
+
  */
 final class SourceContextProvider implements ContextProviderInterface
 {

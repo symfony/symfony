@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\RocketChat;
 use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
- * @author Jeroen Spee <https://github.com/Jeroeny>
+
  *
  * @see https://rocket.chat/docs/administrator-guides/integrations/
  */

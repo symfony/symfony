@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
 /**
  * This exception wraps exceptions whose messages contain a reference to an env parameter.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class EnvParameterException extends InvalidArgumentException
 {

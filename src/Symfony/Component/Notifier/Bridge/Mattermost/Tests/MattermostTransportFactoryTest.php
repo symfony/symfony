@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Test\TransportFactoryTestCase;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 final class MattermostTransportFactoryTest extends TransportFactoryTestCase
 {

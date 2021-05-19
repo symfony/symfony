@@ -15,9 +15,9 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Matthias Noback <matthiasnoback@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
  */
 class MessageBus implements MessageBusInterface
 {

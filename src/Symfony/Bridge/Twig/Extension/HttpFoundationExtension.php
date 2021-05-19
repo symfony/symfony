@@ -19,7 +19,7 @@ use Twig\TwigFunction;
 /**
  * Twig extension for the Symfony HttpFoundation component.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class HttpFoundationExtension extends AbstractExtension
 {

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class SplCasterTest extends TestCase
 {

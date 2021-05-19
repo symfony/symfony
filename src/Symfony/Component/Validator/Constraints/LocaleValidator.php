@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether a value is a valid locale code.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class LocaleValidator extends ConstraintValidator
 {

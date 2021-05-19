@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Use {@see TokenDeauthenticatedEvent} if you want to cover all cases where
  * a session is deauthenticated.
  *
- * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+
  */
 final class DeauthenticatedEvent extends Event
 {

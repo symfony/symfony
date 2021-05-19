@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\LessThanValidator;
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {

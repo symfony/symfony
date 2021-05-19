@@ -16,7 +16,7 @@ use Symfony\Component\Process\Process;
 /**
  * Exception that is thrown when a process has been signaled.
  *
- * @author Sullivan Senechal <soullivaneuh@gmail.com>
+
  */
 final class ProcessSignaledException extends RuntimeException
 {

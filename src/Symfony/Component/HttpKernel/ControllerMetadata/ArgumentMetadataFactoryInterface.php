@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
 /**
  * Builds method argument data.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 interface ArgumentMetadataFactoryInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures\Annotations;
 use Symfony\Component\Serializer\Annotation\Context;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 class ContextDummy extends ContextDummyParent
 {

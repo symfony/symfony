@@ -24,7 +24,7 @@ use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  *
  * @final
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * Node which only allows a finite set of values.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class EnumNode extends ScalarNode
 {

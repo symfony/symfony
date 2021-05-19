@@ -21,8 +21,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * @author Robin Chalas <robin.chalas@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 class ServiceLocator implements ServiceProviderInterface
 {

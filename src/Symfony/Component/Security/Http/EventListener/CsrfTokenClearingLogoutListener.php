@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
- * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+
  *
  * @final
  */

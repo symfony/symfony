@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Loader;
 /**
  * Placeholder for a parameter.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class ParamConfigurator
 {

@@ -16,8 +16,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * Transforms between a normalized time and a localized time string/array.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+
+
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {

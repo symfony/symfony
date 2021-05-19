@@ -16,7 +16,7 @@ use Symfony\Component\Process\Process;
 /**
  * Exception that is thrown when a process times out.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ProcessTimedOutException extends RuntimeException
 {

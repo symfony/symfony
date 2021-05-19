@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button;
 
 /**
- * @author Mihail Krasilnikov <mihail.krasilnikov.j@gmail.com>
+
  */
 abstract class AbstractKeyboardButton
 {

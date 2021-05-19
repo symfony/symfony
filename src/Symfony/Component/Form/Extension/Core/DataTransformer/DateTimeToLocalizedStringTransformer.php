@@ -17,8 +17,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized time and a localized time string.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+
+
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {

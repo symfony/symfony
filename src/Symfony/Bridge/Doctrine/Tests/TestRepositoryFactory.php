@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Symfony\Bridge\Doctrine\Test\TestRepositoryFactory as TestTestRepositoryFactory;
 
 /**
- * @author Andreas Braun <alcaeus@alcaeus.org>
+
  */
 final class TestRepositoryFactory extends TestTestRepositoryFactory
 {

@@ -21,7 +21,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * corresponding string values for the choices. Each checkbox form whose "value"
  * option corresponds to any of the selected values is marked as selected.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CheckboxListMapper implements DataMapperInterface
 {

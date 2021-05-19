@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 class LogoutEvent extends Event
 {

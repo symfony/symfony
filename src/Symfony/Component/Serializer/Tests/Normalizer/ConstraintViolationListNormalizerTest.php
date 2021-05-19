@@ -19,8 +19,8 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Kévin Dunglas <dunglas@gmail.com>
+
+
  */
 class ConstraintViolationListNormalizerTest extends TestCase
 {

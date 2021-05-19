@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 /**
  * This class is used to remove circular dependencies between individual passes.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class Compiler
 {

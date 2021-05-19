@@ -21,7 +21,7 @@ trigger_deprecation('symfony/routing', '5.1', 'The "%s" class is deprecated, use
 /**
  * Helps add and import routes into a RouteCollection.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+
  *
  * @deprecated since Symfony 5.1, use RoutingConfigurator instead
  */

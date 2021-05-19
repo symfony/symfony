@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
  *
  * This badge must be used together with PasswordCredentials.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

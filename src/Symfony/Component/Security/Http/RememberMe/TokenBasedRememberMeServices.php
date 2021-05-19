@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Concrete implementation of the RememberMeServicesInterface providing
  * remember-me capabilities without requiring a TokenProvider.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+
  */
 class DoctrineReceivedStamp implements NonSendableStampInterface
 {

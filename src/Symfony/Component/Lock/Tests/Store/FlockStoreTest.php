@@ -17,7 +17,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class FlockStoreTest extends AbstractStoreTest
 {

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Registers additional validators.
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
+
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {

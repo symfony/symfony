@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Laurent Clouet <laurent35240@gmail.com>
+
  */
 class UlidValidatorTest extends ConstraintValidatorTestCase
 {

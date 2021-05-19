@@ -18,8 +18,8 @@ use Psr\Log\NullLogger;
 /**
  * Factory provides method to create locks.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Hamza Amrouche <hamza.simperfit@gmail.com>
+
+
  */
 class LockFactory implements LoggerAwareInterface
 {

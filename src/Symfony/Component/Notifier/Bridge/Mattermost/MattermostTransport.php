@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Emanuele Panzeri <thepanz@gmail.com>
+
  */
 final class MattermostTransport extends AbstractTransport
 {

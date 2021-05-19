@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 /**
  * Tests for SessionHandlerProxy class.
  *
- * @author Drak <drak@zikula.org>
+
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled

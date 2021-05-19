@@ -21,9 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
  *
  * @internal
  */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Output;
 
 /**
- * @author Jean-François Simon <contact@jfsimon.fr>
+
  */
 class BufferedOutput extends Output
 {

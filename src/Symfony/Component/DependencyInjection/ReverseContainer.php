@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 /**
  * Turns public and "container.reversible" services back to their ids.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class ReverseContainer
 {

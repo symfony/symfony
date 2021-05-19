@@ -18,7 +18,7 @@ if (!class_exists(NumberFormatterPolyfill::class)) {
     /**
      * Stub implementation for the NumberFormatter class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see IntlNumberFormatter
      */
@@ -29,7 +29,7 @@ if (!class_exists(NumberFormatterPolyfill::class)) {
     /**
      * Stub implementation for the NumberFormatter class of the intl extension.
      *
-     * @author Bernhard Schussek <bschussek@gmail.com>
+
      *
      * @see IntlNumberFormatter
      */

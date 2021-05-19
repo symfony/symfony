@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Nate Wiebe <nate@northern.co>
+
  */
 class TranslatableMessage implements TranslatableInterface
 {

@@ -24,8 +24,8 @@ class_exists(FlashBag::class);
 class_exists(SessionBagProxy::class);
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Drak <drak@zikula.org>
+
+
  */
 class Session implements SessionInterface, \IteratorAggregate, \Countable
 {

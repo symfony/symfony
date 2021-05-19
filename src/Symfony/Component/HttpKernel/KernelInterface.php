@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *                              This directory should be used to store build artifacts, and can be read-only at runtime.
  *                              Caches written at runtime should be stored in the "cache directory" ({@see KernelInterface::getCacheDir()}).
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface KernelInterface extends HttpKernelInterface
 {

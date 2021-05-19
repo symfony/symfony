@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * SwitchUserEvent.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class SwitchUserEvent extends Event
 {

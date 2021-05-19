@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
  *
  * @see CsrfProtectionListener
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @final
  */

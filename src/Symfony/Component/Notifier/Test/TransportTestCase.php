@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * A test case to ease testing a Notifier transport.
  *
- * @author Oskar Stark <oskarstark@googlemail.com>
+
  */
 abstract class TransportTestCase extends TestCase
 {

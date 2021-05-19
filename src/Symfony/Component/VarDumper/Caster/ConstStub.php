@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Represents a PHP constant and its value.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ConstStub extends Stub
 {

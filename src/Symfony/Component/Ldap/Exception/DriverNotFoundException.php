@@ -14,7 +14,7 @@ namespace Symfony\Component\Ldap\Exception;
 /**
  * LdapException is thrown if php ldap module is not loaded.
  *
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 class DriverNotFoundException extends \RuntimeException implements ExceptionInterface
 {

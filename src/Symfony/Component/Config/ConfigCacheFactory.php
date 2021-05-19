@@ -18,7 +18,7 @@ namespace Symfony\Component\Config;
  * This factory and/or cache <em>do not</em> support cache validation
  * by means of ResourceChecker instances (that is, service-based).
  *
- * @author Matthias Pigulla <mp@webfactory.de>
+
  */
 class ConfigCacheFactory implements ConfigCacheFactoryInterface
 {

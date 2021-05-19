@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  * @see \Symfony\Component\Messenger\Middleware\HandleMessageMiddleware
  * @see \Symfony\Component\Messenger\HandleTrait
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 final class HandledStamp implements StampInterface
 {

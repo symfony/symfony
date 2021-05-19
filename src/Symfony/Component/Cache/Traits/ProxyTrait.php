@@ -15,7 +15,7 @@ use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

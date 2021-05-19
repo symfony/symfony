@@ -16,10 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * FirePHPHandler.
- *
- * @author Jordi Boggiano <j.boggiano@seld.be>
- *
  * @final
  */
 class FirePHPHandler extends BaseFirePHPHandler

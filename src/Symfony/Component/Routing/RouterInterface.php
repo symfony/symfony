@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  *
  * This interface is the concatenation of UrlMatcherInterface and UrlGeneratorInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface RouterInterface extends UrlMatcherInterface, UrlGeneratorInterface
 {

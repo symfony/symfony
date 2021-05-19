@@ -25,8 +25,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * This class will populate the ServiceReferenceGraph with information. You can
  * retrieve the graph in other passes from the compiler.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
  */
 class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {

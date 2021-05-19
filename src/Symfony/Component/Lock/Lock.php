@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Exception\LockReleasingException;
 /**
  * Lock is the default implementation of the LockInterface.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 final class Lock implements SharedLockInterface, LoggerAwareInterface
 {

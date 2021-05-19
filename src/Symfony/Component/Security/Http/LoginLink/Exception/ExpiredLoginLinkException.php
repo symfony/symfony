@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\LoginLink\Exception;
 use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class ExpiredLoginLinkException extends ExpiredSignatureException implements InvalidLoginLinkExceptionInterface
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface BodyRendererInterface
 {

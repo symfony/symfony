@@ -21,7 +21,7 @@ use Twig\TwigFunction;
 /**
  * Twig extension for the profiler.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

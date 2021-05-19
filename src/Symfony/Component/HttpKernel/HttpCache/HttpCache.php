@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 /**
  * Cache provides HTTP caching.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {

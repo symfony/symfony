@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class CountValidatorTest extends ConstraintValidatorTestCase
 {

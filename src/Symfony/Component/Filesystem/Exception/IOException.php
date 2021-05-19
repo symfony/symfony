@@ -14,9 +14,9 @@ namespace Symfony\Component\Filesystem\Exception;
 /**
  * Exception class thrown when a filesystem operation failure happens.
  *
- * @author Romain Neutron <imprec@gmail.com>
- * @author Christian Gärtner <christiangaertner.film@googlemail.com>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
+
  */
 class IOException extends \RuntimeException implements IOExceptionInterface
 {

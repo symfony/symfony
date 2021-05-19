@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 /**
  * Clears entity managers between messages being handled to avoid outdated data.
  *
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  */
 class DoctrineClearEntityManagerWorkerSubscriber implements EventSubscriberInterface
 {

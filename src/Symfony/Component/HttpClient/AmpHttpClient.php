@@ -35,7 +35,7 @@ if (!interface_exists(DelegateHttpClient::class)) {
 /**
  * A portable implementation of the HttpClientInterface contracts based on Amp's HTTP client.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class AmpHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {

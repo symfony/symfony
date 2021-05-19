@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Collator\Collator;
 /**
  * Test case for Collator implementations.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class AbstractCollatorTest extends TestCase
 {

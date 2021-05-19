@@ -21,7 +21,7 @@ namespace Symfony\Component\Form\ChoiceList;
  * The acceptable data types for the choices depend on the implementation.
  * Values must always be strings and (within the list) free of duplicates.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface ChoiceListInterface
 {

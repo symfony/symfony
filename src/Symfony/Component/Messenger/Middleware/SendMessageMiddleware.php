@@ -23,8 +23,8 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class SendMessageMiddleware implements MiddlewareInterface
 {

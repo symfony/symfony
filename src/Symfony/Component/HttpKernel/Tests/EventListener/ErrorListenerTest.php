@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
- * @author Robert Schönthal <seroscho@googlemail.com>
+
  *
  * @group time-sensitive
  */

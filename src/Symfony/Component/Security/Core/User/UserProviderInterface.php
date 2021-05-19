@@ -32,7 +32,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  * @method UserInterface loadUserByIdentifier(string $identifier) loads the user for the given user identifier (e.g. username or email).
  *                                                                This method must throw UserNotFoundException if the user is not found.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface UserProviderInterface
 {

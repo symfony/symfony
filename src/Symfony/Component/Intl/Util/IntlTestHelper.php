@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Intl;
  * {@link requireFullIntl()} is only necessary if you use functionality in the
  * test that is not provided by the stub intl implementation.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class IntlTestHelper
 {

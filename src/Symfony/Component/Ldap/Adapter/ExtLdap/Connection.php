@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Charles Sarrazin <charles@sarraz.in>
+
  */
 class Connection extends AbstractConnection
 {

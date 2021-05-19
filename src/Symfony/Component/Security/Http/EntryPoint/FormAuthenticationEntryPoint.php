@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 /**
  * FormAuthenticationEntryPoint starts an authentication via a login form.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\ChoiceList;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 abstract class AbstractChoiceListTest extends TestCase
 {

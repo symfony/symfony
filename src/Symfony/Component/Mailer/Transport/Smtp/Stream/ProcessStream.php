@@ -16,8 +16,8 @@ use Symfony\Component\Mailer\Exception\TransportException;
 /**
  * A stream supporting local processes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Chris Corbyn
+
+
  *
  * @internal
  */

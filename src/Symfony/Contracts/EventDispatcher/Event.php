@@ -22,11 +22,11 @@ use Psr\EventDispatcher\StoppableEventInterface;
  * You can call the method stopPropagation() to abort the execution of
  * further listeners in your event listener.
  *
- * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author Jonathan Wage <jonwage@gmail.com>
- * @author Roman Borschel <roman@code-factory.org>
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Nicolas Grekas <p@tchwork.com>
+
+
+
+
+
  */
 class Event implements StoppableEventInterface
 {

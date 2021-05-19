@@ -22,7 +22,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * This cache only caches on disk to allow PHP accelerators to cache the opcodes.
  * All other mechanism would imply the use of `eval()`.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class CacheLoader extends Loader
 {

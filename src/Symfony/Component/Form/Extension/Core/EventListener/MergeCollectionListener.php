@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {

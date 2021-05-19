@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\User;
  *
  * This should not be used for anything else.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @deprecated since Symfony 5.3, use {@link InMemoryUser} instead
  */

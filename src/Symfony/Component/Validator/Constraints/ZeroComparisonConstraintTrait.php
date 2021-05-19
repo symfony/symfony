@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * @internal
  *
- * @author Jan Schädlich <jan.schaedlich@sensiolabs.de>
- * @author Alexander M. Turek <me@derrabus.de>
+
+
  */
 trait ZeroComparisonConstraintTrait
 {

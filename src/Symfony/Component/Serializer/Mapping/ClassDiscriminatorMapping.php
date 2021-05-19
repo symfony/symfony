@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class ClassDiscriminatorMapping
 {

@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Mohammad Emran Hasan <phpfour@gmail.com>
+
  */
 final class ZulipTransportFactory extends AbstractTransportFactory
 {

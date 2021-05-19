@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Diego Saint Esteben <diego@saintesteben.me>
+
+
  */
 class DateTimeValidator extends DateValidator
 {

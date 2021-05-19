@@ -14,7 +14,7 @@ namespace Symfony\Component\ExpressionLanguage;
 /**
  * Represents an expression.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Expression
 {

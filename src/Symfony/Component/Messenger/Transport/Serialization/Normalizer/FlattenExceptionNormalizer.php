@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 /**
  * This normalizer is only used in Debug/Dev/Messenger contexts.
  *
- * @author Pascal Luna <skalpa@zetareticuli.org>
+
  */
 final class FlattenExceptionNormalizer implements DenormalizerInterface, ContextAwareNormalizerInterface
 {

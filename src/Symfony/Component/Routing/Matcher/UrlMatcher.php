@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * UrlMatcher matches URL based on a set of routes.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo;
 /**
  * Extract write information for the property of a class.
  *
- * @author Joel Wurtz <jwurtz@jolicode.com>
+
  */
 interface PropertyWriteInfoExtractorInterface
 {

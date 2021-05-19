@@ -33,8 +33,8 @@ trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecat
 /**
  * Authentication listener for the "guard" system.
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
- * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
+
+
  *
  * @final
  *

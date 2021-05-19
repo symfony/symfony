@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @internal
  */

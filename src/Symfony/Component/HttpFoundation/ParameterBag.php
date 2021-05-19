@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 /**
  * ParameterBag is a container for key/value pairs.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class ParameterBag implements \IteratorAggregate, \Countable
 {

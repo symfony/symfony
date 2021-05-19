@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\ContextDummyParent;
 
 /**
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 trait ContextMappingTestTrait
 {

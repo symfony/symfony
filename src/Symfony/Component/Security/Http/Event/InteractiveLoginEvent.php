@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class InteractiveLoginEvent extends Event
 {

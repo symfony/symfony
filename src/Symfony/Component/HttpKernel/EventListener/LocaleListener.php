@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 /**
  * Initializes the locale based on the current request.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

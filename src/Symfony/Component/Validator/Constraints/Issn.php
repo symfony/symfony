@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Antonio J. García Lagar <aj@garcialagar.es>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Issn extends Constraint

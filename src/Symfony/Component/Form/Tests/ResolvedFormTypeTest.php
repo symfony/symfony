@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ResolvedFormTypeTest extends TestCase
 {

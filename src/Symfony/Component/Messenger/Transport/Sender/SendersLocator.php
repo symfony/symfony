@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
 /**
  * Maps a message to a list of senders.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class SendersLocator implements SendersLocatorInterface
 {

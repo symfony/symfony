@@ -26,7 +26,7 @@ use Twig\Node\SetNode;
 use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
 {

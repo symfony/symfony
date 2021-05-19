@@ -16,7 +16,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 /**
  * Represents a 3xx response.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class RedirectionException extends \RuntimeException implements RedirectionExceptionInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\RateLimit;
  * An implementation of RequestRateLimiterInterface that
  * fits most use-cases.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  *
  * @experimental in 5.3
  */

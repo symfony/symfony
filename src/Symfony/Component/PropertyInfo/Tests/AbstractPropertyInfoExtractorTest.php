@@ -23,7 +23,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class AbstractPropertyInfoExtractorTest extends TestCase
 {

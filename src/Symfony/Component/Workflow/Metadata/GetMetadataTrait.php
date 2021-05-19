@@ -15,7 +15,7 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Transition;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 trait GetMetadataTrait
 {

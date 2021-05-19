@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {

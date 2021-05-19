@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

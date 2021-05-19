@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 /**
  * Symfony Messenger receiver to get messages from AMQP brokers using PHP's AMQP extension.
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 {

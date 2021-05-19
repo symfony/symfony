@@ -21,8 +21,8 @@ use Symfony\Component\Workflow\Marking;
  *
  *   dot -Tpng workflow.dot > workflow.png
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class GraphvizDumper implements DumperInterface
 {

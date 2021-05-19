@@ -22,7 +22,7 @@ use Symfony\Component\Form\FormError;
 /**
  * Abstract class providing test cases for the Bootstrap 5 horizontal Twig form theme.
  *
- * @author Romain Monteil <monteil.romain@gmail.com>
+
  */
 abstract class AbstractBootstrap5HorizontalLayoutTest extends AbstractBootstrap5LayoutTest
 {

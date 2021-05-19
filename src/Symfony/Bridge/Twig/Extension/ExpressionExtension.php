@@ -18,7 +18,7 @@ use Twig\TwigFunction;
 /**
  * ExpressionExtension gives a way to create Expressions from a template.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class ExpressionExtension extends AbstractExtension
 {

@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 interface EventDispatcherInterface extends ContractsEventDispatcherInterface
 {

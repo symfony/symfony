@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
 /**
- * @author Michel Hunziker <info@michelhunziker.com>
+
  */
 class StopWorkerOnFailureLimitListener implements EventSubscriberInterface
 {

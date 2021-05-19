@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @Assert\DisableAutoMapping
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineLoaderNoAutoMappingEntity
 {

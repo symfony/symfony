@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class ControllerDoesNotReturnResponseException extends \LogicException
 {

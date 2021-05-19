@@ -35,8 +35,8 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
+
  *
  * @final
  */

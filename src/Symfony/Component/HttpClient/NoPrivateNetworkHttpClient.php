@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 /**
  * Decorator that blocks requests to private networks by default.
  *
- * @author Hallison Boaventura <hallisonboaventura@gmail.com>
+
  */
 final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface
 {

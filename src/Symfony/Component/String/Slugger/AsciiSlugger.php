@@ -20,7 +20,7 @@ if (!interface_exists(LocaleAwareInterface::class)) {
 }
 
 /**
- * @author Titouan Galopin <galopintitouan@gmail.com>
+
  */
 class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 {

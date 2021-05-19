@@ -14,7 +14,7 @@ namespace Symfony\Contracts\HttpClient\Exception;
 /**
  * When an idle timeout occurs.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 interface TimeoutExceptionInterface extends TransportExceptionInterface
 {

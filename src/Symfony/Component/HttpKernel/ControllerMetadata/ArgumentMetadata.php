@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Attribute\ArgumentInterface;
 /**
  * Responsible for storing metadata of an argument.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+
  */
 class ArgumentMetadata
 {

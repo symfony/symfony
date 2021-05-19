@@ -17,8 +17,8 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Jérémy Romey <jeremy@free-agent.fr>
+
+
  */
 final class InfobipTransportFactory extends AbstractTransportFactory
 {

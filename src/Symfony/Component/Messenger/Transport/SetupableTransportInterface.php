@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Transport;
 
 /**
- * @author Vincent Touzet <vincent.touzet@gmail.com>
+
  */
 interface SetupableTransportInterface
 {

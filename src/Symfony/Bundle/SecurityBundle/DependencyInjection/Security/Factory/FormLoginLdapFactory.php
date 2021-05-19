@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 /**
  * FormLoginLdapFactory creates services for form login ldap authentication.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Charles Sarrazin <charles@sarraz.in>
+
+
  *
  * @internal
  */

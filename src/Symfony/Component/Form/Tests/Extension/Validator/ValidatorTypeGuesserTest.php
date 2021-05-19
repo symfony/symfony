@@ -36,8 +36,8 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 
 /**
- * @author franek <franek@chicour.net>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 class ValidatorTypeGuesserTest extends TestCase
 {

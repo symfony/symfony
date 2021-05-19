@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess;
 /**
  * Entry point of the PropertyAccess component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 final class PropertyAccess
 {

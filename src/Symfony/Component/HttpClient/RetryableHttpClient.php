@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * Automatically retries failing HTTP requests.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class RetryableHttpClient implements HttpClientInterface
 {

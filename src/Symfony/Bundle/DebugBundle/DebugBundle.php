@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class DebugBundle extends Bundle
 {

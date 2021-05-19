@@ -35,8 +35,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPa
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Julien Maulny <jmaulny@darkmira.fr>
+
+
  */
 class CheckTypeDeclarationsPassTest extends TestCase
 {

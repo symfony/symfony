@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class ImportConfigurator
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  *
  * This class contains static methods only and is not meant to be instantiated.
  *
- * @author Martin Hasoň <martin.hason@gmail.com>
+
  */
 class ProcessUtils
 {

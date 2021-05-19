@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl;
 /**
  * Provides access to locale-related data.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  *
  * @internal
  */

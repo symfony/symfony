@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 /**
  * Automatically loads proxy object before validation.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class DoctrineInitializer implements ObjectInitializerInterface
 {

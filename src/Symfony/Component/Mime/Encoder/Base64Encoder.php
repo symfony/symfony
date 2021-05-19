@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime\Encoder;
 
 /**
- * @author Chris Corbyn
+
  */
 class Base64Encoder implements EncoderInterface
 {

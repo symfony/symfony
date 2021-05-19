@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Signature;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * @author Ryan Weaver <ryan@symfonycasts.com>
+
  *
  * @final
  */

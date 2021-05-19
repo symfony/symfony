@@ -18,7 +18,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * @final
  */

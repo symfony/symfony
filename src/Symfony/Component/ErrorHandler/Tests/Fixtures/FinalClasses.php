@@ -21,7 +21,7 @@ class FinalClass2
 /**
  * @final comment with @@@ and ***
  *
- * @author John Doe
+
  */
 class FinalClass3
 {
@@ -31,7 +31,7 @@ class FinalClass3
 /**
  * @final
  *
- * @author John Doe
+
  */
 class FinalClass4
 {
@@ -39,7 +39,7 @@ class FinalClass4
 }
 
 /**
- * @author John Doe
+
  *
  * @final multiline
  * comment
@@ -50,7 +50,7 @@ class FinalClass5
 }
 
 /**
- * @author John Doe
+
  *
  * @final
  */
@@ -60,7 +60,7 @@ class FinalClass6
 }
 
 /**
- * @author John Doe
+
  *
  * @final another
  *        multiline comment...
@@ -73,7 +73,7 @@ class FinalClass7
 }
 
 /**
- * @author John Doe
+
  * @final
  *
  * @return string

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestSuite;
 /**
  * Collects and replays skipped tests.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  *
  * @internal
  */

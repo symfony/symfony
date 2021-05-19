@@ -22,7 +22,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  * Foreach each apps, there can be at most 20 concurrent processes that
  * compute items at the same time and only one per cache-key.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 final class LockRegistry
 {

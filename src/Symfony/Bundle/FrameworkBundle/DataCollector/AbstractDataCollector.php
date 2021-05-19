@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
 /**
- * @author Laurent VOULLEMIER <laurent.voullemier@gmail.com>
+
  */
 abstract class AbstractDataCollector implements TemplateAwareDataCollectorInterface
 {

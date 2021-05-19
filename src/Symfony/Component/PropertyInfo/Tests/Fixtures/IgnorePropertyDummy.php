@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
- * @author Vadim Borodavko <vadim.borodavko@gmail.com>
+
  */
 class IgnorePropertyDummy
 {

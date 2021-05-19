@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Encoder\PasswordHasherAdapter;
 /**
  * A generic hasher factory implementation.
  *
- * @author Nicolas Grekas <p@tchwork.com>
- * @author Robin Chalas <robin.chalas@gmail.com>
+
+
  */
 class PasswordHasherFactory implements PasswordHasherFactoryInterface
 {

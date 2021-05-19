@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * {@link loadClassMetadata()} is called, that method will be called on all
  * loaders in the chain.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class LoaderChain implements LoaderInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class NoProperties
 {

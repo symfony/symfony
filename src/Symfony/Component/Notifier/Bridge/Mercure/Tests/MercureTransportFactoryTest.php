@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface;
 
 /**
- * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+
  */
 final class MercureTransportFactoryTest extends TransportFactoryTestCase
 {

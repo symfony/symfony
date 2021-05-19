@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 /**
  * A console command for retrieving information about form types.
  *
- * @author Yonel Ceruto <yonelceruto@gmail.com>
+
  */
 class DebugCommand extends Command
 {

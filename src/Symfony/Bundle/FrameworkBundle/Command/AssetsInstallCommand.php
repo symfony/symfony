@@ -28,8 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Command that places bundle web assets into a given directory.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Gábor Egyed <gabor.egyed@gmail.com>
+
+
  *
  * @final
  */

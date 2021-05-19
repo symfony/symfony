@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * Use Uuid::v5() to compute one.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 class UuidV5 extends Uuid
 {

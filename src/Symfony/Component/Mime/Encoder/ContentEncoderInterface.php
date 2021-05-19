@@ -12,7 +12,7 @@
 namespace Symfony\Component\Mime\Encoder;
 
 /**
- * @author Chris Corbyn
+
  */
 interface ContentEncoderInterface extends EncoderInterface
 {

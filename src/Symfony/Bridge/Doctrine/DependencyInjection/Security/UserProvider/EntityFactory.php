@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * EntityFactory creates services for Doctrine user provider.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Christophe Coevoet <stof@notk.org>
+
+
  */
 class EntityFactory implements UserProviderFactoryInterface
 {

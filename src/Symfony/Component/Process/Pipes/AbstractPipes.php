@@ -14,7 +14,7 @@ namespace Symfony\Component\Process\Pipes;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
- * @author Romain Neutron <imprec@gmail.com>
+
  *
  * @internal
  */

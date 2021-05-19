@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Mapping;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverInterface
 {

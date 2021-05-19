@@ -36,8 +36,8 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  * then "re-authenticates" the user using the information in the
  * cookie.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @author Wouter de Jong <wouter@wouterj.nl>
+
+
  *
  * @final
  */

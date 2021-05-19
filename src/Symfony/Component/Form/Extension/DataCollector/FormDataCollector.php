@@ -25,8 +25,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Data collector for {@link FormInterface} instances.
  *
- * @author Robert Schönthal <robert.schoenthal@gmail.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  *
  * @final
  */

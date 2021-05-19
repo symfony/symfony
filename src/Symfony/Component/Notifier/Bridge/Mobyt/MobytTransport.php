@@ -22,7 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Basien Durand <bdurand-dev@outlook.com>
+
  */
 final class MobytTransport extends AbstractTransport
 {

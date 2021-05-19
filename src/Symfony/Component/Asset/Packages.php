@@ -17,8 +17,8 @@ use Symfony\Component\Asset\Exception\LogicException;
 /**
  * Helps manage asset URLs.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Kris Wallsmith <kris@symfony.com>
+
+
  */
 class Packages
 {

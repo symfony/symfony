@@ -21,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 /**
  * Maps arrays/objects to/from forms using data accessors.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class DataMapper implements DataMapperInterface
 {

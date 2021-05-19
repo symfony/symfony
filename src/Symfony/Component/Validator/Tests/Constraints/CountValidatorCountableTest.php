@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Tests\Fixtures\Countable;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CountValidatorCountableTest extends CountValidatorTest
 {

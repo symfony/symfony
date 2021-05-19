@@ -34,7 +34,7 @@ use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormRegistryTest extends TestCase
 {

@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {

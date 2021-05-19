@@ -30,8 +30,8 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
- * @author Tobias Schultze <http://tobion.de>
+
+
  *
  * @final
  */

@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+
  */
 class ExtensionPass implements CompilerPassInterface
 {

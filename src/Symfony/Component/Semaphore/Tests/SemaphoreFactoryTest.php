@@ -18,8 +18,8 @@ use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\SemaphoreFactory;
 
 /**
- * @author Jérémy Derussé <jeremy@derusse.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
+
  */
 class SemaphoreFactoryTest extends TestCase
 {

@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Marcin Szepczynski <szepczynski@gmail.com>
+
  */
 final class SmsapiTransport extends AbstractTransport
 {

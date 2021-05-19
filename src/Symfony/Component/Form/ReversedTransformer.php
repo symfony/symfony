@@ -17,7 +17,7 @@ namespace Symfony\Component\Form;
  * When the transform() method is called, the reversed transformer's
  * reverseTransform() method is called and vice versa.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class ReversedTransformer implements DataTransformerInterface
 {

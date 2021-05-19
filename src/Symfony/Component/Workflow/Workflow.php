@@ -27,10 +27,10 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- * @author Carlos Pereira De Amorim <carlos@shauri.fr>
+
+
+
+
  */
 class Workflow implements WorkflowInterface
 {

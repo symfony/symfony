@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * @author Konstantin Myakshin <molodchick@gmail.com>
+
  */
 final class SendgridTransportFactory extends AbstractTransportFactory
 {

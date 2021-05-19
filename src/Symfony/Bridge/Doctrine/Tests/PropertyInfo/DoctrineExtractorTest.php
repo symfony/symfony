@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineRelation;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class DoctrineExtractorTest extends TestCase
 {

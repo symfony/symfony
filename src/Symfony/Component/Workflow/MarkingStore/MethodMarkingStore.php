@@ -25,7 +25,7 @@ use Symfony\Component\Workflow\Marking;
  * "multiple state" Marking means a subject can be in many states at the same
  * time. Use it with workflow.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 final class MethodMarkingStore implements MarkingStoreInterface
 {

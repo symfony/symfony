@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class AttributeMetadataTest extends TestCase
 {

@@ -14,8 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 /**
  * Validates values are equal (==).
  *
- * @author Daniel Holmes <daniel@danielholmes.org>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 class EqualToValidator extends AbstractComparisonValidator
 {

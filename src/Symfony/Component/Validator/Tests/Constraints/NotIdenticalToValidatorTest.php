@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotIdenticalTo;
 use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
 
 /**
- * @author Daniel Holmes <daniel@danielholmes.org>
+
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {

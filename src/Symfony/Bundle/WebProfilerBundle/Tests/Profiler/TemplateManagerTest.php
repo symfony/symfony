@@ -20,7 +20,7 @@ use Twig\Environment;
 use Twig\Loader\LoaderInterface;
 
 /**
- * @author Artur Wielogórski <wodor@wodor.net>
+
  */
 class TemplateManagerTest extends TestCase
 {

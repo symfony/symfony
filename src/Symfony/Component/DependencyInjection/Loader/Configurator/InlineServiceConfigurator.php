@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class InlineServiceConfigurator extends AbstractConfigurator
 {

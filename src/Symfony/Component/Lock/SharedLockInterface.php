@@ -17,7 +17,7 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 /**
  * SharedLockInterface defines an interface to manipulate the status of a shared lock.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 interface SharedLockInterface extends LockInterface
 {

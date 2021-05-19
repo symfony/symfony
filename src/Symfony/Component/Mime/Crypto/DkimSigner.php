@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  *
  * RFC 6376 and 8301
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 /**
  * Specifies how the auto-mapping feature should behave.
  *
- * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
+
  */
 final class AutoMappingStrategy
 {

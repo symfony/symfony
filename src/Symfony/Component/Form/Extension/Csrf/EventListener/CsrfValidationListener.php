@@ -21,7 +21,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class CsrfValidationListener implements EventSubscriberInterface
 {

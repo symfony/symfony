@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Marking;
  * It converts the Marking into something understandable by the subject and vice
  * versa.
  *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+
  */
 interface MarkingStoreInterface
 {

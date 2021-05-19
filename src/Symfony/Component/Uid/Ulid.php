@@ -16,7 +16,7 @@ namespace Symfony\Component\Uid;
  *
  * @see https://github.com/ulid/spec
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class Ulid extends AbstractUid
 {

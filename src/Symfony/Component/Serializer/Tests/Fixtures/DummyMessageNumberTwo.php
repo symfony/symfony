@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+
  */
 class DummyMessageNumberTwo implements DummyMessageInterface
 {

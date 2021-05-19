@@ -12,7 +12,7 @@
 namespace Symfony\Component\Notifier\Recipient;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class NoRecipient implements RecipientInterface
 {

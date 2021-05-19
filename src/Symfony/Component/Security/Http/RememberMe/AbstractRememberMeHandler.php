@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
 {

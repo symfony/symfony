@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
 /**
- * @author Javier Spagnoletti <phansys@gmail.com>
+
  */
 class TimezoneTest extends TestCase
 {

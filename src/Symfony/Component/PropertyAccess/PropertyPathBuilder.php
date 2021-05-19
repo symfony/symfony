@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class PropertyPathBuilder
 {

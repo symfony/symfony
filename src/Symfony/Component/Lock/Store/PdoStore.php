@@ -34,7 +34,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  * To ensure locks don't expire prematurely; the TTLs should be set with enough
  * extra time to account for any clock drift between nodes.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class PdoStore implements PersistingStoreInterface
 {

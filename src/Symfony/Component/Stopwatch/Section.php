@@ -14,7 +14,7 @@ namespace Symfony\Component\Stopwatch;
 /**
  * Stopwatch section.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Section
 {

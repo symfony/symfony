@@ -20,7 +20,7 @@ use Twig\Node\Expression\NameExpression;
 use Twig\Node\TextNode;
 
 /**
- * @author Asmir Mustafic <goetas@gmail.com>
+
  */
 class TransNodeTest extends TestCase
 {

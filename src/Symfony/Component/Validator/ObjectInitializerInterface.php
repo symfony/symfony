@@ -17,8 +17,8 @@ namespace Symfony\Component\Validator;
  * Concrete implementations of this interface are used by {@link Validator\ContextualValidatorInterface}
  * to initialize objects just before validating them.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 interface ObjectInitializerInterface
 {

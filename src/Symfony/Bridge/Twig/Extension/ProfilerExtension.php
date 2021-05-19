@@ -16,7 +16,7 @@ use Twig\Extension\ProfilerExtension as BaseProfilerExtension;
 use Twig\Profiler\Profile;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class ProfilerExtension extends BaseProfilerExtension
 {

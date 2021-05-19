@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ServerBag;
 /**
  * ServerBagTest.
  *
- * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+
  */
 class ServerBagTest extends TestCase
 {

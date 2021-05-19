@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Validates Requests.
  *
- * @author Magnus Nordlander <magnus@fervo.se>
+
  *
  * @final
  */

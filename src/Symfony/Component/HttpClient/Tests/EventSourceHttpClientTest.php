@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+
  */
 class EventSourceHttpClientTest extends TestCase
 {

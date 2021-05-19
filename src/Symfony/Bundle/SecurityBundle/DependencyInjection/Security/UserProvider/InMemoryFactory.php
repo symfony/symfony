@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 /**
  * InMemoryFactory creates services for the memory provider.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Christophe Coevoet <stof@notk.org>
+
+
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {

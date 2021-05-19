@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 /**
  * HelperInterface is the interface all helpers must implement.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 interface HelperInterface
 {

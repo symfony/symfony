@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * YAML File Loader.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+
  */
 class YamlFileLoader extends FileLoader
 {

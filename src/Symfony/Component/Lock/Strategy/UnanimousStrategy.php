@@ -14,7 +14,7 @@ namespace Symfony\Component\Lock\Strategy;
 /**
  * UnanimousStrategy is a StrategyInterface implementation where 100% of elements should be successful.
  *
- * @author Jérémy Derussé <jeremy@derusse.com>
+
  */
 class UnanimousStrategy implements StrategyInterface
 {

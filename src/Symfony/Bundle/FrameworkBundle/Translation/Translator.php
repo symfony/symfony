@@ -19,11 +19,6 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
-/**
- * Translator.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class Translator extends BaseTranslator implements WarmableInterface
 {
     protected $container;

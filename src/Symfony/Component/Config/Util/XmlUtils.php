@@ -19,9 +19,9 @@ use Symfony\Component\Config\Util\Exception\XmlParsingException;
  *
  * This class contains static methods only and is not meant to be instantiated.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Martin Hasoň <martin.hason@gmail.com>
- * @author Ole Rößner <ole@roessner.it>
+
+
+
  */
 class XmlUtils
 {

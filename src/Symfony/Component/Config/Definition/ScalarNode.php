@@ -23,7 +23,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  *   * integers
  *   * floats
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+
  */
 class ScalarNode extends VariableNode
 {

@@ -19,7 +19,7 @@ namespace Symfony\Component\Security\Http\Authenticator;
  * form or HTTP basic authentication). Implementing this interface
  * will dispatch the InteractiveLoginEvent upon successful login.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 interface InteractiveAuthenticatorInterface extends AuthenticatorInterface
 {

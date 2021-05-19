@@ -25,8 +25,8 @@ use Twig\TwigTest;
 /**
  * FormExtension extends Twig with form capabilities.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
  */
 final class FormExtension extends AbstractExtension
 {

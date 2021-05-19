@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 /**
  * Represents an enumeration of values.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+
  */
 class EnumStub extends Stub
 {

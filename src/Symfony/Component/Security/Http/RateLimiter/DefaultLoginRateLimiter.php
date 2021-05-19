@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Security;
  * This limiter prevents breadth-first attacks by enforcing
  * a limit on username+IP and a (higher) limit on IP.
  *
- * @author Wouter de Jong <wouter@wouterj.nl>
+
  */
 final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 {

@@ -15,7 +15,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * @author Jesse Rushlow <jr@rushlow.dev>
+
  */
 final class SerializerExtension extends AbstractExtension
 {

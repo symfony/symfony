@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * This event dispatcher delegates the dispatching to another one.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class TraceableEventDispatcher extends BaseTraceableEventDispatcher
 {

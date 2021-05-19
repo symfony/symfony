@@ -17,8 +17,8 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 
 /**
- * @author Simon Delicata <simon.delicata@free.fr>
- * @author Tobias Schultze <http://tobion.de>
+
+
  */
 class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
 {

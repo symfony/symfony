@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * A helper service for manipulating URLs within and outside the request scope.
  *
- * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+
  */
 final class UrlHelper
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\ErrorHandler;
 /**
  * Registers all the debug tools.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 class Debug
 {

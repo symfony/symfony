@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * @author Yann LUCAS
+
  */
 final class SendinblueApiTransport extends AbstractApiTransport
 {

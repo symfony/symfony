@@ -20,9 +20,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * ChoiceValidator validates that the value is one of the expected values.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Florian Eckerstorfer <florian@eckerstorfer.org>
- * @author Bernhard Schussek <bschussek@gmail.com>
+
+
+
  */
 class ChoiceValidator extends ConstraintValidator
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class Form extends Constraint
 {

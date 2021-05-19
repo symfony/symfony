@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\UriSigner;
 /**
  * Generates a fragment URI.
  *
- * @author Kévin Dunglas <kevin@dunglas.fr>
- * @author Fabien Potencier <fabien@symfony.com>
+
+
  */
 final class FragmentUriGenerator implements FragmentUriGeneratorInterface
 {

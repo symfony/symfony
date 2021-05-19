@@ -15,7 +15,7 @@ namespace Symfony\Component\Messenger\Exception;
  * When handling queued messages from {@link DispatchAfterCurrentBusMiddleware},
  * some handlers caused an exception. This exception contains all those handler exceptions.
  *
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+
  */
 class DelayedMessageHandlingException extends RuntimeException
 {

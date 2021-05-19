@@ -14,7 +14,7 @@ namespace Symfony\Component\Notifier\Transport;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+
  */
 final class NullTransportFactory extends AbstractTransportFactory
 {

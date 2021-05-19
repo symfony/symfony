@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * The central registry of the Form component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormRegistry implements FormRegistryInterface
 {

@@ -22,7 +22,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * A basic form configuration.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {

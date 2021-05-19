@@ -107,22 +107,28 @@ class ConsoleSectionOutput extends StreamOutput
             $message = implode('', $message);
         }
 
-        Terminal::updateDimensions();
+        if ($this->isDecorated()) {
 
-        // only overwrite section if it is visible
-        if ($this->getDisplayableLines() > 0) {
+            Terminal::updateDimensions();
 
-            [, $visibleContent, $visibleLines] = $this->divideMessageByDisplayability($message);
-            $visibleContent .= PHP_EOL;
+            // only overwrite section if it is visible
+            if ($this->getDisplayableLines() > 0) {
 
-            // only overwrite visible portion if it differs from what is already visible
-            if (substr($this->getContent(), -strlen($visibleContent)) !== $visibleContent) {
+                [, $visibleContent, $visibleLines] = $this->divideMessageByDisplayability($message);
+                $visibleContent .= PHP_EOL;
 
-                $erasedContent = $this->popStreamContentUntilCurrentSection(max($visibleLines, $this->getVisibleLines()));
+                // only overwrite visible portion if it differs from what is already visible
+                if (substr($this->getContent(), -strlen($visibleContent)) !== $visibleContent) {
 
-                parent::doWrite($visibleContent, false);
-                parent::doWrite($erasedContent, false);
+                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($visibleLines, $this->getVisibleLines()));
+
+                    parent::doWrite($visibleContent, false);
+                    parent::doWrite($erasedContent, false);
+                }
             }
+        } else {
+            // output is not decorated
+            parent::doWrite($message, true);
         }
 
         $this->content = [];

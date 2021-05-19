@@ -143,13 +143,11 @@ EOPHP;
         yield [0, 14, '/** priv docblock */'];
         yield [0, 15, ''];
 
-        if (\PHP_VERSION_ID >= 70400) {
-            // PHP7.4 typed properties without default value are
-            // undefined, make sure this doesn't throw an error
-            yield [1, 5, 'public array $pub;'];
-            yield [0, 7, 'protected int $prot;'];
-            yield [0, 9, 'private string $priv;'];
-        }
+        // PHP7.4 typed properties without default value are
+        // undefined, make sure this doesn't throw an error
+        yield [1, 5, 'public array $pub;'];
+        yield [0, 7, 'protected int $prot;'];
+        yield [0, 9, 'private string $priv;'];
 
         yield [1, 17, 'public function ccc($bar = 187) {}'];
         yield [1, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];

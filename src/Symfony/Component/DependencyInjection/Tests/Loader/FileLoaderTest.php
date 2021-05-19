@@ -193,9 +193,7 @@ class FileLoaderTest extends TestCase
         $this->assertFalse($alias->isPublic());
         $this->assertTrue($alias->isPrivate());
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
-        }
+        $this->assertEquals([FooInterface::class => (new ChildDefinition(''))->addTag('foo')], $container->getAutoconfiguredInstanceof());
     }
 
     public function testMissingParentClass()
@@ -274,8 +272,6 @@ class FileLoaderTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
-     *
      * @testWith ["prod", true]
      *           ["dev", true]
      *           ["bar", false]

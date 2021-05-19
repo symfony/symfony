@@ -22,9 +22,6 @@ class RangeTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
     {
         $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
@@ -42,9 +39,6 @@ class RangeTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
     {
         $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);

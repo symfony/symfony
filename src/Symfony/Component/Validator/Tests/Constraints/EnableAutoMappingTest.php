@@ -31,9 +31,6 @@ class EnableAutoMappingTest extends TestCase
         new EnableAutoMapping(['groups' => 'foo']);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testDisableAutoMappingAttribute()
     {
         $metadata = new ClassMetadata(EnableAutoMappingDummy::class);

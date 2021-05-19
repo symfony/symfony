@@ -458,9 +458,6 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testPhp74()
     {
         $data = new Php74();

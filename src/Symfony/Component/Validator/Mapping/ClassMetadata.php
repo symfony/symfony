@@ -203,10 +203,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         }
 
         if ($constraint instanceof Cascade) {
-            if (\PHP_VERSION_ID < 70400) {
-                throw new ConstraintDefinitionException(sprintf('The constraint "%s" requires PHP 7.4.', Cascade::class));
-            }
-
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
             foreach ($this->getReflectionClass()->getProperties() as $property) {

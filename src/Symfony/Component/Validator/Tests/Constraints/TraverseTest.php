@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
-/**
- * @requires PHP 8
- */
 class TraverseTest extends TestCase
 {
     public function testPositiveAttributes()

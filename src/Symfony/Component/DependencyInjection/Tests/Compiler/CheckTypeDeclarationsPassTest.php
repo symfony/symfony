@@ -818,9 +818,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithReference()
     {
         $container = new ContainerBuilder();
@@ -834,9 +831,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -849,9 +843,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypePassesWithFalse()
     {
         $container = new ContainerBuilder();
@@ -865,9 +856,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -882,9 +870,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeFailsWithBuiltin()
     {
         $container = new ContainerBuilder();
@@ -898,9 +883,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithReference()
     {
         $container = new ContainerBuilder();
@@ -916,9 +898,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionTypeWithFalseFailsWithTrue()
     {
         $container = new ContainerBuilder();
@@ -934,9 +913,6 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testReferencePassesMixed()
     {
         $container = new ContainerBuilder();

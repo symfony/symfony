@@ -20,9 +20,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureAttributed;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredInterface;
 
-/**
- * @requires PHP 8
- */
 class RegisterAutoconfigureAttributesPassTest extends TestCase
 {
     public function testProcess()

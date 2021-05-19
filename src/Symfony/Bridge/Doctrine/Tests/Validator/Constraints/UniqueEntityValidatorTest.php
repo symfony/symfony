@@ -193,9 +193,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'em' => self::EM_NAME,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo')];
     }
 
     /**
@@ -229,9 +227,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'errorPath' => 'bar',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", errorPath: "bar");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', errorPath: 'bar')];
     }
 
     /**
@@ -290,9 +286,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => false,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: false);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: false)];
     }
 
     /**
@@ -339,9 +333,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'ignoreNull' => true,
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name", "name2"], em: "foo", ignoreNull: true);')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name', 'name2'], em: 'foo', ignoreNull: true)];
     }
 
     public function testValidateUniquenessWithValidCustomErrorPath()
@@ -440,9 +432,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             'repositoryMethod' => 'findByCustom',
         ])];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'Named arguments' => [eval('return new \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity(message: "myMessage", fields: ["name"], em: "foo", repositoryMethod: "findByCustom");')];
-        }
+        yield 'Named arguments' => [new UniqueEntity(message: 'myMessage', fields: ['name'], em: 'foo', repositoryMethod: 'findByCustom')];
     }
 
     /**

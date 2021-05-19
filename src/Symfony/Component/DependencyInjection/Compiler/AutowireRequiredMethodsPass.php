@@ -50,7 +50,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
             }
 
             while (true) {
-                if (\PHP_VERSION_ID >= 80000 && $r->getAttributes(Required::class)) {
+                if ($r->getAttributes(Required::class)) {
                     if ($this->isWither($r, $r->getDocComment() ?: '')) {
                         $withers[] = [$r->name, [], true];
                     } else {

@@ -38,11 +38,7 @@ final class DateTimeImmutableToDateTimeTransformer implements DataTransformerInt
             throw new TransformationFailedException('Expected a \DateTimeImmutable.');
         }
 
-        if (\PHP_VERSION_ID >= 70300) {
-            return \DateTime::createFromImmutable($value);
-        }
-
-        return \DateTime::createFromFormat('U.u', $value->format('U.u'))->setTimezone($value->getTimezone());
+        return \DateTime::createFromImmutable($value);
     }
 
     /**

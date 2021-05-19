@@ -71,7 +71,6 @@ class RouteTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getValidParameters
      */
     public function testRouteParameters(string $methodName, string $getter, $expectedReturn)

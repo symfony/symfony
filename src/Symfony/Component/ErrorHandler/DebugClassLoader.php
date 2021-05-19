@@ -69,13 +69,9 @@ class DebugClassLoader
         'self' => 'self',
         'parent' => 'parent',
         'mixed' => 'mixed',
-    ] + (\PHP_VERSION_ID >= 80000 ? [
         'static' => 'static',
         '$this' => 'static',
-    ] : [
-        'static' => 'object',
-        '$this' => 'object',
-    ]);
+    ];
 
     private const BUILTIN_RETURN_TYPES = [
         'void' => true,
@@ -89,10 +85,9 @@ class DebugClassLoader
         'string' => true,
         'self' => true,
         'parent' => true,
-    ] + (\PHP_VERSION_ID >= 80000 ? [
         'mixed' => true,
         'static' => true,
-    ] : []);
+    ];
 
     private const MAGIC_METHODS = [
         '__set' => 'void',
@@ -873,7 +868,7 @@ class DebugClassLoader
             }
         }
 
-        if ('void' === $normalizedType || (\PHP_VERSION_ID >= 80000 && 'mixed' === $normalizedType)) {
+        if ('void' === $normalizedType || 'mixed' === $normalizedType) {
             $nullable = false;
         } elseif (!isset(self::BUILTIN_RETURN_TYPES[$normalizedType]) && isset(self::SPECIAL_RETURN_TYPES[$normalizedType])) {
             // ignore other special return types

@@ -140,7 +140,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 continue;
             }
 
-            if ((\PHP_VERSION_ID >= 70300 || '\\' !== \DIRECTORY_SEPARATOR) && !@unlink($file)) {
+            if (!@unlink($file)) {
                 fclose($h);
                 continue;
             }
@@ -165,10 +165,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
             }
 
             fclose($h);
-
-            if (\PHP_VERSION_ID < 70300 && '\\' === \DIRECTORY_SEPARATOR) {
-                @unlink($file);
-            }
         }
     }
 

@@ -101,17 +101,15 @@ class PhpFileLoader extends FileLoader
         $configBuilders = [];
         $r = new \ReflectionFunction($callback);
 
-        if (\PHP_VERSION_ID >= 80000) {
-            $attribute = null;
-            foreach ($r->getAttributes(When::class) as $attribute) {
-                if ($this->env === $attribute->newInstance()->env) {
-                    $attribute = null;
-                    break;
-                }
+        $attribute = null;
+        foreach ($r->getAttributes(When::class) as $attribute) {
+            if ($this->env === $attribute->newInstance()->env) {
+                $attribute = null;
+                break;
             }
-            if (null !== $attribute) {
-                return;
-            }
+        }
+        if (null !== $attribute) {
+            return;
         }
 
         foreach ($r->getParameters() as $parameter) {

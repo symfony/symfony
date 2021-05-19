@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
- * @requires PHP 8
- */
 class AttributeAutoconfigurationPassTest extends TestCase
 {
     public function testProcessAddsNoEmptyInstanceofConditionals()

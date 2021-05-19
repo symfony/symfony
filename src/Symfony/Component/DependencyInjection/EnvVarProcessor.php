@@ -192,7 +192,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return (string) $env;
         }
 
-        if (in_array($prefix, ['bool', 'not'], true)) {
+        if (\in_array($prefix, ['bool', 'not'], true)) {
             $env = (bool) (filter_var($env, \FILTER_VALIDATE_BOOLEAN) ?: filter_var($env, \FILTER_VALIDATE_INT) ?: filter_var($env, \FILTER_VALIDATE_FLOAT));
 
             return 'not' === $prefix ? !$env : $env;
@@ -288,7 +288,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('csv' === $prefix) {
-            return str_getcsv($env, ',', '"', \PHP_VERSION_ID >= 70400 ? '' : '\\');
+            return str_getcsv($env, ',', '"', '');
         }
 
         if ('trim' === $prefix) {

@@ -119,9 +119,6 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributeSignature()
     {
         $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'action']);
@@ -131,9 +128,6 @@ class ArgumentMetadataFactoryTest extends TestCase
         ], $arguments);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testMultipleAttributes()
     {
         $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg']);

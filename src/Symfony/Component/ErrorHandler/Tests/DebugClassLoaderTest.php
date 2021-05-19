@@ -371,7 +371,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array_merge([
+        $this->assertSame([
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeGrandParent::returnTypeGrandParent()" will return "string" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentInterface::returnTypeParentInterface()" will return "string" as of its next major version. Doing the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface::returnTypeInterface()" will return "string" as of its next major version. Doing the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
@@ -389,16 +389,11 @@ class DebugClassLoaderTest extends TestCase
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::callableNormalization1()" will return "callable" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::callableNormalization2()" will return "callable" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::otherTypeNormalization()" will return "\ArrayIterator" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::arrayWithLessThanSignNormalization()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-        ], \PHP_VERSION_ID >= 80000 ? [
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::this()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::mixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableMixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-        ] : [
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::this()" will return "object" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" will return "object" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
-        ]), $deprecations);
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::arrayWithLessThanSignNormalization()" will return "array" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.', 'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::this()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::mixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::nullableMixed()" will return "mixed" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+           'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::static()" will return "static" as of its next major version. Doing the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" will be required when upgrading.',
+        ], $deprecations);
     }
 }
 

@@ -167,9 +167,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetValueThrowsExceptionIfUninitializedProperty()
     {
         $this->expectException(UninitializedPropertyException::class);

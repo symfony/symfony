@@ -16,9 +16,6 @@ use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 
-/**
- * @requires PHP 8
- */
 class ImageTest extends TestCase
 {
     public function testAttributes()

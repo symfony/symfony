@@ -29,9 +29,6 @@ class NotBlankTest extends TestCase
         $this->assertEquals('trim', $notBlank->normalizer);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotBlankDummy::class);

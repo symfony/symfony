@@ -180,9 +180,6 @@ ArrayObject {
   iteratorClass: "ArrayIterator"
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -200,9 +197,6 @@ Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {
   flag::ARRAY_AS_PROPS: false
 }
 EOTXT;
-        if (\PHP_VERSION_ID < 70400) {
-            $expected = str_replace('-storage:', 'storage:', $expected);
-        }
         $this->assertDumpEquals($expected, $var);
     }
 

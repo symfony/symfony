@@ -1016,10 +1016,6 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $config['default_uri']);
         }
 
-        if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
-            return;
-        }
-
         $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
             ->setPublic(false)
             ->addTag('routing.loader', ['priority' => -10])

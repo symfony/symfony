@@ -36,7 +36,7 @@ final class HttpClient
             }
 
             // Skip curl when HTTP/2 push is unsupported or buggy, see https://bugs.php.net/77535
-            if (\PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304) || !\defined('CURLMOPT_PUSHFUNCTION')) {
+            if (!\defined('CURLMOPT_PUSHFUNCTION')) {
                 return new AmpHttpClient($defaultOptions, null, $maxHostConnections, $maxPendingPushes);
             }
 

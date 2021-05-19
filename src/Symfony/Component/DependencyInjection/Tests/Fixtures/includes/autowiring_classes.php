@@ -4,10 +4,8 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Psr\Log\LoggerInterface;
 
-if (\PHP_VERSION_ID >= 80000) {
-    require __DIR__.'/uniontype_classes.php';
-    require __DIR__.'/autowiring_classes_80.php';
-}
+require __DIR__.'/uniontype_classes.php';
+require __DIR__.'/autowiring_classes_80.php';
 
 class Foo
 {

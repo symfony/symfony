@@ -280,7 +280,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $globals = $this->resetGlobals();
 
         $annot = null;
-        if (\PHP_VERSION_ID >= 80000 && ($attribute = $class->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null)) {
+        if ($attribute = $class->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
             $annot = $attribute->newInstance();
         }
         if (!$annot && $this->reader) {
@@ -371,10 +371,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     private function getAnnotations(object $reflection): iterable
     {
-        if (\PHP_VERSION_ID >= 80000) {
-            foreach ($reflection->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                yield $attribute->newInstance();
-            }
+        foreach ($reflection->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            yield $attribute->newInstance();
         }
 
         if (!$this->reader) {

@@ -181,9 +181,6 @@ class AnnotationLoaderTest extends TestCase
     public function provideNamespaces(): iterable
     {
         yield 'annotations' => ['Symfony\Component\Validator\Tests\Fixtures\Annotation'];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
-        }
+        yield 'attributes' => ['Symfony\Component\Validator\Tests\Fixtures\Attribute'];
     }
 }

@@ -46,7 +46,7 @@ class JsonEncode implements EncoderInterface
             throw new NotEncodableValueException($e->getMessage(), 0, $e);
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $options)) {
+        if (\JSON_THROW_ON_ERROR & $options) {
             return $encodedJson;
         }
 

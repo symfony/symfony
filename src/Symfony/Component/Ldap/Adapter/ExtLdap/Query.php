@@ -216,9 +216,6 @@ class Query extends AbstractQuery
      */
     private function controlPagedResult($con, int $pageSize, bool $critical, string $cookie): bool
     {
-        if (\PHP_VERSION_ID < 70300) {
-            return ldap_control_paged_result($con, $pageSize, $critical, $cookie);
-        }
         $this->serverctrls = [
             [
                 'oid' => \LDAP_CONTROL_PAGEDRESULTS,
@@ -241,11 +238,6 @@ class Query extends AbstractQuery
      */
     private function controlPagedResultResponse($con, $result, string $cookie = ''): string
     {
-        if (\PHP_VERSION_ID < 70300) {
-            ldap_control_paged_result_response($con, $result, $cookie);
-
-            return $cookie;
-        }
         ldap_parse_result($con, $result, $errcode, $matcheddn, $errmsg, $referrals, $controls);
 
         return $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
@@ -260,10 +252,6 @@ class Query extends AbstractQuery
      */
     private function callSearchFunction($con, string $func, int $sizeLimit)
     {
-        if (\PHP_VERSION_ID < 70300) {
-            return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref']);
-        }
-
         return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
     }
 }

@@ -66,9 +66,6 @@ class TimezoneTest extends TestCase
         yield [\DateTimeZone::ALL_WITH_BC + 1];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(TimezoneDummy::class);

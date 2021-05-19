@@ -23,7 +23,7 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "require-dev": {
-        "symfony/css-selector": "^4.4|^5.0",
+        "symfony/css-selector": "^4.4|^5.0|^6.0",
         "masterminds/html5": "^2.6"
     },
     "conflict": {

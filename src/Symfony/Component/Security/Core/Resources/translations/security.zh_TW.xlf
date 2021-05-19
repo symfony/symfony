@@ -70,6 +70,14 @@
                 <source>Invalid or expired login link.</source>
                 <target>失效或過期的登入鏈接。</target>
             </trans-unit>
+            <trans-unit id="19">
+                <source>Too many failed login attempts, please try again in %minutes% minute.</source>
+                <target>登錄失敗的次數過多，請在%minutes%分鐘後再試。</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Too many failed login attempts, please try again in %minutes% minutes.</source>
+                <target>登錄失敗的次數過多，請在%minutes%分鐘後再試。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

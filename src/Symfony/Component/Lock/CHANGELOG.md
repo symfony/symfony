@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+* Remove the `NotSupportedException`. It shouldn't be thrown anymore
+* Remove the `RetryTillSaveStore`. Logic has been moved in `Lock` and is not needed anymore
+
 5.2.0
 -----
 

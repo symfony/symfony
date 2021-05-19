@@ -1,0 +1,183 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-12T07:55:05Z
+
+I updated the implementation to make `token_verifier` configurable in the security config (definitely would appreciate a review of that bit from @wouterj). By default if the token_provider implements TokenVerifierInterface it will also be used as token verifier, so that makes the default implementation in DoctrineTokenProvider work by default.
+
+I could remove the DoctrineTokenProvider implementation though if you rather avoid having a default fix which is slightly hackish (I fully documented the implementation now so it's hopefully clearer what is going on).
+
+I also added a CacheTokenVerifier implementation which is the ideal one I would configure in prod, but I guess this can not be enabled by default as it requires a configured cache? I'm not sure what the baseline is here.
+
+Edit: I'm also not sure why Psalm fails, it complains about some code I did not change, not sure if I should apply those fixes or not.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-12T08:59:36Z
+
+fyi: I don't have time for a detailed review today, it's on my list for tomorrow
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-14T17:29:41Z
+
+Thanks for the review @wouterj - it's all taken care of.
+
+Still would be curious to get an opinion on these:
+
+> I could remove the DoctrineTokenProvider implementation though if you rather avoid having a default fix which is slightly hackish (I fully documented the implementation now so it's hopefully clearer what is going on).
+
+> I also added a CacheTokenVerifier implementation which is the ideal one I would configure in prod, but I guess this can not be enabled by default as it requires a configured cache? I'm not sure what the baseline is here.
+
+My ideal outcome would be to enable the CacheTokenVerifier by default and remove the other one as I find it rather suboptimal, but not sure if it's possible.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-14T17:53:00Z
+
+> My ideal outcome would be to enable the CacheTokenVerifier by default and remove the other one as I find it rather suboptimal, but not sure if it's possible
+
+Let's keep it for the case where the cache integration is not enabled, which should be pretty rare.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-14T20:18:23Z
+
+Sorry, I forgot my global review message.
+
+I like the `token_verifier` option and providing the optimal implementation in the code. That seems to be a good middle-ground for this not-so-common-but-complex issue.
+
+> My ideal outcome would be to enable the CacheTokenVerifier by default and remove the other one as I find it rather suboptimal, but not sure if it's possible.
+
+Yeah, I'm afraid we don't want to force the dependency on cache. I'm still not very sure if this is a must-fix issue, or rather an edge-case. Would not having a token verifier and only shipping the CacheTokenVerifier make sense?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-14T21:07:20Z
+
+Thanks for the hints @chalasr - I hope my implementation in 8c1d0ccf56 is correct - I'm not entirely sure if the nested null on invalid ref will work here https://github.com/symfony/symfony/pull/41175/files#diff-c790b1d460cd1f019b3eefa9c0322710d078dbadd510dbb1ee631c4c668e0dbcR323-R328 I'm hoping it would set the cache ref to null if the cache service gets deleted by the pass, which would then mark the whole verifier service invalid as the cache arg is not nullable, turning the whole verifier into a null itself.
+
+@wouterj I think we can argue either way.. but if the current implementation works I'd say why not ship a fix by default and save people from having to find out about this issue before they can configure the verifier service.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-14T21:14:53Z
+
+>  I'm not entirely sure if the nested null on invalid ref will work here https://github.com/symfony/symfony/pull/41175/files#diff-c790b1d460cd1f019b3eefa9c0322710d078dbadd510dbb1ee631c4c668e0dbcR323-R328 I'm hoping it would set the cache ref to null if the cache service gets deleted by the pass, which would then mark the whole verifier service
+
+@Seldaek `NULL_ON_INVALID_REFERENCE` means that if the referenced service does not exist, null will be injected as argument to the referencing service.
+If we want to remove the CacheTokenVerifier service (I think so), we need to call `removeDefinition()` from the compiler pass you added.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-14T21:24:49Z
+
+You will probably need a DI tag to collect the cache-based token verifier definitions and remove them from the compiler pass.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-14T21:25:44Z
+
+Yes but injecting null for $cache means the CacheTokenVerifier definition becomes invalid, so I believe it will automatically be removed/nulled, and the RememberMeAuthenticator receives null as verifier.
+
+I tested with this and it seems to work as expected, I get an `App\Test2` instance with null arg:
+
+```yaml
+services:
+    App\Test: # this would be the verifier service
+        arguments:
+            - '@?cache.foo'
+
+    App\Test2: # and this the authenticator
+        arguments:
+            - '@?App\Test'
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-14T22:26:14Z
+
+In your example `App\Test2` should either be given a `App\Test` instance or an exception should be thrown if the arg is not nullable (which is the case here), but `App\Test` won't be removed:
+```
+App\Test2 {#1367 ▼
+  -test: App\Test {#6687 ▼
+    -cacheItemPool: null
+  }
+```
+Here is a reproducer https://github.com/chalasr/repro-null-on-invalid (clone, run `symfony serve` and browse localhost:8000). Do I miss something?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-15T19:11:34Z
+
+Nope, App\Test2 accepts a nullable App\Test in my example, because that's what the PersistentRememberMeHandler accepts https://github.com/symfony/symfony/pull/41175/files#diff-5128596229172c9c8dc0dda0e9846231169b9d239c65366cb13ce6ffc2a913daR39 (a nullable TokenVerifierInterface). Anyway if you want I can tweak the compiler pass to explicitly nullify the service, but to me it does not seem necessary.
+
+Edit: You got the example backwards  I now realize, App\Test should get a non-nullable cache pool, because that's also what CacheTokenVerifier expects.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-17T14:44:48Z
+
+Ok got it, thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-18T14:18:41Z
+
+That's for 5.4, or 5.3?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2021-05-18T14:26:01Z
+
+I was hoping for 5.3 but that's just my opinion ;)
+
+---------------------------------------------------------------------------
+
+by zerkms at 2021-05-18T21:36:08Z
+
+So it won't be backported to 4.4?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-18T22:01:20Z
+
+@zerkms no, Symfony only fixes bugs in already released versions.
+
+I'm a bit divided on 5.3/5.4. On one hand, it's a nice and mostly hidden "bug fix" that fits nicely with the other remember me changes in 5.3. On the other hand, the change is fully BC and thus has no reason (other than another 6 months waiting) to bypass the feature-freeze deadline (unless I'm missing something).
+
+---------------------------------------------------------------------------
+
+by zerkms at 2021-05-18T22:07:48Z
+
+@wouterj it says "3 year support for bugs and security fixes." at https://symfony.com/releases for 4.4 :shrug:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T22:43:56Z
+
+@zerkms It won't be backported because the patch is not compatible with the 4.4 implementation of the remember-me feature.
+
+---------------------------------------------------------------------------
+
+by zerkms at 2021-05-18T22:57:58Z
+
+@chalasr then
+
+> 3 year support for bugs and security fixes.
+
+should be reworded, to be like "3 year support for _some_ bugs and security fixes"?
+
+If a bug is reported against v4.4 (which also is affected) would it be fixed independently?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T23:09:12Z
+
+If someone is able to submit a valid fix for 4.4, we could probably accept it.
+But this seems to be design issue that is hard to fix on the 4.4 implementation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-05-19T06:33:44Z
+
+Tests seem to be broken.

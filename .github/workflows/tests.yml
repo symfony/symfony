@@ -67,7 +67,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "memcached,redis,xsl,ldap" # todo: need to add pcntl here?
+          extensions: "memcached,redis,xsl,ldap" # todo: need to add pcntl and posix here?
           ini-values: "memory_limit=-1"
           php-version: "${{ matrix.php }}"
 

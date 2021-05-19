@@ -99,6 +99,24 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['message' => 'Welcome @chalasr!'], json_decode($response->getContent(), true));
     }
+
+    /**
+     * @testWith    ["json_login"]
+     *              ["Symfony\\Bundle\\SecurityBundle\\Tests\\Functional\\Bundle\\AuthenticatorBundle\\ApiAuthenticator"]
+     */
+    public function testLogout(string $authenticator)
+    {
+        $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' => true]);
+        static::getContainer()->get(WelcomeController::class)->authenticator = $authenticator;
+        $client->request('GET', '/welcome');
+        $this->assertEquals('chalasr', static::getContainer()->get('security.helper')->getUser()->getUserIdentifier());
+
+        $client->request('GET', '/auto-logout');
+        $response = $client->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNull(static::getContainer()->get('security.helper')->getUser());
+        $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
+    }
 }
 
 final class UserWithoutEquatable implements UserInterface, PasswordAuthenticatedUserInterface
@@ -222,5 +240,19 @@ class WelcomeController
         $this->security->login($user, $this->authenticator);
 
         return new JsonResponse(['message' => sprintf('Welcome @%s!', $this->security->getUser()->getUserIdentifier())]);
+    }
+}
+
+class LogoutController
+{
+    public function __construct(private Security $security)
+    {
+    }
+
+    public function logout()
+    {
+        $this->security->logout();
+
+        return new JsonResponse(['message' => 'Logout successful']);
     }
 }

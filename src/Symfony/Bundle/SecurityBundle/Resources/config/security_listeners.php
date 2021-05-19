@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler;
 use Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler;
@@ -160,5 +161,8 @@ return static function (ContainerConfigurator $container) {
                 service('security.access_map'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        ->set('security.firewall.event_dispatcher_locator', ServiceLocator::class)
+            ->args([[]])
     ;
 };

@@ -86,6 +86,7 @@ return static function (ContainerConfigurator $container) {
                     'request_stack' => service('request_stack'),
                     'security.firewall.map' => service('security.firewall.map'),
                     'security.user_checker' => service('security.user_checker'),
+                    'security.firewall.event_dispatcher_locator' => service('security.firewall.event_dispatcher_locator'),
                 ]),
                 abstract_arg('authenticators'),
             ])

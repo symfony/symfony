@@ -15,6 +15,10 @@ services:
         arguments: ['@security.helper']
         public: true
 
+    Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController:
+        arguments: ['@security.helper']
+        public: true
+
     Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\ApiAuthenticator: ~
 
 security:

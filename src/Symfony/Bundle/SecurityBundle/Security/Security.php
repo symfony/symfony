@@ -13,10 +13,12 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Security as LegacySecurity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -58,6 +60,28 @@ class Security extends LegacySecurity
 
         $this->container->get('security.user_checker')->checkPreAuth($user);
         $this->container->get('security.user_authenticator')->authenticateUser($user, $authenticator, $request);
+    }
+
+    /**
+     * Logout the current user by dispatching the LogoutEvent.
+     *
+     * @return Response|null The LogoutEvent's Response if any
+     */
+    public function logout(): ?Response
+    {
+        $request = $this->container->get('request_stack')->getMainRequest();
+        $logoutEvent = new LogoutEvent($request, $this->container->get('security.token_storage')->getToken());
+        $firewallConfig = $this->container->get('security.firewall.map')->getFirewallConfig($request);
+
+        if (!$firewallConfig) {
+            throw new LogicException('It is not possible to logout, as the request is not behind a firewall.');
+        }
+        $firewallName = $firewallConfig->getName();
+
+        $this->container->get('security.firewall.event_dispatcher_locator')->get($firewallName)->dispatch($logoutEvent);
+        $this->container->get('security.token_storage')->setToken();
+
+        return $logoutEvent->getResponse();
     }
 
     private function getAuthenticator(?string $authenticatorName, string $firewallName): AuthenticatorInterface

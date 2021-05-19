@@ -1,3 +1,7 @@
 welcome:
     path: /welcome
-    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\WelcomeController::welcome }
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\WelcomeController::welcome
+
+logout:
+    path: /auto-logout
+    controller: Symfony\Bundle\SecurityBundle\Tests\Functional\LogoutController::logout

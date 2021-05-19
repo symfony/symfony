@@ -122,9 +122,6 @@ class SessionHandlerProxyTest extends TestCase
         $this->proxy->gc(86400);
     }
 
-    /**
-     * @requires PHPUnit 5.1
-     */
     public function testValidateId()
     {
         $mock = $this->createMock(TestSessionHandler::class);
@@ -137,9 +134,6 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertTrue($this->proxy->validateId('id'));
     }
 
-    /**
-     * @requires PHPUnit 5.1
-     */
     public function testUpdateTimestamp()
     {
         $mock = $this->createMock(TestSessionHandler::class);

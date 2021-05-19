@@ -163,7 +163,7 @@ class ConsoleSectionOutput extends StreamOutput
 
         $isLastSection = $this === $this->sections[0];
 
-        // only write anything to the terminal if it is visible
+        // only write anything to the terminal if section is visible
         if (!$isLastSection && $this->getDisplayableLines() > 0) {
 
             $erasedContent = $this->popStreamContentUntilCurrentSection();
@@ -177,7 +177,7 @@ class ConsoleSectionOutput extends StreamOutput
 
         $this->addContent($message);
 
-        // just append to the terminal
+        // just append to the terminal if this is the last section
         if ($isLastSection) {
             parent::doWrite($message, true);
         }

@@ -49,7 +49,7 @@ class Terminal
      *
      * See: https://www.gnu.org/software/libc/manual/html_node/Miscellaneous-Signals.html
      *
-     * todo: Any change to support Windows here?
+     * todo: Any chance to support Windows here?
      *
      * @param bool $activateAsyncSignalHandling Whether to also activate asynchronous signal processing to ensure immediate event processing.
      * @return bool Returns true if the signal handler has been successfully installed and false otherwise.

@@ -1,7 +1,9 @@
 CHANGELOG
 =========
 
-* Added support for console section contents larger than terminal size
+* Fixed output glitches when trying to use sectioned output larger then terminal
+* Fixed returning of old dimensions from `Terminal::{getWidth,getHeight}` when output terminal has been resized
+* Added capability to notify listeners on terminal resize using `Terminal::registerResizeListener` and `Terminal::installWindowResizeSignalHandler`
 
 4.4.0
 -----

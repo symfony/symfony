@@ -184,14 +184,14 @@ class Terminal
         self::$height = self::$height ?? 50;
 
         if ($lastWidth !== self::$width || $lastHeight !== self::$height) {
-            self::triggerWindowResizeListeners();
+            self::triggerWindowResizeListeners([self::$width, self::$height]);
         }
     }
 
-    private static function triggerWindowResizeListeners(): void
+    private static function triggerWindowResizeListeners(array $dimensions): void
     {
         foreach (self::$windowResizeListeners as $listener) {
-            \call_user_func($listener);
+            \call_user_func($listener, $dimensions);
         }
     }
 

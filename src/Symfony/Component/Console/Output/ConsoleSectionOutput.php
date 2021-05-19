@@ -175,9 +175,9 @@ class ConsoleSectionOutput extends StreamOutput
      *
      * @internal
      */
-    public function flushDirtyLines(): void
+    public function flushDirtyLines(array $dimensions): void
     {
-        $terminalHeight = $this->terminal->getHeight();
+        [, $terminalHeight] = $dimensions;
 
         // flush all sections, starting with the bottom-most
         // flushing all sections at once to be independent of order this function is called among the sections

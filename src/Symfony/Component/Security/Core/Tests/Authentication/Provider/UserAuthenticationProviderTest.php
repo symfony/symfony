@@ -69,6 +69,24 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
+    public function testAuthenticateWhenCredentialsAreInvalidAndHideIsTrue()
+    {
+        $provider = $this->getProvider();
+        $provider->expects($this->once())
+            ->method('retrieveUser')
+            ->willReturn($this->createMock(UserInterface::class))
+        ;
+        $provider->expects($this->once())
+            ->method('checkAuthentication')
+            ->willThrowException(new BadCredentialsException())
+        ;
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Bad credentials.');
+
+        $provider->authenticate($this->getSupportedToken());
+    }
+
     public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException(AuthenticationServiceException::class);

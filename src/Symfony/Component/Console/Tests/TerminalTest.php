@@ -43,6 +43,11 @@ class TerminalTest extends TestCase
             $property->setAccessible(true);
             $property->setValue(null);
         }
+
+        // note: not resetting windowSizeChangeSignalHandlerInstalled as tied to global state of installed signal handler
+        $property = new \ReflectionProperty(Terminal::class, 'windowResizeListeners');
+        $property->setAccessible(true);
+        $property->setValue([]);
     }
 
     public function test()
@@ -93,5 +98,106 @@ class TerminalTest extends TestCase
 
         $terminal = new Terminal();
         $this->assertSame((int) $matches[1], $terminal->getWidth());
+    }
+
+    public function testWindowResizeListener()
+    {
+        $called = 0;
+        Terminal::registerResizeListener(function() use (&$called) {
+            $called++;
+        });
+
+        putenv('LINES=5');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $this->assertEquals(0, $called);
+
+        $this->assertEquals(5, $terminal->getHeight());
+        $this->assertEquals(5, $terminal->getHeight());
+        $this->assertEquals(10, $terminal->getWidth());
+        $this->assertEquals(10, $terminal->getWidth());
+
+        // initial dimension extraction should have triggered call
+        $this->assertEquals(1, $called);
+
+        putenv('LINES=6');
+        putenv('COLUMNS=11');
+
+        $this->assertEquals(6, $terminal->getHeight());
+        $this->assertEquals(6, $terminal->getHeight());
+        $this->assertEquals(11, $terminal->getWidth());
+        $this->assertEquals(11, $terminal->getWidth());
+
+        $this->assertEquals(2, $called);
+    }
+
+    public function testWindowResizeListenerOnSignal()
+    {
+        if (!\extension_loaded('pcntl')) {
+            $this->markTestSkipped("Requires pcntl extension");
+        }
+
+        $this->assertNotFalse($pid = \getmypid());
+        $this->assertTrue(Terminal::installWindowResizeSignalHandler(true, false));
+
+        $called = 0;
+        Terminal::registerResizeListener(function() use (&$called) {
+            $called++;
+        });
+
+        putenv('LINES=5');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $this->assertEquals(10, $terminal->getWidth());
+        $this->assertEquals(5, $terminal->getHeight());
+        $this->assertEquals(1, $called);
+
+        // sending signal without changing dimensions
+        $this->assertTrue(\posix_kill($pid, \SIGWINCH));
+        $this->assertTrue(\pcntl_signal_dispatch());
+
+        $this->assertEquals(1, $called);
+
+        // change dimensions and trigger signal
+        putenv('LINES=6');
+        putenv('COLUMNS=11');
+        $this->assertTrue(\posix_kill($pid, \SIGWINCH));
+        $this->assertTrue(\pcntl_signal_dispatch());
+
+        $this->assertEquals(2, $called);
+    }
+
+    public function testWindowResizeListenerOnAsyncSignal()
+    {
+        if (!\extension_loaded('pcntl')) {
+            $this->markTestSkipped("Requires pcntl extension");
+        }
+
+        $this->assertNotFalse($pid = \getmypid());
+        $this->assertTrue(Terminal::installWindowResizeSignalHandler(true, true));
+
+        $called = 0;
+        Terminal::registerResizeListener(function() use (&$called) {
+            $called++;
+        });
+
+        putenv('LINES=5');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $this->assertEquals(10, $terminal->getWidth());
+        $this->assertEquals(5, $terminal->getHeight());
+        $this->assertEquals(1, $called);
+
+        putenv('LINES=6');
+        putenv('COLUMNS=11');
+        $this->assertTrue(\posix_kill($pid, \SIGWINCH));
+
+        $this->assertEquals(2, $called);
     }
 }

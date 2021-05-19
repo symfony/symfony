@@ -17,6 +17,9 @@ class Terminal
     private static $height;
     private static $stty;
 
+    private static $windowSizeChangeSignalHandlerInstalled = false;
+    private static $windowResizeListeners = [];
+
     /**
      * Gets the terminal width.
      *
@@ -24,16 +27,9 @@ class Terminal
      */
     public function getWidth()
     {
-        $width = getenv('COLUMNS');
-        if (false !== $width) {
-            return (int) trim($width);
-        }
+        self::updateDimensions();
 
-        if (null === self::$width) {
-            self::updateDimensions();
-        }
-
-        return self::$width ?: 80;
+        return self::$width;
     }
 
     /**
@@ -43,16 +39,65 @@ class Terminal
      */
     public function getHeight()
     {
-        $height = getenv('LINES');
-        if (false !== $height) {
-            return (int) trim($height);
+        self::updateDimensions();
+
+        return self::$height;
+    }
+
+    /**
+     * Sets up a handler for the SIGWINCH process signal to detect resizes of the terminal window.
+     *
+     * See: https://www.gnu.org/software/libc/manual/html_node/Miscellaneous-Signals.html
+     *
+     * todo: Any change to support Windows here?
+     *
+     * @param bool $activateAsyncSignalHandling Whether to also activate asynchronous signal processing to ensure immediate event processing.
+     * @return bool Returns true if the signal handler has been successfully installed and false otherwise.
+     */
+    public static function installWindowResizeSignalHandler(bool $overwrite = false, bool $activateAsyncSignalHandling = true): bool
+    {
+        if (!\extension_loaded('pcntl') || !function_exists('pcntl_signal')) {
+            return false;
         }
 
-        if (null === self::$height) {
+        // try to activate asynchronous signal handling
+        // todo: should we fail if this cannot be set?
+        if ($activateAsyncSignalHandling && \function_exists('pcntl_async_signals')) {
+            \pcntl_async_signals(true);
+        }
+
+        // checking this after call to \pcntl_async_signals() to allow activation of async signal handling with already installed signal handler
+        if (self::$windowSizeChangeSignalHandlerInstalled) {
+            // signal handler is already installed
+            return true;
+        }
+
+        if (!$overwrite && \pcntl_signal_get_handler(\SIGWINCH)) {
+            // another signal handler is already installed
+            return false;
+        }
+
+        self::$windowSizeChangeSignalHandlerInstalled = \pcntl_signal(\SIGWINCH, function() {
             self::updateDimensions();
-        }
+        });
 
-        return self::$height ?: 50;
+        return self::$windowSizeChangeSignalHandlerInstalled;
+    }
+
+    /**
+     * Registers a listener callable that will be called when a resize of the terminal window has been detected.
+     *
+     * A resize might get detected when:
+     * - explicitly retrieving the terminal dimensions via getWidth()/getHeight() -or-
+     * - installWindowResizeSignalHandler() has been used to set up a signal handler and a corresponding process signal has been received
+     *
+     * @param callable $listener
+     */
+    public static function registerResizeListener(callable $listener): void
+    {
+        if (array_search($listener, self::$windowResizeListeners) === false) {
+            self::$windowResizeListeners[] = $listener;
+        }
     }
 
     /**
@@ -81,7 +126,16 @@ class Terminal
      */
     public static function updateDimensions()
     {
-        if ('\\' === \DIRECTORY_SEPARATOR) {
+        $lastWidth = self::$width;
+        $lastHeight = self::$height;
+
+        $width = getenv('COLUMNS');
+        $height = getenv('LINES');
+
+        if ($width !== false && $height !== false) {
+            self::$width = (int)trim($width);
+            self::$height = (int)trim($height);
+        } elseif ('\\' === \DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
                 // extract [w, H] from "wxh (WxH)"
                 // or [w, h] from "wxh"
@@ -98,6 +152,21 @@ class Terminal
             }
         } else {
             self::initDimensionsUsingStty();
+        }
+
+        // guess dimensions as last resort
+        self::$width = self::$width ?? 80;
+        self::$height = self::$height ?? 50;
+
+        if ($lastWidth !== self::$width || $lastHeight !== self::$height) {
+            self::triggerWindowResizeListeners();
+        }
+    }
+
+    private static function triggerWindowResizeListeners(): void
+    {
+        foreach (self::$windowResizeListeners as $listener) {
+            \call_user_func($listener);
         }
     }
 

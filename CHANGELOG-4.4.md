@@ -7,6 +7,16 @@ in 4.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.4.0...v4.4.1
 
+* 4.4.24 (2021-05-19)
+
+ * security #cve-2021-21424 [Security\Core] Fix user enumeration via response body on invalid credentials (chalasr)
+ * bug #41230 [FrameworkBundle][Validator] Fix deprecations from Doctrine Annotations+Cache (derrabus)
+ * bug #41240 Fixed deprecation warnings about passing null as parameter (derrabus)
+ * bug #41241 [Finder] Fix gitignore regex build with "**" (mvorisek)
+ * bug #41224 [HttpClient] fix adding query string to relative URLs with scoped clients (nicolas-grekas)
+ * bug #41233 [DependencyInjection][ProxyManagerBridge] Don't call class_exists() on null (derrabus)
+ * bug #41210 [Console] Fix Windows code page support (orkan)
+
 * 4.4.23 (2021-05-12)
 
  * security #cve-2021-21424 [Security][Guard] Prevent user enumeration (chalasr)

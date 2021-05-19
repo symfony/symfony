@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=7.2.5",
-        "symfony/mailer": "^4.4|^5.0"
+        "symfony/mailer": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "symfony/http-client": "^4.4|^5.0"
+        "symfony/http-client": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\": "" },

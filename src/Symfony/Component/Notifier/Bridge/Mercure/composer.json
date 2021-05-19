@@ -19,7 +19,7 @@
         "php": ">=7.2.5",
         "ext-json": "*",
         "symfony/mercure": "^0.5.2",
-        "symfony/notifier": "^5.3",
+        "symfony/notifier": "^5.3|^6.0",
         "symfony/service-contracts": "^1.10|^2"
     },
     "autoload": {

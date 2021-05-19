@@ -45,6 +45,19 @@ class Terminal
     }
 
     /**
+     * @return int[]
+     */
+    public function getDimensions(): array
+    {
+        self::updateDimensions();
+
+        return [
+            self::$width,
+            self::$height,
+        ];
+    }
+
+    /**
      * Sets up a handler for the SIGWINCH process signal to detect resizes of the terminal window.
      *
      * See: https://www.gnu.org/software/libc/manual/html_node/Miscellaneous-Signals.html

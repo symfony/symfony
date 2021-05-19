@@ -24,4 +24,12 @@ class SizableTerminalMock extends Terminal
     {
         return $this->height;
     }
+
+    public function getDimensions(): array
+    {
+        return [
+            $this->width,
+            $this->height,
+        ];
+    }
 }

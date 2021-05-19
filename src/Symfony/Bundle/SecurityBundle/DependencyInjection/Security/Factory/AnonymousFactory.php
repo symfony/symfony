@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Parameter;
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class AnonymousFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
 {

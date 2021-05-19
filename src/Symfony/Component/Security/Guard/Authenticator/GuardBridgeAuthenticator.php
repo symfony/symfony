@@ -32,6 +32,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', GuardBridgeAuthenticator::class);
+
 /**
  * This authenticator is used to bridge Guard authenticators with
  * the Symfony Authenticator system.
@@ -39,6 +41,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3
  */
 class GuardBridgeAuthenticator implements InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {

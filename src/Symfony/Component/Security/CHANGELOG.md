@@ -6,6 +6,15 @@ The CHANGELOG for version 5.4 and newer can be found in the security sub-package
 5.3
 ---
 
+ * Deprecate the Guard component
+ * Deprecate `AuthenticationManagerInterface`, `AuthenticationProviderManager`, `AnonymousAuthenticationProvider`,
+  `AuthenticationProviderInterface`, `DaoAuthenticationProvider`, `LdapBindAuthenticationProvider`,
+  `PreAuthenticatedAuthenticationProvider`, `RememberMeAuthenticationProvider`, `UserAuthenticationProvider` and
+  `AuthenticationFailureEvent` from security-core. Use the new authenticator system instead
+ * Deprecate `AbstractAuthenticationListener`, `AbstractPreAuthenticatedListener`, `AnonymousAuthenticationListener`,
+   `BasicAuthenticationListener`, `RememberMeListener`, `RemoteUserAuthenticationListener`,
+   `UsernamePasswordFormAuthenticationListener`, `UsernamePasswordJsonAuthenticationListener` and `X509AuthenticationListener`
+   from security-http, use the new authenticator system instead
  * Add `getPassport()` method and a second `$passport` constructor argument to `AuthenticationTokenCreatedEvent`
  * The authenticator system is no longer experimental
  * Login Link functionality is no longer experimental

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticato
 
 /**
  * @author Jean Pasdeloup <jpasdeloup@sedona.fr>
+ * @group legacy
  */
 class FormLoginAuthenticatorTest extends TestCase
 {

@@ -49,9 +49,11 @@ return static function (ContainerConfigurator $container) {
                 service('security.authentication.manager'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.provider.anonymous', AnonymousAuthenticationProvider::class)
             ->args([abstract_arg('Key')])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.retry_entry_point', RetryAuthenticationEntryPoint::class)
             ->args([
@@ -161,6 +163,7 @@ return static function (ContainerConfigurator $container) {
         ->set('security.authentication.listener.form', UsernamePasswordFormAuthenticationListener::class)
             ->parent('security.authentication.listener.abstract')
             ->abstract()
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.listener.x509', X509AuthenticationListener::class)
             ->abstract()
@@ -174,6 +177,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.listener.json', UsernamePasswordJsonAuthenticationListener::class)
             ->abstract()
@@ -191,6 +195,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->call('setTranslator', [service('translator')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'security'])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.listener.remote_user', RemoteUserAuthenticationListener::class)
             ->abstract()
@@ -203,6 +208,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.listener.basic', BasicAuthenticationListener::class)
             ->abstract()
@@ -214,6 +220,7 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.provider.dao', DaoAuthenticationProvider::class)
             ->abstract()
@@ -224,6 +231,7 @@ return static function (ContainerConfigurator $container) {
                 service('security.password_hasher_factory'),
                 param('security.authentication.hide_user_not_found'),
             ])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.provider.ldap_bind', LdapBindAuthenticationProvider::class)
             ->abstract()
@@ -237,6 +245,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('search dn'),
                 abstract_arg('search password'),
             ])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.authentication.provider.pre_authenticated', PreAuthenticatedAuthenticationProvider::class)
             ->abstract()
@@ -244,6 +253,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('User Provider'),
                 abstract_arg('UserChecker'),
             ])
+            ->deprecate('symfony/security-bundle', '5.3', 'The "%service_id%" service is deprecated, use the new authenticator system instead.')
 
         ->set('security.exception_listener', ExceptionListener::class)
             ->abstract()

@@ -25,6 +25,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
+/**
+ * @group legacy
+ */
 class AuthenticationProviderManagerTest extends TestCase
 {
     public function testAuthenticateWithoutProviders()

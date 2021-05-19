@@ -1,6 +1,7 @@
 <?php
 
 $container->loadFromExtension('security', [
+    'enable_authenticator_manager' => true,
     'providers' => [
         'default' => [
             'memory' => [
@@ -16,13 +17,13 @@ $container->loadFromExtension('security', [
             'stateless' => true,
             'http_basic' => true,
             'form_login' => true,
-            'anonymous' => true,
             'switch_user' => true,
             'x509' => true,
             'remote_user' => true,
             'logout' => true,
             'remember_me' => ['secret' => 'TheSecret'],
             'user_checker' => null,
+            'entry_point' => 'form_login'
         ],
     ],
 ]);

@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
+/**
+ * @group legacy
+ */
 class X509AuthenticationListenerTest extends TestCase
 {
     /**

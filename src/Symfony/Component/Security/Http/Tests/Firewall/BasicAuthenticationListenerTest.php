@@ -26,6 +26,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
 
+/**
+ * @group legacy
+ */
 class BasicAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithValidUsernameAndPasswordServerParameters()

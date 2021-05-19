@@ -22,10 +22,14 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+trigger_deprecation('symfony/security-core', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', UserAuthenticationProvider::class);
+
 /**
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class UserAuthenticationProvider implements AuthenticationProviderInterface
 {

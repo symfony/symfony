@@ -18,11 +18,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', RemoteUserAuthenticationListener::class);
+
 /**
  * REMOTE_USER authentication listener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Maxime Douailin <maxime.douailin@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
 {

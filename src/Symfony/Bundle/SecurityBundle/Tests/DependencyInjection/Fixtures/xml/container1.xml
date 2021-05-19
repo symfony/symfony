@@ -8,7 +8,7 @@
         http://symfony.com/schema/dic/security
         https://symfony.com/schema/dic/security/security-1.0.xsd">
 
-    <config>
+    <config enable-authenticator-manager="true">
         <password_hasher class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
 
         <password_hasher class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
@@ -50,10 +50,9 @@
 
         <firewall name="simple" pattern="/login" security="false" provider="default" />
 
-        <firewall name="secure" stateless="true" provider="default">
+        <firewall name="secure" stateless="true" provider="default" entry-point="form_login">
             <http-basic />
             <form-login />
-            <anonymous />
             <switch-user />
             <x509 />
             <remote-user />
@@ -62,12 +61,10 @@
         </firewall>
 
         <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST" provider="default">
-            <anonymous />
             <http-basic />
         </firewall>
 
         <firewall name="with_user_checker" provider="default">
-            <anonymous />
             <http-basic />
             <user-checker>app.user_checker</user-checker>
         </firewall>

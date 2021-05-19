@@ -32,6 +32,9 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
+/**
+ * @group legacy
+ */
 class UsernamePasswordFormAuthenticationListenerTest extends TestCase
 {
     /**

@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+/**
+ * @group legacy
+ */
 class GuardedTest extends AbstractWebTestCase
 {
     public function testGuarded()

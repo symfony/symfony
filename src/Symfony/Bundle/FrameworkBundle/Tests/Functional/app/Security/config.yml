@@ -8,6 +8,8 @@ services:
             - container.service_subscriber
 
 security:
+    enable_authenticator_manager: true
+
     providers:
         main:
             memory:
@@ -30,3 +32,6 @@ security:
             form_login:
                 check_path: /custom/login/check
             provider: custom
+
+    access_control:
+        - { path: '^/main/user_profile$', roles: IS_AUTHENTICATED_FULLY }

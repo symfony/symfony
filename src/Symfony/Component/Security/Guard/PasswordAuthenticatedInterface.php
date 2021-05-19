@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Security\Guard;
 
+trigger_deprecation('symfony/security-guard', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', PasswordAuthenticatedInterface::class);
+
 /**
  * An optional interface for "guard" authenticators that deal with user passwords.
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 interface PasswordAuthenticatedInterface
 {

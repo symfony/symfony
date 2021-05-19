@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', AbstractPreAuthenticatedListener::class);
+
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
  * authenticates users based on a pre-authenticated request (like a certificate
@@ -33,6 +35,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractPreAuthenticatedListener extends AbstractListener
 {

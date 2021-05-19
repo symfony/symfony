@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * @group legacy
+ */
 class PreAuthenticatedAuthenticationProviderTest extends TestCase
 {
     public function testSupports()

@@ -41,6 +41,7 @@
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
         "symfony/framework-bundle": "^5.3",
+        "symfony/ldap": "^5.3",
         "symfony/process": "^4.4|^5.0",
         "symfony/rate-limiter": "^5.2",
         "symfony/serializer": "^4.4|^5.0",
@@ -55,7 +56,7 @@
         "symfony/browser-kit": "<4.4",
         "symfony/console": "<4.4",
         "symfony/framework-bundle": "<4.4",
-        "symfony/ldap": "<4.4",
+        "symfony/ldap": "<5.1",
         "symfony/twig-bundle": "<4.4"
     },
     "autoload": {

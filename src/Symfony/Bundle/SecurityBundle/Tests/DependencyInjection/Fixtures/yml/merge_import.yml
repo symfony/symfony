@@ -1,4 +1,5 @@
 security:
+    enable_authenticator_manager: true
     firewalls:
         main:
             form_login:

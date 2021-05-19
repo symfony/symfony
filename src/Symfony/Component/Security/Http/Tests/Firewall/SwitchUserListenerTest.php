@@ -30,6 +30,9 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @group legacy
+ */
 class SwitchUserListenerTest extends TestCase
 {
     private $tokenStorage;

@@ -31,6 +31,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', AbstractAuthenticationListener::class);
+
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
  * browser-/HTTP-based authentication requests.
@@ -47,6 +49,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractAuthenticationListener extends AbstractListener
 {

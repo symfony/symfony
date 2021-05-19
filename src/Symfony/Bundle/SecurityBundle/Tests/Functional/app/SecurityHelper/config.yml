@@ -12,6 +12,7 @@ services:
         public: true
 
 security:
+    enable_authenticator_manager: true
     providers:
         in_memory:
             memory:
@@ -19,4 +20,3 @@ security:
 
     firewalls:
         default:
-            anonymous: ~

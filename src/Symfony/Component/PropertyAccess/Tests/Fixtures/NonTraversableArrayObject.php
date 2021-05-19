@@ -15,7 +15,7 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializable
+class NonTraversableArrayObject implements \ArrayAccess, \Countable
 {
     private $array;
 
@@ -58,18 +58,8 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
         return $this->array;
     }
 
-    public function serialize(): string
-    {
-        return serialize($this->__serialize());
-    }
-
     public function __unserialize(array $data): void
     {
         $this->array = $data;
-    }
-
-    public function unserialize($serialized)
-    {
-        $this->__unserialize((array) unserialize((string) $serialized));
     }
 }

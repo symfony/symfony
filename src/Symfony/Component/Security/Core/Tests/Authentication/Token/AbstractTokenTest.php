@@ -232,7 +232,7 @@ class TestUser
     }
 }
 
-class SerializableUser implements UserInterface, \Serializable
+class SerializableUser implements UserInterface
 {
     private $roles;
     private $name;
@@ -274,16 +274,6 @@ class SerializableUser implements UserInterface, \Serializable
     public function getSalt()
     {
         return null;
-    }
-
-    public function serialize(): string
-    {
-        return serialize($this->name);
-    }
-
-    public function unserialize($serialized): void
-    {
-        $this->name = unserialize($serialized);
     }
 }
 

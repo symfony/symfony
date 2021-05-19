@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
+use Symfony\Component\Console\Tests\Fixtures\SizableTerminalMock;
 
 class ConsoleSectionOutputTest extends TestCase
 {
@@ -296,10 +297,57 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[5A\x1b[0Jbazbazbazbaz", '4', '5', '6', '']), stream_get_contents($this->stream));
     }
 
-    public function testTerminalResize()
+    public function testClearIsCompletedAfterTerminalResize()
     {
-        // todo: implement
-        $this->assertTrue(true);
+        putenv('LINES=3');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $sections = [];
+        $section = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(), $terminal);
+
+        // content does not fit on terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6']));
+
+        // only visible portion can be cleared
+        $section->clear();
+
+        // resize terminal
+        putenv('LINES=10');
+
+        // any interaction should now finalize the incomplete clear
+        $section->writeln('foo');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[3A\x1b[0J\x1b[3A\x1b[0Jfoo", '']), stream_get_contents($this->stream));
+    }
+
+    public function testClearsAreCompletedAfterTerminalResize()
+    {
+        putenv('LINES=3');
+        putenv('COLUMNS=10');
+
+        $terminal = new Terminal();
+
+        $sections = [];
+        $section = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter(), $terminal);
+
+        // content does not fit on terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6']));
+
+        // only visible portion can be cleared
+        $section->clear(4);
+        $section->clear(2);
+
+        // resize terminal
+        putenv('LINES=10');
+
+        // any interaction should now finalize the incomplete clear
+        $section->writeln('foo');
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', '6', "\x1b[3A\x1b[0J\x1b[3A\x1b[0Jfoo", '']), stream_get_contents($this->stream));
     }
 
     /**
@@ -307,10 +355,8 @@ class ConsoleSectionOutputTest extends TestCase
      */
     private function prepareSectionsInSizedTerminal(int $numSections, int $terminalHeight, int $terminalWidth): array
     {
-        $terminal = $this->createConfiguredMock(Terminal::class, [
-            'getHeight' => $terminalHeight,
-            'getWidth' => $terminalWidth,
-        ]);
+        // cannot use phpunit mocks as static functions have to be callable for terminal resize listener (de)registration
+        $terminal = new SizableTerminalMock($terminalWidth, $terminalHeight);
 
         $sections = [];
         for($i = 0; $i < $numSections; $i++) {

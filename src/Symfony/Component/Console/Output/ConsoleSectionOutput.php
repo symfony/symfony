@@ -41,6 +41,13 @@ class ConsoleSectionOutput extends StreamOutput
     private $lines = 0;
 
     /**
+     * Number of *dirty* lines above the terminal that need to be cleared when they reappear due to the terminal being resized.
+     *
+     * @var int
+     */
+    private $dirtyLines = 0;
+
+    /**
      * All sections associated with the current console output.
      * The array is ordered from bottom-most to top-most section on screen.
      *
@@ -65,6 +72,12 @@ class ConsoleSectionOutput extends StreamOutput
         array_unshift($sections, $this);
         $this->sections = &$sections;
         $this->terminal = $terminal ?? new Terminal();
+        $this->terminal::registerResizeListener([$this, 'flushDirtyLines']);
+    }
+
+    public function __destruct()
+    {
+        $this->terminal::unregisterResizeListener([$this, 'flushDirtyLines']);
     }
 
     /**
@@ -78,9 +91,11 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
+        // trigger flushing of dirty lines in lower sections
         Terminal::updateDimensions();
 
-        $visibleLinesToClear = min($lines ?? $this->lines, $this->getVisibleLines());
+        $linesToClear = $this->dirtyLines + ($lines ?? $this->lines);
+        $visibleLinesToClear = min($linesToClear, $this->getVisibleLines());
 
         if ($lines) {
             array_splice($this->content, -$lines);
@@ -90,6 +105,7 @@ class ConsoleSectionOutput extends StreamOutput
         }
 
         $this->lines -= $lines;
+        $this->dirtyLines = $linesToClear - $visibleLinesToClear;
 
         if ($visibleLinesToClear > 0) {
             parent::doWrite($this->popStreamContentUntilCurrentSection($visibleLinesToClear), false);
@@ -107,23 +123,34 @@ class ConsoleSectionOutput extends StreamOutput
             $message = implode('', $message);
         }
 
+        // make sure a non-empty message ends with a newline
+        if ($message !== '' && substr($message, -1) !== PHP_EOL) {
+            $message .= PHP_EOL;
+        }
+
         if ($this->isDecorated()) {
 
+            // trigger flushing of dirty lines in lower sections
             Terminal::updateDimensions();
 
-            // only overwrite section if it is visible
-            if ($this->getDisplayableLines() > 0) {
+            $displayableLines = $this->getDisplayableLines();
 
-                [, $visibleContent, $visibleLines] = $this->divideMessageByDisplayability($message);
-                $visibleContent .= PHP_EOL;
+            // only overwrite section if it is visible
+            if ($displayableLines > 0) {
+
+                [, $newVisibleContent, $newVisibleLines] = $this->divideMessageByDisplayability($message);
+
+                $flushableLines = min($this->dirtyLines, $displayableLines - $newVisibleLines);
 
                 // only overwrite visible portion if it differs from what is already visible
-                if (substr($this->getContent(), -strlen($visibleContent)) !== $visibleContent) {
+                if ($flushableLines > 0 || substr($this->getContent(), -strlen($newVisibleContent)) !== $newVisibleContent) {
 
-                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($visibleLines, $this->getVisibleLines()));
+                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($newVisibleLines + $flushableLines, $this->getVisibleLines()));
 
-                    parent::doWrite($visibleContent, false);
+                    parent::doWrite($newVisibleContent, false);
                     parent::doWrite($erasedContent, false);
+
+                    $this->dirtyLines -= $flushableLines;
                 }
             }
         } else {
@@ -142,6 +169,31 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
+     * Tries to flush dirty lines after the terminal has been resized.
+     *
+     * @internal
+     */
+    public function flushDirtyLines(): void
+    {
+        // flush all sections, starting with the bottom-most
+        // flushing all sections at once to be independent of order this function is called among the sections
+        $remainingHeight = $this->terminal->getHeight();
+        foreach ($this->sections as $section) {
+
+            if ($remainingHeight <= 0) {
+                // top of terminal reached - no further flushes possible
+                break;
+            }
+
+            if ($section->dirtyLines !== 0) {
+                $section->overwrite($section->getContent());
+            }
+
+            $remainingHeight -= $section->getVisibleLines();
+        }
+    }
+
+    /**
      * Register content to the section that is e.g. back-printed to the terminal on user-input.
      *
      * @internal
@@ -149,8 +201,9 @@ class ConsoleSectionOutput extends StreamOutput
     public function addContent(string $input)
     {
         foreach (explode(PHP_EOL, $input) as $lineContent) {
+            $lineContent .= PHP_EOL;
             $this->lines += $this->getDisplayHeight($lineContent);
-            $this->content[] = $lineContent. PHP_EOL;
+            $this->content[] = $lineContent;
         }
     }
 
@@ -165,6 +218,7 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
+        // trigger flushing of dirty lines in lower sections
         Terminal::updateDimensions();
 
         $isLastSection = $this === $this->sections[0];
@@ -232,7 +286,7 @@ class ConsoleSectionOutput extends StreamOutput
         $portion2Height = $this->getDisplayHeight($portion2);
         $verticalSpace = $this->getDisplayableLines();
 
-        // todo: can probably be implemented more efficiently (probably logarithmic in text length instead of linear)
+        // todo: implement binary search
         while ($portion2 !== '' && $portion2Height > $verticalSpace) {
             $portion1 .= substr($portion2, 0, 1);
             $portion2 = substr($portion2, 1);
@@ -248,7 +302,7 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayHeight(string $text): int
     {
-        return substr_count($text, PHP_EOL) + ceil($this->getDisplayLength($text) / $this->terminal->getWidth()) ?: 1;
+        return substr_count($text, PHP_EOL) + floor($this->getDisplayLength($text) / $this->terminal->getWidth());
     }
 
     private function getDisplayLength(string $text): string
@@ -257,13 +311,13 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
-     * Returns the number of lines of this section that are visible with the current terminal size.
+     * Returns the number of lines (including dirty lines) that are visible with the current terminal size.
      *
      * @return int
      */
     private function getVisibleLines(): int
     {
-        return min($this->getDisplayableLines(), $this->lines);
+        return min($this->getDisplayableLines(), $this->lines + $this->dirtyLines);
     }
 
     /**

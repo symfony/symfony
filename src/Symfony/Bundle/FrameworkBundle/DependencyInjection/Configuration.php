@@ -1325,6 +1325,7 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('option')
                                 ->children()
                                     ->scalarNode('dsn')->end()
+                                    ->booleanNode('reset_on_message')->defaultFalse()->info('Reset the container services after each message.')->end()
                                     ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
                                     ->arrayNode('options')
                                         ->normalizeKeys(false)

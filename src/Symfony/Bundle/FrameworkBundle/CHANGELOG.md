@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Add support for resting container services after each messenger messages.
+
 5.3
 ---
 

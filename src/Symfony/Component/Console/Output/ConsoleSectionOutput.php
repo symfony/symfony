@@ -91,7 +91,7 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
-        // trigger flushing of dirty lines in lower sections
+        // also triggers flushing of dirty lines in lower sections
         $terminalHeight = $this->terminal->getHeight();
 
         $linesToClear = $this->dirtyLines + ($lines ?? $this->lines);
@@ -132,7 +132,7 @@ class ConsoleSectionOutput extends StreamOutput
 
         if ($this->isDecorated()) {
 
-            // trigger flushing of dirty lines in lower sections
+            // also triggers flushing of dirty lines in lower sections
             [$terminalWidth, $terminalHeight] = $this->terminal->getDimensions();
 
             $displayableLines = $this->getDisplayableLines($terminalHeight);
@@ -224,7 +224,7 @@ class ConsoleSectionOutput extends StreamOutput
             return;
         }
 
-        // trigger flushing of dirty lines in lower sections
+        // also triggers flushing of dirty lines in lower sections
         [$terminalWidth, $terminalHeight] = $this->terminal->getDimensions();
 
         $isLastSection = $this === $this->sections[0];

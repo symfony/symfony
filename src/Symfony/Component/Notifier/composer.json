@@ -22,7 +22,7 @@
     "require-dev": {
         "symfony/event-dispatcher-contracts": "^2",
         "symfony/http-client-contracts": "^2",
-        "symfony/messenger": "^4.4 || ^5.0"
+        "symfony/messenger": "^4.4 || ^5.0|^6.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4",

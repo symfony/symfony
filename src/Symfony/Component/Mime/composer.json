@@ -24,10 +24,10 @@
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/property-access": "^4.4|^5.1",
-        "symfony/property-info": "^4.4|^5.1",
-        "symfony/serializer": "^5.2"
+        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+        "symfony/property-access": "^4.4|^5.1|^6.0",
+        "symfony/property-info": "^4.4|^5.1|^6.0",
+        "symfony/serializer": "^5.2|^6.0"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",

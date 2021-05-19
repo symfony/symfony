@@ -23,10 +23,10 @@
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/error-handler": "^4.4|^5.0",
-        "symfony/http-client": "^4.4|^5.0",
+        "symfony/error-handler": "^4.4|^5.0|^6.0",
+        "symfony/http-client": "^4.4|^5.0|^6.0",
         "symfony/translation-contracts": "^1.1|^2",
-        "symfony/var-exporter": "^4.4|^5.0"
+        "symfony/var-exporter": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\String\\": "" },

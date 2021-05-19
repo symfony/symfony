@@ -19,7 +19,7 @@
         "php": ">=8.0.2"
     },
     "require-dev": {
-        "symfony/security-core": "^5.3",
+        "symfony/security-core": "^5.3|^6.0",
         "symfony/console": "^5"
     },
     "conflict": {

@@ -27,7 +27,7 @@
         "symfony/cache-contracts": "^1.1.7|^2",
         "symfony/deprecation-contracts": "^2.1",
         "symfony/service-contracts": "^1.1|^2",
-        "symfony/var-exporter": "^4.4|^5.0"
+        "symfony/var-exporter": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
@@ -35,12 +35,12 @@
         "doctrine/dbal": "^2.10|^3.0",
         "predis/predis": "^1.1",
         "psr/simple-cache": "^1.0",
-        "symfony/config": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/filesystem": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/messenger": "^4.4|^5.0",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/config": "^4.4|^5.0|^6.0",
+        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+        "symfony/filesystem": "^4.4|^5.0|^6.0",
+        "symfony/http-kernel": "^4.4|^5.0|^6.0",
+        "symfony/messenger": "^4.4|^5.0|^6.0",
+        "symfony/var-dumper": "^4.4|^5.0|^6.0"
     },
     "conflict": {
         "doctrine/dbal": "<2.10",

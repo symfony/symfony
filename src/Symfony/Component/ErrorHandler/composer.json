@@ -18,11 +18,11 @@
     "require": {
         "php": ">=8.0.2",
         "psr/log": "^1.0",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "symfony/var-dumper": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/serializer": "^4.4|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0|^6.0",
+        "symfony/serializer": "^4.4|^5.0|^6.0",
         "symfony/deprecation-contracts": "^2.1"
     },
     "autoload": {

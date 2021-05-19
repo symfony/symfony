@@ -18,10 +18,10 @@
     "require": {
         "php": ">=8.0.2",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/property-info": "^5.2"
+        "symfony/property-info": "^5.2|^6.0"
     },
     "require-dev": {
-        "symfony/cache": "^4.4|^5.0"
+        "symfony/cache": "^4.4|^5.0|^6.0"
     },
     "suggest": {
         "psr/cache-implementation": "To cache access methods."

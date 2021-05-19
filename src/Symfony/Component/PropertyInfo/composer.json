@@ -25,12 +25,12 @@
     "require": {
         "php": ">=8.0.2",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/string": "^5.1"
+        "symfony/string": "^5.1|^6.0"
     },
     "require-dev": {
-        "symfony/serializer": "^4.4|^5.0",
-        "symfony/cache": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/serializer": "^4.4|^5.0|^6.0",
+        "symfony/cache": "^4.4|^5.0|^6.0",
+        "symfony/dependency-injection": "^4.4|^5.0|^6.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "doctrine/annotations": "^1.10.4"
     },

@@ -18,15 +18,15 @@
     "require": {
         "php": ">=8.0.2",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/filesystem": "^4.4|^5.0",
+        "symfony/filesystem": "^4.4|^5.0|^6.0",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/finder": "^4.4|^5.0",
-        "symfony/messenger": "^4.4|^5.0",
+        "symfony/event-dispatcher": "^4.4|^5.0|^6.0",
+        "symfony/finder": "^4.4|^5.0|^6.0",
+        "symfony/messenger": "^4.4|^5.0|^6.0",
         "symfony/service-contracts": "^1.1|^2",
-        "symfony/yaml": "^4.4|^5.0"
+        "symfony/yaml": "^4.4|^5.0|^6.0"
     },
     "conflict": {
         "symfony/finder": "<4.4"

@@ -103,7 +103,7 @@ class TerminalTest extends TestCase
     public function testWindowResizeListener()
     {
         $called = 0;
-        Terminal::registerResizeListener(function() use (&$called) {
+        Terminal::registerResizeListener($listener = function() use (&$called) {
             $called++;
         });
 
@@ -130,6 +130,16 @@ class TerminalTest extends TestCase
         $this->assertEquals(11, $terminal->getWidth());
         $this->assertEquals(11, $terminal->getWidth());
 
+        $this->assertEquals(2, $called);
+
+        Terminal::unregisterResizeListener($listener);
+
+        putenv('LINES=7');
+
+        $this->assertEquals(7, $terminal->getHeight());
+        $this->assertEquals(7, $terminal->getHeight());
+
+        // listener should not have been called anymore
         $this->assertEquals(2, $called);
     }
 

@@ -95,8 +95,20 @@ class Terminal
      */
     public static function registerResizeListener(callable $listener): void
     {
-        if (array_search($listener, self::$windowResizeListeners) === false) {
+        if (array_search($listener, self::$windowResizeListeners, true) === false) {
             self::$windowResizeListeners[] = $listener;
+        }
+    }
+
+    /**
+     * Removes a resize listener previously added with registerResizeListener().
+     *
+     * @param callable $listener
+     */
+    public static function unregisterResizeListener(callable $listener): void
+    {
+        if (($key = array_search($listener, self::$windowResizeListeners, true)) !== false) {
+            unset(self::$windowResizeListeners[$key]);
         }
     }
 

@@ -6,6 +6,21 @@ CHANGELOG
 
  * Added `github` format support & autodetection to render errors as annotations
    when running the YAML linter command in a Github Action environment.
+ * Added support for optional YAML lint config from file `lint:yaml --config=.yamllint.yml`.
+
+   ```yml
+   yaml-lint:
+     format: txt
+     includes:
+       - src/Resources/config/foo.yml
+       - src/Resources/config/bar.yml
+       - src/Resources/config/path/
+     excludes:
+       - src/Resources/config/path/exclude.yml
+   ```
+
+ * Added new `lint:yaml dirname --exclude=/dirname/foo.yml --exclude=/dirname/bar.yml` option to exclude one or more specific files from multiple file list.
+ * Allow negatable for `--parse-tags|--no-parse-tags` option
 
 5.1.0
 -----

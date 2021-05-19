@@ -142,6 +142,67 @@ YAML;
         $this->assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
     }
 
+    public function testLintWithExclude()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('foo: bar');
+
+        $ret = $tester->execute(['filename' => $filename, '--exclude' => [$filename]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
+        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        $this->assertStringContainsString('All 0 YAML files contain valid syntax.', trim($tester->getDisplay()));
+    }
+
+    public function testMissingLintConfig()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->createCommandTester()->execute(['--config' => 'missing.yml'], ['decorated' => false]);
+    }
+
+    public function testInvalidLintConfig()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->createCommandTester()->execute(['--config' => $this->createFile('foo: bar')], ['decorated' => false]);
+    }
+
+    public function testCorrectLintConfig()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('foo: bar');
+
+        $yaml = <<<YAML
+parse-tags: false
+format: txt
+includes:
+  - $filename
+excludes: []
+YAML;
+
+        $ret = $tester->execute(['--config' => $this->createFile($yaml)], ['decorated' => false]);
+
+        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        $this->assertStringContainsString('All 1 YAML files contain valid syntax.', trim($tester->getDisplay()));
+    }
+
+    public function testMixedLintConfig()
+    {
+        $tester = $this->createCommandTester();
+        $filename1 = $this->createFile('foo: bar');
+        $filename2 = $this->createFile('foo: bar');
+
+        $yaml = <<<YAML
+parse-tags: false
+format: invalid
+includes:
+  - $filename1
+excludes:
+  - $filename1
+YAML;
+
+        $ret = $tester->execute(['filename' => [$filename2], '--format' => 'txt', '--exclude' => [$filename2], '--config' => $this->createFile($yaml)], ['decorated' => false]);
+        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+        $this->assertStringContainsString('All 0 YAML files contain valid syntax.', trim($tester->getDisplay()));
+    }
+
     public function testLintFileNotReadable()
     {
         $this->expectException(\RuntimeException::class);
@@ -166,7 +227,7 @@ YAML;
     {
         $application = new Application();
         $application->add(new LintCommand());
-        $command = $application->find('lint:yaml');
+        $command = $application->find(LintCommand::getDefaultName());
 
         return new CommandTester($command);
     }

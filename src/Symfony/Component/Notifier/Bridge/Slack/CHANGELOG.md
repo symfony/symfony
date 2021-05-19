@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `SlackOptions::channel()`, use `SlackOptions::recipient()` instead
+
 5.3
 ---
 

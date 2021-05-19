@@ -59,18 +59,6 @@ final class SlackOptions implements MessageOptionsInterface
     }
 
     /**
-     * @return $this
-     *
-     * @deprecated since Symfony 5.1, use recipient() instead.
-     */
-    public function channel(string $channel): self
-    {
-        trigger_deprecation('symfony/slack-notifier', '5.1', 'The "%s()" method is deprecated, use "recipient()" instead.', __METHOD__);
-
-        return $this;
-    }
-
-    /**
      * @param string $id The hook id (anything after https://hooks.slack.com/services/)
      *
      * @return $this

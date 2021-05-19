@@ -91,7 +91,7 @@ class Terminal
         }
 
         self::$windowSizeChangeSignalHandlerInstalled = \pcntl_signal(\SIGWINCH, function() {
-            self::updateDimensions();
+            self::updateDimensions(true);
         });
 
         return self::$windowSizeChangeSignalHandlerInstalled;
@@ -146,10 +146,7 @@ class Terminal
         return self::$stty = 0 === $exitcode;
     }
 
-    /**
-     * @internal
-     */
-    public static function updateDimensions()
+    private static function updateDimensions(bool $force = false)
     {
         $lastWidth = self::$width;
         $lastHeight = self::$height;
@@ -160,23 +157,29 @@ class Terminal
         if ($width !== false && $height !== false) {
             self::$width = (int)trim($width);
             self::$height = (int)trim($height);
-        } elseif ('\\' === \DIRECTORY_SEPARATOR) {
-            if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
-                // extract [w, H] from "wxh (WxH)"
-                // or [w, h] from "wxh"
-                self::$width = (int) $matches[1];
-                self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
-            } elseif (!self::hasVt100Support() && self::hasSttyAvailable()) {
-                // only use stty on Windows if the terminal does not support vt100 (e.g. Windows 7 + git-bash)
-                // testing for stty in a Windows 10 vt100-enabled console will implicitly disable vt100 support on STDOUT
+        } elseif ($force || self::$width === null || self::$height === null || !self::$windowSizeChangeSignalHandlerInstalled) {
+            // only update dimensions with expensive methods when:
+            // - forced to -or-
+            // - no other value is available -or-
+            // - we would not have been notified about a terminal resize via a signal handler
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {
+                    // extract [w, H] from "wxh (WxH)"
+                    // or [w, h] from "wxh"
+                    self::$width = (int) $matches[1];
+                    self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
+                } elseif (!self::hasVt100Support() && self::hasSttyAvailable()) {
+                    // only use stty on Windows if the terminal does not support vt100 (e.g. Windows 7 + git-bash)
+                    // testing for stty in a Windows 10 vt100-enabled console will implicitly disable vt100 support on STDOUT
+                    self::initDimensionsUsingStty();
+                } elseif (null !== $dimensions = self::getConsoleMode()) {
+                    // extract [w, h] from "wxh"
+                    self::$width = (int) $dimensions[0];
+                    self::$height = (int) $dimensions[1];
+                }
+            } else {
                 self::initDimensionsUsingStty();
-            } elseif (null !== $dimensions = self::getConsoleMode()) {
-                // extract [w, h] from "wxh"
-                self::$width = (int) $dimensions[0];
-                self::$height = (int) $dimensions[1];
             }
-        } else {
-            self::initDimensionsUsingStty();
         }
 
         // guess dimensions as last resort

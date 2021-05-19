@@ -22,13 +22,13 @@ class RegisterEventPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $events = [];
-        foreach (\array_keys($container->findTaggedServiceIds('kernel.event')) as $eventServiceId) {
+        foreach (array_keys($container->findTaggedServiceIds('kernel.event')) as $eventServiceId) {
             $events[$container->getDefinition($eventServiceId)->getClass()] = $eventServiceId;
         }
 
-        $container->setParameter('kernel.events', \array_merge(
+        $container->setParameter('kernel.events', array_merge(
             $container->getParameter('kernel.events'),
-            \array_flip($events)
+            array_flip($events)
         ));
     }
 }

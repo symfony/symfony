@@ -36,7 +36,7 @@ class RegisterEventPassTest extends TestCase
         $this->container->register('app.not_event.service', 'Acme\Store\NotEvent\Service');
     }
 
-    public function testRegisterEventsOnlyFromContainer(): void
+    public function testRegisterEventsOnlyFromContainer()
     {
         $registerEventPass = new RegisterEventPass();
         $registerEventPass->process($this->container);
@@ -44,7 +44,7 @@ class RegisterEventPassTest extends TestCase
         $this->assertSame(self::REGISTERED_EVENTS, $this->container->getParameter('kernel.events'));
     }
 
-    public function testRegisterEventsFromServicesAndContainer(): void
+    public function testRegisterEventsFromServicesAndContainer()
     {
         $this->container->register('app.event.order_placed', 'Acme\Store\Event\OrderPlacedEvent')
             ->addTag('kernel.event', ['template' => 'foo']);

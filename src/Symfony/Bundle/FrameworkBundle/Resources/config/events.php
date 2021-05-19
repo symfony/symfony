@@ -28,8 +28,8 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 
 $filterExistingClass = static function (array $eventsMap = []): array {
-    return \array_filter($eventsMap, static function (string $eventClass): bool {
-        return \class_exists($eventClass);
+    return array_filter($eventsMap, static function (string $eventClass): bool {
+        return class_exists($eventClass);
     });
 };
 

@@ -148,9 +148,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter()
     {
         $this->expectException(AccessException::class);
@@ -159,9 +156,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedPrivateProperty(), 'uninitialized');
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
     {
         $this->expectException(AccessException::class);
@@ -179,9 +173,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
     {
         $this->expectException(AccessException::class);
@@ -199,9 +190,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
     {
         $this->expectException(AccessException::class);

@@ -130,6 +130,7 @@ class TerminalTest extends TestCase
         $this->assertEquals(11, $terminal->getWidth());
         $this->assertEquals(11, $terminal->getWidth());
 
+        // listener should have been triggered once more for the detected resize
         $this->assertEquals(2, $called);
 
         Terminal::unregisterResizeListener($listener);

@@ -20,6 +20,7 @@ use function strlen;
 use const PHP_EOL;
 
 /**
+ * @author Arne Groskurth <arne.groskurth@gmail.com>
  * @author Pierre du Plessis <pdples@gmail.com>
  * @author Gabriel Ostrolucký <gabriel.ostrolucky@gmail.com>
  */

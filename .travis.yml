@@ -55,7 +55,8 @@ before_install:
       export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
       export SYMFONY_DEPRECATIONS_HELPER=max[indirect]=170
-      export SYMFONY_FEATURE_BRANCH=$(curl -s https://flex.symfony.com/versions.json | jq -r '."dev-name"')
+      export SYMFONY_FLEX_VERSIONS=$(curl -s https://flex.symfony.com/versions.json)
+      export SYMFONY_FEATURE_BRANCH=$(echo $SYMFONY_FLEX_VERSIONS | jq -r '."dev"')
 
       nanoseconds () {
           local cmd="date"
@@ -204,7 +205,10 @@ install:
       # For the feature-branch, when deps=high, the version before it is checked out and tested with the locally patched components
       if [[ $deps = high && $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH ]]; then
           export FLIP='^'
-          export SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -o '/[1-9]\.[0-9].*' | tail -n 1 | sed s/.//) &&
+          export SYMFONY_VERSION=$(echo $SYMFONY_FLEX_VERSIONS | jq -r '."next"')
+          if [ $SYMFONY_VERSION = $SYMFONY_FEATURE_BRANCH ]; then
+              export SYMFONY_VERSION = $(echo $SYMFONY_FLEX_VERSIONS | jq -r '."stable"')
+          fi
           git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)

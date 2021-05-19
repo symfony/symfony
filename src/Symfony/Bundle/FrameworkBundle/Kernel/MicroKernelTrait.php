@@ -182,7 +182,7 @@ trait MicroKernelTrait
             throw new \LogicException(sprintf('"%s" uses "%s", but does not implement the required method "protected function configureRoutes(RoutingConfigurator $routes): void".', get_debug_type($this), MicroKernelTrait::class), 0, $e);
         }
 
-        $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) && !$type->isBuiltin() ? $type->getName() : null;
+        $configuratorClass = $configureRoutes->getNumberOfParameters() > 0 && ($type = $configureRoutes->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
 
         if ($configuratorClass && !is_a(RoutingConfigurator::class, $configuratorClass, true)) {
             trigger_deprecation('symfony/framework-bundle', '5.1', 'Using type "%s" for argument 1 of method "%s:configureRoutes()" is deprecated, use "%s" instead.', RouteCollectionBuilder::class, self::class, RoutingConfigurator::class);

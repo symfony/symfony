@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-17T14:35:04Z
+
+ Needs some work to make it green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-18T07:21:47Z
+
+Why 5.3? That's for 5.4 to me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T09:12:46Z
+
+Deprecating the old security system as a late change for 5.3 was discussed on slack with @wouterj and @fabpot.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-18T10:07:51Z
+
+The reasoning is similar to #39308: I'm almost certain that we didn't yet test all uses of the old authentication system on the new one. So I want to buy us time to add the missing features/cases in 5.4, before removing the old system in 6.0. Deprecating the old system gives us the most chance to get this type of feedback from bigger applications.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-18T10:41:39Z
+
+Got it, thanks.
+(Rebase needed)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T11:38:50Z
+
+This PR misses deprecating some service definitions, I'm going to finish it tonight.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T17:20:38Z
+
+This is ready.
+
+Note: this PR deprecates the main part of the old system, but it's not exhaustive: there are some classes which won't be needed in 6.0 that this PR does not deprecate. e.g. `NoopAuthenticationManager` is still needed internally for now.
+Why it's not an issue? Fixing the deprecations introduced here implies that you are not using the remaining to-be-deprecated stuff anymore, thus you won't be bothered for the same topic in the next minor.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-18T22:56:33Z
+
+> Is this also the reason for not having trigger_deprecation() calls in almost all Guard component classes?
+
+@wouterj Nope, that was a mistake. It's fixed now.
+The only files that have no `trigger_deprecation()` calls but only `@deprecated` annotations are abstract classes and interfaces as it causes such issues:
+
+>.   1x: Since symfony/security-guard 5.3: The "Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator" class is deprecated, use the new authenticator system instead.
+    1x in ClassLoader::loadClass from Composer\Autoload
+
+I asked @nicolas-grekas who confirmed that we have to skip triggering in this case.
+
+Thanks for the review!

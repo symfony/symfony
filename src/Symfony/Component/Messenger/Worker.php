@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Messenger;
 
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerRateLimitedEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
@@ -27,6 +29,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -41,17 +44,19 @@ class Worker
     private $bus;
     private $eventDispatcher;
     private $logger;
+    private $rateLimiterLocator;
     private $shouldStop = false;
 
     /**
      * @param ReceiverInterface[] $receivers Where the key is the transport name
      */
-    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    public function __construct(array $receivers, MessageBusInterface $bus, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null, ContainerInterface $rateLimiterLocator = null)
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
         $this->logger = $logger;
         $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
+        $this->rateLimiterLocator = $rateLimiterLocator;
     }
 
     /**
@@ -91,6 +96,7 @@ class Worker
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
 
+                    $this->rateLimit($transportName);
                     $this->handleMessage($envelope, $receiver, $transportName);
                     $this->dispatchEvent(new WorkerRunningEvent($this, false));
 
@@ -115,6 +121,32 @@ class Worker
         }
 
         $this->dispatchEvent(new WorkerStoppedEvent($this));
+    }
+
+    private function rateLimit(string $transportName): void
+    {
+        if (null === $this->rateLimiterLocator) {
+            return;
+        }
+
+        if (!$this->rateLimiterLocator->has($transportName)) {
+            return;
+        }
+
+        /** @var LimiterInterface $rateLimiter */
+        $rateLimiter = $this->rateLimiterLocator->get($transportName)->create();
+        if ($rateLimiter->consume()->isAccepted()) {
+            return;
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->info('Transport {transport} is being rate limited, waiting for token to become available...', [
+                'transport' => $transportName,
+            ]);
+        }
+
+        $this->dispatchEvent(new WorkerRateLimitedEvent($rateLimiter, $transportName));
+        $rateLimiter->reserve()->wait();
     }
 
     private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName): void

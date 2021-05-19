@@ -142,6 +142,7 @@ return static function (ContainerConfigurator $container) {
                 service('event_dispatcher'),
                 service('logger')->nullOnInvalid(),
                 [], // Receiver names
+                service('messenger.rate_limiter_locator')->nullOnInvalid(),
             ])
             ->tag('console.command')
             ->tag('monolog.logger', ['channel' => 'messenger'])

@@ -43,14 +43,16 @@ class ConsumeMessagesCommand extends Command
     private $logger;
     private $receiverNames;
     private $eventDispatcher;
+    private $rateLimiterLocator;
 
-    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [])
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $rateLimiterLocator = null)
     {
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
         $this->eventDispatcher = $eventDispatcher;
+        $this->rateLimiterLocator = $rateLimiterLocator;
 
         parent::__construct();
     }
@@ -199,7 +201,7 @@ EOF
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger);
+        $worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $this->rateLimiterLocator);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
         ];

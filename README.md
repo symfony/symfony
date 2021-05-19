@@ -14,6 +14,18 @@ Installation
   Support" (LTS) versions and has a [release process][6] that is predictable and
   business-friendly.
 
+Sponsor
+-------
+
+Symfony 6.0 is [backed][27] by [SensioLabs][28].
+
+As the creator of Symfony, SensioLabs supports companies using Symfony, with an
+offering encompassing consultancy, expertise, services, training, and technical
+assistance to ensure the success of web application development projects.
+
+Help Symfony by [sponsoring][29] its development!
+
+
 Documentation
 -------------
 
@@ -75,3 +87,6 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [24]: https://symfony.com/coc
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
+[27]: https://symfony.com/backers
+[28]: https://sensiolabs.com/
+[29]: https://symfony.com/sponsor

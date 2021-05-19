@@ -33,17 +33,17 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
-        return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
+        return parent::supportsNormalization($data, $format, $context) && $this->supports(\get_class($data));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
+        return parent::supportsDenormalization($data, $type, $format, $context) && $this->supports($type);
     }
 
     /**

@@ -25,6 +25,8 @@
     },
     "require-dev": {
         "psr/container": "^1.0|^2.0",
+        "psr/cache": "^1.0|^2.0|^3.0",
+        "symfony/cache": "^4.4|^5.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/http-foundation": "^5.3",

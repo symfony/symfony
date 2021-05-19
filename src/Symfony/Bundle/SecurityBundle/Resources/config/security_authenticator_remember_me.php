@@ -51,6 +51,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 abstract_arg('options'),
                 service('logger')->nullOnInvalid(),
+                abstract_arg('token verifier'),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 
@@ -87,5 +88,11 @@ return static function (ContainerConfigurator $container) {
                 service('logger')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
+
+        // Cache
+        ->set('cache.security_token_verifier')
+            ->parent('cache.system')
+            ->private()
+            ->tag('cache.pool')
     ;
 };

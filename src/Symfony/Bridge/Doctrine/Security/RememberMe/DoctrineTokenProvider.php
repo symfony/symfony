@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
 use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenVerifierInterface;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
@@ -39,7 +40,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  *         `username` varchar(200) NOT NULL
  *     );
  */
-class DoctrineTokenProvider implements TokenProviderInterface
+class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInterface
 {
     private $conn;
 
@@ -134,6 +135,65 @@ class DoctrineTokenProvider implements TokenProviderInterface
         } else {
             $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function verifyToken(PersistentTokenInterface $token, string $tokenValue): bool
+    {
+        // Check if the token value matches the current persisted token
+        if (hash_equals($token->getTokenValue(), $tokenValue)) {
+            return true;
+        }
+
+        // Generate an alternative series id here by changing the suffix == to _
+        // this is needed to be able to store an older token value in the database
+        // which has a PRIMARY(series), and it works as long as series ids are
+        // generated using base64_encode(random_bytes(64)) which always outputs
+        // a == suffix, but if it should not work for some reason we abort
+        // for safety
+        $tmpSeries = preg_replace('{=+$}', '_', $token->getSeries());
+        if ($tmpSeries === $token->getSeries()) {
+            return false;
+        }
+
+        // Check if the previous token is present. If the given $tokenValue
+        // matches the previous token (and it is outdated by at most 60seconds)
+        // we also accept it as a valid value.
+        try {
+            $tmpToken = $this->loadTokenBySeries($tmpSeries);
+        } catch (TokenNotFoundException $e) {
+            return false;
+        }
+
+        if ($tmpToken->getLastUsed()->getTimestamp() + 60 < time()) {
+            return false;
+        }
+
+        return hash_equals($tmpToken->getTokenValue(), $tokenValue);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateExistingToken(PersistentTokenInterface $token, string $tokenValue, \DateTimeInterface $lastUsed): void
+    {
+        if (!$token instanceof PersistentToken) {
+            return;
+        }
+
+        // Persist a copy of the previous token for authentication
+        // in verifyToken should the old token still be sent by the browser
+        // in a request concurrent to the one that did this token update
+        $tmpSeries = preg_replace('{=+$}', '_', $token->getSeries());
+        // if we cannot generate a unique series it is not worth trying further
+        if ($tmpSeries === $token->getSeries()) {
+            return;
+        }
+
+        $this->deleteTokenBySeries($tmpSeries);
+        $this->createNewToken(new PersistentToken($token->getClass(), $token->getUserIdentifier(), $tmpSeries, $token->getTokenValue(), $lastUsed));
     }
 
     /**

@@ -44,6 +44,8 @@ The CHANGELOG for version 5.4 and newer can be found in the security sub-package
  * Randomize CSRF tokens to harden BREACH attacks
  * Deprecated voters that do not return a valid decision when calling the `vote` method.
  * Flag `Serializable` implementation of `NullToken` as `@internal` and `@final`
+ * Add `TokenVerifierInterface` to allow fixing parallel requests handling in remember-me
+ * Add a `CacheTokenVerifier` implementation that stores outdated token in a cache, which is more correct and efficient as the default `DoctrineTokenProvider` implementation
 
 5.2.0
 -----

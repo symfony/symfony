@@ -350,6 +350,7 @@
         <xsd:attribute name="secret" type="xsd:string" use="required" />
         <xsd:attribute name="service" type="xsd:string" />
         <xsd:attribute name="token-provider" type="xsd:string" />
+        <xsd:attribute name="token-verifier" type="xsd:string" />
         <xsd:attribute name="catch-exceptions" type="xsd:boolean" />
         <xsd:attribute name="secure" type="remember_me_secure" />
         <xsd:attribute name="samesite" type="remember_me_samesite" />

@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenVerifierInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -32,13 +33,18 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 {
     private $tokenProvider;
+    private $tokenVerifier;
     private $secret;
 
-    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null)
+    public function __construct(TokenProviderInterface $tokenProvider, string $secret, UserProviderInterface $userProvider, RequestStack $requestStack, array $options, ?LoggerInterface $logger = null, ?TokenVerifierInterface $tokenVerifier = null)
     {
         parent::__construct($userProvider, $requestStack, $options, $logger);
 
+        if (!$tokenVerifier && $tokenProvider instanceof TokenVerifierInterface) {
+            $tokenVerifier = $tokenProvider;
+        }
         $this->tokenProvider = $tokenProvider;
+        $this->tokenVerifier = $tokenVerifier;
         $this->secret = $secret;
     }
 
@@ -66,7 +72,13 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
 
         [$series, $tokenValue] = explode(':', $rememberMeDetails->getValue());
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
-        if (!hash_equals($persistentToken->getTokenValue(), $tokenValue)) {
+
+        if ($this->tokenVerifier) {
+            $isTokenValid = $this->tokenVerifier->verifyToken($persistentToken, $tokenValue);
+        } else {
+            $isTokenValid = hash_equals($persistentToken->getTokenValue(), $tokenValue);
+        }
+        if (!$isTokenValid) {
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 
@@ -78,7 +90,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         // if multiple concurrent requests reauthenticate a user we do not want to update the token several times
         if ($persistentToken->getLastUsed()->getTimestamp() + 60 < time()) {
             $tokenValue = base64_encode(random_bytes(64));
-            $this->tokenProvider->updateToken($series, $this->generateHash($tokenValue), new \DateTime());
+            $tokenValueHash = $this->generateHash($tokenValue);
+            $tokenLastUsed = new \DateTime();
+            if ($this->tokenVerifier) {
+                $this->tokenVerifier->updateExistingToken($persistentToken, $tokenValueHash, $tokenLastUsed);
+            }
+            $this->tokenProvider->updateToken($series, $tokenValueHash, $tokenLastUsed);
         }
 
         $this->createCookie($rememberMeDetails->withValue($tokenValue));

@@ -2,10 +2,9 @@
     <img src="https://symfony.com/logos/symfony_black_02.svg">
 </a></p>
 
-[Symfony][1] is a **PHP framework** for web and console applications and a set of reusable
-**PHP components**. Symfony is used by thousands of web applications (including
-BlaBlaCar.com and Spotify.com) and most of the [popular PHP projects][2] (including
-Drupal and Magento).
+[Symfony][1] is a **PHP framework** for web and console applications and a set
+of reusable **PHP components**. Symfony is used by thousands of web
+applications and most of the [popular PHP projects][2].
 
 Installation
 ------------
@@ -14,6 +13,17 @@ Installation
 * Symfony follows the [semantic versioning][5] strictly, publishes "Long Term
   Support" (LTS) versions and has a [release process][6] that is predictable and
   business-friendly.
+
+Sponsor
+-------
+
+Symfony 5.3 is [backed][27] by [JoliCode][28].
+
+JoliCode is a team of passionate developers and open-source lovers, with a
+strong expertise in PHP & Symfony technologies. They can help you build your
+projects using state-of-the-art practices.
+
+Help Symfony by [sponsoring][29] its development!
 
 Documentation
 -------------
@@ -76,3 +86,6 @@ Symfony development is sponsored by [SensioLabs][21], led by the
 [24]: https://symfony.com/coc
 [25]: https://symfony.com/doc/current/contributing/code_of_conduct/care_team.html
 [26]: https://symfony.com/book
+[27]: https://symfony.com/backers
+[28]: https://jolicode.com/
+[29]: https://symfony.com/sponsor

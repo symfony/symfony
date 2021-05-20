@@ -23,21 +23,6 @@ class NotFoundActivationStrategyTest extends TestCase
 {
     /**
      * @dataProvider isActivatedProvider
-     *
-     * @group legacy
-     */
-    public function testIsActivatedLegacy(string $url, array $record, bool $expected)
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create($url));
-
-        $strategy = new NotFoundActivationStrategy($requestStack, ['^/foo', 'bar'], Logger::WARNING);
-
-        self::assertEquals($expected, $strategy->isHandlerActivated($record));
-    }
-
-    /**
-     * @dataProvider isActivatedProvider
      */
     public function testIsActivated(string $url, array $record, bool $expected)
     {

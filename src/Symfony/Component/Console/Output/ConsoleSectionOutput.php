@@ -95,16 +95,11 @@ class ConsoleSectionOutput extends StreamOutput
         // also triggers flushing of dirty lines in lower sections
         $terminalHeight = $this->terminal->getHeight();
 
-        $linesToClear = $this->dirtyLines + ($lines ?? $this->lines);
+        $lines = ($lines === null) ? $this->lines : min($lines, $this->lines);
+        $linesToClear = $this->dirtyLines + $lines;
         $visibleLinesToClear = min($linesToClear, $this->getVisibleLines($terminalHeight));
 
-        if ($lines) {
-            array_splice($this->content, -$lines);
-        } else {
-            $lines = $this->lines;
-            $this->content = [];
-        }
-
+        array_splice($this->content, -$lines);
         $this->lines -= $lines;
         $this->dirtyLines = $linesToClear - $visibleLinesToClear;
 

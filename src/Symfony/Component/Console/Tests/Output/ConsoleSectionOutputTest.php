@@ -93,6 +93,21 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals(\PHP_EOL.'foo'.\PHP_EOL."\x1b[1A\x1b[0J\x1b[1A\x1b[0J".'bar'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testClearMoreLinesThenExisting()
+    {
+        [$section,] = $this->prepareSectionsInSizedTerminal(1, 5, 10);
+
+        $section->writeln("foo1");
+        $section->writeln("foo2");
+        $section->clear(10);
+        $section->writeln("foo3");
+        $section->writeln("foo4");
+        $section->clear(1);
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['foo1', 'foo2', "\x1b[2A\x1b[0Jfoo3", 'foo4', "\x1b[1A\x1b[0J"]), stream_get_contents($this->stream));
+    }
+
     public function testOverwrite()
     {
         $sections = [];

@@ -146,7 +146,8 @@ class ConsoleSectionOutput extends StreamOutput
                 // only overwrite visible portion if it differs from what is already visible
                 if ($flushableLines > 0 || substr($this->getContent(), -strlen($newVisibleContent)) !== $newVisibleContent) {
 
-                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($flushableLines, $this->getVisibleLines($terminalHeight)));
+                    $sectionLinesToPop = max($flushableLines, $this->getVisibleLines($terminalHeight, false));
+                    $erasedContent = $this->popStreamContentUntilCurrentSection($sectionLinesToPop);
 
                     parent::doWrite($newVisibleContent, false);
                     parent::doWrite($erasedContent, false);
@@ -316,11 +317,13 @@ class ConsoleSectionOutput extends StreamOutput
     }
 
     /**
-     * Returns the number of lines (including dirty lines) that are visible with the current terminal size.
+     * Returns the number of lines that are visible with the current terminal size.
+     * This number may be smaller than $this->lines in case the section is higher than the terminal.
+     * This number may be larger than $this->lines in case there are dirty lines on the terminal as it has been resized.
      */
-    private function getVisibleLines(int $terminalHeight): int
+    private function getVisibleLines(int $terminalHeight, bool $includeDirty = true): int
     {
-        return min($this->getDisplayableLines($terminalHeight), $this->lines + $this->dirtyLines);
+        return min($this->getDisplayableLines($terminalHeight), $this->lines + ($includeDirty ? $this->dirtyLines : 0));
     }
 
     /**

@@ -165,6 +165,23 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testOverwriteWithDirtyLines()
+    {
+        [$section] = $this->prepareSectionsInSizedTerminal(1, 3, 10);
+
+        // write something larger then terminal
+        $section->writeln(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        // first two lines are now dirty
+        $section->clear();
+
+        // should only re-write last three lines onto terminal
+        $section->overwrite(implode(\PHP_EOL, ['1', '2', '3', '4', '5']));
+
+        rewind($this->stream);
+        $this->assertEquals(implode(\PHP_EOL, ['1', '2', '3', '4', '5', "\x1b[3A\x1b[0J3", '4', '5', '']), stream_get_contents($this->stream));
+    }
+
     public function testAddingMultipleSections()
     {
         $sections = [];

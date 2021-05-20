@@ -142,7 +142,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent = clone $this;
 
         --$parent->length;
-        if (substr($parent->pathAsString, -1) == ']') {
+        if (']' == substr($parent->pathAsString, -1)) {
             $parent->pathAsString = substr($parent->pathAsString, 0, strrpos($parent->pathAsString, '['));
         } else {
             $parent->pathAsString = substr($parent->pathAsString, 0, strrpos($parent->pathAsString, '.'));

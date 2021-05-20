@@ -26,6 +26,9 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @group legacy
+ */
 class UserAuthenticationProviderTest extends TestCase
 {
     public function testSupports()

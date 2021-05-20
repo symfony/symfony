@@ -29,13 +29,13 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * @group legacy
+ */
 class DaoAuthenticationProviderTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @group legacy
-     */
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
         $this->expectException(AuthenticationServiceException::class);
@@ -53,9 +53,6 @@ class DaoAuthenticationProviderTest extends TestCase
         $method->invoke($provider, 'fabien', $this->getSupportedToken());
     }
 
-    /**
-     * @group legacy
-     */
     public function testRetrieveUserWhenUsernameIsNotFoundWithLegacyEncoderFactory()
     {
         $this->expectException(UserNotFoundException::class);

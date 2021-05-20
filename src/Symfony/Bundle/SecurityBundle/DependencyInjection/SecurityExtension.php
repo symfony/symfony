@@ -440,6 +440,15 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Determine default entry point
         $configuredEntryPoint = $firewall['entry_point'] ?? null;
 
+        // When a entry point path is configured, it overrides the default entry point
+        if (isset($firewall['entry_point_path'])) {
+            $configuredEntryPoint = 'security.authentication.route_entry_point.'.$id;
+            $container
+                ->setDefinition($configuredEntryPoint, new ChildDefinition('security.authentication.route_entry_point'))
+                ->setArgument('$entryPointPath', $firewall['entry_point_path'])
+            ;
+        }
+
         // Authentication listeners
         $firewallAuthenticationProviders = [];
         [$authListeners, $defaultEntryPoint] = $this->createAuthenticationListeners($container, $id, $firewall, $firewallAuthenticationProviders, $defaultProvider, $providerIds, $configuredEntryPoint, $contextListenerId);

@@ -18,14 +18,14 @@
     "require": {
         "php": ">=8.0.2",
         "ext-ldap": "*",
-        "symfony/options-resolver": "^4.4|^5.0|^6.0"
+        "symfony/options-resolver": "^5.4|^6.0"
     },
     "require-dev": {
-        "symfony/security-core": "^5.3|^6.0"
+        "symfony/security-core": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/options-resolver": "<4.4",
-        "symfony/security-core": "<5.3"
+        "symfony/options-resolver": "<5.4",
+        "symfony/security-core": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },

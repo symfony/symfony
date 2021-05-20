@@ -22,7 +22,7 @@
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/css-selector": "^4.4|^5.0|^6.0",
+        "symfony/css-selector": "^5.4|^6.0",
         "masterminds/html5": "^2.6"
     },
     "conflict": {

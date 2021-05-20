@@ -20,7 +20,7 @@
         "symfony/deprecation-contracts": "^2.1"
     },
     "require-dev": {
-        "symfony/process": "^4.4|^5.0|^6.0"
+        "symfony/process": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Dotenv\\": "" },

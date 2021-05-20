@@ -22,23 +22,23 @@
         "symfony/translation-contracts": "^2.3"
     },
     "require-dev": {
-        "symfony/config": "^4.4|^5.0|^6.0",
-        "symfony/console": "^4.4|^5.0|^6.0",
-        "symfony/dependency-injection": "^5.0|^6.0",
-        "symfony/http-kernel": "^5.0|^6.0",
-        "symfony/intl": "^4.4|^5.0|^6.0",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/console": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/http-kernel": "^5.4|^6.0",
+        "symfony/intl": "^5.4|^6.0",
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/service-contracts": "^1.1.2|^2",
-        "symfony/yaml": "^4.4|^5.0|^6.0",
-        "symfony/finder": "^4.4|^5.0|^6.0",
+        "symfony/yaml": "^5.4|^6.0",
+        "symfony/finder": "^5.4|^6.0",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/config": "<4.4",
-        "symfony/dependency-injection": "<5.0",
-        "symfony/http-kernel": "<5.0",
-        "symfony/twig-bundle": "<5.0",
-        "symfony/yaml": "<4.4"
+        "symfony/config": "<5.4",
+        "symfony/dependency-injection": "<5.4",
+        "symfony/http-kernel": "<5.4",
+        "symfony/twig-bundle": "<5.4",
+        "symfony/yaml": "<5.4"
     },
     "provide": {
         "symfony/translation-implementation": "2.3"

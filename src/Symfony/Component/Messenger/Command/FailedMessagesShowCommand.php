@@ -102,14 +102,10 @@ EOF
             $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
             /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
             $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
-            $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
             $errorMessage = '';
             if (null !== $lastErrorDetailsStamp) {
                 $errorMessage = $lastErrorDetailsStamp->getExceptionMessage();
-            } elseif (null !== $lastRedeliveryStampWithException) {
-                // Try reading the errorMessage for messages that are still in the queue without the new ErrorDetailStamps.
-                $errorMessage = $lastRedeliveryStampWithException->getExceptionMessage();
             }
 
             $rows[] = [

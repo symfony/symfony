@@ -36,7 +36,6 @@ class Connection
         'delete_after_reject' => true,
         'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
         'dbindex' => 0,
-        'tls' => false,
         'redeliver_timeout' => 3600, // Timeout before redeliver messages still in pending state (seconds)
         'claim_interval' => 60000, // Interval by which pending/abandoned messages should be checked
         'lazy' => false,
@@ -189,11 +188,6 @@ class Connection
         }
 
         $tls = 'rediss' === $parsedUrl['scheme'];
-        if (\array_key_exists('tls', $redisOptions)) {
-            trigger_deprecation('symfony/redis-messenger', '5.3', 'Providing "tls" parameter is deprecated, use "rediss://" DSN scheme instead');
-            $tls = filter_var($redisOptions['tls'], \FILTER_VALIDATE_BOOLEAN);
-            unset($redisOptions['tls']);
-        }
 
         $redeliverTimeout = null;
         if (\array_key_exists('redeliver_timeout', $redisOptions)) {
@@ -272,7 +266,7 @@ class Connection
         $availableOptions[] = 'serializer';
 
         if (0 < \count($invalidOptions = array_diff(array_keys($options), $availableOptions))) {
-            trigger_deprecation('symfony/messenger', '5.1', 'Invalid option(s) "%s" passed to the Redis Messenger transport. Passing invalid options is deprecated.', implode('", "', $invalidOptions));
+            throw new LogicException(sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport.', implode('", "', $invalidOptions)));
         }
     }
 

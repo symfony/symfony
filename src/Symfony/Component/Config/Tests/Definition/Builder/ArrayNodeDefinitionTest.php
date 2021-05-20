@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -24,8 +23,6 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 class ArrayNodeDefinitionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testAppendingSomeNode()
     {
         $parent = new ArrayNodeDefinition('root');
@@ -347,27 +344,6 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame('The "root.foo" node is deprecated.', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\Builder\NodeDefinition::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-        $node = new ArrayNodeDefinition('root');
-        $node
-            ->children()
-            ->arrayNode('foo')->setDeprecated('The "%path%" node is deprecated.')->end()
-            ->end()
-        ;
-        $deprecatedNode = $node->getNode()->getChildren()['foo'];
-
-        $this->assertTrue($deprecatedNode->isDeprecated());
-        $deprecation = $deprecatedNode->getDeprecation($deprecatedNode->getName(), $deprecatedNode->getPath());
-        $this->assertSame('The "root.foo" node is deprecated.', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
     }
 
     public function testCannotBeEmptyOnConcreteNode()

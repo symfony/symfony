@@ -58,6 +58,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
         if (!$request->hasSession()) {
+            // This variable prevents calling `$this->getSession()` twice in case the Request (and the below factory) is cloned
             $sess = null;
             $request->setSessionFactory(function () use (&$sess) { return $sess ?? $sess = $this->getSession(); });
         }

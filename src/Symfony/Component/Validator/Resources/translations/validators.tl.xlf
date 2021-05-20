@@ -375,8 +375,8 @@
                 <target>Ang bilang ng mga elemento sa koleksyon na ito ay dapat multiple ng {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ang halagang ito ay dapat masunod ang kahit na isang sumusunod na batayan.</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Ang halagang ito ay dapat masunod ang kahit na isang sumusunod na batayan: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

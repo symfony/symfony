@@ -375,8 +375,8 @@
                 <target>จำนวนของสมาชิกในคอเล็กชั่นควรเป็นพหุคูณของ {{ compared_value }}</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>ค่านี้ควรเป็นไปตามข้อจำกัดอย่างน้อยหนึ่งข้อจากข้อจำกัดเหล่านี้:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>ค่านี้ควรเป็นไปตามข้อจำกัดอย่างน้อยหนึ่งข้อจากข้อจำกัดเหล่านี้: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

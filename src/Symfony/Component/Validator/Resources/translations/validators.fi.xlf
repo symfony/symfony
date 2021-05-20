@@ -375,8 +375,8 @@
                 <target>Ryhmässä olevien elementtien määrän pitää olla monikerta luvulle {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Tämän arvon tulee läpäistä vähintään yksi seuraavista tarkistuksista:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Tämän arvon tulee läpäistä vähintään yksi seuraavista tarkistuksista: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

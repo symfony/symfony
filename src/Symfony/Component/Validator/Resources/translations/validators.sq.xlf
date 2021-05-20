@@ -375,8 +375,8 @@
                 <target>Numri i elementeve në këtë koleksion duhet të jetë një shumëfish i {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Kjo vlerë duhet të plotësojë të paktën njërën nga kufizimet e mëposhtme:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Kjo vlerë duhet të plotësojë të paktën njërën nga kufizimet e mëposhtme: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

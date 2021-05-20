@@ -375,8 +375,8 @@
                 <target>Το νούμερο των στοιχείων σε αυτή τη συλλογή θα πρέπει να είναι πολλαπλάσιο του {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Αυτή η τιμή θα πρέπει να ικανοποιεί τουλάχιστον έναν από τους παρακάτω περιορισμούς: </target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Αυτή η τιμή θα πρέπει να ικανοποιεί τουλάχιστον έναν από τους παρακάτω περιορισμούς: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

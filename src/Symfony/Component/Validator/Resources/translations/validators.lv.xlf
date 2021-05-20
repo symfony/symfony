@@ -375,8 +375,8 @@
                 <target>Elementu skaitam šajā kolekcijā jābūt {{ compared_value }} reizinājumam.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Šai vērtībai jāiekļaujas vismaz vienā no sekojošiem ierobežojumiem:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Šai vērtībai jāiekļaujas vismaz vienā no sekojošiem ierobežojumiem: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

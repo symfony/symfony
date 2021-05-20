@@ -375,8 +375,8 @@
                 <target>Angka dari setiap elemen di dalam kumpulan ini harus kelipatan dari {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Nilai ini harus memenuhi setidaknya satu dari batasan berikut:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Nilai ini harus memenuhi setidaknya satu dari batasan berikut: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

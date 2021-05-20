@@ -375,8 +375,8 @@
                 <target>該集合內的元素數量得是 {{ compared_value }} 的倍數。</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>該數值需符合以下其中一個約束：</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>該數值需符合以下其中一個約束： {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

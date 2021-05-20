@@ -375,8 +375,8 @@
                 <target>A gyűjteményben lévő elemek számának oszthatónak kell lennie a következővel: {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ennek az értéknek meg kell felelni legalább egynek a következő feltételek közül:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Ennek az értéknek meg kell felelni legalább egynek a következő feltételek közül: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

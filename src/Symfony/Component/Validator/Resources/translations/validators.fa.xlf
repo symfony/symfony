@@ -375,8 +375,8 @@
                 <target>تعداد عناصر این مجموعه باید ضریبی از {{ compared_value }} باشد.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را ارضا کند:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را ارضا کند: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

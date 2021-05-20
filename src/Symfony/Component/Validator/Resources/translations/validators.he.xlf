@@ -375,8 +375,8 @@
                 <target>מספר האלמנטים באוסף זה צריך להיות מכפיל של {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>ערך זה אמור לעמוד לפחות באחד התנאים הבאים:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>ערך זה אמור לעמוד לפחות באחד התנאים הבאים: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

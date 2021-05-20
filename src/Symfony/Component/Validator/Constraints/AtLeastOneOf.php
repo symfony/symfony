@@ -26,7 +26,7 @@ class AtLeastOneOf extends Composite
     ];
 
     public $constraints = [];
-    public $message = 'This value should satisfy at least one of the following constraints:';
+    public $message = 'This value should satisfy at least one of the following constraints: {{ child_messages }}';
     public $messageCollection = 'Each element of this collection should satisfy its own set of constraints.';
     public $includeInternalMessages = true;
 

@@ -375,8 +375,8 @@
                 <target>Количество элементов в этой коллекции должно быть кратным {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Значение должно удовлетворять как минимум одному из следующих ограничений:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Значение должно удовлетворять как минимум одному из следующих ограничений: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

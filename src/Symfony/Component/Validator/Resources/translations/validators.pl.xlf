@@ -375,8 +375,8 @@
                 <target>Liczba elementów w tym zbiorze powinna być wielokrotnością {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ta wartość powinna spełniać co najmniej jedną z następujących reguł:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Ta wartość powinna spełniać co najmniej jedną z następujących reguł: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

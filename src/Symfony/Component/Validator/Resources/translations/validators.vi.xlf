@@ -375,8 +375,8 @@
                <target>Số lượng các phần tử trong bộ sưu tập này nên là bội số của {{ compared_value }}.</target>
            </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Giá trị này nên thỏa mãn ít nhất một trong những ràng buộc sau:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Giá trị này nên thỏa mãn ít nhất một trong những ràng buộc sau: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

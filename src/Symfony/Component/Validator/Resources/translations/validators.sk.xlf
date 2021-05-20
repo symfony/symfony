@@ -375,8 +375,8 @@
                 <target>Počet prvkov v tejto kolekcii musí byť násobok {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Táto hodnota musí spĺňať aspoň jedno z nasledujúcich obmedzení:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Táto hodnota musí spĺňať aspoň jedno z nasledujúcich obmedzení: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

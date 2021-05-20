@@ -375,8 +375,8 @@
                 <target>Broj elemenata u ovoj kolekciji bi trebalo da bude deljiv sa {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Ova vrednost bi trebalo da zadovoljava namjanje jedno od narednih ograničenja:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Ova vrednost bi trebalo da zadovoljava namjanje jedno od narednih ograničenja: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

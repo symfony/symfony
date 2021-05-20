@@ -97,18 +97,18 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $atLeastOneOf = new AtLeastOneOf(['constraints' => $constraints]);
         $validator = Validation::createValidator();
 
-        $message = [$atLeastOneOf->message];
+        $message = [];
 
         $i = 0;
 
         foreach ($constraints as $constraint) {
-            $message[] = sprintf(' [%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
+            $message[] = sprintf('[%d] %s', ++$i, $validator->validate($value, $constraint)->get(0)->getMessage());
         }
 
         $violations = $validator->validate($value, $atLeastOneOf);
 
         $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
-        $this->assertEquals(new ConstraintViolation(implode('', $message), implode('', $message), [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
+        $this->assertEquals(new ConstraintViolation(str_replace('{{ child_messages }}', implode(' ', $message), $atLeastOneOf->message), $atLeastOneOf->message, ['{{ child_messages }}' => implode(' ', $message)], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     /**
@@ -121,7 +121,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $violations = Validation::createValidator()->validate($value, $atLeastOneOf);
 
         $this->assertCount(1, $violations, sprintf('1 violation expected. Got %u.', \count($violations)));
-        $this->assertEquals(new ConstraintViolation('foo', 'foo', [], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
+        $this->assertEquals(new ConstraintViolation('foo', 'foo', ['{{ child_messages }}' => ''], $value, '', $value, null, AtLeastOneOf::AT_LEAST_ONE_OF_ERROR, $atLeastOneOf), $violations->get(0));
     }
 
     public function getInvalidCombinations()

@@ -375,8 +375,8 @@
                 <target>Энэхүү цуглуулган дахь элемэнтийн тоо, {{ compared_value }}-н үржвэр байх ёстой.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Энэ утга доорх болзолуудын ядаж нэгийг хангах ёстой:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Энэ утга доорх болзолуудын ядаж нэгийг хангах ёстой: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

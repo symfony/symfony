@@ -375,8 +375,8 @@
                 <target>Talet på element i denne samlinga bør vera eit multippel av {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Verdien burde oppfylla minst ein av følgjande avgrensingar:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Verdien burde oppfylla minst ein av følgjande avgrensingar: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

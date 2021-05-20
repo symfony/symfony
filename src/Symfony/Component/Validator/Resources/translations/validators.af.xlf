@@ -371,8 +371,8 @@
                 <target>Die hoeveelheid elemente in hierdie versameling moet 'n meelvoud van {{ compared_value }} wees.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Hierdie waarde moet voldoen aan ten minste een van hierdie beperkings:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Hierdie waarde moet voldoen aan ten minste een van hierdie beperkings: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

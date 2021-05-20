@@ -375,8 +375,8 @@
                 <target>Le nombre d'éléments de cette collection doit être un multiple de {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Cette valeur doit satisfaire à au moins une des contraintes suivantes :</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Cette valeur doit satisfaire au moins une des contraintes suivantes : {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

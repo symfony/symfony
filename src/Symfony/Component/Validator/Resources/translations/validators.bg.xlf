@@ -375,8 +375,8 @@
                 <target>Броят на елементите в тази колекция трябва да бъде кратен на {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Стойността трябва да отговаря на поне едно от следните ограничения:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Стойността трябва да отговаря на поне едно от следните ограничения: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

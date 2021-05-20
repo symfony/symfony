@@ -375,8 +375,8 @@
                 <target>Ushbu to'plamdagi narsalar soni {{ compared_value }} dan ko'p bo'lishi kerak.</target>
             </trans-unit>
             <trans-unit id="97">
-                <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Qiymat quyidagi cheklovlardan kamida bittasiga javob berishi kerak:</target>
+                <source>This value should satisfy at least one of the following constraints: {{ child_messages }}</source>
+                <target>Qiymat quyidagi cheklovlardan kamida bittasiga javob berishi kerak: {{ child_messages }}</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>

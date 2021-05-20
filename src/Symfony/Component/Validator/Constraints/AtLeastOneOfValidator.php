@@ -31,7 +31,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
 
         $validator = $this->context->getValidator();
 
-        $messages = [$constraint->message];
+        $childMessages = [];
 
         foreach ($constraint->constraints as $key => $item) {
             $executionContext = clone $this->context;
@@ -43,7 +43,7 @@ class AtLeastOneOfValidator extends ConstraintValidator
             }
 
             if ($constraint->includeInternalMessages) {
-                $message = ' ['.($key + 1).'] ';
+                $message = '['.($key + 1).'] ';
 
                 if ($item instanceof All || $item instanceof Collection) {
                     $message .= $constraint->messageCollection;
@@ -51,11 +51,12 @@ class AtLeastOneOfValidator extends ConstraintValidator
                     $message .= $violations->get(\count($violations) - 1)->getMessage();
                 }
 
-                $messages[] = $message;
+                $childMessages[] = $message;
             }
         }
 
-        $this->context->buildViolation(implode('', $messages))
+        $this->context->buildViolation($constraint->message)
+            ->setParameter('{{ child_messages }}', implode(' ', $childMessages))
             ->setCode(AtLeastOneOf::AT_LEAST_ONE_OF_ERROR)
             ->addViolation()
         ;

@@ -19,7 +19,6 @@
         "php": ">=8.0.2",
         "egulias/email-validator": "^2.1.10|^3",
         "psr/log": "~1.0",
-        "symfony/deprecation-contracts": "^2.1",
         "symfony/event-dispatcher": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0",
         "symfony/service-contracts": "^1.1|^2"

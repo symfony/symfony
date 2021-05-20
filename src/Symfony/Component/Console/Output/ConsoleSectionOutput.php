@@ -122,8 +122,9 @@ class ConsoleSectionOutput extends StreamOutput
         $message = $this->getFormatter()->format($message);
 
         // make sure a non-empty message ends with a newline
-        if ($message !== '' && substr($message, -1) !== PHP_EOL) {
-            $message .= PHP_EOL;
+        $messageWithNewline = $message;
+        if ($messageWithNewline !== '' && substr($messageWithNewline, -1) !== PHP_EOL) {
+            $messageWithNewline .= PHP_EOL;
         }
 
         $terminalWidth = null;
@@ -138,7 +139,7 @@ class ConsoleSectionOutput extends StreamOutput
             // only overwrite section if it is visible
             if ($displayableLines > 0) {
 
-                [, $newVisibleContent, $newVisibleLines] = $this->divideMessageByDisplayability($message, $terminalWidth, $terminalHeight);
+                [, $newVisibleContent, $newVisibleLines] = $this->divideMessageByDisplayability($messageWithNewline, $terminalWidth, $terminalHeight);
 
                 $flushableLines = min($this->dirtyLines, $displayableLines - $newVisibleLines);
 
@@ -155,7 +156,7 @@ class ConsoleSectionOutput extends StreamOutput
             }
         } else {
             // output is not decorated
-            parent::doWrite($message, true);
+            parent::doWrite($messageWithNewline, false);
         }
 
         $this->content = [];

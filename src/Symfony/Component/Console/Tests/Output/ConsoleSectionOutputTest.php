@@ -211,6 +211,18 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
+    public function testClearAfterOverwriteClearsCorrectNumberOfLines()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('foo');
+        $output->clear();
+
+        rewind($output->getStream());
+        $this->assertEquals(implode(\PHP_EOL, ['foo', "\x1b[1A\x1b[0J"]), stream_get_contents($output->getStream()));
+    }
+
     public function testClearAboveTerminal()
     {
         [$section1, $section2] = $this->prepareSectionsInSizedTerminal(2, 3, 10);

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add class names as additional Helpers alias by default
+
 5.3
 ---
 

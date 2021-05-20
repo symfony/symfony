@@ -43,6 +43,10 @@ class HelperSet implements \IteratorAggregate
         if (null !== $alias) {
             $this->helpers[$alias] = $helper;
         }
+        $classNameAlias = get_class($helper);
+        if ($classNameAlias !== $alias) {
+            $this->helpers[$classNameAlias] = $helper;
+        }
 
         $helper->setHelperSet($this);
     }

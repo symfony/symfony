@@ -10,6 +10,7 @@ Console
 -------
 
  * Deprecate `Helper::strlen()`, use `Helper::width()` instead.
+ * Deprecate `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead.
 
 DoctrineBridge
 --------------

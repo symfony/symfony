@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove deprecated classes `Symfony/Component/Messenger/Transport/AmqpExt`, `Symfony/Component/Messenger/Transport/Doctrine` and `Symfony/Component/Messenger/Transport/Redis`.
+
 5.3
 ---
 

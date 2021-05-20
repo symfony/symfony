@@ -124,7 +124,6 @@
         "doctrine/data-fixtures": "^1.1",
         "doctrine/dbal": "^2.6|^3.0",
         "doctrine/orm": "^2.6.3",
-        "doctrine/doctrine-bundle": "^1.5|^2.0",
         "guzzlehttp/promises": "^1.4",
         "masterminds/html5": "^2.6",
         "monolog/monolog": "^1.25.1",

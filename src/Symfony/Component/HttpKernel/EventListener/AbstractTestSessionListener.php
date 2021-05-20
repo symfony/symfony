@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -50,12 +49,11 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         }
 
         // bootstrap the session
-        if ($event->getRequest()->hasSession()) {
-            $session = $event->getRequest()->getSession();
-        } elseif (!$session = $this->getSession()) {
+        if (!$event->getRequest()->hasSession()) {
             return;
         }
 
+        $session = $event->getRequest()->getSession();
         $cookies = $event->getRequest()->cookies;
 
         if ($cookies->has($session->getName())) {
@@ -110,11 +108,4 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
             KernelEvents::RESPONSE => ['onKernelResponse', -128],
         ];
     }
-
-    /**
-     * Gets the session object.
-     *
-     * @deprecated since Symfony 5.4, will be removed in 6.0.
-     */
-    abstract protected function getSession(): ?SessionInterface;
 }

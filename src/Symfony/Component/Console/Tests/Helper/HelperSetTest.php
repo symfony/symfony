@@ -107,12 +107,16 @@ class HelperSetTest extends TestCase
         $helperset->set($this->getGenericMockHelper('fake_helper_01', $helperset));
         $helperset->set($this->getGenericMockHelper('fake_helper_02', $helperset));
 
-        $helpers = ['fake_helper_01', 'fake_helper_02'];
-        $i = 0;
-
+        $expectedHelpers = [
+            'fake_helper_01' => true,
+            'fake_helper_02' => true,
+        ];
+        $actualHelpers = [];
         foreach ($helperset as $helper) {
-            $this->assertEquals($helpers[$i++], $helper->getName());
+            $actualHelpers[$helper->getName()] = true;
         }
+
+        $this->assertSame($expectedHelpers, $actualHelpers);
     }
 
     private function getGenericMockHelper($name, HelperSet $helperset = null)

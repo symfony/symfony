@@ -142,7 +142,11 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent = clone $this;
 
         --$parent->length;
-        $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
+        if (substr($parent->pathAsString, -1) == ']') {
+            $parent->pathAsString = substr($parent->pathAsString, 0, strrpos($parent->pathAsString, '['));
+        } else {
+            $parent->pathAsString = substr($parent->pathAsString, 0, strrpos($parent->pathAsString, '.'));
+        }
         array_pop($parent->elements);
         array_pop($parent->isIndex);
 

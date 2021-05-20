@@ -50,13 +50,14 @@ before_install:
       set -e
       stty cols 120
       cp .github/composer-config.json "$(composer config home)/config.json"
+      git config --global user.email ""
+      git config --global user.name "Symfony"
       export PHPUNIT=$(readlink -f ./phpunit)
       export PHPUNIT_X="$PHPUNIT --exclude-group tty,benchmark,intl-data"
       export COMPOSER_UP='composer update --no-progress --ansi'
       export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
-      export SYMFONY_DEPRECATIONS_HELPER=max[indirect]=170
-      export SYMFONY_FLEX_VERSIONS=$(curl -s https://flex.symfony.com/versions.json)
-      export SYMFONY_FEATURE_BRANCH=$(echo $SYMFONY_FLEX_VERSIONS | jq -r '."dev"')
+      export SYMFONY_FEATURE_BRANCH=$(curl -s https://flex.symfony.com/versions.json | jq -r '."dev-name"')
+      export SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
 
       nanoseconds () {
           local cmd="date"
@@ -181,11 +182,6 @@ install:
 
     - |
       # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
-      git config --global user.email ""
-      git config --global user.name "Symfony"
-
-      SYMFONY_VERSIONS=$(git ls-remote -q --heads);
-
       if [[ ! $deps ]]; then
           php .github/build-packages.php HEAD^ $SYMFONY_VERSION src/Symfony/Bridge/PhpUnit
       else
@@ -202,13 +198,10 @@ install:
       fi
 
     - |
-      # For the feature-branch, when deps=high, the version before it is checked out and tested with the locally patched components
-      if [[ $deps = high && $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH ]]; then
+      # For the highest branch, when deps=high, the version before it is checked out and tested with the locally patched components
+      if [[ $deps = high && $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
           export FLIP='^'
-          export SYMFONY_VERSION=$(echo $SYMFONY_FLEX_VERSIONS | jq -r '."next"')
-          if [ $SYMFONY_VERSION = $SYMFONY_FEATURE_BRANCH ]; then
-              export SYMFONY_VERSION = $(echo $SYMFONY_FLEX_VERSIONS | jq -r '."stable"')
-          fi
+          export SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//) &&
           git fetch --depth=2 origin $SYMFONY_VERSION &&
           git checkout -m FETCH_HEAD &&
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h\n' | sort)
@@ -216,7 +209,7 @@ install:
 
     - |
       # Skip the phpunit-bridge on bugfix-branches when $deps is empty
-      if [[ ! $deps && ! $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH ]]; then
+      if [[ ! $deps && $SYMFONY_VERSION != $SYMFONY_FEATURE_BRANCH ]]; then
           export COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n' | sort)
       fi
 
@@ -231,7 +224,7 @@ install:
 
     - |
       # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number as the next one
-      [[ $deps = high && ${SYMFONY_VERSION%.*} != $(echo "$SYMFONY_VERSIONS" | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1 | grep -o '[0-9]*' | head -n 1) ]] && export LEGACY=,legacy
+      [[ $deps = high && $SYMFONY_VERSION = *.4 ]] && export LEGACY=,legacy
 
       export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
       if [[ $deps ]]; then mv composer.json.phpunit composer.json; fi
@@ -268,7 +261,7 @@ install:
               (cd src/Symfony/Component/HttpFoundation; mv composer.bak composer.json)
               COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
-              if [[ $COMPONENTS && $LEGACY && ! $TRAVIS_BRANCH = $SYMFONY_FEATURE_BRANCH && $TRAVIS_PULL_REQUEST != false && $(echo "$SYMFONY_VERSIONS" | cut -f2 | grep -FA1 /$SYMFONY_VERSION | tail -n 1) = $SYMFONY_FEATURE_BRANCH ]]; then
+              if [[ $COMPONENTS && $SYMFONY_VERSION = *.4 && $TRAVIS_PULL_REQUEST != false ]]; then
                   export FLIP='^'
                   SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
                   echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"

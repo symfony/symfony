@@ -132,6 +132,17 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testOverwriteEmptySection()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('Foobar');
+
+        rewind($output->getStream());
+        $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
     public function testAddingMultipleSections()
     {
         $sections = [];

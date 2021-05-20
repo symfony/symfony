@@ -143,7 +143,7 @@ class ConsoleSectionOutput extends StreamOutput
                 // only overwrite visible portion if it differs from what is already visible
                 if ($flushableLines > 0 || substr($this->getContent(), -strlen($newVisibleContent)) !== $newVisibleContent) {
 
-                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($newVisibleLines + $flushableLines, $this->getVisibleLines($terminalHeight)));
+                    $erasedContent = $this->popStreamContentUntilCurrentSection(max($flushableLines, $this->getVisibleLines($terminalHeight)));
 
                     parent::doWrite($newVisibleContent, false);
                     parent::doWrite($erasedContent, false);

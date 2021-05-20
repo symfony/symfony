@@ -59,29 +59,6 @@ class JsonResponse extends Response
      *
      * Example:
      *
-     *     return JsonResponse::create(['key' => 'value'])
-     *         ->setSharedMaxAge(300);
-     *
-     * @param mixed $data    The JSON response data
-     * @param int   $status  The response status code
-     * @param array $headers An array of response headers
-     *
-     * @return static
-     *
-     * @deprecated since Symfony 5.1, use __construct() instead.
-     */
-    public static function create($data = null, int $status = 200, array $headers = [])
-    {
-        trigger_deprecation('symfony/http-foundation', '5.1', 'The "%s()" method is deprecated, use "new %s()" instead.', __METHOD__, static::class);
-
-        return new static($data, $status, $headers);
-    }
-
-    /**
-     * Factory method for chainability.
-     *
-     * Example:
-     *
      *     return JsonResponse::fromJsonString('{"key": "value"}')
      *         ->setSharedMaxAge(300);
      *

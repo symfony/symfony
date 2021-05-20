@@ -20,18 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseTest extends ResponseTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testCreate()
-    {
-        $response = Response::create('foo', 301, ['Foo' => 'bar']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('bar', $response->headers->get('foo'));
-    }
-
     public function testToString()
     {
         $response = new Response();

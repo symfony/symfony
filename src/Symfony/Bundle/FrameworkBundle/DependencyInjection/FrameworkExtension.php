@@ -1016,31 +1016,33 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $config['default_uri']);
         }
 
-        if (\PHP_VERSION_ID >= 80000 || $this->annotationsConfigEnabled) {
-            $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
-                ->setPublic(false)
-                ->addTag('routing.loader', ['priority' => -10])
-                ->setArguments([
-                    new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                    '%kernel.environment%',
-                ]);
-
-            $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
-                ->setPublic(false)
-                ->addTag('routing.loader', ['priority' => -10])
-                ->setArguments([
-                    new Reference('file_locator'),
-                    new Reference('routing.loader.annotation'),
-                ]);
-
-            $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
-                ->setPublic(false)
-                ->addTag('routing.loader', ['priority' => -10])
-                ->setArguments([
-                    new Reference('file_locator'),
-                    new Reference('routing.loader.annotation'),
-                ]);
+        if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
+            return;
         }
+
+        $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
+            ->setPublic(false)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->setArguments([
+                new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                '%kernel.environment%',
+            ]);
+
+        $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
+            ->setPublic(false)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->setArguments([
+                new Reference('file_locator'),
+                new Reference('routing.loader.annotation'),
+            ]);
+
+        $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
+            ->setPublic(false)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->setArguments([
+                new Reference('file_locator'),
+                new Reference('routing.loader.annotation'),
+            ]);
     }
 
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader)

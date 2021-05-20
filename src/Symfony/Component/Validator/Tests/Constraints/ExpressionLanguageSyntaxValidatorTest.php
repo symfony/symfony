@@ -65,4 +65,18 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
             ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
             ->assertRaised();
     }
+
+    public function testNullIsValid()
+    {
+        $this->validator->validate(null, new ExpressionLanguageSyntax());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validator->validate('', new ExpressionLanguageSyntax());
+
+        $this->assertNoViolation();
+    }
 }

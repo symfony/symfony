@@ -143,6 +143,28 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
+    public function testOverwriteWithFormat()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->overwrite('<info>Foobar</info>');
+
+        rewind($output->getStream());
+        $this->assertEquals('[32mFoobar[39m'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
+    public function testOverwriteWithFormatButDisabledDecoration()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, false, new OutputFormatter());
+
+        $output->overwrite('<info>Foobar</info>');
+
+        rewind($output->getStream());
+        $this->assertEquals('Foobar'.\PHP_EOL, stream_get_contents($output->getStream()));
+    }
+
     public function testAddingMultipleSections()
     {
         $sections = [];

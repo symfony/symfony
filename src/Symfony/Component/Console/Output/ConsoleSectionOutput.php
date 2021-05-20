@@ -119,6 +119,8 @@ class ConsoleSectionOutput extends StreamOutput
             $message = implode('', $message);
         }
 
+        $message = $this->getFormatter()->format($message);
+
         // make sure a non-empty message ends with a newline
         if ($message !== '' && substr($message, -1) !== PHP_EOL) {
             $message .= PHP_EOL;

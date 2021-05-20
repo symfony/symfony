@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "symfony/config": "^5.3|^6.0",
-        "symfony/http-client": "^5.3|^6.0",
-        "symfony/translation": "^5.3|^6.0"
+        "symfony/config": "^5.4|^6.0",
+        "symfony/http-client": "^5.4|^6.0",
+        "symfony/translation": "^5.4|^6.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\PoEditor\\": "" },

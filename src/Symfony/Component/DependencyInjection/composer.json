@@ -22,9 +22,9 @@
         "symfony/service-contracts": "^1.1.6|^2"
     },
     "require-dev": {
-        "symfony/yaml": "^4.4|^5.0|^6.0",
-        "symfony/config": "^5.3|^6.0",
-        "symfony/expression-language": "^4.4|^5.0|^6.0"
+        "symfony/yaml": "^5.4|^6.0",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/expression-language": "^5.4|^6.0"
     },
     "suggest": {
         "symfony/yaml": "",
@@ -35,10 +35,10 @@
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",
-        "symfony/config": "<5.3",
-        "symfony/finder": "<4.4",
-        "symfony/proxy-manager-bridge": "<4.4",
-        "symfony/yaml": "<4.4"
+        "symfony/config": "<5.4",
+        "symfony/finder": "<5.4",
+        "symfony/proxy-manager-bridge": "<5.4",
+        "symfony/yaml": "<5.4"
     },
     "provide": {
         "psr/container-implementation": "1.0",

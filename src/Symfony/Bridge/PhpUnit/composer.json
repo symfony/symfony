@@ -22,7 +22,7 @@
         "symfony/deprecation-contracts": "^2.1"
     },
     "require-dev": {
-        "symfony/error-handler": "^4.4|^5.0|^6.0"
+        "symfony/error-handler": "^5.4|^6.0"
     },
     "suggest": {
         "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"

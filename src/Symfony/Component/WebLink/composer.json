@@ -26,10 +26,10 @@
         "symfony/http-kernel": ""
     },
     "require-dev": {
-        "symfony/http-kernel": "^5.3|^6.0"
+        "symfony/http-kernel": "^5.4|^6.0"
     },
     "conflict": {
-        "symfony/http-kernel": "<5.3"
+        "symfony/http-kernel": "<5.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

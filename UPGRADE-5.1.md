@@ -101,6 +101,7 @@ Notifier
    arguments were removed.
  * [BC BREAK] The `EmailMessage::fromNotification()` and `SmsMessage::fromNotification()`
    methods' `$transport` argument was removed.
+ * Deprecate `SlackOptions::channel()`, use `SlackOptions::recipient()` instead.
 
 OptionsResolver
 ---------------

@@ -304,7 +304,7 @@ class ConsoleSectionOutput extends StreamOutput
 
     private function getDisplayHeight(string $text, int $terminalWidth): int
     {
-        return substr_count($text, PHP_EOL) + floor($this->getDisplayLength($text) / $terminalWidth);
+        return substr_count($text, PHP_EOL) + (int)floor($this->getDisplayLength($text) / $terminalWidth);
     }
 
     private function getDisplayLength(string $text): string

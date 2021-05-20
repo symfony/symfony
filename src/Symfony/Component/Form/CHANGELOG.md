@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `PropertyPathMaper`
+ * Remove `Symfony\Component\Form\Extension\Validator\Util\ServiceParams`
+ * Remove `FormPass` configuration
+ * Add `FormConfigInterface::getIsEmptyCallback()` and `FormConfigBuilderInterface::setIsEmptyCallback()`
+ * Change `$forms` parameter type of the `DataMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$forms` parameter type of the `DataMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$checkboxes` parameter type of the `CheckboxListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapDataToForms()` method from `iterable` to `\Traversable`
+ * Change `$radios` parameter type of the `RadioListMapper::mapFormsToData()` method from `iterable` to `\Traversable`
+
 5.3
 ---
 

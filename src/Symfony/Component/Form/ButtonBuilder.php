@@ -471,7 +471,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function setIsEmptyCallback(?callable $isEmptyCallback)
+    public function setIsEmptyCallback(?callable $isEmptyCallback): static
     {
         throw new BadMethodCallException('Buttons do not support "is empty" callback.');
     }

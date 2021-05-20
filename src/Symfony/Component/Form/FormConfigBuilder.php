@@ -773,7 +773,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setIsEmptyCallback(?callable $isEmptyCallback)
+    public function setIsEmptyCallback(?callable $isEmptyCallback): static
     {
         $this->isEmptyCallback = $isEmptyCallback;
 

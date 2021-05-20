@@ -38,12 +38,8 @@ class DataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($data, iterable $forms): void
+    public function mapDataToForms($data, \Traversable $forms): void
     {
-        if (\is_array($forms)) {
-            trigger_deprecation('symfony/form', '5.3', 'Passing an array as the second argument of the "%s()" method is deprecated, pass "\Traversable" instead.', __METHOD__);
-        }
-
         $empty = null === $data || [] === $data;
 
         if (!$empty && !\is_array($data) && !\is_object($data)) {
@@ -64,12 +60,8 @@ class DataMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData(iterable $forms, &$data): void
+    public function mapFormsToData(\Traversable $forms, &$data): void
     {
-        if (\is_array($forms)) {
-            trigger_deprecation('symfony/form', '5.3', 'Passing an array as the first argument of the "%s()" method is deprecated, pass "\Traversable" instead.', __METHOD__);
-        }
-
         if (null === $data) {
             return;
         }

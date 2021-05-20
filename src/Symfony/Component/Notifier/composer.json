@@ -28,6 +28,7 @@
         "symfony/http-kernel": "<5.4",
         "symfony/discord-notifier": "<5.4",
         "symfony/esendex-notifier": "<5.4",
+        "symfony/event-dispatcher": "<5.4",
         "symfony/firebase-notifier": "<5.4",
         "symfony/free-mobile-notifier": "<5.4",
         "symfony/google-chat-notifier": "<5.4",

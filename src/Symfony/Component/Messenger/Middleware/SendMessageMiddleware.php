@@ -13,8 +13,6 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
@@ -36,7 +34,7 @@ class SendMessageMiddleware implements MiddlewareInterface
     public function __construct(SendersLocatorInterface $sendersLocator, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->sendersLocator = $sendersLocator;
-        $this->eventDispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($eventDispatcher) : $eventDispatcher;
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = new NullLogger();
     }
 

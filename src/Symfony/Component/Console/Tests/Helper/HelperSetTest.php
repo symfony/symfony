@@ -48,9 +48,11 @@ class HelperSetTest extends TestCase
 
     public function testHas()
     {
-        $helperset = new HelperSet(['fake_helper_alias' => $this->getGenericMockHelper('fake_helper')]);
+        $fakeHelper = $this->getGenericMockHelper('fake_helper');
+        $helperset = new HelperSet(['fake_helper_alias' => $fakeHelper]);
         $this->assertTrue($helperset->has('fake_helper'), '->has() finds set helper');
         $this->assertTrue($helperset->has('fake_helper_alias'), '->has() finds set helper by alias');
+        $this->assertTrue($helperset->has(get_class($fakeHelper)), '->has() finds set helper by class name alias');
     }
 
     public function testGet()
@@ -60,8 +62,10 @@ class HelperSetTest extends TestCase
         $helperset = new HelperSet(['fake_helper_01_alias' => $helper_01, 'fake_helper_02_alias' => $helper_02]);
         $this->assertEquals($helper_01, $helperset->get('fake_helper_01'), '->get() returns correct helper by name');
         $this->assertEquals($helper_01, $helperset->get('fake_helper_01_alias'), '->get() returns correct helper by alias');
+        $this->assertEquals($helper_01, $helperset->get(get_class($helper_01)), '->get() returns correct helper by class name alias');
         $this->assertEquals($helper_02, $helperset->get('fake_helper_02'), '->get() returns correct helper by name');
         $this->assertEquals($helper_02, $helperset->get('fake_helper_02_alias'), '->get() returns correct helper by alias');
+        $this->assertEquals($helper_02, $helperset->get(get_class($helper_02)), '->get() returns correct helper by class name alias');
 
         $helperset = new HelperSet();
         try {

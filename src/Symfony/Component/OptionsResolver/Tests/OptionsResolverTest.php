@@ -452,7 +452,7 @@ class OptionsResolverTest extends TestCase
         $this->resolver
             ->setDefault('bar', 'baz')
             ->setDefault('foo', function (Options $options) {
-                $options->setDeprecated('bar');
+                $options->setDeprecated('bar', 'vendor/package', '1.1');
             })
             ->resolve()
         ;
@@ -461,7 +461,7 @@ class OptionsResolverTest extends TestCase
     public function testSetDeprecatedFailsIfUnknownOption()
     {
         $this->expectException(UndefinedOptionsException::class);
-        $this->resolver->setDeprecated('foo');
+        $this->resolver->setDeprecated('foo', 'vendor/package', '1.1');
     }
 
     public function testSetDeprecatedFailsIfInvalidDeprecationMessageType()
@@ -2490,19 +2490,6 @@ class OptionsResolverTest extends TestCase
         ;
 
         $this->resolver->resolve(['expires' => new \DateTime('-1 hour')]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/options-resolver 5.1: The signature of method "Symfony\Component\OptionsResolver\OptionsResolver::setDeprecated()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.');
-
-        $this->resolver
-            ->setDefined('foo')
-            ->setDeprecated('foo')
-        ;
     }
 
     public function testInvalidValueForPrototypeDefinition()

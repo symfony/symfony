@@ -449,7 +449,7 @@ class OptionsResolver implements Options
      * @param string          $version The version of the package that introduced the deprecation
      * @param string|\Closure $message The deprecation message to use
      */
-    public function setDeprecated(string $option/*, string $package, string $version, $message = 'The option "%name%" is deprecated.' */): self
+    public function setDeprecated(string $option, string $package, string $version, $message = 'The option "%name%" is deprecated.'): self
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be deprecated from a lazy option or normalizer.');
@@ -457,19 +457,6 @@ class OptionsResolver implements Options
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf('The option "%s" does not exist, defined options are: "%s".', $this->formatOptions([$option]), implode('", "', array_keys($this->defined))));
-        }
-
-        $args = \func_get_args();
-
-        if (\func_num_args() < 3) {
-            trigger_deprecation('symfony/options-resolver', '5.1', 'The signature of method "%s()" requires 2 new arguments: "string $package, string $version", not defining them is deprecated.', __METHOD__);
-
-            $message = $args[1] ?? 'The option "%name%" is deprecated.';
-            $package = $version = '';
-        } else {
-            $package = $args[1];
-            $version = $args[2];
-            $message = $args[3] ?? 'The option "%name%" is deprecated.';
         }
 
         if (!\is_string($message) && !$message instanceof \Closure) {

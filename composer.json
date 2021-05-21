@@ -76,7 +76,6 @@
         "symfony/http-client": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
-        "symfony/inflector": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
         "symfony/lock": "self.version",

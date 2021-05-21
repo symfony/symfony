@@ -42,7 +42,7 @@ class InputOption
     public const VALUE_IS_ARRAY = 8;
 
     /**
-     * The option accepts multiple values (e.g. --dir=/foo --dir=/bar).
+     * The option may have either positive or negative value (e.g. --ansi or --no-ansi).
      */
     public const VALUE_NEGATABLE = 16;
 

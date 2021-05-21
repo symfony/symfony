@@ -121,7 +121,7 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
             return false;
         }
 
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 

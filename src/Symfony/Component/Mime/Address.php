@@ -127,22 +127,4 @@ final class Address
 
         return $addrs;
     }
-
-    /**
-     * @deprecated since Symfony 5.2, use "create()" instead.
-     */
-    public static function fromString(string $string): self
-    {
-        trigger_deprecation('symfony/mime', '5.2', '"%s()" is deprecated, use "%s::create()" instead.', __METHOD__, __CLASS__);
-
-        if (false === strpos($string, '<')) {
-            return new self($string, '');
-        }
-
-        if (!preg_match(self::FROM_STRING_PATTERN, $string, $matches)) {
-            throw new InvalidArgumentException(sprintf('Could not parse "%s" to a "%s" instance.', $string, self::class));
-        }
-
-        return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
-    }
 }

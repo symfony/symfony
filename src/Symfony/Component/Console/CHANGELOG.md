@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Removed `Helper::strlen`. Use `Helper::width()` or `Helper::length()` instead
+ * Removed `Helper::strlenWithoutDecoration`. Use `Helper::removeDecoration()` instead
+
 5.3
 ---
 

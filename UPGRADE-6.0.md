@@ -116,6 +116,12 @@ Inflector
 
  * The component has been removed, use `EnglishInflector` from the String component instead.
 
+Intl
+----------
+
+ * Removed `DateFormatter` namespace, use symfony/polyfill-intl-icu ^1.21 instead
+ * Removed `Collator`, `NumberFormatter`, `Locale`, `IntlGlobals`, `MethodArgumentNotImplementedException`, `MethodArgumentValueNotImplementedException`, `MethodNotImplementedException`and `NotImplementedException` classes, use symfony/polyfill-intl-icu ^1.21 instead
+
 Lock
 ----
 

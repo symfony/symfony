@@ -63,6 +63,12 @@ HttpKernel
  * Deprecate `HttpKernelInterface::MASTER_REQUEST` and add `HttpKernelInterface::MAIN_REQUEST` as replacement
  * Deprecate `KernelEvent::isMasterRequest()` and add `isMainRequest()` as replacement
 
+Intl
+----------
+
+ * Deprecate `DateFormatter` namespace, use symfony/polyfill-intl-icu ^1.21 instead
+ * Deprecate `Collator`, `NumberFormatter`, `Locale`, `IntlGlobals`, `MethodArgumentNotImplementedException`, `MethodArgumentValueNotImplementedException`, `MethodNotImplementedException`and `NotImplementedException` classes, use symfony/polyfill-intl-icu ^1.21 instead
+
 Messenger
 ---------
 

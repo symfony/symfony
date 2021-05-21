@@ -172,9 +172,6 @@
         "files": [
             "src/Symfony/Component/String/Resources/functions.php"
         ],
-        "classmap": [
-            "src/Symfony/Component/Intl/Resources/stubs"
-        ],
         "exclude-from-classmap": [
             "**/Tests/"
         ]

@@ -16,6 +16,7 @@ use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
+use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Provider\Dsn;
@@ -32,6 +33,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             CrowdinProviderFactory::class => false,
             LocoProviderFactory::class => false,
             LokaliseProviderFactory::class => false,
+            PhraseProviderFactory::class => false,
             PoEditorProviderFactory::class => false,
         ]);
     }
@@ -54,6 +56,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['crowdin', 'symfony/crowdin-translation-provider'];
         yield ['loco', 'symfony/loco-translation-provider'];
         yield ['lokalise', 'symfony/lokalise-translation-provider'];
+        yield ['phrase', 'symfony/phrase-translation-provider'];
         yield ['poeditor', 'symfony/po-editor-translation-provider'];
     }
 

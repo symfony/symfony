@@ -86,53 +86,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      *
-     * @param int                                 $magicMethods       A bitwise combination of the MAGIC_* constants
-     *                                                                to specify the allowed magic methods (__get, __set, __call)
-     *                                                                or self::DISALLOW_MAGIC_METHODS for none
-     * @param int                                 $throw              A bitwise combination of the THROW_* constants
-     *                                                                to specify when exceptions should be thrown
-     * @param PropertyReadInfoExtractorInterface  $readInfoExtractor
-     * @param PropertyWriteInfoExtractorInterface $writeInfoExtractor
+     * @param int $magicMethods A bitwise combination of the MAGIC_* constants
+     *                          to specify the allowed magic methods (__get, __set, __call)
+     *                          or self::DISALLOW_MAGIC_METHODS for none
+     * @param int $throw        A bitwise combination of the THROW_* constants
+     *                          to specify when exceptions should be thrown
      */
-    public function __construct(/*int */$magicMethods = self::MAGIC_GET | self::MAGIC_SET, /*int */$throw = self::THROW_ON_INVALID_PROPERTY_PATH, CacheItemPoolInterface $cacheItemPool = null, /*PropertyReadInfoExtractorInterface */$readInfoExtractor = null, /*PropertyWriteInfoExtractorInterface */$writeInfoExtractor = null)
+    public function __construct(int $magicMethods = self::MAGIC_GET | self::MAGIC_SET, int $throw = self::THROW_ON_INVALID_PROPERTY_PATH, CacheItemPoolInterface $cacheItemPool = null, PropertyReadInfoExtractorInterface $readInfoExtractor = null, PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
-        if (\is_bool($magicMethods)) {
-            trigger_deprecation('symfony/property-access', '5.2', 'Passing a boolean as the first argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);
-
-            $magicMethods = ($magicMethods ? self::MAGIC_CALL : 0) | self::MAGIC_GET | self::MAGIC_SET;
-        } elseif (!\is_int($magicMethods)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an integer, "%s" given.', __METHOD__, get_debug_type($readInfoExtractor)));
-        }
-
-        if (\is_bool($throw)) {
-            trigger_deprecation('symfony/property-access', '5.3', 'Passing a boolean as the second argument to "%s()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).', __METHOD__);
-
-            $throw = $throw ? self::THROW_ON_INVALID_INDEX : self::DO_NOT_THROW;
-
-            if (!\is_bool($readInfoExtractor)) {
-                $throw |= self::THROW_ON_INVALID_PROPERTY_PATH;
-            }
-        }
-
-        if (\is_bool($readInfoExtractor)) {
-            trigger_deprecation('symfony/property-access', '5.3', 'Passing a boolean as the fourth argument to "%s()" is deprecated. Pass a combination of bitwise flags as the second argument instead (i.e an integer).', __METHOD__);
-
-            if ($readInfoExtractor) {
-                $throw |= self::THROW_ON_INVALID_PROPERTY_PATH;
-            }
-
-            $readInfoExtractor = $writeInfoExtractor;
-            $writeInfoExtractor = 4 < \func_num_args() ? func_get_arg(4) : null;
-        }
-
-        if (null !== $readInfoExtractor && !$readInfoExtractor instanceof PropertyReadInfoExtractorInterface) {
-            throw new \TypeError(sprintf('Argument 4 passed to "%s()" must be null or an instance of "%s", "%s" given.', __METHOD__, PropertyReadInfoExtractorInterface::class, get_debug_type($readInfoExtractor)));
-        }
-
-        if (null !== $writeInfoExtractor && !$writeInfoExtractor instanceof PropertyWriteInfoExtractorInterface) {
-            throw new \TypeError(sprintf('Argument 5 passed to "%s()" must be null or an instance of "%s", "%s" given.', __METHOD__, PropertyWriteInfoExtractorInterface::class, get_debug_type($writeInfoExtractor)));
-        }
-
         $this->magicMethodsFlags = $magicMethods;
         $this->ignoreInvalidIndices = 0 === ($throw & self::THROW_ON_INVALID_INDEX);
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value

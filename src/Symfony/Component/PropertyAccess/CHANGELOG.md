@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * make `PropertyAccessor::__construct()` accept a combination of bitwise flags as first and second arguments
+
 5.3.0
 -----
 

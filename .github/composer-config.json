@@ -1,0 +1,8 @@
+{
+    "config": {
+        "platform-check": false,
+        "preferred-install": {
+            "*": "dist"
+        }
+    }
+}

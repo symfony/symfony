@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * The `security.authorization_checker` and `security.token_storage` services are now private
+
 5.3
 ---
 

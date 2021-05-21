@@ -173,4 +173,3 @@ Security
  * Deprecated the `AbstractRememberMeServices::$providerKey` property in favor of
    `AbstractRememberMeServices::$firewallName`, the old property will be removed
    in 6.0.
-

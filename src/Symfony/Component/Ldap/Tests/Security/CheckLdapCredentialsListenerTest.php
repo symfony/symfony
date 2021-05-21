@@ -138,6 +138,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password is invalid.');
 
+        $this->ldap->method('escape')->willReturnArgument(0);
         $this->ldap->expects($this->any())->method('bind')->willThrowException(new ConnectionException());
 
         $listener = $this->createListener();
@@ -178,6 +179,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
             ->withConsecutive(
                 ['elsa', 'test1234A$']
             );
+        $this->ldap->method('escape')->willReturnArgument(0);
         $this->ldap->expects($this->once())->method('query')->willReturn($query);
 
         $listener = $this->createListener();

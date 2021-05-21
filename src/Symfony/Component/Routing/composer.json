@@ -16,8 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0.2",
-        "symfony/deprecation-contracts": "^2.1"
+        "php": ">=8.0.2"
     },
     "require-dev": {
         "symfony/config": "^5.4|^6.0",

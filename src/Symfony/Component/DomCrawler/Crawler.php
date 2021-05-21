@@ -494,20 +494,6 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Returns the parent nodes of the current selection.
-     *
-     * @return static
-     *
-     * @throws \InvalidArgumentException When current node is empty
-     */
-    public function parents()
-    {
-        trigger_deprecation('symfony/dom-crawler', '5.3', 'The %s() method is deprecated, use ancestors() instead.', __METHOD__);
-
-        return $this->ancestors();
-    }
-
-    /**
      * Returns the ancestors of the current selection.
      *
      * @return static

@@ -356,7 +356,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $this->record($request, 'fresh');
 
-        $entry->headers->set('Age', $entry->getAge());
+        $entry->headers->remove('Age');
+        $entry->headers->remove('Date');
 
         return $entry;
     }

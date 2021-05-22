@@ -29,6 +29,7 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -188,6 +189,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('texter.transport_factory')
 
         ->set('notifier.transport_factory.messagebird', MessageBirdTransportFactory::class)
+            ->parent('notifier.transport_factory.abstract')
+            ->tag('texter.transport_factory')
+
+        ->set('notifier.transport_factory.messagemedia', MessageMediaTransportFactory::class)
             ->parent('notifier.transport_factory.abstract')
             ->tag('texter.transport_factory')
 

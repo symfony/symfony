@@ -31,6 +31,7 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -77,6 +78,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             MattermostTransportFactory::class => false,
             MercureTransportFactory::class => false,
             MessageBirdTransportFactory::class => false,
+            MessageMediaTransportFactory::class => false,
             MicrosoftTeamsTransportFactory::class => false,
             MobytTransportFactory::class => false,
             NexmoTransportFactory::class => false,
@@ -129,6 +131,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['mattermost', 'symfony/mattermost-notifier'];
         yield ['mercure', 'symfony/mercure-notifier'];
         yield ['messagebird', 'symfony/message-bird-notifier'];
+        yield ['messagemedia', 'symfony/message-media-notifier'];
         yield ['microsoftteams', 'symfony/microsoft-teams-notifier'];
         yield ['mobyt', 'symfony/mobyt-notifier'];
         yield ['nexmo', 'symfony/nexmo-notifier'];

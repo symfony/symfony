@@ -24,6 +24,7 @@ use Symfony\Component\Notifier\Bridge\Iqsms\IqsmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\LightSms\LightSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransportFactory;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransport;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -69,6 +70,7 @@ class Transport
         LightSmsTransportFactory::class,
         MattermostTransportFactory::class,
         MessageBirdTransportFactory::class,
+        MessageMediaTransportFactory::class,
         MicrosoftTeamsTransport::class,
         MobytTransportFactory::class,
         NexmoTransportFactory::class,

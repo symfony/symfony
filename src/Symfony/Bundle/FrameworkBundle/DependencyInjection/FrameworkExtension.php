@@ -127,6 +127,7 @@ use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mattermost\MattermostTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mercure\MercureTransportFactory;
 use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdTransport;
+use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransportFactory;
 use Symfony\Component\Notifier\Bridge\MicrosoftTeams\MicrosoftTeamsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Mobyt\MobytTransportFactory;
 use Symfony\Component\Notifier\Bridge\Nexmo\NexmoTransportFactory;
@@ -2431,6 +2432,7 @@ class FrameworkExtension extends Extension
             MattermostTransportFactory::class => 'notifier.transport_factory.mattermost',
             MercureTransportFactory::class => 'notifier.transport_factory.mercure',
             MessageBirdTransport::class => 'notifier.transport_factory.messagebird',
+            MessageMediaTransportFactory::class => 'notifier.transport_factory.messagemedia',
             MicrosoftTeamsTransportFactory::class => 'notifier.transport_factory.microsoftteams',
             MobytTransportFactory::class => 'notifier.transport_factory.mobyt',
             NexmoTransportFactory::class => 'notifier.transport_factory.nexmo',
@@ -2460,6 +2462,7 @@ class FrameworkExtension extends Extension
                 case 'lightsms': $package = 'light-sms'; break;
                 case 'linkedin': $package = 'linked-in'; break;
                 case 'messagebird': $package = 'message-bird'; break;
+                case 'messagemedia': $package = 'message-media'; break;
                 case 'microsoftteams': $package = 'microsoft-teams'; break;
                 case 'ovhcloud': $package = 'ovh-cloud'; break;
                 case 'rocketchat': $package = 'rocket-chat'; break;

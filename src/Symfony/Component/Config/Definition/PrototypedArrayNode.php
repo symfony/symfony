@@ -225,11 +225,11 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $isAssoc = array_keys($value) !== range(0, \count($value) - 1);
+        $isList = array_is_list($value);
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
-                if (!isset($v[$this->keyAttribute]) && \is_int($k) && !$isAssoc) {
+                if (!isset($v[$this->keyAttribute]) && \is_int($k) && $isList) {
                     $ex = new InvalidConfigurationException(sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
                     $ex->setPath($this->getPath());
 
@@ -271,7 +271,7 @@ class PrototypedArrayNode extends ArrayNode
             }
 
             $prototype = $this->getPrototypeForChild($k);
-            if (null !== $this->keyAttribute || $isAssoc) {
+            if (null !== $this->keyAttribute || !$isList) {
                 $normalized[$k] = $prototype->normalize($v);
             } else {
                 $normalized[] = $prototype->normalize($v);
@@ -304,9 +304,10 @@ class PrototypedArrayNode extends ArrayNode
             return $rightSide;
         }
 
+        $isList = array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
-            // prototype, and key is irrelevant, append the element
-            if (null === $this->keyAttribute) {
+            // prototype, and key is irrelevant there are no named keys, append the element
+            if (null === $this->keyAttribute && $isList) {
                 $leftSide[] = $v;
                 continue;
             }

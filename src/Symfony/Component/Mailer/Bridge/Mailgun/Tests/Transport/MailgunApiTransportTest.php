@@ -214,6 +214,7 @@ class MailgunApiTransportTest extends TestCase
         $json = json_encode(['foo' => 'bar']);
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:X-Mailgun-Variables', $json);
+        $email->getHeaders()->addTextHeader('Custom-Header', 'value');
         $email->getHeaders()->add(new TagHeader('password-reset'));
         $email->getHeaders()->add(new MetadataHeader('Color', 'blue'));
         $email->getHeaders()->add(new MetadataHeader('Client-ID', '12345'));
@@ -223,9 +224,10 @@ class MailgunApiTransportTest extends TestCase
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $method->setAccessible(true);
         $payload = $method->invoke($transport, $email, $envelope);
-
         $this->assertArrayHasKey('h:x-mailgun-variables', $payload);
         $this->assertEquals($json, $payload['h:x-mailgun-variables']);
+        $this->assertArrayHasKey('h:custom-header', $payload);
+        $this->assertEquals('value', $payload['h:custom-header']);
         $this->assertArrayHasKey('o:tag', $payload);
         $this->assertSame('password-reset', $payload['o:tag']);
         $this->assertArrayHasKey('v:Color', $payload);

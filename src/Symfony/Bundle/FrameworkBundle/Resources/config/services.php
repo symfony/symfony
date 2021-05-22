@@ -34,6 +34,7 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
 use Symfony\Component\HttpKernel\HttpCache\Store;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -104,6 +105,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 param('kernel.cache_dir').'/http_cache',
             ])
+        ->alias(StoreInterface::class, 'http_cache.store')
 
         ->set('url_helper', UrlHelper::class)
             ->args([

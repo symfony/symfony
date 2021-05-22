@@ -338,4 +338,56 @@ class PrototypedArrayNodeTest extends TestCase
            ],
         ];
     }
+
+    /**
+     * @dataProvider getPrototypedArrayNodeDataToMerge
+     */
+    public function testPrototypedArrayNodeMerge($left, $right, $expected)
+    {
+        $node = new PrototypedArrayNode('options');
+        $node->setNormalizeKeys(false);
+        $node->setPrototype(new VariableNode('value'));
+        $node->setDefaultValue([]);
+
+        $result = $node->merge($left, $right);
+
+        self::assertSame($result, $expected);
+    }
+
+    public function getPrototypedArrayNodeDataToMerge()
+    {
+        return [
+            // data to merged is a plain array
+            [
+                ['foo', 'bar'],
+                ['foo', 'baz', 'qux'],
+                ['foo', 'bar', 'foo', 'baz', 'qux'],
+            ],
+            // data to be merged is an associative array
+            [
+                ['option1' => true, 'option2' => 'foo'],
+                [
+                    'option2' => 'bar',
+                    'option3' => 42,
+                    'option4' => [
+                        'option41' => 'baz',
+                        'option42' => [
+                            'option423' => 'qux',
+                        ],
+                    ],
+                ],
+                [
+                    'option1' => true,
+                    'option2' => 'bar',
+                    'option3' => 42,
+                    'option4' => [
+                        'option41' => 'baz',
+                        'option42' => [
+                            'option423' => 'qux',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

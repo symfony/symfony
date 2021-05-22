@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add autowiring alias for `HttpCache\StoreInterface`
+
 5.3
 ---
 

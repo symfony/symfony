@@ -103,6 +103,23 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
+    public function testTypeIsMovedToAttribute()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json'], 'type' => 'event.microservice.dummy.created'];
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->createMock(Connection::class);
+        unset($encoded['headers']['Content-Type']);
+        $stamp = new AmqpStamp(null, \AMQP_NOPARAM, ['content_type' => 'application/json', 'type' => 'event.microservice.dummy.created']);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
     public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
     {
         $this->expectException(TransportException::class);

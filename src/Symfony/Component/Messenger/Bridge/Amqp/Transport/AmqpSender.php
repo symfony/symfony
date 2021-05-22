@@ -48,13 +48,22 @@ class AmqpSender implements SenderInterface
 
         /** @var AmqpStamp|null $amqpStamp */
         $amqpStamp = $envelope->last(AmqpStamp::class);
+        $attributes = [];
         if (isset($encodedMessage['headers']['Content-Type'])) {
             $contentType = $encodedMessage['headers']['Content-Type'];
             unset($encodedMessage['headers']['Content-Type']);
 
             if (!$amqpStamp || !isset($amqpStamp->getAttributes()['content_type'])) {
-                $amqpStamp = AmqpStamp::createWithAttributes(['content_type' => $contentType], $amqpStamp);
+                $attributes['content_type'] = $contentType;
             }
+        }
+
+        if (isset($encodedMessage['type'])) {
+            $attributes['type'] = $encodedMessage['type'];
+        }
+
+        if (!empty($attributes)) {
+            $amqpStamp = AmqpStamp::createWithAttributes($attributes, $amqpStamp);
         }
 
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);

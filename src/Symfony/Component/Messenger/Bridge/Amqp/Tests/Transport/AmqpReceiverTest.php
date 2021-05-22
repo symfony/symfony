@@ -78,6 +78,7 @@ class AmqpReceiverTest extends TestCase
     {
         $envelope = $this->createMock(\AMQPEnvelope::class);
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getType')->willReturn('event.microservice.dummy.created');
         $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
         ]);

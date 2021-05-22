@@ -74,17 +74,16 @@ class RouteTest extends TestCase
      * @requires PHP 8
      * @dataProvider getValidParameters
      */
-    public function testRouteParameters(string $methodName, string $getter, $expectedReturn)
+    public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)
     {
         $route = $this->getMethodAnnotation($methodName, true);
         $this->assertEquals($route->$getter(), $expectedReturn);
     }
 
     /**
-     * @group legacy
      * @dataProvider getValidParameters
      */
-    public function testLegacyRouteParameters(string $methodName, string $getter, $expectedReturn)
+    public function testLoadFromDoctrineAnnotation(string $methodName, string $getter, $expectedReturn)
     {
         $route = $this->getMethodAnnotation($methodName, false);
         $this->assertEquals($route->$getter(), $expectedReturn);

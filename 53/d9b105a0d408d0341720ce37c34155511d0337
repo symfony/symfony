@@ -1,0 +1,142 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-01-14T22:05:49Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.x branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by svityashchuk at 2021-01-15T09:49:05Z
+
+Test added
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-15T10:09:08Z
+
+looks like the failed tests is related to your change
+
+---------------------------------------------------------------------------
+
+by svityashchuk at 2021-01-15T11:05:09Z
+
+Yes, it was. Now, I've changed the argument `$name` value of method `ArrayNodeDefinition::useAttributeAsKey` to `'option'`. Because in fixture config `messenger_transports.php` there was a piece:
+```
+'options' => ['queue' => ['name' => 'Queue']],
+```
+for which `'name' => 'Queue'` was considered as key for option, and therefore, rewritten the original key `'queue'` with `'Queue'`. Now that problem solved.
+
+P.S. I'm not sure about that, but is that a normal behaviour that original key replaced when `attributeAsKey` is set and original key is present in config simultaneously. Should I create another one issue?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-01-15T11:17:15Z
+
+Indeed, the attributeAsKey should not be an expected subkey of the array.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-01-15T14:49:59Z
+
+![CleanShot 2021-01-15 at 15 49 24](https://user-images.githubusercontent.com/995707/104741265-43673b00-5749-11eb-8e5a-0f8a19293f7b.png)
+
+It looks like your committer email is not associated with your Github account 🤔
+
+---------------------------------------------------------------------------
+
+by svityashchuk at 2021-01-15T15:30:41Z
+
+@OskarStark yes, thanks for pointing. Did it in different environment, but now fixed it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-18T08:41:37Z
+
+@svityashchuk If you change your example to something like this, you will experience the same behavior:
+
+```php
+'options' => [
+    'auto_setup' => true,
+    'queue' => [
+        'name' => 'Queue',
+        'option' => 'foo',
+    ],
+],
+```
+
+---------------------------------------------------------------------------
+
+by svityashchuk at 2021-01-19T22:07:04Z
+
+@xabbuh thank you for providing an example. I've got that behaviour. So, in the circumstances I see the only possibility to use another keyword as keyAttribute. Otherwise, I won't be able to pass this check at `\Symfony\Component\Config\Definition\PrototypedArrayNode::mergeValues`:
+
+```php
+foreach ($rightSide as $k => $v) {
+    // prototype, and key is irrelevant, append the element
+    if (null === $this->keyAttribute) {
+        $leftSide[] = $v;
+        continue;
+    }
+```
+
+Moreover, now it seems for me like this condition `null === $this->keyAttribute` is not enough to decide to append value as plain array item (I mean, not an associative array element). Therefore, I think we need to add an additional condition, like it is done in `\Symfony\Component\Config\Definition\PrototypedArrayNode::normalizeValue`. There we can see the next lines:
+```php
+protected function normalizeValue($value)
+{
+//...
+$isAssoc = array_keys($value) !== range(0, \count($value) - 1);
+//...
+foreach ($value as $k => $v) {
+    //...
+    if (null !== $this->keyAttribute || $isAssoc) {
+        $normalized[$k] = $prototype->normalize($v);
+    } else {
+        $normalized[] = $prototype->normalize($v);
+    }
+```
+
+Pay attention that `$isAssoc` variable affects the way normalized value is added to resulting `$normalized` array.
+If you wouldn't mind, I will provide corresponding changes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-01-20T08:26:11Z
+
+This sounds like a solution that could work. Let's give that a try. For `5.x` I have pending changes locally that allow to configure list and map nodes explicitly which would allow an easier solution. But that's of course not something we can use here for the bugfix.
+
+---------------------------------------------------------------------------
+
+by svityashchuk at 2021-01-27T23:24:14Z
+
+Now it seems like everything is ok :)
+Thanks to my colleague I realized that I had written test in different bundle. Therefore, on Travis CI check it was impossible to test changes that I had provided. So I've removed that test and wrote another one in relevant directory.
+
+I would be very happy if this is merged.
+@xabbuh could you please take a look at it?
+
+---------------------------------------------------------------------------
+
+by Sscorpion9991 at 2021-04-20T12:04:08Z
+
+Hi! Is this PR going to be merged? I have the same issue.

@@ -29,33 +29,16 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AddConsoleCommandPass implements CompilerPassInterface
 {
-    private $commandLoaderServiceId;
-    private $commandTag;
-    private $noPreloadTag;
-    private $privateTagName;
-
-    public function __construct(string $commandLoaderServiceId = 'console.command_loader', string $commandTag = 'console.command', string $noPreloadTag = 'container.no_preload', string $privateTagName = 'container.private')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/console', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->commandLoaderServiceId = $commandLoaderServiceId;
-        $this->commandTag = $commandTag;
-        $this->noPreloadTag = $noPreloadTag;
-        $this->privateTagName = $privateTagName;
-    }
-
     public function process(ContainerBuilder $container)
     {
-        $commandServices = $container->findTaggedServiceIds($this->commandTag, true);
+        $commandServices = $container->findTaggedServiceIds('console.command', true);
         $lazyCommandMap = [];
         $lazyCommandRefs = [];
         $serviceIds = [];
 
         foreach ($commandServices as $id => $tags) {
             $definition = $container->getDefinition($id);
-            $definition->addTag($this->noPreloadTag);
+            $definition->addTag('container.no_preload');
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
 
             if (isset($tags[0]['command'])) {
@@ -65,7 +48,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                     throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
                 }
                 if (!$r->isSubclassOf(Command::class)) {
-                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
+                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, 'console.command', Command::class));
                 }
                 $aliases = $class::getDefaultName();
             }
@@ -78,7 +61,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             }
 
             if (null === $commandName) {
-                if (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag($this->privateTagName)) {
+                if (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag('container.private')) {
                     $commandId = 'console.command.public_alias.'.$id;
                     $container->setAlias($commandId, $id)->setPublic(true);
                     $id = $commandId;
@@ -122,7 +105,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
                     throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
                 }
                 if (!$r->isSubclassOf(Command::class)) {
-                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, $this->commandTag, Command::class));
+                    throw new InvalidArgumentException(sprintf('The service "%s" tagged "%s" must be a subclass of "%s".', $id, 'console.command', Command::class));
                 }
                 $description = $class::getDefaultDescription();
             }
@@ -138,9 +121,9 @@ class AddConsoleCommandPass implements CompilerPassInterface
         }
 
         $container
-            ->register($this->commandLoaderServiceId, ContainerCommandLoader::class)
+            ->register('console.command_loader', ContainerCommandLoader::class)
             ->setPublic(true)
-            ->addTag($this->noPreloadTag)
+            ->addTag('container.no_preload')
             ->setArguments([ServiceLocatorTagPass::register($container, $lazyCommandRefs), $lazyCommandMap]);
 
         $container->setParameter('console.command.ids', $serviceIds);

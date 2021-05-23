@@ -21,7 +21,7 @@ class DescriptorCommand3 extends Command
             ->setName('descriptor:command3')
             ->setDescription('command 3 description')
             ->setHelp('command 3 help')
-            ->setHidden(true)
+            ->setHidden()
         ;
     }
 }

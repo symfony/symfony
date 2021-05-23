@@ -96,7 +96,7 @@ class CommandTest extends TestCase
     public function testSetHidden()
     {
         $command = new \TestCommand();
-        $command->setHidden(true);
+        $command->setHidden();
         $this->assertTrue($command->isHidden());
     }
 

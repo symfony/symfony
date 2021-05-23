@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * `Command::setHidden()` has a default value (`true`) for `$hidden` parameter and is final
+ * Remove `Helper::strlen()`, use `Helper::width()` instead
+ * Remove `Helper::strlenWithoutDecoration()`, use `Helper::removeDecoration()` instead
+ * `AddConsoleCommandPass` can not be configured anymore
+
 5.3
 ---
 

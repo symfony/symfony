@@ -495,13 +495,10 @@ class Command
 
     /**
      * @param bool $hidden Whether or not the command should be hidden from the list of commands
-     *                     The default value will be true in Symfony 6.0
      *
      * @return Command The current instance
-     *
-     * @final since Symfony 5.1
      */
-    public function setHidden(bool $hidden /*= true*/)
+    final public function setHidden(bool $hidden = true): static
     {
         $this->hidden = $hidden;
 

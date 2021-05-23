@@ -170,21 +170,8 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return $this
      */
-    public function setDeprecated(/* string $package, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.' */)
+    public function setDeprecated(string $package, string $version, string $message = 'The child node "%node%" at path "%path%" is deprecated.')
     {
-        $args = \func_get_args();
-
-        if (\func_num_args() < 2) {
-            trigger_deprecation('symfony/config', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
-
-            $message = $args[0] ?? 'The child node "%node%" at path "%path%" is deprecated.';
-            $package = $version = '';
-        } else {
-            $package = (string) $args[0];
-            $version = (string) $args[1];
-            $message = (string) ($args[2] ?? 'The child node "%node%" at path "%path%" is deprecated.');
-        }
-
         $this->deprecation = [
             'package' => $package,
             'version' => $version,

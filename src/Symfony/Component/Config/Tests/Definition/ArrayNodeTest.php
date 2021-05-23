@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
@@ -20,8 +19,6 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
         $this->expectException(InvalidTypeException::class);
@@ -261,37 +258,6 @@ class ArrayNodeTest extends TestCase
         $node->finalize(['foo' => []]);
         restore_error_handler();
         $this->assertTrue($deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testUnDeprecateANode()
-    {
-        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-        $this->expectDeprecation('Since symfony/config 5.1: Passing a null message to un-deprecate a node is deprecated.');
-
-        $node = new ArrayNode('foo');
-        $node->setDeprecated('"%node%" is deprecated');
-        $node->setDeprecated(null);
-
-        $this->assertFalse($node->isDeprecated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetDeprecatedWithoutPackageAndVersion()
-    {
-        $this->expectDeprecation('Since symfony/config 5.1: The signature of method "Symfony\Component\Config\Definition\BaseNode::setDeprecated()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.');
-
-        $node = new ArrayNode('foo');
-        $node->setDeprecated('"%node%" is deprecated');
-
-        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
-        $this->assertSame('"foo" is deprecated', $deprecation['message']);
-        $this->assertSame('', $deprecation['package']);
-        $this->assertSame('', $deprecation['version']);
     }
 
     /**

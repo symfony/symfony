@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-19T21:25:00Z
+
+Some Tests in `ReflectionCasterTest` and `CliDumperTest` are failing: https://travis-ci.com/github/symfony/symfony/jobs/506482134#L9345
+
+I believe this happens because of accidentally deleted trailing spaces again.

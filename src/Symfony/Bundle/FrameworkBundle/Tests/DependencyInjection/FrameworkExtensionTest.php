@@ -1874,13 +1874,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('texter'));
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testIfNotifierTransportsAreKnownByFrameworkExtension()
     {
         $container = $this->createContainerFromFile('notifier');
 
         foreach ((new Finder())->in(\dirname(__DIR__, 4).'/Component/Notifier/Bridge')->directories()->depth(0)->exclude('Mercure') as $bridgeDirectory) {
             $transportFactoryName = strtolower($bridgeDirectory->getFilename());
-            $this->assertTrue($container->hasDefinition('notifier.transport_factory.'.$transportFactoryName), sprintf('Did you forget to add the TransportFactory: "%s" to the $classToServices array in the FrameworkBundleExtension?', $bridgeDirectory->getFilename()));
+            if (!$container->hasDefinition('notifier.transport_factory.'.$transportFactoryName)) {
+                $this->addWarning(sprintf('The TransportFactory service "%s" is missing. Please don\'t forget to add the TransportFactory: "%s" to the $classToServices array in the FrameworkBundleExtension.', 'notifier.transport_factory.'.$transportFactoryName, $bridgeDirectory->getFilename()));
+            }
         }
     }
 

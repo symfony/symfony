@@ -158,6 +158,11 @@ Security
    in `PreAuthenticatedToken`, `RememberMeToken`, `SwitchUserToken`, `UsernamePasswordToken`,
    `DefaultAuthenticationSuccessHandler`.
  * Removed the `AbstractRememberMeServices::$providerKey` property in favor of `AbstractRememberMeServices::$firewallName`
+ * Authentication tokens do not implement the deprecated `Serializable`
+   interface anymore. The consequence is that tokens that were serialized (e.g.
+   into the session) with PHP 7.3 or below cannot be unserialized anymore. It is
+   recommended to roll out a Symfony 5 application with PHP 7.4 or later first
+   before upgrading it to Symfony 6.
 
 TwigBundle
 ----------

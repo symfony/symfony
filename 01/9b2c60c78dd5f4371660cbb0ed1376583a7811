@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-22T09:42:54Z
+
+I think you misunderstand.
+
+In 5.0, all headers was prefixed with `h:`. That made it not possible to use other valid prefixes. So we should remove the automatic prefixing and tell the user that if they want header `h: foobar` they have to add header `h: foobar`. Just adding `foobar` should not be enough.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-05-22T09:53:58Z
+
+I think the issue is, that make the bridge incompatible with all other bridges because headers have to be formatted in a `Mailgun` way.
+
+What's if I implement a `FallBackTransport` that use Mailgun and then fallback to Amazon in case or error or whatever? The original email can't have a header compatible with both formats.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2021-05-22T11:54:13Z
+
+> Hm.. I was convinced that the `h:` was for arbitrary headers. But I see from [the docs](https://documentation.mailgun.com/en/latest/api-sending.html#sending) that `Reply-To` is such header.
+
+I was convinced by the exact same sentence in their doc :wink:
+
+---------------------------------------------------------------------------
+
+by stof at 2021-05-22T12:34:25Z
+
+@Nyholm to me, that's a bugfix. The current deprecation is buggy

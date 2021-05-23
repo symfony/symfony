@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\Slack;
 
-use Symfony\Component\Notifier\Exception\IncompleteDsnException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
@@ -29,10 +28,6 @@ final class SlackTransportFactory extends AbstractTransportFactory
     {
         if ('slack' !== $dsn->getScheme()) {
             throw new UnsupportedSchemeException($dsn, 'slack', $this->getSupportedSchemes());
-        }
-
-        if ('/' !== $dsn->getPath() && null !== $dsn->getPath()) {
-            throw new IncompleteDsnException('Support for Slack webhook DSN has been dropped since 5.2 (maybe you haven\'t updated the DSN when upgrading from 5.1).');
         }
 
         $accessToken = $this->getUser($dsn);

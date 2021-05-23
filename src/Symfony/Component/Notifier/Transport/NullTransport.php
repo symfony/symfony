@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Notifier\Transport;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Notifier\Event\MessageEvent;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\NullMessage;
@@ -28,7 +26,7 @@ class NullTransport implements TransportInterface
 
     public function __construct(EventDispatcherInterface $dispatcher = null)
     {
-        $this->dispatcher = class_exists(Event::class) ? LegacyEventDispatcherProxy::decorate($dispatcher) : $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function send(MessageInterface $message): SentMessage

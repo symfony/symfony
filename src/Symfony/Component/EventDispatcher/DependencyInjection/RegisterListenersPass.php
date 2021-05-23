@@ -25,27 +25,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
-    protected $dispatcherService;
-    protected $listenerTag;
-    protected $subscriberTag;
-    protected $eventAliasesParameter;
-
     private $hotPathEvents = [];
     private $hotPathTagName;
     private $noPreloadEvents = [];
     private $noPreloadTagName;
-
-    public function __construct(string $dispatcherService = 'event_dispatcher', string $listenerTag = 'kernel.event_listener', string $subscriberTag = 'kernel.event_subscriber', string $eventAliasesParameter = 'event_dispatcher.event_aliases')
-    {
-        if (0 < \func_num_args()) {
-            trigger_deprecation('symfony/event-dispatcher', '5.3', 'Configuring "%s" is deprecated.', __CLASS__);
-        }
-
-        $this->dispatcherService = $dispatcherService;
-        $this->listenerTag = $listenerTag;
-        $this->subscriberTag = $subscriberTag;
-        $this->eventAliasesParameter = $eventAliasesParameter;
-    }
 
     /**
      * @return $this
@@ -71,26 +54,26 @@ class RegisterListenersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->dispatcherService) && !$container->hasAlias($this->dispatcherService)) {
+        if (!$container->hasDefinition('event_dispatcher') && !$container->hasAlias('event_dispatcher')) {
             return;
         }
 
         $aliases = [];
 
-        if ($container->hasParameter($this->eventAliasesParameter)) {
-            $aliases = $container->getParameter($this->eventAliasesParameter);
+        if ($container->hasParameter('event_dispatcher.event_aliases')) {
+            $aliases = $container->getParameter('event_dispatcher.event_aliases');
         }
 
-        $globalDispatcherDefinition = $container->findDefinition($this->dispatcherService);
+        $globalDispatcherDefinition = $container->findDefinition('event_dispatcher');
 
-        foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
+        foreach ($container->findTaggedServiceIds('kernel.event_listener', true) as $id => $events) {
             $noPreload = 0;
 
             foreach ($events as $event) {
                 $priority = $event['priority'] ?? 0;
 
                 if (!isset($event['event'])) {
-                    if ($container->getDefinition($id)->hasTag($this->subscriberTag)) {
+                    if ($container->getDefinition($id)->hasTag('kernel.event_subscriber')) {
                         continue;
                     }
 
@@ -133,7 +116,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $extractingDispatcher = new ExtractingEventDispatcher();
 
-        foreach ($container->findTaggedServiceIds($this->subscriberTag, true) as $id => $tags) {
+        foreach ($container->findTaggedServiceIds('kernel.event_subscriber', true) as $id => $tags) {
             $def = $container->getDefinition($id);
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
@@ -195,7 +178,7 @@ class RegisterListenersPass implements CompilerPassInterface
             || $type->isBuiltin()
             || Event::class === ($name = $type->getName())
         ) {
-            throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+            throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.event_listener" tags.', $id));
         }
 
         return $name;

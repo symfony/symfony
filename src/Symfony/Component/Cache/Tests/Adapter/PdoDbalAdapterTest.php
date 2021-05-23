@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\DriverManager;
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
@@ -27,7 +28,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
-            self::markTestSkipped('Extension pdo_sqlite required.');
+            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
         }
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');

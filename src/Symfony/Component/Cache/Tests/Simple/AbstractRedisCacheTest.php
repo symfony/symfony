@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\RedisCache;
 
@@ -35,12 +36,12 @@ abstract class AbstractRedisCacheTest extends CacheTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('redis')) {
-            self::markTestSkipped('Extension redis required.');
+            throw new SkippedTestSuiteError('Extension redis required.');
         }
         try {
             (new \Redis())->connect(getenv('REDIS_HOST'));
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError($e->getMessage());
         }
     }
 

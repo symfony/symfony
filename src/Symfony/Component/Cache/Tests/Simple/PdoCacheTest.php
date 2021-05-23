@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Simple\PdoCache;
 use Symfony\Component\Cache\Tests\Adapter\PdoPruneableTrait;
@@ -28,7 +29,7 @@ class PdoCacheTest extends CacheTestCase
     public static function setUpBeforeClass(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
-            self::markTestSkipped('Extension pdo_sqlite required.');
+            throw new SkippedTestSuiteError('Extension pdo_sqlite required.');
         }
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');

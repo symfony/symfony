@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Store\RedisStore;
 
@@ -27,7 +28,7 @@ class RedisStoreTest extends AbstractRedisStoreTest
         try {
             (new \Redis())->connect(getenv('REDIS_HOST'));
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new SkippedTestSuiteError($e->getMessage());
         }
     }
 

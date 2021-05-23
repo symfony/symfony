@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
+
 /**
  * @group legacy
  * @group integration
@@ -21,7 +23,7 @@ class RedisArrayCacheTest extends AbstractRedisCacheTest
     {
         parent::setupBeforeClass();
         if (!class_exists(\RedisArray::class)) {
-            self::markTestSkipped('The RedisArray class is required.');
+            throw new SkippedTestSuiteError('The RedisArray class is required.');
         }
         self::$redis = new \RedisArray([getenv('REDIS_HOST')], ['lazy_connect' => true]);
     }

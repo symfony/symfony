@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Simple;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
@@ -33,14 +34,14 @@ class MemcachedCacheTest extends CacheTestCase
     public static function setUpBeforeClass(): void
     {
         if (!MemcachedCache::isSupported()) {
-            self::markTestSkipped('Extension memcached >=2.2.0 required.');
+            throw new SkippedTestSuiteError('Extension memcached >=2.2.0 required.');
         }
         self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
         if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
-            self::markTestSkipped('Memcached error: '.strtolower(self::$client->getResultMessage()));
+            throw new SkippedTestSuiteError('Memcached error: '.strtolower(self::$client->getResultMessage()));
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -25,10 +26,10 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
     public static function setUpBeforeClass(): void
     {
         if (!class_exists(\RedisCluster::class)) {
-            self::markTestSkipped('The RedisCluster class is required.');
+            throw new SkippedTestSuiteError('The RedisCluster class is required.');
         }
         if (!$hosts = getenv('REDIS_CLUSTER_HOSTS')) {
-            self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
+            throw new SkippedTestSuiteError('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
         self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['lazy' => true, 'redis_cluster' => true]);

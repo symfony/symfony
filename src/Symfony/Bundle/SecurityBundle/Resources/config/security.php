@@ -61,18 +61,15 @@ return static function (ContainerConfigurator $container) {
 
     $container->services()
         ->set('security.authorization_checker', AuthorizationChecker::class)
-            ->public()
             ->args([
                 service('security.token_storage'),
                 service('security.authentication.manager'),
                 service('security.access.decision_manager'),
                 param('security.access.always_authenticate_before_granting'),
             ])
-            ->tag('container.private', ['package' => 'symfony/security-bundle', 'version' => '5.3'])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
 
         ->set('security.token_storage', UsageTrackingTokenStorage::class)
-            ->public()
             ->args([
                 service('security.untracked_token_storage'),
                 service_locator([
@@ -81,7 +78,6 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('kernel.reset', ['method' => 'disableUsageTracking'])
             ->tag('kernel.reset', ['method' => 'setToken'])
-            ->tag('container.private', ['package' => 'symfony/security-bundle', 'version' => '5.3'])
         ->alias(TokenStorageInterface::class, 'security.token_storage')
 
         ->set('security.untracked_token_storage', TokenStorage::class)

@@ -52,7 +52,6 @@ use Twig\TemplateWrapper;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('twig', Environment::class)
-            ->public()
             ->args([service('twig.loader'), abstract_arg('Twig options')])
             ->call('addGlobal', ['app', service('twig.app_variable')])
             ->call('addRuntimeLoader', [service('twig.runtime_loader')])
@@ -65,7 +64,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => ExtensionSet::class])
             ->tag('container.preload', ['class' => Template::class])
             ->tag('container.preload', ['class' => TemplateWrapper::class])
-            ->tag('container.private', ['package' => 'symfony/twig-bundle', 'version' => '5.2'])
 
         ->alias('Twig_Environment', 'twig')
         ->alias(Environment::class, 'twig')

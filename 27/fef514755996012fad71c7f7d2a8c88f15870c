@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2021-05-23T16:03:46Z
+
+Oh... I was pretty that this fixture was already upgraded in a PR of mine on 5.3 but actually, the upgraded fixture ended up in the wrong directory (1 level up): https://github.com/symfony/symfony/blob/5.3/src/Symfony/Component/Security/Core/Tests/Authentication/Token/switch-user-token-4.4.txt
+Can you please remove this unused file?

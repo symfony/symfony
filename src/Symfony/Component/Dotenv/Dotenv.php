@@ -40,17 +40,8 @@ final class Dotenv
     private $prodEnvs = ['prod'];
     private $usePutenv = false;
 
-    /**
-     * @param string $envKey
-     */
-    public function __construct($envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
+    public function __construct(string $envKey = 'APP_ENV', string $debugKey = 'APP_DEBUG')
     {
-        if (\in_array($envKey = (string) $envKey, ['1', ''], true)) {
-            trigger_deprecation('symfony/dotenv', '5.1', 'Passing a boolean to the constructor of "%s" is deprecated, use "Dotenv::usePutenv()".', __CLASS__);
-            $this->usePutenv = (bool) $envKey;
-            $envKey = 'APP_ENV';
-        }
-
         $this->envKey = $envKey;
         $this->debugKey = $debugKey;
     }

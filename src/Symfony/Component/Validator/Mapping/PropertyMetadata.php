@@ -50,7 +50,7 @@ class PropertyMetadata extends MemberMetadata
     {
         $reflProperty = $this->getReflectionMember($object);
 
-        if (\PHP_VERSION_ID >= 70400 && $reflProperty->hasType() && !$reflProperty->isInitialized($object)) {
+        if ($reflProperty->hasType() && !$reflProperty->isInitialized($object)) {
             // There is no way to check if a property has been unset or if it is uninitialized.
             // When trying to access an uninitialized property, __get method is triggered.
 

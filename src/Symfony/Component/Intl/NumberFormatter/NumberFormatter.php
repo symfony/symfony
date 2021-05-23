@@ -356,13 +356,7 @@ abstract class NumberFormatter
     {
         // The original NumberFormatter does not support this format type
         if (self::TYPE_CURRENCY === $type) {
-            if (\PHP_VERSION_ID >= 80000) {
-                throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%s given).', $type));
-            }
-
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
-
-            return false;
+            throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%s given).', $type));
         }
 
         if (self::CURRENCY === $this->style) {
@@ -514,13 +508,7 @@ abstract class NumberFormatter
     public function parse(string $value, int $type = self::TYPE_DOUBLE, int &$position = 0)
     {
         if (self::TYPE_DEFAULT === $type || self::TYPE_CURRENCY === $type) {
-            if (\PHP_VERSION_ID >= 80000) {
-                throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%d given).', $type));
-            }
-
-            trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
-
-            return false;
+            throw new \ValueError(sprintf('The format type must be a NumberFormatter::TYPE_* constant (%d given).', $type));
         }
 
         // Any invalid number at the end of the string is removed.

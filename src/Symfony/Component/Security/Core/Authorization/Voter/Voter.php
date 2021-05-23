@@ -35,12 +35,7 @@ abstract class Voter implements VoterInterface
                     continue;
                 }
             } catch (\TypeError $e) {
-                if (\PHP_VERSION_ID < 80000) {
-                    if (0 === strpos($e->getMessage(), 'Argument 1 passed to')
-                        && false !== strpos($e->getMessage(), '::supports() must be of the type string')) {
-                        continue;
-                    }
-                } elseif (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
+                if (false !== strpos($e->getMessage(), 'supports(): Argument #1')) {
                     continue;
                 }
 

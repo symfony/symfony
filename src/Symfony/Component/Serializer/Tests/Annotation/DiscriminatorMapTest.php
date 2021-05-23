@@ -23,9 +23,6 @@ class DiscriminatorMapTest extends TestCase
 {
     use ExpectDeprecationTrait;
 
-    /**
-     * @requires PHP 8
-     */
     public function testGetTypePropertyAndMapping()
     {
         $annotation = new DiscriminatorMap(...['typeProperty' => 'type', 'mapping' => [
@@ -67,9 +64,6 @@ class DiscriminatorMapTest extends TestCase
         new DiscriminatorMap(['mapping' => ['foo' => 'FooClass']]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testExceptionWithEmptyTypeProperty()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -85,9 +79,6 @@ class DiscriminatorMapTest extends TestCase
         new DiscriminatorMap(['typeProperty' => '', 'mapping' => ['foo' => 'FooClass']]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testExceptionWithoutMappingProperty()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -103,9 +94,6 @@ class DiscriminatorMapTest extends TestCase
         new DiscriminatorMap(['typeProperty' => 'type']);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testExceptionWitEmptyMappingProperty()
     {
         $this->expectException(InvalidArgumentException::class);

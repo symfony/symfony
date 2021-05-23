@@ -38,11 +38,7 @@ class ExpressionLanguageSyntaxTest extends TestCase
     {
         yield 'Doctrine style' => [new ExpressionLanguageSyntax(['service' => 'my_service'])];
 
-        if (\PHP_VERSION_ID < 80000) {
-            return;
-        }
-
-        yield 'named arguments' => [eval('return new \Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax(service: "my_service");')];
+        yield 'named arguments' => [new ExpressionLanguageSyntax(service: "my_service")];
 
         $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));
@@ -50,9 +46,6 @@ class ExpressionLanguageSyntaxTest extends TestCase
         yield 'attribute' => [$metadata->properties['b']->constraints[0]];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);

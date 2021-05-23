@@ -61,9 +61,6 @@ class ArgumentMetadataTest extends TestCase
         $this->assertSame($attribute, $argument->getAttribute());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testGetAttributes()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true, [new Foo('bar')]);

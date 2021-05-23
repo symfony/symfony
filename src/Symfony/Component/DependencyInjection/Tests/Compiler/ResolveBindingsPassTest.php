@@ -189,9 +189,6 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testBindWithTarget()
     {
         $container = new ContainerBuilder();

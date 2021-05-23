@@ -191,7 +191,7 @@ abstract class AbstractUnicodeString extends AbstractString
     {
         $str = clone $this;
 
-        if (!$compat || \PHP_VERSION_ID < 70300 || !\defined('Normalizer::NFKC_CF')) {
+        if (!$compat || !\defined('Normalizer::NFKC_CF')) {
             $str->string = normalizer_normalize($str->string, $compat ? \Normalizer::NFKC : \Normalizer::NFC);
             $str->string = mb_strtolower(str_replace(self::FOLD_FROM, self::FOLD_TO, $this->string), 'UTF-8');
         } else {
@@ -426,10 +426,6 @@ abstract class AbstractUnicodeString extends AbstractString
     {
         $str = clone $this;
         $str->string = mb_strtoupper($str->string, 'UTF-8');
-
-        if (\PHP_VERSION_ID < 70300) {
-            $str->string = str_replace(self::UPPER_FROM, self::UPPER_TO, $str->string);
-        }
 
         return $str;
     }

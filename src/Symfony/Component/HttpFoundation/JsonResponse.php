@@ -163,7 +163,7 @@ class JsonResponse extends Response
             throw $e;
         }
 
-        if (\PHP_VERSION_ID >= 70300 && (\JSON_THROW_ON_ERROR & $this->encodingOptions)) {
+        if (\JSON_THROW_ON_ERROR & $this->encodingOptions) {
             return $this->setJson($data);
         }
 

@@ -248,20 +248,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             return;
         }
 
-        if (\PHP_VERSION_ID < 80000) {
-            if (0 !== strpos($message, 'Argument ')) {
-                return;
-            }
-
-            $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
-            $pos += \strlen($delim);
-            $j = strpos($message, ',', $pos);
-            $type = substr($message, 2 + $j, strpos($message, ' given', $j) - $j - 2);
-            $message = substr($message, $pos, $j - $pos);
-
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given at property path "%s".', $message, 'NULL' === $type ? 'null' : $type, $propertyPath), 0, $previous);
-        }
-
         if (preg_match('/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/', $message, $matches)) {
             [, $expectedType, $actualType] = $matches;
 
@@ -480,7 +466,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
             } catch (\Error $e) {
                 // handle uninitialized properties in PHP >= 7.4
-                if (\PHP_VERSION_ID >= 70400 && preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
+                if (preg_match('/^Typed property ([\w\\\]+)::\$(\w+) must not be accessed before initialization$/', $e->getMessage(), $matches)) {
                     $r = new \ReflectionProperty($matches[1], $matches[2]);
                     $type = ($type = $r->getType()) instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
 

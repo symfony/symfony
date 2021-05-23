@@ -129,7 +129,7 @@ class AutowirePass extends AbstractRecursivePass
             array_unshift($this->methodCalls, [$constructor, $value->getArguments()]);
         }
 
-        $checkAttributes = 80000 <= \PHP_VERSION_ID && !$value->hasTag('container.ignore_attributes');
+        $checkAttributes = !$value->hasTag('container.ignore_attributes');
         $this->methodCalls = $this->autowireCalls($reflectionClass, $isRoot, $checkAttributes);
 
         if ($constructor) {

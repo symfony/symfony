@@ -261,9 +261,6 @@ class ConstraintTest extends TestCase
         ]);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testSetTypedProperty()
     {
         $constraint = new ConstraintWithTypedProperty([

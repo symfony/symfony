@@ -43,9 +43,6 @@ class UuidTest extends TestCase
         new Uuid(['normalizer' => new \stdClass()]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(UuidDummy::class);

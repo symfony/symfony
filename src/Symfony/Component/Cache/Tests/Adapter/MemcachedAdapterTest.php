@@ -72,13 +72,8 @@ class MemcachedAdapterTest extends AdapterTestCase
      */
     public function testBadOptions($name, $value)
     {
-        if (\PHP_VERSION_ID < 80000) {
-            $this->expectException(\ErrorException::class);
-            $this->expectExceptionMessage('constant(): Couldn\'t find constant Memcached::');
-        } else {
-            $this->expectException(\Error::class);
-            $this->expectExceptionMessage('Undefined constant Memcached::');
-        }
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Undefined constant Memcached::');
 
         MemcachedAdapter::createConnection([], [$name => $value]);
     }

@@ -67,7 +67,7 @@ class Command
     {
         $class = static::class;
 
-        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+        if ($attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->name;
         }
 
@@ -83,7 +83,7 @@ class Command
     {
         $class = static::class;
 
-        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+        if ($attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
             return $attribute[0]->newInstance()->description;
         }
 

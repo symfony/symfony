@@ -60,9 +60,6 @@ class PropertyMetadataTest extends TestCase
         $metadata->getPropertyValue($entity);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetPropertyValueFromUninitializedProperty()
     {
         $entity = new Entity_74();
@@ -71,9 +68,6 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($metadata->getPropertyValue($entity));
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testGetPropertyValueFromUninitializedPropertyShouldNotReturnNullIfMagicGetIsPresent()
     {
         $entity = new Entity_74_Proxy();

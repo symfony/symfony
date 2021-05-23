@@ -111,11 +111,6 @@ class LazyString implements \Stringable, \JsonSerializable
                 $e = new \TypeError(sprintf('Return value of %s() passed to %s::fromCallable() must be of the type string, %s returned.', $callback, static::class, $type));
             }
 
-            if (\PHP_VERSION_ID < 70400) {
-                // leverage the ErrorHandler component with graceful fallback when it's not available
-                return trigger_error($e, \E_USER_ERROR);
-            }
-
             throw $e;
         }
     }

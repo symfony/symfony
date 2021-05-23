@@ -406,7 +406,7 @@ class ErrorHandler
      */
     public function handleError(int $type, string $message, string $file, int $line): bool
     {
-        if (\PHP_VERSION_ID >= 70300 && \E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
+        if (\E_WARNING === $type && '"' === $message[0] && false !== strpos($message, '" targeting switch is equivalent to "break')) {
             $type = \E_DEPRECATED;
         }
 
@@ -487,61 +487,18 @@ class ErrorHandler
         }
 
         if ($throw) {
-            if (\PHP_VERSION_ID < 70400 && \E_USER_ERROR & $type) {
-                for ($i = 1; isset($backtrace[$i]); ++$i) {
-                    if (isset($backtrace[$i]['function'], $backtrace[$i]['type'], $backtrace[$i - 1]['function'])
-                        && '__toString' === $backtrace[$i]['function']
-                        && '->' === $backtrace[$i]['type']
-                        && !isset($backtrace[$i - 1]['class'])
-                        && ('trigger_error' === $backtrace[$i - 1]['function'] || 'user_error' === $backtrace[$i - 1]['function'])
-                    ) {
-                        // Here, we know trigger_error() has been called from __toString().
-                        // PHP triggers a fatal error when throwing from __toString().
-                        // A small convention allows working around the limitation:
-                        // given a caught $e exception in __toString(), quitting the method with
-                        // `return trigger_error($e, E_USER_ERROR);` allows this error handler
-                        // to make $e get through the __toString() barrier.
-
-                        $context = 4 < \func_num_args() ? (func_get_arg(4) ?: []) : [];
-
-                        foreach ($context as $e) {
-                            if ($e instanceof \Throwable && $e->__toString() === $message) {
-                                self::$toStringException = $e;
-
-                                return true;
-                            }
-                        }
-
-                        // Display the original error message instead of the default one.
-                        $this->handleException($errorAsException);
-
-                        // Stop the process by giving back the error to the native handler.
-                        return false;
-                    }
-                }
-            }
-
             throw $errorAsException;
         }
 
         if ($this->isRecursive) {
             $log = 0;
         } else {
-            if (\PHP_VERSION_ID < (\PHP_VERSION_ID < 70400 ? 70316 : 70404)) {
-                $currentErrorHandler = set_error_handler('var_dump');
-                restore_error_handler();
-            }
-
             try {
                 $this->isRecursive = true;
                 $level = ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG;
                 $this->loggers[$type][0]->log($level, $logMessage, $errorAsException ? ['exception' => $errorAsException] : []);
             } finally {
                 $this->isRecursive = false;
-
-                if (\PHP_VERSION_ID < (\PHP_VERSION_ID < 70400 ? 70316 : 70404)) {
-                    set_error_handler($currentErrorHandler);
-                }
             }
         }
 

@@ -77,9 +77,6 @@ class ContextTest extends TestCase
         yield 'non-array denormalization context' => [['normalizationContext' => 'not_an_array']];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidGroupOption()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -128,7 +125,6 @@ class ContextTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider provideValidInputs
      */
     public function testValidInputs(callable $factory, string $expectedDump)

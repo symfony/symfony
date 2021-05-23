@@ -399,9 +399,6 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testBindWithTarget()
     {
         $container = new ContainerBuilder();

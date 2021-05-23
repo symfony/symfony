@@ -283,16 +283,13 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testBinaryFormatNamed()
     {
         fseek($this->file, 10, \SEEK_SET);
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\File(maxSize: 10, binaryFormat: true, maxSizeMessage: "myMessage");');
+        $constraint = new File(maxSize: 10, binaryFormat: true, maxSizeMessage: "myMessage");
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -389,12 +386,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             'mimeTypes' => ['image/png', 'image/jpg'],
             'mimeTypesMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\File(mimeTypes: ["image/png", "image/jpg"], mimeTypesMessage: "myMessage");'),
-            ];
-        }
+        yield 'named arguments' => [
+            new File(mimeTypes: ["image/png", "image/jpg"], mimeTypesMessage: "myMessage"),
+        ];
     }
 
     public function testInvalidWildcardMimeType()
@@ -449,12 +443,9 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new File([
             'disallowEmptyMessage' => 'myMessage',
         ])];
-
-        if (\PHP_VERSION_ID >= 80000) {
-            yield 'named arguments' => [
-                eval('return new \Symfony\Component\Validator\Constraints\File(disallowEmptyMessage: "myMessage");'),
-            ];
-        }
+        yield 'named arguments' => [
+            new File(disallowEmptyMessage: "myMessage"),
+        ];
     }
 
     /**

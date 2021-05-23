@@ -103,7 +103,7 @@ class Registry
                     }
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !method_exists($class, '__sleep') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__serialize'))) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !method_exists($class, '__sleep') && !method_exists($class, '__serialize')) {
                 try {
                     serialize($proto);
                 } catch (\Exception $e) {
@@ -113,7 +113,7 @@ class Registry
         }
 
         if (null === $cloneable) {
-            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($proto, '__wakeup') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize')))) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($proto, '__wakeup') && !method_exists($class, '__unserialize'))) {
                 throw new NotInstantiableTypeException($class);
             }
 

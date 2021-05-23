@@ -29,9 +29,6 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
      */
     protected function processValue($value, bool $isRoot = false)
     {
-        if (\PHP_VERSION_ID < 70400) {
-            return $value;
-        }
         $value = parent::processValue($value, $isRoot);
 
         if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
@@ -46,7 +43,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
             if (!($type = $reflectionProperty->getType()) instanceof \ReflectionNamedType) {
                 continue;
             }
-            if ((\PHP_VERSION_ID < 80000 || !$reflectionProperty->getAttributes(Required::class))
+            if (!$reflectionProperty->getAttributes(Required::class)
                 && ((false === $doc = $reflectionProperty->getDocComment()) || false === stripos($doc, '@required') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc))
             ) {
                 continue;

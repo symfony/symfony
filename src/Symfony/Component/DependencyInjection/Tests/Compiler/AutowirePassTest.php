@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
-use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\MultipleArgumentsOptionalScalarNotReallyOptional;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -239,9 +238,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTypeNotGuessableUnionType()
     {
         $this->expectException(AutowiringFailedException::class);
@@ -341,9 +337,6 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $definition->getArgument(2));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testParameterWithNullUnionIsSkipped()
     {
         $container = new ContainerBuilder();
@@ -357,9 +350,6 @@ class AutowirePassTest extends TestCase
         $this->assertNull($definition->getArgument(0));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testParameterWithNullUnionIsAutowired()
     {
         $container = new ContainerBuilder();
@@ -491,9 +481,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testUnionScalarArgsCannotBeAutowired()
     {
         $this->expectException(AutowiringFailedException::class);
@@ -522,24 +509,6 @@ class AutowirePassTest extends TestCase
         } catch (AutowiringFailedException $e) {
             $this->assertSame('Cannot autowire service "arg_no_type_hint": argument "$foo" of method "Symfony\Component\DependencyInjection\Tests\Compiler\MultipleArguments::__construct()" has no type-hint, you should configure its value explicitly.', (string) $e->getMessage());
         }
-    }
-
-    /**
-     * @requires PHP < 8
-     */
-    public function testOptionalScalarNotReallyOptionalUsesDefaultValue()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register(A::class);
-        $container->register(Lille::class);
-        $definition = $container->register('not_really_optional_scalar', MultipleArgumentsOptionalScalarNotReallyOptional::class)
-            ->setAutowired(true);
-
-        (new ResolveClassPass())->process($container);
-        (new AutowirePass())->process($container);
-
-        $this->assertSame('default_val', $definition->getArgument(1));
     }
 
     public function testOptionalScalarArgsDontMessUpOrder()
@@ -643,9 +612,6 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testSetterInjectionWithAttribute()
     {
         if (!class_exists(Required::class)) {
@@ -1071,9 +1037,6 @@ class AutowirePassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testArgumentWithTarget()
     {
         $container = new ContainerBuilder();

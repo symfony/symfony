@@ -238,9 +238,6 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedInvokableEventListener()
     {
         if (!class_exists(AttributeAutoconfigurationPass::class)) {
@@ -272,9 +269,6 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedMultiEventListener()
     {
         if (!class_exists(AttributeAutoconfigurationPass::class)) {

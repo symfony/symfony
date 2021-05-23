@@ -1679,9 +1679,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testWitherWithStaticReturnType()
     {
         $container = new ContainerBuilder();

@@ -71,7 +71,6 @@ class RouteTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
      * @dataProvider getValidParameters
      */
     public function testLoadFromAttribute(string $methodName, string $getter, $expectedReturn)

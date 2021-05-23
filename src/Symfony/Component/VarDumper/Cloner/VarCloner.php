@@ -65,12 +65,7 @@ class VarCloner extends AbstractCloner
             foreach ($vals as $k => $v) {
                 // $v is the original value or a stub object in case of hard references
 
-                if (\PHP_VERSION_ID >= 70400) {
-                    $zvalIsRef = null !== \ReflectionReference::fromArrayElement($vals, $k);
-                } else {
-                    $refs[$k] = $cookie;
-                    $zvalIsRef = $vals[$k] === $cookie;
-                }
+                $zvalIsRef = null !== \ReflectionReference::fromArrayElement($vals, $k);
 
                 if ($zvalIsRef) {
                     $vals[$k] = &$stub;         // Break hard references to make $queue completely

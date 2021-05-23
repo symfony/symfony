@@ -117,9 +117,6 @@ class PropertyPathMapperTest extends TestCase
         $this->assertNull($form->getData());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapDataToFormsIgnoresUninitializedProperties()
     {
         $engineForm = new Form(new FormConfigBuilder('engine', null, $this->dispatcher));
@@ -321,9 +318,6 @@ class PropertyPathMapperTest extends TestCase
         $this->assertSame($initialEngine, $car->engine);
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testMapFormsToUninitializedProperties()
     {
         $car = new TypehintedPropertiesCar();

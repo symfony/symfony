@@ -328,11 +328,6 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
      */
     private static function select(ClientState $multi, float $timeout): int
     {
-        if (\PHP_VERSION_ID < 70211) {
-            // workaround https://bugs.php.net/76480
-            $timeout = min($timeout, 0.01);
-        }
-
         if ($multi->pauseExpiries) {
             $now = microtime(true);
 

@@ -321,9 +321,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -374,9 +371,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar' => $container->get(BarTagClass::class), 'bar_duplicate' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTaggedLocatorConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -403,9 +397,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
     {
         $container = new ContainerBuilder();
@@ -430,9 +421,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testFactoryWithAutoconfiguredArgument()
     {
         $container = new ContainerBuilder();
@@ -628,9 +616,6 @@ class IntegrationTest extends TestCase
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testTagsViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -666,9 +651,6 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributesAreIgnored()
     {
         $container = new ContainerBuilder();
@@ -699,9 +681,6 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAutoconfigureViaAttribute()
     {
         $container = new ContainerBuilder();

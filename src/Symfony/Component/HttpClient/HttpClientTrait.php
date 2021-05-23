@@ -377,13 +377,9 @@ trait HttpClientTrait
         $flags = $flags ?? (\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_PRESERVE_ZERO_FRACTION);
 
         try {
-            $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0), $maxDepth);
+            $value = json_encode($value, $flags | \JSON_THROW_ON_ERROR, $maxDepth);
         } catch (\JsonException $e) {
             throw new InvalidArgumentException('Invalid value for "json" option: '.$e->getMessage());
-        }
-
-        if (\PHP_VERSION_ID < 70300 && \JSON_ERROR_NONE !== json_last_error() && (false === $value || !($flags & \JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-            throw new InvalidArgumentException('Invalid value for "json" option: '.json_last_error_msg());
         }
 
         return $value;

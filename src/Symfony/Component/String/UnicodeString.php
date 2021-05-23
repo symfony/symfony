@@ -268,9 +268,6 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
 
-        if (\PHP_VERSION_ID < 80000 && 0 > $start && grapheme_strlen($this->string) < -$start) {
-            $start = 0;
-        }
         $str->string = (string) grapheme_substr($this->string, $start, $length ?? 2147483647);
 
         return $str;
@@ -280,9 +277,6 @@ class UnicodeString extends AbstractUnicodeString
     {
         $str = clone $this;
 
-        if (\PHP_VERSION_ID < 80000 && 0 > $start && grapheme_strlen($this->string) < -$start) {
-            $start = 0;
-        }
         $start = $start ? \strlen(grapheme_substr($this->string, 0, $start)) : 0;
         $length = $length ? \strlen(grapheme_substr($this->string, $start, $length ?? 2147483647)) : $length;
         $str->string = substr_replace($this->string, $replacement, $start, $length ?? 2147483647);

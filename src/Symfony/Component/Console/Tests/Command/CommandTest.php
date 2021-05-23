@@ -406,9 +406,6 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'not bound'.\PHP_EOL, $tester->getDisplay());
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testCommandAttribute()
     {
         $this->assertSame('|foo|f', Php8Command::getDefaultName());

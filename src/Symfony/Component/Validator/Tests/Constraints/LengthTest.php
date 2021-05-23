@@ -82,9 +82,6 @@ class LengthTest extends TestCase
         self::assertEquals('message', $constraint->exactMessage);
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testAttributes()
     {
         $metadata = new ClassMetadata(LengthDummy::class);

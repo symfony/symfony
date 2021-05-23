@@ -257,8 +257,7 @@ class ReflectionExtractorTest extends TestCase
     }
 
     /**
-     *     * @dataProvider php80TypesProvider
-     * @requires PHP 8
+     * @dataProvider php80TypesProvider
      */
     public function testExtractPhp80Type($property, array $type = null)
     {
@@ -444,9 +443,6 @@ class ReflectionExtractorTest extends TestCase
         $this->assertEquals(PropertyWriteInfo::TYPE_NONE, $bazMutator->getType());
     }
 
-    /**
-     * @requires PHP 7.4
-     */
     public function testTypedProperties()
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));

@@ -88,7 +88,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/77535
-        if (0 >= $maxPendingPushes || \PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
+        if (0 >= $maxPendingPushes) {
             return;
         }
 

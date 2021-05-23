@@ -86,12 +86,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    /**
-     * @requires PHP 8
-     */
     public function testInvalidValueNamed()
     {
-        $constraint = eval('return new \Symfony\Component\Validator\Constraints\Unique(message: "myMessage");');
+        $constraint = new Unique(message: "myMessage");
         $this->validator->validate([1, 2, 3, 3], $constraint);
 
         $this->buildViolation('myMessage')

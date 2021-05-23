@@ -523,13 +523,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionClass = new \ReflectionClass($class);
 
-            if (\PHP_VERSION_ID >= 70400) {
-                $reflectionProperty = $reflectionClass->getProperty($property);
-                $reflectionPropertyType = $reflectionProperty->getType();
+            $reflectionProperty = $reflectionClass->getProperty($property);
+            $reflectionPropertyType = $reflectionProperty->getType();
 
-                if (null !== $reflectionPropertyType && $types = $this->extractFromReflectionType($reflectionPropertyType, $reflectionProperty->getDeclaringClass())) {
-                    return $types;
-                }
+            if (null !== $reflectionPropertyType && $types = $this->extractFromReflectionType($reflectionPropertyType, $reflectionProperty->getDeclaringClass())) {
+                return $types;
             }
         } catch (\ReflectionException $e) {
             return null;
@@ -589,13 +587,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
-            if (\PHP_VERSION_ID >= 70400) {
-                $reflectionPropertyType = $reflectionProperty->getType();
+            $reflectionPropertyType = $reflectionProperty->getType();
 
-                return null !== $reflectionPropertyType && $reflectionPropertyType->allowsNull();
-            }
-
-            return false;
+            return null !== $reflectionPropertyType && $reflectionPropertyType->allowsNull();
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }

@@ -101,11 +101,6 @@ class LoginLinkHandlerTest extends TestCase
 
         yield [
             new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
-            ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'],
-        ];
-
-        yield [
-            new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'),
             ['lastAuthenticatedAt' => ''],
         ];
 

@@ -940,6 +940,23 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Dummy type "class@anonymous" is invalid.', $tester->getDisplay(true));
     }
 
+    public function testRenderExceptionEscapesLinesOfSynopsis()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application
+            ->register('foo')
+            ->setCode(function () {
+                throw new \Exception('some exception');
+            })
+            ->addArgument('info')
+        ;
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/application_rendersynopsis_escapesline.txt', $tester->getDisplay(true), '->renderException() escapes lines containing formatting of synopsis');
+    }
+
     public function testRun()
     {
         $application = new Application();

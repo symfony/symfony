@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-05-20T05:51:46Z
+
+> I wonder if we should also remove this code
+>
+> https://github.com/symfony/symfony/blob/a2c8e84b7e8618c814458d7c64e56d8b9b779639/src/Symfony/Component/Notifier/Bridge/Slack/SlackTransportFactory.php#L34-L36
+
+I think that make sense. This is missing an entry in the changelog of 5.2 too. Shall I add that entry in a separate PR against 5.2?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2021-05-20T06:00:08Z
+
+> > I wonder if we should also remove this code
+> > https://github.com/symfony/symfony/blob/a2c8e84b7e8618c814458d7c64e56d8b9b779639/src/Symfony/Component/Notifier/Bridge/Slack/SlackTransportFactory.php#L34-L36
+>
+> I think that make sense. This is missing an entry in the changelog of 5.2 too. Shall I add that entry in a separate PR against 5.2?
+
+I checked it again. It's probably this entry: https://github.com/symfony/symfony/blame/4bf9461d9b0d2ee6840f4e3873542f8b54a5f8f4/src/Symfony/Component/Notifier/Bridge/Slack/CHANGELOG.md#L21

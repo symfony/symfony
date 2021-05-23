@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-23T16:23:23Z
+
+Maybe worth fixing the psalm report in this PR?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-23T19:15:12Z
+
+> Maybe worth fixing the psalm report in this PR?
+
+That's a good catch from Psalm. Since EventDispatcher has been bumped to 5.4 everywhere, we can safely drop the calls to `LegacyEventDispatcherProxy` now. I just did that.

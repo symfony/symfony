@@ -135,9 +135,7 @@ class MailgunApiTransport extends AbstractApiTransport
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'])) {
                 $headerName = $name;
             } else {
-                // fallback to prefix with "h:" to not break BC
                 $headerName = 'h:'.$name;
-                trigger_deprecation('symfony/mailer', '5.1', 'Not prefixing the Mailgun header name with "h:" is deprecated. Use header name "%s" instead.', $headerName);
             }
 
             $payload[$headerName] = $header->getBodyAsString();

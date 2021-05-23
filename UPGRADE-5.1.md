@@ -80,7 +80,6 @@ Inflector
 Mailer
 ------
 
- * Deprecated passing Mailgun headers without their "h:" prefix.
  * Deprecated the `SesApiTransport` class. It has been replaced by SesApiAsyncAwsTransport Run `composer require async-aws/ses` to use the new classes.
  * Deprecated the `SesHttpTransport` class. It has been replaced by SesHttpAsyncAwsTransport Run `composer require async-aws/ses` to use the new classes.
 

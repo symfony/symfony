@@ -601,9 +601,7 @@ class Inline
                     case 0 === strncmp($scalar, '!php/object', 11):
                         if (self::$objectSupport) {
                             if (!isset($scalar[12])) {
-                                trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/object tag without a value is deprecated.');
-
-                                return false;
+                                throw new ParseException('Missing value for tag "!php/object".', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
 
                             return unserialize(self::parseScalar(substr($scalar, 12)));
@@ -617,9 +615,7 @@ class Inline
                     case 0 === strncmp($scalar, '!php/const', 10):
                         if (self::$constantSupport) {
                             if (!isset($scalar[11])) {
-                                trigger_deprecation('symfony/yaml', '5.1', 'Using the !php/const tag without a value is deprecated.');
-
-                                return '';
+                                throw new ParseException('Missing value for tag "!php/const".', self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
                             }
 
                             $i = 0;
@@ -660,22 +656,7 @@ class Inline
 
                 switch (true) {
                     case ctype_digit($scalar):
-                        if (preg_match('/^0[0-7]+$/', $scalar)) {
-                            trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
-
-                            return octdec($scalar);
-                        }
-
-                        $cast = (int) $scalar;
-
-                        return ($scalar === (string) $cast) ? $cast : $scalar;
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
-                        if (preg_match('/^-0[0-7]+$/', $scalar)) {
-                            trigger_deprecation('symfony/yaml', '5.1', 'Support for parsing numbers prefixed with 0 as octal numbers. They will be parsed as strings as of 6.0.');
-
-                            return -octdec(substr($scalar, 1));
-                        }
-
                         $cast = (int) $scalar;
 
                         return ($scalar === (string) $cast) ? $cast : $scalar;

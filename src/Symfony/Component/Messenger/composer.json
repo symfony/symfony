@@ -18,10 +18,7 @@
     "require": {
         "php": ">=8.0.2",
         "psr/log": "~1.0",
-        "symfony/amqp-messenger": "^5.4|^6.0",
-        "symfony/deprecation-contracts": "^2.1",
-        "symfony/doctrine-messenger": "^5.4|^6.0",
-        "symfony/redis-messenger": "^5.4|^6.0"
+        "symfony/deprecation-contracts": "^2.1"
     },
     "require-dev": {
         "psr/cache": "^1.0|^2.0|^3.0",

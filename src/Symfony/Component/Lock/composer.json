@@ -17,8 +17,7 @@
     ],
     "require": {
         "php": ">=8.0.2",
-        "psr/log": "~1.0",
-        "symfony/deprecation-contracts": "^2.1"
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "doctrine/dbal": "^2.10|^3.0",

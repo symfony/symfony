@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-21T13:33:48Z
+
+Can you have a look at the Psalm error?
+
+---------------------------------------------------------------------------
+
+by malteschlueter at 2021-05-21T13:48:32Z
+
+> Can you have a look at the Psalm error?
+
+I will revert the deletion of the methods. Probably it's better to delete it if somebody starts to clean up the `UserInterface`
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-21T13:55:44Z
+
+> I will revert the deletion of the methods. Probably it's better to delete it if somebody starts to clean up the `UserInterface`
+
+I think, deleting `getUsername()` is fine. The Psalm error should be fixed by #41367.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-21T14:10:13Z
+
+Please rebase, I've merged my two PRs up.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2021-05-21T19:58:22Z
+
+Thanks for all the PRs!
+
+I'm not sure if you were planning to, but I would propose to leave the security packages (other than this one) as-is for now. There is quite some deprecated code, as well as undeprecated but redundant code if we remove deprecation features. So we probably have to remove them per feature instead of per package. Let's make a plan when 5.3 is stable :)

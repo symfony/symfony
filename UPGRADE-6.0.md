@@ -384,7 +384,8 @@ Validator
   After:
 
   ```php
-  $builder->enableAnnotationMapping(true)
+  $builder
+      ->enableAnnotationMapping()
       ->setDoctrineAnnotationReader($reader);
   ```
 
@@ -399,7 +400,8 @@ Validator
   After:
 
   ```php
-  $builder->enableAnnotationMapping(true)
+  $builder
+      ->enableAnnotationMapping()
       ->addDefaultDoctrineAnnotationReader();
   ```
 

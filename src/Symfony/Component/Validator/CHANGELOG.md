@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove the `allowEmptyString` option from the `Length` constraint
+ * Remove the `NumberConstraintTrait` trait
+ * `ValidatorBuilder::enableAnnotationMapping()` does not accept a Doctrine annotation reader anymore
+ * `ValidatorBuilder::enableAnnotationMapping()` won't automatically setup a Doctrine annotation reader anymore
+
 5.3
 ---
  * Add the `normalizer` option to the `Unique` constraint

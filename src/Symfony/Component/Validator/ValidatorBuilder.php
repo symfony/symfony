@@ -217,25 +217,12 @@ class ValidatorBuilder
     /**
      * Enables annotation based constraint mapping.
      *
-     * @param bool $skipDoctrineAnnotations
-     *
      * @return $this
      */
-    public function enableAnnotationMapping(/* bool $skipDoctrineAnnotations = true */)
+    public function enableAnnotationMapping()
     {
         if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
-
-        $skipDoctrineAnnotations = 1 > \func_num_args() ? false : func_get_arg(0);
-        if (false === $skipDoctrineAnnotations || null === $skipDoctrineAnnotations) {
-            trigger_deprecation('symfony/validator', '5.2', 'Not passing true as first argument to "%s" is deprecated. Pass true and call "addDefaultDoctrineAnnotationReader()" if you want to enable annotation mapping with Doctrine Annotations.', __METHOD__);
-            $this->addDefaultDoctrineAnnotationReader();
-        } elseif ($skipDoctrineAnnotations instanceof Reader) {
-            trigger_deprecation('symfony/validator', '5.2', 'Passing an instance of "%s" as first argument to "%s" is deprecated. Pass true instead and call setDoctrineAnnotationReader() if you want to enable annotation mapping with Doctrine Annotations.', get_debug_type($skipDoctrineAnnotations), __METHOD__);
-            $this->setDoctrineAnnotationReader($skipDoctrineAnnotations);
-        } elseif (true !== $skipDoctrineAnnotations) {
-            throw new \TypeError(sprintf('"%s": Argument 1 is expected to be a boolean, "%s" given.', __METHOD__, get_debug_type($skipDoctrineAnnotations)));
         }
 
         $this->enableAnnotationMapping = true;

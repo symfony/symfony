@@ -182,7 +182,7 @@ abstract class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string.
      *
-     * @param int|\DateTimeInterface $timestamp The timestamp to format
+     * @param int|string|\DateTimeInterface $timestamp The timestamp to format
      *
      * @return string|bool The formatted value or false if formatting failed
      *
@@ -194,9 +194,13 @@ abstract class IntlDateFormatter
     {
         // intl allows timestamps to be passed as arrays - we don't
         if (\is_array($timestamp)) {
-            $message = 'Only integer Unix timestamps and DateTime objects are supported';
+            $message = 'Only Unix timestamps and DateTime objects are supported';
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
+        }
+
+        if (\is_string($timestamp) && $dt = \DateTime::createFromFormat('U', $timestamp)) {
+            $timestamp = $dt;
         }
 
         // behave like the intl extension
@@ -214,7 +218,7 @@ abstract class IntlDateFormatter
         }
 
         if ($timestamp instanceof \DateTimeInterface) {
-            $timestamp = $timestamp->getTimestamp();
+            $timestamp = $timestamp->format('U');
         }
 
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
@@ -585,8 +589,7 @@ abstract class IntlDateFormatter
      */
     protected function createDateTime(int $timestamp)
     {
-        $dateTime = new \DateTime();
-        $dateTime->setTimestamp($timestamp);
+        $dateTime = \DateTime::createFromFormat('U', $timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
         return $dateTime;

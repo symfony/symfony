@@ -927,19 +927,15 @@ class DateTypeTest extends BaseTypeTest
         $this->assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
-    public function testYearsFor32BitsMachines()
+    public function testYears()
     {
-        if (4 !== \PHP_INT_SIZE) {
-            $this->markTestSkipped('PHP 32 bit is required.');
-        }
-
         $view = $this->factory->create(static::TESTED_TYPE, null, [
-            'years' => range(1900, 2040),
+            'years' => [1900, 2000, 2040],
         ])
             ->createView();
 
         $listChoices = [];
-        foreach (range(1902, 2037) as $y) {
+        foreach ([1900, 2000, 2040] as $y) {
             $listChoices[] = new ChoiceView($y, $y, $y);
         }
 

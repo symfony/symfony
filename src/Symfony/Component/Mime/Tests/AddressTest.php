@@ -98,10 +98,10 @@ class AddressTest extends TestCase
      */
     public function testFromString($string, $displayName, $addrSpec)
     {
-        $address = Address::fromString($string);
+        $address = Address::create($string);
         $this->assertEquals($displayName, $address->getName());
         $this->assertEquals($addrSpec, $address->getAddress());
-        $fromToStringAddress = Address::fromString($address->toString());
+        $fromToStringAddress = Address::create($address->toString());
         $this->assertEquals($displayName, $fromToStringAddress->getName());
         $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
     }
@@ -112,7 +112,7 @@ class AddressTest extends TestCase
     public function testFromStringFailure()
     {
         $this->expectException(InvalidArgumentException::class);
-        Address::fromString('Jane Doe <example@example.com');
+        Address::create('Jane Doe <example@example.com');
     }
 
     public function fromStringProvider()

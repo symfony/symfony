@@ -19,8 +19,8 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\RememberMe\PersistentRememberMeHandler;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
@@ -50,8 +50,8 @@ class PersistentRememberMeHandlerTest extends TestCase
             ->method('createNewToken')
             ->with($this->callback(function ($persistentToken) {
                 return $persistentToken instanceof PersistentToken
-                    && $persistentToken->getUserIdentifier() === 'wouter'
-                    && $persistentToken->getClass() === InMemoryUser::class;
+                    && 'wouter' === $persistentToken->getUserIdentifier()
+                    && InMemoryUser::class === $persistentToken->getClass();
             }));
 
         $this->handler->createRememberMeCookie(new InMemoryUser('wouter', null));
@@ -71,7 +71,7 @@ class PersistentRememberMeHandlerTest extends TestCase
 
         /** @var Cookie $cookie */
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
-        $this->assertEquals(null, $cookie->getValue());
+        $this->assertNull($cookie->getValue());
     }
 
     public function testConsumeRememberMeCookieValid()
@@ -118,7 +118,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->tokenProvider->expects($this->any())
             ->method('loadTokenBySeries')
             ->with('series1')
-            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('-'.(31536000 - 1).' years')));
+            ->willReturn(new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTime('-'.(31536000 - 1).' seconds')));
 
         $this->tokenProvider->expects($this->never())->method('updateToken')->with('series1');
 

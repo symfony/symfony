@@ -92,29 +92,6 @@ class AddressTest extends TestCase
         return [[''], [' '], [" \r\n "]];
     }
 
-    /**
-     * @dataProvider fromStringProvider
-     * @group legacy
-     */
-    public function testFromString($string, $displayName, $addrSpec)
-    {
-        $address = Address::create($string);
-        $this->assertEquals($displayName, $address->getName());
-        $this->assertEquals($addrSpec, $address->getAddress());
-        $fromToStringAddress = Address::create($address->toString());
-        $this->assertEquals($displayName, $fromToStringAddress->getName());
-        $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFromStringFailure()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        Address::create('Jane Doe <example@example.com');
-    }
-
     public function fromStringProvider()
     {
         return [

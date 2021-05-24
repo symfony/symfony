@@ -13,7 +13,6 @@ namespace Symfony\Component\Mime\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Exception\InvalidArgumentException;
 
 class AddressTest extends TestCase
 {

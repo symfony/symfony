@@ -19,6 +19,10 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessage;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopedMessageNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeObject;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
@@ -710,6 +714,38 @@ XML;
         $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
 
         (new XmlEncoder())->encode(tmpfile(), 'xml');
+    }
+
+    public function testReentrantXmlEncoder()
+    {
+        $envelope = new EnvelopeObject();
+        $message = new EnvelopedMessage();
+        $message->text = 'Symfony is great';
+        $envelope->message = $message;
+
+        $encoder = $this->createXmlEncoderWithEnvelopeNormalizer();
+        $expected = <<<'XML'
+<?xml version="1.0"?>
+<response><message>PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxyZXNwb25zZT48dGV4dD5TeW1mb255IGlzIGdyZWF0PC90ZXh0PjwvcmVzcG9uc2U+Cg==</message></response>
+
+XML;
+
+        $this->assertSame($expected, $encoder->encode($envelope, 'xml'));
+    }
+
+    private function createXmlEncoderWithEnvelopeNormalizer()
+    {
+        $normalizers = [
+            $envelopeNormalizer = new EnvelopeNormalizer(),
+            new EnvelopedMessageNormalizer(),
+        ];
+
+        $encoder = new XmlEncoder();
+        $serializer = new Serializer($normalizers, ['xml' => $encoder]);
+        $encoder->setSerializer($serializer);
+        $envelopeNormalizer->setSerializer($serializer);
+
+        return $encoder;
     }
 
     /**

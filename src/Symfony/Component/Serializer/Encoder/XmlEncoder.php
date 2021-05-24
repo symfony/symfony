@@ -26,10 +26,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 {
     const FORMAT = 'xml';
 
-    /**
-     * @var \DOMDocument
-     */
-    private $dom;
     private $format;
     private $context;
     private $rootNodeName = 'response';
@@ -58,19 +54,19 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $xmlRootNodeName = $this->resolveXmlRootName($context);
 
-        $this->dom = $this->createDomDocument($context);
+        $dom = $this->createDomDocument($context);
         $this->format = $format;
         $this->context = $context;
 
         if (null !== $data && !is_scalar($data)) {
-            $root = $this->dom->createElement($xmlRootNodeName);
-            $this->dom->appendChild($root);
+            $root = $dom->createElement($xmlRootNodeName);
+            $dom->appendChild($root);
             $this->buildXml($root, $data, $xmlRootNodeName);
         } else {
-            $this->appendNode($this->dom, $data, $xmlRootNodeName);
+            $this->appendNode($dom, $data, $xmlRootNodeName);
         }
 
-        return $this->dom->saveXML();
+        return $dom->saveXML();
     }
 
     /**
@@ -189,7 +185,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     final protected function appendXMLString(\DOMNode $node, $val)
     {
         if (\strlen($val) > 0) {
-            $frag = $this->dom->createDocumentFragment();
+            $frag = $node->ownerDocument->createDocumentFragment();
             $frag->appendXML($val);
             $node->appendChild($frag);
 
@@ -206,7 +202,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     final protected function appendText(\DOMNode $node, $val)
     {
-        $nodeText = $this->dom->createTextNode($val);
+        $nodeText = $node->ownerDocument->createTextNode($val);
         $node->appendChild($nodeText);
 
         return true;
@@ -219,7 +215,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     final protected function appendCData(\DOMNode $node, $val)
     {
-        $nodeText = $this->dom->createCDATASection($val);
+        $nodeText = $node->ownerDocument->createCDATASection($val);
         $node->appendChild($nodeText);
 
         return true;
@@ -449,7 +445,14 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     private function appendNode(\DOMNode $parentNode, $data, $nodeName, $key = null)
     {
-        $node = $this->dom->createElement($nodeName);
+        $dom = null;
+        if ($parentNode instanceof \DomDocument) {
+            $dom = $parentNode;
+        } else {
+            $dom = $parentNode->ownerDocument;
+        }
+
+        $node = $dom->createElement($nodeName);
         if (null !== $key) {
             $node->setAttribute('key', $key);
         }
@@ -488,12 +491,12 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         if (\is_array($val)) {
             return $this->buildXml($node, $val);
         } elseif ($val instanceof \SimpleXMLElement) {
-            $child = $this->dom->importNode(dom_import_simplexml($val), true);
+            $child = $node->ownerDocument->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif ($val instanceof \DOMNode) {
-            $child = $this->dom->importNode($val, true);
+            $child = $node->ownerDocument->importNode($val, true);
             $node->appendChild($child);
         } elseif (\is_object($val)) {
             if (null === $this->serializer) {

@@ -146,6 +146,15 @@ Routing
  * Removed `RouteCollectionBuilder`.
  * Added argument `$priority` to `RouteCollection::add()`
  * Removed the `RouteCompiler::REGEX_DELIMITER` constant
+ * `Route` and `CompiledRoute` do not implement the deprecated `Serializable`
+   interface anymore. The consequence is that objects that were serialized with
+   PHP 7.3 or below cannot be unserialized anymore. If an application stores
+   serialized instances of those classes, those have to be regenerated before
+   upgrading to Symfony 6. This can be done by running the following code on
+   PHP 7.4 or newer:
+   ```php
+   $serializedRoute = serialize(unserialize($serializedRoute));
+   ```
 
 Security
 --------

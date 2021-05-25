@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-24T21:36:40Z
+
+Sorry I wasn't clear enough. On legacy tests, calling deprecated code is expected! This PR is for 6.0:)
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2021-05-24T21:43:09Z
+
+My bad, I hesitated and went for it as it's late, should be good now :) Not sure why it auto asked for review tho, sorry for the unnecessary pings :(
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2021-05-25T12:12:32Z
+
+I just reviewed as I've sent the PR late yesterday, shouldn't I also delete fromStringProvider ?
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2021-05-25T12:46:10Z
+
+>
+>
+> I just reviewed as I've sent the PR late yesterday, shouldn't I also delete fromStringProvider ?
+
+It's still used in testCreateWithString, I don't know if renaming the provider is a good idea or not.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-25T12:53:38Z
+
+Good observation.
+
+Let's rename it. There is no backwards compatibility issue with files in `/Tests/`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-25T12:55:08Z
+
+The rename should happen on 5.3 then!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-25T12:55:22Z
+
+Or better: don't rename
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-25T13:02:14Z
+
+Oh... let's not rename it then =)
+
+Im happy with this PR in its current state.
+
+---------------------------------------------------------------------------
+
+by 0x346e3730 at 2021-05-25T13:03:14Z
+
+I'm cool with not renaming it too.

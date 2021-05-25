@@ -63,6 +63,7 @@
         "doctrine/orm": ""
     },
     "autoload": {
+        "files": [ "bootstrap.php" ],
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },
         "exclude-from-classmap": [
             "/Tests/"

@@ -31,14 +31,20 @@ class ExpressionLanguageSyntax extends Constraint
     public $message = 'This value should be a valid expression.';
     public $service;
     public $allowedVariables;
+    public $allowNullAndEmptyString = false;
 
-    public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, array $groups = null, $payload = null)
+    public function __construct(array $options = null, string $message = null, string $service = null, array $allowedVariables = null, bool $allowNullAndEmptyString = null, array $groups = null, $payload = null)
     {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->service = $service ?? $this->service;
         $this->allowedVariables = $allowedVariables ?? $this->allowedVariables;
+        $this->allowNullAndEmptyString = $allowNullAndEmptyString ?? $this->allowNullAndEmptyString;
+
+        if (isset($options['allowNullAndEmptyString'])) {
+            trigger_deprecation('symfony/validator', '5.4', sprintf('The "allowNullAndEmptyString" option of the "%s" constraint is deprecated.', self::class));
+        }
     }
 
     /**

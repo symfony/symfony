@@ -61,6 +61,7 @@ class ExpressionLanguageSyntaxTest extends TestCase
         [$aConstraint] = $metadata->properties['a']->getConstraints();
         self::assertNull($aConstraint->service);
         self::assertNull($aConstraint->allowedVariables);
+        self::assertFalse($aConstraint->allowNullAndEmptyString);
 
         [$bConstraint] = $metadata->properties['b']->getConstraints();
         self::assertSame('my_service', $bConstraint->service);
@@ -70,6 +71,9 @@ class ExpressionLanguageSyntaxTest extends TestCase
         [$cConstraint] = $metadata->properties['c']->getConstraints();
         self::assertSame(['foo', 'bar'], $cConstraint->allowedVariables);
         self::assertSame(['my_group'], $cConstraint->groups);
+
+        [$dConstraint] = $metadata->properties['d']->getConstraints();
+        self::assertTrue($dConstraint->allowNullAndEmptyString);
     }
 }
 
@@ -83,4 +87,7 @@ class ExpressionLanguageSyntaxDummy
 
     #[ExpressionLanguageSyntax(allowedVariables: ['foo', 'bar'], groups: ['my_group'])]
     private $c;
+
+    #[ExpressionLanguageSyntax(allowNullAndEmptyString: true)]
+    private $d;
 }

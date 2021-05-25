@@ -39,7 +39,7 @@ class ExpressionLanguageSyntaxValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, ExpressionLanguageSyntax::class);
         }
 
-        if (null === $expression || '' === $expression) {
+        if (true === $constraint->allowNullAndEmptyString && (null === $expression || '' === $expression)) {
             return;
         }
 

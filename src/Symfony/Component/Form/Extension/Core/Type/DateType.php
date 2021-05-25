@@ -375,9 +375,7 @@ class DateType extends AbstractType
         $result = [];
 
         foreach ($years as $year) {
-            if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
-                $result[$y] = $year;
-            }
+            $result[\PHP_INT_SIZE === 4 ? \DateTime::createFromFormat('Y e', $year.' UTC')->format('U') : gmmktime(0, 0, 0, 6, 15, $year)] = $year;
         }
 
         return $result;

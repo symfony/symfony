@@ -87,7 +87,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     public function __construct(string $environment, bool $debug)
     {
-        $this->environment = $environment;
+        if (!$this->environment = $environment) {
+            throw new \InvalidArgumentException(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', get_debug_type($this)));
+        }
+
         $this->debug = $debug;
     }
 

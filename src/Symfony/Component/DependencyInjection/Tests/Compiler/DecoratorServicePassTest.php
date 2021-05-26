@@ -242,6 +242,25 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
+    public function testProcessLeavesServiceSubscriberTagOnOriginalDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(['container.service_subscriber' => [], 'bar' => ['attr' => 'baz']])
+        ;
+        $container
+            ->register('baz')
+            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(['container.service_subscriber' => []], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
+    }
+
     public function testGenericInnerReference()
     {
         $container = new ContainerBuilder();

@@ -423,14 +423,6 @@ class Filesystem
                 return null;
             }
 
-            if ('\\' === \DIRECTORY_SEPARATOR) {
-                $path = readlink($path);
-            }
-
-            return realpath($path);
-        }
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
             return realpath($path);
         }
 

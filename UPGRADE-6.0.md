@@ -89,6 +89,7 @@ FrameworkBundle
  * Registered workflow services are now private
  * Remove option `--xliff-version` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
  * Remove option `--output-format` of the `translation:update` command, use e.g. `--output-format=xlf20` instead
+ * Remove the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
 
 HttpFoundation
 --------------

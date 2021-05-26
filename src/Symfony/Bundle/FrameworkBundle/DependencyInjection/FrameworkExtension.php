@@ -1415,7 +1415,7 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            if (!$this->annotationsConfigEnabled && \PHP_VERSION_ID < 80000) {
+            if (!$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the validator cannot be set as the PHP version is lower than 8 and Doctrine Annotations support is disabled. Consider upgrading PHP.');
             }
 
@@ -1718,10 +1718,6 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
-            if (\PHP_VERSION_ID < 80000 && !$this->annotationsConfigEnabled) {
-                throw new \LogicException('"enable_annotations" on the serializer cannot be set as the PHP version is lower than 8 and Annotations support is disabled. Consider upgrading PHP.');
-            }
-
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
                 [new Reference('annotation_reader', ContainerInterface::NULL_ON_INVALID_REFERENCE)]

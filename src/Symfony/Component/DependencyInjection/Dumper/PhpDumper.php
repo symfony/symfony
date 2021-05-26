@@ -157,7 +157,7 @@ class PhpDumper extends Dumper
         $this->hotPathTag = $options['hot_path_tag'];
         $this->preloadTags = $options['preload_tags'];
         $this->inlineFactories = $this->asFiles && $options['inline_factories_parameter'] && $this->container->hasParameter($options['inline_factories_parameter']) && $this->container->getParameter($options['inline_factories_parameter']);
-        $this->inlineRequires = $options['inline_class_loader_parameter'] && ($this->container->hasParameter($options['inline_class_loader_parameter']) ? $this->container->getParameter($options['inline_class_loader_parameter']) : (\PHP_VERSION_ID < 70400 || $options['debug']));
+        $this->inlineRequires = $options['inline_class_loader_parameter'] && ($this->container->hasParameter($options['inline_class_loader_parameter']) ? $this->container->getParameter($options['inline_class_loader_parameter']) : $options['debug']);
         $this->serviceLocatorTag = $options['service_locator_tag'];
 
         if (0 !== strpos($baseClass = $options['base_class'], '\\') && 'Container' !== $baseClass) {

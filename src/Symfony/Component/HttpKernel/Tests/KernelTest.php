@@ -55,6 +55,14 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
 
+    public function testEmptyEnv()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
+
+        new KernelForTest('', false);
+    }
+
     public function testClone()
     {
         $env = 'test_env';

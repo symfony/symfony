@@ -376,7 +376,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse('\\' === \DIRECTORY_SEPARATOR ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        $this->assertFalse(is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
@@ -1076,6 +1076,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->symlink($link1, $link2);
 
         $this->assertEquals($file, $this->filesystem->readlink($link1));
+
         $this->assertEquals($link1, $this->filesystem->readlink($link2));
         $this->assertEquals($file, $this->filesystem->readlink($link1, true));
         $this->assertEquals($file, $this->filesystem->readlink($link2, true));

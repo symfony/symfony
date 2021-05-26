@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-05-25T12:39:52Z
+
+we already added the same special treatment for the `container.service_locator` tag in #35214

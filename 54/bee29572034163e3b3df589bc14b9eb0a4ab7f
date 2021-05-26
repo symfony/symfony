@@ -1,0 +1,157 @@
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-20T11:53:29Z
+
+I'm not sure if skipping a test is a good idea, but the green bars clearly improve my mood :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-04-21T09:12:55Z
+
+:D
+What changed in PHP 7.3? The `Filesystem` component is supposed to provide one consistent behavior for all versions and OSes. We might want to decide which behavior is the correct one and fix it.
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-21T11:35:11Z
+
+> What changed in PHP 7.3?
+```php
+<?php
+
+// check behavior functions realpath, readlink, and component Symfony Filesystem for windows
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Filesystem\Filesystem;
+
+$dir = __DIR__ . DIRECTORY_SEPARATOR . 'dir';
+mkdir($dir);
+
+$file = $dir . DIRECTORY_SEPARATOR . 'file';
+$link1 = $dir . DIRECTORY_SEPARATOR . 'link1';
+$link2 = $dir . DIRECTORY_SEPARATOR . 'link2';
+
+touch($file);
+
+symlink($file, $link1);
+symlink($link1, $link2);
+
+$fs = new Filesystem();
+
+echo 'PHP: ' . PHP_VERSION . PHP_EOL;
+echo 'realpath: ' . realpath($link2) . PHP_EOL;
+echo 'readlink: ' . readlink($link2) . PHP_EOL;
+echo '$fs->readlink($link2, true): ' . $fs->readlink($link2, true) . PHP_EOL;
+echo '$fs->readlink($link2): ' . $fs->readlink($link2) . PHP_EOL;
+
+unlink($file);
+unlink($link1);
+unlink($link2);
+rmdir($dir);
+
+```
+
+b - before patch, a - after patch
+
+|  PHP  | realpath | readlink | (b)$fs->readlink ($link2,true) | (b)$fs-> readlink ($link2) | (a)$fs->readlink ($link2,true) | (a)$fs->readlink ($link2) |
+| ----- | -------- | -------- | --------------------------- | ----------------------------  | ---------------------------- | --------- |
+| 8.0.* | file     | link1    | file | `file`   | file | link1 |
+| 7.4.18 - 7.4.10 | file | link1 | file | `file` | file | link1 |
+| 7.4.9 - 7.4.0  | link1  | link1      | file | link1      | file | link1 |
+| 7.3.28 - 7.3.22 | file  | file        | file | `file`       | file  | `file` |
+| 7.3.21 - 7.3.2  | link1 | file | file | link1 |  file | link1 |
+| 7.3.1 - 7.3.0 | file | file | file | `file` |  file | `file` |
+| 7.2.*| link1 | file        | file | link1      | file | link1 |
+| 7.1.3 - 7.1.33  | link1 | file | file | link1      | file | link1 |
+
+###conclusion:
+ - realpath() works correctly with PHP 7.4.10, bug report https://www.php.net/ChangeLog-7.php#PHP_7_4
+ - readlink() works correctly with PHP 7.4.0, bug report n/a
+
+What to do with PHP 7.3.* ?
+
+Correct me, maybe I am confusing or missing something.
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-22T22:06:38Z
+
+how  check
+
+```cmd
+set PROJECT_DIR=C:\symfony
+set PHPUNIT=%PROJECT_DIR%/phpunit^
+    --colors=never^
+    --bootstrap %PROJECT_DIR%/vendor\autoload.php^
+    --configuration %PROJECT_DIR%/phpunit.xml.dist %PROJECT_DIR%/src/Symfony/Component/Filesystem
+
+FOR %%V IN (
+    7.1.3,
+    7.1.33,
+    7.2.15,
+    7.2.34,
+    7.3.0,
+    7.3.15,
+    7.3.27,
+    7.3.28,
+    7.4.0,
+    7.4.9,
+    7.4.10,
+    7.4.15,
+    7.4.16,
+    7.4.18,
+    8.0.0,
+    8.0.1,
+    8.0.2,
+    8.0.3,
+    8.0.5,
+    8.0.6
+) DO (
+    c:\php\%%V\php %PHPUNIT%
+    @if errorlevel 1 (
+       exit /b
+    )
+)
+```
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-23T09:29:17Z
+
+Hi @nicolas-grekas, please check my code.
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-23T22:51:52Z
+
+imho need to edit the description, the current one is misleading
+
+> "... On Windows systems, readlink() resolves recursively the children links of a link until a final target is found.  ... "
+
+https://symfony.com/doc/4.4/components/filesystem.html#readlink
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-27T09:16:54Z
+
+Bug report for PHP7.3.27 https://bugs.php.net/bug.php?id=80993
+
+---------------------------------------------------------------------------
+
+by a1812 at 2021-04-27T14:16:25Z
+
+Answer from php.net
+
+```
+The erroneous readlink() has apparently been fixed inadvertently
+when php_sys_readlink() has been refactored[1].
+
+Anyhow, PHP 7.3 is in security mode[2], so unless this would be
+regarded as security issue, the fix will not be backported.
+
+[1] <https://github.com/php/php-src/commit/91c905e83c338ef66da824be4f90c1d78d134507>
+[2] <https://www.php.net/supported-versions.php>
+```
+
+I think we did everything we could (fixed for 8.0 and >=7.4.10) for behavior our component

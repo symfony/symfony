@@ -1,7 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-// Cache-Id: 2020-04-10 20:30 UTC
+// Cache-Id: 2021-05-27 20:30 UTC
+// For caching to work properly on appveyor, this file
+// must be exactly the same in all maintained branches
 
 if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";

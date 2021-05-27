@@ -22,8 +22,8 @@ env:
 matrix:
     include:
         - php: 7.2
-          env: php_extra="7.3 8.0"
-        - php: 7.4
+          env: php_extra="7.3 7.4"
+        - php: 8.0
           env: deps=high
         - php: 8.0
           env: deps=low

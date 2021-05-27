@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
@@ -57,6 +58,28 @@ class SessionListenerTest extends TestCase
         $container->set('session', $session);
         $container->set('request_stack', $requestStack);
         $container->set('session_storage', $sessionStorage);
+
+        $request = new Request();
+        $listener = new SessionListener($container);
+
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects($this->exactly(2))->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
+
+        $listener->onKernelRequest($event);
+
+        $this->assertTrue($request->hasSession());
+        $this->assertSame($session, $request->getSession());
+    }
+
+    public function testSessionUsesFactory()
+    {
+        $session = $this->createMock(Session::class);
+        $sessionFactory = $this->createMock(SessionFactory::class);
+        $sessionFactory->expects($this->once())->method('createSession')->willReturn($session);
+
+        $container = new Container();
+        $container->set('session_factory', $sessionFactory);
 
         $request = new Request();
         $listener = new SessionListener($container);

@@ -146,6 +146,7 @@ return static function (ContainerConfigurator $container) {
         ->set('session_listener', SessionListener::class)
             ->args([
                 service_locator([
+                    'session_factory' => service('session.factory')->ignoreOnInvalid(),
                     'session' => service('.session.do-not-use')->ignoreOnInvalid(),
                     'initialized_session' => service('.session.do-not-use')->ignoreOnUninitialized(),
                     'logger' => service('logger')->ignoreOnInvalid(),

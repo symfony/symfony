@@ -120,7 +120,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function getItem($key): CacheItem
+    public function getItem(mixed $key): CacheItem
     {
         $syncItem = self::$syncItem;
         $misses = [];
@@ -184,7 +184,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function hasItem($key): bool
+    public function hasItem(mixed $key): bool
     {
         foreach ($this->adapters as $adapter) {
             if ($adapter->hasItem($key)) {
@@ -217,7 +217,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function deleteItem($key): bool
+    public function deleteItem(mixed $key): bool
     {
         $deleted = true;
         $i = $this->adapterCount;

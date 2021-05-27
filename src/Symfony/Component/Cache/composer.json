@@ -16,13 +16,13 @@
         }
     ],
     "provide": {
-        "psr/cache-implementation": "1.0|2.0|3.0",
+        "psr/cache-implementation": "2.0|3.0",
         "psr/simple-cache-implementation": "1.0",
         "symfony/cache-implementation": "1.0|2.0"
     },
     "require": {
         "php": ">=8.0.2",
-        "psr/cache": "^1.0|^2.0|^3.0",
+        "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1",
         "symfony/cache-contracts": "^1.1.7|^2",
         "symfony/deprecation-contracts": "^2.1",

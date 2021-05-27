@@ -120,7 +120,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function getItem($key): CacheItem
+    public function getItem(mixed $key): CacheItem
     {
         $item = $this->pool->getItem($this->getId($key));
 
@@ -144,7 +144,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function hasItem($key): bool
+    public function hasItem(mixed $key): bool
     {
         return $this->pool->hasItem($this->getId($key));
     }
@@ -164,7 +164,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function deleteItem($key): bool
+    public function deleteItem(mixed $key): bool
     {
         return $this->pool->deleteItem($this->getId($key));
     }
@@ -245,7 +245,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         }
     }
 
-    private function getId($key): string
+    private function getId(mixed $key): string
     {
         \assert('' !== CacheItem::validateKey($key));
 

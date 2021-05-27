@@ -27,7 +27,7 @@ interface AdapterInterface extends CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem($key): CacheItem;
+    public function getItem(mixed $key): CacheItem;
 
     /**
      * {@inheritdoc}

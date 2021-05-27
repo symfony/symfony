@@ -402,7 +402,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
-        if (null === $types = $this->getTypes($currentClass, $attribute)) {
+        if (null === $types = $this->getTypes($currentClass, $attribute, $context)) {
             return $data;
         }
 
@@ -548,18 +548,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @return Type[]|null
      */
-    private function getTypes(string $currentClass, string $attribute): ?array
+    private function getTypes(string $currentClass, string $attribute, array $context): ?array
     {
         if (null === $this->propertyTypeExtractor) {
             return null;
         }
 
-        $key = $currentClass.'::'.$attribute;
+        $key = $this->getTypesCacheKey($currentClass, $attribute, $context);
         if (isset($this->typesCache[$key])) {
             return false === $this->typesCache[$key] ? null : $this->typesCache[$key];
         }
 
-        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute, $context)) {
             return $this->typesCache[$key] = $types;
         }
 
@@ -571,7 +571,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
+                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute, $context)) {
                     return $this->typesCache[$key] = $types;
                 }
             }
@@ -672,6 +672,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
+        } catch (\Exception $exception) {
+            // The context cannot be serialized, skip the cache
+            return false;
+        }
+    }
+
+    /**
+     * @return bool|string
+     */
+    private function getTypesCacheKey(string $currentClass, string $attribute, array $context)
+    {
+        try {
+            return md5($currentClass.'::'.$attribute.serialize(['context' => $context]));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache
             return false;

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Pass context from serializer to property info
+
 5.3
 ---
 

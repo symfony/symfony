@@ -33,10 +33,14 @@ class TestSessionListener extends AbstractTestSessionListener
 
     protected function getSession(): ?SessionInterface
     {
-        if (!$this->container->has('session')) {
-            return null;
+        if ($this->container->has('session')) {
+            return $this->container->get('session');
         }
 
-        return $this->container->get('session');
+        if ($this->container->has('session_factory')) {
+            return $this->container->get('session_factory')->createSession();
+        }
+
+        return null;
     }
 }

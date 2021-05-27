@@ -49,7 +49,7 @@ final class HttpClient
             }
         }
 
-        if (\extension_loaded('curl')) {
+        if (\extension_loaded('curl') && \function_exists('curl_multi_exec')) {
             if ('\\' !== \DIRECTORY_SEPARATOR || isset($defaultOptions['cafile']) || isset($defaultOptions['capath']) || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath')) {
                 return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
             }

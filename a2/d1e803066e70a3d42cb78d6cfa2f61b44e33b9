@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-05-20T18:54:39Z
+
+Hey!
+
+I think @fancyweb has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-23T09:42:57Z
+
+> SwitchUserToken has no unserializer
+
+test failure look related
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-23T13:07:23Z
+
+It is indeed.
+
+The failing test checks if a `SwitchUserToken` that has been serialized with Symfony 4.4 and PHP 7.2 (I think) can still be unserialized. This does not work anymore because on PHP 7.2, the `Serializable` interface is used and if we remove that interface, PHP does not know how to unserialize the data. The test will fail again if we remove the deprecated `User` class because the serialized fixture uses it.
+
+I think, the gap is too large here. I would not expect that I can jump from Symfony 4.4 and PHP 7.2 to Symfony 6.0 and PHP 8.0 directly and resume old sessions.
+
+I would regenerate the fixture with `InMemoryUser` on Symfony 5.3 and PHP 8 and update the test accordingly. Would that be okay?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-23T13:48:45Z
+
+🤔 Let's get that deprecated user out of that fixture first. #41385
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-23T16:33:25Z
+
+Now that the deprecated fixture is out of the way, I could regenerate the fixture on PHP 8. This way, an app could still jump from Symfony 4.4 to 6.0 directly, if PHP is not upgraded at the same time. I'm going to document this is the upgrade notes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-24T07:11:33Z
+
+> Route has no unserializer
+
+one more :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-24T12:59:43Z
+
+> one more :)
+
+Fixed. I regenerated the fixture with Symfony 4.4 and PHP 8:
+
+```php
+$newFixture = serialize(unserialize($oldFixture));
+```
+
+What is the use-case for serializing routes? I'd like to write an upgrade note here as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-24T13:04:21Z
+
+I think Drupal stores the routes in the DB.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-05-24T13:11:59Z
+
+Oh, I see. In that case, Drupal needs to provide a way to migrate database tables storing serialized routes after a PHP upgrade (if that does not happen already), ideally before they release a version with Symfony 6 support. Is there someone we can contact about that?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-24T13:43:08Z
+
+/cc @alexpott
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-26T10:24:17Z
+
+As discussed in https://github.com/symfony/symfony/issues/41094#issuecomment-847242634, we should keep the interface on implementations (not on interfaces), but they should be final and internal, and only unserialize() should have an implementation: serialize() should throw a BadMethodCall instead

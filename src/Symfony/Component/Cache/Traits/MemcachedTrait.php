@@ -84,12 +84,10 @@ trait MemcachedTrait
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = [])
+    public static function createConnection(string|array $servers, array $options = [])
     {
         if (\is_string($servers)) {
             $servers = [$servers];
-        } elseif (!\is_array($servers)) {
-            throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, "%s" given.', \gettype($servers)));
         }
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required.');
@@ -273,7 +271,7 @@ trait MemcachedTrait
     /**
      * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave(string $id)
     {
         return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }
@@ -298,12 +296,12 @@ trait MemcachedTrait
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace)
     {
         return '' === $namespace && $this->getClient()->flush();
     }
 
-    private function checkResultCode($result)
+    private function checkResultCode(mixed $result)
     {
         $code = $this->client->getResultCode();
 

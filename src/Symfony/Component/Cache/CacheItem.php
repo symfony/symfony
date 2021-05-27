@@ -151,11 +151,9 @@ final class CacheItem implements ItemInterface
     /**
      * Validates a cache key according to PSR-6.
      *
-     * @param string $key The key to validate
-     *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key): string
+    public static function validateKey(mixed $key): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));

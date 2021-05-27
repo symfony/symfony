@@ -88,7 +88,7 @@ final class EarlyExpirationMessage
         return $callback;
     }
 
-    private function __construct(CacheItem $item, string $pool, $callback)
+    private function __construct(CacheItem $item, string $pool, string|array $callback)
     {
         $this->item = $item;
         $this->pool = $pool;

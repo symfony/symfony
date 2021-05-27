@@ -291,14 +291,12 @@ trait AbstractAdapterTrait
      *
      * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
      *
-     * @param bool $enable
-     *
      * @return bool the previous state of versioning
      */
-    public function enableVersioning($enable = true)
+    public function enableVersioning(bool $enable = true)
     {
         $wasEnabled = $this->versioningIsEnabled;
-        $this->versioningIsEnabled = (bool) $enable;
+        $this->versioningIsEnabled = $enable;
         $this->namespaceVersion = '';
         $this->ids = [];
 
@@ -356,7 +354,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function getId($key)
+    private function getId(string|int $key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];

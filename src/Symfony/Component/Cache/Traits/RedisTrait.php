@@ -47,19 +47,12 @@ trait RedisTrait
     private $redis;
     private $marshaller;
 
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient
-     */
-    private function init($redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
+    private function init(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 
         if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
-        }
-
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
         }
 
         if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getOptions()->exceptions) {
@@ -82,14 +75,13 @@ trait RedisTrait
      *   - redis:///var/run/redis.sock
      *   - redis://secret@/var/run/redis.sock/13
      *
-     * @param string $dsn
-     * @param array  $options See self::$defaultConnectionOptions
+     * @param array $options See self::$defaultConnectionOptions
      *
      * @throws InvalidArgumentException when the DSN is invalid
      *
      * @return \Redis|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
      */
-    public static function createConnection($dsn, array $options = [])
+    public static function createConnection(string $dsn, array $options = [])
     {
         if (0 === strpos($dsn, 'redis:')) {
             $scheme = 'redis';
@@ -498,7 +490,7 @@ trait RedisTrait
         return $failed;
     }
 
-    private function pipeline(\Closure $generator, $redis = null): \Generator
+    private function pipeline(\Closure $generator, object $redis = null): \Generator
     {
         $ids = [];
         $redis = $redis ?? $this->redis;

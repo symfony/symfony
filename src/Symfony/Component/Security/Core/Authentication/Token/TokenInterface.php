@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface TokenInterface extends \Serializable
+interface TokenInterface
 {
     /**
      * Returns a string representation of the Token.

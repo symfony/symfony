@@ -100,25 +100,4 @@ class NullToken implements TokenInterface
     public function __unserialize(array $data): void
     {
     }
-
-    /**
-     * @return string
-     *
-     * @internal in 5.3
-     * @final in 5.3
-     */
-    public function serialize()
-    {
-        return '';
-    }
-
-    /**
-     * @return void
-     *
-     * @internal in 5.3
-     * @final in 5.3
-     */
-    public function unserialize($serialized)
-    {
-    }
 }

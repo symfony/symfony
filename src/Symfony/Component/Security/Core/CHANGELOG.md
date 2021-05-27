@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * `TokenInterface` does not extend `Serializable` anymore
+
 5.3
 ---
 

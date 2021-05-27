@@ -103,6 +103,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public const PRESERVE_EMPTY_OBJECTS = 'preserve_empty_objects';
 
+    public const DYNAMIC_TYPE_ATTRIBUTES = 'dynamic_type_attributes';
+
     private $propertyTypeExtractor;
     private $typesCache = [];
     private $attributesCache = [];
@@ -138,7 +140,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param array $context
      */
-    public function supportsNormalization(mixed $data, string $format = null /*, array $context = [] */)
+    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
@@ -305,7 +307,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @param array $context
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /*, array $context = [] */)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
@@ -351,7 +353,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
             }
 
-            $types = $this->getTypes($resolvedClass, $attribute);
+            $types = $this->getTypes($resolvedClass, $attribute, $context);
 
             if (null !== $types) {
                 try {
@@ -470,6 +472,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             if (is_numeric($data)) {
                                 return (float) $data;
                             }
+
                             return match ($data) {
                                 'NaN' => \NAN,
                                 'INF' => \INF,
@@ -580,7 +583,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, string $parameterName, mixed $parameterData, array $context, string $format = null): mixed
     {
-        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->getTypes($class->getName(), $parameterName)) {
+        if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $types = $this->getTypes($class->getName(), $parameterName, $context)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
         }
 
@@ -592,18 +595,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * @return Type[]|null
      */
-    private function getTypes(string $currentClass, string $attribute): ?array
+    private function getTypes(string $currentClass, string $attribute, array $context): ?array
     {
         if (null === $this->propertyTypeExtractor) {
             return null;
         }
 
-        $key = $currentClass.'::'.$attribute;
+        $key = $this->getTypesCacheKey($currentClass, $attribute, $context);
         if (isset($this->typesCache[$key])) {
             return false === $this->typesCache[$key] ? null : $this->typesCache[$key];
         }
 
-        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null !== $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute, $context)) {
             return $this->typesCache[$key] = $types;
         }
 
@@ -615,7 +618,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {
-                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute)) {
+                if (null !== $types = $this->propertyTypeExtractor->getTypes($mappedClass, $attribute, $context)) {
                     return $this->typesCache[$key] = $types;
                 }
             }
@@ -713,6 +716,25 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
         } catch (\Exception) {
+            // The context cannot be serialized, skip the cache
+            return false;
+        }
+    }
+
+    private function getTypesCacheKey(string $currentClass, string $attribute, array $context): bool|string
+    {
+        if (($context[self::DYNAMIC_TYPE_ATTRIBUTES][$currentClass] ?? false) && \in_array($attribute, $context[self::DYNAMIC_TYPE_ATTRIBUTES][$currentClass] ?? [], true)) {
+            try {
+                return md5($currentClass.'::'.$attribute.serialize(['context' => $context]));
+            } catch (\Exception $exception) {
+                // The context cannot be serialized, skip the cache
+                return false;
+            }
+        }
+
+        try {
+            return $currentClass.'::'.$attribute;
+        } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache
             return false;
         }

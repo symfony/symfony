@@ -4,7 +4,8 @@ CHANGELOG
 6.2
 ---
 
-* Add support for constructor promoted properties to `Context` attribute
+ * Add support for constructor promoted properties to `Context` attribute
+ * Pass context from serializer to property info
 
 6.1
 ---

@@ -17,6 +17,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -28,14 +30,17 @@ use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -54,10 +59,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Annotations\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyCompany;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberOne;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberTwo;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyProduct;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyReviewCreateDto;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
@@ -1180,6 +1188,47 @@ class SerializerTest extends TestCase
             [new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))],
         ];
     }
+
+    public function testDeserializeDifferentSubjectsWithSameInterface()
+    {
+        $extractor = new class() implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                if (DummyReviewCreateDto::class === $class && 'subject' === $property && ($context['resource_class'] ?? null) === 'CompanyReview') {
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyCompany::class)];
+                }
+
+                if (DummyReviewCreateDto::class === $class && 'subject' === $property && ($context['resource_class'] ?? null) === 'ProductReview') {
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyProduct::class)];
+                }
+
+                return null;
+            }
+        };
+
+        $serializer = new Serializer([
+            new ApiNormalizer([
+                '/companies/1' => $company = new DummyCompany(),
+                '/products/1' => $product = new DummyProduct(),
+            ], null, null, $extractor),
+            new ObjectNormalizer(),
+        ], [
+            new JsonEncoder(),
+        ]);
+        $context = [
+            AbstractObjectNormalizer::DYNAMIC_TYPE_ATTRIBUTES => [DummyReviewCreateDto::class => ['subject']],
+        ];
+
+        $review1 = $serializer->deserialize('{"subject":"/companies/1","review":"review about company"}', DummyReviewCreateDto::class, 'json', ['resource_class' => 'CompanyReview', ...$context]);
+        $review2 = $serializer->deserialize('{"subject":"/products/1","review":"review about product"}', DummyReviewCreateDto::class, 'json', ['resource_class' => 'ProductReview', ...$context]);
+        $review3 = $serializer->deserialize('{"subject":"/products/1","review":"review about product"}', DummyReviewCreateDto::class, 'json', $context);
+
+        $this->assertSame($company, $review1->subject);
+        $this->assertSame('review about company', $review1->review);
+        $this->assertSame($product, $review2->subject);
+        $this->assertSame('review about product', $review2->review);
+        $this->assertSame('/products/1', $review3->subject);
+    }
 }
 
 class Model
@@ -1340,4 +1389,45 @@ interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAware
 
 interface DenormalizerAwareDenormalizer extends DenormalizerInterface, DenormalizerAwareInterface
 {
+}
+
+final class ApiNormalizer extends AbstractObjectNormalizer implements ContextAwareDenormalizerInterface
+{
+    private array $subjects;
+
+    public function __construct(array $subjects, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    {
+        parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
+
+        $this->subjects = $subjects;
+    }
+
+    public function extractAttributes(object $object, string $format = null, array $context = []): array
+    {
+        return ['subject', 'review'];
+    }
+
+    public function setAttributeValue(object $object, string $attribute, $value, string $format = null, array $context = [])
+    {
+        $object->$attribute = $value;
+    }
+
+    public function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []): mixed
+    {
+        return $object->$attribute;
+    }
+
+    public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
+    {
+        return isset($context['resource_class']);
+    }
+
+    public function denormalize(mixed $data, string $type, string $format = null, array $context = []): mixed
+    {
+        if (\is_string($data) && isset($this->subjects[$data])) {
+            return $this->subjects[$data];
+        }
+
+        return parent::denormalize($data, $type, $format, $context);
+    }
 }

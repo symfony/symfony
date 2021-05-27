@@ -27,12 +27,10 @@ final class ViewEvent extends RequestEvent
 {
     /**
      * The return value of the controller.
-     *
-     * @var mixed
      */
     private $controllerResult;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, $controllerResult)
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, mixed $controllerResult)
     {
         parent::__construct($kernel, $request, $requestType);
 
@@ -51,10 +49,8 @@ final class ViewEvent extends RequestEvent
 
     /**
      * Assigns the return value of the controller.
-     *
-     * @param mixed $controllerResult The controller return value
      */
-    public function setControllerResult($controllerResult): void
+    public function setControllerResult(mixed $controllerResult): void
     {
         $this->controllerResult = $controllerResult;
     }

@@ -141,11 +141,9 @@ abstract class AbstractBrowser
     /**
      * Gets single server parameter for specified key.
      *
-     * @param mixed $default A default value when key is undefined
-     *
      * @return mixed A value of the parameter
      */
-    public function getServerParameter(string $key, $default = '')
+    public function getServerParameter(string $key, mixed $default = '')
     {
         return $this->server[$key] ?? $default;
     }
@@ -441,7 +439,7 @@ abstract class AbstractBrowser
      *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess($request)
+    protected function doRequestInProcess(object $request)
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -476,7 +474,7 @@ abstract class AbstractBrowser
      *
      * @return object An origin response instance
      */
-    abstract protected function doRequest($request);
+    abstract protected function doRequest(object $request);
 
     /**
      * Returns the script to execute when the request must be insulated.
@@ -485,7 +483,7 @@ abstract class AbstractBrowser
      *
      * @throws \LogicException When this abstract class is not implemented
      */
-    protected function getScript($request)
+    protected function getScript(object $request)
     {
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -507,7 +505,7 @@ abstract class AbstractBrowser
      *
      * @return Response An BrowserKit Response instance
      */
-    protected function filterResponse($response)
+    protected function filterResponse(object $response)
     {
         return $response;
     }
@@ -699,7 +697,7 @@ abstract class AbstractBrowser
      *
      * @return Crawler
      */
-    protected function requestFromRequest(Request $request, $changeHistory = true)
+    protected function requestFromRequest(Request $request, bool $changeHistory = true)
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }

@@ -67,7 +67,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeContainerService($service, array $options = [], ContainerBuilder $builder = null)
+    protected function describeContainerService(object $service, array $options = [], ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -144,7 +144,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($this->getCallableData($callable), $options);
     }
 
-    protected function describeContainerParameter($parameter, array $options = [])
+    protected function describeContainerParameter(mixed $parameter, array $options = [])
     {
         $key = $options['parameter'] ?? '';
 
@@ -302,7 +302,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    private function getCallableData($callable): array
+    private function getCallableData(mixed $callable): array
     {
         $data = [];
 
@@ -373,7 +373,7 @@ class JsonDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function describeValue($value, bool $omitTags, bool $showArguments)
+    private function describeValue(mixed $value, bool $omitTags, bool $showArguments): mixed
     {
         if (\is_array($value)) {
             $data = [];

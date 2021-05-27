@@ -86,12 +86,6 @@ class RouterListenerTest extends TestCase
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
-    public function testInvalidMatcher()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        new RouterListener(new \stdClass(), $this->requestStack);
-    }
-
     public function testRequestMatcher()
     {
         $kernel = $this->createMock(HttpKernelInterface::class);

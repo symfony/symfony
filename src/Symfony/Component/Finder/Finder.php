@@ -120,7 +120,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DepthRangeFilterIterator
      * @see NumberComparator
      */
-    public function depth($levels)
+    public function depth(string|int|array $levels)
     {
         foreach ((array) $levels as $level) {
             $this->depths[] = new Comparator\NumberComparator($level);
@@ -148,7 +148,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
-    public function date($dates)
+    public function date(string|array $dates)
     {
         foreach ((array) $dates as $date) {
             $this->dates[] = new Comparator\DateComparator($date);
@@ -173,7 +173,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function name($patterns)
+    public function name(string|array $patterns)
     {
         $this->names = array_merge($this->names, (array) $patterns);
 
@@ -189,7 +189,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notName($patterns)
+    public function notName(string|array $patterns)
     {
         $this->notNames = array_merge($this->notNames, (array) $patterns);
 
@@ -211,7 +211,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function contains($patterns)
+    public function contains(string|array $patterns)
     {
         $this->contains = array_merge($this->contains, (array) $patterns);
 
@@ -233,7 +233,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function notContains($patterns)
+    public function notContains(string|array $patterns)
     {
         $this->notContains = array_merge($this->notContains, (array) $patterns);
 
@@ -257,7 +257,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function path($patterns)
+    public function path(string|array $patterns)
     {
         $this->paths = array_merge($this->paths, (array) $patterns);
 
@@ -281,7 +281,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notPath($patterns)
+    public function notPath(string|array $patterns)
     {
         $this->notPaths = array_merge($this->notPaths, (array) $patterns);
 
@@ -303,7 +303,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see SizeRangeFilterIterator
      * @see NumberComparator
      */
-    public function size($sizes)
+    public function size(string|int|array $sizes)
     {
         foreach ((array) $sizes as $size) {
             $this->sizes[] = new Comparator\NumberComparator($size);
@@ -325,7 +325,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function exclude($dirs)
+    public function exclude(string|array $dirs)
     {
         $this->exclude = array_merge($this->exclude, (array) $dirs);
 
@@ -397,7 +397,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $pattern VCS patterns to ignore
      */
-    public static function addVCSPattern($pattern)
+    public static function addVCSPattern(string|array $pattern)
     {
         foreach ((array) $pattern as $p) {
             self::$vcsPatterns[] = $p;
@@ -576,7 +576,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @throws DirectoryNotFoundException if one of the directories does not exist
      */
-    public function in($dirs)
+    public function in(string|array $dirs)
     {
         $resolvedDirs = [];
 

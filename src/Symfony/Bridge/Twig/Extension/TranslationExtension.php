@@ -106,10 +106,9 @@ final class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @param string|\Stringable|TranslatableInterface|null $message
-     * @param array|string                                  $arguments Can be the locale as a string when $message is a TranslatableInterface
+     * @param array|string $arguments Can be the locale as a string when $message is a TranslatableInterface
      */
-    public function trans($message, $arguments = [], string $domain = null, string $locale = null, int $count = null): string
+    public function trans(string|\Stringable|TranslatableInterface|null $message, array|string $arguments = [], string $domain = null, string $locale = null, int $count = null): string
     {
         if ($message instanceof TranslatableInterface) {
             if ([] !== $arguments && !\is_string($arguments)) {

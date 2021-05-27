@@ -28,7 +28,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException
      */
-    public function transform($collection)
+    public function transform(mixed $collection)
     {
         if (null === $collection) {
             return [];
@@ -54,7 +54,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @return Collection A collection of entities
      */
-    public function reverseTransform($array)
+    public function reverseTransform(mixed $array)
     {
         if ('' === $array || null === $array) {
             $array = [];

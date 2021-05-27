@@ -213,7 +213,7 @@ class DoctrineDataCollector extends DataCollector
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
      */
-    private function sanitizeParam($var, ?\Throwable $error): array
+    private function sanitizeParam(mixed $var, ?\Throwable $error): array
     {
         if (\is_object($var)) {
             return [$o = new ObjectParameter($var, $error), false, $o->isStringable() && !$error];

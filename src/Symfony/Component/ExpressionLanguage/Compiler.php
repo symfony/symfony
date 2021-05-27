@@ -102,11 +102,9 @@ class Compiler implements ResetInterface
     /**
      * Returns a PHP representation of a given value.
      *
-     * @param mixed $value The value to convert
-     *
      * @return $this
      */
-    public function repr($value)
+    public function repr(mixed $value)
     {
         if (\is_int($value) || \is_float($value)) {
             if (false !== $locale = setlocale(\LC_NUMERIC, 0)) {

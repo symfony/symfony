@@ -54,7 +54,7 @@ class Scope
      *
      * @throws \LogicException
      */
-    public function set(string $key, $value)
+    public function set(string $key, mixed $value)
     {
         if ($this->left) {
             throw new \LogicException('Left scope is not mutable.');
@@ -88,7 +88,7 @@ class Scope
      *
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null)
     {
         if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];

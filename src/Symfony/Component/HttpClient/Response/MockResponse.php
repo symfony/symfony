@@ -45,7 +45,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
      *
      * @see ResponseInterface::getInfo() for possible info, e.g. "response_headers"
      */
-    public function __construct($body = '', array $info = [])
+    public function __construct(string|iterable $body = '', array $info = [])
     {
         $this->body = is_iterable($body) ? $body : (string) $body;
         $this->info = $info + ['http_code' => 200] + $this->info;

@@ -183,10 +183,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Returns a BinaryFileResponse object with original or customized file name and disposition header.
-     *
-     * @param \SplFileInfo|string $file File object or path to file to be sent as response
      */
-    protected function file($file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
+    protected function file(\SplFileInfo|string $file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file);
         $response->setContentDisposition($disposition, null === $fileName ? $response->getFile()->getFilename() : $fileName);
@@ -199,7 +197,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException
      */
-    protected function addFlash(string $type, $message): void
+    protected function addFlash(string $type, mixed $message): void
     {
         try {
             $this->container->get('request_stack')->getSession()->getFlashBag()->add($type, $message);
@@ -213,7 +211,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws \LogicException
      */
-    protected function isGranted($attribute, $subject = null): bool
+    protected function isGranted(mixed $attribute, mixed $subject = null): bool
     {
         if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
@@ -228,7 +226,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attribute, $subject = null, string $message = 'Access Denied.'): void
+    protected function denyAccessUnlessGranted(mixed $attribute, mixed $subject = null, string $message = 'Access Denied.'): void
     {
         if (!$this->isGranted($attribute, $subject)) {
             $exception = $this->createAccessDeniedException($message);
@@ -354,7 +352,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Creates and returns a Form instance from the type of the form.
      */
-    protected function createForm(string $type, $data = null, array $options = []): FormInterface
+    protected function createForm(string $type, mixed $data = null, array $options = []): FormInterface
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
@@ -362,7 +360,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     /**
      * Creates and returns a form builder instance.
      */
-    protected function createFormBuilder($data = null, array $options = []): FormBuilderInterface
+    protected function createFormBuilder(mixed $data = null, array $options = []): FormBuilderInterface
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }
@@ -428,7 +426,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
      *
      * @param object|Envelope $message The message or the message pre-wrapped in an envelope
      */
-    protected function dispatchMessage($message, array $stamps = []): Envelope
+    protected function dispatchMessage(object $message, array $stamps = []): Envelope
     {
         if (!$this->container->has('messenger.default_bus')) {
             $message = class_exists(Envelope::class) ? 'You need to define the "messenger.default_bus" configuration option.' : 'Try running "composer require symfony/messenger".';

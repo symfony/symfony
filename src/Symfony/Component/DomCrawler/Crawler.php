@@ -68,7 +68,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * @param \DOMNodeList|\DOMNode|\DOMNode[]|string|null $node A Node to use as the base for the crawling
      */
-    public function __construct($node = null, string $uri = null, string $baseHref = null)
+    public function __construct(\DOMNodeList|\DOMNode|array|string|null $node = null, string $uri = null, string $baseHref = null)
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
@@ -118,7 +118,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException when node is not the expected type
      */
-    public function add($node)
+    public function add(\DOMNodeList|\DOMNode|array|string|null $node)
     {
         if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
@@ -1097,11 +1097,9 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param \DOMElement $node
-     *
      * @return array
      */
-    protected function sibling($node, string $siblingDir = 'nextSibling')
+    protected function sibling(\DOMNode $node, string $siblingDir = 'nextSibling')
     {
         $nodes = [];
 
@@ -1212,7 +1210,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      */
-    private function createSubCrawler($nodes): object
+    private function createSubCrawler(\DOMNodeList|\DOMNode|array|string|null $nodes): object
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;

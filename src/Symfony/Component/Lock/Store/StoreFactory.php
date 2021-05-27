@@ -28,7 +28,7 @@ class StoreFactory
     /**
      * @return PersistingStoreInterface
      */
-    public static function createStore(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy|\Memcached|\MongoDB\Collection|\PDO|Connection|\Zookeeper|string $connection)
+    public static function createStore(object|string $connection)
     {
         switch (true) {
             case $connection instanceof \Redis:

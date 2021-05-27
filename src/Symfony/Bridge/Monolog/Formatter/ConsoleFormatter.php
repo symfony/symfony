@@ -145,7 +145,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function castObject($v, array $a, Stub $s, bool $isNested): array
+    public function castObject(mixed $v, array $a, Stub $s, bool $isNested): array
     {
         if ($this->options['multiline']) {
             return $a;
@@ -182,7 +182,7 @@ class ConsoleFormatter implements FormatterInterface
         return $record;
     }
 
-    private function dumpData($data, bool $colors = null): string
+    private function dumpData(mixed $data, bool $colors = null): string
     {
         if (null === $this->dumper) {
             return '';

@@ -124,16 +124,10 @@ class NotificationEmail extends TemplatedEmail
     }
 
     /**
-     * @param \Throwable|FlattenException $exception
-     *
      * @return $this
      */
-    public function exception($exception)
+    public function exception(\Throwable|FlattenException $exception)
     {
-        if (!$exception instanceof \Throwable && !$exception instanceof FlattenException) {
-            throw new \LogicException(sprintf('"%s" accepts "%s" or "%s" instances.', __METHOD__, \Throwable::class, FlattenException::class));
-        }
-
         $exceptionAsString = $this->getExceptionAsString($exception);
 
         $this->context['exception'] = true;
@@ -208,7 +202,7 @@ class NotificationEmail extends TemplatedEmail
         }
     }
 
-    private function getExceptionAsString($exception): string
+    private function getExceptionAsString(\Throwable|FlattenException $exception): string
     {
         if (class_exists(FlattenException::class)) {
             $exception = $exception instanceof FlattenException ? $exception : FlattenException::createFromThrowable($exception);

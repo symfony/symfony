@@ -78,7 +78,7 @@ class HttpOptions
      *
      * @return $this
      */
-    public function setBody($body)
+    public function setBody(mixed $body)
     {
         $this->options['body'] = $body;
 
@@ -86,11 +86,9 @@ class HttpOptions
     }
 
     /**
-     * @param mixed $json
-     *
      * @return $this
      */
-    public function setJson($json)
+    public function setJson(mixed $json)
     {
         $this->options['json'] = $json;
 
@@ -100,7 +98,7 @@ class HttpOptions
     /**
      * @return $this
      */
-    public function setUserData($data)
+    public function setUserData(mixed $data)
     {
         $this->options['user_data'] = $data;
 
@@ -288,11 +286,9 @@ class HttpOptions
     }
 
     /**
-     * @param string|array $fingerprint
-     *
      * @return $this
      */
-    public function setPeerFingerprint($fingerprint)
+    public function setPeerFingerprint(string|array $fingerprint)
     {
         $this->options['peer_fingerprint'] = $fingerprint;
 
@@ -312,7 +308,7 @@ class HttpOptions
     /**
      * @return $this
      */
-    public function setExtra(string $name, $value)
+    public function setExtra(string $name, mixed $value)
     {
         $this->options['extra'][$name] = $value;
 

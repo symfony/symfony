@@ -250,7 +250,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Returns a human-readable string for the specified variable.
      */
-    private function varToString($var): string
+    private function varToString(mixed $var): string
     {
         if (\is_object($var)) {
             return sprintf('an object of type %s', \get_class($var));

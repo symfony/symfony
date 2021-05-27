@@ -28,11 +28,7 @@ class MailerHandler extends AbstractProcessingHandler
 
     private $messageTemplate;
 
-    /**
-     * @param callable|Email $messageTemplate
-     * @param string|int     $level           The minimum logging level at which this handler will be triggered
-     */
-    public function __construct(MailerInterface $mailer, $messageTemplate, $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(MailerInterface $mailer, callable|Email $messageTemplate, string|int $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
 

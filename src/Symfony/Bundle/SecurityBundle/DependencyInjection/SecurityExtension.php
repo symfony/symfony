@@ -1091,7 +1091,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 
-    private function isValidIps($ips): bool
+    private function isValidIps(string|array $ips): bool
     {
         $ipsList = array_reduce((array) $ips, static function (array $ips, string $ip) {
             return array_merge($ips, preg_split('/\s*,\s*/', $ip));

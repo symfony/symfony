@@ -147,7 +147,7 @@ class ControllerResolver implements ControllerResolverInterface
         return new $class();
     }
 
-    private function getControllerError($callable): string
+    private function getControllerError(mixed $callable): string
     {
         if (\is_string($callable)) {
             if (false !== strpos($callable, '::')) {

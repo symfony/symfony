@@ -31,7 +31,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * @param mixed $subject   The subject of the event, usually an object or a callable
      * @param array $arguments Arguments to store in the event
      */
-    public function __construct($subject = null, array $arguments = [])
+    public function __construct(mixed $subject = null, array $arguments = [])
     {
         $this->subject = $subject;
         $this->arguments = $arguments;
@@ -66,11 +66,9 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * Add argument to event.
      *
-     * @param mixed $value Value
-     *
      * @return $this
      */
-    public function setArgument(string $key, $value)
+    public function setArgument(string $key, mixed $value)
     {
         $this->arguments[$key] = $value;
 
@@ -118,7 +116,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if key does not exist in $this->args
      */
-    public function offsetGet($key)
+    public function offsetGet(mixed $key)
     {
         return $this->getArgument($key);
     }
@@ -126,10 +124,9 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * ArrayAccess for argument setter.
      *
-     * @param string $key   Array key to set
-     * @param mixed  $value Value
+     * @param string $key Array key to set
      */
-    public function offsetSet($key, $value)
+    public function offsetSet(mixed $key, mixed $value)
     {
         $this->setArgument($key, $value);
     }
@@ -139,7 +136,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @param string $key Array key
      */
-    public function offsetUnset($key)
+    public function offsetUnset(mixed $key)
     {
         if ($this->hasArgument($key)) {
             unset($this->arguments[$key]);
@@ -153,7 +150,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists(mixed $key)
     {
         return $this->hasArgument($key);
     }

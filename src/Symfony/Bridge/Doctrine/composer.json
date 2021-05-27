@@ -43,6 +43,7 @@
         "symfony/uid": "^5.1|^6.0",
         "symfony/validator": "^5.2|^6.0",
         "symfony/translation": "^4.4|^5.0|^6.0",
+        "symfony/serializer": "^4.4|^5.0|^6.0",
         "symfony/var-dumper": "^4.4|^5.0|^6.0",
         "doctrine/annotations": "^1.10.4",
         "doctrine/collections": "~1.0",

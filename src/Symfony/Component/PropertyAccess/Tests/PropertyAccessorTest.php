@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
@@ -39,8 +38,6 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
 
 class PropertyAccessorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     /**
      * @var PropertyAccessor
      */
@@ -124,19 +121,6 @@ class PropertyAccessorTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider getPathsWithMissingProperty
-     */
-    public function testGetValueReturnsNullIfPropertyNotFoundAndExceptionIsDisabledUsingBooleanArgument($objectOrArray, $path)
-    {
-        $this->expectDeprecation('Since symfony/property-access 5.3: Passing a boolean as the fourth argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags as the second argument instead (i.e an integer).');
-
-        $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW, null, false);
-
-        $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path), $path);
-    }
-
-    /**
      * @dataProvider getPathsWithMissingIndex
      */
     public function testGetValueThrowsNoExceptionIfIndexNotFound($objectOrArray, $path)
@@ -151,19 +135,6 @@ class PropertyAccessorTest extends TestCase
     {
         $this->expectException(NoSuchIndexException::class);
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
-        $this->propertyAccessor->getValue($objectOrArray, $path);
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getPathsWithMissingIndex
-     */
-    public function testGetValueThrowsExceptionIfIndexNotFoundAndIndexExceptionsEnabledUsingBooleanArgument($objectOrArray, $path)
-    {
-        $this->expectException(NoSuchIndexException::class);
-        $this->expectDeprecation('Since symfony/property-access 5.3: Passing a boolean as the second argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).');
-
-        $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, true);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
@@ -291,17 +262,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new TestClassMagicCall('Bernhard'), 'magicCallProperty');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
-     */
-    public function testLegacyGetValueReadsMagicCallIfEnabled()
-    {
-        $this->propertyAccessor = new PropertyAccessor(true);
-
-        $this->assertSame('Bernhard', $this->propertyAccessor->getValue(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
-    }
-
     public function testGetValueReadsMagicCallIfEnabled()
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_CALL);
@@ -410,21 +370,6 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
-     */
-    public function testLegacySetValueUpdatesMagicCallIfEnabled()
-    {
-        $this->propertyAccessor = new PropertyAccessor(true);
-
-        $author = new TestClassMagicCall('Bernhard');
-
-        $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
-
-        $this->assertEquals('Updated', $author->__call('getMagicCallProperty', []));
-    }
-
     public function testSetValueUpdatesMagicCallIfEnabled()
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
@@ -498,17 +443,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
-     */
-    public function testLegacyIsReadableRecognizesMagicCallIfEnabled()
-    {
-        $this->propertyAccessor = new PropertyAccessor(true);
-
-        $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
-    }
-
     public function testIsReadableRecognizesMagicCallIfEnabled()
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
@@ -568,17 +502,6 @@ class PropertyAccessorTest extends TestCase
     public function testIsWritableDoesNotRecognizeMagicCallByDefault()
     {
         $this->assertFalse($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Since symfony/property-access 5.2: Passing a boolean as the first argument to "Symfony\Component\PropertyAccess\PropertyAccessor::__construct()" is deprecated. Pass a combination of bitwise flags instead (i.e an integer).
-     */
-    public function testLegacyIsWritableRecognizesMagicCallIfEnabled()
-    {
-        $this->propertyAccessor = new PropertyAccessor(true);
-
-        $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
     public function testIsWritableRecognizesMagicCallIfEnabled()

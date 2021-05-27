@@ -194,11 +194,6 @@ Routing
 Security
 --------
 
- * Authentication tokens do not implement the deprecated `Serializable`
-   interface anymore. The consequence is that tokens that were serialized (e.g.
-   into the session) with PHP 7.3 or below cannot be unserialized anymore. It is
-   recommended to roll out a Symfony 5 application with PHP 7.4 or later first
-   before upgrading it to Symfony 6.
  * Remove class `User`, use `InMemoryUser` or your own implementation instead.
    If you are using the `isAccountNonLocked()`, `isAccountNonExpired()` or `isCredentialsNonExpired()` method, consider re-implementing them
    in your own user class as they are not part of the `InMemoryUser` API

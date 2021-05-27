@@ -587,7 +587,7 @@ abstract class IntlDateFormatter
      *
      * @return \DateTime
      */
-    protected function createDateTime(int $timestamp)
+    protected function createDateTime(string $timestamp)
     {
         $dateTime = \DateTime::createFromFormat('U', $timestamp);
         $dateTime->setTimezone($this->dateTimeZone);

@@ -50,12 +50,12 @@ SplFileInfo {
 %A}
 EOTXT
             ],
-            ['https://example.com/about', <<<'EOTXT'
+            ['http://example.com/about', <<<'EOTXT'
 SplFileInfo {
-%Apath: "https://example.com"
+%Apath: "http://example.com"
   filename: "about"
   basename: "about"
-  pathname: "https://example.com/about"
+  pathname: "http://example.com/about"
   extension: ""
   realPath: false
 %A}

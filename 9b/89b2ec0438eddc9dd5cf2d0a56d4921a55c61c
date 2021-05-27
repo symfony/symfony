@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2021-04-30T11:01:33Z
+
+Can you add a test for this issue?
+
+Question: `empty()` also filters out empty strings while `!isset()` doesn't. Is this relevant here?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-07T11:28:17Z
+
+Excellent PR. Thank you.
+
+If you add a small test for this I'll be happy to merge.
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-05-07T11:32:10Z
+
+> Excellent PR. Thank you.
+>
+> If you add a small test for this I'll be happy to merge.
+
+I'm kinda waiting on a reply in the mentioned issue tbh.
+Cause it's really only a bug in that specific usecase, which I'm not 100% sure should be valid anyways.
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-05-10T22:16:38Z
+
+Sorry took me a while to get to it but I got some tests that would fail without the changes on both PRs
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-05-17T13:59:32Z
+
+This applies to `4.4` too, right?
+
+---------------------------------------------------------------------------
+
+by KDederichs at 2021-05-17T14:15:29Z
+
+Yeah it's actually a thing in all symfony versions I think.

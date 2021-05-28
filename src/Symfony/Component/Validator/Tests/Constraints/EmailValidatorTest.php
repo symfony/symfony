@@ -311,7 +311,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
 class EmptyEmailObject
 {
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }

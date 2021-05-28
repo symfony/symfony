@@ -509,10 +509,8 @@ class Request
 
     /**
      * Returns the request as a string.
-     *
-     * @return string The request
      */
-    public function __toString()
+    public function __toString(): string
     {
         $content = $this->getContent();
 

@@ -49,10 +49,8 @@ class CsrfToken
 
     /**
      * Returns the value of the CSRF token.
-     *
-     * @return string The token value
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }

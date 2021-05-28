@@ -33,10 +33,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
 
     /**
      * Returns the headers as a string.
-     *
-     * @return string The headers
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (!$headers = $this->all()) {
             return '';

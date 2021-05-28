@@ -82,10 +82,7 @@ class LazyString implements \Stringable, \JsonSerializable
         return $value;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         if (\is_string($this->value)) {
             return $this->value;

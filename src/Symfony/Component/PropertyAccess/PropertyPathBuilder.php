@@ -204,10 +204,8 @@ class PropertyPathBuilder
 
     /**
      * Returns the current property path as string.
-     *
-     * @return string The property path as string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 

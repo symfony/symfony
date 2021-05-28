@@ -35,7 +35,7 @@ class LoginLinkDetails
         return $this->expiresAt;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->url;
     }

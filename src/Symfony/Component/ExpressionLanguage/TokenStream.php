@@ -33,10 +33,8 @@ class TokenStream
 
     /**
      * Returns a string representation of the token stream.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode("\n", $this->tokens);
     }

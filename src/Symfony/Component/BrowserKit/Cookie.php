@@ -83,10 +83,8 @@ class Cookie
 
     /**
      * Returns the HTTP representation of the Cookie.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $cookie = sprintf('%s=%s', $this->name, $this->rawValue);
 

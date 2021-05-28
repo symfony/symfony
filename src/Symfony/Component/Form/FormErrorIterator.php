@@ -58,10 +58,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
     /**
      * Returns all iterated error messages as string.
-     *
-     * @return string The iterated error messages
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 

@@ -61,7 +61,9 @@ final class PoEditorProvider implements ProviderInterface
             $defaultCatalogue = $translatorBag->getCatalogues()[0];
         }
 
+        $this->ensureAllLocalesAreCreated($translatorBag);
         $terms = $translationsToAdd = [];
+
         foreach ($defaultCatalogue->all() as $domain => $messages) {
             foreach ($messages as $id => $message) {
                 $terms[] = [
@@ -116,7 +118,7 @@ final class PoEditorProvider implements ProviderInterface
             $responseContent = $response->toArray(false);
 
             if (200 !== $response->getStatusCode() || '200' !== (string) $responseContent['response']['code']) {
-                $this->logger->error('Unable to read the PoEditor response: '.$response->getContent(false));
+                $this->logger->info('Unable to read the PoEditor response: '.$response->getContent(false));
                 continue;
             }
 
@@ -133,7 +135,7 @@ final class PoEditorProvider implements ProviderInterface
             }
 
             if (!$responseContent) {
-                $this->logger->error(sprintf('The exported file "%s" from PoEditor is empty.', $fileUrl));
+                $this->logger->info(sprintf('The exported file "%s" from PoEditor is empty.', $fileUrl));
                 continue;
             }
 
@@ -209,6 +211,52 @@ final class PoEditorProvider implements ProviderInterface
 
         if (200 !== $response->getStatusCode() || '200' !== (string) $response->toArray(false)['response']['code']) {
             throw new ProviderException(sprintf('Unable to delete translation keys on PoEditor: "%s".', $response->getContent(false)), $response);
+        }
+    }
+
+    private function ensureAllLocalesAreCreated(TranslatorBagInterface $translatorBag)
+    {
+        $providerLanguages = $this->getLanguages();
+        $missingLanguages = array_reduce($translatorBag->getCatalogues(), function ($carry, $catalogue) use ($providerLanguages) {
+            if (!\in_array($catalogue->getLocale(), $providerLanguages)) {
+                $carry[] = $catalogue->getLocale();
+            }
+
+            return $carry;
+        }, []);
+
+        if ($missingLanguages) {
+            $this->createLanguages($missingLanguages);
+        }
+    }
+
+    private function getLanguages(): array
+    {
+        $response = $this->client->request('POST', 'languages/list');
+
+        if (200 !== $response->getStatusCode() || '200' !== (string) $response->toArray(false)['response']['code']) {
+            throw new ProviderException(sprintf('Unable to list languages on PoEditor: "%s".', $response->getContent(false)), $response);
+        }
+
+        return array_column($response->toArray(false)['result']['languages'], 'code');
+    }
+
+    private function createLanguages(array $languages)
+    {
+        $responses = [];
+
+        foreach ($languages as $language) {
+            $responses[] = $this->client->request('POST', 'languages/add', [
+                'body' => [
+                    'language' => $language,
+                ],
+            ]);
+        }
+
+        foreach ($responses as $response) {
+            if (200 !== $response->getStatusCode() || '200' !== (string) $response->toArray(false)['response']['code']) {
+                $this->logger->error(sprintf('Unable to add new language to PoEditor: (status code: "%s") "%s".', $response->getStatusCode(), $response->getContent(false)));
+            }
         }
     }
 }

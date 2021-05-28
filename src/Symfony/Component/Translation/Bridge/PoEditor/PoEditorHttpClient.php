@@ -24,7 +24,7 @@ final class PoEditorHttpClient implements HttpClientInterface
     {
         if (isset($options['poeditor_credentials'])) {
             if ('POST' === $method) {
-                $options['body'] = $options['poeditor_credentials'] + $options['body'];
+                $options['body'] = $options['poeditor_credentials'] + ($options['body'] ?? []);
             }
             unset($options['poeditor_credentials']);
         }

@@ -54,6 +54,39 @@ class PoEditorProviderTest extends ProviderTestCase
         ]));
 
         $responses = [
+            'getLanguages' => function (string $method, string $url, array $options = []): MockResponse {
+                $this->assertSame('POST', $method);
+                $this->assertSame(http_build_query([
+                    'api_token' => 'API_KEY',
+                    'id' => 'PROJECT_ID',
+                ]), $options['body']);
+
+                return new MockResponse(json_encode([
+                    'response' => [
+                        'status' => 'success',
+                        'code' => '200',
+                        'message' => 'OK',
+                    ],
+                    'result' => [
+                        'languages' => [
+                            [
+                                'name' => 'English',
+                                'code' => 'en',
+                            ],
+                        ],
+                    ],
+                ]));
+            },
+            'createLanguages' => function (string $method, string $url, array $options = []) use ($successResponse): MockResponse {
+                $this->assertSame('POST', $method);
+                $this->assertSame(http_build_query([
+                    'api_token' => 'API_KEY',
+                    'id' => 'PROJECT_ID',
+                    'language' => 'fr',
+                ]), $options['body']);
+
+                return $successResponse;
+            },
             'addTerms' => function (string $method, string $url, array $options = []) use ($successResponse): MockResponse {
                 $this->assertSame('POST', $method);
                 $this->assertSame(http_build_query([

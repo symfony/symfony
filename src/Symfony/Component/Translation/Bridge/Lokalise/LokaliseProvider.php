@@ -313,9 +313,7 @@ final class LokaliseProvider implements ProviderInterface
         $responseContent = $response->toArray(false);
 
         if (\array_key_exists('languages', $responseContent)) {
-            return array_map(function ($language) {
-                return $language['lang_iso'];
-            }, $responseContent['languages']);
+            return array_column($responseContent['languages'], 'lang_iso');
         }
 
         return [];

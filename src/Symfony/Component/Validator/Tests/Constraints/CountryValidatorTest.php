@@ -157,7 +157,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             'DE',
-            new Country(alpha3: true, message: "myMessage")
+            new Country(alpha3: true, message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

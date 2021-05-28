@@ -118,7 +118,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidDateTimeNamed()
     {
-        $constraint = new DateTime(message: "myMessage", format: "Y-m-d");
+        $constraint = new DateTime(message: 'myMessage', format: 'Y-m-d');
 
         $this->validator->validate('2010-01-01 00:00:00', $constraint);
 

@@ -60,6 +60,6 @@ class NotNullValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new NotNull([
             'message' => 'myMessage',
         ])];
-        yield 'named parameters' => [new NotNull(message: "myMessage")];
+        yield 'named parameters' => [new NotNull(message: 'myMessage')];
     }
 }

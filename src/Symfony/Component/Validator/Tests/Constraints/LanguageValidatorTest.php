@@ -156,7 +156,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             'DE',
-            new Language(alpha3: true, message: "myMessage")
+            new Language(alpha3: true, message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

@@ -223,7 +223,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidBicsNamed($bic, $code)
     {
-        $constraint = new Bic(message: "myMessage");
+        $constraint = new Bic(message: 'myMessage');
 
         $this->validator->validate($bic, $constraint);
 

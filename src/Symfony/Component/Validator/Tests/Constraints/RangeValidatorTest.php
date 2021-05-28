@@ -125,7 +125,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesMinMaxNamed($value)
     {
-        $constraint = new Range(min:10, max: 20);
+        $constraint = new Range(min: 10, max: 20);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -155,7 +155,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesMinNamed($value, $formattedValue)
     {
-        $constraint = new Range(min:10, minMessage: "myMessage");
+        $constraint = new Range(min: 10, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -190,7 +190,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesMaxNamed($value, $formattedValue)
     {
-        $constraint = new Range(max:20, maxMessage: "myMessage");
+        $constraint = new Range(max: 20, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -227,7 +227,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesCombinedMaxNamed($value, $formattedValue)
     {
-        $constraint = new Range(min: 10, max:20, notInRangeMessage: "myNotInRangeMessage");
+        $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -265,7 +265,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesCombinedMinNamed($value, $formattedValue)
     {
-        $constraint = new Range(min: 10, max:20, notInRangeMessage: "myNotInRangeMessage");
+        $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -637,7 +637,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit(10));
 
-        $this->validator->validate($value, new Range(minPropertyPath: "value"));
+        $this->validator->validate($value, new Range(minPropertyPath: 'value'));
 
         $this->assertNoViolation();
     }
@@ -663,7 +663,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit(20));
 
-        $this->validator->validate($value, new Range(maxPropertyPath: "value"));
+        $this->validator->validate($value, new Range(maxPropertyPath: 'value'));
 
         $this->assertNoViolation();
     }
@@ -760,9 +760,9 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->setObject(new MinMax(10, 20));
 
         $constraint = new Range(
-            minPropertyPath: "min",
-            maxPropertyPath: "max",
-            notInRangeMessage: "myNotInRangeMessage",
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
         );
 
         $this->validator->validate($value, $constraint);
@@ -810,9 +810,9 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->setObject(new MinMax(10, 20));
 
         $constraint = new Range(
-            minPropertyPath: "min",
-            maxPropertyPath: "max",
-            notInRangeMessage: "myNotInRangeMessage",
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
         );
 
         $this->validator->validate($value, $constraint);

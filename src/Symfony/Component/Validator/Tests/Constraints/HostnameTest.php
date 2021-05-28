@@ -43,7 +43,7 @@ class HostnameDummy
     #[Hostname]
     private $a;
 
-    #[Hostname(message: "myMessage", requireTld: false)]
+    #[Hostname(message: 'myMessage', requireTld: false)]
     private $b;
 
     #[Hostname(groups: ['my_group'], payload: 'some attached data')]

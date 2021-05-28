@@ -162,7 +162,7 @@ class HostnameValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             'example',
-            new Hostname(message: "myMessage", requireTld: true)
+            new Hostname(message: 'myMessage', requireTld: true)
         );
 
         $this->buildViolation('myMessage')

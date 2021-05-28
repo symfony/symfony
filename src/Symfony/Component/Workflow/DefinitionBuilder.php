@@ -65,7 +65,7 @@ class DefinitionBuilder
      *
      * @return $this
      */
-    public function setInitialPlaces($initialPlaces)
+    public function setInitialPlaces(string|array|null $initialPlaces)
     {
         $this->initialPlaces = $initialPlaces;
 

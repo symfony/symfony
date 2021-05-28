@@ -200,12 +200,8 @@ class Inline
 
     /**
      * Check if given array is hash or just normal indexed array.
-     *
-     * @param array|\ArrayObject|\stdClass $value The PHP array or array-like object to check
-     *
-     * @return bool true if value is hash array, false otherwise
      */
-    public static function isHash($value): bool
+    public static function isHash(array|\ArrayObject|\stdClass $value): bool
     {
         if ($value instanceof \stdClass || $value instanceof \ArrayObject) {
             return true;

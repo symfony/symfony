@@ -48,7 +48,7 @@ class Dumper
      *
      * @return string The YAML representation of the PHP value
      */
-    public function dump($input, int $inline = 0, int $indent = 0, int $flags = 0): string
+    public function dump(mixed $input, int $inline = 0, int $indent = 0, int $flags = 0): string
     {
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';

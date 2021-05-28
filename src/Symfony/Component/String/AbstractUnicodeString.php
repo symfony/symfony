@@ -303,7 +303,7 @@ abstract class AbstractUnicodeString extends AbstractString
         return $this->pad($length, $pad, \STR_PAD_LEFT);
     }
 
-    public function replaceMatches(string $fromRegexp, $to): parent
+    public function replaceMatches(string $fromRegexp, string|callable $to): parent
     {
         if ($this->ignoreCase) {
             $fromRegexp .= 'i';

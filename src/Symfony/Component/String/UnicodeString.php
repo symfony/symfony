@@ -82,14 +82,12 @@ class UnicodeString extends AbstractUnicodeString
         return $chunks;
     }
 
-    public function endsWith($suffix): bool
+    public function endsWith(string|iterable|AbstractString $suffix): bool
     {
         if ($suffix instanceof AbstractString) {
             $suffix = $suffix->string;
-        } elseif (\is_array($suffix) || $suffix instanceof \Traversable) {
+        } elseif (!\is_string($suffix)) {
             return parent::endsWith($suffix);
-        } else {
-            $suffix = (string) $suffix;
         }
 
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
@@ -106,14 +104,12 @@ class UnicodeString extends AbstractUnicodeString
         return $suffix === grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix));
     }
 
-    public function equalsTo($string): bool
+    public function equalsTo(string|iterable|AbstractString $string): bool
     {
         if ($string instanceof AbstractString) {
             $string = $string->string;
-        } elseif (\is_array($string) || $string instanceof \Traversable) {
+        } elseif (!\is_string($string)) {
             return parent::equalsTo($string);
-        } else {
-            $string = (string) $string;
         }
 
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
@@ -126,14 +122,12 @@ class UnicodeString extends AbstractUnicodeString
         return $string === $this->string;
     }
 
-    public function indexOf($needle, int $offset = 0): ?int
+    public function indexOf(string|iterable|AbstractString $needle, int $offset = 0): ?int
     {
         if ($needle instanceof AbstractString) {
             $needle = $needle->string;
-        } elseif (\is_array($needle) || $needle instanceof \Traversable) {
+        } elseif (!\is_string($needle)) {
             return parent::indexOf($needle, $offset);
-        } else {
-            $needle = (string) $needle;
         }
 
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
@@ -152,14 +146,12 @@ class UnicodeString extends AbstractUnicodeString
         return false === $i ? null : $i;
     }
 
-    public function indexOfLast($needle, int $offset = 0): ?int
+    public function indexOfLast(string|iterable|AbstractString $needle, int $offset = 0): ?int
     {
         if ($needle instanceof AbstractString) {
             $needle = $needle->string;
-        } elseif (\is_array($needle) || $needle instanceof \Traversable) {
+        } elseif (!\is_string($needle)) {
             return parent::indexOfLast($needle, $offset);
-        } else {
-            $needle = (string) $needle;
         }
 
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;
@@ -256,7 +248,7 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
-    public function replaceMatches(string $fromRegexp, $to): AbstractString
+    public function replaceMatches(string $fromRegexp, string|callable $to): AbstractString
     {
         $str = parent::replaceMatches($fromRegexp, $to);
         normalizer_is_normalized($str->string) ?: $str->string = normalizer_normalize($str->string);
@@ -327,14 +319,12 @@ class UnicodeString extends AbstractUnicodeString
         return $chunks;
     }
 
-    public function startsWith($prefix): bool
+    public function startsWith(string|iterable|AbstractString $prefix): bool
     {
         if ($prefix instanceof AbstractString) {
             $prefix = $prefix->string;
-        } elseif (\is_array($prefix) || $prefix instanceof \Traversable) {
+        } elseif (!\is_string($prefix)) {
             return parent::startsWith($prefix);
-        } else {
-            $prefix = (string) $prefix;
         }
 
         $form = null === $this->ignoreCase ? \Normalizer::NFD : \Normalizer::NFC;

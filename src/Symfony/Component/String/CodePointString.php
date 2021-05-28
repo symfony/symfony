@@ -80,14 +80,12 @@ class CodePointString extends AbstractUnicodeString
         return '' === $str->string ? [] : [mb_ord($str->string, 'UTF-8')];
     }
 
-    public function endsWith($suffix): bool
+    public function endsWith(string|iterable|AbstractString $suffix): bool
     {
         if ($suffix instanceof AbstractString) {
             $suffix = $suffix->string;
-        } elseif (\is_array($suffix) || $suffix instanceof \Traversable) {
+        } elseif (!\is_string($suffix)) {
             return parent::endsWith($suffix);
-        } else {
-            $suffix = (string) $suffix;
         }
 
         if ('' === $suffix || !preg_match('//u', $suffix)) {
@@ -101,14 +99,12 @@ class CodePointString extends AbstractUnicodeString
         return \strlen($this->string) >= \strlen($suffix) && 0 === substr_compare($this->string, $suffix, -\strlen($suffix));
     }
 
-    public function equalsTo($string): bool
+    public function equalsTo(string|iterable|AbstractString $string): bool
     {
         if ($string instanceof AbstractString) {
             $string = $string->string;
-        } elseif (\is_array($string) || $string instanceof \Traversable) {
+        } elseif (!\is_string($string)) {
             return parent::equalsTo($string);
-        } else {
-            $string = (string) $string;
         }
 
         if ('' !== $string && $this->ignoreCase) {
@@ -118,14 +114,12 @@ class CodePointString extends AbstractUnicodeString
         return $string === $this->string;
     }
 
-    public function indexOf($needle, int $offset = 0): ?int
+    public function indexOf(string|iterable|AbstractString $needle, int $offset = 0): ?int
     {
         if ($needle instanceof AbstractString) {
             $needle = $needle->string;
-        } elseif (\is_array($needle) || $needle instanceof \Traversable) {
+        } elseif (!\is_string($needle)) {
             return parent::indexOf($needle, $offset);
-        } else {
-            $needle = (string) $needle;
         }
 
         if ('' === $needle) {
@@ -137,14 +131,12 @@ class CodePointString extends AbstractUnicodeString
         return false === $i ? null : $i;
     }
 
-    public function indexOfLast($needle, int $offset = 0): ?int
+    public function indexOfLast(string|iterable|AbstractString $needle, int $offset = 0): ?int
     {
         if ($needle instanceof AbstractString) {
             $needle = $needle->string;
-        } elseif (\is_array($needle) || $needle instanceof \Traversable) {
+        } elseif (!\is_string($needle)) {
             return parent::indexOfLast($needle, $offset);
-        } else {
-            $needle = (string) $needle;
         }
 
         if ('' === $needle) {
@@ -247,14 +239,12 @@ class CodePointString extends AbstractUnicodeString
         return $chunks;
     }
 
-    public function startsWith($prefix): bool
+    public function startsWith(string|iterable|AbstractString $prefix): bool
     {
         if ($prefix instanceof AbstractString) {
             $prefix = $prefix->string;
-        } elseif (\is_array($prefix) || $prefix instanceof \Traversable) {
+        } elseif (!\is_string($prefix)) {
             return parent::startsWith($prefix);
-        } else {
-            $prefix = (string) $prefix;
         }
 
         if ('' === $prefix || !preg_match('//u', $prefix)) {

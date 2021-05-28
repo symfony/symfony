@@ -25,10 +25,10 @@ class LazyString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    public static function fromCallable($callback, ...$arguments): self
+    public static function fromCallable(callable|array $callback, mixed ...$arguments): self
     {
-        if (!\is_callable($callback) && !(\is_array($callback) && isset($callback[0]) && $callback[0] instanceof \Closure && 2 >= \count($callback))) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a callable or a [Closure, method] lazy-callable, "%s" given.', __METHOD__, get_debug_type($callback)));
+        if (\is_array($callback) && !\is_callable($callback) && !(($callback[0] ?? null) instanceof \Closure || 2 < \count($callback))) {
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a callable or a [Closure, method] lazy-callable, "%s" given.', __METHOD__, '['.implode(', ', array_map('get_debug_type', $callback)).']'));
         }
 
         $lazyString = new static();
@@ -50,16 +50,10 @@ class LazyString implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @param string|int|float|bool|\Stringable $value
-     *
      * @return static
      */
-    public static function fromStringable($value): self
+    public static function fromStringable(string|int|float|bool|\Stringable $value): self
     {
-        if (!self::isStringable($value)) {
-            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be a scalar or a stringable object, "%s" given.', __METHOD__, get_debug_type($value)));
-        }
-
         if (\is_object($value)) {
             return static::fromCallable([$value, '__toString']);
         }
@@ -73,19 +67,17 @@ class LazyString implements \Stringable, \JsonSerializable
     /**
      * Tells whether the provided value can be cast to string.
      */
-    final public static function isStringable($value): bool
+    final public static function isStringable(mixed $value): bool
     {
-        return \is_string($value) || $value instanceof self || (\is_object($value) ? method_exists($value, '__toString') : is_scalar($value));
+        return \is_string($value) || $value instanceof \Stringable || is_scalar($value);
     }
 
     /**
      * Casts scalars and stringable objects to strings.
      *
-     * @param object|string|int|float|bool $value
-     *
      * @throws \TypeError When the provided value is not stringable
      */
-    final public static function resolve($value): string
+    final public static function resolve(\Stringable|string|int|float|bool $value): string
     {
         return $value;
     }

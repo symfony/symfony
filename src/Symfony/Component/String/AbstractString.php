@@ -95,12 +95,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    public function after($needle, bool $includeNeedle = false, int $offset = 0): self
+    public function after(string|iterable $needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
         $i = \PHP_INT_MAX;
 
-        foreach ((array) $needle as $n) {
+        if (\is_string($needle)) {
+            $needle = [$needle];
+        }
+
+        foreach ($needle as $n) {
             $n = (string) $n;
             $j = $this->indexOf($n, $offset);
 
@@ -126,12 +130,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    public function afterLast($needle, bool $includeNeedle = false, int $offset = 0): self
+    public function afterLast(string|iterable $needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
         $i = null;
 
-        foreach ((array) $needle as $n) {
+        if (\is_string($needle)) {
+            $needle = [$needle];
+        }
+
+        foreach ($needle as $n) {
             $n = (string) $n;
             $j = $this->indexOfLast($n, $offset);
 
@@ -162,12 +170,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    public function before($needle, bool $includeNeedle = false, int $offset = 0): self
+    public function before(string|iterable $needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
         $i = \PHP_INT_MAX;
 
-        foreach ((array) $needle as $n) {
+        if (\is_string($needle)) {
+            $needle = [$needle];
+        }
+
+        foreach ($needle as $n) {
             $n = (string) $n;
             $j = $this->indexOf($n, $offset);
 
@@ -193,12 +205,16 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    public function beforeLast($needle, bool $includeNeedle = false, int $offset = 0): self
+    public function beforeLast(string|iterable $needle, bool $includeNeedle = false, int $offset = 0): self
     {
         $str = clone $this;
         $i = null;
 
-        foreach ((array) $needle as $n) {
+        if (\is_string($needle)) {
+            $needle = [$needle];
+        }
+
+        foreach ($needle as $n) {
             $n = (string) $n;
             $j = $this->indexOfLast($n, $offset);
 
@@ -253,7 +269,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      */
-    public function containsAny($needle): bool
+    public function containsAny(string|iterable $needle): bool
     {
         return null !== $this->indexOf($needle);
     }
@@ -261,9 +277,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $suffix
      */
-    public function endsWith($suffix): bool
+    public function endsWith(string|iterable $suffix): bool
     {
-        if (!\is_array($suffix) && !$suffix instanceof \Traversable) {
+        if (\is_string($suffix)) {
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
@@ -316,9 +332,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $string
      */
-    public function equalsTo($string): bool
+    public function equalsTo(string|iterable $string): bool
     {
-        if (!\is_array($string) && !$string instanceof \Traversable) {
+        if (\is_string($string)) {
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
@@ -350,9 +366,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      */
-    public function indexOf($needle, int $offset = 0): ?int
+    public function indexOf(string|iterable $needle, int $offset = 0): ?int
     {
-        if (!\is_array($needle) && !$needle instanceof \Traversable) {
+        if (\is_string($needle)) {
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
@@ -372,9 +388,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $needle
      */
-    public function indexOfLast($needle, int $offset = 0): ?int
+    public function indexOfLast(string|iterable $needle, int $offset = 0): ?int
     {
-        if (!\is_array($needle) && !$needle instanceof \Traversable) {
+        if (\is_string($needle)) {
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 
@@ -467,7 +483,7 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
      *
      * @return static
      */
-    abstract public function replaceMatches(string $fromRegexp, $to): self;
+    abstract public function replaceMatches(string $fromRegexp, string|callable $to): self;
 
     /**
      * @return static
@@ -540,9 +556,9 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
     /**
      * @param string|string[] $prefix
      */
-    public function startsWith($prefix): bool
+    public function startsWith(string|iterable $prefix): bool
     {
-        if (!\is_array($prefix) && !$prefix instanceof \Traversable) {
+        if (\is_string($prefix)) {
             throw new \TypeError(sprintf('Method "%s()" must be overridden by class "%s" to deal with non-iterable values.', __FUNCTION__, static::class));
         }
 

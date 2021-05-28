@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 
@@ -183,6 +184,54 @@ class GuardAuthenticationListenerTest extends TestCase
         );
 
         $listener->handle($this->event);
+    }
+
+    /**
+     * @dataProvider exceptionsToHide
+     */
+    public function testHandleHidesInvalidUserExceptions(AuthenticationException $exceptionToHide)
+    {
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $providerKey = 'my_firewall2';
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
+        $authenticator
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn(['username' => 'robin', 'password' => 'hood']);
+
+        $this->authenticationManager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->willThrowException($exceptionToHide);
+
+        $this->guardAuthenticatorHandler
+            ->expects($this->once())
+            ->method('handleAuthenticationFailure')
+            ->with($this->callback(function ($e) use ($exceptionToHide) {
+                return $e instanceof BadCredentialsException && $exceptionToHide === $e->getPrevious();
+            }), $this->request, $authenticator, $providerKey);
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            [$authenticator],
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
+    public function exceptionsToHide()
+    {
+        return [
+            [new UsernameNotFoundException()],
+            [new LockedException()],
+        ];
     }
 
     public function testReturnNullToSkipAuth()

@@ -83,7 +83,7 @@ class UserAuthenticationProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testAuthenticateWhenPreChecksFails()
     {
@@ -103,7 +103,7 @@ class UserAuthenticationProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testAuthenticateWhenPostChecksFails()
     {

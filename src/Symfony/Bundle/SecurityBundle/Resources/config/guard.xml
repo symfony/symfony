@@ -39,6 +39,7 @@
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Authenticator -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
     </services>
 </container>

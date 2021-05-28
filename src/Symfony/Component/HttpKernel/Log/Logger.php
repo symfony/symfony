@@ -91,7 +91,7 @@ class Logger extends AbstractLogger
         if (false !== strpos($message, '{')) {
             $replacements = [];
             foreach ($context as $key => $val) {
-                if (null === $val || is_scalar($val) || (\is_object($val) && method_exists($val, '__toString'))) {
+                if (null === $val || is_scalar($val) || $val instanceof \Stringable) {
                     $replacements["{{$key}}"] = $val;
                 } elseif ($val instanceof \DateTimeInterface) {
                     $replacements["{{$key}}"] = $val->format(\DateTime::RFC3339);

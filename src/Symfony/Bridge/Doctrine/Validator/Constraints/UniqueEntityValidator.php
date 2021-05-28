@@ -181,7 +181,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return $this->formatValue($value, self::PRETTY_DATE);
         }
 
-        if (method_exists($value, '__toString')) {
+        if ($value instanceof \Stringable) {
             return (string) $value;
         }
 

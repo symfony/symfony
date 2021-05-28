@@ -95,7 +95,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
      */
     public function setUser($user)
     {
-        if (!($user instanceof UserInterface || (\is_object($user) && method_exists($user, '__toString')) || \is_string($user))) {
+        if (!($user instanceof UserInterface || $user instanceof \Stringable || \is_string($user))) {
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
         }
 

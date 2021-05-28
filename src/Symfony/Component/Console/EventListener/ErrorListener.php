@@ -82,7 +82,7 @@ class ErrorListener implements EventSubscriberInterface
         $commandName = $event->getCommand() ? $event->getCommand()->getName() : null;
         $input = $event->getInput();
 
-        if (method_exists($input, '__toString')) {
+        if ($input instanceof \Stringable) {
             if ($commandName) {
                 return str_replace(["'$commandName'", "\"$commandName\""], $commandName, (string) $input);
             }

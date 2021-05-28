@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class CutStub extends Stub
 {
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
 

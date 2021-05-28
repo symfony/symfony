@@ -253,12 +253,11 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Clones a PHP variable.
      *
-     * @param mixed $var    Any PHP variable
-     * @param int   $filter A bit field of Caster::EXCLUDE_* constants
+     * @param int $filter A bit field of Caster::EXCLUDE_* constants
      *
      * @return Data The cloned variable represented by a Data object
      */
-    public function cloneVar($var, int $filter = 0)
+    public function cloneVar(mixed $var, int $filter = 0)
     {
         $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) {
             if (\E_RECOVERABLE_ERROR === $type || \E_USER_ERROR === $type) {
@@ -291,11 +290,9 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Effectively clones the PHP variable.
      *
-     * @param mixed $var Any PHP variable
-     *
      * @return array The cloned variable represented in an array
      */
-    abstract protected function doClone($var);
+    abstract protected function doClone(mixed $var);
 
     /**
      * Casts an object to an array representation.

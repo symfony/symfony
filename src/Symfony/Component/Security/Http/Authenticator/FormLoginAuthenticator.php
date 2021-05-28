@@ -136,7 +136,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             $credentials['password'] = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']) ?? '';
         }
 
-        if (!\is_string($credentials['username']) && (!\is_object($credentials['username']) || !method_exists($credentials['username'], '__toString'))) {
+        if (!\is_string($credentials['username']) && !$credentials['username'] instanceof \Stringable) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($credentials['username'])));
         }
 

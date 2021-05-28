@@ -248,7 +248,7 @@ trait HttpClientTrait
         $normalizedHeaders = [];
 
         foreach ($headers as $name => $values) {
-            if (\is_object($values) && method_exists($values, '__toString')) {
+            if ($values instanceof \Stringable) {
                 $values = (string) $values;
             }
 

@@ -121,7 +121,7 @@ final class CacheItem implements ItemInterface
             $tags = [$tags];
         }
         foreach ($tags as $tag) {
-            if (!\is_string($tag) && !(\is_object($tag) && method_exists($tag, '__toString'))) {
+            if (!\is_string($tag) && !$tag instanceof \Stringable) {
                 throw new InvalidArgumentException(sprintf('Cache tag must be string or object that implements __toString(), "%s" given.', \is_object($tag) ? \get_class($tag) : \gettype($tag)));
             }
             $tag = (string) $tag;

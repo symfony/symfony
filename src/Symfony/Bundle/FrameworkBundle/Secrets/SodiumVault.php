@@ -33,7 +33,7 @@ class SodiumVault extends AbstractVault implements EnvVarLoaderInterface
      */
     public function __construct(string $secretsDir, $decryptionKey = null)
     {
-        if (null !== $decryptionKey && !\is_string($decryptionKey) && !(\is_object($decryptionKey) && method_exists($decryptionKey, '__toString'))) {
+        if (null !== $decryptionKey && !\is_string($decryptionKey) && !$decryptionKey instanceof \Stringable) {
             throw new \TypeError(sprintf('Decryption key should be a string or an object that implements the __toString() method, "%s" given.', get_debug_type($decryptionKey)));
         }
 

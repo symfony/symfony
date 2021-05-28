@@ -100,7 +100,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (\is_object($value)) {
-            if (($format & self::OBJECT_TO_STRING) && method_exists($value, '__toString')) {
+            if (($format & self::OBJECT_TO_STRING) && $value instanceof \Stringable) {
                 return $value->__toString();
             }
 

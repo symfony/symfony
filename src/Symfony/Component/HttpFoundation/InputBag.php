@@ -29,7 +29,7 @@ final class InputBag extends ParameterBag
      */
     public function get(string $key, $default = null)
     {
-        if (null !== $default && !is_scalar($default) && !(\is_object($default) && method_exists($default, '__toString'))) {
+        if (null !== $default && !is_scalar($default) && !$default instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Excepted a scalar value as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($default)));
         }
 
@@ -76,7 +76,7 @@ final class InputBag extends ParameterBag
      */
     public function set(string $key, $value)
     {
-        if (null !== $value && !is_scalar($value) && !\is_array($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (null !== $value && !is_scalar($value) && !\is_array($value) && !$value instanceof \Stringable) {
             throw new \InvalidArgumentException(sprintf('Excepted a scalar, or an array as a 2nd argument to "%s()", "%s" given.', __METHOD__, get_debug_type($value)));
         }
 

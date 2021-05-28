@@ -151,6 +151,16 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithSecretKeyQueryOptions()
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $this->assertEquals(
+            new Connection(['account' => '213', 'queue_name' => 'queue', 'buffer_size' => 1, 'wait_time' => 5, 'auto_setup' => false], new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => null, 'accessKeySecret' => 'A+a+B+b'], null, $httpClient)),
+            Connection::fromDsn('sqs://default/213/queue?secret_key=A+a+B+b&buffer_size=1&wait_time=5&auto_setup=0', [], $httpClient)
+        );
+    }
+
     public function testFromDsnWithQueueNameOption()
     {
         $httpClient = $this->createMock(HttpClientInterface::class);

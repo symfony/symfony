@@ -108,6 +108,10 @@ class Connection
             parse_str($parsedUrl['query'], $query);
         }
 
+        if (\array_key_exists('secret_key', $query)) {
+            $query['secret_key'] = str_replace(' ', '+', $query['secret_key']);
+        }
+
         // check for extra keys in options
         $optionsExtraKeys = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS));
         if (0 < \count($optionsExtraKeys)) {

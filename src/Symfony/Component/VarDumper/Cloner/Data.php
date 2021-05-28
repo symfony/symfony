@@ -69,7 +69,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return string|int|float|bool|array|Data[]|null A native representation of the original value
      */
-    public function getValue($recursive = false)
+    public function getValue(array|bool $recursive = false)
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -239,11 +239,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Seeks to a specific key in nested data structures.
      *
-     * @param string|int $key The key to seek to
-     *
      * @return static|null Null if the key is not set
      */
-    public function seek($key)
+    public function seek(string|int $key)
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -309,7 +307,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param mixed $item A Stub object or the original value being dumped
      */
-    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, $item)
+    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, mixed $item)
     {
         $cursor->refIndex = 0;
         $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;
@@ -431,7 +429,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $hashCut;
     }
 
-    private function getStub($item)
+    private function getStub(mixed $item)
     {
         if (!$item || !\is_array($item)) {
             return $item;

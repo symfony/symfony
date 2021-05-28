@@ -146,7 +146,7 @@ class Parser implements ParserInterface
      *
      * @throws SyntaxErrorException
      */
-    private function parseSimpleSelector(TokenStream $stream, bool $insideNegation = false): array
+    private function parseSimpleSelector(TokenStream $stream, bool $insideBlock = false, bool $insideNegation = false): array
     {
         $stream->skipWhitespace();
 
@@ -159,7 +159,7 @@ class Parser implements ParserInterface
             if ($peek->isWhitespace()
                 || $peek->isFileEnd()
                 || $peek->isDelimiter([',', '+', '>', '~'])
-                || ($insideNegation && $peek->isDelimiter([')']))
+                || ($insideBlock && $peek->isDelimiter([')']))
             ) {
                 break;
             }
@@ -209,7 +209,7 @@ class Parser implements ParserInterface
                         throw SyntaxErrorException::nestedNot();
                     }
 
-                    [$argument, $argumentPseudoElement] = $this->parseSimpleSelector($stream, true);
+                    [$argument, $argumentPseudoElement] = $this->parseSimpleSelector($stream, true, true);
                     $next = $stream->getNext();
 
                     if (null !== $argumentPseudoElement) {
@@ -221,6 +221,15 @@ class Parser implements ParserInterface
                     }
 
                     $result = new Node\NegationNode($result, $argument);
+                } elseif ('has' === strtolower($identifier)) {
+                    [$argument, $argumentPseudoElement] = $this->parseSimpleSelector($stream, true);
+                    $next = $stream->getNext();
+
+                    if (!$next->isDelimiter([')'])) {
+                        throw SyntaxErrorException::unexpectedToken('")"', $next);
+                    }
+
+                    $result = new Node\HasNode($result, $argument);
                 } else {
                     $arguments = [];
                     $next = null;

@@ -219,6 +219,7 @@ HTML
             ['e + f', "e/following-sibling::*[(name() = 'f') and (position() = 1)]"],
             ['e ~ f', 'e/following-sibling::f'],
             ['div#container p', "div[@id = 'container']/descendant-or-self::*/p"],
+            ['e:has(div)', "e['div']"]
         ];
     }
 
@@ -353,6 +354,7 @@ HTML
             [':not(*)', []],
             ['a:not([href])', ['name-anchor']],
             ['ol :Not(li[class])', ['first-li', 'second-li', 'li-div', 'fifth-li', 'sixth-li', 'seventh-li']],
+            ['ol:has(li)', ['first-ol']],
             // HTML-specific
             [':link', ['link-href', 'tag-anchor', 'nofollow-anchor', 'area-href']],
             [':visited', []],

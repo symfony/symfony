@@ -1,0 +1,33 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Tests\Node;
+
+use Symfony\Component\CssSelector\Node\ClassNode;
+use Symfony\Component\CssSelector\Node\ElementNode;
+use Symfony\Component\CssSelector\Node\HasNode;
+
+class HasNodeTest extends AbstractNodeTest
+{
+    public function getToStringConversionTestData()
+    {
+        return [
+            [new HasNode(new ElementNode(), new ClassNode(new ElementNode(), 'class')), 'Has[Element[*]:has(Class[Element[*].class])]'],
+        ];
+    }
+
+    public function getSpecificityValueTestData()
+    {
+        return [
+            [new HasNode(new ElementNode(), new ClassNode(new ElementNode(), 'class')), 10],
+        ];
+    }
+}

@@ -138,6 +138,8 @@ class ParserTest extends TestCase
             ['div:not(div.foo)', ['Negation[Element[div]:not(Class[Element[div].foo])]']],
             ['td ~ th', ['CombinedSelector[Element[td] ~ Element[th]]']],
             ['.foo[data-bar][data-baz=0]', ["Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]"]],
+            ['*:has(div)', ['Has[Element[*]:has(Element[div])]']],
+//            ['section:not(:has(h1, h2, h3, h4, h5, h6))', ['']],
         ];
     }
 
@@ -168,6 +170,7 @@ class ParserTest extends TestCase
             [':lang(fr', SyntaxErrorException::unexpectedToken('an argument', new Token(Token::TYPE_FILE_END, '', 8))->getMessage()],
             [':contains("foo', SyntaxErrorException::unclosedString(10)->getMessage()],
             ['foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '!', 3))->getMessage()],
+            ['div:has(div', SyntaxErrorException::unexpectedToken('")"', new Token(Token::TYPE_FILE_END, '', 11))->getMessage()],
         ];
     }
 

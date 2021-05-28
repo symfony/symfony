@@ -74,6 +74,7 @@ class NodeExtension extends AbstractExtension
             'Class' => [$this, 'translateClass'],
             'Hash' => [$this, 'translateHash'],
             'Element' => [$this, 'translateElement'],
+            'Has' => [$this, 'translateHas'],
         ];
     }
 
@@ -98,6 +99,15 @@ class NodeExtension extends AbstractExtension
         }
 
         return $xpath->addCondition('0');
+    }
+
+    public function translateHas(Node\HasNode $node, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($node->getSelector());
+        $subXpath = $translator->nodeToXPath($node->getSubSelector());
+//        $subXpath->addNameTest();
+
+        return new XPathExpr('', $xpath, $subXpath);
     }
 
     public function translateFunction(Node\FunctionNode $node, Translator $translator): XPathExpr

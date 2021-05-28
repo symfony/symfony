@@ -93,7 +93,7 @@ class Yaml
      *
      * @return string A YAML string representing the original PHP value
      */
-    public static function dump($input, int $inline = 2, int $indent = 4, int $flags = 0): string
+    public static function dump(mixed $input, int $inline = 2, int $indent = 4, int $flags = 0): string
     {
         $yaml = new Dumper($indent);
 

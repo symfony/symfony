@@ -29,10 +29,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Lokalise\LokaliseProviderFactory::class,
             'package' => 'symfony/lokalise-translation-provider',
         ],
-        'poeditor' => [
-            'class' => Bridge\PoEditor\PoEditorProviderFactory::class,
-            'package' => 'symfony/po-editor-translation-provider',
-        ],
     ];
 
     public function __construct(Dsn $dsn, string $name = null, array $supported = [])

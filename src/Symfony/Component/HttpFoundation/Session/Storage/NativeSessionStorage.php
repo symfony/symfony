@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -53,11 +52,6 @@ class NativeSessionStorage implements SessionStorageInterface
      * @var MetadataBag
      */
     protected $metadataBag;
-
-    /**
-     * @var string|null
-     */
-    private $emulateSameSite;
 
     /**
      * Depending on how you want the storage driver to behave you probably
@@ -157,13 +151,6 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \RuntimeException('Failed to start the session.');
         }
 
-        if (null !== $this->emulateSameSite) {
-            $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
-            if (null !== $originalCookie) {
-                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite), false);
-            }
-        }
-
         $this->loadSession();
 
         return true;
@@ -225,16 +212,7 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->metadataBag->stampNew();
         }
 
-        $isRegenerated = session_regenerate_id($destroy);
-
-        if (null !== $this->emulateSameSite) {
-            $originalCookie = SessionUtils::popSessionCookie(session_name(), session_id());
-            if (null !== $originalCookie) {
-                header(sprintf('%s; SameSite=%s', $originalCookie, $this->emulateSameSite), false);
-            }
-        }
-
-        return $isRegenerated;
+        return session_regenerate_id($destroy);
     }
 
     /**

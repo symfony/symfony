@@ -14,7 +14,6 @@ namespace Symfony\Component\Lock\Store;
 use Predis\Response\ServerException;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
-use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockStorageException;
@@ -37,15 +36,10 @@ class RedisStore implements SharedLockStoreInterface
     private $supportTime;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|RedisProxy|RedisClusterProxy|\Predis\ClientInterface $redisClient
-     * @param float                                                                                 $initialTtl  the expiration delay of locks in seconds
+     * @param float $initialTtl the expiration delay of locks in seconds
      */
-    public function __construct($redisClient, float $initialTtl = 300.0)
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redisClient, float $initialTtl = 300.0)
     {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
-        }
-
         if ($initialTtl <= 0) {
             throw new InvalidTtlException(sprintf('"%s()" expects a strictly positive TTL. Got %d.', __METHOD__, $initialTtl));
         }
@@ -292,8 +286,6 @@ class RedisStore implements SharedLockStoreInterface
                 throw new LockStorageException($e->getMessage(), $e->getCode(), $e);
             }
         }
-
-        throw new InvalidArgumentException(sprintf('"%s()" expects being initialized with a Redis, RedisArray, RedisCluster or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($this->redis)));
     }
 
     private function getUniqueToken(Key $key): string

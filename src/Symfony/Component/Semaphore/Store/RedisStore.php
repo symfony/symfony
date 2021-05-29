@@ -29,15 +29,8 @@ class RedisStore implements PersistingStoreInterface
 {
     private $redis;
 
-    /**
-     * @param \Redis|\RedisArray|\RedisCluster|\RedisClusterProxy|\Predis\ClientInterface $redisClient
-     */
-    public function __construct($redisClient)
+    public function __construct(\Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface|RedisProxy|RedisClusterProxy $redisClient)
     {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\ClientInterface && !$redisClient instanceof RedisProxy && !$redisClient instanceof RedisClusterProxy) {
-            throw new InvalidArgumentException(sprintf('"%s()" expects parameter 1 to be Redis, RedisArray, RedisCluster, RedisProxy, RedisClusterProxy or Predis\ClientInterface, "%s" given.', __METHOD__, get_debug_type($redisClient)));
-        }
-
         $this->redis = $redisClient;
     }
 

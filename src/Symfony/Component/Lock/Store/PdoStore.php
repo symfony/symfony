@@ -67,16 +67,15 @@ class PdoStore implements PersistingStoreInterface
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param \PDO|Connection|string $connOrDsn     A \PDO or Connection instance or DSN string or null
-     * @param array                  $options       An associative array of options
-     * @param float                  $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
-     * @param int                    $initialTtl    The expiration delay of locks in seconds
+     * @param array $options       An associative array of options
+     * @param float $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
+     * @param int   $initialTtl    The expiration delay of locks in seconds
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct(\PDO|Connection|string $connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         if ($gcProbability < 0 || $gcProbability > 1) {
             throw new InvalidArgumentException(sprintf('"%s" requires gcProbability between 0 and 1, "%f" given.', __METHOD__, $gcProbability));
@@ -93,10 +92,8 @@ class PdoStore implements PersistingStoreInterface
             $this->conn = $connOrDsn;
         } elseif ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
-        } elseif (\is_string($connOrDsn)) {
-            $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
+            $this->dsn = $connOrDsn;
         }
 
         $this->table = $options['db_table'] ?? $this->table;

@@ -45,14 +45,13 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
-     * @param \PDO|Connection|string $connOrDsn A \PDO or Connection instance or DSN string or null
-     * @param array                  $options   An associative array of options
+     * @param array $options An associative array of options
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, array $options = [])
+    public function __construct(\PDO|Connection|string $connOrDsn, array $options = [])
     {
         if ($connOrDsn instanceof \PDO) {
             if (\PDO::ERRMODE_EXCEPTION !== $connOrDsn->getAttribute(\PDO::ATTR_ERRMODE)) {
@@ -64,10 +63,8 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         } elseif ($connOrDsn instanceof Connection) {
             $this->conn = $connOrDsn;
             $this->checkDriver();
-        } elseif (\is_string($connOrDsn)) {
-            $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
+            $this->dsn = $connOrDsn;
         }
 
         $this->username = $options['db_username'] ?? $this->username;
@@ -235,10 +232,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
         }
     }
 
-    /**
-     * @return \PDO|Connection
-     */
-    private function getConnection(): object
+    private function getConnection(): \PDO|Connection
     {
         if (null === $this->conn) {
             if (strpos($this->dsn, '://')) {

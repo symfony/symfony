@@ -181,7 +181,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             '978-2723442282',
-            new Isbn(type: Isbn::ISBN_10, isbn10Message: "myMessage")
+            new Isbn(type: Isbn::ISBN_10, isbn10Message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')
@@ -224,7 +224,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             '2723442284',
-            new Isbn(type: Isbn::ISBN_13, isbn13Message: "myMessage")
+            new Isbn(type: Isbn::ISBN_13, isbn13Message: 'myMessage')
         );
 
         $this->buildViolation('myMessage')

@@ -93,7 +93,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'notFoundMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(notFoundMessage: "myMessage"),
+            new Image(notFoundMessage: 'myMessage'),
         ];
     }
 
@@ -132,7 +132,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minWidthMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(minWidth: 3, minWidthMessage: "myMessage"),
+            new Image(minWidth: 3, minWidthMessage: 'myMessage'),
         ];
     }
 
@@ -157,7 +157,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxWidthMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(maxWidth: 1, maxWidthMessage: "myMessage"),
+            new Image(maxWidth: 1, maxWidthMessage: 'myMessage'),
         ];
     }
 
@@ -182,7 +182,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minHeightMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(minHeight: 3, minHeightMessage: "myMessage"),
+            new Image(minHeight: 3, minHeightMessage: 'myMessage'),
         ];
     }
 
@@ -207,7 +207,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxHeightMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(maxHeight: 1, maxHeightMessage: "myMessage"),
+            new Image(maxHeight: 1, maxHeightMessage: 'myMessage'),
         ];
     }
 
@@ -234,7 +234,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minPixelsMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(minPixels: 5, minPixelsMessage: "myMessage"),
+            new Image(minPixels: 5, minPixelsMessage: 'myMessage'),
         ];
     }
 
@@ -261,7 +261,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxPixelsMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(maxPixels: 3, maxPixelsMessage: "myMessage"),
+            new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'),
         ];
     }
 
@@ -346,7 +346,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'minRatioMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(minRatio: 2, minRatioMessage: "myMessage"),
+            new Image(minRatio: 2, minRatioMessage: 'myMessage'),
         ];
     }
 
@@ -371,7 +371,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'maxRatioMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(maxRatio: 0.5, maxRatioMessage: "myMessage"),
+            new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'),
         ];
     }
 
@@ -427,7 +427,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowSquareMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(allowSquare: false, allowSquareMessage: "myMessage"),
+            new Image(allowSquare: false, allowSquareMessage: 'myMessage'),
         ];
     }
 
@@ -452,7 +452,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowLandscapeMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(allowLandscape: false, allowLandscapeMessage: "myMessage"),
+            new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'),
         ];
     }
 
@@ -477,7 +477,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'allowPortraitMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(allowPortrait: false, allowPortraitMessage: "myMessage"),
+            new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'),
         ];
     }
 
@@ -508,7 +508,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             'corruptedMessage' => 'myMessage',
         ])];
         yield 'Named arguments' => [
-            new Image(detectCorrupted: true, corruptedMessage: "myMessage"),
+            new Image(detectCorrupted: true, corruptedMessage: 'myMessage'),
         ];
     }
 }

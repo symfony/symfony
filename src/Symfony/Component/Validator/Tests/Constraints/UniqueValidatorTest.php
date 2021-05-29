@@ -88,7 +88,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidValueNamed()
     {
-        $constraint = new Unique(message: "myMessage");
+        $constraint = new Unique(message: 'myMessage');
         $this->validator->validate([1, 2, 3, 3], $constraint);
 
         $this->buildViolation('myMessage')

@@ -161,7 +161,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTooManyValuesNamed($value)
     {
-        $constraint = new Count(max: 4, maxMessage: "myMessage");
+        $constraint = new Count(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -200,7 +200,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTooFewValuesNamed($value)
     {
-        $constraint = new Count(min: 4, minMessage: "myMessage");
+        $constraint = new Count(min: 4, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -240,7 +240,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
      */
     public function testTooManyValuesExactNamed($value)
     {
-        $constraint = new Count(exactly: 4, exactMessage: "myMessage");
+        $constraint = new Count(exactly: 4, exactMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

@@ -38,7 +38,7 @@ class ExpressionLanguageSyntaxTest extends TestCase
     {
         yield 'Doctrine style' => [new ExpressionLanguageSyntax(['service' => 'my_service'])];
 
-        yield 'named arguments' => [new ExpressionLanguageSyntax(service: "my_service")];
+        yield 'named arguments' => [new ExpressionLanguageSyntax(service: 'my_service')];
 
         $metadata = new ClassMetadata(ExpressionLanguageSyntaxDummy::class);
         self::assertTrue((new AnnotationLoader())->loadClassMetadata($metadata));

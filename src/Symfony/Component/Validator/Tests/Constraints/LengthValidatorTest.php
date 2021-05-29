@@ -192,7 +192,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesMinNamed($value)
     {
-        $constraint = new Length(min: 4, minMessage: "myMessage");
+        $constraint = new Length(min: 4, minMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -231,7 +231,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesMaxNamed($value)
     {
-        $constraint = new Length(max: 4, maxMessage: "myMessage");
+        $constraint = new Length(max: 4, maxMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 
@@ -271,7 +271,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesExactLessThanFourNamed($value)
     {
-        $constraint = new Length(exactly: 4, exactMessage: "myMessage");
+        $constraint = new Length(exactly: 4, exactMessage: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

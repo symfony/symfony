@@ -51,7 +51,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesNamed($value, $valueAsString)
     {
-        $constraint = new IsNull(message: "myMessage");
+        $constraint = new IsNull(message: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

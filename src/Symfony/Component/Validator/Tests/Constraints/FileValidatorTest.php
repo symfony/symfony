@@ -289,7 +289,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         fwrite($this->file, '0');
         fclose($this->file);
 
-        $constraint = new File(maxSize: 10, binaryFormat: true, maxSizeMessage: "myMessage");
+        $constraint = new File(maxSize: 10, binaryFormat: true, maxSizeMessage: 'myMessage');
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
@@ -387,7 +387,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             'mimeTypesMessage' => 'myMessage',
         ])];
         yield 'named arguments' => [
-            new File(mimeTypes: ["image/png", "image/jpg"], mimeTypesMessage: "myMessage"),
+            new File(mimeTypes: ['image/png', 'image/jpg'], mimeTypesMessage: 'myMessage'),
         ];
     }
 
@@ -444,7 +444,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             'disallowEmptyMessage' => 'myMessage',
         ])];
         yield 'named arguments' => [
-            new File(disallowEmptyMessage: "myMessage"),
+            new File(disallowEmptyMessage: 'myMessage'),
         ];
     }
 

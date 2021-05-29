@@ -183,7 +183,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             '2162321x',
-            new Issn(message: "myMessage", caseSensitive: true, requireHyphen: true)
+            new Issn(message: 'myMessage', caseSensitive: true, requireHyphen: true)
         );
 
         $this->buildViolation('myMessage')

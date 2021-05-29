@@ -182,7 +182,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidGroupedTimezoneNamed()
     {
-        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: "myMessage");
+        $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
 
         $this->validator->validate('Europe/Berlin', $constraint);
 

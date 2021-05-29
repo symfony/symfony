@@ -203,7 +203,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             'type' => ['boolean', 'array'],
             'message' => 'myMessage',
         ])];
-        yield 'named arguments' => [new Type(type: ["boolean", "array"], message: "myMessage")];
+        yield 'named arguments' => [new Type(type: ['boolean', 'array'], message: 'myMessage')];
     }
 
     protected function createFile()

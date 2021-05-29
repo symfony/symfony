@@ -142,7 +142,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             'en-US',
-            new Locale(message: "myMessage", canonicalize: false)
+            new Locale(message: 'myMessage', canonicalize: false)
         );
 
         $this->buildViolation('myMessage')

@@ -70,7 +70,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesWithWhitespacesNamed($value)
     {
-        $constraint = new Regex(pattern: "/^[0-9]+\$/", normalizer: "trim");
+        $constraint = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -127,7 +127,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValuesNamed($value)
     {
-        $constraint = new Regex(pattern: "/^[0-9]+\$/", message: "myMessage");
+        $constraint = new Regex(pattern: '/^[0-9]+$/', message: 'myMessage');
 
         $this->validator->validate($value, $constraint);
 

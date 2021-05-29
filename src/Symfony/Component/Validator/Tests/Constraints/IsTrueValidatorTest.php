@@ -54,6 +54,6 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new IsTrue([
             'message' => 'myMessage',
         ])];
-        yield 'named parameters' => [new IsTrue(message: "myMessage")];
+        yield 'named parameters' => [new IsTrue(message: 'myMessage')];
     }
 }

@@ -89,7 +89,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar']])];
         yield 'Doctrine default option' => [new Choice(['value' => ['foo', 'bar']])];
         yield 'first argument' => [new Choice(['foo', 'bar'])];
-        yield 'named arguments' => [new Choice(choices: ["foo", "bar"])];
+        yield 'named arguments' => [new Choice(choices: ['foo', 'bar'])];
     }
 
     /**
@@ -111,9 +111,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             },
         ])];
         yield 'doctrine style, static method' => [new Choice(['callback' => [__CLASS__, 'staticCallback']])];
-        yield 'named arguments, namespaced function' => [new Choice(callback: 'Symfony\Component\Validator\Tests\Constraints\choice_callback')];
-        yield 'named arguments, closure' => [new Choice(callback: fn () => ["foo", "bar"])];
-        yield 'named arguments, static method' => [new Choice(callback: ["Symfony\Component\Validator\Tests\Constraints\ChoiceValidatorTest", "staticCallback"])];
+        yield 'named arguments, namespaced function' => [new Choice(callback: __NAMESPACE__.'\choice_callback')];
+        yield 'named arguments, closure' => [new Choice(callback: fn () => ['foo', 'bar'])];
+        yield 'named arguments, static method' => [new Choice(callback: [__CLASS__, 'staticCallback'])];
     }
 
     public function testValidChoiceCallbackContextMethod()
@@ -179,7 +179,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     public function provideConstraintsWithMessage(): iterable
     {
         yield 'Doctrine style' => [new Choice(['choices' => ['foo', 'bar'], 'message' => 'myMessage'])];
-        yield 'named arguments' => [new Choice(choices: ["foo", "bar"], message: "myMessage")];
+        yield 'named arguments' => [new Choice(choices: ['foo', 'bar'], message: 'myMessage')];
     }
 
     public function testInvalidChoiceEmptyChoices()

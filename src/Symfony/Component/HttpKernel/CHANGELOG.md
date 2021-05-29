@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead
+
 5.3
 ---
 

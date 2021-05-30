@@ -1555,7 +1555,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition('annotations.cached_reader', $container->getDefinition('annotations.psr_cached_reader'));
 
             if ('php_array' === $config['cache']) {
-                $cacheService = 'annotations.psr_cache';
+                $cacheService = 'annotations.cache_adapter';
 
                 // Enable warmer only if PHP array is used for cache
                 $definition = $container->findDefinition('annotations.cache_warmer');

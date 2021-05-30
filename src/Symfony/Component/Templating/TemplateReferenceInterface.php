@@ -65,8 +65,6 @@ interface TemplateReferenceInterface
      * Returns the string representation as shortcut for getLogicalName().
      *
      * Alias of getLogicalName().
-     *
-     * @return string The template name
      */
-    public function __toString();
+    public function __toString(): string;
 }

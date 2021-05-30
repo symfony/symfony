@@ -60,9 +60,6 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
         return $this->prefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         return 'glob.'.$this->prefix.(int) $this->recursive.$this->pattern.(int) $this->forExclusion.implode("\0", $this->excludedPrefixes);

@@ -68,10 +68,8 @@ class AcceptHeader
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode(',', $this->items);
     }

@@ -27,10 +27,8 @@ class Expression
 
     /**
      * Gets the expression.
-     *
-     * @return string The expression
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->expression;
     }

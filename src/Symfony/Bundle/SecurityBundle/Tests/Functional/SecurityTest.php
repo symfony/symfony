@@ -153,7 +153,7 @@ final class UserWithoutEquatable implements UserInterface, PasswordAuthenticated
         $this->roles = $roles;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getUserIdentifier();
     }

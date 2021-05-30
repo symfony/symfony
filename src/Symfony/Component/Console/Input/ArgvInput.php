@@ -349,10 +349,8 @@ class ArgvInput extends Input
 
     /**
      * Returns a stringified representation of the args passed to the command.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $tokens = array_map(function ($token) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {

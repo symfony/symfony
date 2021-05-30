@@ -26,10 +26,7 @@ class ConstStub extends Stub
         $this->value = 1 < \func_num_args() ? $value : $name;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->value;
     }

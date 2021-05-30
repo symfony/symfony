@@ -65,10 +65,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * Converts the violation into a string for debugging purposes.
-     *
-     * @return string The violation as string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (\is_object($this->root)) {
             $class = 'Object('.\get_class($this->root).')';

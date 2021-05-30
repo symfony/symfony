@@ -256,10 +256,8 @@ class Cookie
 
     /**
      * Returns the cookie as a string.
-     *
-     * @return string The cookie
      */
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->isRaw()) {
             $str = $this->getName();

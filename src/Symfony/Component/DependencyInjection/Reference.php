@@ -27,10 +27,7 @@ class Reference
         $this->invalidBehavior = $invalidBehavior;
     }
 
-    /**
-     * @return string The service identifier
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

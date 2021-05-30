@@ -43,10 +43,8 @@ class Token
 
     /**
      * Returns a string representation of the token.
-     *
-     * @return string A string representation of the token
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%3d %-11s %s', $this->cursor, strtoupper($this->type), $this->value);
     }

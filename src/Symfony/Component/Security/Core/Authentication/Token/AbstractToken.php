@@ -243,10 +243,7 @@ abstract class AbstractToken implements TokenInterface, \Serializable
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         $class = static::class;
         $class = substr($class, strrpos($class, '\\') + 1);

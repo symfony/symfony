@@ -28,10 +28,7 @@ class TemplateReference implements TemplateReferenceInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLogicalName();
     }

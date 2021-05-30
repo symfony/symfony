@@ -170,10 +170,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         $value = $this->getValue();
 

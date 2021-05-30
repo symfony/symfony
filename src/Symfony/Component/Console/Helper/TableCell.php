@@ -43,10 +43,8 @@ class TableCell
 
     /**
      * Returns the cell value.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }

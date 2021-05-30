@@ -37,8 +37,6 @@ final class Response
 
     /**
      * Converts the response object to string containing all headers and the response content.
-     *
-     * @return string The response with headers and content
      */
     public function __toString(): string
     {

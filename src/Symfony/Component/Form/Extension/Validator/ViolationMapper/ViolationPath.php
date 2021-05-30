@@ -112,10 +112,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
         $this->buildString();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->pathAsString;
     }

@@ -149,12 +149,7 @@ class Alias
         ];
     }
 
-    /**
-     * Returns the Id of this alias.
-     *
-     * @return string The alias id
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

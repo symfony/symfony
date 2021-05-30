@@ -27,10 +27,8 @@ interface TokenInterface
      * Returns a string representation of the Token.
      *
      * This is only to be used for debugging purposes.
-     *
-     * @return string
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Returns the user roles.

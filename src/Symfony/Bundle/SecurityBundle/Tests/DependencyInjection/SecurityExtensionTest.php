@@ -382,6 +382,7 @@ class SecurityExtensionTest extends TestCase
         $container->registerExtension(new FrameworkExtension());
         $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.project_dir', __DIR__);
+        $container->setParameter('kernel.build_dir', __DIR__);
         $container->setParameter('kernel.cache_dir', __DIR__);
         $container->setParameter('kernel.container_class', 'FooContainer');
 

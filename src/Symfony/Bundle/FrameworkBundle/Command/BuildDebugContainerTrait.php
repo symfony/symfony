@@ -38,8 +38,10 @@ trait BuildDebugContainerTrait
         if ($this->containerBuilder) {
             return $this->containerBuilder;
         }
+        $container = $kernel->getContainer();
+        $containerDump = $container->hasParameter('debug.container.dump') ? $container->getParameter('debug.container.dump') : null;
 
-        if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
+        if (null === $containerDump || !(new ConfigCache($containerDump, $kernel->isDebug()))->isFresh()) {
             $buildContainer = \Closure::bind(function () {
                 $this->initializeBundles();
 
@@ -50,7 +52,7 @@ trait BuildDebugContainerTrait
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
             $container->compile();
         } else {
-            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
+            (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($containerDump);
             $locatorPass = new ServiceLocatorTagPass();
             $locatorPass->process($container);
         }

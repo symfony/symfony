@@ -30,16 +30,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAllowEmptyString()
-    {
-        $this->validator->validate('', new Length(['value' => 6, 'allowEmptyString' => true]));
-
-        $this->assertNoViolation();
-    }
-
     public function testEmptyStringIsInvalid()
     {
         $this->validator->validate('', new Length([

@@ -1037,8 +1037,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             [
                 ['minMessage' => 'min_message'],
                 0,
-                'min_message',
-                Range::TOO_LOW_ERROR,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
             ],
             [
                 ['maxMessage' => 'max_message'],
@@ -1055,8 +1055,8 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             [
                 ['maxMessage' => 'max_message'],
                 15,
-                'max_message',
-                Range::TOO_HIGH_ERROR,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
             ],
         ];
     }

@@ -107,14 +107,8 @@ class Range extends Constraint
             throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
         }
 
-        if (null !== $this->min && null !== $this->max) {
-            $this->deprecatedMinMessageSet = isset($options['minMessage']) || null !== $minMessage;
-            $this->deprecatedMaxMessageSet = isset($options['maxMessage']) || null !== $maxMessage;
-
-            // BC layer, should throw a ConstraintDefinitionException in 6.0
-            if ($this->deprecatedMinMessageSet || $this->deprecatedMaxMessageSet) {
-                trigger_deprecation('symfony/validator', '4.4', '"minMessage" and "maxMessage" are deprecated when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
-            }
+        if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage)) {
+            throw new ConstraintDefinitionException(sprintf('The "%s" constraint can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.', static::class));
         }
     }
 }

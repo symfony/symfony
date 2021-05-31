@@ -51,6 +51,7 @@
         "symfony/expression-language": "<5.1",
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
+        "symfony/property-info": "<5.3",
         "symfony/translation": "<4.4",
         "symfony/yaml": "<4.4"
     },

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2021-05-20T07:29:51Z
+
+I will continue with the rest tomorrow if no one takes care of it before. Cheers!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-05-20T22:03:45Z
+
+I fixed the issue spotted by fabbot.io (the last one is a false positive)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-23T16:33:10Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-05-24T02:12:20Z
+
+(rebased)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2021-05-27T18:11:13Z
+
+> Can you please check psalm reports and let us know if we they're false positive or not?
+
+It looks like a false positive for me.
+
+(rebased)

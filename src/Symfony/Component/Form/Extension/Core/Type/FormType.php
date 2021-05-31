@@ -18,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -64,12 +63,6 @@ class FormType extends BaseType
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
-        }
-
-        if (!method_exists($builder, 'setIsEmptyCallback')) {
-            trigger_deprecation('symfony/form', '5.1', 'Not implementing the "%s::setIsEmptyCallback()" method in "%s" is deprecated.', FormConfigBuilderInterface::class, get_debug_type($builder));
-
-            return;
         }
 
         $builder->setIsEmptyCallback($options['is_empty_callback']);

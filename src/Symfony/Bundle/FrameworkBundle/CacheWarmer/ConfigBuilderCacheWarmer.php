@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\BuildDebugContainerTrait;
 use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
@@ -28,8 +28,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ConfigBuilderCacheWarmer implements CacheWarmerInterface
 {
-    use BuildDebugContainerTrait;
-
     private $kernel;
     private $logger;
 
@@ -73,7 +71,7 @@ class ConfigBuilderCacheWarmer implements CacheWarmerInterface
         if ($extension instanceof ConfigurationInterface) {
             $configuration = $extension;
         } elseif ($extension instanceof ConfigurationExtensionInterface) {
-            $configuration = $extension->getConfiguration([], $this->getContainerBuilder($this->kernel));
+            $configuration = $extension->getConfiguration([], new ContainerBuilder($this->kernel->getContainer()->getParameterBag()));
         }
 
         if (!$configuration) {

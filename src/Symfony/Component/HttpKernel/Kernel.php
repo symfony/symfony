@@ -82,7 +82,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public const RELEASE_VERSION = 1;
     public const EXTRA_VERSION = 'DEV';
 
-    public const END_OF_MAINTENANCE = '05/2021';
+    public const END_OF_MAINTENANCE = '01/2022';
     public const END_OF_LIFE = '01/2022';
 
     public function __construct(string $environment, bool $debug)

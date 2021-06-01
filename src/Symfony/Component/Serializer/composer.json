@@ -47,7 +47,7 @@
         "phpdocumentor/type-resolver": "<1.4.0",
         "symfony/dependency-injection": "<4.4",
         "symfony/property-access": "<4.4",
-        "symfony/property-info": "<4.4",
+        "symfony/property-info": "<5.3",
         "symfony/yaml": "<4.4"
     },
     "suggest": {

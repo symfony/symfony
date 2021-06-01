@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
-use Symfony\Component\Translation\Bridge\PoEditor\PoEditorProviderFactory;
 use Symfony\Component\Translation\Provider\NullProviderFactory;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Provider\TranslationProviderCollectionFactory;
@@ -56,15 +55,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('translation.provider_factory')
 
         ->set('translation.provider_factory.lokalise', LokaliseProviderFactory::class)
-            ->args([
-                service('http_client'),
-                service('logger'),
-                param('kernel.default_locale'),
-                service('translation.loader.xliff'),
-            ])
-            ->tag('translation.provider_factory')
-
-        ->set('translation.provider_factory.poeditor', PoEditorProviderFactory::class)
             ->args([
                 service('http_client'),
                 service('logger'),

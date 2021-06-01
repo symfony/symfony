@@ -7,6 +7,24 @@ in 5.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.3.0...v5.3.1
 
+* 5.3.0 (2021-05-31)
+
+ * bug #41458 [FrameworkBundle] fix ConfigBuilderCacheWarmer (nicolas-grekas)
+ * bug #41456 [FrameworkBundle] fix creating ContainerBuilder at warmup/CLI time (nicolas-grekas)
+ * bug #41452 [FrameworkBundle] Remove redundant cache service (derrabus)
+ * bug #41451 [Translation] Remove PoEditor Provider (welcoMattic)
+ * bug #41000 [Form] Use !isset for checks cause this doesn't falsely include 0 (Kai Dederichs)
+ * bug #41407 [DependencyInjection] keep container.service_subscriber tag on the decorated definition (xabbuh)
+ * bug #40866 [Filesystem] fix readlink() for Windows (a1812)
+ * bug #41402 [HttpKernel] Throw when HttpKernel is created and the env is empty (nicolas-grekas)
+ * bug #41376 [SecurityBundle] Don't register deprecated listeners with authenticator manager enabled (chalasr)
+ * bug #41394 [Form] fix support for years outside of the 32b range on x86 arch (nicolas-grekas)
+ * bug #41380 Make Mailgun Header compatible with other Bridges (jderusse)
+ * bug #39847 [Messenger] Fix merging PrototypedArrayNode associative values (svityashchuk)
+ * bug #41367 [Ldap] Avoid calling the deprecated getUsername() (derrabus)
+ * bug #41346 [WebProfilerBundle] Wrapping exception js in Sfjs check and also loading base_js Sfjs if needed (weaverryan)
+ * bug #41344 [VarDumper] Don't pass null to parse_url() (derrabus)
+
 * 5.3.0-RC1 (2021-05-19)
 
  * security #cve-2021-21424 [Security\Core] Fix user enumeration via response body on invalid credentials (chalasr)

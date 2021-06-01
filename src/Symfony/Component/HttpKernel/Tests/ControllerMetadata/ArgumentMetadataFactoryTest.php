@@ -140,6 +140,18 @@ class ArgumentMetadataFactoryTest extends TestCase
         $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testIssue41478()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'issue41478']);
+        $this->assertEquals([
+            new ArgumentMetadata('baz', 'string', false, false, null, false, [new Foo('bar')]),
+            new ArgumentMetadata('bat', 'string', false, false, null, false, []),
+        ], $arguments);
+    }
+
     private function signature1(self $foo, array $bar, callable $baz)
     {
     }

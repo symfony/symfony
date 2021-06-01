@@ -5,3 +5,8 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+
+HttpKernel
+----------
+
+ * Deprecate `AbstractTestSessionListener::getSession` inject a session in the request instead

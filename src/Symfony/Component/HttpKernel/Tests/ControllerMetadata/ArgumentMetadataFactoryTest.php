@@ -140,6 +140,16 @@ class ArgumentMetadataFactoryTest extends TestCase
         $this->assertCount(1, $this->factory->createArgumentMetadata([new AttributeController(), 'multiAttributeArg'])[0]->getAttributes());
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testMultipleArguments()
+    {
+        $arguments = $this->factory->createArgumentMetadata([new AttributeController(), 'multipleArguments']);
+        self::assertCount(1, $arguments[0]->getAttributes());
+        self::assertCount(0, $arguments[1]->getAttributes());
+    }
+
     private function signature1(self $foo, array $bar, callable $baz)
     {
     }

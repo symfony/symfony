@@ -20,4 +20,7 @@ class AttributeController
 
     public function multiAttributeArg(#[Foo('bar'), Undefined('bar')] string $baz) {
     }
+
+    public function multipleArguments(#[Foo('bar')] string $first, string $second) {
+    }
 }

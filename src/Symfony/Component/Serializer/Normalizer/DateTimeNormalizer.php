@@ -97,7 +97,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
 
-        if ('' === $data || null === $data) {
+        if (null === $data || (\is_string($data) && '' === trim($data))) {
             throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         }
 

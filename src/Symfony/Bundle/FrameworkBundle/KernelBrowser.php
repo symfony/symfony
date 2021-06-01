@@ -122,7 +122,15 @@ class KernelBrowser extends HttpKernelBrowser
 
         $token = new TestBrowserToken($user->getRoles(), $user, $firewallContext);
         $token->setAuthenticated(true);
-        $session = $this->getContainer()->get('session');
+
+        $container = $this->getContainer();
+        $container->get('security.token_storage')->setToken($token);
+
+        if (!$container->has('session')) {
+            return $this;
+        }
+
+        $session = $container->get('session');
         $session->set('_security_'.$firewallContext, serialize($token));
         $session->save();
 

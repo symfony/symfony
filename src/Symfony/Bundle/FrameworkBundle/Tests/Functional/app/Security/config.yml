@@ -12,6 +12,10 @@ security:
             memory:
                 users:
                     other-username: { password: the-password, roles: ['ROLE_FOO'] }
+        stateless:
+            memory:
+                users:
+                    stateless-username: { password: the-password, roles: ['ROLE_FOO'] }
 
     firewalls:
         main:
@@ -24,3 +28,8 @@ security:
             form_login:
                 check_path: /custom/login/check
             provider: custom
+        stateless:
+            pattern: ^/stateless
+            stateless: true
+            http_basic: ~
+            provider: stateless

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.4
+---
+ * Add `#[Alias]` to tell how service should be aliased
+
 5.3
 ---
 

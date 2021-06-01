@@ -38,7 +38,6 @@ return static function (ContainerConfigurator $container) {
         ->set('test.session.listener', TestSessionListener::class)
             ->args([
                 service_locator([
-                    'session_factory' => service('session.factory')->ignoreOnInvalid(),
                     'session' => service('.session.do-not-use')->ignoreOnInvalid(),
                 ]),
             ])

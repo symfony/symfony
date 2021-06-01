@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener;
-use Symfony\Component\HttpKernel\EventListener\SessionListener;
 use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -99,6 +98,7 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
+        $request->setSession($this->getSession());
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 
@@ -118,6 +118,7 @@ class TestSessionListenerTest extends TestCase
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
+        $request->setSession($this->getSession());
         $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
 

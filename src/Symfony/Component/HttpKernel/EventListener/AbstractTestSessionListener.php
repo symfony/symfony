@@ -46,7 +46,9 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         }
 
         // bootstrap the session
-        if (!$session = $this->getSession()) {
+        if ($event->getRequest()->hasSession()) {
+            $session = $event->getRequest()->getSession();
+        } elseif (!$session = $this->getSession()) {
             return;
         }
 
@@ -100,13 +102,15 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onKernelRequest', 192],
+            KernelEvents::REQUEST => ['onKernelRequest', 127], // AFTER SessionListener
             KernelEvents::RESPONSE => ['onKernelResponse', -128],
         ];
     }
 
     /**
      * Gets the session object.
+     *
+     * @deprecated since Symfony 5.4, will be removed in 6.0.
      *
      * @return SessionInterface|null A SessionInterface instance or null if no session is available
      */

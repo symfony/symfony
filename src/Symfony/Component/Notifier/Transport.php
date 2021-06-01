@@ -41,6 +41,7 @@ use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransportFactory;
 use Symfony\Component\Notifier\Bridge\Smsc\SmscTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 use Symfony\Component\Notifier\Bridge\Telnyx\TelnyxTransportFactory;
+use Symfony\Component\Notifier\Bridge\TurboSms\TurboSmsTransportFactory;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 use Symfony\Component\Notifier\Bridge\Yunpian\YunpianTransportFactory;
 use Symfony\Component\Notifier\Bridge\Zulip\ZulipTransportFactory;
@@ -91,6 +92,7 @@ class Transport
         SmscTransportFactory::class,
         TelegramTransportFactory::class,
         TelnyxTransportFactory::class,
+        TurboSmsTransportFactory::class,
         TwilioTransportFactory::class,
         YunpianTransportFactory::class,
         ZulipTransportFactory::class,

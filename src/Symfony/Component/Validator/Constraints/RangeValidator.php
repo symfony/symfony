@@ -34,7 +34,7 @@ class RangeValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Range) {
             throw new UnexpectedTypeException($constraint, Range::class);
@@ -164,7 +164,7 @@ class RangeValidator extends ConstraintValidator
         }
     }
 
-    private function getLimit($propertyPath, $default, Constraint $constraint)
+    private function getLimit(?string $propertyPath, mixed $default, Constraint $constraint): mixed
     {
         if (null === $propertyPath) {
             return $default;
@@ -190,7 +190,7 @@ class RangeValidator extends ConstraintValidator
         return $this->propertyAccessor;
     }
 
-    private function isParsableDatetimeString($boundary): bool
+    private function isParsableDatetimeString(mixed $boundary): bool
     {
         if (null === $boundary) {
             return true;

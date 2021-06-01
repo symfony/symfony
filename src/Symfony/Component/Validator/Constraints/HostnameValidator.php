@@ -31,7 +31,7 @@ class HostnameValidator extends ConstraintValidator
         'test',
     ];
 
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Hostname) {
             throw new UnexpectedTypeException($constraint, Hostname::class);

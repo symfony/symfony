@@ -131,11 +131,9 @@ class ExecutionContext implements ExecutionContextInterface
     private $cachedObjectsRefs;
 
     /**
-     * @param mixed $root The root value of the validated object graph
-     *
      * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      */
-    public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, string $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, mixed $root, TranslatorInterface $translator, string $translationDomain = null)
     {
         $this->validator = $validator;
         $this->root = $root;
@@ -148,7 +146,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setNode($value, ?object $object, MetadataInterface $metadata = null, string $propertyPath)
+    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath)
     {
         $this->value = $value;
         $this->object = $object;
@@ -352,11 +350,9 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @internal
      *
-     * @param object $object
-     *
      * @return string
      */
-    public function generateCacheKey($object)
+    public function generateCacheKey(object $object)
     {
         if (!isset($this->cachedObjectsRefs[$object])) {
             $this->cachedObjectsRefs[$object] = spl_object_hash($object);

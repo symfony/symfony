@@ -22,7 +22,7 @@ class LessThanValidator extends AbstractComparisonValidator
     /**
      * {@inheritdoc}
      */
-    protected function compareValues($value1, $value2)
+    protected function compareValues(mixed $value1, mixed $value2)
     {
         return null === $value2 || $value1 < $value2;
     }

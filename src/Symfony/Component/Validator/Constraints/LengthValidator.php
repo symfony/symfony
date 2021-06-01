@@ -24,7 +24,7 @@ class LengthValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Length) {
             throw new UnexpectedTypeException($constraint, Length::class);

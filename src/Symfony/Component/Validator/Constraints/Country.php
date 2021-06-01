@@ -38,7 +38,7 @@ class Country extends Constraint
         string $message = null,
         bool $alpha3 = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');

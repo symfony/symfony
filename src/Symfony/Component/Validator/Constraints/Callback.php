@@ -27,12 +27,7 @@ class Callback extends Constraint
      */
     public $callback;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array|string|callable $callback The callback or a set of options
-     */
-    public function __construct($callback = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(array|string|callable|null $callback = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         // Invocation through annotations with an array parameter only
         if (\is_array($callback) && 1 === \count($callback) && isset($callback['value'])) {

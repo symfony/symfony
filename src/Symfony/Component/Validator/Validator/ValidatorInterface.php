@@ -30,7 +30,6 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * If no constraint is passed, the constraint
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
-     * @param mixed                                                 $value       The value to validate
      * @param Constraint|Constraint[]                               $constraints The constraint(s) to validate against
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
@@ -38,13 +37,12 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validate($value, $constraints = null, $groups = null);
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array|null $groups = null);
 
     /**
      * Validates a property of an object against the constraints specified
      * for this property.
      *
-     * @param object                                                $object       The object
      * @param string                                                $propertyName The name of the validated property
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups       The validation groups to validate. If none is given, "Default" is assumed
      *
@@ -52,7 +50,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validateProperty($object, string $propertyName, $groups = null);
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null);
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -67,7 +65,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null);
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null);
 
     /**
      * Starts a new validation context and returns a validator for that context.

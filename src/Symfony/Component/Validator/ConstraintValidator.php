@@ -52,11 +52,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed $value The value to return the type of
-     *
      * @return string The type of the value
      */
-    protected function formatTypeOf($value)
+    protected function formatTypeOf(mixed $value)
     {
         return get_debug_type($value);
     }
@@ -78,13 +76,11 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param mixed $value  The value to format as string
-     * @param int   $format A bitwise combination of the format
-     *                      constants in this class
+     * @param int $format A bitwise combination of the format constants in this class
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, int $format = 0)
+    protected function formatValue(mixed $value, int $format = 0)
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
             if (class_exists(\IntlDateFormatter::class)) {

@@ -43,13 +43,8 @@ class Length extends Constraint
     public $charset = 'UTF-8';
     public $normalizer;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param int|array|null $exactly The expected exact length or a set of options
-     */
     public function __construct(
-        $exactly = null,
+        int|array|null $exactly = null,
         int $min = null,
         int $max = null,
         string $charset = null,
@@ -59,7 +54,7 @@ class Length extends Constraint
         string $maxMessage = null,
         string $charsetMessage = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($exactly)) {

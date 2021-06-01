@@ -22,7 +22,7 @@ class IdenticalToValidator extends AbstractComparisonValidator
     /**
      * {@inheritdoc}
      */
-    protected function compareValues($value1, $value2)
+    protected function compareValues(mixed $value1, mixed $value2)
     {
         return $value1 === $value2;
     }

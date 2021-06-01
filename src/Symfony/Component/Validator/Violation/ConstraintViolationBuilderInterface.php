@@ -71,11 +71,9 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets the invalid value that caused this violation.
      *
-     * @param mixed $invalidValue The invalid value
-     *
      * @return $this
      */
-    public function setInvalidValue($invalidValue);
+    public function setInvalidValue(mixed $invalidValue);
 
     /**
      * Sets the number which determines how the plural form of the violation
@@ -105,7 +103,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      */
-    public function setCause($cause);
+    public function setCause(mixed $cause);
 
     /**
      * Adds the violation to the current execution context.

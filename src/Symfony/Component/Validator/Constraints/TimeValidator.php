@@ -36,7 +36,7 @@ class TimeValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Time) {
             throw new UnexpectedTypeException($constraint, Time::class);

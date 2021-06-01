@@ -91,7 +91,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->restoreDefaultTimezone();
     }
 
-    protected function setDefaultTimezone($defaultTimezone)
+    protected function setDefaultTimezone(?string $defaultTimezone)
     {
         // Make sure this method can not be called twice before calling
         // also restoreDefaultTimezone()

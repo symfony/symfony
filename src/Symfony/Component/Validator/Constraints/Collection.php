@@ -38,7 +38,7 @@ class Collection extends Composite
     /**
      * {@inheritdoc}
      */
-    public function __construct($options = null)
+    public function __construct(mixed $options = null)
     {
         // no known options set? $options is the fields array
         if (\is_array($options)

@@ -39,9 +39,7 @@ interface PropertyMetadataInterface extends MetadataInterface
     /**
      * Extracts the value of the property from the given container.
      *
-     * @param mixed $containingValue The container to extract the property value from
-     *
      * @return mixed The value of the property
      */
-    public function getPropertyValue($containingValue);
+    public function getPropertyValue(mixed $containingValue);
 }

@@ -29,7 +29,7 @@ class TimezoneValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Timezone) {
             throw new UnexpectedTypeException($constraint, Timezone::class);

@@ -38,7 +38,7 @@ class SessionListener extends AbstractSessionListener
     {
         parent::onKernelRequest($event);
 
-        if (!$event->isMainRequest() || !$this->container->has('session')) {
+        if (!$event->isMainRequest() || (!$this->container->has('session') && !$this->container->has('session_factory'))) {
             return;
         }
 

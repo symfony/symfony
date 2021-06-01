@@ -47,13 +47,13 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class MongoDbStore implements PersistingStoreInterface
 {
+    use ExpiringStoreTrait;
+
     private $collection;
     private $client;
     private $uri;
     private $options;
     private $initialTtl;
-
-    use ExpiringStoreTrait;
 
     /**
      * @param Collection|Client|string $mongo      An instance of a Collection or Client or URI @see https://docs.mongodb.com/manual/reference/connection-string/

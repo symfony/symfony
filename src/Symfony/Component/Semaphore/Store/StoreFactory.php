@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
-use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;

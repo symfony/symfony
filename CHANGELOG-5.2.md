@@ -7,6 +7,17 @@ in 5.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v5.2.0...v5.2.1
 
+* 5.2.10 (2021-06-01)
+
+ * bug #41000 [Form] Use !isset for checks cause this doesn't falsely include 0 (Kai Dederichs)
+ * bug #41407 [DependencyInjection] keep container.service_subscriber tag on the decorated definition (xabbuh)
+ * bug #40866 [Filesystem] fix readlink() for Windows (a1812)
+ * bug #41394 [Form] fix support for years outside of the 32b range on x86 arch (nicolas-grekas)
+ * bug #41380 Make Mailgun Header compatible with other Bridges (jderusse)
+ * bug #39847 [Messenger] Fix merging PrototypedArrayNode associative values (svityashchuk)
+ * bug #41346 [WebProfilerBundle] Wrapping exception js in Sfjs check and also loading base_js Sfjs if needed (weaverryan)
+ * bug #41344 [VarDumper] Don't pass null to parse_url() (derrabus)
+
 * 5.2.9 (2021-05-19)
 
  * security #cve-2021-21424 [Security\Core] Fix user enumeration via response body on invalid credentials (chalasr)

@@ -56,10 +56,7 @@ class Connection
     private $deleteAfterReject;
     private $couldHavePendingMessages = true;
 
-    /**
-     * @param \Redis|\RedisCluster|null $redis
-     */
-    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], $redis = null)
+    public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis|\RedisCluster|null $redis = null)
     {
         if (version_compare(phpversion('redis'), '4.3.0', '<')) {
             throw new LogicException('The redis transport requires php-redis 4.3.0 or higher.');
@@ -136,10 +133,7 @@ class Connection
         return $redis;
     }
 
-    /**
-     * @param \Redis|\RedisCluster|null $redis
-     */
-    public static function fromDsn(string $dsn, array $redisOptions = [], $redis = null): self
+    public static function fromDsn(string $dsn, array $redisOptions = [], \Redis|\RedisCluster|null $redis = null): self
     {
         if (false === strpos($dsn, ',')) {
             $parsedUrl = self::parseDsn($dsn, $redisOptions);

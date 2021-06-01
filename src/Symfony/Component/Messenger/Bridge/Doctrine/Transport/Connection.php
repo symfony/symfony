@@ -275,7 +275,7 @@ class Connection implements ResetInterface
         }, $data);
     }
 
-    public function find($id): ?array
+    public function find(mixed $id): ?array
     {
         $queryBuilder = $this->createQueryBuilder()
             ->where('m.id = ? and m.queue_name = ?');

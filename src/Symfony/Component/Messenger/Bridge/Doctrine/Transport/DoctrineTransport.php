@@ -80,7 +80,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     /**
      * {@inheritdoc}
      */
-    public function find($id): ?Envelope
+    public function find(mixed $id): ?Envelope
     {
         return ($this->receiver ?? $this->getReceiver())->find($id);
     }

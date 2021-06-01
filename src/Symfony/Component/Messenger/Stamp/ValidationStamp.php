@@ -23,12 +23,12 @@ final class ValidationStamp implements StampInterface
     /**
      * @param string[]|GroupSequence $groups
      */
-    public function __construct($groups)
+    public function __construct(array|GroupSequence $groups)
     {
         $this->groups = $groups;
     }
 
-    public function getGroups()
+    public function getGroups(): array|GroupSequence
     {
         return $this->groups;
     }

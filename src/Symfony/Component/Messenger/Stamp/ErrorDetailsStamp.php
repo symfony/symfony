@@ -20,22 +20,12 @@ use Throwable;
  */
 final class ErrorDetailsStamp implements StampInterface
 {
-    /** @var string */
     private $exceptionClass;
-
-    /** @var int|mixed */
     private $exceptionCode;
-
-    /** @var string */
     private $exceptionMessage;
-
-    /** @var FlattenException|null */
     private $flattenException;
 
-    /**
-     * @param int|mixed $exceptionCode
-     */
-    public function __construct(string $exceptionClass, $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
+    public function __construct(string $exceptionClass, mixed $exceptionCode, string $exceptionMessage, FlattenException $flattenException = null)
     {
         $this->exceptionClass = $exceptionClass;
         $this->exceptionCode = $exceptionCode;
@@ -62,7 +52,7 @@ final class ErrorDetailsStamp implements StampInterface
         return $this->exceptionClass;
     }
 
-    public function getExceptionCode()
+    public function getExceptionCode(): mixed
     {
         return $this->exceptionCode;
     }

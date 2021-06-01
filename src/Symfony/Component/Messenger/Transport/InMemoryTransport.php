@@ -122,10 +122,7 @@ class InMemoryTransport implements TransportInterface, ResetInterface
         return $this->decode($this->sent);
     }
 
-    /**
-     * @return Envelope|array
-     */
-    private function encode(Envelope $envelope)
+    private function encode(Envelope $envelope): Envelope|array
     {
         if (null === $this->serializer) {
             return $envelope;

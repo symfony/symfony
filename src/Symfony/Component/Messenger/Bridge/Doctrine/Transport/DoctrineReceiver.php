@@ -125,7 +125,7 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
     /**
      * {@inheritdoc}
      */
-    public function find($id): ?Envelope
+    public function find(mixed $id): ?Envelope
     {
         try {
             $doctrineEnvelope = $this->connection->find($id);

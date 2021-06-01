@@ -23,10 +23,7 @@ class ActivationMiddleware implements MiddlewareInterface
     private $inner;
     private $activated;
 
-    /**
-     * @param bool|callable $activated
-     */
-    public function __construct(MiddlewareInterface $inner, $activated)
+    public function __construct(MiddlewareInterface $inner, bool|callable $activated)
     {
         $this->inner = $inner;
         $this->activated = $activated;

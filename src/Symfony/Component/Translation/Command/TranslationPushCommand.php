@@ -94,13 +94,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $provider = $this->providers->get($input->getArgument('provider'));
+
         if (!$this->enabledLocales) {
-            throw new InvalidArgumentException('You must define "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" config key in order to work with translation providers.');
+            throw new InvalidArgumentException(sprintf('You must define "framework.translator.enabled_locales" or "framework.translator.providers.%s.locales" config key in order to work with translation providers.', parse_url($provider, \PHP_URL_SCHEME)));
         }
 
         $io = new SymfonyStyle($input, $output);
-
-        $provider = $this->providers->get($input->getArgument('provider'));
         $domains = $input->getOption('domains');
         $locales = $input->getOption('locales');
         $force = $input->getOption('force');

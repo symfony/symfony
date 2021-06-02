@@ -203,19 +203,7 @@ class Inline
      */
     public static function isHash(array|\ArrayObject|\stdClass $value): bool
     {
-        if ($value instanceof \stdClass || $value instanceof \ArrayObject) {
-            return true;
-        }
-
-        $expectedKey = 0;
-
-        foreach ($value as $key => $val) {
-            if ($key !== $expectedKey++) {
-                return true;
-            }
-        }
-
-        return false;
+        return !\is_array($value) || !array_is_list($value);
     }
 
     /**

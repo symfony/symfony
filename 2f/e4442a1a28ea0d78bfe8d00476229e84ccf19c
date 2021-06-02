@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-05-31T10:42:09Z
+
+Is this really a bugfix?
+
+Ie, why not target 5.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-05-31T15:18:10Z
+
+To save some potential merge conflicts, and benefit from the work on the polyfill I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-01T10:04:01Z
+
+> this is consistent with the way we introduced usage of get_debug_type where we relied on the polyfill in older branches too.
+
+ooch, actually we added `get_debug_type()` only on recent branches! That reverses the argument, updating for 5.4... :)

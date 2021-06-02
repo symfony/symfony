@@ -15,7 +15,7 @@ class TextTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = '', $norm = '', $view = '')
     {
         parent::testSubmitNull($expected, $norm, '');
     }
@@ -23,19 +23,19 @@ class TextTypeTest extends BaseTypeTest
     public function testSubmitNullReturnsNullWithEmptyDataAsString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name', [
-            'empty_data' => '',
+            'empty_data' => null,
         ]);
 
         $form->submit(null);
-        $this->assertSame('', $form->getData());
-        $this->assertSame('', $form->getNormData());
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
     }
 
     public function provideZeros()
     {
         return [
-            [0, '0'],
+            [0, 0],
             ['0', '0'],
             ['00000', '00000'],
         ];

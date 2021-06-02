@@ -46,7 +46,7 @@ class GenericLinkProvider implements EvolvableLinkProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getLinksByRel($rel): array
+    public function getLinksByRel(string $rel): array
     {
         $links = [];
 

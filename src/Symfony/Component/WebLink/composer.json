@@ -20,7 +20,7 @@
     },
     "require": {
         "php": ">=8.0.2",
-        "psr/link": "^1.0"
+        "psr/link": "^1.1"
     },
     "suggest": {
         "symfony/http-kernel": ""

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -45,7 +47,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor(mixed $value)
     {
         return $this->validator->getMetadataFor($value);
     }
@@ -53,7 +55,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function hasMetadataFor($value)
+    public function hasMetadataFor(mixed $value)
     {
         return $this->validator->hasMetadataFor($value);
     }
@@ -61,7 +63,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value, $constraints = null, $groups = null)
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array|null $groups = null)
     {
         $violations = $this->validator->validate($value, $constraints, $groups);
 
@@ -105,7 +107,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, string $propertyName, $groups = null)
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null)
     {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
@@ -113,7 +115,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null)
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null)
     {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }

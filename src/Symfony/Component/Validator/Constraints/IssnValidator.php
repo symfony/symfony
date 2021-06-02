@@ -29,7 +29,7 @@ class IssnValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Issn) {
             throw new UnexpectedTypeException($constraint, Issn::class);

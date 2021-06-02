@@ -23,7 +23,7 @@ class SequentiallyValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Sequentially) {
             throw new UnexpectedTypeException($constraint, Sequentially::class);

@@ -85,7 +85,7 @@ class Ip extends Constraint
         string $message = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

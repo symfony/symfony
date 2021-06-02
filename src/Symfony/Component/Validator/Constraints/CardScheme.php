@@ -49,12 +49,7 @@ class CardScheme extends Constraint
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param array|string $schemes The schemes to validate against or a set of options
-     */
-    public function __construct($schemes, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(array|string|null $schemes, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($schemes) && \is_string(key($schemes))) {
             $options = array_merge($schemes, $options);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -59,12 +58,6 @@ class Range extends Constraint
      */
     public $deprecatedMaxMessageSet = false;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|PropertyPathInterface|null $minPropertyPath
-     * @param string|PropertyPathInterface|null $maxPropertyPath
-     */
     public function __construct(
         array $options = null,
         string $notInRangeMessage = null,
@@ -72,12 +65,12 @@ class Range extends Constraint
         string $maxMessage = null,
         string $invalidMessage = null,
         string $invalidDateTimeMessage = null,
-        $min = null,
-        $minPropertyPath = null,
-        $max = null,
-        $maxPropertyPath = null,
+        mixed $min = null,
+        string $minPropertyPath = null,
+        mixed $max = null,
+        string $maxPropertyPath = null,
         array $groups = null,
-        $payload = null
+        mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 

@@ -404,7 +404,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      *
      * @throws GroupDefinitionException
      */
-    public function setGroupSequence($groupSequence)
+    public function setGroupSequence(array|GroupSequence $groupSequence)
     {
         if ($this->isGroupSequenceProvider()) {
             throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider.');

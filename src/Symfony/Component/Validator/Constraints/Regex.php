@@ -35,19 +35,14 @@ class Regex extends Constraint
     public $match = true;
     public $normalizer;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array $pattern The pattern to evaluate or an array of options
-     */
     public function __construct(
-        $pattern,
+        string|array|null $pattern,
         string $message = null,
         string $htmlPattern = null,
         bool $match = null,
         callable $normalizer = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (\is_array($pattern)) {

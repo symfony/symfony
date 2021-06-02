@@ -120,11 +120,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Returns whether this member is public.
      *
-     * @param object|string $objectOrClassName The object or the class name
-     *
      * @return bool
      */
-    public function isPublic($objectOrClassName)
+    public function isPublic(object|string $objectOrClassName)
     {
         return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
@@ -132,11 +130,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Returns whether this member is protected.
      *
-     * @param object|string $objectOrClassName The object or the class name
-     *
      * @return bool
      */
-    public function isProtected($objectOrClassName)
+    public function isProtected(object|string $objectOrClassName)
     {
         return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
@@ -144,11 +140,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Returns whether this member is private.
      *
-     * @param object|string $objectOrClassName The object or the class name
-     *
      * @return bool
      */
-    public function isPrivate($objectOrClassName)
+    public function isPrivate(object|string $objectOrClassName)
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
@@ -156,11 +150,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
     /**
      * Returns the reflection instance for accessing the member's value.
      *
-     * @param object|string $objectOrClassName The object or the class name
-     *
      * @return \ReflectionMethod|\ReflectionProperty The reflection instance
      */
-    public function getReflectionMember($objectOrClassName)
+    public function getReflectionMember(object|string $objectOrClassName)
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         if (!isset($this->reflMember[$className])) {
@@ -175,11 +167,9 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * Must be implemented by subclasses.
      *
-     * @param object|string $objectOrClassName The object or the class name
-     *
      * @return \ReflectionMethod|\ReflectionProperty The reflection instance
      */
-    abstract protected function newReflectionMember($objectOrClassName);
+    abstract protected function newReflectionMember(object|string $objectOrClassName);
 
     private function checkConstraint(Constraint $constraint)
     {

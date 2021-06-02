@@ -28,8 +28,6 @@ interface ContextualValidatorInterface
      * If called multiple times, the path will always be reset to the context's
      * original path with the given path appended to it.
      *
-     * @param string $path The path to append
-     *
      * @return $this
      */
     public function atPath(string $path);
@@ -46,7 +44,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validate($value, $constraints = null, $groups = null);
+    public function validate(mixed $value, Constraint|array $constraints = null, string|GroupSequence|array|null $groups = null);
 
     /**
      * Validates a property of an object against the constraints specified
@@ -58,7 +56,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validateProperty($object, string $propertyName, $groups = null);
+    public function validateProperty(object $object, string $propertyName, string|GroupSequence|array|null $groups = null);
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -71,7 +69,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null);
+    public function validatePropertyValue(object|string $objectOrClass, string $propertyName, mixed $value, string|GroupSequence|array|null $groups = null);
 
     /**
      * Returns the violations that have been generated so far in the context

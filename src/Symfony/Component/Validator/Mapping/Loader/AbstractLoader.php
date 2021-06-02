@@ -64,7 +64,7 @@ abstract class AbstractLoader implements LoaderInterface
      *
      * @throws MappingException If the namespace prefix is undefined
      */
-    protected function newConstraint(string $name, $options = null)
+    protected function newConstraint(string $name, mixed $options = null)
     {
         if (false !== strpos($name, '\\') && class_exists($name)) {
             $className = (string) $name;

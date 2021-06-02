@@ -18,7 +18,7 @@ class UnexpectedValueException extends UnexpectedTypeException
 {
     private $expectedType;
 
-    public function __construct($value, string $expectedType)
+    public function __construct(mixed $value, string $expectedType)
     {
         parent::__construct($value, $expectedType);
 

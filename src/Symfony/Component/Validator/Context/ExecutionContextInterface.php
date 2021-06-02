@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * When you make another call to the validator, while the validation is in
  * progress, the violations will be isolated from each other:
  *
- *     public function validate($value, Constraint $constraint)
+ *     public function validate(mixed $value, Constraint $constraint)
  *     {
  *         $validator = $this->context->getValidator();
  *
@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * However, if you want to add the violations to the current context, use the
  * {@link ValidatorInterface::inContext()} method:
  *
- *     public function validate($value, Constraint $constraint)
+ *     public function validate(mixed $value, Constraint $constraint)
  *     {
  *         $validator = $this->context->getValidator();
  *
@@ -93,7 +93,7 @@ interface ExecutionContextInterface
      *
      * Useful if you want to validate additional constraints:
      *
-     *     public function validate($value, Constraint $constraint)
+     *     public function validate(mixed $value, Constraint $constraint)
      *     {
      *         $validator = $this->context->getValidator();
      *
@@ -125,14 +125,13 @@ interface ExecutionContextInterface
     /**
      * Sets the currently validated value.
      *
-     * @param mixed       $value        The validated value
      * @param object|null $object       The currently validated object
      * @param string      $propertyPath The property path to the current value
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setNode($value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
+    public function setNode(mixed $value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
 
     /**
      * Sets the currently validated group.

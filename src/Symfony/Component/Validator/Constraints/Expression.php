@@ -36,17 +36,12 @@ class Expression extends Constraint
     public $expression;
     public $values = [];
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|ExpressionObject|array $expression The expression to evaluate or an array of options
-     */
     public function __construct(
-        $expression,
+        string|ExpressionObject|array|null $expression,
         string $message = null,
         array $values = null,
         array $groups = null,
-        $payload = null,
+        mixed $payload = null,
         array $options = []
     ) {
         if (!class_exists(ExpressionLanguage::class)) {
@@ -55,8 +50,6 @@ class Expression extends Constraint
 
         if (\is_array($expression)) {
             $options = array_merge($expression, $options);
-        } elseif (!\is_string($expression) && !$expression instanceof ExpressionObject) {
-            throw new \TypeError(sprintf('"%s": Expected argument $expression to be either a string, an instance of "%s" or an array, got "%s".', __METHOD__, ExpressionObject::class, get_debug_type($expression)));
         } else {
             $options['value'] = $expression;
         }

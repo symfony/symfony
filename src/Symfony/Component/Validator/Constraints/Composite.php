@@ -51,7 +51,7 @@ abstract class Composite extends Constraint
      * cached. When constraints are loaded from the cache, no more group
      * checks need to be done.
      */
-    public function __construct($options = null)
+    public function __construct(mixed $options = null)
     {
         parent::__construct($options);
 
@@ -114,10 +114,8 @@ abstract class Composite extends Constraint
      * {@inheritdoc}
      *
      * Implicit group names are forwarded to nested constraints.
-     *
-     * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group)
     {
         parent::addImplicitGroupName($group);
 

@@ -31,12 +31,7 @@ class Type extends Constraint
     public $message = 'This value should be of type {{ type }}.';
     public $type;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param string|array $type One ore multiple types to validate against or a set of options
-     */
-    public function __construct($type, string $message = null, array $groups = null, $payload = null, array $options = [])
+    public function __construct(string|array|null $type, string $message = null, array $groups = null, mixed $payload = null, array $options = [])
     {
         if (\is_array($type) && \is_string(key($type))) {
             $options = array_merge($type, $options);

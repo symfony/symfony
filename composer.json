@@ -53,8 +53,7 @@
         "symfony/polyfill-php73": "^1.11",
         "symfony/polyfill-php80": "^1.15",
         "symfony/polyfill-php81": "^1.22",
-        "symfony/polyfill-uuid": "^1.15",
-        "symfony/runtime": "self.version"
+        "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -144,6 +143,7 @@
         "egulias/email-validator": "^2.1.10|^3.1",
         "symfony/mercure-bundle": "^0.3",
         "symfony/phpunit-bridge": "^5.2",
+        "symfony/runtime": "self.version",
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
         "twig/cssinliner-extra": "^2.12|^3",

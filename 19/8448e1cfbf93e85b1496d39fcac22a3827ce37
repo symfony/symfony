@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T10:55:51Z
+
+I would prefer to move that to `require-dev`.
+Maintaining that line is going to be pain.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-02T11:04:08Z
+
+I don't understand the maintenance concern here. This line only needs an update for each minor version (unless a prefer-lowest job requires bumping the min version at some point, but that's the same workload than for component dependencies)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T11:10:03Z
+
+Releasing a new symfony version is a highly involving task. The more things we have to do, the more error prone it is.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-06-02T11:13:56Z
+
+So, what should I do?
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-02T11:25:53Z
+
+@nicolas-grekas but here, there is nothing to do at each release, only when bumping to a new minor version.
+If you don't want to accept that PR, you have to ensure that `symfony/runtime` never skips a patch release.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T12:56:38Z
+
+> only when bumping to a new minor version
+
+yes, that's what I mean. The releasing process is tedious enough, I know by experience.
+what's the issue with moving this to require-dev?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2021-06-02T13:34:43Z
+
+Why does it need to be required in dev, since the component is already installed / included in the mono repo?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T13:45:22Z
+
+Because it is a composer-plugin, so it can't just be replaced.
+
+---------------------------------------------------------------------------
+
+by stof at 2021-06-02T15:04:35Z
+
+> what's the issue with moving this to require-dev?
+
+do we actually use symfony/runtime for the dev requirements ? AFAICT, it was added in the composer.json so that projects installing symfony/symfony get the new runtime component too.
+A solution might be to remove the requirement entirely. the runtime component is not used by other components. It is used by the skeleton. And projects using symfony/symfony are not using a runtime-based skeleton (and if they want to migrate their own project to use a runtime-based front controller, they can require it in their own project)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T15:10:18Z
+
+I think that's used by tests yes. But that's simple to validate :)

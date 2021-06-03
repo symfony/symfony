@@ -128,4 +128,11 @@ interface TokenInterface
      * Restores the object state from an array given by __serialize().
      */
     public function __unserialize(array $data): void;
+
+    /**
+     * @return string
+     *
+     * @deprecated since Symfony 5.3, use getUserIdentifier() instead
+     */
+    public function getUsername();
 }

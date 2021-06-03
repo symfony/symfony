@@ -48,4 +48,11 @@ interface PersistentTokenInterface
      * @return \DateTime
      */
     public function getLastUsed();
+
+    /**
+     * @return string
+     *
+     * @deprecated since Symfony 5.3, use getUserIdentifier() instead
+     */
+    public function getUsername();
 }

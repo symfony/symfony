@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2021-06-02T08:58:43Z
+
+Thank you.
+
+I see this error on Travis:
+
+> Declaration of Symfony\Component\WebLink\GenericLinkProvider::getLinksByRel(string $rel): array must be compatible with Psr\Link\LinkProviderInterface::getLinksByRel($rel) in /home/travis/build/symfony/symfony/src/Symfony/Component/WebLink/GenericLinkProvider.php on line 49
+
+It is the same issue as this: https://3v4l.org/uM5S9
+
+Let's update `psr/link` to support only ^1.1. Both the root composer.json and the composer.json in the WebLink component. Travis should be happy then.
+
+---------------------------------------------------------------------------
+
+by tarlepp at 2021-06-02T14:35:14Z
+
+> Let's update `psr/link` to support only ^1.1. Both the root composer.json and the composer.json in the WebLink component. Travis should be happy then.
+
+Done

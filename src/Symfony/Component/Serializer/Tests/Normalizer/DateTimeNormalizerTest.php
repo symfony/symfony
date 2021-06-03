@@ -301,7 +301,7 @@ class DateTimeNormalizerTest extends TestCase
     public function testDenormalizeDateTimeStringWithSpacesUsingFormatPassedInContextThrowsAnException()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage("Parsing datetime string \"  2016.01.01  \" using format \"Y.m.d|\" resulted in 2 errors:\nat position 0: Unexpected data found.\nat position 12: Trailing data");
+        $this->expectExceptionMessage("Parsing datetime string \"  2016.01.01  \" using format \"Y.m.d|\" resulted in 2 errors: \nat position 0: Unexpected data found.\nat position 12: Trailing data");
         $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
     }
 

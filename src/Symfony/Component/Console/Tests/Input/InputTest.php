@@ -45,6 +45,20 @@ class InputTest extends TestCase
         $input = new ArrayInput(['--name' => 'foo', '--bar' => null], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $this->assertNull($input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
         $this->assertEquals(['name' => 'foo', 'bar' => null], $input->getOptions(), '->getOptions() returns all option values');
+
+        $input = new ArrayInput(['--name' => null], new InputDefinition([new InputOption('name', null, InputOption::VALUE_NEGATABLE)]));
+        $this->assertTrue($input->hasOption('name'));
+        $this->assertTrue($input->hasOption('no-name'));
+        $this->assertTrue($input->getOption('name'));
+        $this->assertFalse($input->getOption('no-name'));
+
+        $input = new ArrayInput(['--no-name' => null], new InputDefinition([new InputOption('name', null, InputOption::VALUE_NEGATABLE)]));
+        $this->assertFalse($input->getOption('name'));
+        $this->assertTrue($input->getOption('no-name'));
+
+        $input = new ArrayInput([], new InputDefinition([new InputOption('name', null, InputOption::VALUE_NEGATABLE)]));
+        $this->assertNull($input->getOption('name'));
+        $this->assertNull($input->getOption('no-name'));
     }
 
     public function testSetInvalidOption()

@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-02T09:41:19Z
+
+Can you please add a test case if possible?
+
+---------------------------------------------------------------------------
+
+by Matth-- at 2021-06-02T11:41:23Z
+
+@nicolas-grekas I added some functional tests (Feel like this was the better way to get failing tests first).
+The tests were failing without the change to the `SecurityExtension` class.
+
+Do you have a suggestion to fix the Travis ci bugs? I feel like it used the Symfony 5.4 branch to run tests against.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-02T13:16:45Z
+
+> Do you have a suggestion to fix the Travis ci bugs?
+
+I'd say, the Travis failure is unrelated to your changes.

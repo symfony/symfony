@@ -185,7 +185,8 @@ class CommandTest extends TestCase
         $command = new \TestCommand();
         $command->addOption('foo');
         $command->addArgument('bar');
-        $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+        $command->addArgument('info');
+        $this->assertEquals('namespace:name [--foo] [--] [<bar> [<info>]]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
     public function testAddGetUsages()

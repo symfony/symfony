@@ -46,7 +46,7 @@ class Link implements EvolvableLinkInterface
     private $rel = [];
 
     /**
-     * @var string[]
+     * @var array<string, string|\Stringable|int|float|bool|array>
      */
     private $attributes = [];
 
@@ -95,7 +95,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withHref($href)
+    public function withHref(string|\Stringable $href)
     {
         $that = clone $this;
         $that->href = $href;
@@ -108,7 +108,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withRel($rel)
+    public function withRel(string $rel)
     {
         $that = clone $this;
         $that->rel[$rel] = $rel;
@@ -121,7 +121,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withoutRel($rel)
+    public function withoutRel(string $rel)
     {
         $that = clone $this;
         unset($that->rel[$rel]);
@@ -134,7 +134,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withAttribute($attribute, $value)
+    public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value)
     {
         $that = clone $this;
         $that->attributes[$attribute] = $value;
@@ -147,7 +147,7 @@ class Link implements EvolvableLinkInterface
      *
      * @return static
      */
-    public function withoutAttribute($attribute)
+    public function withoutAttribute(string $attribute)
     {
         $that = clone $this;
         unset($that->attributes[$attribute]);

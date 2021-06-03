@@ -45,7 +45,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     /**
      * Transforms a normalized format into a localized money string.
      *
-     * @param int|float $value Normalized number
+     * @param int|float|null $value Normalized number
      *
      * @return string Localized money string
      *
@@ -69,7 +69,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @param string $value Localized money string
      *
-     * @return int|float Normalized number
+     * @return int|float|null Normalized number
      *
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed

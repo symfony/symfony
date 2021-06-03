@@ -124,7 +124,7 @@ class KernelBrowser extends HttpKernelBrowser
         $token->setAuthenticated(true);
 
         $container = $this->getContainer();
-        $container->get('security.token_storage')->setToken($token);
+        $container->get('security.untracked_token_storage')->setToken($token);
 
         if (!$container->has('session')) {
             return $this;

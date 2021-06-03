@@ -1,0 +1,14 @@
+imports:
+- { resource: ./config.yml }
+- { resource: ./security.yml }
+
+security:
+    firewalls:
+        main:
+            pattern: ^/main
+            provider: in_memory
+            custom_authenticator: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\LoginFormAuthenticator
+        custom:
+            pattern: ^/custom
+            provider: in_memory2
+            custom_authenticator: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AuthenticatorBundle\LoginFormAuthenticator

@@ -339,6 +339,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $config->replaceArgument(4, $firewall['stateless']);
 
+        $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
+
         // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)
         $defaultProvider = null;
         if (isset($firewall['provider'])) {
@@ -349,7 +351,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             if ($this->authenticatorManagerEnabled) {
                 $container->setDefinition('security.listener.'.$id.'.user_provider', new ChildDefinition('security.listener.user_provider.abstract'))
-                    ->addTag('kernel.event_listener', ['event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
+                    ->addTag('kernel.event_listener', ['dispatcher' => $firewallEventDispatcherId, 'event' => CheckPassportEvent::class, 'priority' => 2048, 'method' => 'checkPassport'])
                     ->replaceArgument(0, new Reference($defaultProvider));
             }
         } elseif (1 === \count($providerIds)) {
@@ -359,7 +361,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $config->replaceArgument(5, $defaultProvider);
 
         // Register Firewall-specific event dispatcher
-        $firewallEventDispatcherId = 'security.event_dispatcher.'.$id;
         $container->register($firewallEventDispatcherId, EventDispatcher::class);
 
         // Register listeners

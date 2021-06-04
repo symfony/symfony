@@ -40,7 +40,7 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.4",
-        "symfony/framework-bundle": "<4.4",
+        "symfony/framework-bundle": "<5.3",
         "symfony/http-kernel": "<4.4"
     },
     "suggest": {

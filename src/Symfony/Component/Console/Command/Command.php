@@ -513,7 +513,12 @@ class Command
      */
     public function isHidden()
     {
-        return $this->hidden;
+        $isHidden = false;
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($this))->getAttributes(AsCommand::class)) {
+            $isHidden = $attribute[0]->newInstance()->hidden;
+        }
+
+        return $this->hidden || $isHidden;
     }
 
     /**

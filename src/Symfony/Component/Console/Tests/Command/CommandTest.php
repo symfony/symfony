@@ -414,6 +414,8 @@ class CommandTest extends TestCase
     {
         $this->assertSame('|foo|f', Php8Command::getDefaultName());
         $this->assertSame('desc', Php8Command::getDefaultDescription());
+
+        $this->assertSame(true, (new Php8Command())->isHidden());
     }
 }
 

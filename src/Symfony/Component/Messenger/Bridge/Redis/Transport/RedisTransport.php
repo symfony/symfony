@@ -84,4 +84,7 @@ class RedisTransport implements TransportInterface, SetupableTransportInterface
         return $this->sender = new RedisSender($this->connection, $this->serializer);
     }
 }
-class_alias(RedisTransport::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisTransport::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\RedisTransport::class, false)) {
+    class_alias(RedisTransport::class, \Symfony\Component\Messenger\Transport\RedisExt\RedisTransport::class);
+}

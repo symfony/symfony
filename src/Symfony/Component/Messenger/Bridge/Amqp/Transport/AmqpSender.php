@@ -75,4 +75,7 @@ class AmqpSender implements SenderInterface
         return $envelope;
     }
 }
-class_alias(AmqpSender::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender::class, false)) {
+    class_alias(AmqpSender::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender::class);
+}

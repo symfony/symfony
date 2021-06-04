@@ -409,13 +409,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             return null;
         }
 
-        // @deprecated since 5.4, $user will always be a UserInterface instance
-        if (!\is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
-            return null;
-        }
-
-        return $user;
+        return $token->getUser();
     }
 
     /**

@@ -31,26 +31,4 @@ class UserNotFoundExceptionTest extends TestCase
 
         $this->assertNull($exception->getUserIdentifier());
     }
-
-    /**
-     * @group legacy
-     */
-    public function testUsernameIsNotSetByDefault()
-    {
-        $exception = new UserNotFoundException();
-
-        $this->assertNull($exception->getUsername());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testUsernameNotFoundException()
-    {
-        $exception = new UsernameNotFoundException();
-        $this->assertInstanceOf(UserNotFoundException::class, $exception);
-
-        $exception->setUsername('username');
-        $this->assertEquals('username', $exception->getUserIdentifier());
-    }
 }

@@ -22,7 +22,7 @@ class LogoutTest extends AbstractWebTestCase
 {
     public function testCsrfTokensAreClearedOnLogout()
     {
-        $client = $this->createClient(['enable_authenticator_manager' => true, 'test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
+        $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
         $this->callInRequestContext($client, function () {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
@@ -47,20 +47,7 @@ class LogoutTest extends AbstractWebTestCase
 
     public function testAccessControlDoesNotApplyOnLogout()
     {
-        $client = $this->createClient(['enable_authenticator_manager' => true, 'test_case' => 'Logout', 'root_config' => 'config_access.yml']);
-
-        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
-        $client->request('GET', '/logout');
-
-        $this->assertRedirect($client->getResponse(), '/');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAccessControlDoesNotApplyOnLogout()
-    {
-        $client = $this->createClient(['enable_authenticator_manager' => false, 'test_case' => 'Logout', 'root_config' => 'config_access.yml']);
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
         $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');

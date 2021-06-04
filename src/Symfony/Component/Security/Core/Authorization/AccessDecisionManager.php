@@ -88,7 +88,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             if (VoterInterface::ACCESS_DENIED === $result) {
                 ++$deny;
             } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
+                throw new \LogicException(sprintf('"%s::vote()" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN"), "%s" returned.', get_debug_type($voter), VoterInterface::class, var_export($result, true)));
             }
         }
 
@@ -125,7 +125,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             } elseif (VoterInterface::ACCESS_DENIED === $result) {
                 ++$deny;
             } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
+                throw new \LogicException(sprintf('"%s::vote()" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN"), "%s" returned.', get_debug_type($voter), VoterInterface::class, var_export($result, true)));
             }
         }
 
@@ -164,7 +164,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                 if (VoterInterface::ACCESS_GRANTED === $result) {
                     ++$grant;
                 } elseif (VoterInterface::ACCESS_ABSTAIN !== $result) {
-                    trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
+                    throw new \LogicException(sprintf('"%s::vote()" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN"), "%s" returned.', get_debug_type($voter), VoterInterface::class, var_export($result, true)));
                 }
             }
         }
@@ -198,7 +198,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             }
 
             if (VoterInterface::ACCESS_ABSTAIN !== $result) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Returning "%s" in "%s::vote()" is deprecated, return one of "%s" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".', var_export($result, true), get_debug_type($voter), VoterInterface::class);
+                throw new \LogicException(sprintf('"%s::vote()" must return one of "%s" constants ("ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN"), "%s" returned.', get_debug_type($voter), VoterInterface::class, var_export($result, true)));
             }
         }
 

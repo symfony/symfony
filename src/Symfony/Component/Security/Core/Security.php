@@ -41,18 +41,7 @@ class Security implements AuthorizationCheckerInterface
             return null;
         }
 
-        $user = $token->getUser();
-        // @deprecated since 5.4, $user will always be a UserInterface instance
-        if (!\is_object($user)) {
-            return null;
-        }
-
-        // @deprecated since 5.4, $user will always be a UserInterface instance
-        if (!$user instanceof UserInterface) {
-            return null;
-        }
-
-        return $user;
+        return $token->getUser();
     }
 
     /**

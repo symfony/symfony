@@ -46,16 +46,6 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
         $this->property = $property;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadUserByUsername(string $username): UserInterface
-    {
-        trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
-
-        return $this->loadUserByIdentifier($username);
-    }
-
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         $repository = $this->getRepository();
@@ -66,14 +56,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
                 throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            // @deprecated since Symfony 5.3, change to $repository->loadUserByIdentifier() in 6.0
-            if (method_exists($repository, 'loadUserByIdentifier')) {
-                $user = $repository->loadUserByIdentifier($identifier);
-            } else {
-                trigger_deprecation('symfony/doctrine-bridge', '5.3', 'Not implementing method "loadUserByIdentifier()" in user loader "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($repository));
-
-                $user = $repository->loadUserByUsername($identifier);
-            }
+            $user = $repository->loadUserByIdentifier($identifier);
         }
 
         if (null === $user) {

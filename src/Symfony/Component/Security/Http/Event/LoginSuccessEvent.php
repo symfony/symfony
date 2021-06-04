@@ -18,8 +18,6 @@ use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\UserPassportInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -41,15 +39,8 @@ class LoginSuccessEvent extends Event
     private $response;
     private $firewallName;
 
-    /**
-     * @param Passport $passport
-     */
-    public function __construct(AuthenticatorInterface $authenticator, PassportInterface $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)
+    public function __construct(AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $authenticatedToken, Request $request, ?Response $response, string $firewallName)
     {
-        if (!$passport instanceof Passport) {
-            trigger_deprecation('symfony/security-http', '5.4', 'Not passing an instance of "%s" as "$passport" argument of "%s()" is deprecated, "%s" given.', Passport::class, __METHOD__, get_debug_type($passport));
-        }
-
         $this->authenticator = $authenticator;
         $this->passport = $passport;
         $this->authenticatedToken = $authenticatedToken;
@@ -63,18 +54,13 @@ class LoginSuccessEvent extends Event
         return $this->authenticator;
     }
 
-    public function getPassport(): PassportInterface
+    public function getPassport(): Passport
     {
         return $this->passport;
     }
 
     public function getUser(): UserInterface
     {
-        // @deprecated since Symfony 5.4, passport will always have a user in 6.0
-        if (!$this->passport instanceof UserPassportInterface) {
-            throw new LogicException(sprintf('Cannot call "%s" as the authenticator ("%s") did not set a user.', __METHOD__, \get_class($this->authenticator)));
-        }
-
         return $this->passport->getUser();
     }
 

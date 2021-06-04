@@ -12,14 +12,11 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
-use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
-use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\GuardedBundle\AppCustomAuthenticator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -35,8 +32,6 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface as GuardAuthenticatorInterface;
-use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -62,30 +57,6 @@ class SecurityExtensionTest extends TestCase
                     'form_login' => [
                         'check_path' => '/some_area/login_check',
                     ],
-                ],
-            ],
-        ]);
-
-        $container->compile();
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFirewallWithoutAuthenticationListener()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('No authentication listener registered for firewall "some_firewall"');
-        $container = $this->getRawContainer();
-
-        $container->loadFromExtension('security', [
-            'providers' => [
-                'default' => ['id' => 'foo'],
-            ],
-
-            'firewalls' => [
-                'some_firewall' => [
-                    'pattern' => '/.*',
                 ],
             ],
         ]);
@@ -142,36 +113,6 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGuardHandlerIsPassedStatelessFirewalls()
-    {
-        $container = $this->getRawContainer();
-
-        $container->loadFromExtension('security', [
-            'providers' => [
-                'default' => ['id' => 'foo'],
-            ],
-
-            'firewalls' => [
-                'some_firewall' => [
-                    'pattern' => '^/admin',
-                    'http_basic' => null,
-                ],
-                'stateless_firewall' => [
-                    'pattern' => '/.*',
-                    'stateless' => true,
-                    'http_basic' => null,
-                ],
-            ],
-        ]);
-
-        $container->compile();
-        $definition = $container->getDefinition('security.authentication.guard_handler');
-        $this->assertSame(['stateless_firewall'], $definition->getArgument(2));
     }
 
     public function testSwitchUserNotStatelessOnStatelessFirewall()
@@ -374,40 +315,6 @@ class SecurityExtensionTest extends TestCase
     }
 
     /**
-     * @dataProvider sessionConfigurationProvider
-     * @group legacy
-     */
-    public function testRememberMeCookieInheritFrameworkSessionCookie($config, $samesite, $secure)
-    {
-        $container = $this->getRawContainer();
-
-        $container->registerExtension(new FrameworkExtension());
-        $container->setParameter('kernel.bundles_metadata', []);
-        $container->setParameter('kernel.project_dir', __DIR__);
-        $container->setParameter('kernel.cache_dir', __DIR__);
-        $container->setParameter('kernel.container_class', 'FooContainer');
-
-        $container->loadFromExtension('security', [
-            'firewalls' => [
-                'default' => [
-                    'form_login' => null,
-                    'remember_me' => ['secret' => 'baz'],
-                ],
-            ],
-        ]);
-        $container->loadFromExtension('framework', [
-            'session' => $config,
-        ]);
-
-        $container->compile();
-
-        $definition = $container->getDefinition('security.authentication.rememberme.services.simplehash.default');
-
-        $this->assertEquals($samesite, $definition->getArgument(3)['samesite']);
-        $this->assertEquals($secure, $definition->getArgument(3)['secure']);
-    }
-
-    /**
      * @dataProvider acceptableIpsProvider
      */
     public function testAcceptableAccessControlIps($ips)
@@ -564,48 +471,6 @@ class SecurityExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider provideEntryPointFirewalls
-     */
-    public function testAuthenticatorManagerEnabledEntryPoint(array $firewall, $entryPointId)
-    {
-        $container = $this->getRawContainer();
-        $container->register(AppCustomAuthenticator::class);
-        $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
-            'providers' => [
-                'first' => ['id' => 'users'],
-            ],
-
-            'firewalls' => [
-                'main' => $firewall,
-            ],
-        ]);
-
-        $container->compile();
-
-        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.firewall.map.config.main')->getArgument(7));
-        $this->assertEquals($entryPointId, (string) $container->getDefinition('security.exception_listener.main')->getArgument(4));
-    }
-
-    public function provideEntryPointFirewalls()
-    {
-        // only one entry point available
-        yield [['http_basic' => true], 'security.authenticator.http_basic.main'];
-        // explicitly configured by authenticator key
-        yield [['form_login' => true, 'http_basic' => true, 'entry_point' => 'form_login'], 'security.authenticator.form_login.main'];
-        // explicitly configured another service
-        yield [['form_login' => true, 'entry_point' => EntryPointStub::class], EntryPointStub::class];
-        // no entry point required
-        yield [['json_login' => true], null];
-
-        // only one guard authenticator entry point available
-        yield [[
-            'guard' => ['authenticators' => [AppCustomAuthenticator::class]],
-        ], 'security.authenticator.guard.main.0'];
-    }
-
-    /**
      * @dataProvider provideEntryPointRequiredData
      */
     public function testEntryPointRequired(array $firewall, $messageRegex)
@@ -635,24 +500,6 @@ class SecurityExtensionTest extends TestCase
             ['http_basic' => true, 'form_login' => true],
             '/Because you have multiple authenticators in firewall "main", you need to set the "entry_point" key to one of your authenticators \("form_login", "http_basic"\) or a service ID implementing/',
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAlwaysAuthenticateBeforeGrantingCannotBeTrueWithAuthenticatorManager()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The security option "always_authenticate_before_granting" cannot be used when "enable_authenticator_manager" is set to true. If you rely on this behavior, set it to false.');
-
-        $container = $this->getRawContainer();
-        $container->loadFromExtension('security', [
-            'enable_authenticator_manager' => true,
-            'always_authenticate_before_granting' => true,
-            'firewalls' => ['main' => []],
-        ]);
-
-        $container->compile();
     }
 
     /**
@@ -764,17 +611,15 @@ class SecurityExtensionTest extends TestCase
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];
     }
 
-    /**
-     * @group legacy
-     */
     public function testConfigureCustomFirewallListener()
     {
         $container = $this->getRawContainer();
         /** @var SecurityExtension $extension */
         $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory(new TestFirewallListenerFactory());
+        $extension->addAuthenticatorFactory(new TestFirewallListenerFactory());
 
         $container->loadFromExtension('security', [
+            'enable_authenticator_manager' => true,
             'firewalls' => [
                 'main' => [
                     'custom_listener' => true,
@@ -788,26 +633,6 @@ class SecurityExtensionTest extends TestCase
         $listenersIteratorArgument = $container->getDefinition('security.firewall.map.context.main')->getArgument(0);
         $firewallListeners = array_map('strval', $listenersIteratorArgument->getValues());
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAuthorizationManagerSignature()
-    {
-        $container = $this->getRawContainer();
-        $container->loadFromExtension('security', [
-            'always_authenticate_before_granting' => true,
-            'firewalls' => ['main' => ['http_basic' => true]],
-        ]);
-
-        $container->compile();
-
-        $args = $container->getDefinition('security.authorization_checker')->getArguments();
-        $this->assertEquals('security.token_storage', (string) $args[0]);
-        $this->assertEquals('security.authentication_manager', (string) $args[1]);
-        $this->assertEquals('security.access.decision_manager', (string) $args[2]);
-        $this->assertEquals('%security.access.always_authenticate_before_granting%', (string) $args[3]);
     }
 
     protected function getRawContainer()
@@ -847,7 +672,14 @@ class TestAuthenticator implements AuthenticatorInterface
     {
     }
 
+    /**
+     * @internal for compatibility with Symfony 5.4
+     */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    {
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
     }
 
@@ -856,49 +688,6 @@ class TestAuthenticator implements AuthenticatorInterface
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-    }
-
-    public function createToken(Passport $passport, string $firewallName): TokenInterface
-    {
-    }
-}
-
-class NullAuthenticator implements GuardAuthenticatorInterface
-{
-    public function start(Request $request, AuthenticationException $authException = null): Response
-    {
-    }
-
-    public function supports(Request $request): bool
-    {
-    }
-
-    public function getCredentials(Request $request): mixed
-    {
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
-    {
-    }
-
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-    }
-
-    public function createAuthenticatedToken(UserInterface $user, string $providerKey): GuardTokenInterface
-    {
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response
-    {
-    }
-
-    public function supportsRememberMe(): bool
     {
     }
 }
@@ -914,7 +703,7 @@ class TestUserChecker implements UserCheckerInterface
     }
 }
 
-class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallListenerFactoryInterface
+class TestFirewallListenerFactory implements AuthenticatorFactoryInterface, FirewallListenerFactoryInterface
 {
     public function createListeners(ContainerBuilder $container, string $firewallName, array $config): array
     {
@@ -923,17 +712,14 @@ class TestFirewallListenerFactory implements SecurityFactoryInterface, FirewallL
         return ['custom_firewall_listener_id'];
     }
 
-    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
+    public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
-        $container->register('provider_id', \stdClass::class);
-        $container->register('listener_id', \stdClass::class);
-
-        return ['provider_id', 'listener_id', $defaultEntryPoint];
+        return 'test_authenticator_id';
     }
 
-    public function getPosition(): string
+    public function getPriority(): int
     {
-        return 'form';
+        return 0;
     }
 
     public function getKey(): string

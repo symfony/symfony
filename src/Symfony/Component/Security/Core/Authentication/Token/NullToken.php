@@ -28,51 +28,19 @@ class NullToken implements TokenInterface
         return [];
     }
 
-    public function getCredentials()
-    {
-        return '';
-    }
-
     public function getUser()
     {
         return '';
     }
 
-    public function setUser(string|\Stringable|UserInterface $user)
+    public function setUser(UserInterface $user)
     {
         throw new \BadMethodCallException('Cannot set user on a NullToken.');
-    }
-
-    public function getUsername()
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return '';
     }
 
     public function getUserIdentifier(): string
     {
         return '';
-    }
-
-    /**
-     * @deprecated since Symfony 5.4
-     */
-    public function isAuthenticated()
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/security-core', '5.4', 'Method "%s()" is deprecated. In version 6.0, security tokens won\'t have an "authenticated" flag anymore and will always be considered authenticated.', __METHOD__);
-        }
-
-        return true;
-    }
-
-    /**
-     * @deprecated since Symfony 5.4
-     */
-    public function setAuthenticated(bool $isAuthenticated)
-    {
-        throw new \BadMethodCallException('Cannot change authentication state of NullToken.');
     }
 
     public function eraseCredentials()

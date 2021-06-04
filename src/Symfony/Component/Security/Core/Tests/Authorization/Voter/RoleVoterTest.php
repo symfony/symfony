@@ -47,17 +47,6 @@ class RoleVoterTest extends TestCase
         ];
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedRolePreviousAdmin()
-    {
-        $this->expectDeprecation('Since symfony/security-core 5.1: The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
-        $voter = new RoleVoter();
-
-        $voter->vote($this->getTokenWithRoleNames(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), null, ['ROLE_PREVIOUS_ADMIN']);
-    }
-
     protected function getTokenWithRoleNames(array $roles)
     {
         $token = $this->createMock(AbstractToken::class);

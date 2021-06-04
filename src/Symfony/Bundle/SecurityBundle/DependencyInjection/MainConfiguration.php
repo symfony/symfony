@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -33,16 +32,10 @@ class MainConfiguration implements ConfigurationInterface
     private $userProviderFactories;
 
     /**
-     * @param (SecurityFactoryInterface|AuthenticatorFactoryInterface)[] $factories
+     * @param AuthenticatorFactoryInterface[] $factories
      */
     public function __construct(array $factories, array $userProviderFactories)
     {
-        if (\is_array(current($factories))) {
-            trigger_deprecation('symfony/security-bundle', '5.4', 'Passing an array of arrays as 1st argument to "%s" is deprecated, pass a sorted array of factories instead.', __METHOD__);
-
-            $factories = array_merge(...array_values($factories));
-        }
-
         $this->factories = $factories;
         $this->userProviderFactories = $userProviderFactories;
     }
@@ -83,10 +76,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
-                ->booleanNode('always_authenticate_before_granting')
-                    ->defaultFalse()
-                    ->setDeprecated('symfony/security-bundle', '5.4')
-                ->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->booleanNode('enable_authenticator_manager')->defaultFalse()->info('Enables the new Symfony Security system based on Authenticators, all used authenticators must support this before enabling this.')->end()
                 ->arrayNode('access_decision_manager')

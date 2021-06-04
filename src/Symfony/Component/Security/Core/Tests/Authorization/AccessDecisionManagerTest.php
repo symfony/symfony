@@ -38,20 +38,6 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO']));
     }
 
-    /**
-     * @dataProvider provideStrategies
-     * @group legacy
-     */
-    public function testDeprecatedVoter($strategy)
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
-
-        $this->expectDeprecation('Since symfony/security-core 5.3: Returning "3" in "%s::vote()" is deprecated, return one of "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".');
-
-        $manager->decide($token, ['ROLE_FOO']);
-    }
-
     public function getStrategyTests()
     {
         return [
@@ -110,14 +96,6 @@ class AccessDecisionManagerTest extends TestCase
                 $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
             ], true, true, true],
         ];
-    }
-
-    public function provideStrategies()
-    {
-        yield [AccessDecisionManager::STRATEGY_AFFIRMATIVE];
-        yield [AccessDecisionManager::STRATEGY_CONSENSUS];
-        yield [AccessDecisionManager::STRATEGY_UNANIMOUS];
-        yield [AccessDecisionManager::STRATEGY_PRIORITY];
     }
 
     protected function getVoters($grants, $denies, $abstains)

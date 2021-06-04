@@ -35,23 +35,17 @@ final class DebugFirewallCommand extends Command
     private $contexts;
     private $eventDispatchers;
     private $authenticators;
-    private $authenticatorManagerEnabled;
 
     /**
      * @param string[]                   $firewallNames
      * @param AuthenticatorInterface[][] $authenticators
      */
-    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators, bool $authenticatorManagerEnabled)
+    public function __construct(array $firewallNames, ContainerInterface $contexts, ContainerInterface $eventDispatchers, array $authenticators)
     {
-        if (!$authenticatorManagerEnabled) {
-            trigger_deprecation('symfony/security-bundle', '5.4', 'Setting the $authenticatorManagerEnabled argument of "%s" to "false" is deprecated, use the new authenticator system instead.', __METHOD__);
-        }
-
         $this->firewallNames = $firewallNames;
         $this->contexts = $contexts;
         $this->eventDispatchers = $eventDispatchers;
         $this->authenticators = $authenticators;
-        $this->authenticatorManagerEnabled = $authenticatorManagerEnabled;
 
         parent::__construct();
     }
@@ -119,9 +113,7 @@ EOF
             $this->displayEventListeners($name, $context, $io);
         }
 
-        if ($this->authenticatorManagerEnabled) {
-            $this->displayAuthenticators($name, $io);
-        }
+        $this->displayAuthenticators($name, $io);
 
         return 0;
     }

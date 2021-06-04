@@ -44,7 +44,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
 
     public function testSharedSerializedData()
     {
-        $token = new UsernamePasswordToken(new InMemoryUser('foo', ''), 'bar');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 
         $exception = new CustomUserMessageAuthenticationException();
         $exception->setToken($token);
@@ -58,7 +58,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
 
     public function testSharedSerializedDataFromChild()
     {
-        $token = new UsernamePasswordToken(new InMemoryUser('foo', ''), 'bar');
+        $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 
         $exception = new ChildCustomUserMessageAuthenticationException();
         $exception->childMember = $token;

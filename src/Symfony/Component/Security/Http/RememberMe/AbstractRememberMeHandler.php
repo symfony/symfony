@@ -63,15 +63,7 @@ abstract class AbstractRememberMeHandler implements RememberMeHandlerInterface
     public function consumeRememberMeCookie(RememberMeDetails $rememberMeDetails): UserInterface
     {
         try {
-            // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
-            $method = 'loadUserByIdentifier';
-            if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
-                trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
-
-                $method = 'loadUserByUsername';
-            }
-
-            $user = $this->userProvider->$method($rememberMeDetails->getUserIdentifier());
+            $user = $this->userProvider->loadUserByIdentifier($rememberMeDetails->getUserIdentifier());
         } catch (AuthenticationException $e) {
             throw $e;
         }

@@ -58,7 +58,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('security.token_storage'),
                 service('security.access.decision_manager'),
-                param('security.access.always_authenticate_before_granting'),
             ])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
 

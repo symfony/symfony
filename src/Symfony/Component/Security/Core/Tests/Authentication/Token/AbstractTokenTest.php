@@ -22,48 +22,6 @@ class AbstractTokenTest extends TestCase
     use ExpectDeprecationTrait;
 
     /**
-     * @group legacy
-     */
-    public function testLegacyGetUsername()
-    {
-        $token = new ConcreteToken(['ROLE_FOO']);
-        $token->setUser('fabien');
-        $this->assertEquals('fabien', $token->getUsername());
-
-        $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('fabien', $token->getUsername());
-
-        $legacyUser = new class() implements UserInterface {
-            public function getUsername()
-            {
-                return 'fabien';
-            }
-
-            public function getRoles()
-            {
-                return [];
-            }
-
-            public function getPassword()
-            {
-            }
-
-            public function getSalt()
-            {
-            }
-
-            public function eraseCredentials()
-            {
-            }
-        };
-        $token->setUser($legacyUser);
-        $this->assertEquals('fabien', $token->getUsername());
-
-        $token->setUser($legacyUser);
-        $this->assertEquals('fabien', $token->getUserIdentifier());
-    }
-
-    /**
      * @dataProvider provideUsers
      */
     public function testGetUserIdentifier($user, string $username)
@@ -76,25 +34,6 @@ class AbstractTokenTest extends TestCase
     public function provideUsers()
     {
         yield [new InMemoryUser('fabien', null), 'fabien'];
-    }
-
-    /**
-     * @dataProvider provideLegacyUsers
-     * @group legacy
-     */
-    public function testLegacyGetUserIdentifier($user, string $username)
-    {
-        $token = new ConcreteToken(['ROLE_FOO']);
-        $token->setUser($user);
-        $this->assertEquals($username, $token->getUserIdentifier());
-    }
-
-    public function provideLegacyUsers()
-    {
-        return [
-            [new TestUser('fabien'), 'fabien'],
-            ['fabien', 'fabien'],
-        ];
     }
 
     public function testEraseCredentials()
@@ -123,21 +62,6 @@ class AbstractTokenTest extends TestCase
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAuthenticatedFlag()
-    {
-        $token = new ConcreteToken();
-        $this->assertFalse($token->isAuthenticated());
-
-        $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setAuthenticated(false);
-        $this->assertFalse($token->isAuthenticated());
     }
 
     public function testAttributes()
@@ -170,75 +94,6 @@ class AbstractTokenTest extends TestCase
         $token = new ConcreteToken();
         $token->setUser($user);
         $this->assertSame($user, $token->getUser());
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider getUserChanges
-     */
-    public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
-    {
-        $token = new ConcreteToken();
-        $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($firstUser);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($secondUser);
-        $this->assertFalse($token->isAuthenticated());
-    }
-
-    public function getUserChanges()
-    {
-        $user = $this->createMock(UserInterface::class);
-
-        return [
-            ['foo', 'bar'],
-            ['foo', new TestUser('bar')],
-            ['foo', $user],
-            [$user, 'foo'],
-            [$user, new TestUser('foo')],
-            [new TestUser('foo'), new TestUser('bar')],
-            [new TestUser('foo'), 'bar'],
-            [new TestUser('foo'), $user],
-        ];
-    }
-
-    /**
-     * @group legacy
-     * @dataProvider provideUsers
-     * @dataProvider provideLegacyUsers
-     */
-    public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
-    {
-        $token = new ConcreteToken();
-        $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIsUserChangedWhenSerializing()
-    {
-        $token = new ConcreteToken(['ROLE_ADMIN']);
-        $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
-
-        $user = new SerializableUser('wouter', ['ROLE_ADMIN']);
-        $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token = unserialize(serialize($token));
-        $token->setUser($user);
-        $this->assertTrue($token->isAuthenticated());
     }
 }
 

@@ -14,9 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
@@ -40,23 +38,6 @@ final class EventAliasTest extends AbstractWebTestCase
                 'onInteractiveLogin' => 1,
                 'onSwitchUser' => 1,
             ],
-            $container->get('test_subscriber')->calledMethods
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAliasedLegacyEvent()
-    {
-        $client = $this->createClient(['test_case' => 'AliasedEvents', 'root_config' => 'config.yml']);
-        $container = $client->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
-
-        $dispatcher->dispatch(new AuthenticationFailureEvent($this->createMock(TokenInterface::class), new AuthenticationException()), AuthenticationEvents::AUTHENTICATION_FAILURE);
-
-        $this->assertEquals(
-            ['onAuthenticationFailure' => 1],
             $container->get('test_subscriber')->calledMethods
         );
     }

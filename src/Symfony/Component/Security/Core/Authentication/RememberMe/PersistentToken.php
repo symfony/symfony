@@ -54,16 +54,6 @@ final class PersistentToken implements PersistentTokenInterface
         return $this->class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername(): string
-    {
-        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use getUserIdentifier() instead.', __METHOD__);
-
-        return $this->userIdentifier;
-    }
-
     public function getUserIdentifier(): string
     {
         return $this->userIdentifier;

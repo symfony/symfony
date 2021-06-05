@@ -16,7 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class UsageTrackingTokenStorageTest extends TestCase

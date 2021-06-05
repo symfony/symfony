@@ -37,4 +37,7 @@ class AmqpReceivedStamp implements NonSendableStampInterface
         return $this->queueName;
     }
 }
-class_alias(AmqpReceivedStamp::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp::class, false)) {
+    class_alias(AmqpReceivedStamp::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp::class);
+}

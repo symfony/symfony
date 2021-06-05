@@ -224,9 +224,6 @@ class JsonResponseTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('This error is expected');
-        if (!interface_exists(\JsonSerializable::class, false)) {
-            $this->markTestSkipped('JsonSerializable is required.');
-        }
 
         $serializable = new JsonSerializableObject();
 
@@ -280,12 +277,10 @@ class JsonResponseTest extends TestCase
     }
 }
 
-if (interface_exists(\JsonSerializable::class, false)) {
-    class JsonSerializableObject implements \JsonSerializable
+class JsonSerializableObject implements \JsonSerializable
+{
+    public function jsonSerialize(): array
     {
-        public function jsonSerialize()
-        {
-            throw new \Exception('This error is expected');
-        }
+        throw new \Exception('This error is expected');
     }
 }

@@ -136,4 +136,7 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         return $amqpReceivedStamp;
     }
 }
-class_alias(AmqpReceiver::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class, false)) {
+    class_alias(AmqpReceiver::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver::class);
+}

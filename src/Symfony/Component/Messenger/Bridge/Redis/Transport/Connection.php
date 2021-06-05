@@ -497,4 +497,7 @@ class Connection
         }
     }
 }
-class_alias(Connection::class, \Symfony\Component\Messenger\Transport\RedisExt\Connection::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\RedisExt\Connection::class, false)) {
+    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\RedisExt\Connection::class);
+}

@@ -63,7 +63,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    public function render($name, array $parameters = [])
+    public function render(string|TemplateReferenceInterface $name, array $parameters = [])
     {
         $storage = $this->load($name);
         $key = hash('sha256', serialize($storage));
@@ -94,7 +94,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function exists($name)
+    public function exists(string|TemplateReferenceInterface $name)
     {
         try {
             $this->load($name);
@@ -108,7 +108,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function supports($name)
+    public function supports(string|TemplateReferenceInterface $name)
     {
         $template = $this->parser->parse($name);
 
@@ -165,13 +165,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Gets a helper value.
      *
-     * @param string $name The helper name
-     *
      * @return HelperInterface The helper value
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    public function offsetGet($name)
+    public function offsetGet(mixed $name)
     {
         return $this->get($name);
     }
@@ -179,22 +177,17 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the helper is defined.
      *
-     * @param string $name The helper name
-     *
      * @return bool true if the helper is defined, false otherwise
      */
-    public function offsetExists($name)
+    public function offsetExists(mixed $name)
     {
         return isset($this->helpers[$name]);
     }
 
     /**
      * Sets a helper.
-     *
-     * @param HelperInterface $name  The helper instance
-     * @param string          $value An alias
      */
-    public function offsetSet($name, $value)
+    public function offsetSet(mixed $name, mixed $value)
     {
         $this->set($name, $value);
     }
@@ -202,11 +195,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Removes a helper.
      *
-     * @param string $name The helper name
-     *
      * @throws \LogicException
      */
-    public function offsetUnset($name)
+    public function offsetUnset(mixed $name)
     {
         throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));
     }
@@ -272,8 +263,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Decorates the current template with another one.
-     *
-     * @param string $template The decorator logical name
      */
     public function extend(string $template)
     {
@@ -283,11 +272,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Escapes a string by using the current charset.
      *
-     * @param mixed $value A variable to escape
-     *
      * @return mixed The escaped value
      */
-    public function escape($value, string $context = 'html')
+    public function escape(mixed $value, string $context = 'html')
     {
         if (is_numeric($value)) {
             return $value;
@@ -356,10 +343,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         return $this->escapers[$context];
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function addGlobal(string $name, $value)
+    public function addGlobal(string $name, mixed $value)
     {
         $this->globals[$name] = $value;
     }
@@ -466,13 +450,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Loads the given template.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
      * @return Storage A Storage instance
      *
      * @throws \InvalidArgumentException if the template cannot be found
      */
-    protected function load($name)
+    protected function load(string|TemplateReferenceInterface $name)
     {
         $template = $this->parser->parse($name);
 

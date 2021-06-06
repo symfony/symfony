@@ -22,9 +22,7 @@ interface TemplateNameParserInterface
     /**
      * Convert a template name to a TemplateReferenceInterface instance.
      *
-     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
-     *
      * @return TemplateReferenceInterface A template
      */
-    public function parse($name);
+    public function parse(string|TemplateReferenceInterface $name);
 }

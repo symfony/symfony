@@ -13,6 +13,7 @@ CHANGELOG
 
  * Add autowiring alias for `HttpCache\StoreInterface`
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Deprecate the public `profiler` service to private
 
 5.3
 ---

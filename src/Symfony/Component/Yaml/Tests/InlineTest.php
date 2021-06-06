@@ -526,7 +526,7 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTimestampTests
      */
-    public function testParseTimestampAsUnixTimestampByDefault($yaml, $year, $month, $day, $hour, $minute, $second)
+    public function testParseTimestampAsUnixTimestampByDefault(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second)
     {
         $this->assertSame(gmmktime($hour, $minute, $second, $month, $day, $year), Inline::parse($yaml));
     }
@@ -534,37 +534,37 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTimestampTests
      */
-    public function testParseTimestampAsDateTimeObject($yaml, $year, $month, $day, $hour, $minute, $second, $timezone)
+    public function testParseTimestampAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
     {
         $expected = new \DateTime($yaml);
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
+        $expected->setTime($hour, $minute, $second, $microsecond);
 
         $date = Inline::parse($yaml, Yaml::PARSE_DATETIME);
         $this->assertEquals($expected, $date);
         $this->assertSame($timezone, $date->format('O'));
     }
 
-    public function getTimestampTests()
+    public function getTimestampTests(): array
     {
         return [
-            'canonical' => ['2001-12-15T02:59:43.1Z', 2001, 12, 15, 2, 59, 43.1, '+0000'],
-            'ISO-8601' => ['2001-12-15t21:59:43.10-05:00', 2001, 12, 16, 2, 59, 43.1, '-0500'],
-            'spaced' => ['2001-12-15 21:59:43.10 -5', 2001, 12, 16, 2, 59, 43.1, '-0500'],
-            'date' => ['2001-12-15', 2001, 12, 15, 0, 0, 0, '+0000'],
+            'canonical' => ['2001-12-15T02:59:43.1Z', 2001, 12, 15, 2, 59, 43, 100000, '+0000'],
+            'ISO-8601' => ['2001-12-15t21:59:43.10-05:00', 2001, 12, 16, 2, 59, 43, 100000, '-0500'],
+            'spaced' => ['2001-12-15 21:59:43.10 -5', 2001, 12, 16, 2, 59, 43, 100000, '-0500'],
+            'date' => ['2001-12-15', 2001, 12, 15, 0, 0, 0, 0, '+0000'],
         ];
     }
 
     /**
      * @dataProvider getTimestampTests
      */
-    public function testParseNestedTimestampListAsDateTimeObject($yaml, $year, $month, $day, $hour, $minute, $second)
+    public function testParseNestedTimestampListAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
         $expected = new \DateTime($yaml);
         $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
-        $expected->setTime($hour, $minute, $second, 1000000 * ($second - (int) $second));
+        $expected->setTime($hour, $minute, $second, $microsecond);
 
         $expectedNested = ['nested' => [$expected]];
         $yamlNested = "{nested: [$yaml]}";

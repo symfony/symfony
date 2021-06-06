@@ -36,7 +36,7 @@ class ClosureLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null)
     {
         return $resource instanceof \Closure && (!$type || 'closure' === $type);
     }

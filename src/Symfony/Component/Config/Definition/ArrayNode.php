@@ -32,9 +32,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    public function setNormalizeKeys($normalizeKeys)
+    public function setNormalizeKeys(bool $normalizeKeys)
     {
-        $this->normalizeKeys = (bool) $normalizeKeys;
+        $this->normalizeKeys = $normalizeKeys;
     }
 
     /**
@@ -46,7 +46,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * If you have a mixed key like foo-bar_moo, it will not be altered.
      * The key will also not be altered if the target key already exists.
      */
-    protected function preNormalize($value)
+    protected function preNormalize(mixed $value)
     {
         if (!$this->normalizeKeys || !\is_array($value)) {
             return $value;
@@ -200,7 +200,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
      */
-    protected function finalizeValue($value)
+    protected function finalizeValue(mixed $value)
     {
         if (false === $value) {
             throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
@@ -246,7 +246,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    protected function validateType($value)
+    protected function validateType(mixed $value)
     {
         if (!\is_array($value) && (!$this->allowFalse || false !== $value)) {
             $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected "array", but got "%s"', $this->getPath(), get_debug_type($value)));
@@ -264,7 +264,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws InvalidConfigurationException
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value)
     {
         if (false === $value) {
             return $value;
@@ -345,7 +345,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws InvalidConfigurationException
      * @throws \RuntimeException
      */
-    protected function mergeValues($leftSide, $rightSide)
+    protected function mergeValues(mixed $leftSide, mixed $rightSide)
     {
         if (false === $rightSide) {
             // if this is still false after the last config has been merged the

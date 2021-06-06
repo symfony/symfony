@@ -44,7 +44,7 @@ class XmlUtils
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
      * @throws \RuntimeException   When DOM extension is missing
      */
-    public static function parse(string $content, $schemaOrCallable = null)
+    public static function parse(string $content, string|callable|null $schemaOrCallable = null)
     {
         if (!\extension_loaded('dom')) {
             throw new \LogicException('Extension DOM is required.');
@@ -80,13 +80,13 @@ class XmlUtils
                 } catch (\Exception $e) {
                     $valid = false;
                 }
-            } elseif (!\is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
+            } elseif (is_file($schemaOrCallable)) {
                 $schemaSource = file_get_contents((string) $schemaOrCallable);
                 $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
                 libxml_use_internal_errors($internalErrors);
 
-                throw new XmlParsingException('The schemaOrCallable argument has to be a valid path to XSD file or callable.');
+                throw new XmlParsingException(sprintf('Invalid XSD file: "%s".', $schemaOrCallable));
             }
 
             if (!$valid) {
@@ -116,7 +116,7 @@ class XmlUtils
      * @throws XmlParsingException       When XML parsing returns any errors
      * @throws \RuntimeException         When DOM extension is missing
      */
-    public static function loadFile(string $file, $schemaOrCallable = null)
+    public static function loadFile(string $file, string|callable|null $schemaOrCallable = null)
     {
         if (!is_file($file)) {
             throw new \InvalidArgumentException(sprintf('Resource "%s" is not a file.', $file));
@@ -213,11 +213,9 @@ class XmlUtils
     /**
      * Converts an xml value to a PHP type.
      *
-     * @param mixed $value
-     *
      * @return mixed
      */
-    public static function phpize($value)
+    public static function phpize(string|\Stringable $value)
     {
         $value = (string) $value;
         $lowercaseValue = strtolower($value);
@@ -229,12 +227,12 @@ class XmlUtils
                 $raw = $value;
                 $cast = (int) $value;
 
-                return '0' == $value[0] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
+                return '0' == $value[0] ? octdec($value) : (($raw === (string) $cast) ? $cast : $raw);
             case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
                 $raw = $value;
                 $cast = (int) $value;
 
-                return '0' == $value[1] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
+                return '0' == $value[1] ? octdec($value) : (($raw === (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:

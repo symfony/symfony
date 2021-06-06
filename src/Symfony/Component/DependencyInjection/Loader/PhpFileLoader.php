@@ -45,7 +45,7 @@ class PhpFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null)
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
@@ -75,7 +75,7 @@ class PhpFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null)
     {
         if (!\is_string($resource)) {
             return false;

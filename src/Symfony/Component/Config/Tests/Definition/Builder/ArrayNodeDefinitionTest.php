@@ -98,11 +98,9 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @param int|array|string|null $args
-     *
      * @dataProvider providePrototypedArrayNodeDefaults
      */
-    public function testPrototypedArrayNodeDefault($args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
+    public function testPrototypedArrayNodeDefault(int|array|string|null $args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -437,10 +435,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame($expectedName, $this->getField($actualNode, 'name'));
     }
 
-    /**
-     * @param object $object
-     */
-    protected function getField($object, string $field)
+    protected function getField(object $object, string $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
         $reflection->setAccessible(true);

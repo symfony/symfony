@@ -41,7 +41,7 @@ class EnumNode extends ScalarNode
     /**
      * {@inheritdoc}
      */
-    protected function finalizeValue($value)
+    protected function finalizeValue(mixed $value)
     {
         $value = parent::finalizeValue($value);
 

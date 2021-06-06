@@ -72,7 +72,7 @@ class PdoStoreTest extends AbstractStoreTest
     {
         $this->expectException(InvalidTtlException::class);
 
-        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
+        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0);
     }
 
     /**

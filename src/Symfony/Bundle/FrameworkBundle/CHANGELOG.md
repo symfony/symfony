@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
  * Deprecate `get()`, `has()`, `getDoctrine()`, and `dispatchMessage()` in `AbstractController`, use method/constructor injection instead
+ * Add `MicroKernelTrait::getBundlesPath` method to get bundles config path
 
 5.3
 ---

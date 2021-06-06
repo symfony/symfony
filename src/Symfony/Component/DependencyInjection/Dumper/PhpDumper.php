@@ -2166,6 +2166,6 @@ EOF;
             $definition = $factory[0];
         }
 
-        return array_filter($classes);
+        return $classes;
     }
 }

@@ -96,14 +96,17 @@ before_install:
 
       # tpecl is a helper to compile and cache php extensions
       tpecl () {
+          ls /home/travis/php-ext/no-debug-zts-20160303 || true
           local ext_name=$1
           local ext_so=$2
           local INI=$3
           local input=${4:-yes}
           local ext_dir=$(php -r "echo ini_get('extension_dir');")
           local ext_cache=~/php-ext/$(basename $ext_dir)/$ext_name
+          ls $(dirname $ext_cache/libsodium) || true
 
           if [[ -e $ext_cache/$ext_so ]]; then
+              echo extension = $ext_cache/$ext_so
               echo extension = $ext_cache/$ext_so >> $INI
           else
               rm ~/.pearrc /tmp/pear 2>/dev/null || true
@@ -111,6 +114,7 @@ before_install:
               echo $input | pecl -q install -f $ext_name &&
               cp $ext_dir/$ext_so $ext_cache
           fi
+          cat $INI
       }
       export -f tpecl
 
@@ -147,7 +151,9 @@ before_install:
           composer self-update --2
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           if ! php --ri sodium > /dev/null; then
+              [[ -e /home/travis/php-ext/no-debug-zts-20160303/libsodium/sodium.so ]]; echo $?
               tfold ext.libsodium tpecl libsodium sodium.so $INI
+              [[ -e /home/travis/php-ext/no-debug-zts-20160303/libsodium/sodium.so ]]; echo $?
           fi
           if [[ $PHP = 8.* ]]; then
               tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI

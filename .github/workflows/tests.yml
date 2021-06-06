@@ -176,6 +176,7 @@ jobs:
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_KAFKA_DSN: kafka://localhost:9092
           MEMCACHED_HOST: localhost
           LDAP_HOST: localhost
           LDAP_PORT: 3389

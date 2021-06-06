@@ -13,11 +13,20 @@ jobs:
     runs-on: Ubuntu-20.04
 
     steps:
+      - name: Install system dependencies
+        run: |
+          echo "::group::apt-get update"
+          sudo apt-get update
+          echo "::endgroup::"
+          echo "::group::install tools & libraries"
+          sudo apt-get install librdkafka1 librdkafka-dev
+          echo "::endgroup::"
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.0'
-          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom"
+          extensions: "json,memcached,mongodb,redis,xsl,ldap,dom,rdkafka"
           ini-values: "memory_limit=-1"
           coverage: none
 

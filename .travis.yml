@@ -42,8 +42,11 @@ before_install:
       sudo add-apt-repository -y ppa:ondrej/php
       sudo rm /etc/apt/sources.list.d/google-chrome.list
       sudo rm /etc/apt/sources.list.d/mongodb-3.4.list
+      wget -O confluent_archive.key https://packages.confluent.io/deb/6.0/archive.key
+      sudo apt-key add confluent_archive.key
+      sudo add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/6.0 stable main"
       sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev php-uuid zlib1g-dev
+      sudo apt install -y librabbitmq-dev libsodium-dev php-uuid zlib1g-dev librdkafka1 librdkafka-dev
 
     - |
       # General configuration
@@ -160,6 +163,7 @@ before_install:
           tfold ext.apcu tpecl apcu-5.1.19 apcu.so $INI
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
+          tfold ext.rdkafka tpecl rdkafka-5.0.0 rdkafka.so $INI
       done
 
 install:

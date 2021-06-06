@@ -209,7 +209,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
         }
 
         foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
-            if (false === strpos($env, ':')) {
+            if (!str_contains($env, ':')) {
                 continue;
             }
             foreach ($placeholders as $placeholder) {

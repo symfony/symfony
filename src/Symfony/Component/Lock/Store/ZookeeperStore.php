@@ -37,7 +37,7 @@ class ZookeeperStore implements StoreInterface
 
     public static function createConnection(string $dsn): \Zookeeper
     {
-        if (0 !== strpos($dsn, 'zookeeper:')) {
+        if (!str_starts_with($dsn, 'zookeeper:')) {
             throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
         }
 
@@ -153,7 +153,7 @@ class ZookeeperStore implements StoreInterface
         // For example: foo/bar will become /foo-bar and /foo/bar will become /-foo-bar
         $resource = (string) $key;
 
-        if (false !== strpos($resource, '/')) {
+        if (str_contains($resource, '/')) {
             $resource = strtr($resource, ['/' => '-']).'-'.sha1($resource);
         }
 

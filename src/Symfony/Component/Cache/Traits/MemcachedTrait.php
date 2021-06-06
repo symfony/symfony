@@ -106,7 +106,7 @@ trait MemcachedTrait
                 if (\is_array($dsn)) {
                     continue;
                 }
-                if (0 !== strpos($dsn, 'memcached:')) {
+                if (!str_starts_with($dsn, 'memcached:')) {
                     throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: "%s" does not start with "memcached:".', $dsn));
                 }
                 $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {

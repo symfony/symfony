@@ -73,12 +73,12 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null/*, $exclude = null*/)
     {
-        if (\func_num_args() < 5 && __CLASS__ !== static::class && 0 !== strpos(static::class, 'Symfony\Component\\') && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
+        if (\func_num_args() < 5 && __CLASS__ !== static::class && !str_starts_with(static::class, 'Symfony\Component\\') && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface && !$this instanceof \Mockery\MockInterface) {
             @trigger_error(sprintf('The "%s()" method will have a new "$exclude = null" argument in version 5.0, not defining it is deprecated since Symfony 4.4.', __METHOD__), \E_USER_DEPRECATED);
         }
         $exclude = \func_num_args() >= 5 ? func_get_arg(4) : null;
 
-        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && false === strpos($resource, "\n")) {
+        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
             foreach ((array) $exclude as $pattern) {
                 foreach ($this->glob($pattern, true, $_, false, true) as $path => $info) {
@@ -88,7 +88,7 @@ abstract class FileLoader extends Loader
             }
 
             $ret = [];
-            $isSubpath = 0 !== $i && false !== strpos(substr($resource, 0, $i), '/');
+            $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
             foreach ($this->glob($resource, false, $_, $ignoreErrors || !$isSubpath, false, $excluded) as $path => $info) {
                 if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
                     $ret[] = $res;
@@ -112,7 +112,7 @@ abstract class FileLoader extends Loader
         if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
             $pattern = '';
-        } elseif (0 === $i || false === strpos(substr($pattern, 0, $i), '/')) {
+        } elseif (0 === $i || !str_contains(substr($pattern, 0, $i), '/')) {
             $prefix = '.';
             $pattern = '/'.$pattern;
         } else {

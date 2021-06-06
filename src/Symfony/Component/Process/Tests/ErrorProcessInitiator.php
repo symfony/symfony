@@ -22,7 +22,7 @@ try {
     $process = new Process("exec $php -r \"echo 'ready'; trigger_error('error', E_USER_ERROR);\"");
     $process->start();
     $process->setTimeout(0.5);
-    while (false === strpos($process->getOutput(), 'ready')) {
+    while (!str_contains($process->getOutput(), 'ready')) {
         usleep(1000);
     }
     $process->signal(\SIGSTOP);

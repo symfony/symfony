@@ -50,11 +50,11 @@ class TemplateNameParser extends BaseTemplateNameParser
         // normalize name
         $name = preg_replace('#/{2,}#', '/', str_replace('\\', '/', $name));
 
-        if (false !== strpos($name, '..')) {
+        if (str_contains($name, '..')) {
             throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
         }
 
-        if (!preg_match('/^(?:([^:]*):([^:]*):)?(.+)\.([^\.]+)\.([^\.]+)$/', $name, $matches) || 0 === strpos($name, '@')) {
+        if (!preg_match('/^(?:([^:]*):([^:]*):)?(.+)\.([^\.]+)\.([^\.]+)$/', $name, $matches) || str_starts_with($name, '@')) {
             return parent::parse($name);
         }
 

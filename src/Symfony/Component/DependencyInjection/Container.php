@@ -281,7 +281,7 @@ class Container implements ResettableContainerInterface
                     continue;
                 }
                 $lev = levenshtein($id, $knownId);
-                if ($lev <= \strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                     $alternatives[] = $knownId;
                 }
             }

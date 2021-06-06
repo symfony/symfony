@@ -83,7 +83,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
     {
         // If $encoded was created via "sodium_crypto_pwhash_str()", the hashing algorithm may be "argon2id" instead of "argon2i".
         // In this case, "password_verify()" cannot be used.
-        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I') && (false === strpos($encoded, '$argon2id$'))) {
+        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I') && (!str_contains($encoded, '$argon2id$'))) {
             return !$this->isPasswordTooLong($raw) && password_verify($raw, $encoded);
         }
         if (\function_exists('sodium_crypto_pwhash_str_verify')) {

@@ -81,7 +81,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     {
         $class = static::class;
 
-        if (false !== strpos($class, "\0")) {
+        if (str_contains($class, "\0")) {
             return null; // ignore anonymous classes
         }
 

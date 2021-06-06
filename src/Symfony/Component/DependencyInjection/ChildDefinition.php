@@ -97,7 +97,7 @@ class ChildDefinition extends Definition
     {
         if (\is_int($index)) {
             $this->arguments['index_'.$index] = $value;
-        } elseif (0 === strpos($index, '$')) {
+        } elseif (str_starts_with($index, '$')) {
             $this->arguments[$index] = $value;
         } else {
             throw new InvalidArgumentException('The argument must be an existing index or the name of a constructor\'s parameter.');

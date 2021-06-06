@@ -51,7 +51,7 @@ class ControllerResolver extends ContainerControllerResolver
      */
     protected function createController($controller)
     {
-        if ($this->parser && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
+        if ($this->parser && !str_contains($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
             $deprecatedNotation = $controller;
             $controller = $this->parser->parse($deprecatedNotation, false);

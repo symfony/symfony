@@ -103,7 +103,7 @@ class Alias
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (false === strpos($template, '%alias_id%')) {
+            if (!str_contains($template, '%alias_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%alias_id%" placeholder.');
             }
 

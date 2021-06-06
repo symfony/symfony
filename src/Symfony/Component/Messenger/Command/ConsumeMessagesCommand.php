@@ -142,7 +142,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':consume-')) {
+        if (str_contains($input->getFirstArgument(), ':consume-')) {
             $message = 'The use of the "messenger:consume-messages" command is deprecated since version 4.3 and will be removed in 5.0. Use "messenger:consume" instead.';
             @trigger_error($message, \E_USER_DEPRECATED);
             $output->writeln(sprintf('<comment>%s</comment>', $message));
@@ -209,9 +209,9 @@ EOF
     {
         $memoryLimit = strtolower($memoryLimit);
         $max = ltrim($memoryLimit, '+');
-        if (0 === strpos($max, '0x')) {
+        if (str_starts_with($max, '0x')) {
             $max = \intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
+        } elseif (str_starts_with($max, '0')) {
             $max = \intval($max, 8);
         } else {
             $max = (int) $max;

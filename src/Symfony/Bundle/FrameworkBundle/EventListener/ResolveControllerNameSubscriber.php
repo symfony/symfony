@@ -55,7 +55,7 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
         $event = $args[0];
 
         $controller = $event->getRequest()->attributes->get('_controller');
-        if (\is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
+        if (\is_string($controller) && !str_contains($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
             $event->getRequest()->attributes->set('_controller', $parsedNotation = $this->parser->parse($controller, false));
 

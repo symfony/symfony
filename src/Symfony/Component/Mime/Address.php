@@ -122,7 +122,7 @@ final class Address
 
     public static function fromString(string $string): self
     {
-        if (false === strpos($string, '<')) {
+        if (!str_contains($string, '<')) {
             return new self($string, '');
         }
 

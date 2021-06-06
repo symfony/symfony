@@ -188,7 +188,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         if (\PHP_VERSION_ID < 80000) {
-            if (0 !== strpos($message, 'Argument ')) {
+            if (!str_starts_with($message, 'Argument ')) {
                 return;
             }
 
@@ -400,7 +400,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         && $object instanceof $trace['class']
                         && preg_match('/Return value (?:of .*::\w+\(\) )?must be of (?:the )?type (\w+), null returned$/', $e->getMessage(), $matches)
                     ) {
-                        throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', false === strpos(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: 'class').'@anonymous', $access[self::ACCESS_NAME], $matches[1]), 0, $e);
+                        throw new AccessException(sprintf('The method "%s::%s()" returned "null", but expected type "%3$s". Did you forget to initialize a property or to make the return type nullable using "?%3$s"?', !str_contains(\get_class($object), "@anonymous\0") ? \get_class($object) : (get_parent_class($object) ?: 'class').'@anonymous', $access[self::ACCESS_NAME], $matches[1]), 0, $e);
                     }
 
                     throw $e;

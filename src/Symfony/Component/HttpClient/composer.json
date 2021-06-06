@@ -18,7 +18,8 @@
         "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
-        "symfony/http-client-implementation": "1.1|2.0"
+        "symfony/http-client-implementation": "1.1|2.0",
+        "symfony/polyfill-php80": "^1.16"
     },
     "require": {
         "php": ">=7.1.3",

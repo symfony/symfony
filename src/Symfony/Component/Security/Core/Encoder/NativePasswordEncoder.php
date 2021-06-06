@@ -97,9 +97,9 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
             return false;
         }
 
-        if (0 !== strpos($encoded, '$argon')) {
+        if (!str_starts_with($encoded, '$argon')) {
             // BCrypt encodes only the first 72 chars
-            return (72 >= \strlen($raw) || 0 !== strpos($encoded, '$2')) && password_verify($raw, $encoded);
+            return (72 >= \strlen($raw) || !str_starts_with($encoded, '$2')) && password_verify($raw, $encoded);
         }
 
         if (\extension_loaded('sodium') && version_compare(\SODIUM_LIBRARY_VERSION, '1.0.14', '>=')) {

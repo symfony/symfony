@@ -132,7 +132,7 @@ class Cookie
     {
         $parts = explode(';', $cookie);
 
-        if (false === strpos($parts[0], '=')) {
+        if (!str_contains($parts[0], '=')) {
             throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 

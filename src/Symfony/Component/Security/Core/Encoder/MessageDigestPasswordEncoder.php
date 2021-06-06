@@ -73,7 +73,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        if (\strlen($encoded) !== $this->encodedLength || false !== strpos($encoded, '$')) {
+        if (\strlen($encoded) !== $this->encodedLength || str_contains($encoded, '$')) {
             return false;
         }
 

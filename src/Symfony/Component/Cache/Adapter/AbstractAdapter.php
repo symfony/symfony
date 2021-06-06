@@ -134,10 +134,10 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         if (!\is_string($dsn)) {
             throw new InvalidArgumentException(sprintf('The "%s()" method expect argument #1 to be string, "%s" given.', __METHOD__, \gettype($dsn)));
         }
-        if (0 === strpos($dsn, 'redis:') || 0 === strpos($dsn, 'rediss:')) {
+        if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:')) {
             return RedisAdapter::createConnection($dsn, $options);
         }
-        if (0 === strpos($dsn, 'memcached:')) {
+        if (str_starts_with($dsn, 'memcached:')) {
             return MemcachedAdapter::createConnection($dsn, $options);
         }
 

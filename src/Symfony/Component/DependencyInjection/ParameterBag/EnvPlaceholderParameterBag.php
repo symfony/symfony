@@ -31,7 +31,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function get($name)
     {
-        if (0 === strpos($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
+        if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
             $env = substr($name, 4, -1);
 
             if (isset($this->envPlaceholders[$env])) {

@@ -8,7 +8,7 @@ class FileLocatorStub implements FileLocatorInterface
 {
     public function locate($name, $currentPath = null, $first = true)
     {
-        if (0 === strpos($name, 'http')) {
+        if (str_starts_with($name, 'http')) {
             return $name;
         }
 

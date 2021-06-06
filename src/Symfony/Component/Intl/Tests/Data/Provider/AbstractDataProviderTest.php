@@ -787,7 +787,7 @@ abstract class AbstractDataProviderTest extends TestCase
         if (null === self::$rootLocales) {
             self::$rootLocales = array_filter(static::getLocales(), function ($locale) {
                 // no locales for which fallback is possible (e.g "en_GB")
-                return false === strpos($locale, '_');
+                return !str_contains($locale, '_');
             });
         }
 

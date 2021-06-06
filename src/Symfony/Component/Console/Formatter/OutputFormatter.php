@@ -180,7 +180,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
 
-        if (false !== strpos($output, "\0")) {
+        if (str_contains($output, "\0")) {
             return strtr($output, ["\0" => '\\', '\\<' => '<']);
         }
 

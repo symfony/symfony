@@ -21,6 +21,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/event-dispatcher": "^4.3",
         "symfony/mime": "^4.4.21|^5.2.6",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/service-contracts": "^1.1|^2"
     },
     "require-dev": {

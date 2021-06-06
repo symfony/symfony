@@ -79,7 +79,7 @@ trait ArrayTrait
 
         if ('' !== $prefix) {
             foreach ($this->values as $key => $value) {
-                if (0 === strpos($key, $prefix)) {
+                if (str_starts_with($key, $prefix)) {
                     unset($this->values[$key], $this->expiries[$key]);
                 }
             }

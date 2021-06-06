@@ -14,9 +14,9 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class AnonymousAuthenticationProviderTest extends TestCase
 {

@@ -13,12 +13,12 @@ namespace Symfony\Bundle\SecurityBundle\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
+use Symfony\Bundle\SecurityBundle\Tests\Fixtures\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**

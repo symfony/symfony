@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TokenInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**

@@ -28,6 +28,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface as StrictTokenInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -50,7 +51,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         ;
         $authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
 
-        $authenticatedToken = $this->createMock(TokenInterface::class);
+        $authenticatedToken = $this->createMock(StrictTokenInterface::class);
 
         if ($success) {
             $authenticationManager->method('authenticate')->willReturn($authenticatedToken);

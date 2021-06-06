@@ -14,10 +14,10 @@ namespace Symfony\Component\Security\Core\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 use Symfony\Component\Security\Core\User\User;
 
 class SecurityTest extends TestCase

@@ -19,8 +19,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class AnonymousAuthenticationListenerTest extends TestCase
 {

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Core\Tests\Role;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 /**
  * @group legacy

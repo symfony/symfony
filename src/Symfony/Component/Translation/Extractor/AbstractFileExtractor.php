@@ -21,11 +21,9 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 abstract class AbstractFileExtractor
 {
     /**
-     * @param string|iterable $resource Files, a file or a directory
-     *
      * @return iterable
      */
-    protected function extractFiles($resource)
+    protected function extractFiles(string|iterable $resource)
     {
         if (is_iterable($resource)) {
             $files = [];
@@ -68,9 +66,7 @@ abstract class AbstractFileExtractor
     abstract protected function canBeExtracted(string $file);
 
     /**
-     * @param string|array $resource Files, a file or a directory
-     *
      * @return iterable files to be extracted
      */
-    abstract protected function extractFromDirectory($resource);
+    abstract protected function extractFromDirectory(string|array $resource);
 }

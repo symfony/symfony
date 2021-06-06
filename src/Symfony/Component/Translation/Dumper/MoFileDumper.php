@@ -75,7 +75,7 @@ class MoFileDumper extends FileDumper
         return 'mo';
     }
 
-    private function writeLong($str): string
+    private function writeLong(string $str): string
     {
         return pack('V*', $str);
     }

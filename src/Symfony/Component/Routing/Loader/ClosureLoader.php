@@ -26,12 +26,9 @@ class ClosureLoader extends Loader
     /**
      * Loads a Closure.
      *
-     * @param \Closure    $closure A Closure
-     * @param string|null $type    The resource type
-     *
      * @return RouteCollection A RouteCollection instance
      */
-    public function load($closure, string $type = null)
+    public function load(mixed $closure, string $type = null)
     {
         return $closure($this->env);
     }

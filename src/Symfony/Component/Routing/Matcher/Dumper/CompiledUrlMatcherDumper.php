@@ -416,7 +416,7 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      */
-    private function compileRoute(Route $route, string $name, $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): array
+    private function compileRoute(Route $route, string $name, string|array|null $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): array
     {
         $defaults = $route->getDefaults();
 

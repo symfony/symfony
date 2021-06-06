@@ -35,12 +35,9 @@ abstract class ObjectLoader extends Loader
     /**
      * Calls the object method that will load the routes.
      *
-     * @param string      $resource object_id::method
-     * @param string|null $type     The resource type
-     *
      * @return RouteCollection
      */
-    public function load($resource, string $type = null)
+    public function load(mixed $resource, string $type = null)
     {
         if (!preg_match('/^[^\:]+(?:::(?:[^\:]+))?$/', $resource)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the %s route loader: use the format "object_id::method" or "object_id" if your object class has an "__invoke" method.', $resource, \is_string($type) ? '"'.$type.'"' : 'object'));

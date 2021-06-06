@@ -39,16 +39,11 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * Loads a Yaml file.
-     *
-     * @param string      $file A Yaml file path
-     * @param string|null $type The resource type
-     *
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
-    public function load($file, string $type = null)
+    public function load(mixed $file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -117,17 +112,13 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null)
     {
         return \is_string($resource) && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);
     }
 
     /**
      * Parses a route and adds it to the RouteCollection.
-     *
-     * @param string $name   Route name
-     * @param array  $config Route definition
-     * @param string $path   Full path of the YAML file being processed
      */
     protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
     {
@@ -172,10 +163,6 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses an import and adds the routes in the resource to the RouteCollection.
-     *
-     * @param array  $config Route definition
-     * @param string $path   Full path of the YAML file being processed
-     * @param string $file   Loaded file name
      */
     protected function parseImport(RouteCollection $collection, array $config, string $path, string $file)
     {
@@ -244,16 +231,10 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Validates the route configuration.
-     *
-     * @param array  $config A resource config
-     * @param string $name   The config key
-     * @param string $path   The loaded file path
-     *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
      */
-    protected function validate($config, string $name, string $path)
+    protected function validate(mixed $config, string $name, string $path)
     {
         if (!\is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));

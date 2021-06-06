@@ -115,7 +115,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $name The route name or an array of route names
      */
-    public function remove($name)
+    public function remove(string|array $name)
     {
         foreach ((array) $name as $n) {
             unset($this->routes[$n], $this->priorities[$n]);
@@ -255,7 +255,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $schemes The scheme or an array of schemes
      */
-    public function setSchemes($schemes)
+    public function setSchemes(string|array $schemes)
     {
         foreach ($this->routes as $route) {
             $route->setSchemes($schemes);
@@ -267,7 +267,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $methods The method or an array of methods
      */
-    public function setMethods($methods)
+    public function setMethods(string|array $methods)
     {
         foreach ($this->routes as $route) {
             $route->setMethods($methods);

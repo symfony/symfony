@@ -38,7 +38,7 @@ class RoutingConfigurator
     /**
      * @param string|string[]|null $exclude Glob patterns to exclude from the import
      */
-    final public function import($resource, string $type = null, bool $ignoreErrors = false, $exclude = null): ImportConfigurator
+    final public function import(string|array $resource, string $type = null, bool $ignoreErrors = false, string|array|null $exclude = null): ImportConfigurator
     {
         $this->loader->setCurrentDir(\dirname($this->path));
 

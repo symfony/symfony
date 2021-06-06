@@ -285,7 +285,7 @@ class XmlDescriptor extends Descriptor
             $descriptionXML->appendChild($dom->createCDATASection($classDescription));
         }
 
-        $serviceXML->setAttribute('class', $definition->getClass());
+        $serviceXML->setAttribute('class', $definition->getClass() ?? '');
 
         if ($factory = $definition->getFactory()) {
             $serviceXML->appendChild($factoryXML = $dom->createElement('factory'));
@@ -311,7 +311,7 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
         $serviceXML->setAttribute('autoconfigured', $definition->isAutoconfigured() ? 'true' : 'false');
-        $serviceXML->setAttribute('file', $definition->getFile());
+        $serviceXML->setAttribute('file', $definition->getFile() ?? '');
 
         $calls = $definition->getMethodCalls();
         if (\count($calls) > 0) {

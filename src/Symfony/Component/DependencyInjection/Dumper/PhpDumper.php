@@ -2147,7 +2147,9 @@ EOF;
         $classes = [];
 
         while ($definition instanceof Definition) {
-            $classes[] = trim($definition->getClass(), '\\');
+            if ($class = $definition->getClass()) {
+                $classes[] = trim($class, '\\');
+            }
             $factory = $definition->getFactory();
 
             if (!\is_array($factory)) {

@@ -45,6 +45,11 @@ class Command
      */
     protected static $defaultDescription;
 
+    /**
+     * @var bool|null The default command visibility (true if hidden or false)
+     */
+    protected static $defaultHidden;
+
     private $application;
     private $name;
     private $processTitle;
@@ -93,6 +98,22 @@ class Command
     }
 
     /**
+     * @return bool The default command hidden or false
+     */
+    public static function getDefaultHidden(): ?bool
+    {
+        $class = static::class;
+
+        if (\PHP_VERSION_ID >= 80000 && $attribute = (new \ReflectionClass($class))->getAttributes(AsCommand::class)) {
+            return $attribute[0]->getArguments()['hidden'] ?? false;
+        }
+
+        $r = new \ReflectionProperty($class, 'defaultHidden');
+
+        return $class === $r->class ? static::$defaultHidden : false;
+    }
+
+    /**
      * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty
@@ -107,6 +128,10 @@ class Command
 
         if ('' === $this->description) {
             $this->setDescription(static::getDefaultDescription() ?? '');
+        }
+
+        if (true !== $this->hidden) {
+            $this->setHidden(static::getDefaultHidden() ?? false);
         }
 
         $this->configure();
@@ -490,6 +515,16 @@ class Command
      */
     public function getName()
     {
+        if (false !== strpos($this->name, '|')) {
+            return current(
+                array_values(
+                    array_filter(
+                        explode('|', $this->name)
+                    )
+                )
+            );
+        }
+
         return $this->name;
     }
 
@@ -613,6 +648,13 @@ class Command
      */
     public function getAliases()
     {
+        if (false !== strpos($this->name, '|')) {
+            $aliases = array_values(array_filter(explode('|', $this->name)));
+            array_shift($aliases);
+
+            return $aliases;
+        }
+
         return $this->aliases;
     }
 

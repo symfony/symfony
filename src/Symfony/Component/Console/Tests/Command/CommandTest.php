@@ -33,7 +33,11 @@ class CommandTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
-        require_once self::$fixturesPath.'/TestCommand.php';
+        require_once self::$fixturesPath.'/Commands/TestCommand.php';
+
+        if (\PHP_VERSION_ID >= 80000) {
+            require_once self::$fixturesPath.'/Commands/Php8TestCommand.php';
+        }
     }
 
     public function testConstructor()
@@ -410,10 +414,73 @@ class CommandTest extends TestCase
     /**
      * @requires PHP 8
      */
-    public function testCommandAttribute()
+    public function provideCommandsWithAttribute(): \Traversable
     {
-        $this->assertSame('|foo|f', Php8Command::getDefaultName());
-        $this->assertSame('desc', Php8Command::getDefaultDescription());
+        yield '`name` only' => [
+            [
+                'defaultName' => 'foo',
+                'defaultDescription' => null,
+                'name' => 'foo',
+                'description' => '',
+                'aliases' => [],
+            ],
+            \Php8Command2::class,
+        ];
+
+        yield '`name` and `description` set' => [
+            [
+                'defaultName' => 'foo',
+                'defaultDescription' => 'desc',
+                'name' => 'foo',
+                'description' => 'desc',
+                'aliases' => [],
+            ],
+            \Php8Command3::class,
+        ];
+
+        yield '`name`, `description` and `aliases` set' => [
+            [
+                'defaultName' => 'foo|f',
+                'defaultDescription' => 'desc',
+                'name' => 'foo',
+                'description' => 'desc',
+                'aliases' => ['f'],
+            ],
+            \Php8Command4::class,
+        ];
+
+        yield '`name`, `description`, `aliases` and `hidden` = true set' => [
+            [
+                'defaultName' => '|foo|f',
+                'defaultDescription' => 'desc',
+                'name' => 'foo',
+                'description' => 'desc',
+                'aliases' => ['f'],
+            ],
+            \Php8Command5::class,
+        ];
+    }
+
+    /**
+     * @requires PHP 8
+     *
+     * @dataProvider provideCommandsWithAttribute
+     */
+    public function testCommandAttribute(array $expectedCommandValues, string $commandPath)
+    {
+        /** @var Command $command */
+        $command = new $commandPath();
+
+        $this->assertSame(
+            $expectedCommandValues,
+            [
+                'defaultName' => $command::getDefaultName(),
+                'defaultDescription' => $command::getDefaultDescription(),
+                'name' => $command->getName(),
+                'description' => $command->getDescription(),
+                'aliases' => $command->getAliases(),
+            ]
+        );
     }
 }
 
@@ -424,9 +491,4 @@ function createClosure()
     return function (InputInterface $input, OutputInterface $output) {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
     };
-}
-
-#[AsCommand(name: 'foo', description: 'desc', hidden: true, aliases: ['f'])]
-class Php8Command extends Command
-{
 }

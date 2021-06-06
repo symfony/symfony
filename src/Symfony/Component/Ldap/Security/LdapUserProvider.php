@@ -62,6 +62,16 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
         $this->extraFields = $extraFields;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function loadUserByUsername(string $username)
+    {
+        trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
+
+        return $this->loadUserByIdentifier($username);
+    }
+
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         try {

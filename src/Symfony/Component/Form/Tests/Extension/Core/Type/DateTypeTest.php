@@ -1066,8 +1066,7 @@ class DateTypeTest extends BaseTypeTest
             'Compound text fields' => ['text', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
             'Compound choice fields' => ['choice', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
             'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
-            // TODO uncomment after update to Symfony 6.0
-            // 'Compound text fields lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound text fields lazy' => ['text', $lazyEmptyData, $expectedData],
             'Compound choice fields lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }

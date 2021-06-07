@@ -29,7 +29,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class FormType extends BaseType
 {
     private $dataMapper;
-    private static $emptyData = null;
+
+    /**
+     * @internal
+     *
+     * @deprecated Don't use this property. It will be removed in symfony/form 6.0
+     */
+    public static $emptyData = null;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -159,7 +165,7 @@ class FormType extends BaseType
         };
 
         // Derive "empty_data" closure from "data_class" option
-        if (self::$emptyData === null) {
+        if (null === self::$emptyData) {
             self::$emptyData = function (Options $options) {
                 $class = $options['data_class'];
 

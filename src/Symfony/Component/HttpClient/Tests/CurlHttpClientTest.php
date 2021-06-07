@@ -38,7 +38,8 @@ class CurlHttpClientTest extends HttpClientTestCase
     public function testBindToPort()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
+        $localhost = gethostbyname('localhost');
+        $response = $client->request('GET', "http://$localhost:8057", ['bindto' => "$localhost:9876"]);
         $response->getStatusCode();
 
         $r = new \ReflectionProperty($response, 'handle');
@@ -46,7 +47,7 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         $curlInfo = curl_getinfo($r->getValue($response));
 
-        self::assertSame('127.0.0.1', $curlInfo['local_ip']);
+        self::assertSame($localhost, $curlInfo['local_ip']);
         self::assertSame(9876, $curlInfo['local_port']);
     }
 
@@ -152,13 +153,15 @@ class CurlHttpClientTest extends HttpClientTestCase
             return $client;
         }
 
-        if (['application/json'] !== $client->request('GET', 'http://127.0.0.1:8057/json')->getHeaders()['content-type']) {
+        $localhost = gethostbyname('localhost');
+
+        if (['application/json'] !== $client->request('GET', "http://$localhost:8057/json")->getHeaders()['content-type']) {
             $this->markTestSkipped('symfony/http-client-contracts >= 2.0.1 required');
         }
 
         $process = new Process(['vulcain'], null, [
             'DEBUG' => 1,
-            'UPSTREAM' => 'http://127.0.0.1:8057',
+            'UPSTREAM' => "http://$localhost:8057",
             'ADDR' => ':3000',
             'KEY_FILE' => __DIR__.'/Fixtures/tls/server.key',
             'CERT_FILE' => __DIR__.'/Fixtures/tls/server.crt',

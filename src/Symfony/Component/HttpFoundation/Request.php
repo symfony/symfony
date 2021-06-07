@@ -1964,6 +1964,9 @@ class Request
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         }
+        if ('/' !== $pathInfo[0]) {
+            $pathInfo = '/'.$pathInfo;
+        }
 
         return (string) $pathInfo;
     }

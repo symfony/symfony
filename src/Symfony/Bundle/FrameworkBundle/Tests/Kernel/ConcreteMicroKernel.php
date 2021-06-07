@@ -76,8 +76,10 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     public function __destruct()
     {
-        $fs = new Filesystem();
-        $fs->remove($this->cacheDir);
+        if ($this->cacheDir) {
+            $fs = new Filesystem();
+            $fs->remove($this->cacheDir);
+        }
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes)

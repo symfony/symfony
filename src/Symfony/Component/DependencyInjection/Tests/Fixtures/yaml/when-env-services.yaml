@@ -1,0 +1,13 @@
+when@some-env:
+    services:
+        foo_service:
+            class: FooClass
+
+when@some-other-env:
+    services:
+        foo_service:
+            class: BarClass
+
+services:
+    foo_service:
+        class: BazClass

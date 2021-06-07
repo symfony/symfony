@@ -71,6 +71,16 @@ class LdapUser implements UserInterface, PasswordAuthenticatedUserInterface, Equ
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getUsername(): string
+    {
+        trigger_deprecation('symfony/ldap', '5.3', 'Method "%s()" is deprecated and will be removed in 6.0, use getUserIdentifier() instead.', __METHOD__);
+
+        return $this->username;
+    }
+
     public function getUserIdentifier(): string
     {
         return $this->username;

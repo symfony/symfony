@@ -30,7 +30,6 @@ foreach ($_SERVER as $k => $v) {
 }
 
 $json = json_encode($vars, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
-$localhost = gethostbyname('localhost');
 
 switch ($vars['REQUEST_URI']) {
     default:
@@ -42,7 +41,7 @@ switch ($vars['REQUEST_URI']) {
 
     case '/':
     case '/?a=a&b=b':
-    case "http://$localhost:8057/":
+    case 'http://127.0.0.1:8057/':
     case 'http://localhost:8057/':
         ob_start('ob_gzhandler');
         break;
@@ -75,7 +74,7 @@ switch ($vars['REQUEST_URI']) {
 
     case '/301':
         if ('Basic Zm9vOmJhcg==' === $vars['HTTP_AUTHORIZATION']) {
-            header("Location: http://$localhost:8057/302", true, 301);
+            header('Location: http://127.0.0.1:8057/302', true, 301);
         }
         break;
 

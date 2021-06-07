@@ -22,6 +22,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 class EnumTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = EnumType::class;
+    public const TESTED_TYPE_OPTIONS = ['class' => Suit::class];
 
     public function testClassOptionIsRequired()
     {
@@ -119,7 +120,7 @@ class EnumTypeTest extends BaseTypeTest
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        $form = $this->factory->create($this->getTestedType(), null, $this->getTestOptions());
+        $form = $this->factory->create($this->getTestedType(), null, $this->getTestedTypeOptions());
 
         $form->submit(null);
 
@@ -255,10 +256,5 @@ class EnumTypeTest extends BaseTypeTest
         $view = $form->createView();
 
         $this->assertSame('Yes', $view->children[0]->vars['label']);
-    }
-
-    protected function getTestOptions(): array
-    {
-        return ['class' => Suit::class];
     }
 }

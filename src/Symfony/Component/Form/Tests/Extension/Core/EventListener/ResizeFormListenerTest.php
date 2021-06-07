@@ -59,7 +59,10 @@ class ResizeFormListenerTest extends TestCase
 
         $data = [1 => 'string', 2 => 'string'];
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], false, false);
+        $listener = new ResizeFormListener(TextType::class, [
+            'empty_data' => null,
+            'attr' => ['maxlength' => 10],
+        ], false, false);
         $listener->preSetData($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -80,7 +83,9 @@ class ResizeFormListenerTest extends TestCase
     {
         $data = null;
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, [], false, false);
+        $listener = new ResizeFormListener(TextType::class, [
+            'empty_data' => null,
+        ], false, false);
         $listener->preSetData($event);
 
         $this->assertSame(0, $this->form->count());
@@ -92,7 +97,10 @@ class ResizeFormListenerTest extends TestCase
 
         $data = [0 => 'string', 1 => 'string'];
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener(TextType::class, ['attr' => ['maxlength' => 10]], true, false);
+        $listener = new ResizeFormListener(TextType::class, [
+            'empty_data' => null,
+            'attr' => ['maxlength' => 10],
+        ], true, false);
         $listener->preSubmit($event);
 
         $this->assertTrue($this->form->has('0'));

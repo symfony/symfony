@@ -19,11 +19,13 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 class BirthdayTypeTest extends DateTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
+    public const TESTED_TYPE_OPTIONS = [
+    ];
 
     public function testSetInvalidYearsOption()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->factory->create(static::TESTED_TYPE, null, [
+        $this->factory->create($this->getTestedType(), null, $this->getTestedTypeOptions() + [
             'years' => 'bad value',
         ]);
     }

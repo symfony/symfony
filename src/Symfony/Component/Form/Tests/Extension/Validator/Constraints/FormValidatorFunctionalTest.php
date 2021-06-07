@@ -86,9 +86,10 @@ class FormValidatorFunctionalTest extends TestCase
     public function testNonCompositeConstraintValidatedOnce()
     {
         $form = $this->formFactory->create(TextType::class, null, [
-                'constraints' => [new NotBlank(['groups' => ['foo', 'bar']])],
-                'validation_groups' => ['foo', 'bar'],
-            ]);
+            'empty_data' => null,
+            'constraints' => [new NotBlank(['groups' => ['foo', 'bar']])],
+            'validation_groups' => ['foo', 'bar'],
+        ]);
         $form->submit('');
 
         $violations = $this->validator->validate($form);
@@ -113,8 +114,12 @@ class FormValidatorFunctionalTest extends TestCase
             ],
             'validation_groups' => ['field1', 'field2'],
         ]);
-        $form->add('field1');
-        $form->add('field2');
+        $form->add('field1', null, [
+            'empty_data' => null,
+        ]);
+        $form->add('field2', null, [
+            'empty_data' => null,
+        ]);
         $form->submit([
             'field1' => '',
             'field2' => '',
@@ -144,8 +149,12 @@ class FormValidatorFunctionalTest extends TestCase
             ],
             'validation_groups' => new GroupSequence(['field1', 'field2']),
         ]);
-        $form->add('field1');
-        $form->add('field2');
+        $form->add('field1', null, [
+            'empty_data' => null,
+        ]);
+        $form->add('field2', null, [
+            'empty_data' => null,
+        ]);
 
         $form->submit([
             'field1' => '',
@@ -165,9 +174,11 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
             ->add('foo', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => ['group2']])],
             ])
         ;
@@ -186,12 +197,15 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => new GroupSequence([['group1', 'group2'], 'group3']),
         ])
             ->add('foo', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [new Length(['min' => 10, 'groups' => ['group1']])],
             ])
             ->add('bar', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [new Length(['min' => 10, 'groups' => ['group2']])],
             ])
             ->add('baz', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => ['group3']])],
             ])
         ;
@@ -211,6 +225,7 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
             ->add('foo', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [
                     new NotBlank([
                         'groups' => ['group1'],
@@ -237,8 +252,11 @@ class FormValidatorFunctionalTest extends TestCase
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
-            ->add('bar')
+            ->add('bar', null, [
+                'empty_data' => null,
+            ])
             ->add('foo', TextType::class, [
+                'empty_data' => null,
                 'constraints' => [
                     new NotBlank([
                         'groups' => ['group1'],
@@ -266,10 +284,12 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => ['group1', 'group2'],
         ])
             ->add('field1', null, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => 'group1'])],
                 'property_path' => '[foo]',
             ])
             ->add('field2', null, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => 'group2'])],
                 'property_path' => '[bar]',
             ])
@@ -357,10 +377,12 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => new GroupSequence(['group1', 'group2']),
         ])
             ->add('field1', null, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => 'group1'])],
                 'property_path' => '[foo]',
             ])
             ->add('field2', null, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank(['groups' => 'group2'])],
                 'property_path' => '[bar]',
             ])
@@ -382,11 +404,14 @@ class FormValidatorFunctionalTest extends TestCase
     {
         $form = $this->formFactory->create(FormType::class)
             ->add('field1', null, [
+                'empty_data' => null,
                 'constraints' => [new Expression([
                     'expression' => '!this.getParent().get("field2").getData()',
                 ])],
             ])
-            ->add('field2')
+            ->add('field2', null, [
+                'empty_data' => null,
+            ])
         ;
 
         $form->submit([
@@ -405,12 +430,15 @@ class FormValidatorFunctionalTest extends TestCase
             'validation_groups' => new GroupSequence(['group1']),
         ])
             ->add('field1', null, [
+                'empty_data' => null,
                 'constraints' => [new Expression([
                     'expression' => '!this.getParent().get("field2").getData()',
                     'groups' => ['group1'],
                 ])],
             ])
-            ->add('field2')
+            ->add('field2', null, [
+                'empty_data' => null,
+            ])
         ;
 
         $form->submit([
@@ -448,8 +476,12 @@ class FormValidatorFunctionalTest extends TestCase
     public function testDoNotAddInvalidMessageIfChildFormIsAlreadyNotSynchronized()
     {
         $formBuilder = $this->formFactory->createBuilder()
-            ->add('field1')
-            ->add('field2')
+            ->add('field1', null, [
+                'empty_data' => null,
+            ])
+            ->add('field2', null, [
+                'empty_data' => null,
+            ])
             ->addModelTransformer(new CallbackTransformer(
                 function () {
                 },
@@ -497,8 +529,11 @@ class FooType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('bar')
+            ->add('bar', null, [
+                'empty_data' => null,
+            ])
             ->add('baz', null, [
+                'empty_data' => null,
                 'constraints' => [new NotBlank()],
             ])
         ;
@@ -531,7 +566,9 @@ class ReviewType extends AbstractType
             ->add('rating', IntegerType::class, [
                 'constraints' => [new Valid()],
             ])
-            ->add('title')
+            ->add('title', null, [
+                'empty_data' => null,
+            ])
             ->add('author', CustomerType::class, [
                 'constraints' => [new Valid()],
             ])
@@ -559,7 +596,9 @@ class CustomerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email')
+            ->add('email', null, [
+                'empty_data' => null,
+            ])
         ;
     }
 

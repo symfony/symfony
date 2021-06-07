@@ -81,7 +81,7 @@ trait FilesystemTrait
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(mixed $id)
     {
         $file = $this->getFile($id);
 

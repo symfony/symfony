@@ -61,7 +61,7 @@ class TestingArrayAdapter extends ArrayAdapter
         $this->item = $item;
     }
 
-    public function getItem($key): CacheItem
+    public function getItem(mixed $key): CacheItem
     {
         return $this->item;
     }

@@ -63,7 +63,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if item exists in the cache, false otherwise
      */
-    abstract protected function doHave(string $id);
+    abstract protected function doHave(mixed $id);
 
     /**
      * Deletes all items in the pool.
@@ -98,7 +98,7 @@ trait AbstractAdapterTrait
      *
      * @return bool
      */
-    public function hasItem($key)
+    public function hasItem(mixed $key)
     {
         $id = $this->getId($key);
 
@@ -158,7 +158,7 @@ trait AbstractAdapterTrait
      *
      * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem(mixed $key)
     {
         return $this->deleteItems([$key]);
     }
@@ -206,7 +206,7 @@ trait AbstractAdapterTrait
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem(mixed $key)
     {
         if ($this->deferred) {
             $this->commit();
@@ -291,11 +291,9 @@ trait AbstractAdapterTrait
      *
      * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
      *
-     * @param bool $enable
-     *
      * @return bool the previous state of versioning
      */
-    public function enableVersioning($enable = true)
+    public function enableVersioning(bool $enable = true)
     {
         $wasEnabled = $this->versioningIsEnabled;
         $this->versioningIsEnabled = (bool) $enable;
@@ -356,7 +354,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    private function getId($key)
+    private function getId(mixed $key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];
@@ -394,7 +392,7 @@ trait AbstractAdapterTrait
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback(string $class)
     {
         throw new \DomainException('Class not found: '.$class);
     }

@@ -84,7 +84,7 @@ trait MemcachedTrait
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = [])
+    public static function createConnection(array | string $servers, array $options = [])
     {
         if (\is_string($servers)) {
             $servers = [$servers];

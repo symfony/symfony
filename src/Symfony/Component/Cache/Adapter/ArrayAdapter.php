@@ -100,7 +100,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      *
      * @return bool
      */
-    public function hasItem($key)
+    public function hasItem(mixed $key)
     {
         if (\is_string($key) && isset($this->expiries[$key]) && $this->expiries[$key] > microtime(true)) {
             if ($this->maxItems) {
@@ -120,7 +120,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem(mixed $key)
     {
         if (!$isHit = $this->hasItem($key)) {
             $value = null;
@@ -151,7 +151,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      *
      * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem(mixed $key)
     {
         \assert('' !== CacheItem::validateKey($key));
         unset($this->values[$key], $this->expiries[$key]);

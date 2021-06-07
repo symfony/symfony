@@ -30,7 +30,7 @@ class RedisClusterNodeProxy
     /**
      * @param \RedisCluster|RedisClusterProxy $redis
      */
-    public function __construct(array $host, $redis)
+    public function __construct(array $host, \RedisCluster | RedisClusterProxy $redis)
     {
         $this->host = $host;
         $this->redis = $redis;

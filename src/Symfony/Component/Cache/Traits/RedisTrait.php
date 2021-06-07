@@ -48,9 +48,9 @@ trait RedisTrait
     private $marshaller;
 
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\ClientInterface $redisClient
+     * @param \Predis\ClientInterface|\RedisCluster|\Redis|\RedisArray|RedisProxy $redisClient
      */
-    private function init($redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
+    private function init(mixed $redisClient, string $namespace, int $defaultLifetime, ?MarshallerInterface $marshaller)
     {
         parent::__construct($namespace, $defaultLifetime);
 
@@ -82,14 +82,13 @@ trait RedisTrait
      *   - redis:///var/run/redis.sock
      *   - redis://secret@/var/run/redis.sock/13
      *
-     * @param string $dsn
-     * @param array  $options See self::$defaultConnectionOptions
-     *
-     * @throws InvalidArgumentException when the DSN is invalid
+     * @param array $options See self::$defaultConnectionOptions
      *
      * @return \Redis|\RedisCluster|RedisClusterProxy|RedisProxy|\Predis\ClientInterface According to the "class" option
+     *
+     *@throws InvalidArgumentException when the DSN is invalid
      */
-    public static function createConnection($dsn, array $options = [])
+    public static function createConnection(string $dsn, array $options = [])
     {
         if (0 === strpos($dsn, 'redis:')) {
             $scheme = 'redis';
@@ -364,7 +363,7 @@ trait RedisTrait
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(mixed $id)
     {
         return (bool) $this->redis->exists($id);
     }
@@ -487,7 +486,7 @@ trait RedisTrait
         return $failed;
     }
 
-    private function pipeline(\Closure $generator, $redis = null): \Generator
+    private function pipeline(\Closure $generator, mixed $redis = null): \Generator
     {
         $ids = [];
         $redis = $redis ?? $this->redis;

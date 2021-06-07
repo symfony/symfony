@@ -96,7 +96,7 @@ This conversation was marked as resolved by lstrojny
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = [])
+    public static function createConnection(array | string $servers, array $options = [])
     {
         if (\is_string($servers)) {
             $servers = [$servers];
@@ -285,7 +285,7 @@ This conversation was marked as resolved by lstrojny
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(mixed $id)
     {
         return false !== $this->getClient()->get(self::encodeKey($id)) || $this->checkResultCode(\Memcached::RES_SUCCESS === $this->client->getResultCode());
     }

@@ -70,7 +70,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem(mixed $key)
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -92,7 +92,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      *
      * @return bool
      */
-    public function hasItem($key)
+    public function hasItem(mixed $key)
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -107,7 +107,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      *
      * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem(mixed $key)
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -274,7 +274,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         $this->calls = [];
     }
 
-    protected function start($name)
+    protected function start(string $name)
     {
         $this->calls[] = $event = new TraceableAdapterEvent();
         $event->name = $name;

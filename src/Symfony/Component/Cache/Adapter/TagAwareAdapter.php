@@ -27,11 +27,10 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  */
 class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, PruneableInterface, ResettableInterface, LoggerAwareInterface
 {
-    public const TAGS_PREFIX = "\0tags\0";
-
     use ContractsTrait;
     use LoggerAwareTrait;
     use ProxyTrait;
+    public const TAGS_PREFIX = "\0tags\0";
 
     private $deferred = [];
     private $tags;
@@ -155,7 +154,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      *
      * @return bool
      */
-    public function hasItem($key)
+    public function hasItem(mixed $key)
     {
         if ($this->deferred) {
             $this->commit();
@@ -186,7 +185,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem(mixed $key)
     {
         foreach ($this->getItems([$key]) as $item) {
             return $item;
@@ -252,7 +251,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      *
      * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem(mixed $key)
     {
         return $this->deleteItems([$key]);
     }

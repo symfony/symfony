@@ -77,7 +77,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
+    protected function doHave(mixed $id)
     {
         return apcu_exists($id);
     }

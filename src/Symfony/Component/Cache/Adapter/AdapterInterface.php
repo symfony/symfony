@@ -29,7 +29,7 @@ interface AdapterInterface extends CacheItemPoolInterface
      *
      * @return CacheItem
      */
-    public function getItem($key);
+    public function getItem(mixed $key);
 
     /**
      * {@inheritdoc}

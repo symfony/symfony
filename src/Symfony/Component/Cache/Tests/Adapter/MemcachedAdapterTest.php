@@ -70,7 +70,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideBadOptions
      */
-    public function testBadOptions($name, $value)
+    public function testBadOptions(string $name, string $value)
     {
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Undefined constant Memcached::');

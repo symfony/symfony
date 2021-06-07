@@ -29,7 +29,7 @@ class TagAwareAdapterTest extends AdapterTestCase
 {
     use TagAwareTestTrait;
 
-    public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface
+    public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
     }

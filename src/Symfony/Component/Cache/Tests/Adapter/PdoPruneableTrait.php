@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 trait PdoPruneableTrait
 {
-    protected function isPruned($cache, string $name): bool
+    protected function isPruned(object | null $cache, string $name): bool
     {
         $o = new \ReflectionObject($cache);
 

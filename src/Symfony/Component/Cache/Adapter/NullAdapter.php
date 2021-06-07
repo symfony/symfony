@@ -50,7 +50,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem(mixed $key)
     {
         return (self::$createCacheItem)($key);
     }
@@ -68,7 +68,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      *
      * @return bool
      */
-    public function hasItem($key)
+    public function hasItem(mixed $key)
     {
         return false;
     }
@@ -88,7 +88,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
      *
      * @return bool
      */
-    public function deleteItem($key)
+    public function deleteItem(mixed $key)
     {
         return true;
     }
@@ -136,7 +136,7 @@ class NullAdapter implements AdapterInterface, CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(string $key): bool
+    public function delete(mixed $key): bool
     {
         return $this->deleteItem($key);
     }

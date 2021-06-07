@@ -64,7 +64,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function set($value): self
+    public function set(mixed $value): self
     {
         $this->value = $value;
 
@@ -76,7 +76,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAt($expiration): self
+    public function expiresAt(?\DateTimeInterface $expiration): self
     {
         if (null === $expiration) {
             $this->expiry = null;
@@ -94,7 +94,7 @@ final class CacheItem implements ItemInterface
      *
      * @return $this
      */
-    public function expiresAfter($time): self
+    public function expiresAfter(mixed $time): self
     {
         if (null === $time) {
             $this->expiry = null;
@@ -155,7 +155,7 @@ final class CacheItem implements ItemInterface
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key): string
+    public static function validateKey(mixed $key): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given.', get_debug_type($key)));

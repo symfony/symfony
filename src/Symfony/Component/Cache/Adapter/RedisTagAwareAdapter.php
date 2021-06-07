@@ -70,7 +70,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
      * @param string                                                   $namespace       The default namespace
      * @param int                                                      $defaultLifetime The default lifetime
      */
-    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
+    public function __construct(mixed $redisClient, string $namespace = '', int $defaultLifetime = 0, MarshallerInterface $marshaller = null)
     {
         if ($redisClient instanceof \Predis\ClientInterface && $redisClient->getConnection() instanceof ClusterInterface && !$redisClient->getConnection() instanceof PredisCluster) {
             throw new InvalidArgumentException(sprintf('Unsupported Predis cluster connection: only "%s" is, "%s" given.', PredisCluster::class, get_debug_type($redisClient->getConnection())));
@@ -256,7 +256,7 @@ EOLUA;
      *
      * @return array Filtered list of the valid moved keys (only those that existed)
      */
-    private function renameKeys($redis, array $ids): array
+    private function renameKeys(mixed $redis, array $ids): array
     {
         $newIds = [];
         $uniqueToken = bin2hex(random_bytes(10));

@@ -44,6 +44,7 @@ before_install:
       # General configuration
       set -e
       stty cols 120
+      sudo sed -i 's/127\.0\.1\.1 localhost/127.0.0.1 localhost/' /etc/hosts
       cp .github/composer-config.json "$(composer config home)/config.json"
       git config --global user.email ""
       git config --global user.name "Symfony"

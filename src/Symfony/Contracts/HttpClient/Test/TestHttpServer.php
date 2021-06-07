@@ -28,16 +28,15 @@ class TestHttpServer
             });
         }
 
-        $localhost = gethostbyname('localhost');
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', "$localhost:$port"]));
+        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:'.$port]));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');
         $process->start();
         self::$process[$port] = $process;
 
         do {
             usleep(50000);
-        } while (!@fopen("http://$localhost:$port", 'r'));
+        } while (!@fopen('http://127.0.0.1:'.$port, 'r'));
 
         return $process;
     }

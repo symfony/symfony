@@ -743,6 +743,9 @@ class FormDataCollectorTest extends TestCase
         $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
             ->add('items', CollectionType::class, [
                 'entry_type' => TextType::class,
+                'entry_options' => [
+                    'empty_data' => null,
+                ],
                 'allow_add' => true,
                 // data is locked and modelData (null) is different to the
                 // configured data, so modifications of the configured data

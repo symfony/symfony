@@ -17,13 +17,16 @@ use Symfony\Component\Form\FormError;
 final class ColorTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = ColorType::class;
+    public const TESTED_TYPE_OPTIONS = [
+        'empty_data' => null,
+    ];
 
     /**
      * @dataProvider validationShouldPassProvider
      */
     public function testValidationShouldPass(bool $html5, ?string $submittedValue)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create($this->getTestedType(), null, $this->getTestedTypeOptions() + [
             'html5' => $html5,
             'trim' => true,
         ]);
@@ -56,7 +59,7 @@ final class ColorTypeTest extends BaseTypeTest
      */
     public function testValidationShouldFail(string $expectedValueParameterValue, ?string $submittedValue, bool $trim = true)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
+        $form = $this->factory->create($this->getTestedType(), null, $this->getTestedTypeOptions() + [
             'html5' => true,
             'trim' => $trim,
         ]);

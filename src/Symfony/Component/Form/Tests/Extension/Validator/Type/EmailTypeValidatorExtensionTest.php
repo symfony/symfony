@@ -22,7 +22,9 @@ class EmailTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(EmailType::class, null, $options);
+        return $this->factory->create(EmailType::class, null, [
+            'empty_data' => null,
+        ] + $options);
     }
 
     public function testInvalidMessage()

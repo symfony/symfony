@@ -27,7 +27,9 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
     {
         // The form needs a child in order to trigger CSRF protection by
         // default
-        $builder->add('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $builder->add('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+            'empty_data' => null,
+        ]);
     }
 }
 
@@ -201,7 +203,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ])
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $form->submit([
@@ -232,7 +236,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ])
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $form->submit([
@@ -263,7 +269,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ])
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $form->submit([
@@ -290,7 +298,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ])
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType', [
+                'empty_data' => null,
+            ])
             ->getForm();
 
         $form->submit([

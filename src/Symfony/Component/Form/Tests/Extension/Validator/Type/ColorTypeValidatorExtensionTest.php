@@ -22,7 +22,9 @@ class ColorTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(ColorType::class, null, $options);
+        return $this->factory->create(ColorType::class, null, [
+            'empty_data' => null,
+        ] + $options);
     }
 
     public function testInvalidMessage()

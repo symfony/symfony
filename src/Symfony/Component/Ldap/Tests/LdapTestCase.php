@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class LdapTestCase extends TestCase
 {
-    protected function getLdapConfig()
+    protected function getLdapConfig(): array
     {
         $h = @ldap_connect(getenv('LDAP_HOST'), getenv('LDAP_PORT'));
         @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);

@@ -14,15 +14,16 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Traversable;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
  */
 class Collection implements CollectionInterface
 {
-    private $connection;
-    private $search;
-    private $entries;
+    private Connection $connection;
+    private Query $search;
+    private array $entries;
 
     public function __construct(Connection $connection, Query $search)
     {
@@ -33,7 +34,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         if (null === $this->entries) {
             $this->entries = iterator_to_array($this->getIterator(), false);
@@ -42,10 +43,7 @@ class Collection implements CollectionInterface
         return $this->entries;
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
@@ -61,10 +59,7 @@ class Collection implements CollectionInterface
         return $count;
     }
 
-    /**
-     * @return \Traversable
-     */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         if (0 === $this->count()) {
             return;
@@ -87,10 +82,7 @@ class Collection implements CollectionInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $this->toArray();
 

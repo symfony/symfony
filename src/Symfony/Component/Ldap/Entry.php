@@ -17,9 +17,9 @@ namespace Symfony\Component\Ldap;
  */
 class Entry
 {
-    private $dn;
-    private $attributes;
-    private $lowerMap;
+    private string $dn;
+    private array $attributes;
+    private array $lowerMap;
 
     public function __construct(string $dn, array $attributes = [])
     {
@@ -34,10 +34,8 @@ class Entry
 
     /**
      * Returns the entry's DN.
-     *
-     * @return string
      */
-    public function getDn()
+    public function getDn(): string
     {
         return $this->dn;
     }
@@ -47,10 +45,8 @@ class Entry
      *
      * @param string $name          The name of the attribute
      * @param bool   $caseSensitive Whether the check should be case-sensitive
-     *
-     * @return bool
      */
-    public function hasAttribute(string $name/* , bool $caseSensitive = true */)
+    public function hasAttribute(string $name/* , bool $caseSensitive = true */): bool
     {
         $caseSensitive = 2 > \func_num_args() || true === func_get_arg(1);
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
@@ -70,10 +66,8 @@ class Entry
      *
      * @param string $name          The name of the attribute
      * @param bool   $caseSensitive Whether the attribute name is case-sensitive
-     *
-     * @return array|null
      */
-    public function getAttribute(string $name/* , bool $caseSensitive = true */)
+    public function getAttribute(string $name/* , bool $caseSensitive = true */): ?array
     {
         $caseSensitive = 2 > \func_num_args() || true === func_get_arg(1);
         $attributeKey = $this->getAttributeKey($name, $caseSensitive);
@@ -87,10 +81,8 @@ class Entry
 
     /**
      * Returns the complete list of attributes.
-     *
-     * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

@@ -166,7 +166,7 @@ class AdapterTest extends LdapTestCase
         $this->destroyEntries($ldap, $entries);
     }
 
-    private function setupTestUsers($ldap)
+    private function setupTestUsers($ldap): array
     {
         $entries = [];
 

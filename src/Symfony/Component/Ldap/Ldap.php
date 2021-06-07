@@ -21,7 +21,7 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class Ldap implements LdapInterface
 {
-    private $adapter;
+    private AdapterInterface $adapter;
 
     private const ADAPTER_MAP = [
         'ext_ldap' => 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter',

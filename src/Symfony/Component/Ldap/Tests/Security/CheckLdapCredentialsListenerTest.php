@@ -59,7 +59,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent($authenticator, $passport));
     }
 
-    public function provideShouldNotCheckPassport()
+    public function provideShouldNotCheckPassport(): \Generator
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-http:^5.1');
@@ -108,7 +108,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
-    public function provideWrongPassportData()
+    public function provideWrongPassportData(): \Generator
     {
         if (!interface_exists(AuthenticatorInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-http:^5.1');
@@ -186,7 +186,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{username}', 'elsa', 'test1234A$', '{username}_test')));
     }
 
-    private function createEvent($password = 's3cr3t', $ldapBadge = null)
+    private function createEvent($password = 's3cr3t', $ldapBadge = null): CheckPassportEvent
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
@@ -194,7 +194,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         );
     }
 
-    private function createListener()
+    private function createListener(): CheckLdapCredentialsListener
     {
         $ldapLocator = new class(['app.ldap' => function () {
             return $this->ldap;

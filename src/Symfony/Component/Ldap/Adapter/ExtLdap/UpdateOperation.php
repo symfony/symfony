@@ -15,11 +15,11 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
 class UpdateOperation
 {
-    private $operationType;
-    private $values;
-    private $attribute;
+    private mixed $operationType;
+    private ?array $values;
+    private string $attribute;
 
-    private $validOperationTypes = [
+    private array $validOperationTypes = [
         \LDAP_MODIFY_BATCH_ADD,
         \LDAP_MODIFY_BATCH_REMOVE,
         \LDAP_MODIFY_BATCH_REMOVE_ALL,

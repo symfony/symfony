@@ -29,8 +29,7 @@ class Connection extends AbstractConnection
     private const LDAP_TIMEOUT = 0x55;
     private const LDAP_ALREADY_EXISTS = 0x44;
 
-    /** @var bool */
-    private $bound = false;
+    private bool $bound = false;
 
     /** @var resource */
     private $connection;
@@ -53,7 +52,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function isBound()
+    public function isBound(): bool
     {
         return $this->bound;
     }

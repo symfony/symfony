@@ -12,6 +12,8 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
+use Symfony\Component\Ldap\Adapter\ConnectionInterface;
+use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
@@ -19,9 +21,9 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Adapter implements AdapterInterface
 {
-    private $config;
-    private $connection;
-    private $entryManager;
+    private array $config;
+    private ConnectionInterface | Connection $connection;
+    private EntryManager | EntryManagerInterface $entryManager;
 
     public function __construct(array $config = [])
     {
@@ -35,7 +37,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface | Connection
     {
         if (null === $this->connection) {
             $this->connection = new Connection($this->config);
@@ -47,7 +49,7 @@ class Adapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntryManager()
+    public function getEntryManager(): EntryManager | EntryManagerInterface
     {
         if (null === $this->entryManager) {
             $this->entryManager = new EntryManager($this->getConnection());

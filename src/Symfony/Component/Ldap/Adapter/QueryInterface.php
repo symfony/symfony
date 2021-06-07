@@ -38,5 +38,5 @@ interface QueryInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function execute();
+    public function execute(): CollectionInterface | array;
 }

@@ -31,15 +31,15 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
-    private $ldap;
-    private $baseDn;
-    private $searchDn;
-    private $searchPassword;
-    private $defaultRoles;
-    private $uidKey;
-    private $defaultSearch;
-    private $passwordAttribute;
-    private $extraFields;
+    private LdapInterface $ldap;
+    private string $baseDn;
+    private ?string $searchDn;
+    private ?string $searchPassword;
+    private array $defaultRoles;
+    private ?string $uidKey;
+    private string | array | null $defaultSearch;
+    private ?string $passwordAttribute;
+    private array $extraFields;
 
     public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {
@@ -65,7 +65,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername(string $username): UserInterface
     {
         trigger_deprecation('symfony/security-core', '5.3', 'Method "%s()" is deprecated, use loadUserByIdentifier() instead.', __METHOD__);
 
@@ -118,7 +118,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface | LdapUser
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
@@ -154,17 +154,15 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return LdapUser::class === $class;
     }
 
     /**
      * Loads a user from an LDAP entry.
-     *
-     * @return UserInterface
      */
-    protected function loadUser(string $identifier, Entry $entry)
+    protected function loadUser(string $identifier, Entry $entry): UserInterface | LdapUser
     {
         $password = null;
         $extraFields = [];

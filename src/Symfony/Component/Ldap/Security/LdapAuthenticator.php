@@ -31,12 +31,12 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
  */
 class LdapAuthenticator implements AuthenticatorInterface
 {
-    private $authenticator;
-    private $ldapServiceId;
-    private $dnString;
-    private $searchDn;
-    private $searchPassword;
-    private $queryString;
+    private AuthenticatorInterface $authenticator;
+    private string $ldapServiceId;
+    private string $dnString;
+    private string $searchDn;
+    private string $searchPassword;
+    private string $queryString;
 
     public function __construct(AuthenticatorInterface $authenticator, string $ldapServiceId, string $dnString = '{username}', string $searchDn = '', string $searchPassword = '', string $queryString = '')
     {

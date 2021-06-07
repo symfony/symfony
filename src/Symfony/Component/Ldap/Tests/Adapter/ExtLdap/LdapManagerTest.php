@@ -26,8 +26,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
  */
 class LdapManagerTest extends LdapTestCase
 {
-    /** @var Adapter */
-    private $adapter;
+    private Adapter $adapter;
 
     protected function setUp(): void
     {
@@ -163,7 +162,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @return Collection|Entry[]
      */
-    private function executeSearchQuery($expectedResults = 1)
+    private function executeSearchQuery($expectedResults = 1): Collection | array
     {
         $results = $this
             ->adapter

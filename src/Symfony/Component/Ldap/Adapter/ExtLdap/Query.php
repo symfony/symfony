@@ -25,13 +25,12 @@ class Query extends AbstractQuery
     public const PAGINATION_OID = '1.2.840.113556.1.4.319';
 
     /** @var Connection */
-    protected $connection;
+    protected \Symfony\Component\Ldap\Adapter\ConnectionInterface $connection;
 
     /** @var resource[] */
-    private $results;
+    private array $results;
 
-    /** @var array */
-    private $serverctrls = [];
+    private array $serverctrls = [];
 
     public function __construct(Connection $connection, string $dn, string $query, array $options = [])
     {
@@ -71,7 +70,7 @@ class Query extends AbstractQuery
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(): Collection
     {
         if (null === $this->results) {
             // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
@@ -216,6 +215,9 @@ class Query extends AbstractQuery
      */
     private function controlPagedResult($con, int $pageSize, bool $critical, string $cookie): bool
     {
+        if (\PHP_VERSION_ID < 70300) {
+            return ldap_control_paged_result($con, $pageSize, $critical, $cookie);
+        }
         $this->serverctrls = [
             [
                 'oid' => \LDAP_CONTROL_PAGEDRESULTS,
@@ -238,6 +240,11 @@ class Query extends AbstractQuery
      */
     private function controlPagedResultResponse($con, $result, string $cookie = ''): string
     {
+        if (\PHP_VERSION_ID < 70300) {
+            ldap_control_paged_result_response($con, $result, $cookie);
+
+            return $cookie;
+        }
         ldap_parse_result($con, $result, $errcode, $matcheddn, $errmsg, $referrals, $controls);
 
         return $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
@@ -252,6 +259,10 @@ class Query extends AbstractQuery
      */
     private function callSearchFunction($con, string $func, int $sizeLimit)
     {
+        if (\PHP_VERSION_ID < 70300) {
+            return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref']);
+        }
+
         return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
     }
 }

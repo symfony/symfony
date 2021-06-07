@@ -23,7 +23,7 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
  */
 class EntryManager implements EntryManagerInterface
 {
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {
@@ -33,7 +33,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function add(Entry $entry)
+    public function add(Entry $entry): static
     {
         $con = $this->getConnectionResource();
 

@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-06T17:30:58Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 5.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-06T18:58:46Z
+
+Can you please rebase your patch onto 5.3?
+
+---------------------------------------------------------------------------
+
+by matason at 2021-06-06T19:41:35Z
+
+> Can you please rebase your patch onto 5.3?
+
+Doh, of course, that's done now, sorry about that!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-06T19:43:20Z
+
+No worries. 🙂 And can you please apply the code style patch from fabbot?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2021-06-06T19:53:10Z
+
+Your change looks correct, but would you be able to add a small test case? I'd like to make sure we don't break your use-case again in the future.
+
+---------------------------------------------------------------------------
+
+by matason at 2021-06-06T20:18:12Z
+
+Sure, I’ll do that tomorrow!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2021-06-07T08:24:47Z
+
+> PasswordHasher in a standalone project
+
+Nice!

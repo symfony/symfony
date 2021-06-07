@@ -28,8 +28,12 @@ class TextType extends AbstractType implements DataTransformerInterface
         if ('' === $options['empty_data']) {
             $builder->addViewTransformer($this);
         } elseif ($options['empty_data'] instanceof \Closure) {
-            // we assume that this is the default value from \Symfony\Component\Form\Extension\Core\Type\FormType::configureOptions()
-            trigger_deprecation('symfony/form', '5.4', 'The default value of "empty_data" option in "%s" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.', __CLASS__);
+            $emptyData = new \ReflectionProperty(FormType::class, 'emptyData');
+            $emptyData->setAccessible(true);
+            // Closure in "empty_data" option is the default value from FormType::configureOptions()
+            if ($emptyData->getValue($builder->getForm()) === $options['empty_data']) {
+                trigger_deprecation('symfony/form', '5.4', 'The default value of "empty_data" option in "%s" will be changed to empty string. Declare "NULL" as value for "empty_data" if you still want use "NULL" as data.', __CLASS__);
+            }
         }
     }
 

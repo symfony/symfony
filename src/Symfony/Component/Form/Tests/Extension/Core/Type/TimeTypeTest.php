@@ -1034,8 +1034,7 @@ class TimeTypeTest extends BaseTypeTest
             'Compound text field' => ['text', ['hour' => '21', 'minute' => '23'], $expectedData],
             'Compound choice field' => ['choice', ['hour' => '21', 'minute' => '23'], $expectedData],
             'Simple field lazy' => ['single_text', $lazyEmptyData, $expectedData],
-            // TODO uncomment after update to Symfony 6.0
-            // 'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
+            'Compound text field lazy' => ['text', $lazyEmptyData, $expectedData],
             'Compound choice field lazy' => ['choice', $lazyEmptyData, $expectedData],
         ];
     }

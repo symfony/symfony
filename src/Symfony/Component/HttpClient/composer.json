@@ -33,6 +33,7 @@
         "php-http/httplug": "^1.0|^2.0",
         "psr/http-client": "^1.0",
         "symfony/dependency-injection": "^4.3|^5.0",
+        "symfony/http-client-contracts": "^1.1.11|~2.1.4|~2.2.1|~2.3.2|^2.4.1",
         "symfony/http-kernel": "^4.4.13",
         "symfony/process": "^4.2|^5.0"
     },

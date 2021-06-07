@@ -335,6 +335,7 @@ abstract class HttpClientTestCase extends TestCase
     public function testRedirects()
     {
         $client = $this->getHttpClient(__FUNCTION__);
+        $localhost = gethostbyname('localhost');
         $response = $client->request('POST', 'http://localhost:8057/301', [
             'auth_basic' => 'foo:bar',
             'body' => function () {
@@ -352,7 +353,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $expected = [
             'HTTP/1.1 301 Moved Permanently',
-            'Location: http://127.0.0.1:8057/302',
+            "Location: http://$localhost:8057/302",
             'Content-Type: application/json',
             'HTTP/1.1 302 Found',
             'Location: http://localhost:8057/',
@@ -425,6 +426,7 @@ abstract class HttpClientTestCase extends TestCase
     public function testMaxRedirects()
     {
         $client = $this->getHttpClient(__FUNCTION__);
+        $localhost = gethostbyname('localhost');
         $response = $client->request('GET', 'http://localhost:8057/301', [
             'max_redirects' => 1,
             'auth_basic' => 'foo:bar',
@@ -442,7 +444,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $expected = [
             'HTTP/1.1 301 Moved Permanently',
-            'Location: http://127.0.0.1:8057/302',
+            "Location: http://$localhost:8057/302",
             'Content-Type: application/json',
             'HTTP/1.1 302 Found',
             'Location: http://localhost:8057/',
@@ -691,8 +693,9 @@ abstract class HttpClientTestCase extends TestCase
     public function testResolve()
     {
         $client = $this->getHttpClient(__FUNCTION__);
+        $localhost = gethostbyname('localhost');
         $response = $client->request('GET', 'http://symfony.com:8057/', [
-            'resolve' => ['symfony.com' => '127.0.0.1'],
+            'resolve' => ['symfony.com' => $localhost],
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -706,15 +709,16 @@ abstract class HttpClientTestCase extends TestCase
     public function testIdnResolve()
     {
         $client = $this->getHttpClient(__FUNCTION__);
+        $localhost = gethostbyname('localhost');
 
         $response = $client->request('GET', 'http://0-------------------------------------------------------------0.com:8057/', [
-            'resolve' => ['0-------------------------------------------------------------0.com' => '127.0.0.1'],
+            'resolve' => ['0-------------------------------------------------------------0.com' => $localhost],
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
 
         $response = $client->request('GET', 'http://Bücher.example:8057/', [
-            'resolve' => ['xn--bcher-kva.example' => '127.0.0.1'],
+            'resolve' => ['xn--bcher-kva.example' => $localhost],
         ]);
 
         $this->assertSame(200, $response->getStatusCode());

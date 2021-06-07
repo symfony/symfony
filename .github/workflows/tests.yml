@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.2', '7.4']
+        php: ['7.2', '8.0']
 
     services:
       postgres:
@@ -183,14 +183,14 @@ jobs:
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
 
-      - name: Run HTTP push tests
-        if: matrix.php == '7.4'
-        run: |
-          [ -d .phpunit ] && mv .phpunit .phpunit.bak
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-          docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v /usr/local/bin/vulcain:/usr/local/bin/vulcain -w /app php:7.4-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
-          sudo rm -rf .phpunit
-          [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
+      #- name: Run HTTP push tests
+      #  if: matrix.php == '8.0'
+      #  run: |
+      #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
+      #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
+      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.0-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
+      #    sudo rm -rf .phpunit
+      #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 
   nightly:
     name: PHPUnit on PHP nightly

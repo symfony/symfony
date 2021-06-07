@@ -235,12 +235,22 @@ class SerializableUser implements UserInterface, \Serializable
 
     public function serialize(): string
     {
-        return serialize($this->name);
+        return serialize($this->__serialize());
     }
 
     public function unserialize($serialized): void
     {
-        $this->name = unserialize($serialized);
+        $this->__unserialize(unserialize($serialized));
+    }
+
+    public function __serialize(): array
+    {
+        return ['name' => $this->name];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        ['name' => $this->name] = $data;
     }
 }
 

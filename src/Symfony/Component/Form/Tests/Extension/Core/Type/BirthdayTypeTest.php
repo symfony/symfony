@@ -19,8 +19,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 class BirthdayTypeTest extends DateTypeTest
 {
     public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
-    public const TESTED_TYPE_OPTIONS = [
-    ];
+    public const TESTED_TYPE_OPTIONS = [];
 
     public function testSetInvalidYearsOption()
     {

@@ -186,7 +186,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ])
             ->add('child', $this->getTestedType(), $this->getTestedTypeOptions() + [
                 'label_translation_parameters' => ['%override_param%' => 'child_value'],
-            ]))
+            ])
             ->getForm()
             ->createView();
 
@@ -203,7 +203,7 @@ abstract class BaseTypeTest extends TypeTestCase
             ])
             ->add('child', $this->getTestedType(), $this->getTestedTypeOptions() + [
                 'attr_translation_parameters' => ['%override_param%' => 'child_value'],
-            ]))
+            ])
             ->getForm()
             ->createView();
 
@@ -292,7 +292,7 @@ abstract class BaseTypeTest extends TypeTestCase
         return static::TESTED_TYPE;
     }
 
-    protected function getTestedTypeOptions()
+    protected function getTestedTypeOptions(): array
     {
         return static::TESTED_TYPE_OPTIONS;
     }

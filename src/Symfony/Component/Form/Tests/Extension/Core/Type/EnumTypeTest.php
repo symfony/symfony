@@ -22,7 +22,9 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 class EnumTypeTest extends BaseTypeTest
 {
     public const TESTED_TYPE = EnumType::class;
-    public const TESTED_TYPE_OPTIONS = ['class' => Suit::class];
+    public const TESTED_TYPE_OPTIONS = [
+        'class' => Suit::class,
+    ];
 
     public function testClassOptionIsRequired()
     {

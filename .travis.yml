@@ -44,6 +44,7 @@ before_install:
       # General configuration
       set -e
       stty cols 120
+      sudo sed -i 's/127\.0\.1\.1 localhost/127.0.0.1 localhost/' /etc/hosts
       cp .github/composer-config.json "$(composer config home)/config.json"
       git config --global user.email ""
       git config --global user.name "Symfony"
@@ -120,7 +121,7 @@ before_install:
       # php.ini configuration
       (
           for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-              phpenv global $PHP 2>/dev/null || (cd / && wget https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/18.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj) &
+              (cd / && wget https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/18.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj) &
           done
           wait
       )
@@ -155,7 +156,7 @@ before_install:
           tfold ext.apcu tpecl apcu-5.1.19 apcu.so $INI
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
-          tfold ext.mongodb tpecl mongodb-1.9.1 mongodb.so $INI
+          tfold ext.mongodb tpecl mongodb-1.10.0alpha1 mongodb.so $INI
       done
 
 install:

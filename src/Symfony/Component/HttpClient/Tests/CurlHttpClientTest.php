@@ -34,8 +34,7 @@ class CurlHttpClientTest extends HttpClientTestCase
     public function testBindToPort()
     {
         $client = $this->getHttpClient(__FUNCTION__);
-        $localhost = gethostbyname('localhost');
-        $response = $client->request('GET', "http://$localhost:8057", ['bindto' => "$localhost:9876"]);
+        $response = $client->request('GET', 'http://localhost:8057', ['bindto' => '127.0.0.1:9876']);
         $response->getStatusCode();
 
         $r = new \ReflectionProperty($response, 'handle');
@@ -43,7 +42,7 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         $curlInfo = curl_getinfo($r->getValue($response));
 
-        self::assertSame($localhost, $curlInfo['local_ip']);
+        self::assertSame('127.0.0.1', $curlInfo['local_ip']);
         self::assertSame(9876, $curlInfo['local_port']);
     }
 

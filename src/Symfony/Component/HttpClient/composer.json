@@ -24,7 +24,7 @@
         "php": ">=8.0.2",
         "psr/log": "^1.0",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/http-client-contracts": "^2.4.1",
+        "symfony/http-client-contracts": "^2.4",
         "symfony/service-contracts": "^1.0|^2"
     },
     "require-dev": {

@@ -1,6 +1,6 @@
 language: php
 
-dist: xenial
+dist: bionic
 
 git:
     depth: 2
@@ -11,6 +11,9 @@ addons:
         - language-pack-fr-base
         - zookeeperd
         - libzookeeper-mt-dev
+        - librabbitmq-dev
+        - libsodium-dev
+        - libtidy-dev
 
 env:
     global:
@@ -36,15 +39,6 @@ cache:
         - ~/php-ext
 
 before_install:
-    - |
-      # Enable Sury ppa
-      sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
-      sudo add-apt-repository -y ppa:ondrej/php
-      sudo rm /etc/apt/sources.list.d/google-chrome.list
-      sudo rm /etc/apt/sources.list.d/mongodb-3.4.list
-      sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev
-
     - |
       # General configuration
       set -e
@@ -123,8 +117,13 @@ before_install:
 
     - |
       # php.ini configuration
+      (
+          for PHP in $TRAVIS_PHP_VERSION $php_extra; do
+              phpenv global $PHP 2>/dev/null || (cd / && wget https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/18.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj) &
+          done
+          wait
+      )
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
-          phpenv global $PHP 2>/dev/null || (cd / && wget https://storage.googleapis.com/travis-ci-language-archives/php/binaries/ubuntu/16.04/x86_64/php-$PHP.tar.bz2 -O - | tar -xj)
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           echo date.timezone = Europe/Paris >> $INI
           echo memory_limit = -1 >> $INI
@@ -132,34 +131,30 @@ before_install:
           echo session.gc_probability = 0 >> $INI
           echo opcache.enable_cli = 1 >> $INI
           echo apc.enable_cli = 1 >> $INI
-          if [[ $PHP != 8.* ]]; then
-              echo extension = memcached.so >> $INI
-          fi
       done
       find ~/.phpenv -name xdebug.ini -delete
+
+      composer self-update
+      composer self-update --2
 
     - |
       # Install extra PHP extensions
       for PHP in $TRAVIS_PHP_VERSION $php_extra; do
           export PHP=$PHP
           phpenv global $PHP
-          composer self-update
-          composer self-update --2
           INI=~/.phpenv/versions/$PHP/etc/conf.d/travis.ini
           if ! php --ri sodium > /dev/null; then
               tfold ext.libsodium tpecl libsodium sodium.so $INI
           fi
-          if [[ $PHP = 8.* ]]; then
-              tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
-          else
+          if [[ $PHP != 8.* ]]; then
               tfold ext.zookeeper tpecl zookeeper-0.7.2 zookeeper.so $INI
-              tfold ext.amqp tpecl amqp-1.10.2 amqp.so $INI
           fi
-
-          tfold ext.mongodb tpecl mongodb-1.9.0 mongodb.so $INI
+          tfold ext.memcached tpecl memcached-3.1.5 memcached.so $INI
+          tfold ext.amqp tpecl amqp-1.11.0beta  amqp.so $INI
           tfold ext.apcu tpecl apcu-5.1.19 apcu.so $INI
           tfold ext.igbinary tpecl igbinary-3.1.6 igbinary.so $INI
           tfold ext.redis tpecl redis-5.2.3 redis.so $INI "no"
+          tfold ext.mongodb tpecl mongodb-1.9.1 mongodb.so $INI
       done
 
 install:

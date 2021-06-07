@@ -18,6 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -83,6 +84,16 @@ class PasswordHasherFactoryTest extends TestCase
         $hasher = $factory->getPasswordHasher(SomeChildUser::class);
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
+    }
+
+    public function testGetHasherConfiguredWithAuto()
+    {
+        $factory = new PasswordHasherFactory([
+            'auto' => ['algorithm' => 'auto'],
+        ]);
+
+        $hasher = $factory->getPasswordHasher('auto');
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
     }
 
     public function testGetNamedHasherForHasherAware()

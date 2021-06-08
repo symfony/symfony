@@ -39,11 +39,6 @@ class CachePoolsTest extends AbstractWebTestCase
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
-                throw $e;
-            }
-            $this->markTestSkipped($e->getMessage());
         } catch (InvalidArgumentException $e) {
             if (0 !== strpos($e->getMessage(), 'Redis connection ')) {
                 throw $e;
@@ -62,11 +57,6 @@ class CachePoolsTest extends AbstractWebTestCase
 
         try {
             $this->doTestCachePools(['root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'], RedisAdapter::class);
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
-            if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
-                throw $e;
-            }
-            $this->markTestSkipped($e->getMessage());
         } catch (\PHPUnit\Framework\Error\Warning $e) {
             if (0 !== strpos($e->getMessage(), 'unable to connect to')) {
                 throw $e;

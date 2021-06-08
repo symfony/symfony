@@ -470,7 +470,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $builtinType = Type::BUILTIN_TYPE_OBJECT;
                 $class = $collectionValueType->getClassName().'[]';
 
-                if (null !== $collectionKeyType = $type->getCollectionKeyTypes()) {
+                if (\count($collectionKeyType = $type->getCollectionKeyTypes()) > 0) {
                     [$context['key_type']] = $collectionKeyType;
                 }
             } elseif ($type->isCollection() && \count($collectionValueType = $type->getCollectionValueTypes()) > 0 && Type::BUILTIN_TYPE_ARRAY === $collectionValueType[0]->getBuiltinType()) {

@@ -260,7 +260,11 @@ class MessengerPass implements CompilerPassInterface
             $commandDefinition = $container->getDefinition('console.command.messenger_failed_messages_retry');
             $globalReceiverName = $commandDefinition->getArgument(0);
             if (null !== $globalReceiverName) {
-                $failureTransportsMap[$commandDefinition->getArgument(0)] = new Reference('messenger.failure_transports.default');
+                if ($container->hasAlias('messenger.failure_transports.default')) {
+                    $failureTransportsMap[$globalReceiverName] = new Reference('messenger.failure_transports.default');
+                } else {
+                    $failureTransportsMap[$globalReceiverName] = new Reference('messenger.transport.'.$globalReceiverName);
+                }
             }
         }
 

@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
  */
 final class CurlClientState extends ClientState
 {
-    /** @var \CurlMultiHandle|resource */
+    /** @var \CurlMultiHandle */
     public $handle;
     /** @var PushedResponse[] */
     public $pushedResponses = [];
@@ -52,7 +52,7 @@ final class CurlClientState extends ClientState
         $this->dnsCache->evictions = $this->dnsCache->evictions ?: $this->dnsCache->removals;
         $this->dnsCache->removals = $this->dnsCache->hostnames = [];
 
-        if (\is_resource($this->handle) || $this->handle instanceof \CurlMultiHandle) {
+        if ($this->handle instanceof \CurlMultiHandle) {
             if (\defined('CURLMOPT_PUSHFUNCTION')) {
                 curl_multi_setopt($this->handle, \CURLMOPT_PUSHFUNCTION, null);
             }
@@ -62,7 +62,7 @@ final class CurlClientState extends ClientState
         }
 
         foreach ($this->openHandles as [$ch]) {
-            if (\is_resource($ch) || $ch instanceof \CurlHandle) {
+            if ($ch instanceof \CurlHandle) {
                 curl_setopt($ch, \CURLOPT_VERBOSE, false);
             }
         }

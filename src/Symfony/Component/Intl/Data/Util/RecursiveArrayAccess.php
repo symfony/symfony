@@ -20,23 +20,14 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RecursiveArrayAccess
 {
-    public static function get($array, array $indices)
+    public static function get(array|\ArrayAccess $array, array $indices)
     {
         foreach ($indices as $index) {
-            // Use array_key_exists() for arrays, isset() otherwise
-            if (\is_array($array)) {
-                if (\array_key_exists($index, $array)) {
-                    $array = $array[$index];
-                    continue;
-                }
-            } elseif ($array instanceof \ArrayAccess) {
-                if (isset($array[$index])) {
-                    $array = $array[$index];
-                    continue;
-                }
+            if (\is_array($array) ? !\array_key_exists($index, $array) : !isset($array[$index])) {
+                throw new OutOfBoundsException(sprintf('The index "%s" does not exist.', $index));
             }
 
-            throw new OutOfBoundsException(sprintf('The index "%s" does not exist.', $index));
+            $array = $array[$index];
         }
 
         return $array;

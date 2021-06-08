@@ -193,6 +193,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $options['timeout'] = min($options['max_duration'], $options['timeout']);
         }
 
+        $bindto = $options['bindto'];
+        if (!$bindto && (70322 === \PHP_VERSION_ID || 70410 === \PHP_VERSION_ID)) {
+            $bindto = '0:0';
+        }
+
         $context = [
             'http' => [
                 'protocol_version' => min($options['http_version'] ?: '1.1', '1.1'),
@@ -221,7 +226,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'disable_compression' => true,
             ], static function ($v) { return null !== $v; }),
             'socket' => [
-                'bindto' => $options['bindto'] ?: '0:0',
+                'bindto' => $bindto,
                 'tcp_nodelay' => true,
             ],
         ];

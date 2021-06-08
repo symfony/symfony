@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by monteiro at 2021-06-05T15:15:28Z
+
+Can you help us review this BC @weaverryan
+
+---------------------------------------------------------------------------
+
+by monteiro at 2021-06-06T09:23:02Z
+
+I was able to test the behaviour with this [repository](https://github.com/monteiro/PR-41553-symfony). Feel fee to test it too. Everything seems to work fine, and the global failed transport is set correctly.
+
+I tested using the AMQP transport in the [repository](https://github.com/monteiro/PR-41553-symfony).
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2021-06-06T11:14:34Z
+
+Hey!
+
+I think @DavidBadura has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot

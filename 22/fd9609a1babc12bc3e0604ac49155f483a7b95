@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dragosprotung at 2021-06-07T17:22:49Z
+
+I would add a test if I could even begin to know how to write a test for it. It's too deep into a private method and do not really know how to set it up
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-06-08T08:59:48Z
+
+Maybe you can take inspiration from the tests added to #41463?
+
+---------------------------------------------------------------------------
+
+by dragosprotung at 2021-06-08T13:29:36Z
+
+In #41463 there was no test added for the `Serializer` component after the fixes. The test was added for `Validator`, related to the changes made in `Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader`

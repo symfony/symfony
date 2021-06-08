@@ -1486,6 +1486,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         // the package is installed but in dev-mode only, check if this applies to one of the parent packages too
 
         $rootPackage = InstalledVersions::getRootPackage()['name'] ?? '';
+
+        if ('symfony/symfony' === $rootPackage) {
+            return true;
+        }
+
         foreach ($parentPackages as $parentPackage) {
             if ($rootPackage === $parentPackage || (InstalledVersions::isInstalled($parentPackage) && !InstalledVersions::isInstalled($parentPackage, false))) {
                 return true;

@@ -130,13 +130,7 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
-        $env = $this->env;
-        $this->env = null;
-        try {
-            $this->loadContent($content, $path);
-        } finally {
-            $this->env = $env;
-        }
+        $this->loadContent($content, $path);
 
         // per-env configuration
         if ($this->env && isset($content['when@'.$this->env])) {
@@ -144,7 +138,13 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The "when@%s" key should contain an array in "%s". Check your YAML syntax.', $this->env, $path));
             }
 
-            $this->loadContent($content['when@'.$this->env], $path);
+            $env = $this->env;
+            $this->env = null;
+            try {
+                $this->loadContent($content['when@'.$env], $path);
+            } finally {
+                $this->env = $env;
+            }
         }
     }
 

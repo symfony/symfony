@@ -172,6 +172,43 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadWithEnvironment()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'dev');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on dev',
+            'root_parameter' => 'value when on dev',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'test');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on test',
+            'root_parameter' => 'value when on test',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'prod');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'value when on prod',
+            'root_parameter' => 'value when on prod',
+        ], $container->getParameterBag()->all());
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'), 'other');
+        $loader->load('services29.yml');
+
+        self::assertSame([
+            'imported_parameter' => 'default value',
+            'root_parameter' => 'default value',
+        ], $container->getParameterBag()->all());
+    }
+
     public function testLoadServices()
     {
         $container = new ContainerBuilder();

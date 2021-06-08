@@ -173,14 +173,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Finalizes the value of this node.
-     *
-     * @param mixed $value
-     *
-     * @return mixed The finalized value
-     *
-     * @throws UnsetKeyException
-     * @throws InvalidConfigurationException if the node doesn't have enough children
+     * {@inheritdoc}
      */
     protected function finalizeValue($value)
     {
@@ -208,13 +201,8 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Normalizes the value.
+     * {@inheritdoc}
      *
-     * @param mixed $value The value to normalize
-     *
-     * @return mixed The normalized value
-     *
-     * @throws InvalidConfigurationException
      * @throws DuplicateKeyException
      */
     protected function normalizeValue($value)
@@ -282,15 +270,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Merges values together.
-     *
-     * @param mixed $leftSide  The left side to merge
-     * @param mixed $rightSide The right side to merge
-     *
-     * @return mixed The merged values
-     *
-     * @throws InvalidConfigurationException
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
     protected function mergeValues($leftSide, $rightSide)
     {

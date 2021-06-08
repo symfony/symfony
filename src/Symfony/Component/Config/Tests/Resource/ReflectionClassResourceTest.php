@@ -64,7 +64,7 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature($changeExpected, $changedLine, $changedCode, $setContext = null)
+    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, ?\Closure $setContext = null)
     {
         if ($setContext) {
             $setContext();
@@ -117,43 +117,43 @@ EOPHP;
         }
     }
 
-    public function provideHashedSignature()
+    public function provideHashedSignature(): iterable
     {
-        yield [0, 0, "// line change\n\n"];
-        yield [1, 0, '/** class docblock */'];
-        yield [1, 1, 'abstract class %s'];
-        yield [1, 1, 'final class %s'];
-        yield [1, 1, 'class %s extends Exception'];
-        yield [1, 1, 'class %s implements '.DummyInterface::class];
-        yield [1, 3, 'const FOO = 456;'];
-        yield [1, 3, 'const BAR = 123;'];
-        yield [1, 4, '/** pub docblock */'];
-        yield [1, 5, 'protected $pub = [];'];
-        yield [1, 5, 'public $pub = [123];'];
-        yield [1, 6, '/** prot docblock */'];
-        yield [1, 7, 'private $prot;'];
-        yield [0, 8, '/** priv docblock */'];
-        yield [0, 9, 'private $priv = 123;'];
-        yield [1, 10, '/** pub docblock */'];
-        yield [1, 11, 'public function pub(...$arg) {}'];
-        yield [1, 11, 'public function pub($arg = null): Foo {}'];
-        yield [0, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
-        yield [1, 12, '/** prot docblock */'];
-        yield [1, 13, 'protected function prot($a = [123]) {}'];
-        yield [0, 14, '/** priv docblock */'];
-        yield [0, 15, ''];
+        yield [false, 0, "// line change\n\n"];
+        yield [true, 0, '/** class docblock */'];
+        yield [true, 1, 'abstract class %s'];
+        yield [true, 1, 'final class %s'];
+        yield [true, 1, 'class %s extends Exception'];
+        yield [true, 1, 'class %s implements '.DummyInterface::class];
+        yield [true, 3, 'const FOO = 456;'];
+        yield [true, 3, 'const BAR = 123;'];
+        yield [true, 4, '/** pub docblock */'];
+        yield [true, 5, 'protected $pub = [];'];
+        yield [true, 5, 'public $pub = [123];'];
+        yield [true, 6, '/** prot docblock */'];
+        yield [true, 7, 'private $prot;'];
+        yield [false, 8, '/** priv docblock */'];
+        yield [false, 9, 'private $priv = 123;'];
+        yield [true, 10, '/** pub docblock */'];
+        yield [true, 11, 'public function pub(...$arg) {}'];
+        yield [true, 11, 'public function pub($arg = null): Foo {}'];
+        yield [false, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
+        yield [true, 12, '/** prot docblock */'];
+        yield [true, 13, 'protected function prot($a = [123]) {}'];
+        yield [false, 14, '/** priv docblock */'];
+        yield [false, 15, ''];
 
         if (\PHP_VERSION_ID >= 70400) {
             // PHP7.4 typed properties without default value are
             // undefined, make sure this doesn't throw an error
-            yield [1, 5, 'public array $pub;'];
-            yield [0, 7, 'protected int $prot;'];
-            yield [0, 9, 'private string $priv;'];
+            yield [true, 5, 'public array $pub;'];
+            yield [false, 7, 'protected int $prot;'];
+            yield [false, 9, 'private string $priv;'];
         }
 
-        yield [1, 17, 'public function ccc($bar = 187) {}'];
-        yield [1, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
-        yield [1, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
+        yield [true, 17, 'public function ccc($bar = 187) {}'];
+        yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}'];
+        yield [true, 17, null, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
     public function testEventSubscriber()

@@ -116,7 +116,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForConvertDomToArray
      */
-    public function testConvertDomToArray($expected, $xml, $root = false, $checkPrefix = true)
+    public function testConvertDomToArray($expected, string $xml, bool $root = false, bool $checkPrefix = true)
     {
         $dom = new \DOMDocument();
         $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
@@ -124,7 +124,7 @@ class XmlUtilsTest extends TestCase
         $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
     }
 
-    public function getDataForConvertDomToArray()
+    public function getDataForConvertDomToArray(): array
     {
         return [
             [null, ''],
@@ -155,7 +155,7 @@ class XmlUtilsTest extends TestCase
         $this->assertSame($expected, XmlUtils::phpize($value));
     }
 
-    public function getDataForPhpize()
+    public function getDataForPhpize(): array
     {
         return [
             ['', ''],

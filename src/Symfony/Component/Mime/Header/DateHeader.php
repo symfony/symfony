@@ -30,7 +30,7 @@ final class DateHeader extends AbstractHeader
     /**
      * @param \DateTimeInterface $body
      */
-    public function setBody($body)
+    public function setBody(mixed $body)
     {
         $this->setDateTime($body);
     }

@@ -58,7 +58,7 @@ class AddressTest extends TestCase
 
     public function testCreateWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         Address::create(new \stdClass());
     }
 
@@ -73,7 +73,7 @@ class AddressTest extends TestCase
 
     public function testCreateArrayWrongArg()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
         Address::createArray([new \stdClass()]);
     }
 

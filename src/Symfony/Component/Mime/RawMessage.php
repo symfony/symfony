@@ -20,10 +20,7 @@ class RawMessage
 {
     private $message;
 
-    /**
-     * @param iterable|string $message
-     */
-    public function __construct($message)
+    public function __construct(iterable|string $message)
     {
         $this->message = $message;
     }

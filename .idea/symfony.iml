@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Doctrine" isTestSource="false" packagePrefix="Symfony\Bridge\Doctrine\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Monolog" isTestSource="false" packagePrefix="Symfony\Bridge\Monolog\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/ProxyManager" isTestSource="false" packagePrefix="Symfony\Bridge\ProxyManager\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bridge/Twig" isTestSource="false" packagePrefix="Symfony\Bridge\Twig\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Bundle" isTestSource="false" packagePrefix="Symfony\Bundle\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Symfony/Component" isTestSource="false" packagePrefix="Symfony\Component\" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

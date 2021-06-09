@@ -27,7 +27,7 @@ class PackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return [
             ['v1', '', 'http://example.com/foo', 'http://example.com/foo'],

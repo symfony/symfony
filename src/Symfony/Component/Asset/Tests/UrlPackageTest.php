@@ -31,7 +31,7 @@ class UrlPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public function getConfigs()
+    public function getConfigs(): array
     {
         return [
             ['http://example.net', '', 'http://example.com/foo', 'http://example.com/foo'],
@@ -72,7 +72,7 @@ class UrlPackageTest extends TestCase
         $this->assertSame($expected, $package->getUrl($path));
     }
 
-    public function getContextConfigs()
+    public function getContextConfigs(): array
     {
         return [
             [false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'],
@@ -114,7 +114,7 @@ class UrlPackageTest extends TestCase
         new UrlPackage($baseUrls, new EmptyVersionStrategy());
     }
 
-    public function getWrongBaseUrlConfig()
+    public function getWrongBaseUrlConfig(): array
     {
         return [
             ['not-a-url'],

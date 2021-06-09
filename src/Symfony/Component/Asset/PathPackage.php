@@ -26,7 +26,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class PathPackage extends Package
 {
-    private $basePath;
+    private string $basePath;
 
     /**
      * @param string $basePath The base path to be prepended to relative paths
@@ -66,7 +66,7 @@ class PathPackage extends Package
      *
      * @return string The base path
      */
-    public function getBasePath()
+    public function getBasePath(): string
     {
         return $this->getContext()->getBasePath().$this->basePath;
     }

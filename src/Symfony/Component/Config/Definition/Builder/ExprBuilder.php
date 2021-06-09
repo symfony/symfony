@@ -37,7 +37,7 @@ class ExprBuilder
      */
     public function always(\Closure $then = null)
     {
-        $this->ifPart = function ($v) { return true; };
+        $this->ifPart = function () { return true; };
 
         if (null !== $then) {
             $this->thenPart = $then;
@@ -168,7 +168,7 @@ class ExprBuilder
      */
     public function thenEmptyArray()
     {
-        $this->thenPart = function ($v) { return []; };
+        $this->thenPart = function () { return []; };
 
         return $this;
     }
@@ -198,7 +198,7 @@ class ExprBuilder
      */
     public function thenUnset()
     {
-        $this->thenPart = function ($v) { throw new UnsetKeyException('Unsetting key.'); };
+        $this->thenPart = function () { throw new UnsetKeyException('Unsetting key.'); };
 
         return $this;
     }

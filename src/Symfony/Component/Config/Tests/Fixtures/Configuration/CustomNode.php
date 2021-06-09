@@ -7,22 +7,22 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 class CustomNode implements NodeInterface
 {
-    public function getName()
+    public function getName(): string
     {
         return 'custom_node';
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return 'custom';
     }
 
-    public function isRequired()
+    public function isRequired(): bool
     {
         return false;
     }
 
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return true;
     }

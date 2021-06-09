@@ -75,7 +75,12 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
     }
 
     /**
-     * PHP 8 detects .csv files as "application/csv" while PHP 7 returns "text/plain".
+     * PHP 8 detects .csv files as "application/csv" (or "text/csv", depending
+     * on your system) while PHP 7 returns "text/plain".
+     *
+     * "text/csv" is described by RFC 7111.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7111
      *
      * @requires PHP 8
      */
@@ -84,7 +89,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
         $mt = new MimeTypes();
 
         $mime = $mt->guessMimeType(__DIR__.'/Fixtures/mimetypes/abc.csv');
-        $this->assertSame('application/csv', $mime);
+        $this->assertContains($mime, ['application/csv', 'text/csv']);
         $this->assertSame(['csv'], $mt->getExtensions($mime));
     }
 }

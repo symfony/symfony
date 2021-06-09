@@ -26,7 +26,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     /**
      * Ensures that the value is smaller than the given reference.
      *
-     * @param mixed $max
+     * @param int|float $max
      *
      * @return $this
      *
@@ -45,7 +45,7 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     /**
      * Ensures that the value is bigger than the given reference.
      *
-     * @param mixed $min
+     * @param int|float $min
      *
      * @return $this
      *

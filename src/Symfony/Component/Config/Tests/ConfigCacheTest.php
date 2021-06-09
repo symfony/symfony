@@ -38,7 +38,7 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
+    public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug)
     {
         unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ConfigCache($this->cacheFile, $debug);
@@ -60,7 +60,7 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testIsFreshWhenNoResourceProvided($debug)
+    public function testIsFreshWhenNoResourceProvided(bool $debug)
     {
         $cache = new ConfigCache($this->cacheFile, $debug);
         $cache->write('', []);
@@ -89,7 +89,7 @@ class ConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function debugModes()
+    public function debugModes(): array
     {
         return [
             [true],

@@ -16,6 +16,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderAwareInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordHasherAdapter;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * A generic hasher factory implementation.
@@ -38,7 +39,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getPasswordHasher($user): PasswordHasherInterface
+    public function getPasswordHasher(string|PasswordAuthenticatedUserInterface|PasswordHasherAwareInterface $user): PasswordHasherInterface
     {
         $hasherKey = null;
 

@@ -91,5 +91,5 @@ interface HttpClientInterface
      * @param ResponseInterface|ResponseInterface[]|iterable $responses One or more responses created by the current HTTP client
      * @param float|null                                     $timeout   The idle timeout before yielding timeout chunks
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface;
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface;
 }

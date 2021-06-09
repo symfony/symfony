@@ -27,7 +27,7 @@ class FilesystemLoader extends Loader
     /**
      * @param string|string[] $templatePathPatterns An array of path patterns to look for templates
      */
-    public function __construct($templatePathPatterns)
+    public function __construct(string|array $templatePathPatterns)
     {
         $this->templatePathPatterns = (array) $templatePathPatterns;
     }

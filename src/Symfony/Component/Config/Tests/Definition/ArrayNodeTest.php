@@ -58,7 +58,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['beta' => 'foo']);
     }
 
-    public function ignoreAndRemoveMatrixProvider()
+    public function ignoreAndRemoveMatrixProvider(): array
     {
         $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
 
@@ -71,9 +71,11 @@ class ArrayNodeTest extends TestCase
     }
 
     /**
+     * @param array|\Exception $expected
+     *
      * @dataProvider ignoreAndRemoveMatrixProvider
      */
-    public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
+    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, $expected, string $message = '')
     {
         if ($expected instanceof \Exception) {
             $this->expectException(\get_class($expected));
@@ -88,7 +90,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getPreNormalizationTests
      */
-    public function testPreNormalize($denormalized, $normalized)
+    public function testPreNormalize(array $denormalized, array $normalized)
     {
         $node = new ArrayNode('foo');
 
@@ -98,7 +100,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($node, $denormalized));
     }
 
-    public function getPreNormalizationTests()
+    public function getPreNormalizationTests(): array
     {
         return [
             [
@@ -123,7 +125,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getZeroNamedNodeExamplesData
      */
-    public function testNodeNameCanBeZero($denormalized, $normalized)
+    public function testNodeNameCanBeZero(array $denormalized, array $normalized)
     {
         $zeroNode = new ArrayNode(0);
         $zeroNode->addChild(new ScalarNode('name'));
@@ -140,7 +142,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($rootNode, $denormalized));
     }
 
-    public function getZeroNamedNodeExamplesData()
+    public function getZeroNamedNodeExamplesData(): array
     {
         return [
             [
@@ -171,7 +173,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getPreNormalizedNormalizedOrderedData
      */
-    public function testChildrenOrderIsMaintainedOnNormalizeValue($prenormalized, $normalized)
+    public function testChildrenOrderIsMaintainedOnNormalizeValue(array $prenormalized, array $normalized)
     {
         $scalar1 = new ScalarNode('1');
         $scalar2 = new ScalarNode('2');
@@ -187,7 +189,7 @@ class ArrayNodeTest extends TestCase
         $this->assertSame($normalized, $r->invoke($node, $prenormalized));
     }
 
-    public function getPreNormalizedNormalizedOrderedData()
+    public function getPreNormalizedNormalizedOrderedData(): array
     {
         return [
             [
@@ -297,7 +299,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getDataWithIncludedExtraKeys
      */
-    public function testMergeWithoutIgnoringExtraKeys($prenormalizeds, $merged)
+    public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds)
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('merge() expects a normalized config array.');
@@ -315,7 +317,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getDataWithIncludedExtraKeys
      */
-    public function testMergeWithIgnoringAndRemovingExtraKeys($prenormalizeds, $merged)
+    public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds)
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('merge() expects a normalized config array.');
@@ -333,7 +335,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getDataWithIncludedExtraKeys
      */
-    public function testMergeWithIgnoringExtraKeys($prenormalizeds, $merged)
+    public function testMergeWithIgnoringExtraKeys(array $prenormalizeds, array $merged)
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -346,7 +348,7 @@ class ArrayNodeTest extends TestCase
         $this->assertEquals($merged, $r->invoke($node, ...$prenormalizeds));
     }
 
-    public function getDataWithIncludedExtraKeys()
+    public function getDataWithIncludedExtraKeys(): array
     {
         return [
             [

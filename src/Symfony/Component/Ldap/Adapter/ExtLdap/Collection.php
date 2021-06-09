@@ -90,21 +90,21 @@ class Collection implements CollectionInterface
     /**
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset)
     {
         $this->toArray();
 
         return isset($this->entries[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset)
     {
         $this->toArray();
 
         return $this->entries[$offset] ?? null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value)
     {
         $this->toArray();
 

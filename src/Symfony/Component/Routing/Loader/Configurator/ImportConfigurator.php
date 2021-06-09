@@ -52,7 +52,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix, bool $trailingSlashOnRoot = true): self
+    final public function prefix(string|array $prefix, bool $trailingSlashOnRoot = true): self
     {
         $this->addPrefix($this->route, $prefix, $trailingSlashOnRoot);
 
@@ -78,7 +78,7 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function host($host): self
+    final public function host(string|array $host): self
     {
         $this->addHost($this->route, $host);
 

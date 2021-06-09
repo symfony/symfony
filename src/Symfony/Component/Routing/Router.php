@@ -94,10 +94,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     private static $cache = [];
 
-    /**
-     * @param mixed $resource The main resource to load
-     */
-    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(LoaderInterface $loader, mixed $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->loader = $loader;
         $this->resource = $resource;
@@ -155,11 +152,9 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Sets an option.
      *
-     * @param mixed $value The value
-     *
      * @throws \InvalidArgumentException
      */
-    public function setOption(string $key, $value)
+    public function setOption(string $key, mixed $value)
     {
         if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));

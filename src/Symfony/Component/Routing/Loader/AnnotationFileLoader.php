@@ -26,9 +26,6 @@ class AnnotationFileLoader extends FileLoader
 {
     protected $loader;
 
-    /**
-     * @throws \RuntimeException
-     */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {
         if (!\function_exists('token_get_all')) {
@@ -43,14 +40,11 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Loads from annotations from a file.
      *
-     * @param string      $file A PHP file path
-     * @param string|null $type The resource type
-     *
      * @return RouteCollection|null A RouteCollection instance
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
-    public function load($file, string $type = null)
+    public function load(mixed $file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -73,7 +67,7 @@ class AnnotationFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports(mixed $resource, string $type = null)
     {
         return \is_string($resource) && 'php' === pathinfo($resource, \PATHINFO_EXTENSION) && (!$type || 'annotation' === $type);
     }

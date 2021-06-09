@@ -309,11 +309,9 @@ class RequestContext
     /**
      * Sets a parameter value.
      *
-     * @param mixed $parameter The parameter value
-     *
      * @return $this
      */
-    public function setParameter(string $name, $parameter)
+    public function setParameter(string $name, mixed $parameter)
     {
         $this->parameters[$name] = $parameter;
 

@@ -75,7 +75,7 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix): self
+    final public function prefix(string|array $prefix): self
     {
         if (\is_array($prefix)) {
             if (null === $this->parentPrefixes) {
@@ -108,7 +108,7 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function host($host): self
+    final public function host(string|array $host): self
     {
         $this->host = $host;
 

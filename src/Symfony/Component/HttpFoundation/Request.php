@@ -420,12 +420,12 @@ class Request
 
         $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
-        
+
         if (isset($server['IIS_WasUrlRewritten']) && '1' == $server['IIS_WasUrlRewritten']
             && isset($server['UNENCODED_URL']) && !empty($server['UNENCODED_URL'])) {
             $server['UNENCODED_URL'] = $server['REQUEST_URI'];
         }
-        
+
         return self::createRequestFromFactory($query, $request, [], $cookies, $files, $server, $content);
     }
 

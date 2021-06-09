@@ -22,8 +22,8 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class Packages
 {
-    private ?PackageInterface $defaultPackage;
-    private array $packages = [];
+    private $defaultPackage;
+    private $packages = [];
 
     /**
      * @param PackageInterface[] $packages Additional packages indexed by name

@@ -116,7 +116,7 @@ class PasswordHasherFactory implements PasswordHasherFactoryInterface
         if ('auto' === $config['algorithm']) {
             // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
             if (SodiumPasswordHasher::isSupported()) {
-                $algorithms = ['native', 'sodium', 'pbkdf2'];
+                $algorithms = ['sodium', 'native', 'pbkdf2'];
             } else {
                 $algorithms = ['native', 'pbkdf2'];
             }

@@ -55,7 +55,10 @@ class InstantiatorTest extends TestCase
             "\0".__NAMESPACE__."\Foo\0priv" => 234,
         ];
 
-        $this->assertSame($expected, (array) Instantiator::instantiate(Bar::class, ['priv' => 123], [Foo::class => ['priv' => 234]]));
+        $actual = (array) Instantiator::instantiate(Bar::class, ['priv' => 123], [Foo::class => ['priv' => 234]]);
+        ksort($actual);
+
+        $this->assertSame($expected, $actual);
 
         $e = Instantiator::instantiate('Exception', ['foo' => 123, 'trace' => [234]]);
 

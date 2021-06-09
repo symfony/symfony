@@ -4,17 +4,26 @@ on:
   push:
   pull_request:
 
-jobs:
+defaults:
+  run:
+    shell: bash
 
+jobs:
   integration:
     name: Integration
     runs-on: Ubuntu-20.04
 
     strategy:
       matrix:
-        php: ['7.1', '8.0']
+        php: ['7.2', '8.0']
 
     services:
+      postgres:
+        image: postgres:9.6-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: 'password'
       ldap:
         image: bitnami/openldap
         ports:
@@ -58,18 +67,69 @@ jobs:
         image: rabbitmq:3.8.3
         ports:
           - 5672:5672
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+      couchbase:
+        image: couchbase:6.5.1
+        ports:
+          - 8091:8091
+          - 8092:8092
+          - 8093:8093
+          - 8094:8094
+          - 11210:11210
+      sqs:
+        image: asyncaws/testing-sqs
+        ports:
+          - 9494:9494
+      zookeeper:
+        image: wurstmeister/zookeeper:3.4.6
+      kafka:
+        image: wurstmeister/kafka:2.12-2.4.1
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+          KAFKA_CREATE_TOPICS: 'test-topic:1:1:compact'
+          KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+          KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+          KAFKA_ADVERTISED_PORT: 9092
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install system dependencies
+        run: |
+          echo "::group::apt-get update"
+          sudo apt-get update
+          echo "::endgroup::"
+
+          echo "::group::install tools & libraries"
+          sudo apt-get install librdkafka-dev
+          echo "::endgroup::"
+
+      - name: Configure Couchbase
+        run: |
+          curl -s -u 'username=Administrator&password=111111' -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex%2Cfts'
+          curl -s -X POST http://localhost:8091/settings/web -d 'username=Administrator&password=111111&port=SAME'
+          curl -s -u Administrator:111111 -X POST http://localhost:8091/pools/default/buckets -d 'ramQuotaMB=100&bucketType=ephemeral&name=cache'
+          curl -s -u Administrator:111111 -X POST  http://localhost:8091/pools/default -d 'memoryQuota=256'
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          extensions: "memcached,redis,xsl,ldap"
+          extensions: "json,couchbase,memcached,mongodb,redis,rdkafka,xsl,ldap"
           ini-values: "memory_limit=-1"
           php-version: "${{ matrix.php }}"
+          tools: pecl
+
+      - name: Display versions
+        run: |
+          php -r 'foreach (get_loaded_extensions() as $extension) echo $extension . " " . phpversion($extension) . PHP_EOL;'
+          php -i
 
       - name: Load fixtures
         uses: docker://bitnami/openldap
@@ -84,9 +144,21 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
 
+      - name: Determine composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=directory::$(composer config cache-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.directory }}
+          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ matrix.php }}-composer-
+
       - name: Install dependencies
         run: |
           echo "::group::composer update"
+          composer require --dev --no-update mongodb/mongodb:@stable
           composer update --no-progress --ansi
           echo "::endgroup::"
           echo "::group::install phpunit"
@@ -102,9 +174,14 @@ jobs:
           REDIS_SENTINEL_SERVICE: redis_sentinel
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
+          MESSENGER_SQS_DSN: "sqs://localhost:9494/messages?sslmode=disable&poll_timeout=0.01"
+          MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:9494/messages.fifo?sslmode=disable&poll_timeout=0.01"
           MEMCACHED_HOST: localhost
           LDAP_HOST: localhost
           LDAP_PORT: 3389
+          MONGODB_HOST: localhost
+          KAFKA_BROKER: 127.0.0.1:9092
+          POSTGRES_HOST: localhost
 
       #- name: Run HTTP push tests
       #  if: matrix.php == '8.0'

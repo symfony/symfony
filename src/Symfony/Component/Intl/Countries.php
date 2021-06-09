@@ -109,7 +109,7 @@ final class Countries extends ResourceBundle
      *
      * @return string[]
      */
-    public static function getNames($displayLocale = null): array
+    public static function getNames(?string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
     }
@@ -121,7 +121,7 @@ final class Countries extends ResourceBundle
      *
      * @return string[]
      */
-    public static function getAlpha3Names($displayLocale = null): array
+    public static function getAlpha3Names(?string $displayLocale = null): array
     {
         $alpha2Names = self::getNames($displayLocale);
         $alpha3Names = [];

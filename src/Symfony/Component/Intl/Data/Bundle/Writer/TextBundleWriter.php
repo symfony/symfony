@@ -29,7 +29,7 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function write(string $path, string $locale, $data, bool $fallback = true)
+    public function write(string $path, string $locale, mixed $data, bool $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 
@@ -46,7 +46,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResourceBundle($file, string $bundleName, $value, bool $fallback)
+    private function writeResourceBundle($file, string $bundleName, mixed $value, bool $fallback)
     {
         fwrite($file, $bundleName);
 
@@ -63,7 +63,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResource($file, $value, int $indentation, bool $requireBraces = true)
+    private function writeResource($file, mixed $value, int $indentation, bool $requireBraces = true)
     {
         if (\is_int($value)) {
             $this->writeInteger($file, $value);

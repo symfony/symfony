@@ -14,21 +14,18 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
-use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @group legacy
- */
 class UserAuthenticationProviderTest extends TestCase
 {
     public function testSupports()
@@ -50,11 +47,11 @@ class UserAuthenticationProviderTest extends TestCase
 
     public function testAuthenticateWhenUsernameIsNotFound()
     {
-        $this->expectException(UserNotFoundException::class);
+        $this->expectException(UsernameNotFoundException::class);
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->willThrowException(new UserNotFoundException())
+                 ->willThrowException(new UsernameNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -66,7 +63,7 @@ class UserAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->willThrowException(new UserNotFoundException())
+                 ->willThrowException(new UsernameNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -192,11 +189,55 @@ class UserAuthenticationProviderTest extends TestCase
               ->willReturn('foo')
         ;
 
+        $token->expects($this->once())
+              ->method('getRoles')
+              ->willReturn([])
+        ;
+
         $authToken = $provider->authenticate($token);
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $authToken);
         $this->assertSame($user, $authToken->getUser());
         $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
+        $this->assertEquals('foo', $authToken->getCredentials());
+        $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAuthenticateWithPreservingRoleSwitchUserRole()
+    {
+        $user = $this->createMock(UserInterface::class);
+        $user->expects($this->once())
+             ->method('getRoles')
+             ->willReturn(['ROLE_FOO'])
+        ;
+
+        $provider = $this->getProvider();
+        $provider->expects($this->once())
+                 ->method('retrieveUser')
+                 ->willReturn($user)
+        ;
+
+        $token = $this->getSupportedToken();
+        $token->expects($this->once())
+              ->method('getCredentials')
+              ->willReturn('foo')
+        ;
+
+        $switchUserRole = new SwitchUserRole('foo', $this->createMock(TokenInterface::class));
+        $token->expects($this->once())
+              ->method('getRoles')
+              ->willReturn([$switchUserRole])
+        ;
+
+        $authToken = $provider->authenticate($token);
+
+        $this->assertInstanceOf(UsernamePasswordToken::class, $authToken);
+        $this->assertSame($user, $authToken->getUser());
+        $this->assertContains('ROLE_FOO', $authToken->getRoleNames());
+        $this->assertContains($switchUserRole, $authToken->getRoles());
         $this->assertEquals('foo', $authToken->getCredentials());
         $this->assertEquals(['foo' => 'bar'], $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
@@ -216,7 +257,7 @@ class UserAuthenticationProviderTest extends TestCase
         ;
 
         $originalToken = $this->createMock(TokenInterface::class);
-        $token = new SwitchUserToken(new InMemoryUser('wouter', null), 'foo', 'key', [], $originalToken);
+        $token = new SwitchUserToken($this->createMock(UserInterface::class), 'foo', 'key', [], $originalToken);
         $token->setAttributes(['foo' => 'bar']);
 
         $authToken = $provider->authenticate($token);
@@ -231,10 +272,10 @@ class UserAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getFirewallName', 'getRoles'])->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder(UsernamePasswordToken::class)->setMethods(['getCredentials', 'getProviderKey', 'getRoles'])->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
-            ->method('getFirewallName')
+            ->method('getProviderKey')
             ->willReturn('key')
         ;
 

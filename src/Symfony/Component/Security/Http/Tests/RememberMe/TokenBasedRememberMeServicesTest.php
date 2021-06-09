@@ -17,11 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
+use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class TokenBasedRememberMeServicesTest extends TestCase
 {
@@ -50,6 +51,12 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() + 3600, 'foopass'));
 
+        $userProvider
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->willThrowException(new UsernameNotFoundException('user not found'))
+        ;
+
         $this->assertNull($service->autoLogin($request));
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
@@ -61,8 +68,19 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
-        $user = new InMemoryUser('foouser', 'foopass');
-        $userProvider->createUser($user);
+        $user = $this->createMock(UserInterface::class);
+        $user
+            ->expects($this->once())
+            ->method('getPassword')
+            ->willReturn('foopass')
+        ;
+
+        $userProvider
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($this->equalTo('foouser'))
+            ->willReturn($user)
+        ;
 
         $this->assertNull($service->autoLogin($request));
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
@@ -75,8 +93,19 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
-        $user = new InMemoryUser('foouser', 'foopass');
-        $userProvider->createUser($user);
+        $user = $this->createMock(UserInterface::class);
+        $user
+            ->expects($this->once())
+            ->method('getPassword')
+            ->willReturn('foopass')
+        ;
+
+        $userProvider
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($this->equalTo('foouser'))
+            ->willReturn($user)
+        ;
 
         $this->assertNull($service->autoLogin($request));
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
@@ -89,18 +118,34 @@ class TokenBasedRememberMeServicesTest extends TestCase
      */
     public function testAutoLogin($username)
     {
+        $user = $this->createMock(UserInterface::class);
+        $user
+            ->expects($this->once())
+            ->method('getRoles')
+            ->willReturn(['ROLE_FOO'])
+        ;
+        $user
+            ->expects($this->once())
+            ->method('getPassword')
+            ->willReturn('foopass')
+        ;
+
         $userProvider = $this->getProvider();
-        $user = new InMemoryUser($username, 'foopass', ['ROLE_FOO']);
-        $userProvider->createUser($user);
+        $userProvider
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($this->equalTo($username))
+            ->willReturn($user)
+        ;
 
         $service = $this->getService($userProvider, ['name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600]);
         $request = new Request();
-        $request->cookies->set('foo', $this->getCookie(InMemoryUser::class, $username, time() + 3600, 'foopass'));
+        $request->cookies->set('foo', $this->getCookie('fooclass', $username, time() + 3600, 'foopass'));
 
         $returnedToken = $service->autoLogin($request);
 
         $this->assertInstanceOf(RememberMeToken::class, $returnedToken);
-        $this->assertTrue($user->isEqualTo($returnedToken->getUser()));
+        $this->assertSame($user, $returnedToken->getUser());
         $this->assertEquals('foosecret', $returnedToken->getSecret());
     }
 
@@ -169,8 +214,18 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $user = new InMemoryUser('foouser', 'foopass');
         $token = $this->createMock(TokenInterface::class);
+        $user = $this->createMock(UserInterface::class);
+        $user
+            ->expects($this->once())
+            ->method('getPassword')
+            ->willReturn('foopass')
+        ;
+        $user
+            ->expects($this->once())
+            ->method('getUsername')
+            ->willReturn('foouser')
+        ;
         $token
             ->expects($this->atLeastOnce())
             ->method('getUser')
@@ -224,6 +279,13 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     protected function getProvider()
     {
-        return new InMemoryUserProvider();
+        $provider = $this->createMock(UserProviderInterface::class);
+        $provider
+            ->expects($this->any())
+            ->method('supportsClass')
+            ->willReturn(true)
+        ;
+
+        return $provider;
     }
 }

@@ -12,14 +12,24 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class RoleVoterTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    /**
+     * @group legacy
+     * @dataProvider getVoteTests
+     */
+    public function testVote($roles, $attributes, $expected)
+    {
+        $voter = new RoleVoter();
+
+        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+    }
 
     /**
      * @dataProvider getVoteTests
@@ -49,13 +59,34 @@ class RoleVoterTest extends TestCase
 
     /**
      * @group legacy
+     * @dataProvider getLegacyVoteOnRoleObjectsTests
      */
-    public function testDeprecatedRolePreviousAdmin()
+    public function testVoteOnRoleObjects($roles, $attributes, $expected)
     {
-        $this->expectDeprecation('Since symfony/security-core 5.1: The ROLE_PREVIOUS_ADMIN role is deprecated and will be removed in version 6.0, use the IS_IMPERSONATOR attribute instead.');
         $voter = new RoleVoter();
 
-        $voter->vote($this->getTokenWithRoleNames(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN']), null, ['ROLE_PREVIOUS_ADMIN']);
+        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+    }
+
+    public function getLegacyVoteOnRoleObjectsTests()
+    {
+        return [
+            [['ROLE_BAR'], [new Role('ROLE_BAR')], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_BAR'], [new Role('ROLE_FOO')], VoterInterface::ACCESS_DENIED],
+        ];
+    }
+
+    protected function getToken(array $roles)
+    {
+        foreach ($roles as $i => $role) {
+            $roles[$i] = new Role($role);
+        }
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+              ->method('getRoles')
+              ->willReturn($roles);
+
+        return $token;
     }
 
     protected function getTokenWithRoleNames(array $roles)

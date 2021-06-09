@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler;
+use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class CookieClearingLogoutHandlerTest extends TestCase
 {

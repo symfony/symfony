@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Http\Logout\CsrfTokenClearingLogoutHandler;
+use Symfony\Component\Security\Http\Tests\Fixtures\TokenInterface;
 
 class CsrfTokenClearingLogoutHandlerTest extends TestCase
 {

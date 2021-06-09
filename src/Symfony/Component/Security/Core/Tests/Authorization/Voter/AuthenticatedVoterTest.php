@@ -15,10 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class AuthenticatedVoterTest extends TestCase
 {
@@ -53,15 +52,6 @@ class AuthenticatedVoterTest extends TestCase
             ['fully', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_GRANTED],
             ['remembered', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
             ['anonymously', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
-
-            ['fully', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
-            ['remembered', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
-            ['anonymously', ['IS_ANONYMOUS'], VoterInterface::ACCESS_GRANTED],
-
-            ['fully', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['remembered', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['anonymously', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
-            ['impersonated', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_GRANTED],
         ];
     }
 
@@ -71,8 +61,6 @@ class AuthenticatedVoterTest extends TestCase
             return $this->createMock(TokenInterface::class);
         } elseif ('remembered' === $authenticated) {
             return $this->getMockBuilder(RememberMeToken::class)->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
-        } elseif ('impersonated' === $authenticated) {
-            return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
         } else {
             return $this->getMockBuilder(AnonymousToken::class)->setConstructorArgs(['', ''])->getMock();
         }

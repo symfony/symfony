@@ -13,39 +13,25 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token\Storage;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class UsageTrackingTokenStorageTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testGetSetToken()
     {
         $sessionAccess = 0;
-        $sessionLocator = new class(['request_stack' => function () use (&$sessionAccess) {
+        $sessionLocator = new class(['session' => function () use (&$sessionAccess) {
+            ++$sessionAccess;
+
             $session = $this->createMock(SessionInterface::class);
+            $session->expects($this->once())
+                    ->method('getMetadataBag');
 
-            $request = new Request();
-            $request->setSession($session);
-            $requestStack = $this->getMockBuilder(RequestStack::class)->setMethods(['getSession'])->getMock();
-            $requestStack->push($request);
-            $requestStack->expects($this->any())->method('getSession')->willReturnCallback(function () use ($session, &$sessionAccess) {
-                ++$sessionAccess;
-
-                $session->expects($this->once())
-                        ->method('getMetadataBag');
-
-                return $session;
-            });
-
-            return $requestStack;
+            return $session;
         }]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
@@ -53,7 +39,7 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $sessionLocator);
 
         $this->assertNull($trackingStorage->getToken());
-        $token = new NullToken();
+        $token = $this->createMock(TokenInterface::class);
 
         $trackingStorage->setToken($token);
         $this->assertSame($token, $trackingStorage->getToken());
@@ -67,23 +53,5 @@ class UsageTrackingTokenStorageTest extends TestCase
         $trackingStorage->disableUsageTracking();
         $this->assertSame($token, $trackingStorage->getToken());
         $this->assertSame(1, $sessionAccess);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testWithoutMainRequest()
-    {
-        $locator = new class(['request_stack' => function () {
-            return new RequestStack();
-        }]) implements ContainerInterface {
-            use ServiceLocatorTrait;
-        };
-        $tokenStorage = new TokenStorage();
-        $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $locator);
-        $trackingStorage->enableUsageTracking();
-
-        $this->expectDeprecation('Since symfony/security-core 5.3: Using "%s" (service ID: "security.token_storage") outside the request-response cycle is deprecated, use the "%s" class (service ID: "security.untracked_token_storage") instead or disable usage tracking using "disableUsageTracking()".');
-        $trackingStorage->getToken();
     }
 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface as StrictTokenInterface;
 
 class VoterTest extends TestCase
 {
@@ -22,7 +23,7 @@ class VoterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->token = $this->createMock(TokenInterface::class);
+        $this->token = $this->createMock(StrictTokenInterface::class);
     }
 
     public function getTests()

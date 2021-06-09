@@ -7,6 +7,7 @@ CHANGELOG
  * Add autowiring alias for `HttpCache\StoreInterface`
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
  * Deprecate the public `profiler` service to private
+ * Add support for `statusCode` default parameter when loading a template directly from route using the `Symfony\Bundle\FrameworkBundle\Controller\TemplateController` controller
 
 5.3
 ---
@@ -47,6 +48,7 @@ CHANGELOG
 
 5.1.0
 -----
+
  * Removed `--no-backup` option from `translation:update` command (broken since `5.0.0`)
  * Added link to source for controllers registered as named services
  * Added link to source on controller on `router:match`/`debug:router` (when `framework.ide` is configured)

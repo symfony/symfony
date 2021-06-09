@@ -12,15 +12,12 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testSetUnsupportedStrategy()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -39,17 +36,45 @@ class AccessDecisionManagerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideStrategies
-     * @group legacy
+     * @dataProvider getStrategiesWith2RolesTests
      */
-    public function testDeprecatedVoter($strategy)
+    public function testLegacyStrategiesWith2Roles($token, $strategy, $voter, $expected)
+    {
+        $manager = new AccessDecisionManager([$voter], $strategy);
+
+        $this->assertSame($expected, $manager->decide($token, ['ROLE_FOO', 'ROLE_BAR']));
+    }
+
+    public function getStrategiesWith2RolesTests()
     {
         $token = $this->createMock(TokenInterface::class);
-        $manager = new AccessDecisionManager([$this->getVoter(3)], $strategy);
 
-        $this->expectDeprecation('Since symfony/security-core 5.3: Returning "3" in "%s::vote()" is deprecated, return one of "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" constants: "ACCESS_GRANTED", "ACCESS_DENIED" or "ACCESS_ABSTAIN".');
+        return [
+            [$token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_DENIED), false],
+            [$token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_GRANTED), true],
 
-        $manager->decide($token, ['ROLE_FOO']);
+            [$token, 'consensus', $this->getVoter(VoterInterface::ACCESS_DENIED), false],
+            [$token, 'consensus', $this->getVoter(VoterInterface::ACCESS_GRANTED), true],
+
+            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_DENIED), false],
+            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED), false],
+            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_DENIED), false],
+            [$token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_GRANTED), true],
+        ];
+    }
+
+    protected function getVoterFor2Roles($token, $vote1, $vote2)
+    {
+        $voter = $this->createMock(VoterInterface::class);
+        $voter->expects($this->any())
+              ->method('vote')
+              ->willReturnMap([
+                  [$token, null, ['ROLE_FOO'], $vote1],
+                  [$token, null, ['ROLE_BAR'], $vote2],
+              ])
+        ;
+
+        return $voter;
     }
 
     public function getStrategyTests()
@@ -84,40 +109,7 @@ class AccessDecisionManagerTest extends TestCase
 
             [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), false, true, false],
             [AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), true, true, true],
-
-            // priority
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-            ], true, true, true],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_DENIED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-                $this->getVoter(VoterInterface::ACCESS_GRANTED),
-            ], true, true, false],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-            ], false, true, false],
-
-            [AccessDecisionManager::STRATEGY_PRIORITY, [
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-                $this->getVoter(VoterInterface::ACCESS_ABSTAIN),
-            ], true, true, true],
         ];
-    }
-
-    public function provideStrategies()
-    {
-        yield [AccessDecisionManager::STRATEGY_AFFIRMATIVE];
-        yield [AccessDecisionManager::STRATEGY_CONSENSUS];
-        yield [AccessDecisionManager::STRATEGY_UNANIMOUS];
-        yield [AccessDecisionManager::STRATEGY_PRIORITY];
     }
 
     protected function getVoters($grants, $denies, $abstains)

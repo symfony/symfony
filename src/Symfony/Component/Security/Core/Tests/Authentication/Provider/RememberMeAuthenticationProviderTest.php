@@ -14,18 +14,15 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LogicException;
-use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\Tests\Fixtures\TokenInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @group legacy
- */
 class RememberMeAuthenticationProviderTest extends TestCase
 {
     public function testSupports()
@@ -62,7 +59,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $this->expectExceptionMessage('Method "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken::getUser()" must return a "Symfony\Component\Security\Core\User\UserInterface" instance, "string" returned.');
 
         $provider = $this->getProvider();
-        $token = new RememberMeToken(new InMemoryUser('dummyuser', null), 'foo', 'test');
+        $token = new RememberMeToken(new User('dummyuser', null), 'foo', 'test');
         $token->setUser('stringish-user');
         $provider->authenticate($token);
     }
@@ -108,10 +105,10 @@ class RememberMeAuthenticationProviderTest extends TestCase
                 ->willReturn([]);
         }
 
-        $token = $this->getMockBuilder(RememberMeToken::class)->setMethods(['getFirewallName'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
+        $token = $this->getMockBuilder(RememberMeToken::class)->setMethods(['getProviderKey'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
         $token
             ->expects($this->once())
-            ->method('getFirewallName')
+            ->method('getProviderKey')
             ->willReturn('foo');
 
         return $token;

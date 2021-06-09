@@ -140,7 +140,7 @@ abstract class AbstractUid implements \JsonSerializable
     /**
      * Returns whether the argument is an AbstractUid and contains the same value as the current instance.
      */
-    public function equals($other): bool
+    public function equals(mixed $other): bool
     {
         if (!$other instanceof self) {
             return false;

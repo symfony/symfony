@@ -135,7 +135,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function extract($resource, MessageCatalogue $catalog)
+    public function extract(string|iterable $resource, MessageCatalogue $catalog)
     {
         $files = $this->extractFiles($resource);
         foreach ($files as $file) {
@@ -156,11 +156,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * Normalizes a token.
      *
-     * @param mixed $token
-     *
      * @return string|null
      */
-    protected function normalizeToken($token)
+    protected function normalizeToken(mixed $token)
     {
         if (isset($token[1]) && 'b"' !== $token) {
             return $token[1];
@@ -327,7 +325,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    protected function extractFromDirectory($directory)
+    protected function extractFromDirectory(string|array $directory)
     {
         $finder = new Finder();
 

@@ -27,8 +27,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     private $parent;
 
     /**
-     * @param string $locale   The locale
-     * @param array  $messages An array of messages classified by domain
+     * @param array $messages An array of messages classified by domain
      */
     public function __construct(string $locale, array $messages = [])
     {
@@ -283,7 +282,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function setMetadata(string $key, $value, string $domain = 'messages')
+    public function setMetadata(string $key, mixed $value, string $domain = 'messages')
     {
         $this->metadata[$domain][$key] = $value;
     }

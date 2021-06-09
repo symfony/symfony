@@ -31,7 +31,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $locale, string $domain = 'messages')
+    public function load(mixed $resource, string $locale, string $domain = 'messages')
     {
         if (!class_exists(XmlUtils::class)) {
             throw new RuntimeException('Loading translations from the Xliff format requires the Symfony Config component.');
@@ -75,7 +75,7 @@ class XliffFileLoader implements LoaderInterface
         return $catalogue;
     }
 
-    private function extract($dom, MessageCatalogue $catalogue, string $domain)
+    private function extract(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
     {
         $xliffVersion = XliffUtils::getVersionNumber($dom);
 

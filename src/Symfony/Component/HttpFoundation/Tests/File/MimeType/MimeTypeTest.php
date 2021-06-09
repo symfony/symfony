@@ -65,8 +65,7 @@ class MimeTypeTest extends TestCase
 
     public function testGuessWithDuplicatedFileType()
     {
-        $type = MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.docx');
-        $this->assertTrue(\in_array($type, ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'], true));
+        $this->assertContains(MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.docx'), ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip']);
     }
 
     public function testGuessWithIncorrectPath()

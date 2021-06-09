@@ -97,7 +97,7 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption(string $name, $value)
+    public function setOption(string $name, array|string|int|bool $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));

@@ -49,6 +49,7 @@ class Table
      */
     private $rows = [];
     private $horizontal = false;
+    private $vertical = false;
 
     /**
      * Column widths cache.
@@ -318,6 +319,13 @@ class Table
         return $this;
     }
 
+    public function setVertical(bool $vertical = true): self
+    {
+        $this->vertical = $vertical;
+
+        return $this;
+    }
+
     /**
      * Renders table to output.
      *
@@ -334,8 +342,12 @@ class Table
     public function render()
     {
         $divider = new TableSeparator();
+        $isCellWithColspan = static function ($cell): bool {
+            return $cell instanceof TableCell && $cell->getColspan() >= 2;
+        };
+
+        $rows = [];
         if ($this->horizontal) {
-            $rows = [];
             foreach ($this->headers[0] ?? [] as $i => $header) {
                 $rows[$i] = [$header];
                 foreach ($this->rows as $row) {
@@ -344,10 +356,43 @@ class Table
                     }
                     if (isset($row[$i])) {
                         $rows[$i][] = $row[$i];
-                    } elseif ($rows[$i][0] instanceof TableCell && $rows[$i][0]->getColspan() >= 2) {
+                    } elseif ($isCellWithColspan($rows[$i][0])) {
                         // Noop, there is a "title"
                     } else {
                         $rows[$i][] = null;
+                    }
+                }
+            }
+        } elseif ($this->vertical) {
+            $maxHeaderLength = max(array_map(static function (string $header) {
+                return mb_strlen($header);
+            }, $this->headers[0] ?? ['']));
+
+            foreach ($this->rows as $row) {
+                if ($row instanceof TableSeparator) {
+                    continue;
+                }
+
+                if (0 < \count($rows)) {
+                    $rows[] = [$divider];
+                }
+
+                $containsColspan = 0 < \count(array_filter($row, static function ($cell) use ($isCellWithColspan): bool {
+                    return $isCellWithColspan($cell);
+                }));
+
+                $headers = $this->headers[0] ?? [];
+                $maxRows = max(\count($headers), \count($row));
+                for ($i = 0; $i < $maxRows; ++$i) {
+                    $cell = (string) ($row[$i] ?? '');
+                    if (!empty($headers) && !$containsColspan) {
+                        $rows[] = [sprintf(
+                            '<comment>%s</>: %s',
+                            str_pad($headers[$i] ?? '', $maxHeaderLength, ' ', \STR_PAD_LEFT),
+                            $cell
+                        )];
+                    } elseif (!empty($cell)) {
+                        $rows[] = [$cell];
                     }
                 }
             }
@@ -386,6 +431,11 @@ class Table
                     $this->renderRowSeparator(self::SEPARATOR_TOP, $this->headerTitle, $this->style->getHeaderTitleFormat());
                 }
             }
+            if ($this->vertical) {
+                $isHeader = false;
+                $isFirstRow = false;
+            }
+
             if ($this->horizontal) {
                 $this->renderRow($row, $this->style->getCellRowFormat(), $this->style->getCellHeaderFormat());
             } else {

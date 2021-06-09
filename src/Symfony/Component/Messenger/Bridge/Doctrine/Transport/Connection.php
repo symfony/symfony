@@ -445,4 +445,7 @@ class Connection implements ResetInterface
         }
     }
 }
-class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\Connection::class, false)) {
+    class_alias(Connection::class, \Symfony\Component\Messenger\Transport\Doctrine\Connection::class);
+}

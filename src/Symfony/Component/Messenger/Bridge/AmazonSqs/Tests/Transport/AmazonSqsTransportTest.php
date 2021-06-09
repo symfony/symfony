@@ -177,6 +177,20 @@ class AmazonSqsTransportTest extends TestCase
 
     private function createHttpException(): HttpException
     {
-        return new ServerException($this->createMock(ResponseInterface::class));
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getInfo')->willReturnCallback(static function (?string $type = null) {
+            $info = [
+                'http_code' => 500,
+                'url' => 'https://symfony.com',
+            ];
+
+            if (null === $type) {
+                return $info;
+            }
+
+            return $info[$type] ?? null;
+        });
+
+        return new ServerException($response);
     }
 }

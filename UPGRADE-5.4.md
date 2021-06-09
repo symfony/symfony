@@ -5,6 +5,7 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `AdapterInterface` autowiring alias, use `CacheItemPoolInterface` instead
+ * Deprecate the public `profiler` service to private
 
 HttpKernel
 ----------

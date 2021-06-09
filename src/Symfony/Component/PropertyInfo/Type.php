@@ -179,16 +179,7 @@ class Type
     {
         trigger_deprecation('symfony/property-info', '5.3', 'The "%s()" method is deprecated, use "getCollectionValueTypes()" instead.', __METHOD__);
 
-        $type = $this->getCollectionValueTypes();
-        if (0 === \count($type)) {
-            return null;
-        }
-
-        if (\is_array($type)) {
-            [$type] = $type;
-        }
-
-        return $type;
+        return $this->getCollectionValueTypes()[0] ?? null;
     }
 
     /**

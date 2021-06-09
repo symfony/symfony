@@ -171,4 +171,7 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
         );
     }
 }
-class_alias(DoctrineReceiver::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceiver::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceiver::class, false)) {
+    class_alias(DoctrineReceiver::class, \Symfony\Component\Messenger\Transport\Doctrine\DoctrineReceiver::class);
+}

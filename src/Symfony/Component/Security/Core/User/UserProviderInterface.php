@@ -57,4 +57,13 @@ interface UserProviderInterface
      * @return bool
      */
     public function supportsClass(string $class);
+
+    /**
+     * @return UserInterface
+     *
+     * @throws UserNotFoundException
+     *
+     * @deprecated since Symfony 5.3, use loadUserByIdentifier() instead
+     */
+    public function loadUserByUsername(string $username);
 }

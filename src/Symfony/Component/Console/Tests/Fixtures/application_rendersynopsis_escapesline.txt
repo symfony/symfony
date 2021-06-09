@@ -1,0 +1,7 @@
+
+In ApplicationTest.php line %d:
+                  
+  some exception  
+                  
+
+foo [<info>]

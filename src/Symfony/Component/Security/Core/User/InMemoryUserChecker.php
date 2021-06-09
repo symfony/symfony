@@ -67,4 +67,7 @@ class InMemoryUserChecker implements UserCheckerInterface
         }
     }
 }
-class_alias(InMemoryUserChecker::class, UserChecker::class);
+
+if (!class_exists(UserChecker::class, false)) {
+    class_alias(InMemoryUserChecker::class, UserChecker::class);
+}

@@ -1450,6 +1450,10 @@ class FrameworkExtension extends Extension
             ->setArgument(2, $config['not_compromised_password']['enabled'])
             ->setArgument(3, $config['not_compromised_password']['endpoint'])
         ;
+
+        if (!class_exists(ExpressionLanguage::class)) {
+            $container->removeDefinition('validator.expression_language');
+        }
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)

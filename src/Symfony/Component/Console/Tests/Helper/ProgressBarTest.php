@@ -535,7 +535,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     public function testRedrawFrequencyIsAtLeastOneIfSmallerOneGiven()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
-        $bar->setRedrawFrequency(0.9);
+        $bar->setRedrawFrequency(0);
         $bar->start();
         $bar->advance();
 

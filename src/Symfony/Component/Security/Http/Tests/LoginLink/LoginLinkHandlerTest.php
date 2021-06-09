@@ -211,6 +211,11 @@ class TestLoginLinkHandlerUserProvider implements UserProviderInterface
         $this->users[$user->getUserIdentifier()] = $user;
     }
 
+    public function loadUserByUsername($username): TestLoginLinkHandlerUser
+    {
+        return $this->loadUserByIdentifier($username);
+    }
+
     public function loadUserByIdentifier(string $userIdentifier): TestLoginLinkHandlerUser
     {
         if (!isset($this->users[$userIdentifier])) {

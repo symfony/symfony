@@ -33,4 +33,7 @@ class AmqpFactory
         return new \AMQPExchange($channel);
     }
 }
-class_alias(AmqpFactory::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory::class, false)) {
+    class_alias(AmqpFactory::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory::class);
+}

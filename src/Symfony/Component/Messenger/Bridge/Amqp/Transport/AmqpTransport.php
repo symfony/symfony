@@ -92,4 +92,7 @@ class AmqpTransport implements TransportInterface, SetupableTransportInterface, 
         return $this->sender = new AmqpSender($this->connection, $this->serializer);
     }
 }
-class_alias(AmqpTransport::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport::class);
+
+if (!class_exists(\Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport::class, false)) {
+    class_alias(AmqpTransport::class, \Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport::class);
+}

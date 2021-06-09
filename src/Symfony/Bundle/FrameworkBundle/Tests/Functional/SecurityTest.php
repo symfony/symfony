@@ -38,6 +38,7 @@ class SecurityTest extends AbstractWebTestCase
         yield ['the-username', ['ROLE_FOO'], null];
         yield ['the-username', ['ROLE_FOO'], 'main'];
         yield ['other-username', ['ROLE_FOO'], 'custom'];
+        yield ['stateless-username', ['ROLE_FOO'], 'stateless'];
 
         yield ['the-username', ['ROLE_FOO'], null];
         yield ['no-role-username', [], null];

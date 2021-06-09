@@ -17,6 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
@@ -93,6 +94,12 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('validator.constraint_validator', [
                 'alias' => NotCompromisedPasswordValidator::class,
+            ])
+
+        ->set('validator.when', WhenValidator::class)
+            ->args([service('validator.expression_language')->nullOnInvalid()])
+            ->tag('validator.constraint_validator', [
+                'alias' => WhenValidator::class,
             ])
 
         ->set('validator.property_info_loader', PropertyInfoLoader::class)

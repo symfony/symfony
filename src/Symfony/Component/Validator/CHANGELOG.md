@@ -4,6 +4,7 @@ CHANGELOG
 6.2
 ---
 
+ * Add the `When` constraint and validator
  * Deprecate the "loose" e-mail validation mode, use "html5" instead
  * Add the `negate` option to the `Expression` constraint, to inverse the logic of the violation's creation
 

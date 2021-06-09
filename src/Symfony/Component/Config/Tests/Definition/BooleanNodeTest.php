@@ -20,7 +20,7 @@ class BooleanNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize($value)
+    public function testNormalize(bool $value)
     {
         $node = new BooleanNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -28,10 +28,8 @@ class BooleanNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param bool $value
      */
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues(bool $value)
     {
         $node = new BooleanNode('test');
         $node->setAllowEmptyValue(false);
@@ -39,7 +37,7 @@ class BooleanNodeTest extends TestCase
         $this->assertSame($value, $node->finalize($value));
     }
 
-    public function getValidValues()
+    public function getValidValues(): array
     {
         return [
             [false],
@@ -57,7 +55,7 @@ class BooleanNodeTest extends TestCase
         $node->normalize($value);
     }
 
-    public function getInvalidValues()
+    public function getInvalidValues(): array
     {
         return [
             [null],

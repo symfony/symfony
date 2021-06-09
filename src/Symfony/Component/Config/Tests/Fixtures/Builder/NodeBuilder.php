@@ -12,10 +12,11 @@
 namespace Symfony\Component\Config\Tests\Fixtures\Builder;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder as BaseNodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 class NodeBuilder extends BaseNodeBuilder
 {
-    public function barNode($name)
+    public function barNode($name): NodeDefinition
     {
         return $this->node($name, 'bar');
     }
@@ -23,9 +24,8 @@ class NodeBuilder extends BaseNodeBuilder
     protected function getNodeClass(string $type): string
     {
         switch ($type) {
-            case 'variable':
-                return __NAMESPACE__.'\\'.ucfirst($type).'NodeDefinition';
             case 'bar':
+            case 'variable':
                 return __NAMESPACE__.'\\'.ucfirst($type).'NodeDefinition';
             default:
                 return parent::getNodeClass($type);

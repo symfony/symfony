@@ -51,7 +51,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getEncoderTests()
+    public function getEncoderTests(): array
     {
         $configs = [];
 
@@ -120,7 +120,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $denormalized, $normalized);
     }
 
-    public function getAnonymousKeysTests()
+    public function getAnonymousKeysTests(): array
     {
         $configs = [];
 
@@ -151,7 +151,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
     }
 
-    public function getNumericKeysTests()
+    public function getNumericKeysTests(): array
     {
         $configs = [];
 
@@ -233,10 +233,9 @@ class NormalizationTest extends TestCase
         self::assertSame($normalized, $tree->normalize($denormalized));
     }
 
-    private function getNumericKeysTestTree()
+    private function getNumericKeysTestTree(): NodeInterface
     {
-        $tb = new TreeBuilder('root', 'array');
-        $tree = $tb
+        return (new TreeBuilder('root', 'array'))
             ->getRootNode()
                 ->children()
                     ->node('thing', 'array')
@@ -247,9 +246,6 @@ class NormalizationTest extends TestCase
                     ->end()
                 ->end()
             ->end()
-            ->buildTree()
-        ;
-
-        return $tree;
+            ->buildTree();
     }
 }

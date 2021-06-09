@@ -42,7 +42,7 @@ class ArrayNodeDefinitionTest extends TestCase
     /**
      * @dataProvider providePrototypeNodeSpecificCalls
      */
-    public function testPrototypeNodeSpecificOption($method, $args)
+    public function testPrototypeNodeSpecificOption(string $method, array $args)
     {
         $this->expectException(InvalidDefinitionException::class);
         $node = new ArrayNodeDefinition('root');
@@ -52,7 +52,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function providePrototypeNodeSpecificCalls()
+    public function providePrototypeNodeSpecificCalls(): array
     {
         return [
             ['defaultValue', [[]]],
@@ -98,9 +98,11 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
+     * @param int|array|string|null $args
+     *
      * @dataProvider providePrototypedArrayNodeDefaults
      */
-    public function testPrototypedArrayNodeDefault($args, $shouldThrowWhenUsingAttrAsKey, $shouldThrowWhenNotUsingAttrAsKey, $defaults)
+    public function testPrototypedArrayNodeDefault($args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -132,7 +134,7 @@ class ArrayNodeDefinitionTest extends TestCase
         }
     }
 
-    public function providePrototypedArrayNodeDefaults()
+    public function providePrototypedArrayNodeDefaults(): array
     {
         return [
             [null, true, false, [[]]],
@@ -173,7 +175,7 @@ class ArrayNodeDefinitionTest extends TestCase
     /**
      * @dataProvider getEnableableNodeFixtures
      */
-    public function testTrueEnableEnabledNode($expected, $config, $message)
+    public function testTrueEnableEnabledNode(array $expected, array $config, string $message)
     {
         $processor = new Processor();
         $node = new ArrayNodeDefinition('root');
@@ -293,7 +295,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals($node->prototype('enum'), $node->enumPrototype());
     }
 
-    public function getEnableableNodeFixtures()
+    public function getEnableableNodeFixtures(): array
     {
         return [
             [['enabled' => true, 'foo' => 'bar'], [true], 'true enables an enableable node'],
@@ -435,7 +437,10 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame($expectedName, $this->getField($actualNode, 'name'));
     }
 
-    protected function getField($object, $field)
+    /**
+     * @param object $object
+     */
+    protected function getField($object, string $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
         $reflection->setAccessible(true);

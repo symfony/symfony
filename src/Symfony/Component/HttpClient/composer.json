@@ -18,13 +18,13 @@
         "php-http/async-client-implementation": "*",
         "php-http/client-implementation": "*",
         "psr/http-client-implementation": "1.0",
-        "symfony/http-client-implementation": "2.4"
+        "symfony/http-client-implementation": "2.5"
     },
     "require": {
         "php": ">=8.0.2",
         "psr/log": "^1.0",
         "symfony/deprecation-contracts": "^2.1",
-        "symfony/http-client-contracts": "^2.4",
+        "symfony/http-client-contracts": "^2.5",
         "symfony/service-contracts": "^1.0|^2"
     },
     "require-dev": {

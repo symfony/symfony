@@ -96,7 +96,7 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface, LoggerAw
     /**
      * {@inheritdoc}
      */
-    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }

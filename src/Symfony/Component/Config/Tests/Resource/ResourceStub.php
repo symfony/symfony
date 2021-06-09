@@ -17,7 +17,7 @@ class ResourceStub implements SelfCheckingResourceInterface
 {
     private $fresh = true;
 
-    public function setFresh($isFresh)
+    public function setFresh(bool $isFresh): void
     {
         $this->fresh = $isFresh;
     }

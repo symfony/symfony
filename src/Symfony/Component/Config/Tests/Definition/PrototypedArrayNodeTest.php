@@ -264,7 +264,7 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
-    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, $expected)
+    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, array $expected)
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);
@@ -280,7 +280,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEquals($expected, $normalized);
     }
 
-    public function getDataForKeyRemovedLeftValueOnly()
+    public function getDataForKeyRemovedLeftValueOnly(): array
     {
         $scalarValue = new ScalarNode('value');
 
@@ -342,7 +342,7 @@ class PrototypedArrayNodeTest extends TestCase
     /**
      * @dataProvider getPrototypedArrayNodeDataToMerge
      */
-    public function testPrototypedArrayNodeMerge($left, $right, $expected)
+    public function testPrototypedArrayNodeMerge(array $left, array $right, array $expected)
     {
         $node = new PrototypedArrayNode('options');
         $node->setNormalizeKeys(false);
@@ -354,7 +354,7 @@ class PrototypedArrayNodeTest extends TestCase
         self::assertSame($result, $expected);
     }
 
-    public function getPrototypedArrayNodeDataToMerge()
+    public function getPrototypedArrayNodeDataToMerge(): array
     {
         return [
             // data to merged is a plain array

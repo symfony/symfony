@@ -49,7 +49,7 @@ class XmlReferenceDumper
 
         // xml remapping
         if ($node->getParent()) {
-            $remapping = array_filter($node->getParent()->getXmlRemappings(), function ($mapping) use ($rootName) {
+            $remapping = array_filter($node->getParent()->getXmlRemappings(), function (array $mapping) use ($rootName) {
                 return $rootName === $mapping[1];
             });
 

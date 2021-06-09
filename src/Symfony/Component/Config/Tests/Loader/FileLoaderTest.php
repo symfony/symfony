@@ -165,22 +165,12 @@ class TestFileLoader extends FileLoader
         return $this->supports;
     }
 
-    public function addLoading($resource)
+    public function addLoading(string $resource): void
     {
         self::$loading[$resource] = true;
     }
 
-    public function removeLoading($resource)
-    {
-        unset(self::$loading[$resource]);
-    }
-
-    public function clearLoading()
-    {
-        self::$loading = [];
-    }
-
-    public function setSupports($supports)
+    public function setSupports(bool $supports): void
     {
         $this->supports = $supports;
     }

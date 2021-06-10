@@ -119,6 +119,15 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
 
     private function generateSignature(\ReflectionClass $class): iterable
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $attributes = [];
+            foreach ($class->getAttributes() as $a) {
+                $attributes[] = [$a->getName(), $a->getArguments()];
+            }
+            yield print_r($attributes, true);
+            $attributes = [];
+        }
+
         yield $class->getDocComment();
         yield (int) $class->isFinal();
         yield (int) $class->isAbstract();
@@ -135,6 +144,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             $defaults = $class->getDefaultProperties();
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
+                if (\PHP_VERSION_ID >= 80000) {
+                    foreach ($p->getAttributes() as $a) {
+                        $attributes[] = [$a->getName(), $a->getArguments()];
+                    }
+                    yield print_r($attributes, true);
+                    $attributes = [];
+                }
+
                 yield $p->getDocComment();
                 yield $p->isDefault() ? '<default>' : '';
                 yield $p->isPublic() ? 'public' : 'protected';
@@ -145,9 +162,25 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
+            if (\PHP_VERSION_ID >= 80000) {
+                foreach ($m->getAttributes() as $a) {
+                    $attributes[] = [$a->getName(), $a->getArguments()];
+                }
+                yield print_r($attributes, true);
+                $attributes = [];
+            }
+
             $defaults = [];
             $parametersWithUndefinedConstants = [];
             foreach ($m->getParameters() as $p) {
+                if (\PHP_VERSION_ID >= 80000) {
+                    foreach ($p->getAttributes() as $a) {
+                        $attributes[] = [$a->getName(), $a->getArguments()];
+                    }
+                    yield print_r($attributes, true);
+                    $attributes = [];
+                }
+
                 if (!$p->isDefaultValueAvailable()) {
                     $defaults[$p->name] = null;
 

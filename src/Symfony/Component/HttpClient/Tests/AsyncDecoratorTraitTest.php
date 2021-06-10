@@ -19,10 +19,11 @@ use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 class AsyncDecoratorTraitTest extends NativeHttpClientTest
 {
-    protected function getHttpClient(string $testCase, \Closure $chunkFilter = null): HttpClientInterface
+    protected function getHttpClient(string $testCase, \Closure $chunkFilter = null, HttpClientInterface $decoratedClient = null): HttpClientInterface
     {
         if ('testHandleIsRemovedOnException' === $testCase) {
             $this->markTestSkipped("AsyncDecoratorTrait doesn't cache handles");
@@ -30,7 +31,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $chunkFilter = $chunkFilter ?? static function (ChunkInterface $chunk, AsyncContext $context) { yield $chunk; };
 
-        return new class(parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
+        return new class($decoratedClient ?? parent::getHttpClient($testCase), $chunkFilter) implements HttpClientInterface {
             use AsyncDecoratorTrait;
 
             private $chunkFilter;
@@ -302,5 +303,31 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
 
         $this->assertSame(404, $response->getStatusCode());
         $this->assertStringContainsString('injectedFoo', $response->getContent(false));
+    }
+
+    public function testConsumingDecoratedClient()
+    {
+        $client = $this->getHttpClient(__FUNCTION__, null, new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
+            use AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                $response = $this->client->request($method, $url, $options);
+                $response->getStatusCode(); // should  be avoided and breaks compatibility with AsyncDecoratorTrait
+
+                return $response;
+            }
+
+            public function stream($responses, float $timeout = null): ResponseStreamInterface
+            {
+                return $this->client->stream($responses, $timeout);
+            }
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Instance of "Symfony\Component\HttpClient\Response\NativeResponse" is already consumed and cannot be managed by "Symfony\Component\HttpClient\Response\AsyncResponse". A decorated client should not call any of the response\'s methods in its "request()" method.');
+        $response->getStatusCode();
     }
 }

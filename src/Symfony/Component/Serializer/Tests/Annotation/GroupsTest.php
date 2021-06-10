@@ -26,12 +26,6 @@ class GroupsTest extends TestCase
         new Groups([]);
     }
 
-    public function testEmptyGroupsParameterLegacy()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new Groups(['value' => []]);
-    }
-
     public function testInvalidGroupsParameter()
     {
         $this->expectException(InvalidArgumentException::class);

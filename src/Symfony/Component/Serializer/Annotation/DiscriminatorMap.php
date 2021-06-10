@@ -25,11 +25,10 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DiscriminatorMap
 {
-    private $typeProperty;
-    private $mapping;
-
-    public function __construct(string $typeProperty, array $mapping)
-    {
+    public function __construct(
+        private string $typeProperty,
+        private array $mapping,
+    ) {
         if (empty($typeProperty)) {
             throw new InvalidArgumentException(sprintf('Parameter "typeProperty" of annotation "%s" cannot be empty.', static::class));
         }
@@ -37,9 +36,6 @@ class DiscriminatorMap
         if (empty($mapping)) {
             throw new InvalidArgumentException(sprintf('Parameter "mapping" of annotation "%s" cannot be empty.', static::class));
         }
-
-        $this->typeProperty = $typeProperty;
-        $this->mapping = $mapping;
     }
 
     public function getTypeProperty(): string

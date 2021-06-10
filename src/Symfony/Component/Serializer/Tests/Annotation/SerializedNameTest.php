@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -21,18 +20,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class SerializedNameTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    public function provideInvalidValues(): array
-    {
-        return [
-            [''],
-            [0],
-        ];
-    }
-
     /**
-     * @dataProvider provideInvalidValues
+     * @testWith    [""]
+     *              [0]
      */
     public function testNotAStringSerializedNameParameter($value)
     {

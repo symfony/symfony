@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.0
+---
+
+ * Remove `ArrayDenormalizer::setSerializer()`, call `setDenormalizer()` instead
+ * Remove the ability to create instances of the annotation classes by passing an array of parameters, use named arguments instead
+
 5.3
 ---
 

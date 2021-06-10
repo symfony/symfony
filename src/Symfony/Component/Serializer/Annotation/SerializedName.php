@@ -25,15 +25,11 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY)]
 final class SerializedName
 {
-    private $serializedName;
-
-    public function __construct(string $serializedName)
+    public function __construct(private string $serializedName)
     {
         if (empty($serializedName)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', static::class));
         }
-
-        $this->serializedName = $serializedName;
     }
 
     public function getSerializedName(): string

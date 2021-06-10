@@ -77,12 +77,19 @@ jobs:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -h ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
 
+      - name: Detect Symfony version
+        id: symfony-versions
+        run: |
+          echo "::set-output name=symfony-major-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-minor-version::$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+').$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+          echo "COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
@@ -115,40 +122,81 @@ jobs:
       #    sudo rm -rf .phpunit
       #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit
 
-  nightly:
-    name: PHPUnit on PHP nightly
+  phpunit:
+    name: PHPUnit
     runs-on: Ubuntu-20.04
+
+    env:
+      extensions: amqp,apcu,igbinary,intl,mbstring,memcached,mongodb,redis
+      EXCLUDE_GROUPS: benchmark,intl-data,tty,integration
+
+    strategy:
+      matrix:
+        php: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+      fail-fast: false
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Configure extensions
+        if: "${{ matrix.php == '8.0' }}"
+        # TODO: memcached is excluded because of compatibility issues with PHP 8
+        run: echo "extensions=amqp,apcu,igbinary,intl,mbstring,:memcached,mongodb,redis" >> $GITHUB_ENV
+
+      - name: Configure extensions
+        if: "${{ matrix.php == '8.1' }}"
+        # Test on PHP 8.1 with bundled extensions only and allow tests to fail for now.
+        run: |
+          echo "extensions=mbstring" >> $GITHUB_ENV
+          echo "ALLOW_FAILURE=yes" >> $GITHUB_ENV
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          ini-values: "memory_limit=-1"
-          php-version: "8.1"
+          ini-values: date.timezone=Europe/Paris,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1
+          php-version: "${{ matrix.php }}"
+          extensions: "${{ env.extensions }}"
+          tools: flex
+
+      - name: Fake PHP version
+        if: "${{ matrix.php == '8.1' }}"
+        run: composer config platform.php 8.0.99
+
+      - name: Detect Symfony version
+        id: symfony-versions
+        run: |
+          echo "::set-output name=symfony-major-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-minor-version::$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
+          echo "::set-output name=symfony-version::$(grep "const MAJOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+').$(grep "const MINOR_VERSION =" ./src/Symfony/Component/HttpKernel/Kernel.php | egrep -o '[0-9]+')"
 
       - name: Configure composer
         run: |
           COMPOSER_HOME="$(composer config home)"
-          composer self-update
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
-          echo "COMPOSER_ROOT_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*').x-dev" >> $GITHUB_ENV
+
+          echo 'COMPOSER_ROOT_VERSION=${{ steps.symfony-versions.outputs.symfony-version }}.x-dev' >> $GITHUB_ENV
+          echo 'SYMFONY_REQUIRE=>=${{ steps.symfony-versions.outputs.symfony-version }}' >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
-          echo "::group::fake PHP version"
-          composer config platform.php 8.0.99
-          echo "::group::Adjust dependencies"
-          composer require --dev --no-update masterminds/html5:~2.7.5@dev
           echo "::group::composer update"
+          composer require --dev --no-update masterminds/html5:~2.7.5@dev
           composer update --no-progress --ansi
           echo "::endgroup::"
           echo "::group::install phpunit"
           ./phpunit install
           echo "::endgroup::"
+
+      - name: Patch return types
+        if: "${{ matrix.php == '8.0' }}"
+        run: |
+          sed -i 's/"\*\*\/Tests\/"//' composer.json
+          composer install --optimize-autoloader
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php
+          SYMFONY_PATCH_TYPE_DECLARATIONS=force=1 php .github/patch-types.php # ensure the script is idempotent
+          echo EXCLUDE_GROUPS="$EXCLUDE_GROUPS,legacy" >> $GITHUB_ENV
 
       - name: Run tests
         run: |
@@ -157,17 +205,33 @@ jobs:
             echo "::group::$1"
 
             # Run the tests
-            ./phpunit --colors=always --exclude-group tty,benchmark,intl-data ./$1 2>&1 || ok=1
-            echo ::endgroup::
+            ./phpunit --colors=always --exclude-group $EXCLUDE_GROUPS ./$1 2>&1 || ok=1
+
+            echo ""
+            echo "::endgroup::"
 
             if [ $ok -ne 0 ]; then
               echo "::error::$1 failed"
             fi
 
-            # Make the tests always pass because we don't want the build to fail (yet).
-            return 0
-            #return $ok
+            if [ "$ALLOW_FAILURE" = "yes" ]; then
+              # Make the tests always pass because we don't want the build to fail (yet).
+              return 0
+            fi
+
+            return $ok
           }
           export -f _run_tests
 
           find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
+
+      - name: Run tests with SIGCHLD enabled PHP
+        if: "${{ matrix.php == '7.1' }}"
+        run: |
+          mkdir build
+          cd build
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.1.3-pcntl-sigchild.tar.bz2
+          tar -xjf php-7.1.3-pcntl-sigchild.tar.bz2
+          cd ..
+
+          ./build/php/bin/php ./phpunit --colors=always src/Symfony/Component/Process

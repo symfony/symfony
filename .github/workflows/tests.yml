@@ -169,3 +169,72 @@ jobs:
           export -f _run_tests
 
           find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests
+
+  high_deps:
+    name: PHPUnit (7.4, high deps)
+    runs-on: Ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: "none"
+          ini-values: "memory_limit=-1"
+          php-version: "7.4"
+          extensions: amqp, apcu, igbinary, intl, mbstring, memcached, mongodb, redis
+          tools: flex
+
+      - name: Configure composer
+        run: |
+          SYMFONY_VERSION=$(grep -m1 SYMFONY_VERSION .travis.yml | grep -o '[0-9.x]*')
+          SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
+          COMPOSER_HOME="$(composer config home)"
+          composer self-update
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+
+          echo COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev >> $GITHUB_ENV
+          echo SYMFONY_VERSION=$SYMFONY_VERSION >> $GITHUB_ENV
+          echo SYMFONY_REQUIRE="$SYMFONY_REQUIRE" >> $GITHUB_ENV
+
+      - name: Install PHPUnit
+        run: |
+          mkdir -p ./vendor/symfony
+          cd ./vendor/symfony
+          ln -s ../../src/Symfony/Bridge/PhpUnit phpunit-bridge
+          cd ../..
+          ./phpunit install
+          echo PHPUNIT=`pwd`/phpunit >> $GITHUB_ENV
+          echo SYMFONY_DEPRECATIONS_HELPER=weak >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          _run_tests() {
+            ok=0
+            echo "::group::$1"
+
+            # Install dependencies
+            cd ./$1
+            composer update --no-progress --ansi 2>&1  || ok=1
+
+            if [ $ok -ne 0 ]; then
+              echo "::error::$1 failed"
+              return $ok
+            fi
+
+            # Run the tests
+            $PHPUNIT --colors=always --exclude-group tty,benchmark,intl-data,legacy 2>&1 || ok=1
+            echo ::endgroup::
+
+            if [ $ok -ne 0 ]; then
+              echo "::error::$1 failed"
+            fi
+
+            # Make the tests always pass because we don't want the build to fail (yet).
+            return $ok
+          }
+          export -f _run_tests
+
+          find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -print0 | xargs -0 -n1 dirname | sort | parallel _run_tests

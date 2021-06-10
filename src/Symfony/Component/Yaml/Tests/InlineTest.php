@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
@@ -575,6 +576,14 @@ class InlineTest extends TestCase
     public function testDumpDateTime($dateTime, $expected)
     {
         $this->assertSame($expected, Inline::dump($dateTime));
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function testDumpUnitEnum()
+    {
+        $this->assertSame("!php/const Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum::BAR", Inline::dump(FooUnitEnum::BAR));
     }
 
     public function getDateTimeDumpTests()
